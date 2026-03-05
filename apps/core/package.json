@@ -1,0 +1,26 @@
+{
+  "name": "@apps/core",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "lint": "echo lint core",
+    "test": "echo test core"
+  },
+  "dependencies": {
+    "@repo/db": "workspace:*",
+    "@repo/platform": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "express": "^5.1.0",
+    "joi": "^17.13.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.2"
+  }
+}
