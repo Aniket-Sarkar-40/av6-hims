@@ -1,2 +1,2 @@
-export * from "./http/setupPlatform";
-export * from "./http/errorMiddleware";
+export * from "./http/setupPlatform.js";
+export * from "./http/errorMiddleware.js";

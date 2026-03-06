@@ -11,6 +11,8 @@
     "dev:gateway": "pnpm --filter @apps/gateway dev",
     "dev:core": "pnpm --filter @apps/core dev",
     "dev:opd": "pnpm --filter @apps/opd dev",
+    "start:gateway": "pnpm --filter @apps/gateway start",
+    "start:core": "pnpm --filter @apps/core start",
     "db:generate": "pnpm --filter @repo/db prisma:generate",
     "db:migrate": "pnpm --filter @repo/db prisma:migrate",
     "db:deploy": "pnpm --filter @repo/db prisma:deploy",
