@@ -4,9 +4,18 @@
   "type": "module",
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./client": "./src/client.ts",
-    "./generated/prisma/client": "./generated/prisma/client.js"
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./client": {
+      "types": "./dist/src/client.d.ts",
+      "default": "./dist/src/client.js"
+    },
+    "./generated/prisma/client": {
+      "types": "./generated/prisma/client.d.ts",
+      "default": "./generated/prisma/client.js"
+    }
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
