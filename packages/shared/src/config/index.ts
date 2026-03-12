@@ -30,8 +30,16 @@ export const IMAGE_URL = process.env.IMAGE_URL;
 export const LOG_DAYS = process.env.LOG_DAYS || "7d";
 export const MASTER_TABLES = ["country", "city", "state"];
 export const NO_OF_LEVELS = Number(process.env.NO_OF_LEVELS) || 3;
-export const TOKEN_VERSION = process.env.TOKEN_VERSION || "V2";
+export const TOKEN_VERSION = process.env.TOKEN_VERSION || "V1";
 export const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || ".fixuji.com";
+
+export const JWT_TOKEN = process.env.JWT_TOKEN || "access-token-fixuji";
+export const SUPER_ADMIN_ID = Number(process.env.SUPER_ADMIN_ID) || 1;
+export const PERMISSION_PREFIX = process.env.PERMISSION_PREFIX || "";
+
+export const CRON_RETRY_DELAY_MS = 5 * 60 * 1000;
+export const CRON_MAX_RETRIES = 3;
+export const CRON_IN_PROGRESS_STALE_MS = 10 * 60 * 1000;
 
 // S3 bucket
 export const HETZNER_ACCESS_KEY = String(process.env.HETZNER_ACCESS_KEY);
