@@ -17,3 +17,122 @@ enum RoundFormat {
     TRUNC
     NONE
 }
+
+enum UIN_RESET_POLICY {
+    daily
+    weekly
+    monthly
+    yearly
+    no
+}
+
+enum UinShortCode {
+    PO
+    GRN
+    POR
+    SRN
+    GATE_PASS
+    SELL
+    SELL_RETURN
+    ITEM
+    STR
+    BATCH_JOB
+    TEMP_CODE
+}
+
+enum BinaryFlag {
+    false @map("0")
+    true  @map("1")
+}
+
+enum MainLab {
+    N
+    Y
+}
+
+enum YesNoFlag {
+    yes
+    no
+}
+
+enum ServiceCode {
+    PATHOLOGY
+    OPD
+    PHARMACY
+    INVENTORY
+    CORE
+}
+
+enum TemplateType {
+    EMAIL
+    SMS
+    WHATSAPP
+    APP_NOTIFICATION
+    WEB_NOTIFICATION
+}
+
+enum NotificationType {
+    INFO
+    WARNING
+    ERROR
+    SUCCESS
+}
+
+enum NotificationPriority {
+    PRIMARY
+    SECONDARY
+    TERTIARY
+}
+
+enum AttachmentRequired {
+    REQUIRED
+    OPTIONAL
+    NOT_REQUIRED
+}
+
+enum RecipientSourceType {
+    HARDCODE
+    ROLES
+    STAFFS
+    KEY_VALUE
+}
+
+enum DeliveryStatus {
+    PROCESSING
+    COMPLETED
+    PARTIAL
+    FAILED
+}
+
+enum ServiceDomain {
+    FIXUJI
+    AV6
+    LEVEL2
+}
+
+enum PdfTemplateType {
+    BILL
+    INVOICE
+    REPORT
+}
+
+enum DiscMethod {
+    FIXED
+    PERCENTAGE
+}
+
+enum TAX_METHOD {
+    INCLUSIVE
+    EXCLUSIVE
+}
+
+enum PAYMENT_STATUS {
+    PAID
+    PARTIALLY_PAID
+    UNPAID
+}
+
+enum MasterType {
+    ML
+    CC
+}

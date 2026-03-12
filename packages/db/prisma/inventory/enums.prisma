@@ -1,0 +1,99 @@
+enum VendorType {
+    LOCAL
+    EXPORTED
+}
+
+enum Action {
+    ADDITION
+    SUBTRACTION
+}
+
+enum Batch_Type {
+    ITEM
+    ITEM_PRICING
+}
+
+enum Batch_Status {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum Batch_Details_Status {
+    SUCCESS
+    FAILED
+}
+
+enum GRN_STATUS {
+    DRAFT
+    COMPLETED
+    PENDING
+}
+
+enum RETURN_STS {
+    PENDING
+    APPROVED
+    PARTIALLY_APPROVED
+    REJECTED
+}
+
+enum InvOperation {
+    GOOD_RECEIVE
+    GOOD_RECEIVE_RETURN
+    STORE_REQUISITION
+    SELL
+    SELL_RETURN
+    STOCK_TRANSFER
+    GRN_RETURN_APPROVAL
+    SELL_RETURN_APPROVAL
+    CONSUMPTION
+    STOCK_ADJUSTMENT
+}
+
+enum DefaultUnit {
+    PACK
+    BOX
+    LITER
+    ML
+}
+
+enum PO_STATUS {
+    SENT_FOR_APPROVAL
+    APPROVED
+    REJECTED
+    DRAFT
+    RECEIVED
+    PARTIALLY_RECEIVED
+    PARTIALLY_APPROVED
+}
+
+enum STORE_REQ_STATUS {
+    Draft
+    Pending
+    Partially_Approved
+    Approved
+    Reject
+}
+
+enum STORE_REQ_ACK_STATUS {
+    ACK_PENDING
+    ACK_PARTIALLY_RECEIVED
+    ACK_RECEIVED
+}
+
+enum Consumption_Priority {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+enum Consumption_Status {
+    DRAFT
+    SENT_FOR_APPROVAL
+    APPROVED
+    REJECTED
+}
+
+enum EMAIL_TYPE {
+    GENERAL
+}

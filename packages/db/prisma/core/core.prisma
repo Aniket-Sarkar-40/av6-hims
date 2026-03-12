@@ -27,3 +27,699 @@ model CoreSettings {
 
     @@map("core_settings")
 }
+
+model CoreDynamicShortCode {
+    id           Int      @id @default(autoincrement())
+    shortCode    String   @unique @map("short_code")
+    tableName    String   @map("table_name")
+    isDTO        Boolean  @default(false) @map("is_dto")
+    isCacheable  Boolean  @default(false) @map("is_cacheable")
+    isDropDown   Boolean  @default(false) @map("is_drop_down")
+    permission   String?
+    whereClause  Json?    @map("where_clause")
+    selectClause Json?    @map("select_clause")
+    createdBy    Int?     @map("created_by")
+    updatedBy    Int?     @map("updated_by")
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    @@map("core_dynamic_short_code")
+}
+
+model CoreUINConfig {
+    id             Int              @id @default(autoincrement())
+    shortCode      UinShortCode     @map("short_code")
+    sequenceNo     BigInt           @default(0) @map("sequence_no")
+    seqResetDate   DateTime         @map("seq_reset_date") @db.Date
+    seqResetPolicy UIN_RESET_POLICY @default(no) @map("seq_reset_policy")
+    description    String?
+    uinSegments    Json             @map("uin_segments")
+    isActive       Boolean          @default(true) @map("is_active")
+    createdBy      Int?             @map("created_by")
+    updatedBy      Int?             @map("updated_by")
+    createdAt      DateTime         @default(now()) @map("created_at")
+    updatedAt      DateTime         @updatedAt @map("updated_at")
+    deletedAt      DateTime?        @map("deleted_at")
+    deletedBy      Int?             @map("deleted_by")
+
+    @@map("core_uin_config")
+}
+
+model Country {
+    id          Int     @id @default(autoincrement()) @map("num_code")
+    alpha2Code  String? @map("alpha_2_code")
+    alpha3Code  String? @map("alpha_3_code")
+    enShortName String? @map("en_short_name")
+    nationality String? @map("nationality")
+
+    state       State[] // Relation to states
+    cities      City[] // Relation to cities
+    CountryCode CountryCode?
+
+    @@map("countries")
+}
+
+model State {
+    id        Int       @id @default(autoincrement())
+    name      String
+    countryId Int       @map("country_id")
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+    country   Country   @relation(fields: [countryId], references: [id])
+    cities    City[]
+
+    @@index([countryId], name: "state_country_id_idx")
+    @@map("master_state")
+}
+
+model City {
+    id        Int       @id @default(autoincrement())
+    name      String
+    stateId   Int       @map("state_id")
+    countryId Int       @map("country_id")
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+    state     State     @relation(fields: [stateId], references: [id])
+    country   Country   @relation(fields: [countryId], references: [id])
+
+    @@index([stateId], name: "city_state_id_idx")
+    @@index([countryId], name: "city_countryId_id_idx")
+    @@map("master_city")
+}
+
+model CountryCode {
+    id          Int    @id @default(autoincrement())
+    countryCode String @unique @map("country_code")
+    countryId   Int    @unique @map("country_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedBy Int?      @map("updated_by")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedBy Int?      @map("deleted_by")
+    deletedAt DateTime? @map("deleted_at")
+    country   Country   @relation(fields: [countryId], references: [id], map: "core_country_code_country_id_fk")
+
+    @@index([countryId], name: "core_country_code_country_id_idx")
+    @@map("core_country_code")
+}
+
+model StaffCollectionCenter {
+    id                 Int        @id @default(autoincrement()) @db.Int
+    staffId            Int        @map("staff_id") @db.Int
+    collectionCenterId Int        @map("collection_center_id") @db.Int
+    isMainLab          MainLab    @map("is_main_lab")
+    addedOn            DateTime   @default(now()) @map("added_on") @db.DateTime(0)
+    modifiedOn         DateTime   @updatedAt @map("modified_on") @db.DateTime(0)
+    isActive           BinaryFlag @map("is_active")
+
+    collectionCenter CollectionCenter @relation(fields: [collectionCenterId], references: [id])
+    staff            Staff            @relation(fields: [staffId], references: [id])
+
+    @@index([collectionCenterId], name: "staff_collection_center_collection_center_id_idx")
+    @@index([staffId], name: "staff_collection_center_staff_id_idx")
+    @@map("staff_collection_center")
+}
+
+model CollectionCenter {
+    id                         Int                      @id @default(autoincrement()) @map("id")
+    colName                    String                   @map("col_name") @db.VarChar(100)
+    email                      String                   @db.VarChar(100)
+    phone                      String                   @db.VarChar(100)
+    address                    String                   @db.VarChar(255)
+    langId                     Int                      @map("lang_id")
+    dateFormat                 String                   @map("date_format") @db.VarChar(100)
+    timeFormat                 String                   @map("time_format") @db.VarChar(100)
+    currency                   String                   @db.VarChar(100)
+    currencySymbol             String                   @map("currency_symbol") @db.VarChar(50)
+    timezone                   String                   @db.VarChar(50)
+    testPrefix                 String                   @map("test_prefix") @db.VarChar(50)
+    barcodePrefix              String                   @map("barcode_prefix") @db.VarChar(50)
+    invoicePrefix              String                   @map("invoice_prefix") @db.VarChar(50)
+    disabledOn                 DateTime?                @map("disabled_on")
+    disabledBy                 String                   @default("") @map("disabled_by") @db.VarChar(100)
+    createdAt                  DateTime                 @default(now()) @map("created_at")
+    updatedAt                  DateTime                 @updatedAt @map("updated_at")
+    collectionAbbreviationName String?                  @map("collection_abbreviation_name") @db.VarChar(255)
+    isSubOrganization          BinaryFlag               @default(false) @map("is_sub_organization")
+    diseCode                   String                   @map("dise_code") @db.VarChar(100)
+    connectionCode             String                   @map("connection_code") @db.VarChar(100)
+    barcodePrinterName         String?                  @map("barcode_printer_name") @db.VarChar(255)
+    isActive                   BinaryFlag               @default(true) @map("is_active")
+    staffCollectionCenter      StaffCollectionCenter[]
+    notifications              Notification[]
+    warehouse                  InvWarehouse[]
+    branch                     InvBranch[]
+    inTransitStockFrom         InvInTransitStock[]      @relation(name: "From")
+    inTransitStockTo           InvInTransitStock[]      @relation(name: "To")
+    itemStore                  InvItemStore[]
+    itemSupplierMapping        InvItemSupplierMapping[]
+    consumption                Consumption[]
+    ItemStock                  InvItemStock[]
+    GoodReceive                InvGoodReceive[]
+    GoodReceiveReturn          InvGoodReceiveReturn[]
+    stockAdjustment            InvStockAdjustment[]
+    PurchaseOrder              InvPurchaseOrder[]
+
+    @@unique([connectionCode], name: "sch_collection_center_unique")
+    @@map("sch_collection_center")
+}
+
+model Staff {
+    id                           Int         @id @default(autoincrement())
+    employeeId                   String      @unique(map: "employee_id") @map("employee_id") @db.VarChar(200)
+    department                   String?     @db.VarChar(100)
+    designation                  String      @db.VarChar(100)
+    qualification                String?     @db.VarChar(500)
+    workExp                      String?     @map("work_exp") @db.VarChar(200)
+    specialization               String?     @db.VarChar(200)
+    name                         String      @db.VarChar(200)
+    surname                      String?     @db.VarChar(200)
+    fatherName                   String?     @map("father_name") @db.VarChar(200)
+    motherName                   String?     @map("mother_name") @db.VarChar(200)
+    contactNo                    String?     @map("contact_no") @db.VarChar(200)
+    emergencyContactName         String?     @map("emergency_contact_name") @db.VarChar(200)
+    emergencyContactNo           String?     @map("emergency_contact_no") @db.VarChar(200)
+    email                        String      @db.VarChar(200)
+    dob                          DateTime?   @db.Date
+    maritalStatus                String?     @map("marital_status") @db.VarChar(100)
+    dateOfJoining                DateTime?   @map("date_of_joining") @db.Date
+    // dateOfLeaving                String     @map("date_of_leaving")
+    localAddress                 String?     @map("local_address") @db.VarChar(300)
+    permanentAddress             String?     @map("permanent_address") @db.VarChar(200)
+    note                         String?     @db.VarChar(200)
+    image                        String?     @db.VarChar(200)
+    digitalSign                  String?     @map("digital_sign") @db.VarChar(255)
+    password                     String      @db.VarChar(250)
+    gender                       String?     @db.VarChar(50)
+    bloodGroup                   String?     @map("blood_group") @db.VarChar(100)
+    accountTitle                 String?     @map("account_title") @db.VarChar(200)
+    bankAccountNo                String?     @map("bank_account_no") @db.VarChar(200)
+    bankName                     String?     @map("bank_name") @db.VarChar(200)
+    ifscCode                     String?     @map("ifsc_code") @db.VarChar(200)
+    bankBranch                   String?     @map("bank_branch") @db.VarChar(100)
+    payscale                     String?     @db.VarChar(200)
+    basicSalary                  String?     @map("basic_salary") @db.VarChar(200)
+    epfNo                        String?     @map("epf_no") @db.VarChar(200)
+    contractType                 String?     @map("contract_type") @db.VarChar(100)
+    shift                        String?     @db.VarChar(100)
+    location                     String?     @db.VarChar(100)
+    facebook                     String?     @db.VarChar(200)
+    twitter                      String?     @db.VarChar(200)
+    linkedin                     String?     @db.VarChar(200)
+    instagram                    String?     @db.VarChar(200)
+    resume                       String?     @db.VarChar(200)
+    joiningLetter                String?     @map("joining_letter") @db.VarChar(200)
+    resignationLetter            String?     @map("resignation_letter") @db.VarChar(200)
+    otherDocumentName            String?     @map("other_document_name") @db.VarChar(200)
+    otherDocumentFile            String?     @map("other_document_file") @db.VarChar(200)
+    userId                       Int?        @map("user_id")
+    isActive                     Int         @map("is_active")
+    isEligibleDiscount           BinaryFlag? @map("is_eligible_discount")
+    isEligibleConsumption        BinaryFlag? @map("is_eligible_consumption")
+    verificationCode             String?     @map("verification_code") @db.VarChar(100)
+    noOfChildren                 Int?        @map("no_of_children")
+    age                          Int?
+    staffPlaceOfBirth            String?     @map("staff_place_of_birth") @db.VarChar(100)
+    staffNationality             String?     @map("staff_nationality") @db.VarChar(100)
+    staffHometown                String?     @map("staff_hometown") @db.VarChar(255)
+    staffReligion                String?     @map("staff_religion") @db.VarChar(100)
+    denomination                 String?     @db.VarChar(100)
+    profilePhoto                 String?     @map("profilePhoto") @db.VarChar(255)
+    hoursOfWorks                 String?     @map("hourse_of_works") @db.VarChar(100)
+    holidayEntitlement           String?     @map("holiday_entitlement") @db.VarChar(255)
+    nationalHealthInsuranceNo    String?     @map("national_health_insurance_no") @db.VarChar(255)
+    ssnitNo                      String?     @map("ssnit_no") @db.VarChar(255)
+    otherScheme                  String?     @map("other_scheme") @db.VarChar(255)
+    spouseName                   String?     @map("spouse_name") @db.VarChar(255)
+    spouseSex                    String?     @map("spouse_sex") @db.VarChar(100)
+    spouseNationality            String?     @map("spouse_nationality") @db.VarChar(100)
+    // spouseDob                    DateTime?   @map("spouse_dob") @db.Date
+    spousePhone                  String?     @map("spouse_phone") @db.VarChar(20)
+    spouseAddress                String?     @map("spouse_address") @db.Text
+    isDiscAllowed                BinaryFlag  @default(false) @map("is_disc_allowed")
+    doctorRegistrationNo         String?     @map("doctor_registration_no") @db.VarChar(100)
+    loanAmount                   Decimal?    @default(0.00) @map("loan_amount") @db.Decimal(25, 2)
+    tenure                       Int?        @default(0)
+    interestPercentage           Decimal?    @default(0.00) @map("interest_percentage") @db.Decimal(25, 2)
+    totalInterestAmount          Decimal?    @default(0.00) @map("total_interest_amount") @db.Decimal(25, 2)
+    monthlyInstallment           Decimal?    @default(0.00) @map("monthly_installment") @db.Decimal(25, 2)
+    effectiveFrom                String?     @map("effective_from") @db.VarChar(50)
+    attendancePayrollEligibility BinaryFlag? @default(false) @map("attendance_payroll_eligibility")
+    incentiveEligibility         BinaryFlag? @default(false) @map("incentive_eligibility")
+    isClinicalConsultant         BinaryFlag? @default(false) @map("is_clinical_consultant")
+    reportingHead                Int?        @map("reporting_head")
+    rememberToken                String?     @map("remember_token") @db.VarChar(255)
+    opdDepartmentId              Int?        @map("opd_department_id")
+    prefixId                     Int?        @map("prefix_id")
+    licenseName                  String?     @map("license_name") @db.VarChar(100)
+
+    //* For Alma DB
+    isOpdConsultant Boolean? @default(false) @map("is_opd_consultant")
+
+    //* For Omni DB 
+    // incentiveCalculationType     IncentiveCalculationType @default(STANDARD) @map("incentive_calculation_type")
+    // isOpdConsultant              BinaryFlag               @default(false) @map("is_opd_consultant")
+
+    employee              StaffMapping?
+    staffCollectionCenter StaffCollectionCenter[]
+    notifications         Notification[]
+
+    @@map("staff")
+}
+
+model StaffMapping {
+    id            Int               @id @default(autoincrement())
+    staffId       Int               @unique @map("staff_id")
+    designationId Int?              @map("designation_id")
+    departmentId  Int?              @map("department_id")
+    isActive      Boolean           @default(true) @map("is_active")
+    createdBy     Int?              @map("created_by")
+    updatedBy     Int?              @map("updated_by")
+    createdAt     DateTime          @default(now()) @map("created_at")
+    updatedAt     DateTime?         @updatedAt @map("updated_at")
+    deletedAt     DateTime?         @map("deleted_at")
+    deletedBy     Int?              @map("deleted_by")
+    staff         Staff             @relation(fields: [staffId], references: [id])
+    designation   StaffDesignation? @relation(fields: [designationId], references: [id])
+    Department    Department?       @relation(fields: [departmentId], references: [id])
+
+    @@index([designationId], name: "StaffEmployee_designationId_idx")
+    @@index([departmentId], name: "StaffEmployee_departmentId_idx")
+    @@index([staffId], name: "StaffEmployee_staffId_idx")
+    @@map("core_staff_employee")
+}
+
+model StaffDesignation {
+    id            Int            @id @default(autoincrement())
+    designation   String         @db.VarChar(200)
+    isActive      String         @map("is_active") @db.VarChar(100)
+    staffEmployee StaffMapping[]
+
+    @@map("staff_designation")
+}
+
+model Department {
+    id              Int            @id @default(autoincrement())
+    name            String         @map("department_name") @db.VarChar(200)
+    deptId          String         @map("dept_id") @db.VarChar(50)
+    deptDisplayText String         @map("dept_display_text") @db.VarChar(100)
+    deptSequence    Int            @map("dept_sequence")
+    isSample        BinaryFlag     @map("is_sample")
+    isAnalyte       BinaryFlag?    @map("is_analyte")
+    masterDept      Int            @map("master_dept")
+    tatData         String?        @map("tat_data") @db.LongText
+    printInTrs      YesNoFlag      @default(yes) @map("print_in_trs")
+    isActive        YesNoFlag      @map("is_active")
+    staffEmployee   StaffMapping[]
+
+    // For Alma
+    designation String? @map("designation") @db.VarChar(255)
+
+    @@map("department")
+}
+
+model Currency {
+    id        Int       @id @default(autoincrement())
+    code      String
+    name      String
+    symbol    String
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("core_currency")
+}
+
+model ServiceEvent {
+    id                   Int           @id @default(autoincrement())
+    service              ServiceCode   @default(OPD)
+    serviceDomain        ServiceDomain @default(AV6) @map("service_domain")
+    allowEmail           Boolean       @default(false) @map("allow_email")
+    allowSms             Boolean       @default(false) @map("allow_sms")
+    allowWhatsapp        Boolean       @default(false) @map("allow_whatsapp")
+    allowAppNotification Boolean       @default(false) @map("allow_app_notification")
+    allowWebNotification Boolean       @default(false) @map("allow_web_notification")
+
+    // WhatsApp
+    masterPhone String? @map("master_phone")
+    wpApiUrl    String? @map("wp_api_url")
+    wpApiKey    String? @map("wp_api_key") @db.Text
+    countryCode String? @default("+91") @map("country_code")
+    wpLanguage  String? @default("en") @map("wp_language")
+    wpCallback  String? @map("wp_callback_data")
+
+    // SMS
+    smsApiUrl   String? @map("sms_api_url")
+    smsApiKey   String? @map("sms_api_key") @db.Text
+    smsSenderId String? @map("sms_sender_id")
+
+    // app notification
+    appNotificationApiUrl String? @map("app_notification_api_url")
+
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    eventConfig     EventConfig[]
+    eventDeliveries EventDelivery[]
+
+    @@map("core_service_event")
+}
+
+model EventConfig {
+    id                   Int     @id @default(autoincrement())
+    serviceEventId       Int     @map("service_event_id")
+    eventName            String  @map("event_name")
+    shortCode            String  @map("short_code")
+    allowEmail           Boolean @default(false) @map("allow_email")
+    allowSms             Boolean @default(false) @map("allow_sms")
+    allowWhatsapp        Boolean @default(false) @map("allow_whatsapp")
+    allowAppNotification Boolean @default(false) @map("allow_app_notification")
+    allowWebNotification Boolean @default(false) @map("allow_web_notification")
+
+    // emailTemplateId              Int? @map("email_template_id")
+    // smsTemplateId                Int? @map("sms_template_id")
+    // wpTemplateId                 Int? @map("wp_template_id")
+    // appNotificationTemplateId    Int? @map("app_notification_template_id")
+    // webNotificationTemplateId    Int? @map("web_notification_template_id")
+    // webNotificationUrlTemplateId Int? @map("web_notification_url_template_id")
+    // appNotificationUrlTemplateId Int? @map("app_notification_url_template_id")
+
+    attachmentRequired AttachmentRequired   @default(NOT_REQUIRED) @map("attachment_required")
+    notificationType   NotificationType     @default(INFO) @map("notification_type")
+    priority           NotificationPriority @default(SECONDARY) @map("priority")
+    channelId          String?              @map("channel_id")
+
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    serviceEvent        ServiceEvent         @relation(fields: [serviceEventId], references: [id])
+    eventConfigKeys     EventConfigKey[]
+    eventRecipientRules EventRecipientRule[]
+    eventDeliveries     EventDelivery[]
+    templates           Template[]
+
+    @@unique([serviceEventId, eventName])
+    @@map("core_service_event_config")
+}
+
+model EventConfigKey {
+    id            Int    @id @default(autoincrement())
+    key           String @map("key")
+    defaultValue  String @map("default_value")
+    eventConfigId Int    @map("event_config_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    eventConfig EventConfig @relation(fields: [eventConfigId], references: [id])
+
+    @@index([eventConfigId], map: "event_config_key_event_config_id_idx")
+    @@map("core_event_config_key")
+}
+
+model EventRecipientRule {
+    id            Int                 @id @default(autoincrement())
+    eventConfigId Int                 @map("event_config_id")
+    templateType  TemplateType        @map("template_type")
+    sourceType    RecipientSourceType @map("source_type")
+
+    /**
+     * - WEB_NOTIFICATION:
+     * - HARDCODE recipients: {userId, level1Id, level2Id?}[]
+     * - KEY_VALUE recipients: {userId:key, level1Id:key, level2Id?:key}[]
+     * - STAFFS recipients: {userId, level1Id, level2Id?}[]
+     * - ROLES recipients: {roleId, level1Id, level2Id?}[]
+     * - Other notification types:
+     * - HARDCODE recipients: string[]
+     * - KEY_VALUE recipients: string[] (keys array)
+     * - STAFFS recipients: number[] (array of staff ids)
+     * - ROLES recipients: {roleId, level1Id, level2Id?}[]
+     */
+    config Json
+
+    isActive  Boolean   @default(true) @map("is_active")
+    sortOrder Int       @default(0) @map("sort_order")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+
+    eventConfig EventConfig @relation(fields: [eventConfigId], references: [id])
+
+    @@index([eventConfigId, templateType])
+    @@map("core_event_recipient_rule")
+}
+
+model Notification {
+    id       Int  @id @default(autoincrement())
+    level1Id Int  @map("cc_id")
+    roleId   Int? @map("role_id")
+    userId   Int? @map("user_id")
+
+    source   ServiceCode
+    type     NotificationType     @default(INFO)
+    priority NotificationPriority @default(SECONDARY)
+
+    actionType String? @map("action_type") @db.VarChar(100)
+    message    String  @db.Text
+    link       String? @db.VarChar(255)
+
+    isRead Boolean   @default(false) @map("is_read")
+    readAt DateTime? @map("read_at")
+
+    isActive Boolean @default(true) @map("is_active")
+
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    level1 CollectionCenter @relation(fields: [level1Id], references: [id])
+    user   Staff?           @relation(fields: [userId], references: [id])
+
+    @@index([level1Id], name: "notification_level1_id_idx")
+    @@index([userId], name: "notification_user_id_idx")
+    @@map("notifications")
+}
+
+model EventDelivery {
+    id            Int                   @id @default(autoincrement())
+    eventId       Int                   @map("event_id")
+    eventName     String                @map("event_name") // shortCode
+    eventConfigId Int                   @map("event_config_id")
+    service       ServiceCode
+    priority      NotificationPriority?
+
+    payload Json? @map("payload")
+
+    totalCount   Int            @default(0) @map("total_count")
+    successCount Int            @default(0) @map("success_count")
+    failedCount  Int            @default(0) @map("failed_count")
+    status       DeliveryStatus @default(PROCESSING)
+
+    startedAt  DateTime  @default(now()) @map("started_at")
+    finishedAt DateTime? @map("finished_at")
+
+    items       EventDeliveryItem[]
+    eventConfig EventConfig         @relation(fields: [eventConfigId], references: [id])
+    event       ServiceEvent        @relation(fields: [eventId], references: [id])
+
+    @@index([eventConfigId], map: "event_delivery_event_config_id_idx")
+    @@index([eventId], name: "event_delivery_event_id_idx")
+    @@map("core_event_delivery")
+}
+
+model EventDeliveryItem {
+    id               Int          @id @default(autoincrement())
+    deliveryId       Int          @map("delivery_id")
+    notificationType TemplateType @map("notification_type")
+
+    recipient          String? @db.VarChar(255)
+    messageContent     String? @map("message_content") @db.Text
+    thirdPartyResponse Json?   @map("third_party_response")
+
+    isSent     Boolean   @default(false) @map("is_sent")
+    sentAt     DateTime? @map("sent_at")
+    error      String?   @db.Text
+    externalId String?   @map("external_id") @db.VarChar(255)
+
+    delivery EventDelivery @relation(fields: [deliveryId], references: [id])
+
+    @@index([deliveryId])
+    @@map("core_event_delivery_item")
+}
+
+model Template {
+    id           Int          @id @default(autoincrement())
+    templateCode String       @unique @map("template_code")
+    templateName String       @map("template_name")
+    templateType TemplateType @map("template_type")
+    url          String?      @map("url")
+    subject      String?
+    bodyHtml     String?      @map("body_html") @db.Text
+    bodyText     String?      @map("body_text") @db.Text
+    extra        Json?        @map("extra")
+
+    eventConfigId Int @map("event_config_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    eventConfig EventConfig @relation(fields: [eventConfigId], references: [id])
+
+    @@index([eventConfigId], name: "template_event_config_id_idx")
+    @@map("core_template")
+}
+
+model AuditConfig {
+    id          Int         @id @default(autoincrement())
+    module      ServiceCode
+    service     String
+    method      String
+    message     String?
+    isAuditable Boolean     @default(true) @map("is_auditable")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("core_audit_config")
+}
+
+model CommonAudit {
+    id         Int         @id @default(autoincrement())
+    module     ServiceCode
+    service    String
+    type       String
+    message    String
+    level1Id   Int?        @map("level1_id")
+    level2Id   Int?        @map("level2_id")
+    methodName String?     @map("method_name")
+    traceId    String?     @map("trace_id")
+
+    createdBy Int?     @map("created_by")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@map("core_common_audit")
+}
+
+model PdfTemplate {
+    id             Int             @id @default(autoincrement())
+    templateName   String          @map("template_name")
+    module         ServiceCode
+    templateType   PdfTemplateType @map("template_type")
+    bodyJson       Json            @map("body_json")
+    isDefault      Boolean         @default(false) @map("is_default")
+    sampleImageUrl String?         @map("sample_image_url")
+    isActive       Boolean         @default(true) @map("is_active")
+    createdBy      Int?            @map("created_by")
+    updatedBy      Int?            @map("updated_by")
+    createdAt      DateTime        @default(now()) @map("created_at")
+    updatedAt      DateTime?       @updatedAt @map("updated_at")
+
+    @@map("core_pdf_template")
+}
+
+model IncomeHead {
+    id             Int       @id @default(autoincrement())
+    incomeCategory String?   @map("income_category") @db.VarChar(255)
+    description    String?   @db.VarChar(255)
+    isActive       YesNoFlag @default(yes) @map("is_active")
+    isDeleted      String    @default("no") @map("is_deleted") @db.VarChar(255)
+    createdAt      DateTime  @default(now()) @map("created_at")
+    updatedAt      DateTime  @updatedAt @map("updated_at")
+    income         Income[]
+
+    @@map("income_head")
+}
+
+model Income {
+    id         Int         @id @default(autoincrement())
+    incHeadId  Int?        @map("inc_head_id")
+    name       String?     @db.VarChar(50)
+    invoiceNo  String      @map("invoice_no") @db.VarChar(200)
+    date       DateTime?   @db.Date
+    amount     Decimal?    @db.Decimal(15, 2)
+    note       String?     @db.Text
+    isActive   YesNoFlag   @default(yes) @map("is_active")
+    isDeleted  String      @default("no") @map("is_deleted") @db.VarChar(255)
+    createdAt  DateTime    @default(now()) @map("created_at")
+    updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+    documents  String?     @db.VarChar(255)
+    ccId       Int         @default(1) @map("cc_id")
+    isMaster   MasterType  @default(ML) @map("is_master")
+    incomeHead IncomeHead? @relation(fields: [incHeadId], references: [id])
+
+    @@index([incHeadId], name: "income_inc_head_id_idx")
+    @@map("income")
+}
+
+model ExpenseHead {
+    id              Int       @id @default(autoincrement())
+    expenseCategory String?   @map("exp_category") @db.VarChar(255)
+    description     String?   @db.Text
+    isActive        YesNoFlag @default(yes) @map("is_active")
+    isDeleted       YesNoFlag @default(no) @map("is_deleted")
+    createdAt       DateTime  @default(now()) @map("created_at")
+    updatedAt       DateTime  @updatedAt @map("updated_at")
+    expenses        Expense[]
+
+    @@map("expense_head")
+}
+
+model Expense {
+    id            Int          @id @default(autoincrement())
+    expenseHeadId Int?         @map("exp_head_id")
+    name          String?      @db.VarChar(50)
+    invoiceNo     String       @map("invoice_no") @db.VarChar(200)
+    date          DateTime?    @db.Date
+    amount        Decimal?     @db.Decimal(15, 2)
+    // expMethod     ExpMethod?   @map("exp_method")
+    documents     String?      @db.VarChar(255)
+    note          String?      @db.Text
+    isActive      YesNoFlag    @default(yes) @map("is_active")
+    isDeleted     YesNoFlag    @default(no) @map("is_deleted")
+    createdAt     DateTime     @default(now()) @map("created_at")
+    updatedAt     DateTime     @updatedAt @map("updated_at")
+    ccId          Int          @default(1) @map("cc_id")
+    isMaster      MasterType?  @default(ML) @map("is_master")
+    expenseHead   ExpenseHead? @relation(fields: [expenseHeadId], references: [id])
+
+    @@index([expenseHeadId], name: "expense_expense_head_id_idx")
+    @@map("expenses")
+}
