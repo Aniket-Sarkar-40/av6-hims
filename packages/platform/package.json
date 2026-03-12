@@ -1,18 +1,6 @@
 {
   "name": "@repo/platform",
-  "private": true,
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./*": "./dist/*"
-  },
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json"
-  },
+  "version": "0.0.1",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1003.0",
     "@repo/db": "workspace:*",
@@ -31,5 +19,18 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^25.4.0",
     "typescript": "^5.9.2"
-  }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./*": "./dist/*"
+  },
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts"
 }

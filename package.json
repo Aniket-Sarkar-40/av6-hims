@@ -1,27 +1,35 @@
 {
   "name": "hims-backend",
-  "private": true,
-  "type": "module",
-  "packageManager": "pnpm@10.0.0",
-  "scripts": {
-    "dev": "turbo run dev --parallel",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
-    "dev:gateway": "pnpm --filter @apps/gateway dev",
-    "dev:core": "pnpm --filter @apps/core dev",
-    "dev:opd": "pnpm --filter @apps/opd dev",
-    "start:gateway": "pnpm --filter @apps/gateway start",
-    "start:core": "pnpm --filter @apps/core start",
-    "p:gen": "pnpm --filter @repo/db prisma:generate",
-    "p:mig": "pnpm --filter @repo/db prisma:migrate",
-    "db:deploy": "pnpm --filter @repo/db prisma:deploy",
-    "db:studio": "pnpm --filter @repo/db prisma:studio",
-    "db:validate": "pnpm --filter @repo/db prisma:validate"
-  },
+  "version": "0.0.1",
   "devDependencies": {
-    "@types/node": "^22.10.1",
+    "@types/node": "^25.4.0",
+    "sherif": "^1.10.0",
+    "syncpack": "^14.2.0",
     "turbo": "^2.8.12",
     "typescript": "^5.9.2"
-  }
+  },
+  "packageManager": "pnpm@10.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm check:repo && turbo build",
+    "check:repo": "pnpm pkg:format && pnpm deps:check && pnpm lint:monorepo",
+    "db:deploy": "pnpm --filter @repo/db prisma:deploy",
+    "db:studio": "pnpm --filter @repo/db prisma:studio",
+    "db:validate": "pnpm --filter @repo/db prisma:validate",
+    "deps:check": "syncpack lint",
+    "deps:fix": "syncpack fix",
+    "dev": "turbo run dev --parallel",
+    "dev:core": "pnpm --filter @apps/core dev",
+    "dev:gateway": "pnpm --filter @apps/gateway dev",
+    "dev:opd": "pnpm --filter @apps/opd dev",
+    "lint": "turbo run lint",
+    "lint:monorepo": "sherif",
+    "p:gen": "pnpm --filter @repo/db prisma:generate",
+    "p:mig": "pnpm --filter @repo/db prisma:migrate",
+    "pkg:format": "syncpack format",
+    "start:core": "pnpm --filter @apps/core start",
+    "start:gateway": "pnpm --filter @apps/gateway start",
+    "test": "turbo run test"
+  },
+  "type": "module"
 }
