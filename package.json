@@ -13,8 +13,8 @@
     "dev:opd": "pnpm --filter @apps/opd dev",
     "start:gateway": "pnpm --filter @apps/gateway start",
     "start:core": "pnpm --filter @apps/core start",
-    "db:generate": "pnpm --filter @repo/db prisma:generate",
-    "db:migrate": "pnpm --filter @repo/db prisma:migrate",
+    "p:gen": "pnpm --filter @repo/db prisma:generate",
+    "p:mig": "pnpm --filter @repo/db prisma:migrate",
     "db:deploy": "pnpm --filter @repo/db prisma:deploy",
     "db:studio": "pnpm --filter @repo/db prisma:studio",
     "db:validate": "pnpm --filter @repo/db prisma:validate"

@@ -2,3 +2,18 @@ enum UserStatus {
     ACTIVE
     INACTIVE
 }
+
+enum CalculationMethod {
+    STEP_WISE
+    FINAL
+}
+
+enum RoundFormat {
+    ROUND
+    SPECIAL_ROUND
+    TO_FIXED
+    CEIL
+    FLOOR
+    TRUNC
+    NONE
+}

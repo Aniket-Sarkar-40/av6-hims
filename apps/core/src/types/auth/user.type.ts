@@ -1,7 +1,8 @@
-import type { Prisma, UserStatus } from "@repo/db/generated/prisma/client";
+import { Prisma } from "@repo/db/generated/prisma/client";
+import { UserStatus } from "@repo/db/generated/prisma/enums.js";
 
 export interface UserDto
-  extends Prisma.UserGetPayload<{
+  extends Prisma.CoreSettingsGetPayload<{
     select: {
       id: true;
     };
