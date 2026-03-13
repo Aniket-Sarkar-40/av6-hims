@@ -43,6 +43,25 @@ export enum PermissionResource {
   COLLECTION_CENTER = "collection-center",
 
   // CORE
+  COUNTRY = "country",
+  STATE = "state",
+  CITY = "city",
+  PDF_TEMPLATE = "pdf-template",
+  PDF_CONTRACT = "pdf-contract",
+  COUNTRY_CODE = "countryCode",
+  STAFF = "staff",
+  STAFF_DESIGNATION = "staffDesignation",
+  STAFF_EMPLOYEE = "staffEmployee",
+  DEPARTMENT = "department",
+  DOCTOR = "doctor",
+  EMPLOYEE = "employee",
+  STAFF_COLLECTION_CENTER = "staffCollectionCenter",
+  SERVICE_EVENT = "service-event",
+  TEMPLATE = "template",
+  EVENT_CONFIG = "event-config",
+  NOTIFICATION = "notification",
+  EVENT_RECIPIENT_RULE = "event-recipient-rule",
+  CORE_APPROVAL = "core-approval",
 }
 
 export enum PermissionModule {

@@ -1,5 +1,5 @@
+import { createCoreApp } from "@apps/core";
 import express from "express";
-import { createApp as createCoreApp } from "@apps/core";
 
 const app = express();
 
@@ -7,7 +7,7 @@ const enabled = new Set(
   (process.env.ENABLED_APPS ?? "core,opd,pharmacy").split(",")
 );
 
-if (enabled.has("core")) app.use("/core", createCoreApp());
+if (enabled.has("core")) app.use("/api/v1/core", createCoreApp());
 
 const port = Number(process.env.PORT || 3005);
 

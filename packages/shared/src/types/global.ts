@@ -39,3 +39,35 @@ export interface IdValue {
 }
 
 export type Service = "CORE" | "PHARMACY" | "OPD" | "INVENTORY";
+
+export interface BaseModel {
+  isActive: boolean;
+  createdBy: number | null;
+  updatedBy: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  canceledAt?: Date | null;
+  canceledBy?: number | null;
+  deletedAt?: Date | null;
+  deletedBy?: number | null;
+}
+
+export type BaseModelAttr =
+  | "isActive"
+  | "createdBy"
+  | "updatedBy"
+  | "deletedBy"
+  | "canceledBy"
+  | "canceledAt"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt";
+
+export type BaseModelAttrWoCancel =
+  | "isActive"
+  | "createdBy"
+  | "updatedBy"
+  | "deletedBy"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt";

@@ -13,13 +13,13 @@ const adapter = new PrismaMariaDb({
 
 const globalForPrisma = globalThis as { prisma?: PrismaClient };
 
-export const prisma =
+export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
-    log: ["warn", "error"],
+    log: ["query", "info", "warn", "error"],
   });
 
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+  globalForPrisma.prisma = db;
 }

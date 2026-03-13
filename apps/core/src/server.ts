@@ -1,7 +1,7 @@
-import { createApp } from "./index.js";
+import { createCoreApp } from "./index.js";
 
 const port = Number(process.env.PORT || 3001);
 
-createApp().listen(port, () => {
+createCoreApp().listen(port, () => {
   console.log(`core running on ${port}`);
 });

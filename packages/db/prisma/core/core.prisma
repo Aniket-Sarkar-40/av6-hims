@@ -38,6 +38,8 @@ model CoreDynamicShortCode {
     permission   String?
     whereClause  Json?    @map("where_clause")
     selectClause Json?    @map("select_clause")
+    config       Json?    @map("config")
+    isSingleDto  Boolean  @default(true) @map("is_single_dto")
     createdBy    Int?     @map("created_by")
     updatedBy    Int?     @map("updated_by")
     createdAt    DateTime @default(now()) @map("created_at")
@@ -722,4 +724,31 @@ model Expense {
 
     @@index([expenseHeadId], name: "expense_expense_head_id_idx")
     @@map("expenses")
+}
+
+model CoreApprovalService {
+    id          Int       @id @default(autoincrement())
+    name        String    @db.VarChar(191)
+    description String?   @db.Text
+    isActive    Boolean   @default(true) @map("is_active")
+    createdBy   Int?      @map("created_by")
+    updatedBy   Int?      @map("updated_by")
+    createdAt   DateTime  @default(now()) @map("created_at") @db.DateTime(3)
+    updatedAt   DateTime? @map("updated_at") @db.DateTime(3)
+
+    @@map("core_approval_service")
+}
+
+model EmailConfig {
+    id           Int      @id @default(autoincrement()) @db.UnsignedInt
+    emailType    String?  @map("email_type") @db.VarChar(100)
+    smtpServer   String?  @map("smtp_server") @db.VarChar(100)
+    smtpPort     String?  @map("smtp_port") @db.VarChar(100)
+    smtpUsername String?  @map("smtp_username") @db.VarChar(100)
+    smtpPassword String?  @map("smtp_password") @db.VarChar(100)
+    sslTls       String?  @map("ssl_tls") @db.VarChar(100)
+    isActive     String   @default("no") @map("is_active") @db.VarChar(10)
+    createdAt    DateTime @default(now()) @updatedAt @map("created_at")
+
+    @@map("email_config")
 }

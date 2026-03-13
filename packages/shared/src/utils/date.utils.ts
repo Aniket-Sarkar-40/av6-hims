@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { ISO_DATE_FORMAT } from "./constants.utils.js";
 export const fromTimestampToSqlDatetime = (date: string) =>
   date.replace("T", " ").replace("Z", "");
 
@@ -7,6 +8,11 @@ export const normalizeDate = (date: Date): Date => {
   d.setHours(0, 0, 0, 0);
   return d;
 };
+
+export function isValidDate(date: string): boolean {
+  const parsedDate = dayjs(date, ISO_DATE_FORMAT, true);
+  return parsedDate.isValid();
+}
 
 export const adjustToPreferredDayWithinRange = (
   baseDate: Date,

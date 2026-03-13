@@ -5,11 +5,20 @@
     "@repo/db": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
+    "av6-core": "^1.7.5",
+    "av6-pdf-engine": "^1.0.9",
+    "av6-utils": "^1.0.6",
+    "axios": "^1.13.6",
+    "dayjs": "^1.11.19",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
-    "joi": "^17.13.0"
+    "joi": "^17.13.0",
+    "jsonwebtoken": "^9.0.3",
+    "redis": "^5.11.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "tsx": "^4.20.0",
     "typescript": "^5.9.2"
   },

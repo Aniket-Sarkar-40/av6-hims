@@ -33,11 +33,11 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prisma:deploy": "prisma migrate deploy",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "prisma:validate": "prisma validate"
+    "p:deploy": "prisma migrate deploy",
+    "p:gen": "prisma generate",
+    "p:mig": "prisma migrate dev",
+    "p:studio": "prisma studio",
+    "p:validate": "prisma validate"
   },
   "types": "./dist/src/index.d.ts"
 }

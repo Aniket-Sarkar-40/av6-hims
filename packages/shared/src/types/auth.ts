@@ -46,3 +46,41 @@ export interface JwtRefreshPayload {
   role: CurrentMapping | null;
   expireAt: number;
 }
+
+export interface DecodedToken {
+  id: string;
+  username: string;
+  email: string;
+  contact_no: string;
+  role: object;
+  uuid: string;
+  roles: Record<string, string>[];
+  currentRoleid: string;
+  date_format: string;
+  currency_symbol: string;
+  school_name: string;
+  timezone: string;
+  sch_name: string;
+  language: object;
+  doctor_restriction: string;
+  superadmin_restriction: string;
+  theme: string;
+  cc_lab_name: string;
+  cc_lab_address: string;
+  cc_lab_phone: string;
+  cc_lab_email: string;
+  lab_code: number;
+  lab_type: string;
+  dise_code: string;
+  print_due_report: string;
+  barcode_print_size: string;
+  contact_email: string;
+  auto_consume: string;
+  recollect_count: number;
+  rerun_count: number;
+  cancelled_test_count: number;
+  expire_at: number;
+  permissions: string[];
+  API_TIME: number;
+  expiry: number;
+}

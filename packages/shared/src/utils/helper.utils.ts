@@ -1,6 +1,8 @@
 import { BASE_URL } from "@/config/index.js";
+import { DecodedToken } from "@/types/auth.js";
 import fs from "fs";
 import path from "path";
+import jwt from "jsonwebtoken";
 
 /**
  * Recursively convert any BigInt properties to strings.
@@ -85,3 +87,59 @@ export function toArrayBuffer(buf: Buffer): ArrayBuffer {
   const uint8 = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
   return uint8.slice().buffer;
 }
+
+export type RemoveUndefined<T> = {
+  [K in keyof T as undefined extends T[K] ? K : K]: Exclude<T[K], undefined>;
+};
+
+export function omitUndefined<T extends object>(obj: T): RemoveUndefined<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined)
+  ) as RemoveUndefined<T>;
+}
+
+export const processAndRecreateJWT = (
+  token: string
+): { permissions: string[]; roles: Record<string, string>[] } => {
+  try {
+    // Decode the existing JWT token
+    const decoded = jwt.decode(token) as DecodedToken;
+
+    //generate new time based UUID
+    // const uuid = crypto.randomUUID();
+
+    // Create a new object excluding irrelevant fields
+    // const updatedObject = {
+    //   id: decoded.id,
+    //   username: decoded.username,
+    //   email: decoded.email,
+    //   contact_no: decoded.contact_no,
+    //   role: decoded.role,
+    //   uuid: uuid,
+    //   // roles: decoded.,
+    //   currentRoleid: decoded.currentRoleid,
+    //   currency_symbol: decoded.currency_symbol,
+    //   timezone: decoded.timezone,
+    //   sch_name: decoded.sch_name,
+    //   language: decoded.language,
+    //   cc_lab_name: decoded.cc_lab_name,
+
+    //   lab_code: decoded.lab_code,
+    //   lab_type: decoded.lab_type,
+
+    //   contact_email: decoded.contact_email,
+
+    //   expire_at: decoded.expire_at,
+    //   // permissions: decoded.permissions,
+    //   API_TIME: decoded.API_TIME,
+    //   expiry: decoded.expiry,
+    // };
+
+    // Create a new JWT token from the updated object
+    // const newToken = jwt.sign(updatedObject, secret, { expiresIn: "3h" }); // You can adjust the expiry time as per your needs
+
+    return { permissions: decoded.permissions, roles: decoded.roles };
+  } catch (error) {
+    throw new Error("Error processing the token: " + error);
+  }
+};

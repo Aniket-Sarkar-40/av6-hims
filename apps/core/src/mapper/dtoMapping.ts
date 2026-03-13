@@ -1,0 +1,29 @@
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
+import {
+  City,
+  Country,
+  EventConfig,
+  PdfTemplate,
+  ServiceEvent,
+  State,
+  InvUINConfig,
+} from "@repo/db/generated/prisma/client";
+// import { toCityDTOOnlyForCity } from "@repo/core/mapper/master/city.mapper.js";
+// import { toCountryDto } from "@repo/core/mapper/master/country.mapper.js";
+// import { toStateDTOForState } from "@repo/core/mapper/master/state.mapper.js";
+// import { toUINConfigDTO } from "@repo/core/mapper/master/uinConfig.mapper.js";
+// import { toServiceEventDTO } from "@repo/core/mapper/master/serviceEvent.mapper.js";
+// import { toEventConfigDTO } from "@repo/core/mapper/master/eventConfig.mapper.js";
+// import { toPdfTemplateDTO } from "@repo/core/mapper/pdf/pdf.mapper.js";
+
+// Define a type for DTO mapping functions.
+type DtoMappingFunction = (data: unknown) => unknown;
+export const dtoMapping: Record<string, DtoMappingFunction> = {
+  // [SHORT_CODE.CITY]: (data: unknown) => toCityDTOOnlyForCity(data as City),
+  // [SHORT_CODE.UIN_CONFIG]: (data: unknown) => toUINConfigDTO(data as UINConfig),
+  // [SHORT_CODE.STATE]: (data: unknown) => toStateDTOForState(data as State),
+  // [SHORT_CODE.COUNTRY]: (data: unknown) => toCountryDto(data as Country),
+  // [SHORT_CODE.SERVICE_EVENT]: (data: unknown) => toServiceEventDTO(data as ServiceEvent),
+  // [SHORT_CODE.EVENT_CONFIG]: (data: unknown) => toEventConfigDTO(data as EventConfig),
+  // [SHORT_CODE.PDF_TEMPLATE]: (data: unknown) => toPdfTemplateDTO(data as PdfTemplate),
+};

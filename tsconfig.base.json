@@ -6,7 +6,6 @@
 
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
 
