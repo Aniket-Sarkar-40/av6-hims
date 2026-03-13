@@ -23,11 +23,11 @@
       "default": "./dist/src/client.js"
     },
     "./generated/prisma/client": {
-      "types": "./generated/prisma/client.d.ts",
-      "default": "./generated/prisma/client.js"
+      "types": "./dist/generated/prisma/client.d.ts",
+      "default": "./dist/generated/prisma/client.js"
     },
-    "./generated/prisma/*": "./generated/prisma/*",
-    "./models/*": "./generated/prisma/models/*"
+    "./generated/prisma/*": "./dist/generated/prisma/*",
+    "./models/*": "./dist/generated/prisma/models/*"
   },
   "main": "./dist/src/index.js",
   "private": true,
