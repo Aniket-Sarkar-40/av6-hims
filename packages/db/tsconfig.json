@@ -11,10 +11,11 @@
     },
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "prisma.config.ts", "generated/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "prisma.config.ts"],
   "exclude": [
     "node_modules",
     "dist",
+    "generated",
     "prisma/generated",
     "logs",
     "uploads",

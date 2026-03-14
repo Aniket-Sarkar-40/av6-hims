@@ -1,6 +1,11 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 
-dotenv.config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const rootEnvPath = path.resolve(__dirname, "../../../../.env");
+
+dotenv.config({ path: rootEnvPath });
 
 export const PORT = process.env.PORT || 3000;
 export const DATABASE_URL = process.env.DATABASE_URL || "";

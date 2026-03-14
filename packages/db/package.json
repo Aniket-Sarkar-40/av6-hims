@@ -32,12 +32,13 @@
   "main": "./dist/src/index.js",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.generated.json",
     "p:deploy": "prisma migrate deploy",
     "p:gen": "prisma generate",
     "p:mig": "prisma migrate dev",
     "p:studio": "prisma studio",
     "p:validate": "prisma validate"
   },
+  "type": "module",
   "types": "./dist/src/index.d.ts"
 }

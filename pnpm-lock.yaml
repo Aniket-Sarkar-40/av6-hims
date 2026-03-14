@@ -87,6 +87,12 @@ importers:
       '@apps/core':
         specifier: workspace:*
         version: link:../core
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       express:
         specifier: ^5.1.0
         version: 5.2.1

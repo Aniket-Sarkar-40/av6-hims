@@ -12,7 +12,7 @@ import {
 import { logger } from "@repo/platform/logging/logger.js";
 import { createCache } from "@repo/platform/cache/redis.utils.js";
 import { PrismaClient } from "@repo/db/generated/prisma/client";
-import db from "@repo/db/client";
+import { db } from "@repo/db/client";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 
 export const fetchTableData = async (table: string) => {
@@ -50,7 +50,8 @@ export const fetchTableData = async (table: string) => {
   return dbData;
 };
 
-const lowerFirst = <S extends string>(s: S) => (s.charAt(0).toLowerCase() + s.slice(1)) as Uncapitalize<S>;
+const lowerFirst = <S extends string>(s: S) =>
+  (s.charAt(0).toLowerCase() + s.slice(1)) as Uncapitalize<S>;
 
 export async function getByUnique<M extends ModelName>(
   input: CommonFindUniqueInput<M>
@@ -83,7 +84,9 @@ export async function getAll<M extends ModelName>(
   const delegate = (db as any)[delegateKey];
 
   if (!delegate?.findMany) {
-    throw new Error(`Model delegate "${String(delegateKey)}" not found on PrismaClient`);
+    throw new Error(
+      `Model delegate "${String(delegateKey)}" not found on PrismaClient`
+    );
   }
 
   // #region agent log
