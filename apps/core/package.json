@@ -27,7 +27,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./*": "./dist/*"
   },
   "main": "./dist/index.js",
   "private": true,
