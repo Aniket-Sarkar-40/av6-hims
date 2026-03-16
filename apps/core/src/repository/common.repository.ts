@@ -1,6 +1,3 @@
-// import { mappingExport } from "@/mapper/excelExportMapping";
-// import { mappingImport } from "@/mapper/excelImportMapping";
-
 import {
   CommonFindManyInput,
   CommonFindUniqueInput,
@@ -28,15 +25,33 @@ export const fetchTableData = async (table: string) => {
   // If not cached, fetch from DB
   let dbData;
   if (
-    table === "dynamicShortCode" ||
-    table === "serviceEvent" ||
+    table === "staffDesignation" ||
+    table === "department" ||
+    table === "incomeHead" ||
+    table === "expenseHead" ||
+    table === "emailConfig" ||
+    table === "expense"
+  ) {
+    dbData = await model.findMany({
+      where: { isActive: "yes" },
+    });
+  } else if (
+    table === "coreDynamicShortCode" ||
+    table === "warehouse" ||
+    table === "branch" ||
+    table === "country" ||
     table === "eventConfig" ||
-    table === "eventNotificationAudit" ||
-    table === "managerAttendanceAudit" ||
-    table === "attendanceSettings" ||
-    table === "companyDetails"
+    table === "serviceEvent"
   ) {
     dbData = await model.findMany();
+  } else if (table === "collectionCenter") {
+    dbData = await model.findMany({
+      where: { isActive: "true" },
+    });
+  } else if (table === "staff") {
+    dbData = await model.findMany({
+      where: { isActive: 1 },
+    });
   } else {
     dbData = await model.findMany({
       where: { isActive: true },
@@ -54,7 +69,7 @@ const lowerFirst = <S extends string>(s: S) =>
   (s.charAt(0).toLowerCase() + s.slice(1)) as Uncapitalize<S>;
 
 export async function getByUnique<M extends ModelName>(
-  input: CommonFindUniqueInput<M>
+  input: CommonFindUniqueInput<M>,
 ): Promise<FindFirstResult<M> | null> {
   const { model, useActiveFlag = true, where, args } = input;
   const delegateKey = lowerFirst(model) as keyof PrismaClient;
@@ -63,7 +78,7 @@ export async function getByUnique<M extends ModelName>(
   if (!delegate?.findFirst) {
     throw new ErrorHandler(
       500,
-      `Model delegate "${String(delegateKey)}" not found on PrismaClient`
+      `Model delegate "${String(delegateKey)}" not found on PrismaClient`,
     );
   }
 
@@ -77,7 +92,7 @@ export async function getByUnique<M extends ModelName>(
 }
 
 export async function getAll<M extends ModelName>(
-  input: CommonFindManyInput<M>
+  input: CommonFindManyInput<M>,
 ): Promise<FindManyResult<M>> {
   const { model, useActiveFlag = true, where, args } = input;
   const delegateKey = lowerFirst(model) as keyof PrismaClient;
@@ -85,7 +100,7 @@ export async function getAll<M extends ModelName>(
 
   if (!delegate?.findMany) {
     throw new Error(
-      `Model delegate "${String(delegateKey)}" not found on PrismaClient`
+      `Model delegate "${String(delegateKey)}" not found on PrismaClient`,
     );
   }
 

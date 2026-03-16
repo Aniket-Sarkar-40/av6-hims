@@ -1,42 +1,9 @@
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { fetchTableData } from "@/repository/common.repository.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { createClient, RedisClientType } from "redis";
 import { db } from "@repo/db/client";
-import {
-  IS_REDIS,
-  REDIS_URL,
-  REDIS_PASSWORD,
-  REDIS_PREFIX,
-} from "@repo/shared";
-
-let redisClient: RedisClientType | null = null;
-
-export const getRedisClient = (): RedisClientType | null => {
-  if (!IS_REDIS) return null;
-
-  if (!redisClient) {
-    redisClient = createClient({ url: REDIS_URL, password: REDIS_PASSWORD });
-    redisClient.on("error", (err) => {
-      logger.error("Redis Client Error", err);
-    });
-  }
-
-  return redisClient;
-};
-
-export const connectRedis = async (): Promise<void> => {
-  if (!IS_REDIS) {
-    logger.info("Redis is disabled: skipping connection.");
-    return;
-  }
-
-  const client = getRedisClient()!;
-  if (!client.isOpen) {
-    await client.connect();
-    logger.info("Redis client connected.");
-  }
-};
+import { getRedisClient } from "@repo/platform/cache/redisClient.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { IS_REDIS, REDIS_PREFIX } from "@repo/shared";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 
 export const initializeCache = async (): Promise<void> => {
   if (!IS_REDIS) {
@@ -46,7 +13,7 @@ export const initializeCache = async (): Promise<void> => {
 
   logger.info("Initializing cache…");
   try {
-    const tablesToCache = await fetchTableData("dynamicShortCode");
+    const tablesToCache = await fetchTableData("coreDynamicShortCode");
 
     setTimeout(async () => {
       for (const table of tablesToCache) {
@@ -59,7 +26,7 @@ export const initializeCache = async (): Promise<void> => {
         } catch (error) {
           logger.error(
             `Error caching data for table ${table.tableName}:`,
-            error
+            error,
           );
         }
       }
@@ -72,12 +39,14 @@ export const initializeCache = async (): Promise<void> => {
 };
 
 export const loadCache = async (
-  cacheKey?: string | string[]
+  cacheKey?: string | string[],
 ): Promise<void> => {
   if (!IS_REDIS) {
     logger.info("Redis is disabled: skipping cache load.");
     return;
   }
+
+  const redisClient = getRedisClient();
 
   if (!redisClient) {
     throw new ErrorHandler(500, "Redis client is not initialized.");
@@ -94,7 +63,7 @@ export const loadCache = async (
   });
 
   const validTables = new Set(
-    dynamicShortCodes.filter((r) => r.isCacheable).map((r) => r.tableName)
+    dynamicShortCodes.filter((r) => r.isCacheable).map((r) => r.tableName),
   );
 
   const folderMap = dynamicShortCodes.reduce<Record<string, string[]>>(
@@ -104,14 +73,14 @@ export const loadCache = async (
       }
       return acc;
     },
-    {}
+    {},
   );
 
   const reloadTable = async (tableName: string) => {
     if (!validTables.has(tableName)) {
       throw new ErrorHandler(
         404,
-        `Table "${tableName}" is not cacheable or does not exist.`
+        `Table "${tableName}" is not cacheable or does not exist.`,
       );
     }
     logger.info(`Reloading cache for table "${tableName}"…`);
@@ -141,7 +110,7 @@ export const loadCache = async (
     await Promise.all(
       tables.map(async (table) => {
         const patterns = [
-          `${REDIS_PREFIX}fixuji:${table}:*`,
+          `${REDIS_PREFIX}av6:${table}:*`,
           `${REDIS_PREFIX}master:${table}:*`,
         ];
 
@@ -155,9 +124,9 @@ export const loadCache = async (
 
         await redisClient!.del(uniqueKeys);
         logger.info(
-          `Deleted ${uniqueKeys.length} cache key(s) for table "${table}".`
+          `Deleted ${uniqueKeys.length} cache key(s) for table "${table}".`,
         );
-      })
+      }),
     );
   };
 
@@ -171,7 +140,7 @@ export const loadCache = async (
         {
           MATCH: pattern,
           COUNT: 100,
-        }
+        },
       );
       cursor = Number(nextCursor);
       matchedKeys.push(...keys);
@@ -183,14 +152,14 @@ export const loadCache = async (
       new Set(
         matchedKeys
           .map((k) => k.split(":")[1])
-          .filter((t): t is string => !!t && validTables.has(t))
-      )
+          .filter((t): t is string => !!t && validTables.has(t)),
+      ),
     );
 
     if (!tablesToReload.length) {
       throw new ErrorHandler(
         404,
-        `Pattern "${pattern}" matched keys, but none belong to a cacheable table.`
+        `Pattern "${pattern}" matched keys, but none belong to a cacheable table.`,
       );
     }
 
@@ -207,7 +176,7 @@ export const loadCache = async (
         logger.info(
           `Reloading folder "${folderName}" → [${folderTables.join(", ")}] (${
             folderTables.length
-          } table(s))`
+          } table(s))`,
         );
         await Promise.all(folderTables.map(reloadTable));
       } else {
@@ -219,12 +188,12 @@ export const loadCache = async (
 
   if (!cacheKey) {
     logger.info(
-      "No cacheKey: deleting all cache except the login folder and reloading ALL cacheable tables."
+      "No cacheKey: deleting all cache except the login folder and reloading ALL cacheable tables.",
     );
     // Delete everything except the login folder
     const loginFolder = "login"; // Replace with your actual login folder name
     const otherTables = [...validTables].filter(
-      (table) => table !== loginFolder
+      (table) => table !== loginFolder,
     );
     await deleteCacheForTables(otherTables);
     await Promise.all([...validTables].map(reloadTable));
@@ -236,7 +205,7 @@ export const loadCache = async (
     if (!matched) {
       throw new ErrorHandler(
         404,
-        `No cache entries match pattern "${cacheKey}".`
+        `No cache entries match pattern "${cacheKey}".`,
       );
     }
     return;
@@ -257,7 +226,7 @@ export const loadCache = async (
     logger.info(
       `Reloading folder "${cacheKey}" → [${folderTables.join(", ")}] (${
         folderTables.length
-      } table(s))`
+      } table(s))`,
     );
     await deleteCacheForTables(folderTables);
     await Promise.all(folderTables.map(reloadTable));
@@ -278,6 +247,8 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
     return;
   }
 
+  const redisClient = getRedisClient();
+
   if (!redisClient) {
     throw new ErrorHandler(500, "Redis client is not initialized.");
   }
@@ -293,7 +264,7 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
           {
             MATCH: cacheKey,
             COUNT: 100,
-          }
+          },
         );
         cursor = Number(nextCursor);
         if (keys.length > 0) {
@@ -304,7 +275,7 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
       if (matchedKeys.length === 0) {
         throw new ErrorHandler(
           404,
-          `No cache entries found matching pattern '${cacheKey}'.`
+          `No cache entries found matching pattern '${cacheKey}'.`,
         );
       }
 
@@ -312,7 +283,7 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
       logger.info(
         `Cleared ${matchedKeys.length} entr${
           matchedKeys.length === 1 ? "y" : "ies"
-        } matching pattern '${cacheKey}'.`
+        } matching pattern '${cacheKey}'.`,
       );
       return;
     }
@@ -328,7 +299,7 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
           {
             MATCH: prefixPattern,
             COUNT: 100,
-          }
+          },
         );
         cursor = Number(nextCursor);
         if (keys.length > 0) {
@@ -340,7 +311,7 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
         logger.info(
           `Cleared ${prefixMatchedKeys.length} entr${
             prefixMatchedKeys.length === 1 ? "y" : "ies"
-          } under prefix '${prefixPattern}'.`
+          } under prefix '${prefixPattern}'.`,
         );
         return;
       }
@@ -351,7 +322,7 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
       if (exists === 0) {
         throw new ErrorHandler(
           404,
-          `Cache key or folder '${cacheKey}' not found.`
+          `Cache key or folder '${cacheKey}' not found.`,
         );
       }
 
@@ -359,7 +330,7 @@ export const clearCache = async (cacheKey: string): Promise<void> => {
       if (deletedCount === 0) {
         throw new ErrorHandler(
           400,
-          `Failed to delete cache key '${cacheKey}'.`
+          `Failed to delete cache key '${cacheKey}'.`,
         );
       }
 
@@ -382,6 +353,11 @@ export const clearAllCache = async () => {
   }
 
   try {
+    const redisClient = getRedisClient();
+    if (!redisClient) {
+      throw new ErrorHandler(500, "Redis client is not initialized.");
+    }
+
     if (redisClient) {
       const keys = await redisClient.keys("*");
       const filteredKeys = keys.filter((key) => !key.includes("login"));

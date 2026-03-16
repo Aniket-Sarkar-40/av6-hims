@@ -32,7 +32,7 @@ export const commonServiceFactory = commonService({
     addToCache: addToCache,
   },
   config: {
-    CACHE_KEY_NAME: "fixuji",
+    CACHE_KEY_NAME: "av6",
     REDIS_PREFIX: REDIS_PREFIX,
     MASTER_CACHE_KEY_NAME: "master",
     MASTER_KEY_MODELS: MASTER_TABLES,

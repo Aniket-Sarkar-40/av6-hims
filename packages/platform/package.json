@@ -5,15 +5,18 @@
     "@aws-sdk/client-s3": "^3.1003.0",
     "@repo/db": "workspace:*",
     "@repo/shared": "workspace:*",
+    "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "joi": "^17.13.0",
     "morgan": "^1.10.1",
     "multer": "^2.1.1",
     "redis": "^5.11.0",
+    "uuid": "^13.0.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.1.0",

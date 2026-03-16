@@ -38,7 +38,7 @@ export const NO_OF_LEVELS = Number(process.env.NO_OF_LEVELS) || 3;
 export const TOKEN_VERSION = process.env.TOKEN_VERSION || "V1";
 export const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || ".fixuji.com";
 
-export const JWT_TOKEN = process.env.JWT_TOKEN || "access-token-fixuji";
+export const JWT_TOKEN = process.env.JWT_TOKEN || "access-token-av6";
 export const SUPER_ADMIN_ID = Number(process.env.SUPER_ADMIN_ID) || 1;
 export const PERMISSION_PREFIX = process.env.PERMISSION_PREFIX || "";
 

@@ -6,7 +6,8 @@ import { type Application as ExpressApplication } from "express";
 export function createCoreApp(): ExpressApplication {
   const app = express();
   setupPlatform(app);
-  app.use("/", coreRouter);
+  app.use("/api/v1/core", coreRouter);
+
   app.use(errorMiddleware);
   return app;
 }
