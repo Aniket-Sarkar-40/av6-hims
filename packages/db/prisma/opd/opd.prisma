@@ -1,0 +1,1307 @@
+model OpdDynamicShortCode {
+    id           Int      @id @default(autoincrement())
+    shortCode    String   @unique @map("short_code")
+    tableName    String   @map("table_name")
+    isDTO        Boolean  @default(false) @map("is_dto")
+    isCacheable  Boolean  @default(false) @map("is_cacheable")
+    isDropDown   Boolean  @default(false) @map("is_drop_down")
+    permission   String?
+    isSingleDto  Boolean  @default(true) @map("is_single_dto")
+    whereClause  Json?    @map("where_clause")
+    selectClause Json?    @map("select_clause")
+    createdBy    Int?     @map("created_by")
+    updatedBy    Int?     @map("updated_by")
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    @@map("nopd_dynamic_short_code")
+}
+
+model OpdSettings {
+    id Int @id @default(autoincrement())
+
+    isEmail             Boolean           @default(true) @map("is_email")
+    isSMS               Boolean           @default(false) @map("is_sms")
+    isWhatsapp          Boolean           @default(false) @map("is_whatsapp")
+    countryCode         String?           @map("county_code")
+    batchSize           Int               @default(100) @map("batch_size")
+    defaultPrecision    Int               @default(2) @map("default_precision")
+    calculationMethod   CalculationMethod @default(FINAL) @map("calculation_method")
+    roundedFormat       RoundFormat       @default(TO_FIXED) @map("rounded_format")
+    finalRoundedFormat  RoundFormat       @default(TO_FIXED) @map("final_round_format")
+    defaultEmailPostfix String?           @map("default_email_postfix")
+    isActive            Boolean           @default(true) @map("is_active")
+
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("nopd_settings")
+}
+
+model OpdUINConfig {
+    id             Int              @id @default(autoincrement())
+    shortCode      UinShortCode     @map("short_code")
+    sequenceNo     BigInt           @default(0) @map("sequence_no")
+    seqResetDate   DateTime         @map("seq_reset_date") @db.Date
+    seqResetPolicy UIN_RESET_POLICY @default(no) @map("seq_reset_policy")
+    description    String?
+    uinSegments    Json             @map("uin_segments")
+    isActive       Boolean          @default(true) @map("is_active")
+    createdBy      Int?             @map("created_by")
+    updatedBy      Int?             @map("updated_by")
+    createdAt      DateTime         @default(now()) @map("created_at")
+    updatedAt      DateTime         @updatedAt @map("updated_at")
+    deletedAt      DateTime?        @map("deleted_at")
+    deletedBy      Int?             @map("deleted_by")
+
+    @@map("nopd_uin_config")
+}
+
+model DoctorSchedule {
+    id                     Int    @id @default(autoincrement())
+    docId                  Int    @map("doc_id")
+    ccId                   Int    @map("cc_id")
+    weekId                 Int    @map("week_id")
+    startTime              String @map("start_time")
+    endTime                String @map("end_time")
+    maxPatient             Int?   @map("max_patient")
+    timeTaken              Int    @map("time_taken")
+    firstVisitPrice        Float? @default(0.00) @map("first_visit_price")
+    followUpPrice          Float? @default(0.00) @map("follow_up_price")
+    vipFirstVisitPrice     Float? @default(0.00) @map("vip_first_visit_price")
+    vipFollowUpPrice       Float? @default(0.00) @map("vip_follow_up_price")
+    specialFirstVisitPrice Float? @default(0.00) @map("special_first_visit_price")
+    specialFollowUpPrice   Float? @default(0.00) @map("special_follow_up_price")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    doctor Staff            @relation(fields: [docId], references: [id])
+    cc     CollectionCenter @relation(fields: [ccId], references: [id])
+
+    @@index([ccId], name: "opd_doctor_schedule_collection_center_id_idx")
+    @@index([docId], name: "opd_doctor_schedule_doc_id_idx")
+    @@map("nopd_doctor_schedule")
+}
+
+model PatientConsultation {
+    id            Int @id @default(autoincrement())
+    appointmentId Int @map("appointment_id")
+    patientId     Int @map("patient_id")
+
+    temperature           Float       @default(0.00) @map("temperature")
+    weight                Float       @default(0.00) @map("weight")
+    bloodPressure         String?     @map("blood_pressure") @db.VarChar(20)
+    spO2                  Int?        @map("spO2")
+    pulse                 Int?        @map("pulse")
+    notes                 String?     @db.Text
+    height                Float       @default(0.00) @map("height")
+    bloodGroup            BloodGroup? @map("blood_group")
+    bmi                   Float       @default(0.00) @map("bmi")
+    systolicBp            Int?        @map("systolic_bp")
+    diastolicBp           Int?        @map("diastolic_bp")
+    respiratoryRate       Int?        @map("respiratory_rate")
+    heartRateBpm          Int?        @map("heart_rate_bpm")
+    urineOutput           Float?      @default(0.00) @map("urine_output")
+    bloodSugarF           Float?      @default(0.00) @map("blood_sugar_f")
+    bloodSugarR           Float?      @default(0.00) @map("blood_sugar_r")
+    oxygenSupplementation Int?        @map("oxygen_supplementation")
+    intake                Float?      @default(0.00) @map("intake")
+    output                Float?      @default(0.00) @map("output")
+    comments              String?     @map("comments") @db.Text
+
+    blood String? @map("blood") @db.VarChar(200)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+    patient     Patient?    @relation(fields: [patientId], references: [id])
+
+    @@index([appointmentId], name: "patient_consultation_appointment_id_idx")
+    @@index([patientId], name: "patient_consultation_patient_id_idx")
+    @@map("nopd_patient_consultation")
+}
+
+model ConsultationComplaint {
+    id            Int    @id @default(autoincrement())
+    patientId     Int    @map("patient_id")
+    complaint     String @map("complaints") @db.Text
+    appointmentId Int    @map("appointment_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    patient Patient? @relation(fields: [patientId], references: [id])
+
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+
+    @@index([appointmentId], name: "consultation_complaints_appointment_id_idx")
+    @@index([patientId], name: "consultation_complaints_patient_id_idx")
+    @@map("nopd_consultation_complaints")
+}
+
+model PatientAdviceDetails {
+    id               Int    @id @default(autoincrement()) @map("id")
+    appointmentId    Int    @map("appointment_id")
+    patientId        Int    @map("patient_id")
+    advice           String @map("advice") @db.Text
+    initialComplaint String @map("initial_complaint") @db.Text
+
+    referToEmergency       Boolean @default(false) @map("refer_to_emergency")
+    referToAdmission       Boolean @default(false) @map("refer_to_admission")
+    visitComplete          Boolean @default(false) @map("visit_complete")
+    referToMentalHealth    Boolean @default(false) @map("refer_to_mental_health")
+    referToAntenatalCare   Boolean @default(false) @map("refer_to_antenatal_care")
+    surgeryRequest         Boolean @default(false) @map("surgery_request")
+    referToOutsideHospital Boolean @default(false) @map("refer_to_outside_hospital")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    patient     Patient?    @relation(fields: [patientId], references: [id])
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+
+    @@index([appointmentId], name: "consultation_complaints_appointment_id_idx")
+    @@index([patientId], name: "patient_advice_details_patient_id_idx")
+    @@map("nopd_patient_advice_details")
+}
+
+model OpdDepartment {
+    id             Int            @id @default(autoincrement())
+    departmentType DepartmentType @default(PRIMARY) @map("department_type")
+    departmentName String         @map("department_name")
+    isActive       Boolean        @default(true) @map("is_active")
+
+    createdBy            Int?                   @map("created_by")
+    updatedBy            Int?                   @map("updated_by")
+    createdAt            DateTime               @default(now()) @map("created_at")
+    updatedAt            DateTime               @updatedAt @map("updated_at")
+    deletedAt            DateTime?              @map("deleted_at")
+    deletedBy            Int?                   @map("deleted_by")
+    opdDepartmentPrefix  OpdDepartmentPrefix[]
+    patientReferToDoctor PatientReferToDoctor[]
+
+    @@map("nopd_department")
+}
+
+model OpdDepartmentPrefix {
+    id              Int     @id @default(autoincrement())
+    opdDepartmentId Int     @map("opd_department_id")
+    prefix          String  @map("prefix")
+    licenseType     String  @map("license_type")
+    isActive        Boolean @default(true) @map("is_active")
+
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    opdDepartment OpdDepartment @relation(fields: [opdDepartmentId], references: [id])
+
+    @@index([opdDepartmentId], name: "opd_department_prefix_opd_department_id_idx")
+    @@map("nopd_department_prefix")
+}
+
+model ClinicalHistory {
+    id            Int @id @default(autoincrement())
+    appointmentId Int @map("appointment_id")
+    patientId     Int @map("patient_id")
+
+    isSulphurDrugs Boolean @default(false) @map("is_sulphur_drugs")
+    isCodeine      Boolean @default(false) @map("is_codeine")
+    isPenicillin   Boolean @default(false) @map("is_penicillin")
+    isAspirin      Boolean @default(false) @map("is_aspirin")
+    isIbuprofen    Boolean @default(false) @map("is_ibuprofen")
+    isIodine       Boolean @default(false) @map("is_iodine")
+    allergiesNote  String? @map("allergies_note")
+
+    isDiabetes          Boolean @default(false) @map("is_diabetes")
+    isCancer            Boolean @default(false) @map("is_cancer")
+    isHypertension      Boolean @default(false) @map("is_hypertension")
+    isAsthma            Boolean @default(false) @map("is_asthma")
+    isStd               Boolean @default(false) @map("is_std")
+    isUlcer             Boolean @default(false) @map("is_ulcer")
+    isG6pdPartialDefect Boolean @default(false) @map("is_g6pd_partial_defect")
+    isSickleCellDisease Boolean @default(false) @map("is_sickle_cell_disease")
+    isOtherDisease      Boolean @default(false) @map("is_other_disease")
+    otherNote           String? @map("other_note")
+    isSmoke             Boolean @default(false) @map("is_smoke")
+    isDrink             Boolean @default(false) @map("is_drink")
+    isSurgery           Boolean @default(false) @map("is_surgery")
+    surgeryNote         String? @map("surgery_note")
+    isMedication        Boolean @default(false) @map("is_medication")
+    medicationNote      String? @map("medication_note")
+
+    isPregnant      Boolean @default(false) @map("is_pregnant")
+    isBreastFeeding Boolean @default(false) @map("is_breast_feeding")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    patient     Patient     @relation(fields: [patientId], references: [id])
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+
+    @@index([patientId], name: "opd_clinical_history_patient_id_idx")
+    @@index([appointmentId], name: "opd_clinical_history_appointment_id_idx")
+    @@map("nopd_clinical_history")
+}
+
+model TimeSlot {
+    id                Int      @id @default(autoincrement())
+    docId             Int      @map("doc_id")
+    appointmentId     Int      @map("appointment_id")
+    bookedTime        String   @map("booked_time")
+    bookedDate        DateTime @map("booked_date") @db.Date
+    isBooked          Boolean  @map("is_booked")
+    isBookedWithMoney Boolean  @default(false) @map("is_booked_with_money")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    doctor      Staff       @relation(fields: [docId], references: [id])
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+
+    @@index([docId], name: "time_slot_doc_id_idx")
+    @@index([appointmentId], name: "time_slot_appointment_id_idx")
+    @@map("nopd_time_slot")
+}
+
+model Appointment {
+    id              Int             @id @default(autoincrement())
+    appointmentId   String          @map("appointment_id")
+    patientUniqueId Int             @map("patient_unique_id")
+    patientId       Int             @map("patient_id")
+    ccId            Int             @map("cc_id")
+    doctorId        Int             @map("doctor_id")
+    clientId        Int?            @map("client_id")
+    visitId         String?         @map("visit_id")
+    weekId          Int             @map("week_id")
+    appointmentType AppointmentType @map("appointment_type")
+    contactNumber   String          @map("contact_number")
+    reason          String?         @map("reason") @db.Text
+
+    isVipBooking     Boolean? @map("is_vip_booking")
+    isSpecialBooking Boolean? @map("is_special_booking")
+
+    subtotalAmount    Float @default(0) @map("sub_total_amount")
+    otherChargeAmount Float @default(0) @map("other_charge_amount")
+
+    taxMethod TAX_METHOD @default(EXCLUSIVE) @map("tax_method")
+    taxValue  Float      @default(0) @map("tax_value")
+    taxAmount Float      @default(0) @map("tax_amount")
+
+    additionalDiscountMode  PercentageOrAmount? @map("additional_discount_mode")
+    additionalDiscountValue Float?              @default(0) @map("additional_discount_value")
+    discountTotalAmount     Float               @default(0) @map("discount_total_amount")
+
+    netAmount      Float @default(0) @map("net_amount")
+    grossAmount    Float @default(0) @map("gross_amount")
+    paidAmount     Float @default(0) @map("paid_amount")
+    refundAmount   Float @default(0) @map("refund_amount")
+    refundedAmount Float @default(0) @map("refunded_amount")
+
+    // Insurance Information
+    insuranceId        Int? @map("insurance_id")
+    patientInsuranceId Int? @map("patient_insurance_id")
+
+    coPaymentType   PercentageOrAmount? @default(PERCENTAGE) @map("copayment_type")
+    coPaymentValue  Float?              @default(0) @map("copayment_value")
+    coPaymentAmount Float?              @default(0) @map("copayment_amount")
+    coPaymentSource CoPaymentSource     @default(SETTINGS) @map("copayment_source")
+
+    // Payment Status and Appointment Status
+    paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+    status        AptStatus     @default(BOOKED) @map("status")
+    billId        String?       @map("bill_id")
+    referredBy    ReferredBy?   @map("referred_by")
+    isFoc         Boolean?      @default(false) @map("is_foc")
+    focBillReason FocBillReason @default(NONE) @map("foc_bill_reason")
+    isMigrated    Boolean?      @default(false) @map("is_migrated")
+    isRescheduled Boolean       @default(false) @map("is_rescheduled")
+
+    procedureStatus ModuleStatus? @map("procedure_status")
+    pharmacyStatus  ModuleStatus? @map("pharmacy_status")
+
+    // Date Time Information
+    selectedDate DateTime @map("selected_date") @db.Date
+    selectedTime String   @map("selected_time")
+
+    // Cancellation Information
+    cancellationReason String?   @map("cancellation_reason")
+    cancelledBy        Int?      @map("cancelled_by")
+    cancelledAt        DateTime? @map("cancelled_at")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    patient                Patient                  @relation(fields: [patientId], references: [id])
+    doctor                 Staff                    @relation(fields: [doctorId], references: [id])
+    client                 ClientMaster?            @relation(fields: [clientId], references: [id])
+    cc                     CollectionCenter         @relation(fields: [ccId], references: [id])
+    patientConsultation    PatientConsultation[]
+    consultationComplaint  ConsultationComplaint[]
+    patientAdviceDetails   PatientAdviceDetails[]
+    clinicalHistory        ClinicalHistory[]
+    patientFollowUp        PatientFollowUp[]
+    patientDocument        PatientDocument[]
+    consultationIcdTenList ConsultationICDTenList[]
+    insurance              InsuranceMaster?         @relation(fields: [insuranceId], references: [id])
+    consultation           Consultation[]
+    patientTest            PatientTest[]
+    patientInsurance       PatientInsurance?        @relation(fields: [patientInsuranceId], references: [id])
+
+    patientReferToDoctor    PatientReferToDoctor[]
+    financialChangeRequests FinancialChangeRequest[]
+    timeSlots               TimeSlot[]
+    patientProcedures       PatientProcedure[]
+    patientMedicines        PatientMedicine[]
+
+    @@index([patientId], name: "appointments_table_patient_id_idx")
+    @@index([doctorId], name: "appointments_table_doctor_id_idx")
+    @@index([ccId], name: "appointments_table_cc_id_idx")
+    @@index([clientId], name: "appointments_table_client_id_idx")
+    @@index([insuranceId], name: "appointments_table_insurance_id_idx")
+    @@index([patientInsuranceId], name: "appointments_table_patient_insurance_id_idx")
+    @@map("nopd_appointments")
+}
+
+model PatientDocument {
+    id            Int          @id @default(autoincrement())
+    appointmentId Int          @map("appointment_id")
+    patientId     Int          @map("patient_id")
+    documentType  DocumentName @map("document_type")
+    filePath      String       @map("file_path")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+    patient     Patient     @relation(fields: [patientId], references: [id])
+
+    @@index([patientId], name: "patient_documents_table_patient_id_idx")
+    @@index([appointmentId], name: "patient_documents_table_appointment_id_idx")
+    @@map("nopd_patient_documents")
+}
+
+model PatientReferToDoctor {
+    id              Int       @id @default(autoincrement())
+    appointmentId   Int       @map("appointment_id")
+    patientId       Int       @map("patient_id")
+    visitType       VisitType @map("visit_type")
+    description     String?
+    opdDepartmentId Int       @map("opd_department_id")
+    doctorId        Int       @map("doctor_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    appointment   Appointment   @relation(fields: [appointmentId], references: [id])
+    patient       Patient       @relation(fields: [patientId], references: [id])
+    opdDepartment OpdDepartment @relation(fields: [opdDepartmentId], references: [id])
+    doctor        Staff         @relation(fields: [doctorId], references: [id])
+
+    @@index([appointmentId], name: "patient_refer_to_doctor_appointment_id_idx")
+    @@index([patientId], name: "patient_refer_to_doctor_patient_id_idx")
+    @@index([opdDepartmentId], name: "patient_refer_to_doctor_opd_department_id_idx")
+    @@index([doctorId], name: "patient_refer_to_doctor_doctor_id_idx")
+    @@map("nopd_patient_refer_to_doctor")
+}
+
+model PathologyB2BInvoiceAmountSummary {
+    id               Int         @id @default(autoincrement())
+    caseId           String      @map("case_id")
+    invoiceId        String      @map("invoice_id")
+    b2bClientId      Int         @map("b2b_client_id")
+    totalAmount      String      @map("total_amount")
+    status           String
+    creationDate     DateTime    @default(now()) @map("creation_date")
+    paidDate         DateTime    @map("paid_date") @db.Date
+    invoicePaymentId Int?        @map("invoice_payment_id")
+    mrpRate          String?     @map("mrp_rate")
+    serviceType      ServiceCode @default(PATHOLOGY) @map("service_type")
+
+    @@map("pathology_b2b_invoice_amount_summary")
+}
+
+model PatientFollowUp {
+    id                        Int            @id @default(autoincrement())
+    appointmentId             Int            @map("appointment_id")
+    patientId                 Int            @map("patient_id")
+    doctorId                  Int            @map("doctor_id")
+    followUpDays              Int            @map("follow_up_days")
+    followUpDate              DateTime       @map("follow_up_date") @db.Date
+    status                    FollowUpStatus @default(UPCOMING)
+    isCurrentDateReminderSent Boolean        @default(false) @map("is_current_date_reminder_sent")
+    isAheadReminderSent       Boolean        @default(false) @map("is_ahead_reminder_sent")
+    isReminderSent            Json           @map("is_reminder_sent")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+    patient     Patient     @relation(fields: [patientId], references: [id])
+    doctor      Staff       @relation(fields: [doctorId], references: [id])
+
+    @@index([appointmentId], name: "patient_follow_up_appointment_id_idx")
+    @@index([patientId], name: "patient_follow_up_patient_id_idx")
+    @@index([doctorId], name: "patient_follow_up_doctor_id_idx")
+    @@map("nopd_patient_follow_up")
+}
+
+model ChipsButtonMapping {
+    id        Int    @id @default(autoincrement())
+    doctorId  Int    @map("doctor_id")
+    chipsName String @map("chips_name")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    doctor Staff @relation(fields: [doctorId], references: [id])
+
+    @@index([doctorId], name: "chips_doctor_mapping_doctor_id_idx")
+    @@map("nopd_chips_button_mapping")
+}
+
+model ConsultationICDTenList {
+    id                Int                    @id @default(autoincrement())
+    appointmentId     Int                    @map("appointment_id")
+    icdTenId          Int                    @map("icd_ten_id")
+    patientId         Int                    @map("patient_id")
+    attendance        String?                @db.VarChar(100)
+    type              ConsultationICD10Type? @map("type")
+    statusOfDiagnosis StatusOfDiagnosis?     @map("status_of_diagnosis")
+    category          CategoryType?          @map("category")
+    adverseEffect     String?                @map("adverse_effect") @db.VarChar(150)
+    dgrgCode          String?                @map("dgrg_code") @db.VarChar(100)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+    icdTen      ICDTen      @relation(fields: [icdTenId], references: [id])
+    patient     Patient     @relation(fields: [patientId], references: [id])
+
+    @@index([icdTenId], name: "consultation_icd_ten_list_icd_10_id_idx")
+    @@index([appointmentId], name: "consultation_icd_ten_list_appointment_id_idx")
+    @@index([patientId], name: "consultation_icd_ten_list_patient_id_idx")
+    @@map("nopd_consultation_icd_ten_list")
+}
+
+model ConsultationNotes {
+    id               Int    @id @default(autoincrement())
+    consultationName String @map("consultation_name")
+
+    isActive                 Boolean                    @default(true) @map("is_active")
+    createdBy                Int?                       @map("created_by")
+    updatedBy                Int?                       @map("updated_by")
+    deletedBy                Int?                       @map("deleted_by")
+    createdAt                DateTime                   @default(now()) @map("created_at")
+    updatedAt                DateTime                   @updatedAt @map("updated_at")
+    deletedAt                DateTime?                  @map("deleted_at")
+    consultationNotesMapping ConsultationNotesMapping[]
+
+    @@map("nopd_consultation_notes")
+}
+
+model ConsultationNotesMapping {
+    id                  Int @id @default(autoincrement())
+    consultationNotesId Int @map("consultation_notes_id")
+    doctorId            Int @map("doctor_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    consultationNotes ConsultationNotes @relation(fields: [consultationNotesId], references: [id])
+    doctor            Staff             @relation(fields: [doctorId], references: [id])
+
+    @@index([consultationNotesId], name: "consultation_notes_mapping_consultation_notes_id_idx")
+    @@index([doctorId], name: "consultation_notes_mapping_doctor_id_idx")
+    @@map("nopd_consultation_notes_mapping")
+}
+
+model ICDTen {
+    id                     Int                      @id @default(autoincrement())
+    icdGeneralCode         String                   @map("icd_general_code")
+    seqNo                  String?                  @map("seq_no")
+    icdSpecificCode        String                   @map("icd_specific_code")
+    icdDescription         String                   @map("icd_description")
+    icdName                String                   @map("icd_name")
+    insertTimestamp        DateTime                 @default(now()) @map("insert_timestamp")
+    consultationICDTenList ConsultationICDTenList[]
+
+    @@map("icd_ten_master")
+}
+
+model OpdInsurerPaymentSetting {
+    id             Int                @id @default(autoincrement())
+    insurerId      Int                @map("insurer_id")
+    locationId     Int                @map("location_id")
+    type           OpdMasterType      @default(Procedure)
+    typeId         Int                @map("type_id")
+    standardCharge Float              @map("standard_charge")
+    paymentMode    InsurerPaymentMode @map("payment_mode")
+    paymentValue   Float              @map("payment_value")
+    paymentAmount  Float?             @map("payment_amount")
+
+    firstVisitPrice        Float? @default(0.00) @map("first_visit_price")
+    followUpPrice          Float? @default(0.00) @map("followup_price")
+    vipFirstVisitPrice     Float? @default(0.00) @map("vip_first_visit_price")
+    vipFollowUpPrice       Float? @default(0.00) @map("vip_followup_price")
+    specialFirstVisitPrice Float? @default(0.00) @map("special_first_visit_price")
+    specialFollowUpPrice   Float? @default(0.00) @map("special_followup_price")
+
+    status    BinaryFlag @default(true)
+    createdBy Int?       @map("created_by")
+    createdAt DateTime   @default(now()) @map("created_at")
+    updatedAt DateTime   @updatedAt @map("updated_at")
+    updatedBy Int?       @map("updated_by")
+
+    insurer  InsuranceMaster  @relation(fields: [insurerId], references: [id])
+    location CollectionCenter @relation(fields: [locationId], references: [id])
+
+    @@index([insurerId], name: "opd_insurer_payment_setting_insurer_index")
+    @@index([locationId], name: "opd_insurer_payment_setting_location_index")
+    @@index([type, typeId], name: "opd_insurer_payment_setting_type_typeid_index")
+    @@map("opd_insurer_payment_settings")
+}
+
+model OpdClientMasterSetting {
+    id                     Int           @id @default(autoincrement())
+    clientId               Int           @map("client_id")
+    locationId             Int           @map("location_id")
+    type                   OpdMasterType @default(Procedure)
+    typeId                 Int           @map("type_id")
+    standardCharge         Float         @map("standard_charge")
+    paymentMode            PaymentMode   @default(in_percentage) @map("payment_mode")
+    paymentValue           Float         @map("payment_value")
+    paymentAmount          Float?        @map("payment_amount")
+    firstVisitPrice        Float         @default(0.00) @map("first_visit_price")
+    followUpPrice          Float         @default(0.00) @map("followup_price")
+    vipFirstVisitPrice     Float         @default(0.00) @map("vip_first_visit_price")
+    vipFollowUpPrice       Float         @default(0.00) @map("vip_followup_price")
+    specialFirstVisitPrice Float         @default(0.00) @map("special_first_visit_price")
+    specialFollowUpPrice   Float         @default(0.00) @map("special_followup_price")
+    status                 BinaryFlag    @default(true)
+    createdBy              Int?          @map("created_by")
+    createdAt              DateTime?     @default(now()) @map("created_at")
+    updatedAt              DateTime      @updatedAt @map("updated_at")
+    updatedBy              Int?          @map("updated_by")
+
+    location CollectionCenter @relation(fields: [locationId], references: [id])
+    client   ClientMaster     @relation(fields: [clientId], references: [id])
+
+    @@index([locationId], name: "opd_client_master_setting_location_index")
+    @@index([clientId], name: "opd_client_master_setting_client_id_idx")
+    @@index([type, typeId], name: "opd_client_master_setting_type_typeid_index")
+    @@map("opd_client_master_settings")
+}
+
+model PatientInsurance {
+    id             Int           @id @default(autoincrement())
+    insurerId      Int           @map("insurer_id")
+    patientId      Int           @map("patient_id")
+    insuranceType  InsuranceType @map("insurance_type")
+    insurancePlan  String?       @map("insurance_plan") @db.VarChar(100)
+    policyNumber   String?       @map("policy_number") @db.VarChar(100)
+    relationship   String?       @db.VarChar(50)
+    issueDate      DateTime?     @map("issue_date") @db.Date
+    expireDate     DateTime?     @map("expire_date") @db.Date
+    cardFrontImage String?       @map("card_front_image") @db.VarChar(255)
+    cardBackImage  String?       @map("card_back_image") @db.VarChar(255)
+    createdBy      Int?          @map("created_by")
+    createdAt      DateTime      @default(now()) @map("created_at")
+    updatedAt      DateTime      @updatedAt @map("updated_at")
+
+    insurance        InsuranceMaster    @relation(fields: [insurerId], references: [id])
+    patient          Patient            @relation(fields: [patientId], references: [id])
+    patientProcedure PatientProcedure[]
+    appointments     Appointment[]
+
+    @@index([insurerId], name: "patient_insurance_insurer_id_idx")
+    @@index([patientId], name: "patient_insurance_patient_id_idx")
+    @@map("patients_insurance")
+}
+
+model Consultation {
+    id                Int       @id @default(autoincrement())
+    appointmentId     Int       @map("appointment_id")
+    patientId         Int       @map("patient_id")
+    consultationNotes Json      @map("consultation_notes")
+    isActive          Boolean   @default(true) @map("is_active")
+    createdBy         Int?      @map("created_by")
+    updatedBy         Int?      @map("updated_by")
+    deletedBy         Int?      @map("deleted_by")
+    createdAt         DateTime  @default(now()) @map("created_at")
+    updatedAt         DateTime  @updatedAt @map("updated_at")
+    deletedAt         DateTime? @map("deleted_at")
+
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+    patient     Patient     @relation(fields: [patientId], references: [id])
+
+    @@index([appointmentId], name: "consultation_appointment_id_idx")
+    @@index([patientId], name: "consultation_patient_id_idx")
+    @@map("nopd_consultation")
+}
+
+model PathologyMaster {
+    id                Int           @id @default(autoincrement())
+    analyteId         String?       @map("analyteid")
+    analytecode       String        @map("analytecode")
+    analyteName       String        @map("analyte_name")
+    departmentName    String?       @map("department_name")
+    methodName        String?       @map("method_name")
+    sampleName        String?       @map("sample_name")
+    containerName     String?       @map("container_name")
+    standardCharge    Float         @default(500.00) @map("standard_charge")
+    ccId              Int           @default(1) @map("cc_id")
+    isCommentRequired YesNoEnum     @default(No) @map("is_comment_required")
+    orderable         String        @default("Yes")
+    isActive          String?       @map("is_active")
+    patientTest       PatientTest[]
+    tests             Tests[]
+
+    @@map("pathology_master")
+}
+
+model TestCategories {
+    id            Int    @id @default(autoincrement())
+    doctorId      Int    @map("doctor_id")
+    catergoryName String @map("category_name")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    doctor Staff   @relation(fields: [doctorId], references: [id])
+    tests  Tests[]
+
+    @@index([doctorId], name: "test_categories_doctor_id_idx")
+    @@map("nopd_test_categories")
+}
+
+model Tests {
+    id             Int    @id @default(autoincrement())
+    testCategoryId Int    @map("test_category_id")
+    testId         Int    @map("test_id")
+    testCode       String @map("test_code")
+    testName       String @map("test_name")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    testCategories TestCategories  @relation(fields: [testCategoryId], references: [id])
+    test           PathologyMaster @relation(fields: [testId], references: [id])
+
+    @@index([testCategoryId], name: "tests_test_category_id_idx")
+    @@index([testId], name: "tests_test_id_idx")
+    @@map("nopd_tests")
+}
+
+model PatientTest {
+    id              Int     @id @default(autoincrement())
+    appointmentId   Int     @map("appointment_id")
+    patientId       Int     @map("patient_id")
+    testId          Int     @map("test_id")
+    testCode        String  @map("test_code")
+    testName        String  @map("test_name")
+    visitId         String? @map("visit_id")
+    comment         String?
+    processLocation Int?    @map("process_location")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    appointment      Appointment       @relation(fields: [appointmentId], references: [id])
+    patient          Patient           @relation(fields: [patientId], references: [id])
+    test             PathologyMaster   @relation(fields: [testId], references: [id])
+    collectionCenter CollectionCenter? @relation(fields: [processLocation], references: [id])
+
+    @@index([appointmentId], name: "patient_test_appointment_id_idx")
+    @@index([patientId], name: "patient_test_patient_id_idx")
+    @@index([testId], name: "patient_test_test_id_idx")
+    @@index([processLocation], name: "patient_test_process_location_idx")
+    @@map("nopd_patient_test")
+}
+
+model ProcedureMaster {
+    id              Int    @id @default(autoincrement())
+    ccId            Int    @map("cc_id")
+    procedureName   String @map("procedure_name")
+    procedureCharge Float  @map("procedure_charge")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    collectionCenter CollectionCenter @relation(fields: [ccId], references: [id])
+
+    patientProcedureDetails PatientProcedureDetails[]
+
+    @@index([ccId], name: "procedure_master_cc_id_idx")
+    @@map("nopd_procedure_master")
+}
+
+model PatientProcedure {
+    id                    Int    @id @default(autoincrement())
+    patientProcedureRefNo String @map("patient_procedure_ref_no")
+    ccId                  Int    @map("cc_id")
+    appointmentId         Int    @map("appointment_id")
+    patientId             Int    @map("patient_id")
+
+    insuranceId        Int? @map("insurance_id")
+    patientInsuranceId Int? @map("patient_insurance_id")
+    clientId           Int? @map("client_id")
+
+    additionalDiscountMode  PercentageOrAmount? @map("additional_discount_mode")
+    additionalDiscountValue Float               @default(0) @map("additional_discount_value")
+
+    subtotalAmount      Float @default(0) @map("subtotal_amount")
+    otherChargeAmount   Float @default(0) @map("other_charge_amount")
+    discountTotalAmount Float @default(0) @map("discount_total_amount")
+
+    taxAmount       Float @default(0) @map("tax_amount")
+    grossAmount     Float @default(0) @map("gross_amount")
+    netAmount       Float @default(0) @map("net_amount")
+    coPaymentAmount Float @default(0) @map("co_payment_amount")
+
+    paidAmount     Float @default(0) @map("paid_amount")
+    refundAmount   Float @default(0) @map("refund_amount")
+    refundedAmount Float @default(0) @map("refunded_amount")
+
+    status           PatientProcedureStatus @default(COMPLETED)
+    procedureDoneBy  Int?                   @map("procedure_done_by")
+    paymentStatus    ProcedurePaymentStatus @default(PENDING) @map("payment_status")
+    billNumber       String?                @map("bill_number")
+    remark           String?                @map("remark")
+    insurerInvoiceId Int?                   @map("insurer_invoice_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    collectionCenter CollectionCenter  @relation(fields: [ccId], references: [id])
+    appointment      Appointment       @relation(fields: [appointmentId], references: [id])
+    patient          Patient           @relation(fields: [patientId], references: [id])
+    insurance        InsuranceMaster?  @relation(fields: [insuranceId], references: [id])
+    patientInsurance PatientInsurance? @relation(fields: [patientInsuranceId], references: [id])
+    client           ClientMaster?     @relation(fields: [clientId], references: [id])
+
+    patientProcedureDetails PatientProcedureDetails[]
+
+    @@index([ccId], name: "patient_procedure_cc_id_idx")
+    @@index([appointmentId], name: "patient_procedure_appointment_id_idx")
+    @@index([patientId], name: "patient_procedure_patient_id_idx")
+    @@index([insuranceId], name: "patient_procedure_insurance_id_idx")
+    @@index([patientInsuranceId], name: "patient_procedure_patient_insurance_id_idx")
+    @@index([clientId], name: "patient_procedure_client_id_idx")
+    @@map("nopd_patient_procedure")
+}
+
+model PatientProcedureDetails {
+    id                 Int    @id @default(autoincrement())
+    patientProcedureId Int    @map("patient_procedure_id")
+    procedureId        Int    @map("procedure_id")
+    procedureName      String @map("procedure_name")
+
+    subtotalAmount    Float @default(0) @map("subtotal_amount")
+    otherChargeAmount Float @default(0) @map("other_charge_amount")
+
+    discountMode   PercentageOrAmount? @map("discount_mode")
+    discountValue  Float               @default(0) @map("discount_value")
+    discountAmount Float               @default(0) @map("discount_amount")
+
+    taxMethod TAX_METHOD? @map("tax_method")
+    taxValue  Float       @default(0) @map("tax_value")
+    taxAmount Float       @default(0) @map("tax_amount")
+
+    grossAmount Float @map("gross_amount")
+    netAmount   Float @map("net_amount")
+
+    coPaymentMode   PercentageOrAmount? @map("co_payment_mode")
+    coPaymentValue  Float               @default(0) @map("co_payment_value")
+    coPaymentAmount Float               @default(0) @map("co_payment_amount")
+
+    isReturned Boolean @default(false) @map("is_returned")
+
+    coPaymentSource CoPaymentSource @default(SETTINGS) @map("co_payment_source")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    patientProcedure PatientProcedure @relation(fields: [patientProcedureId], references: [id])
+    procedure        ProcedureMaster  @relation(fields: [procedureId], references: [id])
+
+    @@index([patientProcedureId], name: "patient_procedure_details_patient_procedure_id_idx")
+    @@index([procedureId], name: "patient_procedure_details_procedure_id_idx")
+    @@map("nopd_patient_procedure_details")
+}
+
+model FinancialChangeRequest {
+    id            Int                 @id @default(autoincrement())
+    module        String // e.g., OPD, PHARMACY, IPD, LAB, etc.
+    referenceId   Int // the entity ID (appointmentId, saleId, etc.)
+    referenceType String // e.g., 'Appointment', 'PharmacySale'
+    changeType    FinancialChangeType // CO_PAY or DISCOUNT
+
+    oldType   PercentageOrAmount
+    oldValue  Float
+    oldAmount Float
+    newType   PercentageOrAmount
+    newValue  Float
+    newAmount Float
+
+    reason        String?        @db.Text
+    status        ApprovalStatus @default(PENDING)
+    approvedLevel Int? // for tracking which level approved so far
+    approvedBy    Int?
+    approvedAt    DateTime?
+    rejectedBy    Int?
+    rejectedAt    DateTime?
+
+    createdBy Int?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Flexible relation for OPD use-case
+    appointment Appointment? @relation(fields: [referenceId], references: [id])
+
+    @@index([referenceId], name: "core_financial_change_request_reference_id_idx")
+    @@map("core_financial_change_request")
+}
+
+model MedicineTab {
+    id         Int    @id @default(autoincrement())
+    doctorId   Int    @map("doctor_id")
+    medTabName String @map("med_tab_name")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    doctor Staff @relation(fields: [doctorId], references: [id])
+
+    medicineTabDetails MedicineTabDetails[]
+
+    @@index([doctorId], name: "medcine_tab_doctor_id_idx")
+    @@map("nopd_medicine_tab")
+}
+
+model MedicineTabDetails {
+    id            Int     @id @default(autoincrement())
+    medicineTabId Int     @map("medicine_tab_id")
+    medId         Int     @map("med_id")
+    morn          Int?    @default(0)
+    aft           Int?    @default(0)
+    night         Int?    @default(0)
+    sos           Boolean @default(false)
+    duration      Int
+    notes         String? @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    medicineTab MedicineTab @relation(fields: [medicineTabId], references: [id])
+
+    @@index([medicineTabId], name: "medicine_tab_pharmacy_medicine_tab_id_idx")
+    @@map("nopd_medicine_tab_details")
+}
+
+model PatientMedicine {
+    id                  Int         @id @default(autoincrement())
+    appointmentId       Int         @map("appointment_id")
+    patientId           Int         @map("patient_id")
+    patientUniqueId     Int         @map("patient_unique_id")
+    medicineGroupNumber String      @map("medicine_group_number")
+    doctorId            Int         @map("doctor_id")
+    projectType         ProjectType @default(OPD) @map("project_type")
+    notes               String?     @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    doctor      Staff       @relation(fields: [doctorId], references: [id])
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+
+    details PatientMedicineDetail[]
+
+    @@index([appointmentId], name: "patient_medicine_master_appointment_id_idx")
+    @@index([patientId], name: "patient_medicine_master_patient_id_idx")
+    @@index([doctorId], name: "patient_medicine_master_doctor_id_idx")
+    @@map("nopd_patient_medicine")
+}
+
+model PatientMedicineDetail {
+    id        Int     @id @default(autoincrement())
+    masterId  Int     @map("master_id")
+    medId     Int     @map("med_id")
+    sellId    Int?    @map("sell_id")
+    sellRefNo String? @map("sell_ref_no")
+    morn      Int?    @default(0)
+    aft       Int?    @default(0)
+    night     Int?    @default(0)
+    sos       Boolean @default(false)
+    duration  Int
+    notes     String? @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    patientMedicine PatientMedicine @relation(fields: [masterId], references: [id])
+
+    @@index([masterId], name: "patient_medicine_detail_master_id_idx")
+    @@map("nopd_patient_medicine_detail")
+}
+
+model PaymentTransaction {
+    id              Int      @id @default(autoincrement())
+    transactionNo   String   @map("transaction_no")
+    transactionDate DateTime @default(now()) @map("transaction_date")
+
+    module          ServiceCode
+    referenceId     Int         @map("reference_id")
+    referenceNumber String?     @map("reference_number")
+
+    patientId   Int  @map("patient_id")
+    ccId        Int  @map("cc_id")
+    collectorId Int? @map("collector_id")
+
+    netAmount    Float @default(0) @map("net_amount")
+    paidAmount   Float @default(0) @map("paid_amount")
+    dueAmount    Float @default(0) @map("due_amount")
+    refundAmount Float @default(0) @map("refund_amount")
+
+    remarks String?
+
+    transactionType TransactionType        @map("transaction_type")
+    paymentMode     PaymentTransactionMode @map("payment_mode")
+
+    bankName      String? @map("bank_name")
+    accountNumber String? @map("account_number")
+
+    cardNo         String?   @map("card_no")
+    cardHolderName String?   @map("card_holder_name")
+    cardExpiryDate DateTime? @map("card_expiry_date")
+
+    transactionId       String? @map("transaction_id")
+    bankHeadId          Int?    @map("bank_head_id")
+    mobileMoneyMethodId Int?    @map("mobile_money_method_id")
+
+    isReconciled       Boolean   @default(false)
+    reconciliationDate DateTime?
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    patient           Patient            @relation(fields: [patientId], references: [id])
+    collectionCenter  CollectionCenter   @relation(fields: [ccId], references: [id])
+    staff             Staff?             @relation(fields: [collectorId], references: [id])
+    bankHead          CashNBankHead?     @relation(fields: [bankHeadId], references: [id])
+    mobileMoneyMethod MobileMoneyMethod? @relation(fields: [mobileMoneyMethodId], references: [id])
+
+    @@index([ccId], name: "idx_payment_cc_id")
+    @@index([collectorId], name: "idx_payment_collector_id")
+    @@index([patientId], name: "idx_payment_patient_id")
+    @@index([transactionNo], name: "idx_payment_transaction_no")
+    @@index([referenceId, module], name: "idx_payment_reference")
+    @@index([transactionType], name: "idx_payment_trx_type")
+    @@index([paymentMode], name: "idx_payment_mode")
+    @@index([bankHeadId], name: "idx_payment_bank_head_id")
+    @@index([mobileMoneyMethodId], name: "idx_payment_mobile_money_method_id")
+    @@map("nopd_payment_transactions")
+}
+
+model GeneralBillItem {
+    id           Int     @id @default(autoincrement())
+    name         String  @map("name")
+    description  String? @map("description")
+    defaultPrice Float   @map("default_price")
+
+    isActive              Boolean                 @default(true) @map("is_active")
+    createdBy             Int?                    @map("created_by")
+    updatedBy             Int?                    @map("updated_by")
+    deletedBy             Int?                    @map("deleted_by")
+    createdAt             DateTime                @default(now()) @map("created_at")
+    updatedAt             DateTime                @updatedAt @map("updated_at")
+    deletedAt             DateTime?               @map("deleted_at")
+    generalBillPricing    GeneralBillPricing[]
+    generalBillingDetails GeneralBillingDetails[]
+
+    @@map("nopd_general_bill_item")
+}
+
+model GeneralBillPricing {
+    id                Int     @id @default(autoincrement())
+    ccId              Int     @map("cc_id")
+    generalBillItemId Int     @map("general_bill_item_id")
+    description       String? @map("description")
+    price             Float   @map("price")
+
+    isActive         Boolean          @default(true) @map("is_active")
+    createdBy        Int?             @map("created_by")
+    updatedBy        Int?             @map("updated_by")
+    deletedBy        Int?             @map("deleted_by")
+    createdAt        DateTime         @default(now()) @map("created_at")
+    updatedAt        DateTime         @updatedAt @map("updated_at")
+    deletedAt        DateTime?        @map("deleted_at")
+    collectionCenter CollectionCenter @relation(fields: [ccId], references: [id])
+    generalBillItem  GeneralBillItem  @relation(fields: [generalBillItemId], references: [id])
+
+    @@index([ccId], name: "general_bill_pricing_cc_id_idx")
+    @@index([generalBillItemId], name: "general_bill_pricing_general_bill_item_id_idx")
+    @@map("nopd_general_bill_pricing")
+}
+
+model BatchJob {
+    id Int @id @default(autoincrement())
+
+    type         Batch_Type
+    status       Batch_Status @default(PENDING)
+    batchJobNo   String?      @map("batch_job_no")
+    totalQty     Int          @map("total_qty")
+    processedQty Int          @default(0) @map("processed_qty")
+    successCount Int          @default(0) @map("success_count")
+    failureCount Int          @default(0) @map("failure_count")
+
+    createdAt               DateTime                  @default(now()) @map("created_at")
+    updatedAt               DateTime                  @updatedAt @map("updated_at")
+    generalBillPricingExcel GeneralBillPricingExcel[]
+    batchJobDetails         BatchJobDetails[]
+
+    @@map("nopd_batch_job")
+}
+
+model BatchJobDetails {
+    id Int @id @default(autoincrement())
+
+    batchId  Int                  @map("batch_id")
+    type     BT_JOB_DET_TYPE      @default(CREATE)
+    rowTitle String?              @map("row_title")
+    rowNo    Int?                 @map("row_no")
+    refId    Int?                 @map("ref_id")
+    refNo    String?              @map("ref_no")
+    status   Batch_Details_Status
+    errorMsg String?              @map("error_msg") @db.Text
+
+    batch BatchJob @relation(fields: [batchId], references: [id])
+
+    @@index([batchId], name: "batch_job_details_batch_id_idx")
+    @@map("nopd_batch_job_details")
+}
+
+model GeneralBillPricingExcel {
+    id                  Int    @id @default(autoincrement())
+    ccId                Int    @map("cc_id")
+    generalBillItemId   Int    @map("general_bill_item_id")
+    generalBillItemName String @map("general_bill_item_name")
+    price               Int    @map("price")
+    description         String @map("description")
+    batchJobId          Int    @map("batch_job_id")
+
+    batchJob BatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], name: "general_bill_pricing_excel_batch_job_id_idx")
+    @@map("nopd_general_bill_pricing_excel")
+}
+
+model GeneralBilling {
+    id              Int @id @default(autoincrement())
+    ccId            Int @map("cc_id")
+    patientId       Int @map("patient_id")
+    patientUniqueId Int @map("patient_unique_id")
+
+    additionalDiscountMode  PercentageOrAmount? @map("additional_discount_mode")
+    additionalDiscountValue Float               @default(0) @map("additional_discount_value")
+
+    subtotalAmount      Float @default(0) @map("subtotal_amount")
+    otherChargeAmount   Float @default(0) @map("other_charge_amount")
+    discountTotalAmount Float @default(0) @map("discount_total_amount")
+
+    taxAmount   Float @default(0) @map("tax_amount")
+    grossAmount Float @default(0) @map("gross_amount")
+    netAmount   Float @default(0) @map("net_amount")
+
+    paidAmount     Float @default(0) @map("paid_amount")
+    refundAmount   Float @default(0) @map("refund_amount")
+    refundedAmount Float @default(0) @map("refunded_amount")
+
+    billNumber String  @map("bill_number")
+    remark     String? @map("remark")
+
+    paymentStatus PaymentStatus        @default(PENDING) @map("payment_status")
+    status        GeneralBillingStatus @default(COMPLETED)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    collectionCenter      CollectionCenter        @relation(fields: [ccId], references: [id])
+    patient               Patient                 @relation(fields: [patientId], references: [id])
+    generalBillingDetails GeneralBillingDetails[]
+
+    @@index([ccId], name: "patient_procedure_cc_id_idx")
+    @@index([patientId], name: "patient_procedure_patient_id_idx")
+    @@map("nopd_general_billing")
+}
+
+model GeneralBillingDetails {
+    id                Int @id @default(autoincrement())
+    generalBillingId  Int @map("general_billing_id")
+    generalBillItemId Int @map("general_bill_item_id")
+
+    subtotalAmount    Float @default(0) @map("subtotal_amount")
+    otherChargeAmount Float @default(0) @map("other_charge_amount")
+
+    discountMode   PercentageOrAmount? @map("discount_mode")
+    discountValue  Float               @default(0) @map("discount_value")
+    discountAmount Float               @default(0) @map("discount_amount")
+
+    taxMethod TAX_METHOD? @map("tax_method")
+    taxValue  Float       @default(0) @map("tax_value")
+    taxAmount Float       @default(0) @map("tax_amount")
+
+    grossAmount Float @map("gross_amount")
+    netAmount   Float @map("net_amount")
+
+    isRefunded Boolean @default(false) @map("is_refunded")
+    isFoc      Boolean @default(false) @map("is_foc")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    generalBilling  GeneralBilling  @relation(fields: [generalBillingId], references: [id])
+    generalBillItem GeneralBillItem @relation(fields: [generalBillItemId], references: [id])
+
+    @@index([generalBillingId], name: "general_billing_details_general_billing_id_idx")
+    @@index([generalBillItemId], name: "general_billing_details_general_item_pricing_id_idx")
+    @@map("nopd_general_billing_details")
+}

@@ -1,9 +1,0 @@
-model Booking {
-    id            Int      @id @default(autoincrement())
-    bookingNumber String   @unique @map("booking_number")
-    patientName   String   @map("patient_name")
-    createdAt     DateTime @default(now()) @map("created_at")
-    updatedAt     DateTime @updatedAt @map("updated_at")
-
-    @@map("bookings")
-}

@@ -155,36 +155,36 @@ model StaffCollectionCenter {
 }
 
 model CollectionCenter {
-    id                         Int                      @id @default(autoincrement()) @map("id")
-    colName                    String                   @map("col_name") @db.VarChar(100)
-    email                      String                   @db.VarChar(100)
-    phone                      String                   @db.VarChar(100)
-    address                    String                   @db.VarChar(255)
-    langId                     Int                      @map("lang_id")
-    dateFormat                 String                   @map("date_format") @db.VarChar(100)
-    timeFormat                 String                   @map("time_format") @db.VarChar(100)
-    currency                   String                   @db.VarChar(100)
-    currencySymbol             String                   @map("currency_symbol") @db.VarChar(50)
-    timezone                   String                   @db.VarChar(50)
-    testPrefix                 String                   @map("test_prefix") @db.VarChar(50)
-    barcodePrefix              String                   @map("barcode_prefix") @db.VarChar(50)
-    invoicePrefix              String                   @map("invoice_prefix") @db.VarChar(50)
-    disabledOn                 DateTime?                @map("disabled_on")
-    disabledBy                 String                   @default("") @map("disabled_by") @db.VarChar(100)
-    createdAt                  DateTime                 @default(now()) @map("created_at")
-    updatedAt                  DateTime                 @updatedAt @map("updated_at")
-    collectionAbbreviationName String?                  @map("collection_abbreviation_name") @db.VarChar(255)
-    isSubOrganization          BinaryFlag               @default(false) @map("is_sub_organization")
-    diseCode                   String                   @map("dise_code") @db.VarChar(100)
-    connectionCode             String                   @map("connection_code") @db.VarChar(100)
-    barcodePrinterName         String?                  @map("barcode_printer_name") @db.VarChar(255)
-    isActive                   BinaryFlag               @default(true) @map("is_active")
+    id                         Int                        @id @default(autoincrement()) @map("id")
+    colName                    String                     @map("col_name") @db.VarChar(100)
+    email                      String                     @db.VarChar(100)
+    phone                      String                     @db.VarChar(100)
+    address                    String                     @db.VarChar(255)
+    langId                     Int                        @map("lang_id")
+    dateFormat                 String                     @map("date_format") @db.VarChar(100)
+    timeFormat                 String                     @map("time_format") @db.VarChar(100)
+    currency                   String                     @db.VarChar(100)
+    currencySymbol             String                     @map("currency_symbol") @db.VarChar(50)
+    timezone                   String                     @db.VarChar(50)
+    testPrefix                 String                     @map("test_prefix") @db.VarChar(50)
+    barcodePrefix              String                     @map("barcode_prefix") @db.VarChar(50)
+    invoicePrefix              String                     @map("invoice_prefix") @db.VarChar(50)
+    disabledOn                 DateTime?                  @map("disabled_on")
+    disabledBy                 String                     @default("") @map("disabled_by") @db.VarChar(100)
+    createdAt                  DateTime                   @default(now()) @map("created_at")
+    updatedAt                  DateTime                   @updatedAt @map("updated_at")
+    collectionAbbreviationName String?                    @map("collection_abbreviation_name") @db.VarChar(255)
+    isSubOrganization          BinaryFlag                 @default(false) @map("is_sub_organization")
+    diseCode                   String                     @map("dise_code") @db.VarChar(100)
+    connectionCode             String                     @map("connection_code") @db.VarChar(100)
+    barcodePrinterName         String?                    @map("barcode_printer_name") @db.VarChar(255)
+    isActive                   BinaryFlag                 @default(true) @map("is_active")
     staffCollectionCenter      StaffCollectionCenter[]
     notifications              Notification[]
     warehouse                  InvWarehouse[]
     branch                     InvBranch[]
-    inTransitStockFrom         InvInTransitStock[]      @relation(name: "From")
-    inTransitStockTo           InvInTransitStock[]      @relation(name: "To")
+    inTransitStockFrom         InvInTransitStock[]        @relation(name: "From")
+    inTransitStockTo           InvInTransitStock[]        @relation(name: "To")
     itemStore                  InvItemStore[]
     itemSupplierMapping        InvItemSupplierMapping[]
     consumption                Consumption[]
@@ -193,6 +193,16 @@ model CollectionCenter {
     GoodReceiveReturn          InvGoodReceiveReturn[]
     stockAdjustment            InvStockAdjustment[]
     PurchaseOrder              InvPurchaseOrder[]
+    doctorSchedule             DoctorSchedule[]
+    appointment                Appointment[]
+    opdInsurerPaymentSetting   OpdInsurerPaymentSetting[]
+    opdClientMasterSetting     OpdClientMasterSetting[]
+    patientTest                PatientTest[]
+    procedureMaster            ProcedureMaster[]
+    patientProcedure           PatientProcedure[]
+    paymentTransactions        PaymentTransaction[]
+    generalBillings            GeneralBilling[]
+    generalBillPricing         GeneralBillPricing[]
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")
@@ -294,9 +304,20 @@ model Staff {
     // incentiveCalculationType     IncentiveCalculationType @default(STANDARD) @map("incentive_calculation_type")
     // isOpdConsultant              BinaryFlag               @default(false) @map("is_opd_consultant")
 
-    employee              StaffMapping?
-    staffCollectionCenter StaffCollectionCenter[]
-    notifications         Notification[]
+    employee                  StaffMapping?
+    staffCollectionCenter     StaffCollectionCenter[]
+    notifications             Notification[]
+    doctorSchedules           DoctorSchedule[]
+    timeSlots                 TimeSlot[]
+    appointments              Appointment[]
+    patientReferToDoctors     PatientReferToDoctor[]
+    patientFollowUps          PatientFollowUp[]
+    chipsButtonMappings       ChipsButtonMapping[]
+    consultationNotesMappings ConsultationNotesMapping[]
+    testCategories            TestCategories[]
+    medicineTabs              MedicineTab[]
+    patientMedicines          PatientMedicine[]
+    paymentTransactions       PaymentTransaction[]
 
     @@map("staff")
 }
@@ -751,4 +772,260 @@ model EmailConfig {
     createdAt    DateTime @default(now()) @updatedAt @map("created_at")
 
     @@map("email_config")
+}
+
+model Patient {
+    id                      Int                      @id @default(autoincrement())
+    patientUniqueId         Int                      @map("patient_unique_id")
+    admissionDate           String?                  @map("admission_date") @db.VarChar(100)
+    patientName             String?                  @map("patient_name") @db.VarChar(100)
+    age                     String                   @map("age") @db.VarChar(10)
+    month                   String                   @map("month") @db.VarChar(200)
+    days                    String?                  @db.VarChar(255)
+    image                   String?                  @db.VarChar(100)
+    mobileNo                String?                  @map("mobileno") @db.VarChar(100)
+    email                   String?                  @db.VarChar(100)
+    dob                     DateTime?                @db.Date
+    gender                  String?                  @db.VarChar(100)
+    maritalStatus           String?                  @map("marital_status") @db.VarChar(100)
+    bloodGroup              String?                  @map("blood_group") @db.VarChar(200)
+    address                 String                   @db.Text
+    guardianName            String?                  @map("guardian_name") @db.VarChar(100)
+    guardianPhone           String?                  @map("guardian_phone") @db.VarChar(100)
+    guardianAddress         String?                  @map("guardian_address") @db.Text
+    guardianEmail           String?                  @map("guardian_email") @db.VarChar(100)
+    isActive                String?                  @default("no") @map("is_active") @db.VarChar(255)
+    discharged              String?                  @db.VarChar(100)
+    patientType             String                   @map("patient_type") @db.VarChar(200)
+    creditLimit             String?                  @map("credit_limit") @db.VarChar(50)
+    organization            String?                  @map("organisation") @db.VarChar(100)
+    knownAllergies          String?                  @map("known_allergies") @db.VarChar(200)
+    oldPatient              String?                  @map("old_patient") @db.VarChar(100)
+    createdAt               DateTime                 @default(now()) @map("created_at")
+    updatedAt               DateTime                 @default(now()) @map("updated_at")
+    disableAt               DateTime?                @map("disable_at")
+    note                    String                   @db.VarChar(200)
+    isIpd                   String?                  @map("is_ipd") @db.VarChar(200)
+    ccId                    Int?                     @map("cc_id")
+    isMaster                MasterType?              @map("is_master")
+    uniqueSequenceNumber    Int                      @map("unique_sequence_number")
+    aadhar                  String?                  @db.VarChar(100)
+    passport                String?                  @db.VarChar(100)
+    nationality             String?                  @db.VarChar(100)
+    area                    String?                  @db.VarChar(100)
+    pinCode                 String?                  @map("pincode") @db.VarChar(100)
+    height                  String?                  @db.VarChar(100)
+    weight                  String?                  @db.VarChar(100)
+    patientCode             String?                  @map("patient_code") @db.VarChar(100)
+    userLogin               String?                  @map("user_login") @db.VarChar(100)
+    state                   String?                  @db.VarChar(100)
+    userRelationship        String?                  @map("user_relationship") @db.VarChar(100)
+    pid                     String?                  @db.VarChar(100)
+    localId                 String?                  @map("local_id") @db.VarChar(100)
+    street                  String?                  @db.VarChar(255)
+    city                    String?                  @db.VarChar(100)
+    pinCode2                String?                  @map("pin_code") @db.VarChar(10)
+    country                 Int?                     @db.Int
+    remarks                 String?                  @db.VarChar(155)
+    patientImage            String?                  @map("patient_image") @db.VarChar(255)
+    emergencyFirstName      String?                  @map("emergency_first_name") @db.VarChar(255)
+    emergencyLastName       String?                  @map("emergency_last_name") @db.VarChar(255)
+    emergencyRelation       String?                  @map("emergency_relation") @db.VarChar(255)
+    emergencyPhoneNumber    String?                  @map("emergency_phone_number") @db.VarChar(15)
+    emergencyEmail          String?                  @map("emergency_email") @db.VarChar(255)
+    emergencyMaritalStatus  String?                  @map("emergency_marital_status") @db.VarChar(50)
+    emergencyAddress        String?                  @map("emergency_address") @db.Text
+    emergencyState          String?                  @map("emergency_state") @db.VarChar(100)
+    emergencyCountry        String?                  @map("emergency_country") @db.VarChar(100)
+    patientSignature        String?                  @map("patient_signature") @db.Text
+    patientOccupation       String?                  @map("patient_occupation") @db.VarChar(255)
+    employeeId              String?                  @map("employee_id")
+    clientId                Int?                     @map("client_id")
+    client                  ClientMaster?            @relation(fields: [clientId], references: [id])
+    patientConsultation     PatientConsultation[]
+    consultationComplaint   ConsultationComplaint[]
+    patientAdviceDetails    PatientAdviceDetails[]
+    appointment             Appointment[]
+    patientDocument         PatientDocument[]
+    clinicalHistory         ClinicalHistory[]
+    patientReferToDoctor    PatientReferToDoctor[]
+    patientFollowUp         PatientFollowUp[]
+    consultation            Consultation[]
+    patientTest             PatientTest[]
+    patientInsurance        PatientInsurance[]
+    patientProcedure        PatientProcedure[]
+    consultationICDTenLists ConsultationICDTenList[]
+    paymentTransactions     PaymentTransaction[]
+    generalBillings         GeneralBilling[]
+
+    @@index([patientUniqueId], name: "patient_unique_id")
+    @@index([note], name: "note")
+    @@index([email], name: "email")
+    @@index([mobileNo, patientName], name: "patients_mobileno_patient_name_IDX")
+    @@index([patientName], name: "patients_patient_name_IDX")
+    @@index([mobileNo], name: "patients_mobileno_IDX")
+    @@index([clientId], name: "patients_client_id")
+    @@map("patients")
+}
+
+model ClientMaster {
+    id                            Int                      @id @default(autoincrement())
+    customerCode                  String                   @map("customer_code") @db.VarChar(50)
+    customerName                  String                   @map("customer_name") @db.VarChar(255)
+    contactNo                     String                   @map("contact_no") @db.VarChar(100)
+    email                         String                   @db.VarChar(255)
+    businessType1                 String?                  @map("business_type_1") @db.Char(10)
+    customerPlan1                 String?                  @map("customer_plan_1") @db.Char(100)
+    businessType                  BUSINESS_TYPE            @default(b2c) @map("business_type")
+    customerPlan                  CUSTOMER_PLAN            @default(postpaid) @map("customer_plan")
+    customerType                  Int?                     @map("customer_type")
+    isCashClient                  String?                  @map("is_cash_client") @db.Char(3)
+    creditAmt                     Decimal?                 @map("credit_amt") @db.Decimal(11, 2)
+    creditLimit                   String?                  @map("credit_limit") @db.VarChar(500)
+    asAdv                         Decimal?                 @map("as_adv") @db.Decimal(11, 2)
+    additionalCreditLimit         Decimal?                 @map("additional_credit_limit") @db.Decimal(10, 2)
+    creditPeriodInDays            String?                  @map("credit_period_in_days") @db.VarChar(10)
+    minInvoicePayment             String?                  @map("min_invoice_payment") @db.Char(10)
+    invoiceAgeing                 String?                  @map("invoice_ageing") @db.Char(10)
+    createdUser                   String?                  @map("created_user") @db.Char(100)
+    createdDate                   DateTime?                @map("created_date")
+    customerActiveFrom            DateTime?                @map("customer_active_from")
+    customerStatus                String?                  @map("customer_status") @db.Char(10)
+    status                        InsurerStatus            @default(active)
+    billEmail                     YesNoFlag                @default(no) @map("bill_email")
+    billSms                       YesNoFlag                @default(no) @map("bill_sms")
+    reportEmail                   YesNoFlag                @default(no) @map("report_email")
+    reportSms                     YesNoFlag                @default(no) @map("report_sms")
+    reportWithHeader              YesNoFlag                @default(no) @map("report_with_header")
+    logoImage                     String?                  @default("uploads/patient_images/no_image.png") @map("logo_image") @db.VarChar(255)
+    parentClientName              String?                  @map("parent_client_name") @db.VarChar(100)
+    adhaar                        String?                  @db.VarChar(100)
+    pan                           String?                  @db.VarChar(100)
+    gstNo                         String?                  @map("gst_no") @db.VarChar(100)
+    viewDashboard                 YesNoFlag                @default(yes) @map("view_dashboard")
+    viewRegistration              YesNoFlag                @default(yes) @map("view_registration")
+    viewServiceRate               String?                  @map("view_service_rate") @db.Char(3)
+    ccId                          Int?                     @map("cc_id")
+    isMaster                      MasterType?              @map("is_master")
+    reportMaxLimitToPrintDownload Int?                     @map("report_max_limit_to_print_download")
+    reportAllowPrintDownload      YesNoFlag                @default(no) @map("report_allow_print_download")
+    customeCustomerCode           String                   @map("custome_customer_code") @db.VarChar(255)
+    sapCode                       String?                  @map("sap_code") @db.VarChar(100)
+    prepaidThresholdAmount        Decimal                  @map("prepaid_threshold_amount") @db.Decimal(10, 0)
+    prepaidAccountBalance         Decimal                  @map("prepaid_account_balance") @db.Decimal(10, 0)
+    securityDepositAmount         Decimal                  @default(0.00) @map("security_deposit_amount") @db.Decimal(10, 2)
+    additionalCreditPeriodInDays  Int?                     @map("additional_credit_period_in_days")
+    statusChangeRemark            String?                  @map("status_change_remark") @db.VarChar(255)
+    billPrintEmailGrossNet        BillPrintEmailGrossNet   @default(gross) @map("bill_print_email_gross_net")
+    billPrint                     YesNoFlag                @default(yes) @map("bill_print")
+    billAddress                   String?                  @map("bill_address") @db.LongText
+    shiftAddress                  String?                  @map("shift_address") @db.LongText
+    uploadedDocuments             String?                  @map("uploaded_documents") @db.LongText
+    portalAccessConfig            String?                  @map("portal_access_config") @db.LongText
+    printConfig                   String?                  @map("print_config") @db.LongText
+    notificationConfig            String?                  @map("notification_config") @db.LongText
+    clientHead                    Int?                     @map("client_head")
+    odcCollectionCenterKey        String?                  @map("odc_collection_center_key") @db.VarChar(100)
+    odcOrganizationKey            String?                  @map("odc_organization_key") @db.VarChar(100)
+    odcInitial                    String?                  @map("odc_initial") @db.VarChar(100)
+    odcCode                       String?                  @map("odc_code") @db.VarChar(100)
+    attachments                   String?                  @db.LongText
+    parentClientId                Int?                     @map("parent_client_id")
+    patient                       Patient[]
+    appointment                   Appointment[]
+    opdClientMasterSetting        OpdClientMasterSetting[]
+    patientProcedure              PatientProcedure[]
+
+    @@map("client_master")
+}
+
+model InsuranceMaster {
+    id                       Int                        @id @default(autoincrement())
+    customerCode             String                     @map("customer_code") @db.VarChar(255)
+    customerName             String                     @map("customer_name") @db.VarChar(255)
+    contactNo                String                     @map("contact_no") @db.VarChar(100)
+    email                    String                     @db.VarChar(255)
+    contactPersonName        String                     @map("contact_person_name") @db.VarChar(255)
+    contactPersonPhone       String                     @map("contact_person_phone") @db.VarChar(255)
+    contactPersonEmail       String                     @map("contact_person_email") @db.VarChar(255)
+    createdUser              String?                    @map("created_user") @db.Char(100)
+    createdDate              DateTime                   @default(now()) @map("created_date")
+    customerActiveFrom       DateTime                   @default(now()) @map("customer_active_from")
+    customerStatus           String?                    @map("customer_status") @db.Char(10)
+    status                   InsurerStatus              @default(active)
+    logoImage                String?                    @default("uploads/patient_images/no_image.png") @map("logo_image") @db.VarChar(255)
+    adhaar                   String?                    @db.VarChar(100)
+    pan                      String?                    @db.VarChar(100)
+    gstNo                    String?                    @map("gst_no") @db.VarChar(100)
+    ccId                     Int?                       @default(1) @map("cc_id")
+    isMaster                 MasterType?                @default(ML) @map("is_master")
+    sapCode                  String?                    @map("sap_code") @db.VarChar(100)
+    statusChangeRemark       String?                    @map("status_change_remark") @db.VarChar(255)
+    billAddress              String?                    @map("bill_address") @db.LongText
+    shiftAddress             String?                    @map("shift_address") @db.LongText
+    portalAccessConfig       String?                    @map("portal_access_config") @db.LongText
+    printConfig              String?                    @map("print_config") @db.LongText
+    notificationConfig       String?                    @map("notification_config") @db.LongText
+    attachments              String?                    @db.LongText
+    createdBy                Int?                       @map("created_by")
+    createdAt                DateTime                   @default(now()) @map("created_at")
+    updatedAt                DateTime                   @default(now()) @updatedAt @map("updated_at")
+    updatedBy                Int?                       @map("updated_by")
+    paymentMode              PaymentModeInsurance?      @default(amount_in_cash) @map("payment_mode")
+    insuranceType            InsuranceTypeIns?          @default(corporate) @map("insurance_type")
+    pathologyPaymentType     PaymentType?               @default(percentage) @map("pathology_payment_type")
+    opdPaymentType           PaymentType?               @default(percentage) @map("opd_payment_type")
+    pharmacyPaymentType      PaymentType?               @default(percentage) @map("pharmacy_payment_type")
+    opdPaymentValue          Decimal?                   @default(0.00) @map("opd_payment_value")
+    pathologyPaymentValue    Decimal?                   @default(0.00) @map("pathology_payment_value")
+    pharmacyPaymentValue     Decimal?                   @default(0.00) @map("pharmacy_payment_value")
+    insuranceBusinessMapping InsuranceBusinessMapping[]
+    patientInsurance         PatientInsurance[]
+    opdInsurerPaymentSetting OpdInsurerPaymentSetting[]
+    appointment              Appointment[]
+    patientProcedure         PatientProcedure[]
+
+    @@map("insurer_master")
+}
+
+model InsuranceBusinessMapping {
+    id        Int      @id @default(autoincrement())
+    insurerId Int      @map("insurer_id")
+    type      String   @db.VarChar(100)
+    name      String   @db.VarChar(255)
+    phone     String   @db.VarChar(50)
+    isDefault String   @map("is_default") @db.Char(3)
+    date      DateTime @default(now())
+
+    insurance InsuranceMaster @relation(fields: [insurerId], references: [id])
+
+    @@index([insurerId])
+    @@map("insurer_business_mapping")
+}
+
+model CashNBankHead {
+    id       Int     @id @default(autoincrement())
+    name     String
+    bankNo   BigInt? @map("bank_no") @db.BigInt
+    headCode Int     @map("head_code") @db.Int
+
+    status              BinaryFlag           @default(true)
+    card                BinaryFlag
+    cheque              BinaryFlag
+    momo                BinaryFlag
+    paymentTransactions PaymentTransaction[]
+
+    @@map("cash_n_bank_head")
+}
+
+model MobileMoneyMethod {
+    id                  Int                  @id @default(autoincrement())
+    name                String
+    bankId              Int                  @map("bank_id")
+    description         String
+    createdAt           DateTime             @default(now()) @map("created_at")
+    createdBy           Int                  @map("created_by")
+    paymentTransactions PaymentTransaction[]
+
+    @@map("mobile_money_methods")
 }

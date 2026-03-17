@@ -1,0 +1,140 @@
+enum BloodGroup {
+    A_POSITIVE  @map("A+")
+    A_NEGATIVE  @map("A-")
+    B_POSITIVE  @map("B+")
+    B_NEGATIVE  @map("B-")
+    AB_POSITIVE @map("AB+")
+    AB_NEGATIVE @map("AB-")
+    O_POSITIVE  @map("O+")
+    O_NEGATIVE  @map("O-")
+}
+
+enum AppointmentType {
+    WALK_IN
+    INSURANCE
+    CORPORATE
+}
+
+enum PaymentStatus {
+    PENDING
+    REFUND
+    SETTLED
+    PARTIAL
+}
+
+enum AptStatus {
+    BOOKED
+    COMPLETE
+    CANCELLED
+    PENDING
+}
+
+enum ReferredBy {
+    NEW_PATIENT
+    FOLLOW_UP
+    PREVENTIVE_CASE_SERVICES
+}
+
+enum FocBillReason {
+    NONE
+    GOVT_SCHEME
+    DOCTOR_REQUEST
+    CHARITY
+}
+
+enum ModuleStatus {
+    BOOKED
+    CANCELLED
+    PARTIALLY_CANCELLED
+}
+
+enum DocumentName {
+    PATHOLOGY
+    RADIOLOGY
+    OTHERS
+}
+
+enum VisitType {
+    GENERAL_VISIT
+    FOLLOW_UP
+    EMERGENCY_VISIT
+    MLC_VISIT
+}
+
+enum FollowUpStatus {
+    UPCOMING
+    COMPLETED
+}
+
+enum ConsultationICD10Type {
+    PRINCIPLE
+    PROVISIONAL
+}
+
+enum StatusOfDiagnosis {
+    NEW
+    OLD
+}
+
+enum CategoryType {
+    PRIMARY
+    ADDITIONAL
+}
+
+enum PaymentMode {
+    in_percentage
+    in_amount
+}
+
+enum InsuranceType {
+    primary
+    secondary
+    tertiary
+}
+
+enum YesNoEnum {
+    Yes
+    No
+}
+
+enum PatientProcedureStatus {
+    PARTIAL
+    COMPLETED
+    CANCELLED
+}
+
+enum ProcedurePaymentStatus {
+    PENDING
+    SETTELED
+    PARTIAL
+    REFUND
+}
+
+enum FinancialChangeType {
+    CO_PAY
+    DISCOUNT
+}
+
+enum ApprovalStatus {
+    PENDING
+    PARTIALLY_APPROVED
+    APPROVED
+    REJECTED
+    CANCELLED // optional
+}
+
+enum ProjectType {
+    IPD
+    OPD
+}
+
+enum BT_JOB_DET_TYPE {
+    CREATE
+    UPDATE
+}
+
+enum GeneralBillingStatus {
+    PARTIAL
+    COMPLETED
+    CANCELLED
+}

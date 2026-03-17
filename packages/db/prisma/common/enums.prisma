@@ -136,3 +136,82 @@ enum MasterType {
     ML
     CC
 }
+
+enum BUSINESS_TYPE {
+    b2c
+    b2b
+}
+
+enum CUSTOMER_PLAN {
+    prepaid
+    postpaid
+}
+
+enum InsurerStatus {
+    active
+    block
+    suspend
+    deactivate
+}
+
+enum BillPrintEmailGrossNet {
+    net
+    gross
+}
+
+enum DepartmentType {
+    PRIMARY
+    SECONDARY
+}
+
+enum PercentageOrAmount {
+    PERCENTAGE
+    AMOUNT
+}
+
+enum CoPaymentSource {
+    MANUAL
+    SETTINGS
+}
+
+enum PaymentModeInsurance {
+    amount_in_cash
+    co_payment
+}
+
+enum InsuranceTypeIns {
+    corporate
+    national
+    others
+}
+
+enum PaymentType {
+    percentage
+    amount
+}
+
+enum OpdMasterType {
+    Procedure
+    Department
+    Doctor
+}
+
+enum InsurerPaymentMode {
+    co_pay
+    in_amount
+}
+
+enum TransactionType {
+    CREDIT
+    DEBIT
+}
+
+enum PaymentTransactionMode {
+    CASH
+    CARD
+    UPI
+    BANK_TRANSFER
+    CHEQUE
+    ONLINE_GATEWAY
+    WALLET
+}
