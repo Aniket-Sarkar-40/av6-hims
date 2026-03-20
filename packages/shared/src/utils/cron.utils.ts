@@ -1,7 +1,7 @@
-import { CRON_RETRY_DELAY_MS } from "@/config/index.js";
+import { CRON_RETRY_DELAY_MS } from "@repo/shared/config/index.js";
 
 export const parseAttemptFromMessage = (
-  msg: string | null | undefined
+  msg: string | null | undefined,
 ): number => {
   if (!msg) return 0;
   const m = msg.match(/attempt=(\d+)\//);
@@ -11,7 +11,7 @@ export const parseAttemptFromMessage = (
 export const withAttemptPrefix = (
   attempt: number,
   max: number,
-  msg?: string
+  msg?: string,
 ): string => {
   const safe = msg?.trim();
   return `attempt=${attempt}/${max}${safe ? ` | ${safe}` : ""}`;

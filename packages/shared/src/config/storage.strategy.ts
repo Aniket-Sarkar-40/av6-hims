@@ -3,12 +3,16 @@ import path from "path";
 import crypto from "crypto";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { hetznerS3 } from "@/config/hetznerS3.config.js";
-import { HETZNER_BUCKET, HETZNER_ENDPOINT, envMode } from "@/config/index.js";
+import {
+  HETZNER_BUCKET,
+  HETZNER_ENDPOINT,
+  envMode,
+} from "@repo/shared/config/index.js";
 import "multer"; // ensure Multer augments global Express namespace
 
 export async function uploadFileByEnv(
   folder: string,
-  file: Express.Multer.File
+  file: Express.Multer.File,
 ): Promise<{
   url: string;
   key?: string;
@@ -45,7 +49,7 @@ export async function uploadFileByEnv(
       Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,
-    })
+    }),
   );
 
   return {

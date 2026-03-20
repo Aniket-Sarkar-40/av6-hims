@@ -26,7 +26,7 @@ enum UIN_RESET_POLICY {
     no
 }
 
-enum UinShortCode {
+enum CoreUinShortCode {
     PO
     GRN
     POR
@@ -61,6 +61,9 @@ enum ServiceCode {
     PHARMACY
     INVENTORY
     CORE
+    GENERAL_BILL
+    PROCEDURE
+    RADIOLOGY
 }
 
 enum TemplateType {

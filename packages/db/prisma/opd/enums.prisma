@@ -138,3 +138,22 @@ enum GeneralBillingStatus {
     COMPLETED
     CANCELLED
 }
+
+enum BookedStatus {
+    BOOKED
+    AVAILABLE
+}
+
+enum OpdUinShortCode {
+    AID
+    HRMS
+    MED
+    PROID
+    INV
+    TRANS
+    BATCH_JOB
+}
+
+enum Opd_Batch_Type {
+    GENERAL_BILL_PRICING
+}

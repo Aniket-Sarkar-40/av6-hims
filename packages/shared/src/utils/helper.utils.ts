@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/config/index.js";
+import { BASE_URL } from "@repo/shared/config/index.js";
 import { DecodedToken } from "@/types/auth.js";
 import fs from "fs";
 import path from "path";
@@ -62,6 +62,14 @@ export function toPublicImageUrl(filePath?: string | null): string | null {
   return `${BASE_URL}${urlPath}`;
 }
 
+export const toImageApiUrl = (
+  fileName: string,
+  directoryPath: string,
+): string => {
+  const baseUrl = BASE_URL;
+  return `${baseUrl}/api/v1/common/image/${fileName}?path=${encodeURIComponent(directoryPath)}`;
+};
+
 export const imageToBase64 = (imagePath: string) => {
   const image = fs.readFileSync(imagePath);
   return Buffer.from(image).toString("base64");
@@ -94,12 +102,12 @@ export type RemoveUndefined<T> = {
 
 export function omitUndefined<T extends object>(obj: T): RemoveUndefined<T> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([, v]) => v !== undefined)
+    Object.entries(obj).filter(([, v]) => v !== undefined),
   ) as RemoveUndefined<T>;
 }
 
 export const processAndRecreateJWT = (
-  token: string
+  token: string,
 ): { permissions: string[]; roles: Record<string, string>[] } => {
   try {
     // Decode the existing JWT token
@@ -143,3 +151,26 @@ export const processAndRecreateJWT = (
     throw new Error("Error processing the token: " + error);
   }
 };
+
+/**
+ * Calculates age in years from the given date of birth.
+ * @param dob - Date of birth as a string (YYYY-MM-DD) or Date object.
+ * @returns Age in full years.
+ */
+export function calculateAge(dob: string | Date): number {
+  const birthDate = new Date(dob);
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  // Adjust if birthday hasn't occurred yet this year
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}

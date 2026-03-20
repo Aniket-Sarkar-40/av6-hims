@@ -44,7 +44,7 @@ model OpdSettings {
 
 model OpdUINConfig {
     id             Int              @id @default(autoincrement())
-    shortCode      UinShortCode     @map("short_code")
+    shortCode      OpdUinShortCode  @map("short_code")
     sequenceNo     BigInt           @default(0) @map("sequence_no")
     seqResetDate   DateTime         @map("seq_reset_date") @db.Date
     seqResetPolicy UIN_RESET_POLICY @default(no) @map("seq_reset_policy")
@@ -1175,13 +1175,13 @@ model GeneralBillPricing {
 model BatchJob {
     id Int @id @default(autoincrement())
 
-    type         Batch_Type
-    status       Batch_Status @default(PENDING)
-    batchJobNo   String?      @map("batch_job_no")
-    totalQty     Int          @map("total_qty")
-    processedQty Int          @default(0) @map("processed_qty")
-    successCount Int          @default(0) @map("success_count")
-    failureCount Int          @default(0) @map("failure_count")
+    type         Opd_Batch_Type
+    status       Batch_Status   @default(PENDING)
+    batchJobNo   String?        @map("batch_job_no")
+    totalQty     Int            @map("total_qty")
+    processedQty Int            @default(0) @map("processed_qty")
+    successCount Int            @default(0) @map("success_count")
+    failureCount Int            @default(0) @map("failure_count")
 
     createdAt               DateTime                  @default(now()) @map("created_at")
     updatedAt               DateTime                  @updatedAt @map("updated_at")

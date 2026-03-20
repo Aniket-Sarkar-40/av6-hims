@@ -50,7 +50,7 @@ model CoreDynamicShortCode {
 
 model CoreUINConfig {
     id             Int              @id @default(autoincrement())
-    shortCode      UinShortCode     @map("short_code")
+    shortCode      CoreUinShortCode @map("short_code")
     sequenceNo     BigInt           @default(0) @map("sequence_no")
     seqResetDate   DateTime         @map("seq_reset_date") @db.Date
     seqResetPolicy UIN_RESET_POLICY @default(no) @map("seq_reset_policy")
@@ -307,7 +307,7 @@ model Staff {
     employee                  StaffMapping?
     staffCollectionCenter     StaffCollectionCenter[]
     notifications             Notification[]
-    doctorSchedules           DoctorSchedule[]
+    doctorSchedule            DoctorSchedule[]
     timeSlots                 TimeSlot[]
     appointments              Appointment[]
     patientReferToDoctors     PatientReferToDoctor[]

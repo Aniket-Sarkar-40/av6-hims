@@ -1,4 +1,4 @@
-import ErrorHandler from "@/utils/errorHandler.utils.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { ValidationErrorItem } from "joi";
 
 // Define the possible literal types for error 'type'
@@ -71,3 +71,14 @@ export type BaseModelAttrWoCancel =
   | "createdAt"
   | "updatedAt"
   | "deletedAt";
+
+export interface FileInfo {
+  fileName: string;
+  path: string;
+  base64: string;
+}
+
+export interface UploadFilesResponse {
+  success: boolean;
+  uploadedPaths: FileInfo[];
+}

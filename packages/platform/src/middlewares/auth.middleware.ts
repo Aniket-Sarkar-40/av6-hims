@@ -1,5 +1,5 @@
 import { getCacheLoginById } from "@/cache/redis.utils.js";
-import { requestStorage } from "@/config/requestContext.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@/logging/logger.js";
 import {
   envMode,
@@ -43,7 +43,7 @@ export const verifyToken = TryCatch(
 
       const cache = (await getCacheLoginById(
         AUTH.OLD_LOGIN_CACHE_KEY,
-        uuid
+        uuid,
       )) as
         | {
             roles: Record<string, string>[];
@@ -101,7 +101,7 @@ export const verifyToken = TryCatch(
 
       const cache = (await getCacheLoginById(
         AUTH.NEW_LOGIN_CACHE_KEY,
-        uuid
+        uuid,
       )) as
         | {
             permissions: string[];
@@ -140,7 +140,7 @@ export const verifyToken = TryCatch(
 
       next();
     }
-  }
+  },
 );
 
 export const authorize =
@@ -157,7 +157,7 @@ export const authorize =
         next();
       } else {
         const ok = required.every((p) =>
-          req.perms!.has(`${PERMISSION_PREFIX}${p}`)
+          req.perms!.has(`${PERMISSION_PREFIX}${p}`),
         );
         if (!ok) throw new ErrorHandler(403, "You are not authorized.");
         logger.info("exiting::authorization ::middleware");

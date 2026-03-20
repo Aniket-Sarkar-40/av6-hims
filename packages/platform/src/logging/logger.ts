@@ -1,4 +1,4 @@
-import { requestStorage } from "@/config/requestContext.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import { envMode, LOG_DAYS } from "@repo/shared";
@@ -44,7 +44,7 @@ const logFormat = winston.format.combine(
   winston.format.printf((info) => {
     const traceId = info.traceId ?? "-";
     return `${info.timestamp}: [${info.level}]: [traceId:${traceId}] ${info.message}`;
-  })
+  }),
 );
 
 /* =========================
@@ -76,7 +76,7 @@ export const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize({ all: true }),
-        logFormat
+        logFormat,
       ),
     }),
   ],

@@ -97,3 +97,16 @@ enum Consumption_Status {
 enum EMAIL_TYPE {
     GENERAL
 }
+
+enum InvUinShortCode {
+    ITEM
+    STORE
+    STORE_REQ
+    SELL
+    SELL_RETURN
+    STOCK_TRANS
+    GRN_RETURN_APPROVAL
+    SELL_RETURN_APPROVAL
+    CONSUMPTION
+    STOCK_ADJUSTMENT
+}

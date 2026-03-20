@@ -62,6 +62,44 @@ export enum PermissionResource {
   NOTIFICATION = "notification",
   EVENT_RECIPIENT_RULE = "event-recipient-rule",
   CORE_APPROVAL = "core-approval",
+
+  // OPD
+  PATIENT = "patients",
+  OPD_DEPARTMENT = "opd-department",
+  OPD_DEPARTMENT_PREFIX = "opd-department-prefix",
+  CLINICAL_HISTORY = "clinical-history",
+  REFER_TO_DOCTOR = "refer-to-doctor",
+  PATIENT_CONSULTATION = "patient-consultation",
+  CONSULTATION_COMPLAINTS = "consultation-complaints",
+  PATIENT_ADVICE_DETAILS = "patient-advice-details",
+  TIME_SLOT = "time-slot",
+  DOCUMENT = "document",
+  APPOINTMENT = "appointment",
+  PATIENT_MEDICINE = "patient-medicine",
+  FOLLOW_UP = "follow-up",
+  CHIPS_BUTTON_MAPPING = "chips-button-mapping",
+  CONSULTATION_ICD_TEN_LIST = "consultation-icd-ten-list",
+  ICD_TEN = "icd-ten",
+  CONSULTATION_NOTES = "consultation-notes",
+  CONSULTATION_NOTES_MAPPING = "consultation-notes-mapping",
+  PATIENT_INSURANCE = "patient-insurance",
+  INSURANCE = "insurance",
+  CONSULTATION = "consultation",
+  PATHOLOGY_MASTER = "pathology-master",
+  TEST_CATEGORIES = "test-categories",
+  TESTS = "tests",
+  PATIENT_TEST = "patient-test",
+  MEDICINE_TAB = "medicine-tab",
+  MEDICINE_TAB_DETAILS = "medicine-tab-details",
+  PROCEDURE = "procedure",
+  PATIENT_PROCEDURE = "patient-procedure",
+  DOCTOR_FEES = "doctor-fees",
+  PAYMENT = "payment",
+  BANK_HEAD = "cash-n-bank-head",
+  MOBILE_MONEY = "mobile-money-method",
+  GENERAL_BILLING = "general-billing",
+  GENERAL_BILL_ITEM = "general-bill-item",
+  GENERAL_BILL_PRICING = "general-bill-pricing",
 }
 
 export enum PermissionModule {
@@ -74,7 +112,7 @@ export enum PermissionModule {
 export const getPermission = (
   module: keyof typeof PermissionModule,
   resource: keyof typeof PermissionResource,
-  type: keyof typeof PermissionType
+  type: keyof typeof PermissionType,
 ): string => {
   return `${module}:${PermissionResource[resource]}:${PermissionType[type]}`;
 };

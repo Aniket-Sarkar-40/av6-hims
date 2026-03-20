@@ -15,6 +15,8 @@ export enum SuccessMessageType {
   RELEASED = "%1 has been successfully released",
   REDEEMED = "%1 has been successfully redeemed",
   COMPLETED = "%1 has been successfully completed",
+  RESCHEDULED = "%1 has been successfully rescheduled",
+  UPGRADED = "%1 has been successfully upgraded.",
 }
 
 export enum ErrorMessageType {
@@ -56,6 +58,9 @@ export enum ErrorMessageType {
   NOT_GREATER_THAN = "%1 must not be greater than %2",
   NOT_LESS_THAN = "%1 must not be less than %2",
   NOT_GREATER_THAN_OR_EQUAL_TO = "%1 must not be greater than or equal to %2",
+  NOT_AVAILABLE = "%1 not available",
+  DELETE_RESTRICTED = "Deletion is not allowed because all medicines under this record have been sold.",
+  NOT_EXCEED = "%1 cannot exceed %2",
 }
 
 export enum ValidationErrorMessage {
@@ -111,4 +116,7 @@ export enum ValidationErrorMessage {
   INVALID_URL = "%1 Invalid Url",
   DUPLICATE_ITEM = "%1 already exist",
   TIME = "1% must be in 2% format",
+  INVALID_FILE = "%1 file is invalid",
+  ONLY_NULL = "%1 must be null",
+  DUPLICATE = "Duplicate %1 exists.",
 }

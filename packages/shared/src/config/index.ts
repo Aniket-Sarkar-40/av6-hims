@@ -52,3 +52,11 @@ export const HETZNER_SECRET_KEY = String(process.env.HETZNER_SECRET_KEY);
 export const HETZNER_BUCKET = String(process.env.HETZNER_BUCKET);
 export const HETZNER_REGION = String(process.env.HETZNER_REGION);
 export const HETZNER_ENDPOINT = String(process.env.HETZNER_ENDPOINT);
+
+export const DOC_ROLE_ID = process.env.DOC_ROLE_ID || "3";
+export const EXT_PHARMACY_ITEM_URL = process.env.EXT_PHARMACY_ITEM_URL || "";
+export const MASTER_SERVICE_URL =
+  process.env.MASTER_SERVICE_URL ?? "http://127.0.0.1:4002";
+export const EXT_COLLECTION_CENTER_BY_STAFF = `${MASTER_SERVICE_URL}/api/v1/master/collection-center/staffId`;
+export const EXT_COUNTRY_URL = `${MASTER_SERVICE_URL}/api/v1/master/country`;
+export const EXT_BASE_URL = process.env.EXT_BASE_URL;

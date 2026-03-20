@@ -18,7 +18,7 @@ export const adjustToPreferredDayWithinRange = (
   baseDate: Date,
   preferredDay: number,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): Date => {
   const base = normalizeDate(baseDate);
   const start = normalizeDate(startDate);
@@ -51,7 +51,7 @@ type DurationOpts = {
 export function durationMinutesHHMM(
   startHHMM: string,
   endHHMM: string,
-  opts: DurationOpts = {}
+  opts: DurationOpts = {},
 ): number {
   const { allowNextDay = false, format = "HH:mm" } = opts;
 
@@ -60,11 +60,11 @@ export function durationMinutesHHMM(
 
   if (!start.isValid())
     throw new Error(
-      `Invalid start time "${startHHMM}". Expected format ${format}.`
+      `Invalid start time "${startHHMM}". Expected format ${format}.`,
     );
   if (!end.isValid())
     throw new Error(
-      `Invalid end time "${endHHMM}". Expected format ${format}.`
+      `Invalid end time "${endHHMM}". Expected format ${format}.`,
     );
 
   let diff = end.diff(start, "minute");
@@ -96,7 +96,7 @@ export const eachUTCDate = (from: Date, to: Date) => {
   while (cur.getTime() <= end.getTime()) {
     out.push(cur);
     cur = new Date(
-      Date.UTC(cur.getUTCFullYear(), cur.getUTCMonth(), cur.getUTCDate() + 1)
+      Date.UTC(cur.getUTCFullYear(), cur.getUTCMonth(), cur.getUTCDate() + 1),
     );
   }
 
@@ -166,7 +166,7 @@ export const monthsBetween = (from: Date, to: Date) =>
 export function calculateMissedAt(
   scheduledAt: Date,
   graceType?: "HOURS" | "DAYS",
-  graceValue?: number
+  graceValue?: number,
 ): Date {
   if (!graceType || !graceValue) {
     return scheduledAt;
@@ -186,10 +186,17 @@ export function calculateMissedAt(
 }
 export const runDateIso = (d: Date) => {
   const u = new Date(
-    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
   );
   const yyyy = u.getUTCFullYear();
   const mm = String(u.getUTCMonth() + 1).padStart(2, "0");
   const dd = String(u.getUTCDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
+};
+
+export const parseTimeToDate = (time: string, date: Date): Date => {
+  const [hours, minutes] = time.split(":").map(Number);
+  const d = new Date(date);
+  d.setHours(hours, minutes, 0, 0);
+  return d;
 };
