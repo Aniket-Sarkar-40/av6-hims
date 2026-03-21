@@ -1,3 +1,4 @@
+import { db } from "@repo/db";
 import { createCache } from "@repo/platform/cache/redis.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
@@ -21,7 +22,7 @@ export const fetchTableData = async (table: string) => {
     dbData = await model.findMany({
       where: { isActive: "yes" },
     });
-  } else if (table === "dynamicShortCode" || table === "iCDTen") {
+  } else if (table === "opdDynamicShortCode" || table === "iCDTen") {
     dbData = await model.findMany();
   } else if (table === "collectionCenter") {
     dbData = await model.findMany({

@@ -87,6 +87,9 @@ importers:
       '@apps/core':
         specifier: workspace:*
         version: link:../core
+      '@apps/opd':
+        specifier: workspace:*
+        version: link:../opd
       '@repo/platform':
         specifier: workspace:*
         version: link:../../packages/platform
@@ -149,6 +152,9 @@ importers:
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
+      tsc-alias:
+        specifier: ^1.8.16
+        version: 1.8.16
       tsx:
         specifier: ^4.20.0
         version: 4.21.0

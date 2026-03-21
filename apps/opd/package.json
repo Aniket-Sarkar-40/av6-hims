@@ -18,18 +18,20 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "tsx": "^4.20.0",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.9.2"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./*": "./dist/*"
   },
   "main": "./dist/index.js",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "tsx watch src/server.ts",
     "lint": "echo lint core",
     "start": "node dist/src/server.js",
