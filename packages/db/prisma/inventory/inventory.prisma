@@ -6,6 +6,8 @@ model InvDynamicShortCode {
     isCacheable  Boolean  @default(false) @map("is_cacheable")
     isDropDown   Boolean  @default(false) @map("is_drop_down")
     permission   String?
+    config       Json?    @map("config")
+    isSingleDto  Boolean  @default(true) @map("is_single_dto")
     whereClause  Json?    @map("where_clause")
     selectClause Json?    @map("select_clause")
     createdBy    Int?     @map("created_by")

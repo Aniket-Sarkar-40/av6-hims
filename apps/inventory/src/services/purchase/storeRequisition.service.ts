@@ -1,4 +1,7 @@
-import { toStoreRequisitionBatchWiseDTO, toStoreRequisitionDTO } from "@/mapper/purchase/storeRequisition.mapper";
+import {
+  toStoreRequisitionBatchWiseDTO,
+  toStoreRequisitionDTO,
+} from "@/mapper/purchase/storeRequisition.mapper.js";
 import {
   acknowledgeStoreRequisition,
   approveStoreRequisition,
@@ -9,17 +12,17 @@ import {
   getStoreRequisitionByIdFromDb,
   rejectStoreRequisition,
   updateStoreRequisitionInDb,
-} from "@/repository/purchase/storeRequisition.repository";
+} from "@/repository/purchase/storeRequisition.repository.js";
 import {
   AcknowledgeRequisition,
   ApproveStoreReqInput,
   CreateStoreRequisitionInput,
   RejectStoreRequisitionInput,
-} from "@/types/purchase/storeRequisition";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@/types/purchase/storeRequisition.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   acknowledgeStoreRequisitionServiceValidation,
   approveStoreRequisitionServiceValidation,
@@ -28,7 +31,7 @@ import {
   rejectStoreRequisitionServiceValidation,
   updateStoreRequisitionServiceValidation,
   // updateStoreRequisitionServiceValidation,
-} from "@/validations/service/purchase/storeRequisition.service.validation";
+} from "@/validations/service/purchase/storeRequisition.service.validation.js";
 
 export const storeRequisitionService = {
   async createStoreRequisition(input: CreateStoreRequisitionInput) {
@@ -56,7 +59,10 @@ export const storeRequisitionService = {
 
     const records = await getAllStoreRequisitionFromDb();
     if (records.length === 0) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "storeRequisition Order"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "storeRequisition Order"),
+      );
     }
 
     const dto = await Promise.all(
@@ -65,7 +71,7 @@ export const storeRequisitionService = {
           ...sr,
           storeRequisitionDetails: sr.storeRequisitionDetails,
         });
-      })
+      }),
     );
 
     logger.info("exiting::getAllStoreRequisition::service");
@@ -78,7 +84,10 @@ export const storeRequisitionService = {
     validIdCheck(id);
     const storeReq = await getStoreRequisitionByIdFromDb(id);
     if (!storeReq) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Store Requisition"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Store Requisition"),
+      );
     }
 
     const dto = await toStoreRequisitionDTO(storeReq);
@@ -96,7 +105,9 @@ export const storeRequisitionService = {
     logger.info("exiting::deleteStoreRequisition::service id=" + id);
   },
 
-  async rejectStoreRequisition(input: RejectStoreRequisitionInput): Promise<void> {
+  async rejectStoreRequisition(
+    input: RejectStoreRequisitionInput,
+  ): Promise<void> {
     logger.info("entering::rejectStoreRequisition::service id=" + input.id);
 
     await rejectStoreRequisitionServiceValidation(input);
@@ -114,7 +125,9 @@ export const storeRequisitionService = {
     logger.info("exiting::approveStoreRequisition::service");
   },
 
-  async acknowledgeStoreRequisition(input: AcknowledgeRequisition): Promise<void> {
+  async acknowledgeStoreRequisition(
+    input: AcknowledgeRequisition,
+  ): Promise<void> {
     logger.info("entering::acknowledgeStoreRequisition::service");
 
     await acknowledgeStoreRequisitionServiceValidation(input);
@@ -129,7 +142,10 @@ export const storeRequisitionService = {
     validIdCheck(id);
     const storeReq = await getStoreRequisitionBatchWiseFromDb(id);
     if (!storeReq) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Store Requisition"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Store Requisition"),
+      );
     }
 
     const dto = await toStoreRequisitionBatchWiseDTO(storeReq);

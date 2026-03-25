@@ -1,11 +1,10 @@
-import { TryCatch } from "@/middlewares/error.middleware";
-import { purchaseService } from "@/services/purchase/purchase.service";
-import { UpdatePurchaseOrder } from "@/types/purchase/purchase";
-import { BaseResponse } from "@/utils/baseResponse.utils";
-import { imageToBase64 } from "@/utils/helper.utils";
-import { logger } from "@/utils/logger.utils";
-import { generatePDF } from "@/utils/pdfGenerator.utils";
-import { generateSuccessMessage } from "@/utils/responseMessage.utils";
+import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
+import { purchaseService } from "@/services/purchase/purchase.service.js";
+import { UpdatePurchaseOrder } from "@/types/purchase/purchase.js";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
 import path from "path";
 
@@ -13,7 +12,10 @@ export const createPurchase = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createPurchase::controller");
   const input = req.body;
   const purchase = await purchaseService.createPurchaseOrder(input);
-  const response = BaseResponse.success({ type: "CREATED", data: purchase }, "Purchase Order");
+  const response = BaseResponse.success(
+    { type: "CREATED", data: purchase },
+    "Purchase Order",
+  );
   logger.info("exiting::createPurchase::controller");
   return res.status(201).json(response);
 });
@@ -25,7 +27,10 @@ export const updatePurchase = TryCatch(async (req: Request, res: Response) => {
   const updated = await purchaseService.updatePurchase(input);
 
   logger.info("exiting::updatePurchase::controller");
-  const response = BaseResponse.success({ type: "UPDATED", data: updated }, "Purchase Order");
+  const response = BaseResponse.success(
+    { type: "UPDATED", data: updated },
+    "Purchase Order",
+  );
   return res.status(200).json(response);
 });
 
@@ -34,7 +39,10 @@ export const getAllPurchase = TryCatch(async (req: Request, res: Response) => {
   const purchase = await purchaseService.getAllPurchase();
   logger.info("exiting::getAllPurchase::controller");
 
-  const response = BaseResponse.success({ type: "FETCHED", data: purchase }, "Purchase Order");
+  const response = BaseResponse.success(
+    { type: "FETCHED", data: purchase },
+    "Purchase Order",
+  );
   return res.status(200).json(response);
 });
 
@@ -48,10 +56,13 @@ export const getPurchaseById = TryCatch(async (req: Request, res: Response) => {
     return res.status(400).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
-  const response = BaseResponse.success({ type: "FETCHED", data: purchase }, "Purchase Order");
+  const response = BaseResponse.success(
+    { type: "FETCHED", data: purchase },
+    "Purchase Order",
+  );
   logger.info("exiting::getPurchaseById::controller");
   return res.status(200).json(response);
 });
@@ -114,34 +125,41 @@ export const deletePurchase = TryCatch(async (req, res) => {
 //     .send(buffer);
 // });
 
-export const printPOById = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::printPOById::controller");
+// export const printPOById = TryCatch(async (req: Request, res: Response) => {
+//   logger.info("entering::printPOById::controller");
 
-  // 1) Read filters and fetch data
-  const { id } = req.query as { id: string };
+//   // 1) Read filters and fetch data
+//   const { id } = req.query as { id: string };
 
-  const po = await purchaseService.getPurchaseById(Number(id));
+//   const po = await purchaseService.getPurchaseById(Number(id));
 
-  // 3) Locate template & logo
-  const tplDir = path.join(process.cwd(), "src", "templates", "pdf", "reports-pdf", "purchase");
-  const bodyTpl = path.join(tplDir, "purchase.hbs");
-  const base64Image = imageToBase64("public/images/logo.png");
+//   // 3) Locate template & logo
+//   const tplDir = path.join(
+//     process.cwd(),
+//     "src",
+//     "templates",
+//     "pdf",
+//     "reports-pdf",
+//     "purchase",
+//   );
+//   const bodyTpl = path.join(tplDir, "purchase.hbs");
+//   const base64Image = imageToBase64("public/images/logo.png");
 
-  // 4) Render PDF
-  const pdfBuffer = await generatePDF(bodyTpl, {
-    po,
-    base64Image,
-    reportFor: "Purchase Order",
-  });
+//   // 4) Render PDF
+//   const pdfBuffer = await generatePDF(bodyTpl, {
+//     po,
+//     base64Image,
+//     reportFor: "Purchase Order",
+//   });
 
-  // 5) Stream down
-  res
-    .status(200)
-    .set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="purchase_order.pdf"',
-    })
-    .send(pdfBuffer);
+//   // 5) Stream down
+//   res
+//     .status(200)
+//     .set({
+//       "Content-Type": "application/pdf",
+//       "Content-Disposition": 'attachment; filename="purchase_order.pdf"',
+//     })
+//     .send(pdfBuffer);
 
-  logger.info("exiting::printPOById::controller");
-});
+//   logger.info("exiting::printPOById::controller");
+// });

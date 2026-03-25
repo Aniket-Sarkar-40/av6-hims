@@ -2,7 +2,7 @@ import {
   mapRowToItemSupplierMapImportExcelInput,
   toAllItemSupplierMapDTO,
   toItemSupplierMapDTO,
-} from "@/mapper/itemSupplierMap/itemSupplierMap.mapper";
+} from "@/mapper/itemSupplierMap/itemSupplierMap.mapper.js";
 import {
   CreateItemSupplierMapExcelInDb,
   createItemSupplierMapInDb,
@@ -12,7 +12,7 @@ import {
   getItemSupplierMapFromDb,
   ItemSupplierMapBatchJob,
   updateItemSupplierMapInDb,
-} from "@/repository/itemSupplierMap/itemSupplierMap.repository";
+} from "@/repository/itemSupplierMap/itemSupplierMap.repository.js";
 import {
   ItemSuppierMapDTO,
   ItemSupplierMapCreateInput,
@@ -20,53 +20,69 @@ import {
   ItemSupplierMapImportExcelInput,
   ItemSupplierMaplBatchJobInput,
   ItemSupplierMapUpdateInput,
-} from "@/types/itemSupplierMap/itemSupplierMap";
-import { GetItemReq } from "@/types/master/itemMaster";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
+} from "@/types/itemSupplierMap/itemSupplierMap.js";
+import { GetItemReq } from "@/types/master/itemMaster.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   createItemSupplierMapServiceValidation,
   deleteItemSupplierMapServiceValidation,
   getItemSupplierMapServiceValidation,
   updateItemSupplierMapServiceValidation,
-} from "@/validations/service/itemSupplierMap/itemSupplierMapService.validation";
+} from "@/validations/service/itemSupplierMap/itemSupplierMapService.validation.js";
 import ExcelJs from "exceljs";
 import XLSX from "xlsx";
-import { itemMasterService } from "../master/itemMaster.service";
+import { itemMasterService } from "../master/itemMaster.service.js";
 export const itemSupplierMapService = {
-  async createItemSupplierMap(input: ItemSupplierMapCreateInput): Promise<ItemSuppierMapDTO> {
+  async createItemSupplierMap(
+    input: ItemSupplierMapCreateInput,
+  ): Promise<ItemSuppierMapDTO> {
     logger.info("entering::createItemSupplierMap::service");
     await createItemSupplierMapServiceValidation(input);
     const ItemSupplierMap = await createItemSupplierMapInDb(input);
     logger.info("exiting::createItemSupplierMap::service");
     return toItemSupplierMapDTO(ItemSupplierMap);
   },
-  async updateItemSupplierMap(input: ItemSupplierMapUpdateInput): Promise<ItemSuppierMapDTO> {
+  async updateItemSupplierMap(
+    input: ItemSupplierMapUpdateInput,
+  ): Promise<ItemSuppierMapDTO> {
     logger.info("entering::updateItemSupplierMap::service");
     await updateItemSupplierMapServiceValidation(input);
     const updatedItemSupplierMap = await updateItemSupplierMapInDb(input);
     logger.info("exiting::updateItemSupplierMap::service");
     return toItemSupplierMapDTO(updatedItemSupplierMap);
   },
-  async getAllItemSupplierMap(canNullReturnable: boolean = false): Promise<ItemSuppierMapDTO[]> {
+  async getAllItemSupplierMap(
+    canNullReturnable: boolean = false,
+  ): Promise<ItemSuppierMapDTO[]> {
     logger.info("entering::getAllItemSupplierMap::service");
     const itemSupplierMap = await getAllItemSupplierMapFromDb();
     logger.info("exiting::getAllItemSupplierMap::service");
     if (itemSupplierMap.length === 0) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Supplier Mapping"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Supplier Mapping"),
+        );
       else return [];
     }
     return toAllItemSupplierMapDTO(itemSupplierMap);
   },
-  async getItemSupplierMapById(id: number, canNullReturnable: boolean = false): Promise<ItemSuppierMapDTO | null> {
+  async getItemSupplierMapById(
+    id: number,
+    canNullReturnable: boolean = false,
+  ): Promise<ItemSuppierMapDTO | null> {
     logger.info("entering::getItemSupplierMapById::service");
 
     const itemSupplierMap = await getItemSupplierMapByIdFromDb(id);
 
     if (!itemSupplierMap) {
       if (!canNullReturnable) {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Supplier Mapping"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Supplier Mapping"),
+        );
       } else return null;
     }
 
@@ -84,16 +100,35 @@ export const itemSupplierMapService = {
     logger.info("entering::exportItemSupplierMapExcel::service");
     const item = await itemMasterService.getAllItemMaster();
     if (item.length === 0) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Master"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Item Master"),
+      );
     }
     const wb = new ExcelJs.Workbook();
-    const ws = wb.addWorksheet("Item Supplier Map", { properties: { defaultRowHeight: 18 } });
-    const attribute = ["Item Code", "Item Id", "Item Category", "Item Name", "Base Price", "Supplier Price"];
+    const ws = wb.addWorksheet("Item Supplier Map", {
+      properties: { defaultRowHeight: 18 },
+    });
+    const attribute = [
+      "Item Code",
+      "Item Id",
+      "Item Category",
+      "Item Name",
+      "Base Price",
+      "Supplier Price",
+    ];
     const attributeRow = ws.addRow(attribute);
     attributeRow.font = { bold: true };
 
     item.forEach((i) => {
-      ws.addRow([i.itemCode, i.id, i.itemCategory?.value, i.item, i.basePrice, 0.0]);
+      ws.addRow([
+        i.itemCode,
+        i.id,
+        i.itemCategory?.value,
+        i.item,
+        i.basePrice,
+        0.0,
+      ]);
     });
 
     /* Auto size the columns */
@@ -127,7 +162,10 @@ export const itemSupplierMapService = {
     return wb;
   },
 
-  async itemSupplierMapImportExcel(filePath: string, input: ItemSupplierMapImportExcelInput) {
+  async itemSupplierMapImportExcel(
+    filePath: string,
+    input: ItemSupplierMapImportExcelInput,
+  ) {
     logger.info("entering::itemSupplierMapImportExcel::service");
     const { supplierId, ccId } = input;
     if (!filePath) {
@@ -138,7 +176,9 @@ export const itemSupplierMapService = {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = XLSX.utils.sheet_to_json(sheet) as ItemSupplierMapExcelRow[];
 
-    const convertedData = data.map((elem, ind) => mapRowToItemSupplierMapImportExcelInput(elem, ind + 1));
+    const convertedData = data.map((elem, ind) =>
+      mapRowToItemSupplierMapImportExcelInput(elem, ind + 1),
+    );
     const batch = await CreateItemSupplierMapExcelInDb(convertedData);
     const batchJobInput: ItemSupplierMaplBatchJobInput = {
       batchJobId: batch.id,

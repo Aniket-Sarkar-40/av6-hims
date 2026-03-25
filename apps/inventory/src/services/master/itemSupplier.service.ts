@@ -1,40 +1,45 @@
-import { toAllItemSupplierDTO, toItemSupplierDTO } from "@/mapper/master/itemSupplier.mapper";
+import {
+  toAllItemSupplierDTO,
+  toItemSupplierDTO,
+} from "@/mapper/master/itemSupplier.mapper.js";
 import {
   createItemSupplierInDb,
   deleteItemSupplierByIdFromDb,
   getAllItemSupplierFromDb,
   getItemSupplierByIdFromDb,
   updateItemSupplierInDb,
-} from "@/repository/master/itemSupplier.repository";
+} from "@/repository/master/itemSupplier.repository.js";
 import {
   ItemSupplierCreateInput,
   ItemSupplierDTO,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
-} from "@/types/master/itemSupplier";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
+} from "@/types/master/itemSupplier.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
 import {
   addToCache,
-  checkIsCacheable,
   deleteCache,
   getAllCache,
   getCacheById,
   updateCache,
-} from "@/utils/redisHelper.utils";
-import { getRedisKey } from "@/utils/redisKey.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { SHORT_CODE } from "@/utils/shortCode.utils";
+} from "@repo/platform/cache/redis.utils.js";
+import { getRedisKey } from "@/config/cache.config.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import {
   createItemSupplierServiceValidation,
   deleteItemSupplierServiceValidation,
   updateItemSupplierServiceValidation,
-} from "@/validations/service/master/itemSupplier.service.validation";
+} from "@/validations/service/master/itemSupplier.service.validation.js";
+import { checkIsCacheable } from "@/config/cache.config.js";
 
 const cacheKey = getRedisKey("ITEM_SUPPLIER", "all");
 
 export const itemSupplierService = {
-  async createItemSupplier(input: ItemSupplierCreateInput): Promise<ItemSupplierDTO> {
+  async createItemSupplier(
+    input: ItemSupplierCreateInput,
+  ): Promise<ItemSupplierDTO> {
     logger.info("entering::createItemSupplier::service");
     await createItemSupplierServiceValidation(input);
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
@@ -47,7 +52,9 @@ export const itemSupplierService = {
 
     return await toItemSupplierDTO(itemSupplier);
   },
-  async updateItemSupplier(input: ItemSupplierUpdateInput): Promise<ItemSupplierDTO> {
+  async updateItemSupplier(
+    input: ItemSupplierUpdateInput,
+  ): Promise<ItemSupplierDTO> {
     logger.info("entering::updateItemSupplier::service");
     await updateItemSupplierServiceValidation(input);
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
@@ -58,7 +65,9 @@ export const itemSupplierService = {
     logger.info("exiting::updateItemSupplier::service");
     return await toItemSupplierDTO(updatedItemSupplier);
   },
-  async getAllItemSupplier(canNullReturnable: boolean = false): Promise<ItemSupplierDTO[]> {
+  async getAllItemSupplier(
+    canNullReturnable: boolean = false,
+  ): Promise<ItemSupplierDTO[]> {
     logger.info("entering::getAllItemSupplier::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
     let itemSupplier: ItemSupplierResponse[];
@@ -69,25 +78,38 @@ export const itemSupplierService = {
     }
     logger.info("exiting::getAllItemSupplier::service");
     if (itemSupplier.length === 0) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Supplier"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Supplier"),
+        );
       else return [];
     }
     return toAllItemSupplierDTO(itemSupplier);
   },
-  async getItemSupplierById(id: number, canNullReturnable: boolean = false): Promise<ItemSupplierDTO | null> {
+  async getItemSupplierById(
+    id: number,
+    canNullReturnable: boolean = false,
+  ): Promise<ItemSupplierDTO | null> {
     logger.info("entering::getItemSupplierById::service");
 
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
     let itemSupplier: ItemSupplierResponse | null;
     if (isCacheable) {
-      itemSupplier = (await getCacheById(cacheKey, id)) as ItemSupplierResponse | null;
+      itemSupplier = (await getCacheById(
+        cacheKey,
+        id,
+      )) as ItemSupplierResponse | null;
     } else {
       itemSupplier = await getItemSupplierByIdFromDb(id);
     }
 
     if (!itemSupplier) {
       if (!canNullReturnable) {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Supplier"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Supplier"),
+        );
       } else return null;
     }
 

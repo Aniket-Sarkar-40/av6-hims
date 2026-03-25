@@ -61,7 +61,7 @@ export interface ItemSearchInput {
   units: number | null;
 }
 export type ItemDto = Omit<
-  Prisma.ItemUncheckedCreateInput,
+  Prisma.InvItemUncheckedCreateInput,
   | "taxDetailsId"
   | "itemStoreId"
   | "itemSupplierId"

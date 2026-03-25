@@ -1,17 +1,21 @@
-import { createSettingsInDb, getSettingsInDb } from "@/repository/master/settings.repository";
-import { CreateOrUpdateSettings } from "@/types/master/settings";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { addToCache, checkIsCacheable, getAllCache } from "@/utils/redisHelper.utils";
-import { getRedisKey } from "@/utils/redisKey.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { SHORT_CODE } from "@/utils/shortCode.utils";
-import { Settings } from "@prisma/client";
+import {
+  createSettingsInDb,
+  getSettingsInDb,
+} from "@/repository/master/settings.repository.js";
+import { CreateOrUpdateSettings } from "@/types/master/settings.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { addToCache, getAllCache } from "@repo/platform/cache/redis.utils.js";
+import { getRedisKey } from "@/config/cache.config.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import { InvSettings } from "@repo/db/generated/prisma/client";
+import { checkIsCacheable } from "@/config/cache.config.js";
 
 const cacheKey = getRedisKey("SETTINGS", "all");
 
 export const settingsService = {
-  async upsertSettings(input: CreateOrUpdateSettings): Promise<Settings> {
+  async upsertSettings(input: CreateOrUpdateSettings): Promise<InvSettings> {
     logger.info("entering::upsertSettings::service");
 
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
@@ -25,13 +29,15 @@ export const settingsService = {
     logger.info("exiting::upsertSettings::service");
     return created;
   },
-  async getSettings(canNullReturnable: boolean = false): Promise<Settings | null> {
+  async getSettings(
+    canNullReturnable: boolean = false,
+  ): Promise<InvSettings | null> {
     logger.info("entering::getSettings::service");
 
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
-    let settings: Settings | null = null;
+    let settings: InvSettings | null = null;
     if (isCacheable) {
-      const cached = (await getAllCache(cacheKey)) as Settings[];
+      const cached = (await getAllCache(cacheKey)) as InvSettings[];
       if (cached && cached.length > 0) {
         logger.info("exiting::getSettings::service (cache)");
         settings = cached[0];
@@ -40,7 +46,10 @@ export const settingsService = {
 
     settings = await getSettingsInDb();
     if (!settings && !canNullReturnable) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Settings"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Settings"),
+      );
     }
 
     logger.info("exiting::getSettings::service");

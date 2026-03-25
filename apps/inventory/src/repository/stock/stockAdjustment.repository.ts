@@ -1,29 +1,39 @@
 import { uinServiceFactory } from "@/config/core.config.js";
-import { requestStorage } from "@/config/requestContext";
-import db from "@/db/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { db } from "@repo/db/client";
 import {
   CreateStockAjustmentInput,
   StockAdjustmentResponse,
   UpdateStockAjustmentInput,
-} from "@/types/stock/stockAdjustment";
-import { customOmit } from "@/utils/helper.utils";
-import { logger } from "@/utils/logger.utils";
-import { Action, Operation, STOCK_ADJUSTMENT_STATUS, UinShortCode } from "@prisma/client";
-import { addItemStock, subItemStock } from "./stock.repository";
+} from "@/types/stock/stockAdjustment.js";
+import { customOmit } from "av6-utils";
+import { logger } from "@repo/platform/logging/logger.js";
+import {
+  Action,
+  InvOperation,
+  InvStockAdjustmentStatus,
+  InvUinShortCode,
+} from "@repo/db/generated/prisma/client";
+import {
+  addItemStock,
+  subItemStock,
+} from "@/repository/stock/stock.repository.js";
 
-export const createStockAdjustmentInDb = async (input: CreateStockAjustmentInput): Promise<boolean> => {
+export const createStockAdjustmentInDb = async (
+  input: CreateStockAjustmentInput,
+): Promise<boolean> => {
   logger.info("entering::createStockAdjustmentInDb::repository");
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
 
-  const omittedInput = customOmit<CreateStockAjustmentInput, "stockAdjustmentDetails" | "isAvailQtyCheck">(input, [
-    "stockAdjustmentDetails",
-    "isAvailQtyCheck",
-  ]);
+  const omittedInput = customOmit<
+    CreateStockAjustmentInput,
+    "stockAdjustmentDetails" | "isAvailQtyCheck"
+  >(input, ["stockAdjustmentDetails", "isAvailQtyCheck"]);
   const { stockAdjustmentDetails } = input;
-  const refNo = await uinServiceFactory.generateUIN(UinShortCode.STAJ);
+  const refNo = await uinServiceFactory.generateUIN(InvUinShortCode.STAJ);
   await db.$transaction(async (tx) => {
-    const createdStockAdjustment = await tx.stockAdjustment.create({
+    const createdStockAdjustment = await tx.invStockAdjustment.create({
       data: {
         ...omittedInput.rest,
         refNo,
@@ -46,7 +56,7 @@ export const createStockAdjustmentInDb = async (input: CreateStockAjustmentInput
     });
 
     /*---------------------Stock Adjustment ------------------------*/
-    if (input.status === STOCK_ADJUSTMENT_STATUS.COMPLETED) {
+    if (input.status === InvStockAdjustmentStatus.COMPLETED) {
       for (const detail of createdStockAdjustment.stockAdjustmentDetails) {
         if (detail.adjustType === Action.ADDITION) {
           await addItemStock(
@@ -56,16 +66,18 @@ export const createStockAdjustmentInDb = async (input: CreateStockAjustmentInput
               ccId: input.targetCcId,
               quantity: detail.quantity,
               batchNo: detail.batchNo,
-              expiryDate: detail.expiryDate ? new Date(detail.expiryDate) : undefined,
+              expiryDate: detail.expiryDate
+                ? new Date(detail.expiryDate)
+                : undefined,
               isFoc: detail.isFoc ?? undefined,
             },
             {
-              operation: Operation.STOCK_ADJUSTMENT,
+              operation: InvOperation.STOCK_ADJUSTMENT,
               refId: createdStockAdjustment.id,
               refDetailsId: detail.id,
               refNo: createdStockAdjustment.refNo,
               refDate: createdStockAdjustment.date,
-            }
+            },
           );
         } else {
           await subItemStock(
@@ -75,16 +87,18 @@ export const createStockAdjustmentInDb = async (input: CreateStockAjustmentInput
               ccId: input.targetCcId,
               quantity: detail.quantity,
               batchNo: detail.batchNo,
-              expiryDate: detail.expiryDate ? new Date(detail.expiryDate) : undefined,
+              expiryDate: detail.expiryDate
+                ? new Date(detail.expiryDate)
+                : undefined,
               isFoc: detail.isFoc ?? undefined,
             },
             {
-              operation: Operation.STOCK_ADJUSTMENT,
+              operation: InvOperation.STOCK_ADJUSTMENT,
               refId: createdStockAdjustment.id,
               refDetailsId: detail.id,
               refNo: createdStockAdjustment.refNo,
               refDate: createdStockAdjustment.date,
-            }
+            },
           );
         }
       }
@@ -95,9 +109,11 @@ export const createStockAdjustmentInDb = async (input: CreateStockAjustmentInput
   return true;
 };
 
-export const getStockAdjustmentByIdFromDb = async (id: number): Promise<StockAdjustmentResponse | null> => {
+export const getStockAdjustmentByIdFromDb = async (
+  id: number,
+): Promise<StockAdjustmentResponse | null> => {
   logger.info("entering::getStockAdjustmentByIdFromDb::repository");
-  const record = await db.stockAdjustment.findFirst({
+  const record = await db.invStockAdjustment.findFirst({
     where: {
       id,
       isActive: true,
@@ -116,7 +132,9 @@ export const getStockAdjustmentByIdFromDb = async (id: number): Promise<StockAdj
   return record;
 };
 
-export const updateStockAdjustmentInDb = async (input: UpdateStockAjustmentInput): Promise<boolean> => {
+export const updateStockAdjustmentInDb = async (
+  input: UpdateStockAjustmentInput,
+): Promise<boolean> => {
   logger.info("entering::updateStockAdjustmentInDb::repository");
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
@@ -128,14 +146,18 @@ export const updateStockAdjustmentInDb = async (input: UpdateStockAjustmentInput
 
   const { stockAdjustmentDetails } = input;
 
-  const toCreate = stockAdjustmentDetails.filter((d) => typeof d.id !== "number");
-  const toUpdate = stockAdjustmentDetails.filter((d) => typeof d.id === "number");
+  const toCreate = stockAdjustmentDetails.filter(
+    (d) => typeof d.id !== "number",
+  );
+  const toUpdate = stockAdjustmentDetails.filter(
+    (d) => typeof d.id === "number",
+  );
   const toDelete = input.existing.stockAdjustmentDetails
     .filter((d) => !stockAdjustmentDetails.some((item) => item.id === d.id))
     .map((d) => d.id);
 
   await db.$transaction(async (tx) => {
-    const updatedStockAdjustment = await tx.stockAdjustment.update({
+    const updatedStockAdjustment = await tx.invStockAdjustment.update({
       where: { id: input.id },
       data: {
         ...omittedInput.rest,
@@ -176,7 +198,7 @@ export const updateStockAdjustmentInDb = async (input: UpdateStockAjustmentInput
     });
 
     /*---------------------Stock Adjustment ------------------------*/
-    if (input.status === STOCK_ADJUSTMENT_STATUS.COMPLETED) {
+    if (input.status === InvStockAdjustmentStatus.COMPLETED) {
       for (const detail of updatedStockAdjustment.stockAdjustmentDetails) {
         if (detail.adjustType === Action.ADDITION) {
           await addItemStock(
@@ -186,16 +208,18 @@ export const updateStockAdjustmentInDb = async (input: UpdateStockAjustmentInput
               ccId: input.targetCcId,
               quantity: detail.quantity,
               batchNo: detail.batchNo,
-              expiryDate: detail.expiryDate ? new Date(detail.expiryDate) : undefined,
+              expiryDate: detail.expiryDate
+                ? new Date(detail.expiryDate)
+                : undefined,
               isFoc: detail.isFoc ?? undefined,
             },
             {
-              operation: Operation.STOCK_ADJUSTMENT,
+              operation: InvOperation.STOCK_ADJUSTMENT,
               refId: updatedStockAdjustment.id,
               refDetailsId: detail.id,
               refNo: updatedStockAdjustment.refNo,
               refDate: updatedStockAdjustment.date,
-            }
+            },
           );
         } else {
           await subItemStock(
@@ -205,16 +229,18 @@ export const updateStockAdjustmentInDb = async (input: UpdateStockAjustmentInput
               ccId: input.targetCcId,
               quantity: detail.quantity,
               batchNo: detail.batchNo,
-              expiryDate: detail.expiryDate ? new Date(detail.expiryDate) : undefined,
+              expiryDate: detail.expiryDate
+                ? new Date(detail.expiryDate)
+                : undefined,
               isFoc: detail.isFoc ?? undefined,
             },
             {
-              operation: Operation.STOCK_ADJUSTMENT,
+              operation: InvOperation.STOCK_ADJUSTMENT,
               refId: updatedStockAdjustment.id,
               refDetailsId: detail.id,
               refNo: updatedStockAdjustment.refNo,
               refDate: updatedStockAdjustment.date,
-            }
+            },
           );
         }
       }

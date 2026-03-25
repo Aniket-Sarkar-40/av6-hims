@@ -13,7 +13,7 @@ export type CreatePurchaseOrderInput = Omit<
 > & {
   supplier: ItemSupplierDTO | null;
   purchaseOrderDetails: PurchaseOrderDetails[];
-  po: InvPurchaseOrder;
+  po: PurchaseOrderDTO;
 };
 
 export interface UpdatePurchaseOrder extends CreatePurchaseOrderInput {

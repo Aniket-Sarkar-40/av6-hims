@@ -1,21 +1,21 @@
-import { toGrnDTO } from "@/mapper/grn/grn.mapper";
+import { toGrnDTO } from "@/mapper/grn/grn.mapper.js";
 import {
   createGrnInDb,
   deleteGrnFromDb,
   getAllGrnFromDb,
   getGrnByIdFromDb,
   updateGrnInDb,
-} from "@/repository/grn/grn.repository";
-import { CreateGrnInput, GrnDTO } from "@/types/grn/grn";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@/repository/grn/grn.repository.js";
+import { CreateGrnInput, GrnDTO } from "@/types/grn/grn.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createGrnServiceValidation,
   deleteGrnServiceValidation,
   updateGrnServiceValidation,
-} from "@/validations/service/grn/grn.service.validation";
+} from "@/validations/service/grn/grn.service.validation.js";
 
 export const grnService = {
   async createGrn(input: CreateGrnInput) {
@@ -43,7 +43,10 @@ export const grnService = {
 
     const records = await getAllGrnFromDb();
     if (records.length === 0) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "grn Order"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "grn Order"),
+      );
     }
 
     const dto = await Promise.all(
@@ -52,14 +55,17 @@ export const grnService = {
           ...sr,
           goodReceiveDetails: sr.goodReceiveDetails,
         });
-      })
+      }),
     );
 
     logger.info("exiting::getAllGrn::service");
     return dto;
   },
 
-  async getGrnById(id: number, canNullReturnable: boolean = false): Promise<GrnDTO | null> {
+  async getGrnById(
+    id: number,
+    canNullReturnable: boolean = false,
+  ): Promise<GrnDTO | null> {
     logger.info("entering::getGrnById::service id=" + id);
 
     validIdCheck(id);
@@ -68,9 +74,14 @@ export const grnService = {
 
     if (!grn) {
       if (!canNullReturnable) {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Good Receive Note"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Good Receive Note"),
+        );
       } else {
-        logger.warn(`GRN with id=${id} not found, returning null as requested.`);
+        logger.warn(
+          `GRN with id=${id} not found, returning null as requested.`,
+        );
         return null;
       }
     }

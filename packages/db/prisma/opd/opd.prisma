@@ -9,6 +9,7 @@ model OpdDynamicShortCode {
     isSingleDto  Boolean  @default(true) @map("is_single_dto")
     whereClause  Json?    @map("where_clause")
     selectClause Json?    @map("select_clause")
+    config       Json?    @map("config")
     createdBy    Int?     @map("created_by")
     updatedBy    Int?     @map("updated_by")
     createdAt    DateTime @default(now()) @map("created_at")

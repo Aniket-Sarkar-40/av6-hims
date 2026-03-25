@@ -1,11 +1,11 @@
-import { TryCatch } from "@/middlewares/error.middleware";
+import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
 import { Request, Response } from "express";
-import { logger } from "@/utils/logger.utils";
-import { generateSuccessMessage } from "@/utils/responseMessage.utils";
-import { BaseResponse } from "@/utils/baseResponse.utils";
-import { branchService } from "@/services/master/branch.service";
-import { BranchReq } from "@/types/master/branch";
-import { ToggleActive } from "@/types/common";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { branchService } from "@/services/master/branch.service.js";
+import { BranchReq } from "@/types/master/branch.js";
+import { ToggleActive } from "@/types/common.js";
 
 export const createBranch = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createBranch::controller");
@@ -16,7 +16,7 @@ export const createBranch = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Branch"),
     },
-    branch
+    branch,
   );
   logger.info("exiting::createBranch::controller");
   return res.status(201).json(response);
@@ -33,8 +33,8 @@ export const updateBranch = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Branch"),
       },
-      updateBranch
-    )
+      updateBranch,
+    ),
   );
 });
 
@@ -48,8 +48,8 @@ export const getAllBranch = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Branch"),
       },
-      branches
-    )
+      branches,
+    ),
   );
 });
 
@@ -63,7 +63,7 @@ export const getBranchById = TryCatch(async (req: Request, res: Response) => {
     return res.status(400).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
   logger.info("exiting::getBranchById::controller");
@@ -73,28 +73,30 @@ export const getBranchById = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Branch"),
       },
-      branch
-    )
+      branch,
+    ),
   );
 });
 
-export const toggleActiveBranch = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::toggleActiveBranch::controller");
-  const input = req.body as ToggleActive;
+export const toggleActiveBranch = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::toggleActiveBranch::controller");
+    const input = req.body as ToggleActive;
 
-  const branch = await branchService.toggleActiveBranch(input);
+    const branch = await branchService.toggleActiveBranch(input);
 
-  logger.info("exiting::toggleActiveBranch::controller");
-  return res.status(200).json(
-    new BaseResponse(
-      {
-        success: true,
-        message: generateSuccessMessage("UPDATED", "Branch"),
-      },
-      branch
-    )
-  );
-});
+    logger.info("exiting::toggleActiveBranch::controller");
+    return res.status(200).json(
+      new BaseResponse(
+        {
+          success: true,
+          message: generateSuccessMessage("UPDATED", "Branch"),
+        },
+        branch,
+      ),
+    );
+  },
+);
 
 // export const getAllBranchFromItemBanchMap = TryCatch(async (req: Request, res: Response) => {
 //   logger.info("entering::getAllBranchFromItemBanchMap::controller");

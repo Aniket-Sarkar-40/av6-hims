@@ -1,21 +1,25 @@
-import { toPurchaseOrderDTO } from "@/mapper/purchase/purchase.mapper";
+import { toPurchaseOrderDTO } from "@/mapper/purchase/purchase.mapper.js";
 import {
   createPurchaseOrder,
   deletePurchaseOrderFromDb,
   getAllPurchaseFromDb,
   getPurchaseByIdFromDb,
   updatePurchaseOrderInDb,
-} from "@/repository/purchase/purchase.repository";
-import { CreatePurchaseOrderInput, PurchaseOrderDTO, UpdatePurchaseOrder } from "@/types/purchase/purchase";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@/repository/purchase/purchase.repository.js";
+import {
+  CreatePurchaseOrderInput,
+  PurchaseOrderDTO,
+  UpdatePurchaseOrder,
+} from "@/types/purchase/purchase.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createPOServiceValidation,
   deletePOServiceValidation,
   updatePOServiceValidation,
-} from "@/validations/service/purchase/purchase.service.validation";
+} from "@/validations/service/purchase/purchase.service.validation.js";
 
 export const purchaseService = {
   async createPurchaseOrder(input: CreatePurchaseOrderInput) {
@@ -43,7 +47,10 @@ export const purchaseService = {
 
     const pos = await getAllPurchaseFromDb();
     if (pos.length === 0) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Purchase Order"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Purchase Order"),
+      );
     }
 
     const dto = await Promise.all(pos.map(toPurchaseOrderDTO));
@@ -52,7 +59,10 @@ export const purchaseService = {
     return dto;
   },
 
-  async getPurchaseById(id: number, canNullReturnable: boolean = false): Promise<PurchaseOrderDTO | null> {
+  async getPurchaseById(
+    id: number,
+    canNullReturnable: boolean = false,
+  ): Promise<PurchaseOrderDTO | null> {
     logger.info("entering::getPurchaseById::service id=" + id);
 
     validIdCheck(id);
@@ -62,7 +72,10 @@ export const purchaseService = {
       if (canNullReturnable) {
         return null;
       }
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "PurchaseOrder"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "PurchaseOrder"),
+      );
     }
 
     const dto = await toPurchaseOrderDTO(po);

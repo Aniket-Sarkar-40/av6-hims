@@ -3,55 +3,76 @@ import {
   getAllStorageFromDb,
   getStorageByIdFromDb,
   updateStorageInDb,
-} from "@/repository/master/storage.repository";
-import { CreateOrUpdateStorage } from "@/types/master/storage";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { addToCache, checkIsCacheable, getAllCache, getCacheById, updateCache } from "@/utils/redisHelper.utils";
-import { getRedisKey } from "@/utils/redisKey.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { SHORT_CODE } from "@/utils/shortCode.utils";
+} from "@/repository/master/storage.repository.js";
+import { CreateOrUpdateStorage } from "@/types/master/storage.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import {
+  addToCache,
+  getAllCache,
+  getCacheById,
+  updateCache,
+} from "@repo/platform/cache/redis.utils.js";
+import { getRedisKey } from "@/config/cache.config.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import {
   createStorageServiceValidation,
   updateIdStorageServiceValidation,
-} from "@/validations/service/master/storage.service.validation";
-import { Storage } from "@prisma/client";
+} from "@/validations/service/master/storage.service.validation.js";
+import { InvStorage } from "@repo/db/generated/prisma/client";
+import { checkIsCacheable } from "@/config/cache.config.js";
 
 const cacheKey = getRedisKey("STORAGE", "all");
 
 export const storageService = {
-  async getStorageById(id: number, canNullReturnable: boolean = false): Promise<Storage | null> {
+  async getStorageById(
+    id: number,
+    canNullReturnable: boolean = false,
+  ): Promise<InvStorage | null> {
     logger.info("entering::getStorageById::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.STORAGE);
-    let storage: Storage | null;
+    let storage: InvStorage | null;
     if (isCacheable) {
-      storage = (await getCacheById(cacheKey, id)) as Storage | null;
+      storage = (await getCacheById(cacheKey, id)) as InvStorage | null;
     } else {
       storage = await getStorageByIdFromDb(id);
     }
 
     if (!storage) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Storage"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Storage"),
+        );
       else return null;
     }
     logger.info("exiting::getStorageById::service");
     return storage;
   },
 
-  async getAllStorage(): Promise<Storage[]> {
+  async getAllStorage(): Promise<InvStorage[]> {
     logger.info("entering::getAllStorage::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.STORAGE);
     if (isCacheable) {
-      const cachedStorage = (await getAllCache(cacheKey)) as Storage[] | null;
+      const cachedStorage = (await getAllCache(cacheKey)) as
+        | InvStorage[]
+        | null;
       if (cachedStorage && cachedStorage.length > 0) {
         return cachedStorage;
       } else {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Storage"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Storage"),
+        );
       }
     } else {
       const storage = await getAllStorageFromDb();
       if (storage.length === 0) {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Storage"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Storage"),
+        );
       }
       logger.info("exiting::getAllStorage::service");
       return storage;

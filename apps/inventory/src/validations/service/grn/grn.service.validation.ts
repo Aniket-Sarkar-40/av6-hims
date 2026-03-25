@@ -1,44 +1,65 @@
-import { requestStorage } from "@/config/requestContext";
-import { getCountGRNDetailsFromDb, getGrnByIdFromDb } from "@/repository/grn/grn.repository";
-import { getPurchaseByIdFromDb } from "@/repository/purchase/purchase.repository";
-import { branchService } from "@/services/master/branch.service";
-import { itemSupplierService } from "@/services/master/itemSupplier.service";
-import { warehouseService } from "@/services/master/warehouse.service";
-import { CreateGrnInput } from "@/types/grn/grn";
-import { applyRound, calculation } from "@/utils/commonCalculation.utils";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
-import { CalculationMethod, GRN_STATUS, PO_STATUS } from "@prisma/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import {
+  getCountGRNDetailsFromDb,
+  getGrnByIdFromDb,
+} from "@/repository/grn/grn.repository.js";
+import { getPurchaseByIdFromDb } from "@/repository/purchase/purchase.repository.js";
+import { branchService } from "@/services/master/branch.service.js";
+import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
+import { warehouseService } from "@/services/master/warehouse.service.js";
+import { CreateGrnInput } from "@/types/grn/grn.js";
+import { applyRound } from "av6-utils";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import {
+  CalculationMethod,
+  GRN_STATUS,
+  PO_STATUS,
+} from "@repo/db/generated/prisma/client";
+import { calculation } from "@/utils/commonCalculation.utils.js";
+import { settingsService } from "@/services/master/settings.service.js";
 
 export const validateIdGrn = async (id: number) => {
   logger.info("entering::validateIdGrn service::validation");
   validIdCheck(id);
   const po = await getGrnByIdFromDb(id);
   if (!po) {
-    throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Good Receive Note"));
+    throw new ErrorHandler(
+      404,
+      generateErrorMessage("NOT_FOUND", "Good Receive Note"),
+    );
   }
   logger.info("exiting::validateIdGrn::service::validation");
 
   return po;
 };
 
-export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => {
+export const validateGrnCommon = async (
+  body: CreateGrnInput,
+): Promise<void> => {
   logger.info("entering::validateGrnCommon::service::validation");
+  const settings = await settingsService.getSettings(true);
 
-  const itemSupplier = await itemSupplierService.getItemSupplierById(body.supplierId, true);
+  const itemSupplier = await itemSupplierService.getItemSupplierById(
+    body.supplierId,
+    true,
+  );
   if (!itemSupplier) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Supplier"));
   }
   body.supplier = itemSupplier;
-  const ccSettingsId = requestStorage.getStore()?.settings?.warehouseMode;
+  const ccSettingsId = settings?.warehouseMode;
 
   let warehouse, branch;
   if (ccSettingsId) {
     warehouse = await warehouseService.getWarehouseById(body.ccId, true);
     if (!warehouse) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Warehouse"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Warehouse"),
+      );
     }
   } else {
     branch = await branchService.getBranchById(body.ccId, true);
@@ -47,8 +68,8 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
     }
   }
 
-  const settings = requestStorage.getStore()?.settings;
-  const calculationMethod: CalculationMethod = settings?.grnCalculationMethod || "FINAL";
+  const calculationMethod: CalculationMethod =
+    settings?.grnCalculationMethod || "FINAL";
   const roundFormat = settings?.grnRoundedFormat || "TO_FIXED";
   const precision = settings?.defaultPrecision || 2;
 
@@ -56,42 +77,76 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
 
   if (ccSettingsId) {
     if (warehouse?.isMain === false) {
-      throw new ErrorHandler(404, generateErrorMessage("ACCESS_FAIL", "Warehouse"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("ACCESS_FAIL", "Warehouse"),
+      );
     }
   }
 
   const existingPO = await getPurchaseByIdFromDb(body.poId);
   if (!existingPO) {
-    throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Purchase Order"));
+    throw new ErrorHandler(
+      404,
+      generateErrorMessage("NOT_FOUND", "Purchase Order"),
+    );
   }
 
   if (existingPO.poNumber !== body.poNumber) {
-    throw new ErrorHandler(400, generateErrorMessage("MISMATCH", "Purchase Order ID and Number", " Sending PO Number"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "MISMATCH",
+        "Purchase Order ID and Number",
+        " Sending PO Number",
+      ),
+    );
   }
 
   if (existingPO.supplierId !== body.supplierId) {
-    throw new ErrorHandler(400, generateErrorMessage("MISMATCH", "Supplier ID", "Sending Supplier ID"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("MISMATCH", "Supplier ID", "Sending Supplier ID"),
+    );
   }
 
   if (ccSettingsId) {
     if (existingPO.ccId !== body.ccId && warehouse?.isMain === false) {
-      throw new ErrorHandler(400, generateErrorMessage("MISMATCH", "Warehouse ID", "Sending Warehouse ID"));
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage(
+          "MISMATCH",
+          "Warehouse ID",
+          "Sending Warehouse ID",
+        ),
+      );
     }
   } else {
     if (existingPO.ccId !== body.ccId) {
-      throw new ErrorHandler(400, generateErrorMessage("MISMATCH", "Branch ID", "Sending Branch ID"));
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("MISMATCH", "Branch ID", "Sending Branch ID"),
+      );
     }
   }
 
   // Validate discounts
   const totalDiscount = body.netDiscount ?? 0;
   if (totalDiscount > body.totalAmount) {
-    throw new ErrorHandler(400, generateErrorMessage("INVALID_VALUE", "Total Discount cannot exceed Total Amount"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "INVALID_VALUE",
+        "Total Discount cannot exceed Total Amount",
+      ),
+    );
   }
 
   // Validate Item IDs between GRN and PO
   const grnItemIds = new Set(body.goodReceiveDetails.map((d) => d.itemId));
-  const poItemIds = new Set(existingPO.purchaseOrderDetails.map((d) => d.itemId));
+  const poItemIds = new Set(
+    existingPO.purchaseOrderDetails.map((d) => d.itemId),
+  );
   const invalidIds = Array.from(grnItemIds).filter((id) => !poItemIds.has(id));
 
   if (invalidIds.length > 0) {
@@ -99,15 +154,18 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
       400,
       generateErrorMessage(
         "INVALID_VALUE",
-        `Item ID${invalidIds.length > 1 ? "s" : ""} [${invalidIds.join(", ")}] not found in Purchase Order details`
-      )
+        `Item ID${invalidIds.length > 1 ? "s" : ""} [${invalidIds.join(", ")}] not found in Purchase Order details`,
+      ),
     );
   }
 
   if (grnItemIds.size > poItemIds.size) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_VALUE", `GRN contains ${grnItemIds.size} items but PO only has ${poItemIds.size}`)
+      generateErrorMessage(
+        "INVALID_VALUE",
+        `GRN contains ${grnItemIds.size} items but PO only has ${poItemIds.size}`,
+      ),
     );
   }
 
@@ -115,7 +173,9 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
 
   // Validate each GRN item against PO details
   for (const detail of body.goodReceiveDetails) {
-    const poDetail = existingPO.purchaseOrderDetails.find((poItem) => poItem.id === detail.poDetailsId);
+    const poDetail = existingPO.purchaseOrderDetails.find(
+      (poItem) => poItem.id === detail.poDetailsId,
+    );
 
     if (poDetail) {
       const itemLabel = poDetail?.item?.item ?? `ID ${detail.itemId}`;
@@ -126,13 +186,16 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
           400,
           generateErrorMessage(
             "INVALID_VALUE",
-            `Item ${itemLabel}: Quantity in GRN (${detail.quantity}) exceeds order quantity (${finalQuantity}) in Purchase Order`
-          )
+            `Item ${itemLabel}: Quantity in GRN (${detail.quantity}) exceeds order quantity (${finalQuantity}) in Purchase Order`,
+          ),
         );
       }
       detail.orderQuantity = poDetail.quantity;
     } else {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Purchase Order Details"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Purchase Order Details"),
+      );
     }
 
     // Validate price mismatch
@@ -141,23 +204,26 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
-          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Purchased Price (${detail.purchasedPrice}) does not match Purchase Order Price (${poDetail.purchasedPrice})`
-        )
+          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Purchased Price (${detail.purchasedPrice}) does not match Purchase Order Price (${poDetail.purchasedPrice})`,
+        ),
       );
     }
 
     let itemAmount = poDetail.purchasedPrice * (detail.quantity ?? 0);
 
     // Adjust for calculation method
-    itemAmount = calculationMethod === "STEP_WISE" ? applyRound(itemAmount, roundFormat, precision) : itemAmount;
+    itemAmount =
+      calculationMethod === "STEP_WISE"
+        ? applyRound(itemAmount, roundFormat, precision)
+        : itemAmount;
 
     if (applyRound(itemAmount, roundFormat, precision) !== detail.netAmount) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
-          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Item Amount (${applyRound(itemAmount, roundFormat, precision)}) does not match net amount (${detail.netAmount})`
-        )
+          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Item Amount (${applyRound(itemAmount, roundFormat, precision)}) does not match net amount (${detail.netAmount})`,
+        ),
       );
     }
 
@@ -172,15 +238,19 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
       precision: precision || 2,
     });
 
-    const formattedTotalAmount = applyRound(totalAmount, roundFormat, precision);
+    const formattedTotalAmount = applyRound(
+      totalAmount,
+      roundFormat,
+      precision,
+    );
 
     if (detail.totalAmount !== formattedTotalAmount) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
-          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Total Amount (${detail.totalAmount}) does not match calculated total amount (${formattedTotalAmount})`
-        )
+          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Total Amount (${detail.totalAmount}) does not match calculated total amount (${formattedTotalAmount})`,
+        ),
       );
     }
 
@@ -189,18 +259,20 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
-          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Net tax (${detail.netTax}) does not match calculated net tax (${applyRound(netTax, roundFormat, precision)})`
-        )
+          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Net tax (${detail.netTax}) does not match calculated net tax (${applyRound(netTax, roundFormat, precision)})`,
+        ),
       );
     }
 
-    if (detail.netDiscount !== applyRound(netDiscount, roundFormat, precision)) {
+    if (
+      detail.netDiscount !== applyRound(netDiscount, roundFormat, precision)
+    ) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
-          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Net Discount (${detail.netDiscount}) does not match calculated net discount (${applyRound(netDiscount, roundFormat, precision)})`
-        )
+          `Item ${poDetail?.item?.item ?? `ID ${detail.itemId}`}: Net Discount (${detail.netDiscount}) does not match calculated net discount (${applyRound(netDiscount, roundFormat, precision)})`,
+        ),
       );
     }
 
@@ -208,13 +280,15 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
   }
 
   // Validate total amounts across GRN
-  if (body.netTotal !== applyRound(totalDetailAmounts, roundFormat, precision)) {
+  if (
+    body.netTotal !== applyRound(totalDetailAmounts, roundFormat, precision)
+  ) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "VALUE_MISMATCH",
-        `Net Amount (${body.netTotal}) does not match sum of detail total amounts (${applyRound(totalDetailAmounts, roundFormat, precision)})`
-      )
+        `Net Amount (${body.netTotal}) does not match sum of detail total amounts (${applyRound(totalDetailAmounts, roundFormat, precision)})`,
+      ),
     );
   }
 
@@ -236,8 +310,8 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
       400,
       generateErrorMessage(
         "VALUE_MISMATCH",
-        `Net Tax (${body.netTax}) does not match calculated tax (${applyRound(netTax, roundFormat, precision)})`
-      )
+        `Net Tax (${body.netTax}) does not match calculated tax (${applyRound(netTax, roundFormat, precision)})`,
+      ),
     );
   }
 
@@ -246,8 +320,8 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
       400,
       generateErrorMessage(
         "VALUE_MISMATCH",
-        `Net Discount (${body.netDiscount}) does not match calculated discount (${applyRound(netDiscount, roundFormat, precision)})`
-      )
+        `Net Discount (${body.netDiscount}) does not match calculated discount (${applyRound(netDiscount, roundFormat, precision)})`,
+      ),
     );
   }
 
@@ -256,26 +330,38 @@ export const validateGrnCommon = async (body: CreateGrnInput): Promise<void> => 
       400,
       generateErrorMessage(
         "VALUE_MISMATCH",
-        `Total Amount (${body.totalAmount}) does not match calculated net total (${applyRound(totalAmount, roundFormat, precision)})`
-      )
+        `Total Amount (${body.totalAmount}) does not match calculated net total (${applyRound(totalAmount, roundFormat, precision)})`,
+      ),
     );
   }
 
   // Validate paid amount
   const paidAmount = body.paidAmount ?? 0;
   if (paidAmount > body.totalAmount) {
-    throw new ErrorHandler(400, generateErrorMessage("INVALID_VALUE", "Paid Amount cannot exceed Total Amount"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "INVALID_VALUE",
+        "Paid Amount cannot exceed Total Amount",
+      ),
+    );
   }
 
   // Validate quantity matches remaining PO quantity
   const remainingTotalPOQty = existingPO.purchaseOrderDetails.reduce(
     (acc, curr) => (acc += curr.quantity - (curr.receivedQty ?? 0)),
-    0
+    0,
   );
-  const totalGRNQty = body.goodReceiveDetails.reduce((acc, curr) => (acc += curr.quantity ?? 0), 0);
+  const totalGRNQty = body.goodReceiveDetails.reduce(
+    (acc, curr) => (acc += curr.quantity ?? 0),
+    0,
+  );
 
   if (remainingTotalPOQty < totalGRNQty) {
-    throw new ErrorHandler(400, "Total Quantity of GRN items must be less than or equal to the total quantity of PO.");
+    throw new ErrorHandler(
+      400,
+      "Total Quantity of GRN items must be less than or equal to the total quantity of PO.",
+    );
   } else if (remainingTotalPOQty > totalGRNQty) {
     body.poStatus = PO_STATUS.PARTIALLY_RECEIVED;
   } else {
@@ -298,17 +384,25 @@ export const updateGrnServiceValidation = async (body: CreateGrnInput) => {
 
   if (body.id == null) {
     logger.error("missing grn id in update request");
-    throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Good Receive Note id"));
+    throw new ErrorHandler(
+      404,
+      generateErrorMessage("NOT_FOUND", "Good Receive Note id"),
+    );
   }
   logger.info(`validating existence of grn id=${body.id}`);
   await validateIdGrn(body.id);
 
-  const detailIds = body.goodReceiveDetails.map((d) => d.id).filter((id): id is number => id != null);
+  const detailIds = body.goodReceiveDetails
+    .map((d) => d.id)
+    .filter((id): id is number => id != null);
 
   if (detailIds.length > 0) {
     const count = await getCountGRNDetailsFromDb(detailIds, body.id);
     if (count !== detailIds.length) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Good Receive Note details"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Good Receive Note details"),
+      );
     }
   }
 
@@ -323,8 +417,13 @@ export const deleteGrnServiceValidation = async (id: number) => {
   const grn = await validateIdGrn(id);
 
   if (grn.status !== GRN_STATUS.DRAFT) {
-    logger.error(`Cannot delete Good Receive Note with id=${id} in status=${grn.status}`);
-    throw new ErrorHandler(400, generateErrorMessage("INVALID_STATUS", "Good Receive Note"));
+    logger.error(
+      `Cannot delete Good Receive Note with id=${id} in status=${grn.status}`,
+    );
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("INVALID_STATUS", "Good Receive Note"),
+    );
   }
   logger.info("exiting::deleteGrnServiceValidation::service::validation");
 };

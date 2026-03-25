@@ -1,4 +1,4 @@
-import { toBranchDTO } from "@/mapper/master/branch.mapper";
+import { toBranchDTO } from "@/mapper/master/branch.mapper.js";
 import {
   createBranchInDb,
   getAllBranchFromDb,
@@ -7,24 +7,30 @@ import {
   updateBranchInDb,
   getBranchesByCcIdsFromDb,
   getCollectionCenterByIdFromDb,
-} from "@/repository/master/branch.repository";
-import { ToggleActive } from "@/types/common";
-import { BranchDTO, BranchReq, BranchResponse } from "@/types/master/branch";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { addToCache, checkIsCacheable, getAllCache, getCacheById, updateCache } from "@/utils/redisHelper.utils";
-import { getRedisKey } from "@/utils/redisKey.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { SHORT_CODE } from "@/utils/shortCode.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@/repository/master/branch.repository.js";
+import { ToggleActive } from "@/types/common.js";
+import { BranchDTO, BranchReq, BranchResponse } from "@/types/master/branch.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import {
+  addToCache,
+  getAllCache,
+  getCacheById,
+  updateCache,
+} from "@repo/platform/cache/redis.utils.js";
+import { getRedisKey } from "@/config/cache.config.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createBranchServiceValidation,
   updateIdBranchServiceValidation,
   validateIdBranch,
-} from "@/validations/service/master/branch.service.validation";
-import { Branch, CollectionCenter } from "@prisma/client";
-import { BranchDTOLocation } from "@/types/master/branch";
-import { toBranchDTOLocation } from "@/mapper/master/branch.mapper";
+} from "@/validations/service/master/branch.service.validation.js";
+import { InvBranch, CollectionCenter } from "@repo/db/generated/prisma/client";
+import { BranchDTOLocation } from "@/types/master/branch.js";
+import { toBranchDTOLocation } from "@/mapper/master/branch.mapper.js";
+import { checkIsCacheable } from "@/config/cache.config.js";
 
 const cacheKey = getRedisKey("BRANCH", "all");
 
@@ -69,26 +75,42 @@ export const branchService = {
       branch = await getAllBranchFromDb();
     }
     if (branch.length === 0) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Branch"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Branch"),
+        );
       else return [];
     }
-    const branchDTO = await Promise.all(branch.map((branch) => toBranchDTO(branch)));
+    const branchDTO = await Promise.all(
+      branch.map((branch) => toBranchDTO(branch)),
+    );
     logger.info("exiting::getAllBranch::service");
     return branchDTO;
   },
 
-  async getBranchById(branchId: number, canNullReturnable: boolean = false): Promise<BranchDTO | null> {
+  async getBranchById(
+    branchId: number,
+    canNullReturnable: boolean = false,
+  ): Promise<BranchDTO | null> {
     logger.info("entering::getBranchById::service");
     validIdCheck(branchId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.BRANCH);
     let branch: BranchResponse | null;
     if (isCacheable) {
-      branch = (await getCacheById(cacheKey, branchId)) as BranchResponse | null;
+      branch = (await getCacheById(
+        cacheKey,
+        branchId,
+      )) as BranchResponse | null;
     } else {
       branch = await getBranchByIdFromDb(branchId);
     }
     if (!branch) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Branch"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Branch"),
+        );
       else return null;
     }
     const branchDTO = await toBranchDTO(branch);
@@ -96,19 +118,26 @@ export const branchService = {
     return branchDTO;
   },
 
-  async getBranchByIdWoDTO(branchId: number, canNullReturnable: boolean = false): Promise<Branch | null> {
+  async getBranchByIdWoDTO(
+    branchId: number,
+    canNullReturnable: boolean = false,
+  ): Promise<InvBranch | null> {
     logger.info("entering::getBranchById::service");
     validIdCheck(branchId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.BRANCH);
-    let branch: Branch | null;
+    let branch: InvBranch | null;
     if (isCacheable) {
-      branch = (await getCacheById(cacheKey, branchId)) as Branch | null;
+      branch = (await getCacheById(cacheKey, branchId)) as InvBranch | null;
     } else {
       branch = await getBranchByIdFromDb(branchId);
     }
 
     if (!branch) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Branch"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Branch"),
+        );
       else return null;
     }
 
@@ -142,7 +171,9 @@ export const branchService = {
     return dtos;
   },
 
-  async getBranchesByCcIdsAsLocation(ccIds: number[]): Promise<BranchDTOLocation[]> {
+  async getBranchesByCcIdsAsLocation(
+    ccIds: number[],
+  ): Promise<BranchDTOLocation[]> {
     logger.info("entering::getBranchesByCcIdsAsLocation::service");
     if (!ccIds.length) return [];
 
@@ -155,7 +186,7 @@ export const branchService = {
 
   async getCollectionCenterById(
     collectionCenterId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<CollectionCenter | null> {
     logger.info("entering::getCollectionCenterById::service");
     validIdCheck(collectionCenterId);
@@ -164,13 +195,18 @@ export const branchService = {
     if (isCacheable) {
       collectionCenter = (await getCacheById(
         getRedisKey("COLLECTION_CENTER", "all"),
-        collectionCenterId
+        collectionCenterId,
       )) as CollectionCenter | null;
     } else {
-      collectionCenter = await getCollectionCenterByIdFromDb(collectionCenterId);
+      collectionCenter =
+        await getCollectionCenterByIdFromDb(collectionCenterId);
     }
     if (!collectionCenter) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Collection Center"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Collection Center"),
+        );
       else return null;
     }
 

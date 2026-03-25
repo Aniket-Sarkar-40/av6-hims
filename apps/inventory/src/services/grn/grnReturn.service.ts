@@ -1,4 +1,4 @@
-import { toGrnReturnDTO } from "@/mapper/grn/grnReturn.mapper";
+import { toGrnReturnDTO } from "@/mapper/grn/grnReturn.mapper.js";
 import {
   approvedGrnReturnInDb,
   createGrnReturnInDb,
@@ -7,19 +7,22 @@ import {
   getGrnReturnByIdFromDb,
   rejectGrnReturnInDb,
   updateGrnReturnInDb,
-} from "@/repository/grn/grnReturn.repository";
-import { CreateGrnReturnInput, GoodReceiveReturnDTO } from "@/types/grn/grnReturn";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@/repository/grn/grnReturn.repository.js";
+import {
+  CreateGrnReturnInput,
+  GoodReceiveReturnDTO,
+} from "@/types/grn/grnReturn.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   approveGrnReturnServiceValidation,
   createGrnReturnServiceValidation,
   deleteGrnReturnServiceValidation,
   rejectGrnReturnServiceValidation,
   updateGrnReturnServiceValidation,
-} from "@/validations/service/grn/grnReturn.service.validation";
+} from "@/validations/service/grn/grnReturn.service.validation.js";
 
 export const grnReturnService = {
   async createGrnReturn(input: CreateGrnReturnInput) {
@@ -47,7 +50,10 @@ export const grnReturnService = {
 
     const records = await getAllGrnReturnFromDb();
     if (records.length === 0) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "grnReturn Order"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "grnReturn Order"),
+      );
     }
 
     const dto = await Promise.all(
@@ -56,14 +62,17 @@ export const grnReturnService = {
           ...sr,
           goodReceiveReturnDetails: sr.goodReceiveReturnDetails,
         });
-      })
+      }),
     );
 
     logger.info("exiting::getAllGrnReturn::service");
     return dto;
   },
 
-  async getGrnReturnById(id: number, canNullReturnable: boolean = false): Promise<GoodReceiveReturnDTO | null> {
+  async getGrnReturnById(
+    id: number,
+    canNullReturnable: boolean = false,
+  ): Promise<GoodReceiveReturnDTO | null> {
     logger.info("entering::getGrnReturnById::service id=" + id);
 
     validIdCheck(id);
@@ -72,9 +81,14 @@ export const grnReturnService = {
 
     if (!grn) {
       if (!canNullReturnable) {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Good Receive Note"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Good Receive Note"),
+        );
       } else {
-        logger.warn(`GRN with id=${id} not found, returning null as requested.`);
+        logger.warn(
+          `GRN with id=${id} not found, returning null as requested.`,
+        );
         return null;
       }
     }

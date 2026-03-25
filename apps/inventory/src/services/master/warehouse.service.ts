@@ -1,4 +1,4 @@
-import { toWarehouseDTO } from "@/mapper/master/warehouse.mapper";
+import { toWarehouseDTO } from "@/mapper/master/warehouse.mapper.js";
 import {
   createWarehouseInDb,
   getAllWarehouseFromDb,
@@ -6,24 +6,34 @@ import {
   toggleActiveWarehouse,
   updateWarehouseInDb,
   getWarehousesByCcIdsFromDb,
-} from "@/repository/master/warehouse.repository";
-import { ToggleActive } from "@/types/common";
-import { WarehouseDTO, WarehouseReq, WarehouseResponse } from "@/types/master/warehouse";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { addToCache, checkIsCacheable, getAllCache, getCacheById, updateCache } from "@/utils/redisHelper.utils";
-import { getRedisKey } from "@/utils/redisKey.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { SHORT_CODE } from "@/utils/shortCode.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@/repository/master/warehouse.repository.js";
+import { ToggleActive } from "@/types/common.js";
+import {
+  WarehouseDTO,
+  WarehouseReq,
+  WarehouseResponse,
+} from "@/types/master/warehouse.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import {
+  addToCache,
+  getAllCache,
+  getCacheById,
+  updateCache,
+} from "@repo/platform/cache/redis.utils.js";
+import { getRedisKey } from "@/config/cache.config.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createWarehouseServiceValidation,
   updateIdWarehouseServiceValidation,
   validateWarehouseId,
-} from "@/validations/service/master/warehouse.service.validation";
-import { Warehouse } from "@prisma/client";
-import { WarehouseDTOLocation } from "@/types/master/warehouse";
-import { toWarehouseDTOLocation } from "@/mapper/master/warehouse.mapper";
+} from "@/validations/service/master/warehouse.service.validation.js";
+import { InvWarehouse } from "@repo/db/generated/prisma/client";
+import { WarehouseDTOLocation } from "@/types/master/warehouse.js";
+import { toWarehouseDTOLocation } from "@/mapper/master/warehouse.mapper.js";
+import { checkIsCacheable } from "@/config/cache.config.js";
 
 const cacheKey = getRedisKey("WAREHOUSE", "all");
 
@@ -58,7 +68,9 @@ export const warehouseService = {
     return updatedWarehouseDTO;
   },
 
-  async getAllWarehouse(canNullReturnable: boolean = false): Promise<WarehouseDTO[]> {
+  async getAllWarehouse(
+    canNullReturnable: boolean = false,
+  ): Promise<WarehouseDTO[]> {
     logger.info("entering::getAllWarehouse::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.WAREHOUSE);
     let warehouse: WarehouseResponse[];
@@ -68,15 +80,24 @@ export const warehouseService = {
       warehouse = await getAllWarehouseFromDb();
     }
     if (warehouse.length === 0) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Warehouse"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Warehouse"),
+        );
       else return [];
     }
-    const warehouseDTO = await Promise.all(warehouse.map((warehouse) => toWarehouseDTO(warehouse)));
+    const warehouseDTO = await Promise.all(
+      warehouse.map((warehouse) => toWarehouseDTO(warehouse)),
+    );
     logger.info("exiting::getAllWarehouse::service");
     return warehouseDTO;
   },
 
-  async getWarehouseById(warehouseId: number, canNullReturnable: boolean = false): Promise<WarehouseDTO | null> {
+  async getWarehouseById(
+    warehouseId: number,
+    canNullReturnable: boolean = false,
+  ): Promise<WarehouseDTO | null> {
     logger.info("entering::getWarehouseById::service");
     validIdCheck(warehouseId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.WAREHOUSE);
@@ -84,7 +105,10 @@ export const warehouseService = {
     let warehouseDTO = null;
 
     if (isCacheable) {
-      warehouse = (await getCacheById(cacheKey, warehouseId)) as WarehouseResponse | null;
+      warehouse = (await getCacheById(
+        cacheKey,
+        warehouseId,
+      )) as WarehouseResponse | null;
 
       if (warehouse !== null) {
         warehouseDTO = await toWarehouseDTO(warehouse);
@@ -98,7 +122,11 @@ export const warehouseService = {
     }
 
     if (!warehouseDTO) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Warehouse"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Warehouse"),
+        );
       else return null;
     }
 
@@ -106,20 +134,30 @@ export const warehouseService = {
     return warehouseDTO;
   },
 
-  async getWarehouseByIdWoDTO(warehouseId: number, canNullReturnable: boolean = false): Promise<Warehouse | null> {
+  async getWarehouseByIdWoDTO(
+    warehouseId: number,
+    canNullReturnable: boolean = false,
+  ): Promise<InvWarehouse | null> {
     logger.info("entering::getWarehouseById::service");
     validIdCheck(warehouseId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.WAREHOUSE);
-    let warehouse: Warehouse | null;
+    let warehouse: InvWarehouse | null;
 
     if (isCacheable) {
-      warehouse = (await getCacheById(cacheKey, warehouseId)) as Warehouse | null;
+      warehouse = (await getCacheById(
+        cacheKey,
+        warehouseId,
+      )) as InvWarehouse | null;
     } else {
       warehouse = await getWarehouseByIdFromDb(warehouseId);
     }
 
     if (!warehouse) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Warehouse"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Warehouse"),
+        );
       else return null;
     }
 
@@ -153,12 +191,16 @@ export const warehouseService = {
     return dtos;
   },
 
-  async getWarehousesByCcIdsAsLocation(ccIds: number[]): Promise<WarehouseDTOLocation[]> {
+  async getWarehousesByCcIdsAsLocation(
+    ccIds: number[],
+  ): Promise<WarehouseDTOLocation[]> {
     logger.info("entering::getWarehousesByCcIdsAsLocation::service");
     if (!ccIds.length) return [];
 
     const warehouses = await getWarehousesByCcIdsFromDb(ccIds);
-    const dtos = await Promise.all(warehouses.map((w) => toWarehouseDTOLocation(w)));
+    const dtos = await Promise.all(
+      warehouses.map((w) => toWarehouseDTOLocation(w)),
+    );
 
     logger.info("exiting::getWarehousesByCcIdsAsLocation::service");
     return dtos;
