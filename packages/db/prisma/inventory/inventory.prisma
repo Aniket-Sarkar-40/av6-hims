@@ -403,7 +403,6 @@ model InvBranch {
 
     collectionCenter          CollectionCenter            @relation(fields: [id], references: [id])
     requisitionInvItemDetails RequisitionInvItemDetails[]
-    stockAdjustment           InvStockAdjustment[]
 
     @@index([id], name: "idx_branch_id")
     @@map("inv_branch")
@@ -433,20 +432,19 @@ model InvWarehouse {
     deletedBy                 Int?                        @map("deleted_by")
     collectionCenter          CollectionCenter            @relation(fields: [id], references: [id])
     requisitionInvItemDetails RequisitionInvItemDetails[]
-    stockAdjustment           InvStockAdjustment[]
 
     @@index([id], name: "idx_warehouse_id")
     @@map("inv_warehouse")
 }
 
 model InvStockAdjustment {
-    id          Int      @id @default(autoincrement())
-    ccId        Int      @map("cc_id")
-    branchId    Int?     @map("branch_id")
-    warehouseId Int?     @map("warehouse_id")
+    id          Int                       @id @default(autoincrement())
+    ccId        Int                       @map("cc_id")
+    targetCcId  Int                       @map("target_cc_id")
     date        DateTime
-    refNo       String   @map("ref_no")
-    description String?  @db.LongText
+    refNo       String                    @map("ref_no")
+    description String?                   @db.LongText
+    status      InvStockAdjustmentStatus?
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -457,13 +455,11 @@ model InvStockAdjustment {
     deletedBy Int?      @map("deleted_by")
 
     cc                     CollectionCenter            @relation(fields: [ccId], references: [id])
-    branch                 InvBranch?                  @relation(fields: [branchId], references: [id])
-    warehouse              InvWarehouse?               @relation(fields: [warehouseId], references: [id])
+    targetCc               CollectionCenter            @relation(name: "TargetCc", fields: [targetCcId], references: [id])
     stockAdjustmentDetails InvStockAdjustmentDetails[]
 
     @@index([ccId], name: "stock_adjustment_cc_id_idx")
-    @@index([branchId], name: "stock_adjustment_branch_id_idx")
-    @@index([warehouseId], name: "stock_adjustment_warehouse_id_idx")
+    @@index([targetCcId], name: "stock_adjustment_target_cc_id_idx")
     @@map("inv_stock_adjustment")
 }
 
@@ -476,6 +472,8 @@ model InvStockAdjustmentDetails {
     isFoc             Boolean?  @default(false) @map("is_foc")
     quantity          Int
     adjustType        Action    @map("adjust_type")
+    availableQty      Int?      @map("available_qty")
+    batchId           Int?      @map("batch_id")
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -494,13 +492,13 @@ model InvStockAdjustmentDetails {
 model InvBatchJob {
     id Int @id @default(autoincrement())
 
-    type         Batch_Type
-    status       Batch_Status @default(PENDING)
-    batchJobNo   String?      @map("batch_job_no")
-    totalQty     Int          @map("total_qty")
-    processedQty Int          @default(0) @map("processed_qty")
-    successCount Int          @default(0) @map("success_count")
-    failureCount Int          @default(0) @map("failure_count")
+    type         Inv_Batch_Type
+    status       Batch_Status   @default(PENDING)
+    batchJobNo   String?        @map("batch_job_no")
+    totalQty     Int            @map("total_qty")
+    processedQty Int            @default(0) @map("processed_qty")
+    successCount Int            @default(0) @map("success_count")
+    failureCount Int            @default(0) @map("failure_count")
 
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")

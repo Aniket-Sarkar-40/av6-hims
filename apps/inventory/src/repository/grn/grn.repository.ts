@@ -1,0 +1,672 @@
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { db } from "@repo/db/client";
+import { subItemStock } from "./../stock/stock.repository.js";
+
+import { eventEmailService } from "@/services/master/emailConfig.service.js";
+import { uinServiceFactory } from "@/config/core.config.js";
+import {
+  CreateGrnInput,
+  GrnDetailInput,
+  GrnResponse,
+} from "@/types/grn/grn.js";
+import { customOmit } from "av6-utils";
+import { logger } from "@repo/platform/logging/logger.js";
+import {
+  InvGoodReceiveDetails,
+  InvUinShortCode,
+  InvGoodReceive,
+} from "@repo/db/generated/prisma/client";
+import { addItemStock } from "../stock/stock.repository.js";
+
+export const createGrnInDb = async (
+  input: CreateGrnInput,
+): Promise<InvGoodReceive> => {
+  logger.info("entering::createGrnInDb::repository");
+
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
+
+  const { poId, poStatus } = input;
+
+  const omittedGrn = customOmit<
+    CreateGrnInput,
+    "goodReceiveDetails" | "poStatus" | "supplier"
+  >(input, ["goodReceiveDetails", "poStatus", "supplier"]);
+  const grnUin = await uinServiceFactory.generateUIN(InvUinShortCode.GRN);
+  return db.$transaction(async (tx) => {
+    const createdGrn = await tx.invGoodReceive.create({
+      data: {
+        ...omittedGrn.rest,
+        date: new Date(omittedGrn.rest.date),
+        createdBy: currentUser,
+        grnNumber: grnUin,
+        goodReceiveDetails: {
+          create: omittedGrn.omitted.goodReceiveDetails.map((d) => {
+            const omittedDetails = customOmit<
+              GrnDetailInput,
+              "poDetailsId" | "id" | "isExpiry" | "isBatch"
+            >(d, ["id", "poDetailsId", "isBatch", "isExpiry"]);
+            return {
+              ...omittedDetails.rest,
+              expiryDate: d.expiryDate ? new Date(d.expiryDate) : undefined,
+              createdBy: currentUser,
+            };
+          }),
+        },
+      },
+      include: {
+        goodReceiveDetails: true,
+      },
+    });
+
+    await Promise.all(
+      createdGrn.goodReceiveDetails.map(async (detail) => {
+        if ((detail.quantity ?? 0) > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: detail.batchNo ?? null,
+              expiryDate: detail.expiryDate ?? null,
+              itemId: detail.itemId,
+              quantity: detail.quantity,
+              ccId: input.ccId,
+              isFoc: false,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(new Date(input.date)),
+              refId: createdGrn.id,
+              refDetailsId: detail.id,
+              refNo: createdGrn.grnNumber,
+            },
+          );
+        }
+
+        if ((detail.focQuantity ?? 0) > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: detail.batchNo ?? null,
+              expiryDate: detail.expiryDate ?? null,
+              itemId: detail.itemId,
+              quantity: detail.focQuantity,
+              ccId: input.ccId,
+              isFoc: true,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(new Date(input.date)),
+              refId: createdGrn.id,
+              refDetailsId: detail.id,
+              refNo: createdGrn.grnNumber,
+            },
+          );
+        }
+      }),
+    );
+
+    await tx.invPurchaseOrder.update({
+      where: { id: poId },
+      data: { status: poStatus! },
+    });
+
+    await Promise.all(
+      omittedGrn.omitted.goodReceiveDetails.map((detail) =>
+        tx.invPurchaseOrderDetails.updateMany({
+          where: { id: detail.poDetailsId },
+          data: {
+            receivedQty: {
+              increment: detail.quantity ?? 0,
+            },
+          },
+        }),
+      ),
+    );
+
+    const supplier = omittedGrn.omitted.supplier;
+
+    if (supplier.isGrnEmail) {
+      if (supplier.email) {
+        const emailTemplate = await eventEmailService.getEventEmail();
+
+        if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
+          // sendTemplatedEmail({
+          //   template: emailTemplate,
+          //   to: [supplier.email],
+          //   variables: {
+          //     name: store.user.userName || "User",
+          //     companyDetails: "Aerial View-6 Infotech Pvt. Ltd.",
+          //     message: `Good Receive created.`,
+          //     signature: `Aerial View-6 Pvt. Ltd.`,
+          //   },
+          // })
+          //   .then(() => {
+          //     logger.info("Email Sent Successfully.");
+          //   })
+          //   .catch((e: Error) => logger.error(`Email Failed:: ${e.message} `));
+          // TODO: Send notification
+        }
+      }
+    }
+
+    return createdGrn;
+  });
+};
+
+export const updateGrnInDb = async (input: CreateGrnInput) => {
+  logger.info("entering::updateGrnInDb::repository");
+
+  const { id, goodReceiveDetails } = input;
+  if (!id) throw new Error("Cannot update a GoodReceive without an id");
+
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
+
+  const toUpdate = goodReceiveDetails.filter((d) => typeof d.id === "number");
+  const toCreate = goodReceiveDetails.filter((d) => typeof d.id !== "number");
+
+  const omittedGrn = customOmit<
+    CreateGrnInput,
+    "goodReceiveDetails" | "poStatus" | "supplier"
+  >(input, ["goodReceiveDetails", "poStatus", "supplier"]);
+
+  return await db.$transaction(async (tx) => {
+    const prevGrn = await tx.invGoodReceive.findUnique({
+      where: { id },
+      include: { goodReceiveDetails: true },
+    });
+    if (!prevGrn) throw new Error(`GRN ${id} not found`);
+
+    const updatedGrn = await tx.invGoodReceive.update({
+      where: { id },
+      data: {
+        ...omittedGrn.rest,
+        updatedBy: currentUser,
+        date: new Date(omittedGrn.rest.date),
+        goodReceiveDetails: {
+          update: toUpdate.map((d) => ({
+            where: { id: d.id! },
+            data: {
+              ...d,
+              updatedBy: currentUser,
+            },
+          })),
+          create: toCreate.map((detail) => {
+            const omittedDetails = customOmit<
+              GrnDetailInput,
+              "poDetailsId" | "id" | "isExpiry" | "isBatch"
+            >(detail, ["id", "poDetailsId", "isBatch", "isExpiry"]);
+            return {
+              ...omittedDetails.rest,
+              createdBy: currentUser,
+              expiryDate: detail.expiryDate
+                ? new Date(detail.expiryDate)
+                : undefined,
+            };
+          }),
+        },
+      },
+      include: { goodReceiveDetails: true },
+    });
+
+    const prevMap = new Map<number, (typeof prevGrn.goodReceiveDetails)[0]>(
+      prevGrn.goodReceiveDetails.map((d) => [d.id, d]),
+    );
+    const updatedMap = new Map<
+      number,
+      (typeof updatedGrn.goodReceiveDetails)[0]
+    >(updatedGrn.goodReceiveDetails.map((d) => [d.id, d]));
+
+    for (const prevDetail of prevGrn.goodReceiveDetails) {
+      if (!updatedMap.has(prevDetail.id)) {
+        if (prevDetail.quantity > 0) {
+          await subItemStock(
+            tx,
+            {
+              batchNo: prevDetail.batchNo ?? null,
+              expiryDate: prevDetail.expiryDate ?? null,
+              itemId: prevDetail.itemId,
+              quantity: prevDetail.quantity,
+              ccId: input.ccId,
+              isFoc: false,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: prevGrn.id,
+              refDetailsId: prevDetail.id,
+              refNo: prevGrn.grnNumber,
+            },
+          );
+        }
+        if (prevDetail.focQuantity > 0) {
+          await subItemStock(
+            tx,
+            {
+              batchNo: prevDetail.batchNo ?? null,
+              expiryDate: prevDetail.expiryDate ?? null,
+              itemId: prevDetail.itemId,
+              quantity: prevDetail.focQuantity,
+              ccId: input.ccId,
+              isFoc: true,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: prevGrn.id,
+              refDetailsId: prevDetail.id,
+              refNo: prevGrn.grnNumber,
+            },
+          );
+        }
+      }
+    }
+
+    for (const updDetail of updatedGrn.goodReceiveDetails) {
+      const prevDetail = prevMap.get(updDetail.id);
+      if (!prevDetail) continue;
+
+      const sameBatch =
+        prevDetail.batchNo === updDetail.batchNo &&
+        String(prevDetail.expiryDate) === String(updDetail.expiryDate);
+
+      if (sameBatch) {
+        const delta = updDetail.quantity - prevDetail.quantity;
+        const deltaFoc = updDetail.focQuantity - prevDetail.focQuantity;
+        if (delta > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: delta,
+              ccId: input.ccId,
+              isFoc: false,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: updatedGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: updatedGrn.grnNumber,
+            },
+          );
+        } else if (delta < 0) {
+          await subItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: -delta,
+              ccId: input.ccId,
+              isFoc: false,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: prevGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: prevGrn.grnNumber,
+            },
+          );
+        }
+
+        if (deltaFoc > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: deltaFoc,
+              ccId: input.ccId,
+              isFoc: true,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: updatedGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: updatedGrn.grnNumber,
+            },
+          );
+        } else if (deltaFoc < 0) {
+          await subItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: -deltaFoc,
+              ccId: input.ccId,
+              isFoc: true,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: prevGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: prevGrn.grnNumber,
+            },
+          );
+        }
+      } else {
+        if (prevDetail.quantity > 0) {
+          await subItemStock(
+            tx,
+            {
+              batchNo: prevDetail.batchNo ?? null,
+              expiryDate: prevDetail.expiryDate ?? null,
+              itemId: prevDetail.itemId,
+              quantity: prevDetail.quantity,
+              ccId: input.ccId,
+              isFoc: false,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: prevGrn.id,
+              refDetailsId: prevDetail.id,
+              refNo: prevGrn.grnNumber,
+            },
+          );
+        }
+        if (updDetail.quantity > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: updDetail.quantity,
+              ccId: input.ccId,
+              isFoc: false,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: updatedGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: updatedGrn.grnNumber,
+            },
+          );
+        }
+        if (prevDetail.focQuantity > 0) {
+          await subItemStock(
+            tx,
+            {
+              batchNo: prevDetail.batchNo ?? null,
+              expiryDate: prevDetail.expiryDate ?? null,
+              itemId: prevDetail.itemId,
+              quantity: prevDetail.focQuantity,
+              ccId: input.ccId,
+              isFoc: true,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: prevGrn.id,
+              refDetailsId: prevDetail.id,
+              refNo: prevGrn.grnNumber,
+            },
+          );
+        }
+        if (updDetail.focQuantity > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: updDetail.focQuantity,
+              ccId: input.ccId,
+              isFoc: true,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: updatedGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: updatedGrn.grnNumber,
+            },
+          );
+        }
+      }
+    }
+
+    for (const updDetail of updatedGrn.goodReceiveDetails) {
+      if (!prevMap.has(updDetail.id)) {
+        if (updDetail.quantity > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: updDetail.quantity,
+              ccId: input.ccId,
+              isFoc: false,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: updatedGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: updatedGrn.grnNumber,
+            },
+          );
+        }
+        if (updDetail.focQuantity > 0) {
+          await addItemStock(
+            tx,
+            {
+              batchNo: updDetail.batchNo ?? null,
+              expiryDate: updDetail.expiryDate ?? null,
+              itemId: updDetail.itemId,
+              quantity: updDetail.focQuantity,
+              ccId: input.ccId,
+              isFoc: true,
+            },
+            {
+              operation: "GOOD_RECEIVE",
+              refDate: new Date(input.date),
+              refId: updatedGrn.id,
+              refDetailsId: updDetail.id,
+              refNo: updatedGrn.grnNumber,
+            },
+          );
+        }
+      }
+    }
+
+    return updatedGrn;
+  });
+};
+
+export const getCountGRNDetailsFromDb = async (
+  detailIds: number[],
+  grnId: number,
+): Promise<number> => {
+  logger.info("entering::getCountGRNDetailsFromDb::repository");
+
+  const count = await db.invGoodReceiveDetails.count({
+    where: {
+      id: { in: detailIds },
+      isActive: true,
+      goodReceiveId: grnId,
+    },
+  });
+
+  logger.info(`exit::getCountGRNDetailsFromDb::found ${count} records`);
+  return count;
+};
+
+export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
+  logger.info("entering::getAllGrnFromDb::repository");
+
+  const allGRNs = await db.invGoodReceive.findMany({
+    where: { isActive: true },
+    include: {
+      goodReceiveDetails: {
+        where: {
+          isActive: true,
+          quantity: {
+            gt: 0,
+          },
+        },
+      },
+      po: {
+        select: {
+          id: true,
+          date: true,
+          verifiedBy1: true,
+          verifiedAt1: true,
+          verifiedBy2: true,
+          verifiedAt2: true,
+          createdBy: true,
+          status: true,
+          currency: true,
+          grandTotal: true,
+        },
+      },
+    },
+  });
+
+  logger.info("exiting::getAllGrnFromDb::repository");
+  return allGRNs;
+};
+
+export const getGrnByIdFromDb = async (
+  id: number,
+): Promise<GrnResponse | null> => {
+  logger.info(`entering::getGrnByIdFromDb::repository id=${id}`);
+
+  const grn = await db.invGoodReceive.findFirst({
+    where: { id, isActive: true },
+    include: {
+      goodReceiveDetails: {
+        where: {
+          isActive: true,
+          quantity: {
+            gt: 0,
+          },
+        },
+        include: {
+          item: {
+            select: { item: true },
+          },
+        },
+      },
+      po: {
+        select: {
+          id: true,
+          date: true,
+          verifiedBy1: true,
+          verifiedAt1: true,
+          verifiedBy2: true,
+          verifiedAt2: true,
+          createdBy: true,
+          status: true,
+          currency: true,
+          grandTotal: true,
+        },
+      },
+    },
+  });
+
+  logger.info(`exiting::getGrnByIdFromDb::repository id=${id}`);
+  return grn;
+};
+
+export const getGrnDetailsByIdFromDb = async (
+  id: number,
+): Promise<InvGoodReceiveDetails | null> => {
+  logger.info(`entering::getGrnDetailsByIdFromDb::repository id=${id}`);
+
+  const grnDetails = await db.invGoodReceiveDetails.findUnique({
+    where: { id, isActive: true },
+  });
+
+  logger.info(`exiting::getGrnByIdFromDb::repository id=${id}`);
+  return grnDetails;
+};
+
+export const deleteGrnFromDb = async (id: number) => {
+  logger.info(`entering::deleteGrnFromDb::repository id=${id}`);
+
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
+
+  await db.invGoodReceive.update({
+    where: { id },
+    data: {
+      isActive: false,
+      deletedBy: currentUser,
+      deletedAt: new Date(),
+      goodReceiveDetails: {
+        updateMany: {
+          where: { goodReceiveId: id },
+          data: {
+            isActive: false,
+            deletedBy: currentUser,
+            deletedAt: new Date(),
+          },
+        },
+      },
+    },
+    include: {
+      goodReceiveDetails: true,
+    },
+  });
+
+  logger.info(
+    `exiting::deleteGrnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+  );
+};
+
+// export const getGrnForExcelInDb = async (input: GrnReqExcelFilter): Promise<GrnResponse[]> => {
+//   logger.info("entering::getGrnForExcelInDb::repository");
+//   const results = await db.goodReceive.findMany({
+//     where: {
+//       id: input.id,
+//       poNumber: input.poNumber,
+//       date: {
+//         gte: input.startDate ? new Date(input.startDate) : undefined,
+//         lte: input.endDate ? new Date(input.endDate) : undefined,
+//       },
+//       ccId: input.ccId,
+//       supplierId: input.distributorId,
+//       status: input.status,
+//       paymentStatus: input.paymentStatus,
+//       po: { status: input.poStatus },
+//       gatePassId: input.gatePassId,
+//       isActive: true,
+//     },
+//     orderBy: { date: "desc" },
+//     include: {
+//       goodReceiveDetails: {
+//         where: {
+//           isActive: true,
+//           quantity: { gt: 0 },
+//         },
+//       },
+//       po: {
+//         select: {
+//           id: true,
+//           date: true,
+//           verifiedBy1: true,
+//           verifiedAt1: true,
+//           verifiedBy2: true,
+//           verifiedAt2: true,
+//           createdBy: true,
+//           status: true,
+//           currency: true,
+//           grandTotal: true,
+//         },
+//       },
+//     },
+//   });
+//   return results;
+// };

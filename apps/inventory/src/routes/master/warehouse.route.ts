@@ -1,0 +1,126 @@
+import {
+  createWarehouse,
+  getAllWarehouse,
+  getWarehouseById,
+  toggleActiveWarehouse,
+  updateWarehouse,
+} from "@/controllers/master/warehouse.controller";
+import { authorize, verifyToken } from "@/middlewares/auth.middleware";
+import { getPermission } from "@/utils/permissions.utils";
+import { validateToggleActive } from "@/validations/request/common.validation";
+import { validateWarehouse } from "@/validations/request/master/warehouse.validation";
+import { Router } from "express";
+
+const warehouseRouter = Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Warehouse
+ *   description: Warehouse management endpoints
+ */
+
+/**
+ * @swagger
+ * /api/v1/master/warehouse:
+ *   post:
+ *     summary: Create a new Warehouse
+ *     tags: [Warehouse]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/warehouseSchema'
+ */
+warehouseRouter.post(
+  "/",
+  verifyToken,
+  authorize(getPermission("WAREHOUSE", "CREATE")),
+  validateWarehouse,
+  createWarehouse
+);
+
+/**
+ * @swagger
+ * /api/v1/master/warehouse:
+ *   get:
+ *     summary: Retrieve a list of Warehouse
+ *     tags: [Warehouse]
+ *     security:
+ *       - bearerAuth: []
+ */
+warehouseRouter.get("/", verifyToken, authorize(getPermission("WAREHOUSE", "VIEW")), getAllWarehouse);
+
+/**
+ * @swagger
+ * /api/v1/master/warehouse/id:
+ *   get:
+ *     summary: Retrieve a single Warehouse
+ *     tags: [Warehouse]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Type found
+ *       '404':
+ *         description: Type not found
+ */
+warehouseRouter.get("/id", verifyToken, authorize(getPermission("WAREHOUSE", "VIEW")), getWarehouseById);
+
+/**
+ * @swagger
+ * /api/v1/master/warehouse:
+ *   put:
+ *     summary: Update a Warehouse's details
+ *     tags: [Warehouse]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: warehouseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The warehouse ID.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/warehouseSchemaUpdate'
+ */
+warehouseRouter.put(
+  "/",
+  verifyToken,
+  authorize(getPermission("WAREHOUSE", "VIEW"), getPermission("WAREHOUSE", "UPDATE")),
+  validateWarehouse,
+  updateWarehouse
+);
+
+/**
+ * @swagger
+ * /api/v1/master/warehouse/toggle-active:
+ *   post:
+ *     summary: active or Re-active a single Warehouse
+ *     tags: [Warehouse]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/toggleActiveSchema'
+ */
+warehouseRouter.post(
+  "/toggle-active",
+  verifyToken,
+  authorize(getPermission("WAREHOUSE", "VIEW"), getPermission("WAREHOUSE", "UPDATE")),
+  validateToggleActive,
+  toggleActiveWarehouse
+);
+
+export default warehouseRouter;

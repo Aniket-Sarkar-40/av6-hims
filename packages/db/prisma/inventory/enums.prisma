@@ -8,7 +8,7 @@ enum Action {
     SUBTRACTION
 }
 
-enum Batch_Type {
+enum Inv_Batch_Type {
     ITEM
     ITEM_PRICING
 }
@@ -99,14 +99,17 @@ enum EMAIL_TYPE {
 }
 
 enum InvUinShortCode {
+    PO
+    GRN
+    POR
+    SRN
     ITEM
-    STORE
-    STORE_REQ
-    SELL
-    SELL_RETURN
-    STOCK_TRANS
-    GRN_RETURN_APPROVAL
-    SELL_RETURN_APPROVAL
-    CONSUMPTION
-    STOCK_ADJUSTMENT
+    BATCH_JOB
+    CN
+    STAJ
+}
+
+enum InvStockAdjustmentStatus {
+    DRAFT
+    COMPLETED
 }

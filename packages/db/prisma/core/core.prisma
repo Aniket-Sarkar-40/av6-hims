@@ -192,6 +192,7 @@ model CollectionCenter {
     GoodReceive                InvGoodReceive[]
     GoodReceiveReturn          InvGoodReceiveReturn[]
     stockAdjustment            InvStockAdjustment[]
+    stockAdjustmentsTo         InvStockAdjustment[]       @relation(name: "TargetCc")
     PurchaseOrder              InvPurchaseOrder[]
     doctorSchedule             DoctorSchedule[]
     appointment                Appointment[]
