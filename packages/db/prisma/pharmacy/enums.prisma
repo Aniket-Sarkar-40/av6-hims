@@ -190,3 +190,32 @@ enum ALERT_MODE {
     SYSTEM
     MANUAL
 }
+
+enum PmsUinShortCode {
+    PO
+    GRN
+    POR
+    SRN
+    GATE_PASS
+    SELL
+    SELL_RETURN
+    ITEM
+    STR
+    BATCH_JOB
+    STAJ
+    BILL
+    SRR
+}
+
+enum PMS_UIN_RESET_POLICY {
+    daily
+    weekly
+    monthly
+    yearly
+    no
+}
+
+enum IncentiveCalculationType {
+    STANDARD
+    IGNORE_DISCOUNT @map("IGNORE_DISCOUNT")
+}
