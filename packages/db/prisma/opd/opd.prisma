@@ -668,32 +668,6 @@ model OpdClientMasterSetting {
     @@map("opd_client_master_settings")
 }
 
-model PatientInsurance {
-    id             Int           @id @default(autoincrement())
-    insurerId      Int           @map("insurer_id")
-    patientId      Int           @map("patient_id")
-    insuranceType  InsuranceType @map("insurance_type")
-    insurancePlan  String?       @map("insurance_plan") @db.VarChar(100)
-    policyNumber   String?       @map("policy_number") @db.VarChar(100)
-    relationship   String?       @db.VarChar(50)
-    issueDate      DateTime?     @map("issue_date") @db.Date
-    expireDate     DateTime?     @map("expire_date") @db.Date
-    cardFrontImage String?       @map("card_front_image") @db.VarChar(255)
-    cardBackImage  String?       @map("card_back_image") @db.VarChar(255)
-    createdBy      Int?          @map("created_by")
-    createdAt      DateTime      @default(now()) @map("created_at")
-    updatedAt      DateTime      @updatedAt @map("updated_at")
-
-    insurance        InsuranceMaster    @relation(fields: [insurerId], references: [id])
-    patient          Patient            @relation(fields: [patientId], references: [id])
-    patientProcedure PatientProcedure[]
-    appointments     Appointment[]
-
-    @@index([insurerId], name: "patient_insurance_insurer_id_idx")
-    @@index([patientId], name: "patient_insurance_patient_id_idx")
-    @@map("patients_insurance")
-}
-
 model Consultation {
     id                Int       @id @default(autoincrement())
     appointmentId     Int       @map("appointment_id")
@@ -1172,7 +1146,7 @@ model GeneralBillPricing {
     @@map("nopd_general_bill_pricing")
 }
 
-model BatchJob {
+model OpdBatchJob {
     id Int @id @default(autoincrement())
 
     type         Opd_Batch_Type
@@ -1203,7 +1177,7 @@ model BatchJobDetails {
     status   Batch_Details_Status
     errorMsg String?              @map("error_msg") @db.Text
 
-    batch BatchJob @relation(fields: [batchId], references: [id])
+    batch OpdBatchJob @relation(fields: [batchId], references: [id])
 
     @@index([batchId], name: "batch_job_details_batch_id_idx")
     @@map("nopd_batch_job_details")
@@ -1218,7 +1192,7 @@ model GeneralBillPricingExcel {
     description         String @map("description")
     batchJobId          Int    @map("batch_job_id")
 
-    batchJob BatchJob @relation(fields: [batchJobId], references: [id])
+    batchJob OpdBatchJob @relation(fields: [batchJobId], references: [id])
 
     @@index([batchJobId], name: "general_bill_pricing_excel_batch_job_id_idx")
     @@map("nopd_general_bill_pricing_excel")

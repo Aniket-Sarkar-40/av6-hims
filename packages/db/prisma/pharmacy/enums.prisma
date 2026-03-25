@@ -1,0 +1,192 @@
+enum PmsItemStatus {
+    AVAILABLE
+}
+
+enum PmsMedPackType {
+    Tube
+    Strip
+    Bottle
+    Box
+    Sachet
+    Packet
+    Jar
+    Others
+}
+
+enum IMAGE_NAME {
+    Front
+    Right
+    Left
+    Back
+}
+
+enum PmsGender {
+    Male
+    Female
+    Others
+}
+
+enum IncomeMaster {
+    ML
+    CC
+}
+
+enum PmsOperation {
+    GOOD_RECEIVE
+    GOOD_RECEIVE_RETURN
+    STORE_REQUISITION
+    STORE_REQUISITION_RETURN
+    SELL
+    SELL_RETURN
+    STOCK_TRANSFER
+    GRN_RETURN_APPROVAL
+    SELL_RETURN_APPROVAL
+    STOCK_ADJUSTMENT
+    STOCK_INITIALIZATION
+    EXPIRY_UPDATE
+}
+
+enum PMS_STR_STATUS {
+    CREATED
+    DISPATCHED
+    ACKNOWLEDGED
+    PARTIALLY_ACKNOWLEDGED
+}
+
+enum PMS_STR_RETURN_STATUS {
+    PENDING_RETURN
+    RETURNED
+}
+
+enum PMS_PRIORITY {
+    HIGH
+    MEDIUM
+    LOW
+    NORMAL
+}
+
+enum GPStatus {
+    PENDING
+    COMPLETED
+}
+
+enum DeliveryType {
+    OPD
+    IPD
+    WALK_IN
+}
+
+enum BILL_FOR {
+    SELF
+    OTHERS
+}
+
+enum SELL_PAYMENT_STATUS {
+    PAID
+    PARTIALLY_PAID
+    UNPAID
+    REFUND
+    REFUNDED
+}
+
+enum SELL_STATUS {
+    DRAFT
+    COMPLETED
+    PARTIALLY_RETURNED
+    RETURNED
+}
+
+enum RETURN_STS_SELL {
+    PENDING
+    COMPLETED
+}
+
+enum PaymentModePharmacy {
+    co_pay
+    in_amount
+}
+
+enum CO_PAY_MODIFICATION_STATUS {
+    pending
+    approved
+    rejected
+}
+
+enum PatientInsuranceType {
+    primary
+    secondary
+    tertiary
+}
+
+enum PaymentTypePharmacy {
+    Pharmacy
+}
+
+enum Batch_Type {
+    ITEM
+    ITEM_PRICING
+}
+
+enum FlowType {
+    STATUS
+    CO_PAY
+    INDIVIDUAL_DISCOUNT
+    OVERALL_DISCOUNT
+    SPECIAL_DISCOUNT
+    REFUND
+}
+
+enum StepType {
+    MIN_MAX
+    NORMAL
+}
+
+enum INCLUDE_EXCLUDE {
+    Exclude
+    Include
+}
+
+enum Printer_Type {
+    THERMAL
+    LASER
+    BARCODE
+    LABEL
+    NORMAL
+}
+
+enum Migration_Ref_Type {
+    SELL_NO
+    APPOINTMENT_NO
+}
+
+enum Migration_Type {
+    CO_PAY
+}
+
+enum STOCK_ADJUSTMENT_STATUS {
+    DRAFT
+    COMPLETED
+}
+
+enum ALERT_TYPE {
+    LOW_STOCK
+    EXPIRED_ITEMS
+    EXPIRING_ITEMS
+}
+
+enum ALERT_DELIVERY_METHOD {
+    EMAIL
+    SMS
+    WHATSAPP
+}
+
+enum ALERT_STATUS {
+    PENDING
+    SENT
+    FAILED
+}
+
+enum ALERT_MODE {
+    SYSTEM
+    MANUAL
+}
