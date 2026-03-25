@@ -6,6 +6,7 @@ enum VendorType {
 enum Action {
     ADDITION
     SUBTRACTION
+    UPDATE
 }
 
 enum Inv_Batch_Type {
