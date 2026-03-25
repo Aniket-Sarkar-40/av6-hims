@@ -1,4 +1,3 @@
-import { getAllApprovalActDetails } from "@/repository/approval/approval.repository.js";
 import { distributorService } from "@/services/distributor/distributor.service.js";
 import { itemService } from "@/services/item/item.service.js";
 import { medCategoryService } from "@/services/master/medCategory.service.js";
@@ -12,30 +11,49 @@ import {
   PurchaseOrderDTO,
 } from "@/types/purchase/purchase.js";
 
-import { PurchaseOrder, PurchaseOrderDetails, Storage } from "@prisma/client";
+import {
+  PmsPurchaseOrder,
+  PmsPurchaseOrderDetails,
+  PmsStorage,
+} from "@repo/db/generated/prisma/client";
 
 export const toPurchaseOrderDTO = async (
-  purchaseOrder: PurchaseOrder & {
-    purchaseOrderDetails: PurchaseOrderDetails[];
-  }
+  purchaseOrder: PmsPurchaseOrder & {
+    purchaseOrderDetails: PmsPurchaseOrderDetails[];
+  },
 ): Promise<PurchaseOrderDTO> => {
-  const warehouseDTO = await warehouseService.getWarehouseById(purchaseOrder.warehouseId, true);
-  const distributorDTO = await distributorService.getDistributorByIdWoDto(purchaseOrder.distributorId, true);
+  const warehouseDTO = await warehouseService.getWarehouseById(
+    purchaseOrder.warehouseId,
+    true,
+  );
+  const distributorDTO = await distributorService.getDistributorByIdWoDto(
+    purchaseOrder.distributorId,
+    true,
+  );
 
   const createdBy = purchaseOrder.createdBy
-    ? await employeeService.getEmployeeByIdFrmCacheOrDb(purchaseOrder.createdBy, true)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+        purchaseOrder.createdBy,
+        true,
+      )
     : null;
 
   let storage: Storage | null = null;
   if (purchaseOrder.storageId != null) {
-    storage = await storageService.getStorageById(purchaseOrder.storageId, true);
+    storage = await storageService.getStorageById(
+      purchaseOrder.storageId,
+      true,
+    );
   }
 
   const detailDTO: PurchaseOrderDetailDTO[] = await Promise.all(
     purchaseOrder.purchaseOrderDetails.map(async (detail) => {
       const itemDTO = await itemService.getItemByIdWoDTO(detail.itemId, true);
       const itemCategoryDTO = detail.itemCategoryId
-        ? await medCategoryService.getMedCategoryByIdWODto(detail.itemCategoryId, true)
+        ? await medCategoryService.getMedCategoryByIdWODto(
+            detail.itemCategoryId,
+            true,
+          )
         : null;
 
       return {
@@ -70,7 +88,7 @@ export const toPurchaseOrderDTO = async (
         createdAt: detail.createdAt,
         updatedAt: detail.updatedAt,
       };
-    })
+    }),
   );
 
   return {
@@ -92,34 +110,46 @@ export const toPurchaseOrderDTO = async (
     updatedAt: purchaseOrder.updatedAt,
     purchaseOrderDetailDTO: detailDTO,
     lastVerifiedBy: purchaseOrder.lastVerifiedBy
-      ? await employeeService.getEmployeeByIdFrmCacheOrDb(purchaseOrder.lastVerifiedBy, true)
+      ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+          purchaseOrder.lastVerifiedBy,
+          true,
+        )
       : null,
     lastVerifiedAt: purchaseOrder.lastVerifiedAt ?? null,
   };
 };
 
 export const toPurchaseOrderDetailsDto = async (
-  poDetails: PurchaseOrderDetailsBase[]
+  poDetails: PurchaseOrderDetailsBase[],
 ): Promise<PurchaseOrderDetailsDto[]> => {
   const warehouses = await warehouseService.getAllWarehouseWoDTO();
   const distributors = await distributorService.getDistributorWoDto(true);
   const staffs = await employeeService.getAllEmployeesWoDto();
   const items = await itemService.getAllItemWoDto();
 
-  const approvalActions = await getAllApprovalActDetails("PURCHASE_ORDER", "PHARMACY");
+  const approvalActions = await getAllApprovalActDetails(
+    "PURCHASE_ORDER",
+    "PHARMACY",
+  );
 
   return Promise.all(
     poDetails.map(async (poDet) => {
-      const warehouse = warehouses.find((w) => w.id === poDet.purchase.warehouseId) ?? null;
-      const distributor = distributors.find((d) => d.id === poDet.purchase.distributorId) ?? null;
+      const warehouse =
+        warehouses.find((w) => w.id === poDet.purchase.warehouseId) ?? null;
+      const distributor =
+        distributors.find((d) => d.id === poDet.purchase.distributorId) ?? null;
       const createdBy = poDet.createdBy
         ? (staffs.find((st) => st.id === poDet.createdBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(poDet.createdBy)) ??
+          (await employeeService.getEmployeeByIdFrmCacheOrDb(
+            poDet.createdBy,
+          )) ??
           null)
         : null;
       const item = items.find((item) => item.id === poDet.itemId) ?? null;
 
-      const currApprovalActions = approvalActions.filter((act) => act.approvalInstance.subjectId === poDet.purchaseId);
+      const currApprovalActions = approvalActions.filter(
+        (act) => act.approvalInstance.subjectId === poDet.purchaseId,
+      );
 
       const level1Action = currApprovalActions.find((act) => act.level === 1);
       const level2Action = currApprovalActions.find((act) => act.level === 2);
@@ -127,19 +157,25 @@ export const toPurchaseOrderDetailsDto = async (
 
       const level1Approver = level1Action?.actedBy
         ? (staffs.find((st) => st.id === level1Action?.actedBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(level1Action?.actedBy)) ??
+          (await employeeService.getEmployeeByIdFrmCacheOrDb(
+            level1Action?.actedBy,
+          )) ??
           null)
         : null;
 
       const level2Approver = level2Action?.actedBy
         ? (staffs.find((st) => st.id === level2Action?.actedBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(level2Action?.actedBy)) ??
+          (await employeeService.getEmployeeByIdFrmCacheOrDb(
+            level2Action?.actedBy,
+          )) ??
           null)
         : null;
 
       const level3Approver = level3Action?.actedBy
         ? (staffs.find((st) => st.id === level3Action?.actedBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(level3Action?.actedBy)) ??
+          (await employeeService.getEmployeeByIdFrmCacheOrDb(
+            level3Action?.actedBy,
+          )) ??
           null)
         : null;
 
@@ -153,6 +189,6 @@ export const toPurchaseOrderDetailsDto = async (
         approvedByL2: level2Approver,
         approvedByL3: level3Approver,
       };
-    })
+    }),
   );
 };

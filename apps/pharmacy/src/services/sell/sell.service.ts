@@ -17,10 +17,10 @@ import {
   SellInput,
   SellStockAdjustmentInput,
 } from "@/types/sell/sell.js";
-import ErrorHandler from "@/utils/errorHandler.utils.js";
-import { logger } from "@/utils/logger.utils.js";
-import { generateErrorMessage } from "@/utils/responseMessage.utils.js";
-import { validIdCheck } from "@/validations/global.validation.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createSellServiceValidation,
   deleteSellServiceValidation,
@@ -30,8 +30,10 @@ import {
 import dayjs from "dayjs";
 import ExcelJs from "exceljs";
 import { printService } from "../print/print.service.js";
-import { sellStockAdjustment } from "@/utils/sell.utils.js";
-import { getAppointmentById, getNotCompetedOpdBillWithMedicinesDetails } from "@/repository/opd/opdList.repository.js";
+import {
+  getAppointmentById,
+  getNotCompetedOpdBillWithMedicinesDetails,
+} from "@/repository/opd/opdList.repository.js";
 
 export const sellService = {
   async createSell(input: SellInput): Promise<PrinterResponse | SellDTO> {
@@ -54,7 +56,9 @@ export const sellService = {
     logger.info("entering::getAllSell::service");
     const sell = await getSellFromDb();
     logger.info("exiting::getAllSell::service");
-    const sellDto = await Promise.all(sell.map(async (sell) => toSellDTO(sell)));
+    const sellDto = await Promise.all(
+      sell.map(async (sell) => toSellDTO(sell)),
+    );
     return sellDto;
   },
 
@@ -106,7 +110,9 @@ export const sellService = {
     if (sells.length === 0) {
       throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Sell"));
     }
-    const sellDto = await Promise.all(sells.map(async (sell) => toSellDTO(sell)));
+    const sellDto = await Promise.all(
+      sells.map(async (sell) => toSellDTO(sell)),
+    );
     const wb = new ExcelJs.Workbook();
     const ws = wb.addWorksheet("Sell Report");
 
@@ -154,10 +160,24 @@ export const sellService = {
       ]);
       rowIndex++;
 
-      ws.addRow(["Total", String(sell.totalAmount), "Paid", String(sell.paidAmount), "Payment Mode", sell.paymentMode]);
+      ws.addRow([
+        "Total",
+        String(sell.totalAmount),
+        "Paid",
+        String(sell.paidAmount),
+        "Payment Mode",
+        sell.paymentMode,
+      ]);
       rowIndex++;
 
-      ws.addRow(["Payment Status", sell.paymentStatus, "Status", sell.status, " Amount", String(sell.returnedAmount)]);
+      ws.addRow([
+        "Payment Status",
+        sell.paymentStatus,
+        "Status",
+        sell.status,
+        " Amount",
+        String(sell.returnedAmount),
+      ]);
       rowIndex++;
       for (let row = startInd; row < rowIndex; row++) {
         [1, 3, 5].map((col) => {
@@ -284,15 +304,24 @@ export const sellService = {
 
     const apt = await getAppointmentById(id);
     if (!apt) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Appointment"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Appointment"),
+      );
     }
 
     const medicines = await getNotCompetedOpdBillWithMedicinesDetails(id);
     if (medicines.length === 0) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Not Completed Medicines"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Not Completed Medicines"),
+      );
     }
 
-    const response = await printService.printNotCompletedSellReceipt(apt, medicines);
+    const response = await printService.printNotCompletedSellReceipt(
+      apt,
+      medicines,
+    );
 
     logger.info("exiting::printNotCompletedSellReceipt::service");
     return response;

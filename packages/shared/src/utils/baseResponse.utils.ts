@@ -36,7 +36,7 @@ export class BaseResponse<T> {
   ): BaseResponse<T> {
     return new BaseResponse<T>(
       { success: true, message: generateSuccessMessage(type, ...variables) },
-      data
+      data,
     );
   }
 
@@ -59,5 +59,15 @@ export class BaseResponse<T> {
     err?: ErrorHandler;
   }): BaseResponse<T> {
     return new BaseResponse<T>({ success: false, ...options });
+  }
+
+  static errorCustomMsg<T>({
+    data,
+    message = "Error",
+  }: {
+    data?: T;
+    message: string;
+  }): BaseResponse<T> {
+    return new BaseResponse<T>({ success: false, message }, data);
   }
 }
