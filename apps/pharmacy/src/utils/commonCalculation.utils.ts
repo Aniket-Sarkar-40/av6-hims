@@ -1,7 +1,11 @@
+import { Prisma } from "@repo/db/generated/prisma/client";
 import { DiscMethod } from "@repo/db/generated/prisma/enums.js";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { CalculationInput } from "@repo/platform/types/common.js";
+import {
+  CalculationInput,
+  DecimalToNumber,
+} from "@repo/platform/types/common.js";
 import { PrecisionKey } from "@repo/shared/utils/helper.utils.js";
 import { CalculationRes } from "av6-core";
 import { RoundFormat } from "av6-utils";
@@ -160,4 +164,20 @@ export function joiDecimalFromSettings(opts: Opts) {
   }, "dynamic precision");
 
   return required ? s.required() : s.optional().allow(null);
+}
+
+export function toNumberDeep<T>(val: T): DecimalToNumber<T> {
+  if (val === null || val === undefined) return val as any;
+  if (val instanceof Prisma.Decimal) return val.toNumber() as any;
+  if (Array.isArray(val)) return val.map(toNumberDeep) as any;
+  // If it’s a Date, just keep it (or you could toISOString() if you prefer)
+  if (val instanceof Date) {
+    return val as any;
+  }
+  if (typeof val === "object") {
+    const out: any = {};
+    for (const [k, v] of Object.entries(val as any)) out[k] = toNumberDeep(v);
+    return out;
+  }
+  return val as any;
 }
