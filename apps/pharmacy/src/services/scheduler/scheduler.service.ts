@@ -10,9 +10,7 @@ import {
   fetchLowStockItems,
 } from "@/repository/stock/stock.repository.js";
 import { ExpiredItemsResponse, LowStockResponse } from "@/types/stock/stock.js";
-import { sendTemplatedEmail } from "@repo/platform/email/email.service.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { interpolate } from "@repo/shared/utils/helper.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
@@ -25,6 +23,7 @@ import {
 import ExcelJs from "exceljs";
 import cron from "node-cron";
 import { featureFlagService } from "../feature/feature.service.js";
+import { interpolate } from "av6-core";
 
 export const getSummary = (
   items: LowStockResponse[] | ExpiredItemsResponse[],
@@ -197,19 +196,21 @@ export async function lowStockAlert(inp: {
     });
     const excelBuffer = Buffer.from(await wb.xlsx.writeBuffer());
 
-    await sendTemplatedEmail({
-      template: emailTemplate,
-      to: toMails,
-      cc: ccMails,
-      bcc: bccMails,
-      variables: {},
-      attachments: [
-        {
-          filename: `low_stock_items_${inp.runDate?.toDateString() ?? new Date().toDateString()}.xlsx`,
-          content: excelBuffer,
-        },
-      ],
-    });
+    // await sendTemplatedEmail({
+    //   template: emailTemplate,
+    //   to: toMails,
+    //   cc: ccMails,
+    //   bcc: bccMails,
+    //   variables: {},
+    //   attachments: [
+    //     {
+    //       filename: `low_stock_items_${inp.runDate?.toDateString() ?? new Date().toDateString()}.xlsx`,
+    //       content: excelBuffer,
+    //     },
+    //   ],
+    // });
+
+    // TODO: Implement email sending logic
 
     const updateAudit = await updateAutoAlertAuditInDb({
       id: autoAlertAudit.id,
@@ -403,19 +404,21 @@ export async function expiredItemAlert(inp: {
     // Convert into nuffer
     const excelBuffer = Buffer.from(await wb.xlsx.writeBuffer());
 
-    await sendTemplatedEmail({
-      template: emailTemplate,
-      to: toMails,
-      cc: ccMails,
-      bcc: bccMails,
-      variables: {},
-      attachments: [
-        {
-          filename: `expired_items_${inp.runDate?.toDateString() ?? new Date().toDateString()}.xlsx`,
-          content: excelBuffer,
-        },
-      ],
-    });
+    // await sendTemplatedEmail({
+    //   template: emailTemplate,
+    //   to: toMails,
+    //   cc: ccMails,
+    //   bcc: bccMails,
+    //   variables: {},
+    //   attachments: [
+    //     {
+    //       filename: `expired_items_${inp.runDate?.toDateString() ?? new Date().toDateString()}.xlsx`,
+    //       content: excelBuffer,
+    //     },
+    //   ],
+    // });
+
+    // TODO: Implement email sending logic
 
     const updateAudit = await updateAutoAlertAuditInDb({
       id: autoAlertAudit.id,
@@ -614,21 +617,23 @@ export async function expiringItemAlert(inp: {
     // Convert into nuffer
     const excelBuffer = Buffer.from(await wb.xlsx.writeBuffer());
 
-    await sendTemplatedEmail({
-      template: emailTemplate,
-      to: toMails,
-      cc: ccMails,
-      bcc: bccMails,
-      variables: {
-        expiry: expiryInMonth,
-      },
-      attachments: [
-        {
-          filename: `expiring_items_${inp.runDate?.toDateString() ?? new Date().toDateString()}.xlsx`,
-          content: excelBuffer,
-        },
-      ],
-    });
+    // await sendTemplatedEmail({
+    //   template: emailTemplate,
+    //   to: toMails,
+    //   cc: ccMails,
+    //   bcc: bccMails,
+    //   variables: {
+    //     expiry: expiryInMonth,
+    //   },
+    //   attachments: [
+    //     {
+    //       filename: `expiring_items_${inp.runDate?.toDateString() ?? new Date().toDateString()}.xlsx`,
+    //       content: excelBuffer,
+    //     },
+    //   ],
+    // });
+
+    // TODO: Implement email sending logic
 
     const updateAudit = await updateAutoAlertAuditInDb({
       id: autoAlertAudit.id,

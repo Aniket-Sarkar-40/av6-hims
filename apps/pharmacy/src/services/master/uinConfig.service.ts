@@ -36,6 +36,7 @@ import {
   PmsUinShortCode,
 } from "@repo/db/generated/prisma/client";
 import dayjs from "dayjs";
+import cron from "node-cron";
 
 const cacheKey = getRedisKey("UIN_CONFIG", "all");
 const MS_IN_A_DAY = 24 * 3600e3;

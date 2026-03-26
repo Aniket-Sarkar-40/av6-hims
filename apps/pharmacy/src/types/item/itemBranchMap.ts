@@ -123,3 +123,10 @@ export type BranchItemMapExcelRow = {
   "Walk In Percentage": number;
   "On Hold Sale": Date;
 };
+
+export interface BranchItemMapAuditDetailsCreateInput {
+  auditId: number;
+  field: string;
+  changeFrom: string;
+  changeTo: string;
+}

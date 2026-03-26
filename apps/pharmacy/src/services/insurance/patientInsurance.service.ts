@@ -20,7 +20,6 @@ import {
   updatePatientsInsuranceServiceValidation,
 } from "@/validations/service/insurance/patientInsurance.service.validation.js";
 import { PatientInsuranceType } from "@repo/db/generated/prisma/client";
-import { authService } from "../auth.service.js";
 import { FileInfo } from "@repo/shared/types/global.js";
 
 export const patientsInsuranceService = {
@@ -31,7 +30,7 @@ export const patientsInsuranceService = {
     logger.info("entering::createPatientsInsurance::service");
     await createPatientsInsuranceServiceValidation(input);
     const createPatientsInsurance = await createPatientsInsuranceInDb(input);
-    await authService.uploadInsuranceImagesExt(fileInfos);
+    // await authService.uploadInsuranceImagesExt(fileInfos);
     const patientRes = await toPatientInsuranceDto(createPatientsInsurance);
     logger.info("exiting::createPatientsInsurance::service");
     return patientRes;
@@ -47,7 +46,7 @@ export const patientsInsuranceService = {
     await updatePatientsInsuranceServiceValidation(input);
 
     const updatedPO = await updatePatientsInsuranceInDb(id, input);
-    await authService.uploadInsuranceImagesExt(fileInfos);
+    // await authService.uploadInsuranceImagesExt(fileInfos);
 
     logger.info("exiting::updatePatientsInsurance::service");
     return updatedPO;

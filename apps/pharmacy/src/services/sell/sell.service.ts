@@ -34,6 +34,7 @@ import {
   getAppointmentById,
   getNotCompetedOpdBillWithMedicinesDetails,
 } from "@/repository/opd/opdList.repository.js";
+import { sellStockAdjustment } from "@/utils/sell.utils.js";
 
 export const sellService = {
   async createSell(input: SellInput): Promise<PrinterResponse | SellDTO> {

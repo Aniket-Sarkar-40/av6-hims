@@ -1,7 +1,4 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { approvalService } from "@repo/core/events/eventBus.js";
 import { toPurchaseOrderDTO } from "@/mapper/purchase/purchase.mapper.js";
-import { getInstance } from "@/repository/approval/approval.repository.js";
 import {
   createPurchaseOrder,
   deletePurchaseOrderFromDb,
@@ -16,16 +13,17 @@ import {
   PurchaseOrderDTO,
   PurchaseReqExcelFilter,
 } from "@/types/purchase/purchase.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createPOServiceValidation,
   deletePOServiceValidation,
   updatePOServiceValidation,
   validateIdPO,
 } from "@/validations/service/purchase/purchase.service.validation.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import dayjs from "dayjs";
 import ExcelJs from "exceljs";
 
@@ -106,19 +104,21 @@ export const purchaseService = {
 
     const po = await validateIdPO(purchaseId);
 
-    const instance = await getInstance(po.id, "PURCHASE_ORDER", "PHARMACY");
+    // const instance = await getInstance(po.id, "PURCHASE_ORDER", "PHARMACY"); // TODO: Implement approval logic
     const store = requestStorage.getStore();
     const userId = store?.user?.id;
 
-    if (userId) {
-      await approvalService.act({
-        instanceId: instance.id,
-        approverId: userId,
-        action: "APPROVE",
-        comment: "Purchase Order approved by user",
-        ccId: po.warehouseId,
-      });
-    }
+    // if (userId) {
+    //   await approvalService.act({
+    //     instanceId: instance.id,
+    //     approverId: userId,
+    //     action: "APPROVE",
+    //     comment: "Purchase Order approved by user",
+    //     ccId: po.warehouseId,
+    //   });
+    // }
+
+    // TODO: Implement approval logic
 
     logger.info("exiting::purchaseApproval::service");
   },

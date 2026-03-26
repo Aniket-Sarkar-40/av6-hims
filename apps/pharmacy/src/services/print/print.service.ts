@@ -7,7 +7,6 @@ import {
 import { PrinterResponse, SellDtoForReceipt } from "@/types/sell/sell.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { applyRound, getValidCharSet } from "av6-utils";
 import dayjs from "dayjs";
 import {
   BreakLine,
@@ -18,6 +17,8 @@ import {
 import { ToWords } from "to-words";
 import { printerSettingService } from "../master/printerSettings.service.js";
 import { settingsService } from "../master/settings.service.js";
+import { applyRound } from "av6-utils";
+import { getValidCharSet } from "@/utils/helper.utils.js";
 
 const toWords = new ToWords({
   localeCode: "en-GH",

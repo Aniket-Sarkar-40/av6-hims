@@ -10,6 +10,8 @@ import {
 import { createBatchJobInDb } from "../batch/batch.repository.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
+  BranchItemMapAuditCreateInput,
+  BranchItemMapAuditDetailsCreateInput,
   BranchToBranchPriceCopy,
   BranchWithSellAmountMap,
   createItemBranchMapInput,
@@ -21,10 +23,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-core";
 import { applyRound } from "av6-utils";
 import { findDifferences } from "@repo/shared/utils/audit.utils.js";
-import {
-  BranchItemMapAuditCreateInput,
-  BranchItemMapAuditDetailsCreateInput,
-} from "@repo/db/generated/prisma/models.js";
+
 import { settingsService } from "@/services/master/settings.service.js";
 
 type Tx = Prisma.TransactionClient;

@@ -181,7 +181,9 @@ export const itemBranchService = {
       mapRowToBranchItemMapExcelCreateInput(elem, ind + 1),
     );
 
-    const batch = await CreateBranchItemMapExcelInDb(convertedData);
+    const batch = await CreateBranchItemMapExcelInDb(
+      await Promise.all(convertedData),
+    );
     branchItemMapBatchJob(batch.id)
       .then(() => logger.info("Batch Procesing Completed."))
       .catch((e) => logger.error(JSON.stringify(e)));

@@ -1,4 +1,3 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { getInsurancePricing } from "@/repository/insurance/insurancePaymentSettings.repository.js";
 import { getCountItemsFromDb } from "@/repository/item/item.repository.js";
 import { createMigrationInDb } from "@/repository/migration/migration.repository.js";
@@ -28,6 +27,7 @@ import {
 } from "@repo/db/generated/prisma/client";
 import { settingsService } from "../master/settings.service.js";
 import { calculation } from "@/utils/commonCalculation.utils.js";
+import { externalService } from "@/config/service/external.service.js";
 
 export const migrationService = {
   async createMigrationService(body: CreateMigrationReq): Promise<Migration> {

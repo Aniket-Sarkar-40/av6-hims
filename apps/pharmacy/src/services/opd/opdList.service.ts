@@ -201,7 +201,9 @@ export const opdListService = {
 
     const result = await getCorporateClientByCcId(ccId);
 
-    const response = result.map((item) => toIdValue(item, "customerName"));
+    const response = result?.map(
+      (item) => toIdValue(item, "customerName") as IdValue,
+    );
     logger.info("exiting::getCorporateClientByCcId::opdList");
     return response;
   },
