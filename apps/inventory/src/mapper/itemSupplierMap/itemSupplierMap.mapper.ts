@@ -1,21 +1,25 @@
-import { itemMasterService } from "@/services/master/itemMaster.service";
-import { itemSupplierService } from "@/services/master/itemSupplier.service";
+import { itemMasterService } from "@/services/master/itemMaster.service.js";
+import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import {
   ItemSuppierMapDTO,
   ItemSupplierMapExcelRow,
   ItemSupplierMapImportExcelInput,
   ItemSupplierMapImportExcelReq,
-} from "@/types/itemSupplierMap/itemSupplierMap";
-import { getAllBranchAndWarehouse, getBranchOrWarehouse } from "@/utils/getCollectionCenter.utils";
-import { customOmit } from "@/utils/helper.utils";
-import { toIdValue } from "@/utils/idValue.utils";
-import { ItemSupplierMapping, Prisma } from "@prisma/client";
+} from "@/types/itemSupplierMap/itemSupplierMap.js";
+import { getAllBranchAndWarehouse } from "@/utils/getCollectionCenter.utils.js";
+import { customOmit } from "av6-utils";
+import { toIdValue } from "av6-utils";
+import {
+  InvItemSupplierMapping,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 
 export function mapRowToItemSupplierMapImportExcelInput(
   row: ItemSupplierMapExcelRow,
-  rowNo: number
-): Prisma.ItemSupplierMapExcelCreateInput {
-  const mappedData: Prisma.ItemSupplierMapExcelCreateInput = {
+  rowNo: number,
+): Prisma.InvItemSupplierMapExcelCreateInput {
+  const mappedData: Prisma.InvItemSupplierMapExcelCreateInput = {
     rowNo,
     itemCode: row["Item Code"],
     itemId: row["Item Id"],
@@ -28,7 +32,7 @@ export function mapRowToItemSupplierMapImportExcelInput(
 }
 
 export function toItemSupplierMapImportExcelEntity(
-  req: ItemSupplierMapImportExcelReq
+  req: ItemSupplierMapImportExcelReq,
 ): ItemSupplierMapImportExcelInput {
   return {
     ccId: Number(req.ccId),
@@ -36,46 +40,41 @@ export function toItemSupplierMapImportExcelEntity(
   };
 }
 
-export const toItemSupplierMapDTO = async (input: ItemSupplierMapping): Promise<ItemSuppierMapDTO> => {
-  const item = await itemMasterService.getItemMasterById({ itemId: input.itemId }, true);
-  const supplier = await itemSupplierService.getItemSupplierById(input.supplierId, true);
-  const cc = await getBranchOrWarehouse(input.ccId);
-  const omittedItemSupplierMap = customOmit<
-    ItemSupplierMapping,
-    "createdBy" | "updatedBy" | "isActive" | "deletedAt" | "deletedBy" | "createdAt" | "updatedAt"
-  >(input, ["createdAt", "updatedBy", "isActive", "deletedAt", "deletedBy", "createdAt", "updatedAt"]);
-
-  return {
-    ...omittedItemSupplierMap.rest,
-    item: item ? toIdValue(item, "item") : null,
-    supplier: toIdValue(supplier, "name"),
-    collectionCenter: cc ? toIdValue(cc, "name") : null,
-  };
-};
-
-export const toAllItemSupplierMapDTO = async (input: ItemSupplierMapping[]): Promise<ItemSuppierMapDTO[]> => {
-  const items = await itemMasterService.getAllItemMaster();
+export const toItemSupplierMapDTO = async (
+  data: InvItemSupplierMapping[],
+): Promise<ItemSuppierMapDTO[]> => {
+  const items = await itemMasterService.getAllItemMaster(true);
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
   const collectionCenters = await getAllBranchAndWarehouse();
 
-  const itemSupplierMapDTO = await Promise.all(
-    input.map(async (d) => {
-      const supplier = suppliers.find((s) => s.id === d.supplierId);
-      const cc = collectionCenters.find((center) => center.id === d.ccId);
-      const item = items.find((i) => i.id === d.itemId);
+  return Promise.all(
+    data.map(async (itemSupplierMap) => {
       const omittedItemSupplierMap = customOmit<
-        ItemSupplierMapping,
-        "createdBy" | "updatedBy" | "isActive" | "deletedAt" | "deletedBy" | "createdAt" | "updatedAt"
-      >(d, ["createdAt", "updatedBy", "isActive", "deletedAt", "deletedBy", "createdAt", "updatedAt"]);
+        InvItemSupplierMapping,
+        BaseModelAttrWoCancel | "ccId" | "itemId" | "supplierId"
+      >(itemSupplierMap, [
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "ccId",
+        "itemId",
+        "supplierId",
+      ]);
 
+      const item = items.find((i) => i.id === itemSupplierMap.itemId) ?? null;
+      const supplier =
+        suppliers.find((s) => s.id === itemSupplierMap.supplierId) ?? null;
+      const CollectionCenter =
+        collectionCenters.find((cc) => cc.id === itemSupplierMap.ccId) ?? null;
       return {
         ...omittedItemSupplierMap.rest,
         item: item ? toIdValue(item, "item") : null,
         supplier: supplier ? toIdValue(supplier, "name") : null,
-        collectionCenter: cc ? toIdValue(cc, "name") : null,
+        collectionCenter: toIdValue(CollectionCenter, "name"),
       };
-    })
+    }),
   );
-
-  return itemSupplierMapDTO;
 };

@@ -37,7 +37,15 @@ export type GoodReceivedReturnResponse = Prisma.InvGoodReceiveReturnGetPayload<{
 
 export interface GoodReceiveReturnDTO extends Omit<
   GrnReturnResponse,
-  "createdBy" | "goodReceiveReturnDetails" | "rejectedBy" | "approvedBy"
+  | BaseModelAttr
+  | "createdBy"
+  | "goodReceiveReturnDetails"
+  | "rejectedBy"
+  | "approvedBy"
+  | "grnId"
+  | "poId"
+  | "ccId"
+  | "supplierId"
 > {
   goodReceiveReturnDetails: GoodReceiveReturnDetailDTO[];
   supplier: IdValue | null;

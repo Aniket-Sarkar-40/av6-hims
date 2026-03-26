@@ -1,5 +1,5 @@
 import { InvItem, Prisma } from "@repo/db/generated/prisma/client";
-import { IdValue } from "@repo/shared/types/global.js";
+import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
 import { FormData } from "@repo/shared/utils/types.utils.js";
 
 export type ItemMasterReq = Omit<Prisma.InvItemUncheckedCreateInput, "id">;
@@ -17,7 +17,14 @@ export interface ItemImageFiles {
   rightSideImage?: Express.Multer.File[];
 }
 
-export interface ItemMasterDto extends InvItem {
+export interface ItemMasterDto extends Omit<
+  InvItem,
+  | "itemCategoryId"
+  | "unitId"
+  | "taxDetailsId"
+  | "storageId"
+  | BaseModelAttrWoCancel
+> {
   itemCategory: IdValue | null;
   unitMaster: IdValue | null;
   taxDetails: IdValue | null;

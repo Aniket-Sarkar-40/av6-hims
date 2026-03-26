@@ -4,7 +4,7 @@ import {
   PO_STATUS,
   Prisma,
 } from "@repo/db/generated/prisma/client";
-import { IdValue } from "@repo/shared/types/global.js";
+import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
 import { EmployeeCache } from "av6-core";
 import { ItemSupplierDTO } from "../master/itemSupplier.js";
 
@@ -34,7 +34,12 @@ export type CreateGrnInput = Omit<
 
 export interface GrnDTO extends Omit<
   GrnResponse,
-  "createdBy" | "goodReceiveDetails"
+  | BaseModelAttr
+  | "goodReceiveDetails"
+  | "supplierId"
+  | "poId"
+  | "ccId"
+  | "storeId"
 > {
   supplier: IdValue | null;
   warehouse: IdValue | null;

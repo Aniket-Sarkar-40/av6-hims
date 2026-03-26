@@ -35,8 +35,9 @@ export const consumptionService = {
     logger.info("entering::createConsumption::service");
     await createConsumptionServiceValidation(input);
     const consumption = await createConsumptionInDb(input);
+    const createdConsumption = await toConsumptionDTO([consumption]);
     logger.info("exiting::createConsumption::service");
-    return await toConsumptionDTO(consumption);
+    return createdConsumption[0];
   },
   async updateConsumption(
     input: ConsumptionUpdateInput,
@@ -44,8 +45,9 @@ export const consumptionService = {
     logger.info("entering::updateConsumption::service");
     await updateConsumptionServiceValidation(input);
     const consumption = await updateConsumptionInDb(input);
+    const updatedConsumption = await toConsumptionDTO([consumption]);
     logger.info("exiting::updateConsumption::service");
-    return await toConsumptionDTO(consumption);
+    return updatedConsumption[0];
   },
   async getConsumptionById(
     id: number,
@@ -63,13 +65,15 @@ export const consumptionService = {
       } else return null;
     }
     logger.info("exiting::getConsumptionById::service");
-    return await toConsumptionDTO(consumption);
+    const consumptionDTO = await toConsumptionDTO([consumption]);
+    return consumptionDTO[0];
   },
   async getAllConsumption(): Promise<ConsumptionDTO[]> {
     logger.info("entering::getAllConsumption::service");
     const consumption = await getAllConsumptionsFromDb();
+    const consumptionDTO = await toConsumptionDTO(consumption);
     logger.info("exiting::getAllConsumption::service");
-    return await Promise.all(consumption.map((item) => toConsumptionDTO(item)));
+    return consumptionDTO;
   },
   async deleteConsumptionById(input: CommonConsumptionInput) {
     logger.info("entering::deleteConsumptionById::service");
@@ -84,7 +88,8 @@ export const consumptionService = {
     await approveConsumptionServiceValidation(input);
     const consumption = await approveConsumptionInDb(input);
     logger.info("exiting::approveConsumption::service");
-    return await toConsumptionDTO(consumption);
+    const consumptionDTO = await toConsumptionDTO([consumption]);
+    return consumptionDTO[0];
   },
   async rejectConsumptionById(input: CommonConsumptionInput) {
     logger.info("entering::rejectConsumptionById::service");
@@ -97,6 +102,7 @@ export const consumptionService = {
     await getConsumptionByUserIdServiceValidation(userId);
     const consumption = await getConsumptionByUserIdFromDb(userId);
     logger.info("exiting::getConsumptionByUserId::service");
-    return await Promise.all(consumption.map((item) => toConsumptionDTO(item)));
+    const consumptionDTO = await toConsumptionDTO(consumption);
+    return consumptionDTO;
   },
 };

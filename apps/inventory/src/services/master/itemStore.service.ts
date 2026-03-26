@@ -1,7 +1,4 @@
-import {
-  toAllItemStoreDTO,
-  toItemStoreDTO,
-} from "@/mapper/master/itemStore.mapper.js";
+import { toItemStoreDTO } from "@/mapper/master/itemStore.mapper.js";
 import {
   createItemStoreInDb,
   getAllItemStoreFromDb,
@@ -44,7 +41,8 @@ export const itemStoreService = {
       await addToCache(cacheKey, itemStore.id, itemStore);
     }
     logger.info("exiting::createItemStore::service");
-    return await toItemStoreDTO(itemStore);
+    const itemStoreDTO = await toItemStoreDTO([itemStore]);
+    return itemStoreDTO[0];
   },
 
   async updateItemStore(input: ItemStoreUpdate): Promise<ItemStoreDTO> {
@@ -60,9 +58,9 @@ export const itemStoreService = {
     }
 
     logger.info("exiting::updateItemStore::service");
-    return await toItemStoreDTO(updatedItemStore);
+    const itemStoreDTO = await toItemStoreDTO([updatedItemStore]);
+    return itemStoreDTO[0];
   },
-
   async getAllItemStore(
     canNullReturnable: boolean = false,
   ): Promise<ItemStoreDTO[]> {
@@ -83,7 +81,7 @@ export const itemStoreService = {
         );
       else return [];
     }
-    return await toAllItemStoreDTO(itemStore);
+    return await toItemStoreDTO(itemStore);
   },
 
   async getItemStoreById(
@@ -112,7 +110,8 @@ export const itemStoreService = {
     }
 
     logger.info("exiting::getItemStoreById::service");
-    return await toItemStoreDTO(itemStore);
+    const itemStoreDTO = await toItemStoreDTO([itemStore]);
+    return itemStoreDTO[0];
   },
 
   async getItemStoreByIdFromCache(
@@ -138,7 +137,8 @@ export const itemStoreService = {
     }
 
     logger.info("exiting::getItemStoreByIdFromCache::service");
-    return await toItemStoreDTO(itemStore);
+    const itemStoreDTO = await toItemStoreDTO([itemStore]);
+    return itemStoreDTO[0];
   },
   async getAllItemStoreFromCache(): Promise<ItemStoreDTO[]> {
     logger.info("entering::getAllItemStoreFromCache::service");
@@ -149,6 +149,6 @@ export const itemStoreService = {
     const cachedItemStore = (await getAllCache(cacheKey)) as InvItemStore[];
 
     logger.info("exiting::getAllItemStoreFromCache::service");
-    return await toAllItemStoreDTO(cachedItemStore);
+    return await toItemStoreDTO(cachedItemStore);
   },
 };

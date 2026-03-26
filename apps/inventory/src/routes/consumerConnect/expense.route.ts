@@ -5,13 +5,17 @@ import {
   getExpenseById,
   updateExpense,
 } from "@/controllers/consumerConnect/expense.controller.js";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware.js";
-import { createUploadMiddleware } from "@/middlewares/imageUpload.middleware.js";
-import { getPermission } from "@/utils/permissions.utils.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { validateExpenseSchema } from "@/validations/request/consumerConnect/expense.validation.js";
 
 import { Router } from "express";
-export const expenseRouter = Router();
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+export const expenseRouter: Router = Router();
 
 /**
  * @swagger
@@ -37,10 +41,11 @@ export const expenseRouter = Router();
 expenseRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("EXPENSE", "CREATE")),
-  createUploadMiddleware("expense", "documents"),
+  authorize(getPermission("INV", "EXPENSE", "CREATE")),
+  createUploadMiddleware("expense"),
+  uploadToHetzner("documents"),
   validateExpenseSchema,
-  createExpense
+  createExpense,
 );
 /**
  * @swagger
@@ -51,7 +56,12 @@ expenseRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-expenseRouter.get("/", verifyToken, authorize(getPermission("EXPENSE", "VIEW")), getAllExpense);
+expenseRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "EXPENSE", "VIEW")),
+  getAllExpense,
+);
 
 /**
  * @swagger
@@ -73,7 +83,12 @@ expenseRouter.get("/", verifyToken, authorize(getPermission("EXPENSE", "VIEW")),
  *         description: Success
  */
 
-expenseRouter.get("/id", verifyToken, authorize(getPermission("EXPENSE", "VIEW")), getExpenseById);
+expenseRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "EXPENSE", "VIEW")),
+  getExpenseById,
+);
 /**
  * @swagger
  * /api/v1/expense/:
@@ -99,10 +114,14 @@ expenseRouter.get("/id", verifyToken, authorize(getPermission("EXPENSE", "VIEW")
 expenseRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("EXPENSE", "VIEW"), getPermission("EXPENSE", "UPDATE")),
-  createUploadMiddleware("expense", "documents"),
+  authorize(
+    getPermission("INV", "EXPENSE", "VIEW"),
+    getPermission("INV", "EXPENSE", "UPDATE"),
+  ),
+  createUploadMiddleware("expense"),
+  uploadToHetzner("documents"),
   validateExpenseSchema,
-  updateExpense
+  updateExpense,
 );
 /**
  * @swagger
@@ -123,6 +142,9 @@ expenseRouter.put(
 expenseRouter.delete(
   "/",
   verifyToken,
-  authorize(getPermission("EXPENSE", "VIEW"), getPermission("EXPENSE", "DELETE")),
-  deleteExpense
+  authorize(
+    getPermission("INV", "EXPENSE", "VIEW"),
+    getPermission("INV", "EXPENSE", "DELETE"),
+  ),
+  deleteExpense,
 );

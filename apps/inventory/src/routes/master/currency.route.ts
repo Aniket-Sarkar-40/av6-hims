@@ -1,16 +1,22 @@
 import { Router } from "express";
-import { verifyToken, authorize } from "@/middlewares/auth.middleware";
-import { validateCurrency, validateUpdateCurrency } from "@/validations/request/master/currency.validation";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import {
+  validateCurrency,
+  validateUpdateCurrency,
+} from "@/validations/request/master/currency.validation.js";
 import {
   createCurrency,
   deleteCurrency,
   getAllCurrency,
   getCurrencyById,
   updateCurrency,
-} from "@/controllers/master/currency.controller";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/master/currency.controller.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 
-const currencyRouter = Router();
+const currencyRouter: Router = Router();
 
 /**
  * @swagger
@@ -34,7 +40,13 @@ const currencyRouter = Router();
  *           schema:
  *             $ref: '#/components/currencySchema'
  */
-currencyRouter.post("/", verifyToken, authorize(getPermission("CURRENCY", "CREATE")), validateCurrency, createCurrency);
+currencyRouter.post(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "CURRENCY", "CREATE")),
+  validateCurrency,
+  createCurrency,
+);
 
 /**
  * @swagger
@@ -45,7 +57,12 @@ currencyRouter.post("/", verifyToken, authorize(getPermission("CURRENCY", "CREAT
  *     security:
  *       - bearerAuth: []
  */
-currencyRouter.get("/", verifyToken, authorize(getPermission("CURRENCY", "VIEW")), getAllCurrency);
+currencyRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "CURRENCY", "VIEW")),
+  getAllCurrency,
+);
 
 /**
  * @swagger
@@ -63,7 +80,12 @@ currencyRouter.get("/", verifyToken, authorize(getPermission("CURRENCY", "VIEW")
  *           type: string
  *         description: The currency ID.
  */
-currencyRouter.get("/:currencyId", verifyToken, authorize(getPermission("CURRENCY", "VIEW")), getCurrencyById);
+currencyRouter.get(
+  "/:currencyId",
+  verifyToken,
+  authorize(getPermission("INV", "CURRENCY", "VIEW")),
+  getCurrencyById,
+);
 
 /**
  * @swagger
@@ -90,9 +112,12 @@ currencyRouter.get("/:currencyId", verifyToken, authorize(getPermission("CURRENC
 currencyRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("CURRENCY", "VIEW"), getPermission("CURRENCY", "UPDATE")),
+  authorize(
+    getPermission("INV", "CURRENCY", "VIEW"),
+    getPermission("INV", "CURRENCY", "UPDATE"),
+  ),
   validateUpdateCurrency,
-  updateCurrency
+  updateCurrency,
 );
 
 /**
@@ -111,6 +136,11 @@ currencyRouter.put(
  *           type: string
  *         description: The currency ID to delete.
  */
-currencyRouter.delete("/:currencyId", verifyToken, authorize(getPermission("CURRENCY", "DELETE")), deleteCurrency);
+currencyRouter.delete(
+  "/:currencyId",
+  verifyToken,
+  authorize(getPermission("INV", "CURRENCY", "DELETE")),
+  deleteCurrency,
+);
 
 export default currencyRouter;

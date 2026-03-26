@@ -2,16 +2,19 @@ import {
   createStockAdjustment,
   getStockAdjustmentById,
   updateStockAdjustment,
-} from "@/controllers/stock/stockAdjustment.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/stock/stockAdjustment.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateStockAdjustment,
   validateUpdateStockAdjustment,
-} from "@/validations/request/stock/stockAdjustment.validation";
+} from "@/validations/request/stock/stockAdjustment.validation.js";
 import { Router } from "express";
 
-const stockAdjustmentRouter = Router();
+export const stockAdjustmentRouter: Router = Router();
 
 /**
  * @swagger
@@ -38,17 +41,20 @@ const stockAdjustmentRouter = Router();
 stockAdjustmentRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("STOCK_ADJUSTMENT", "CREATE")),
+  authorize(getPermission("INV", "STOCK_ADJUSTMENT", "CREATE")),
   validateStockAdjustment,
-  createStockAdjustment
+  createStockAdjustment,
 );
 
 stockAdjustmentRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("STOCK_ADJUSTMENT", "UPDATE"), getPermission("STOCK_ADJUSTMENT", "VIEW")),
+  authorize(
+    getPermission("INV", "STOCK_ADJUSTMENT", "UPDATE"),
+    getPermission("INV", "STOCK_ADJUSTMENT", "VIEW"),
+  ),
   validateUpdateStockAdjustment,
-  updateStockAdjustment
+  updateStockAdjustment,
 );
 
 /**
@@ -70,8 +76,8 @@ stockAdjustmentRouter.put(
 stockAdjustmentRouter.get(
   "/id",
   verifyToken,
-  authorize(getPermission("STOCK_ADJUSTMENT", "VIEW")),
-  getStockAdjustmentById
+  authorize(getPermission("INV", "STOCK_ADJUSTMENT", "VIEW")),
+  getStockAdjustmentById,
 );
 
 export default stockAdjustmentRouter;

@@ -1,11 +1,18 @@
 import { Router } from "express";
 
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
 
-import { getPermission } from "@/utils/permissions.utils";
-import { clearAllCacheController, clearCacheController, getAllCacheController } from "@/controllers/cache.controller";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  clearAllCacheController,
+  clearCacheController,
+  getAllCacheController,
+} from "@/controllers/cache.controller.js";
 
-const cacheRouter = Router();
+export const cacheRouter: Router = Router();
 
 /**
  * @swagger
@@ -23,7 +30,12 @@ const cacheRouter = Router();
  *     security:
  *       - bearerAuth: []
  */
-cacheRouter.post("/load", verifyToken, authorize(getPermission("CACHE", "VIEW")), getAllCacheController);
+cacheRouter.post(
+  "/load",
+  verifyToken,
+  authorize(getPermission("INV", "CACHE", "VIEW")),
+  getAllCacheController,
+);
 /**
  * @swagger
  * /api/v1/cache:
@@ -40,7 +52,17 @@ cacheRouter.post("/load", verifyToken, authorize(getPermission("CACHE", "VIEW"))
  *           type: string
  *         description: The cache ID to delete.
  */
-cacheRouter.delete("/delete", verifyToken, authorize(getPermission("CACHE", "DELETE")), clearCacheController);
-cacheRouter.delete("/all", verifyToken, authorize(getPermission("CACHE", "DELETE")), clearAllCacheController);
+cacheRouter.delete(
+  "/delete",
+  verifyToken,
+  authorize(getPermission("INV", "CACHE", "DELETE")),
+  clearCacheController,
+);
+cacheRouter.delete(
+  "/all",
+  verifyToken,
+  authorize(getPermission("INV", "CACHE", "DELETE")),
+  clearAllCacheController,
+);
 
 export default cacheRouter;

@@ -51,10 +51,12 @@ export const grnService = {
 
     const dto = await Promise.all(
       records.map(async (sr) => {
-        return toGrnDTO({
-          ...sr,
-          goodReceiveDetails: sr.goodReceiveDetails,
-        });
+        return toGrnDTO([
+          {
+            ...sr,
+            goodReceiveDetails: sr.goodReceiveDetails,
+          },
+        ]);
       }),
     );
 
@@ -86,10 +88,10 @@ export const grnService = {
       }
     }
 
-    const dto = await toGrnDTO(grn);
+    const dto = await toGrnDTO([grn]);
 
     logger.info("exiting::getGrnById::service id=" + id);
-    return dto;
+    return dto[0];
   },
 
   async deleteGrn(id: number): Promise<void> {

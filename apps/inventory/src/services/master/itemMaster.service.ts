@@ -66,13 +66,11 @@ export const itemMasterService = {
       await addToCache(cacheKey, itemMaster.id, itemMaster);
     }
     logger.info("exiting::createItemMaster::service");
-    const itemForSearch = toItemMasterDTO(itemMaster);
-    await addToCache(
-      cacheKeyForItemSearch,
-      (await itemForSearch).id,
-      itemForSearch,
-    );
-    return itemForSearch;
+    const itemForSearch = await toItemMasterDTO([itemMaster]);
+    if (isCacheable) {
+      await addToCache(cacheKeyForItemSearch, itemMaster.id, itemForSearch[0]);
+    }
+    return itemForSearch[0];
   },
 
   async getItemStocks(itemStockReq: GetItemStockRequest) {
@@ -92,7 +90,7 @@ export const itemMasterService = {
     if (!input.id) {
       throw new ErrorHandler(400, "Item Master ID is required");
     }
-    const oldItem = await updateIdItemMasterServiceValidation(input);
+    // const oldItem = await updateIdItemMasterServiceValidation(input);
     // deleteOldItemImageFiles(oldItem);
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
     const updatedItemMaster = await updateItemMasterInDb(input);
@@ -101,7 +99,8 @@ export const itemMasterService = {
     }
 
     logger.info("exiting::updateItemMaster::service");
-    return toItemMasterDTO(updatedItemMaster);
+    const itemMasterDto = await toItemMasterDTO([updatedItemMaster]);
+    return itemMasterDto[0];
   },
 
   async getAllItemMaster(
@@ -124,7 +123,8 @@ export const itemMasterService = {
       else return [];
     }
     logger.info("exiting::getAllItemMaster::service");
-    return Promise.all(itemMaster.map((item) => toItemMasterDTO(item)));
+    const itemMasterDTO = await toItemMasterDTO(itemMaster);
+    return itemMasterDTO;
   },
 
   async getAllItemMasterWoDto(): Promise<InvItem[]> {

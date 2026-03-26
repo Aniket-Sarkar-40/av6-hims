@@ -1,9 +1,12 @@
-import { collectionCenterGet } from "@/controllers/location/location.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+import { collectionCenterGet } from "@/controllers/location/location.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { Router } from "express";
 
-export const locationRouter = Router();
+export const locationRouter: Router = Router();
 
 /**
  * @swagger
@@ -27,4 +30,9 @@ export const locationRouter = Router();
  *           schema:
  *             $ref: '#/components/branchSchema'
  */
-locationRouter.post("/", verifyToken, authorize(getPermission("LOCATION", "VIEW")), collectionCenterGet);
+locationRouter.post(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "LOCATION", "VIEW")),
+  collectionCenterGet,
+);

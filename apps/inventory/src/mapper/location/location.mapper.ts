@@ -1,14 +1,19 @@
-import { requestStorage } from "@/config/requestContext";
-import { CollectionCenterApiRow, CollectionCenterResolved } from "@/types/common";
-import { getBranchAndWarehouseByCcIds } from "@/utils/getCollectionCenter.utils";
+import { settingsService } from "@/services/master/settings.service.js";
+import {
+  CollectionCenterApiRow,
+  CollectionCenterResolved,
+} from "@/types/common.js";
+import { getBranchAndWarehouseByCcIds } from "@/utils/getCollectionCenter.utils.js";
 
-export const resolveCollectionCenters = async (rows: CollectionCenterApiRow[]): Promise<CollectionCenterResolved[]> => {
+export const resolveCollectionCenters = async (
+  rows: CollectionCenterApiRow[],
+): Promise<CollectionCenterResolved[]> => {
   // de-dup ids just in case
   const ids = Array.from(new Set(rows.map((r) => r.id)));
   const map = await getBranchAndWarehouseByCcIds(ids); // Record<ccId, { branch, warehouse }>
 
-  const ccSettingsId = requestStorage.getStore();
-  const warehouseMode = ccSettingsId?.settings?.warehouseMode || false;
+  const ccSettings = await settingsService.getSettings(true);
+  const warehouseMode = ccSettings?.warehouseMode || false;
 
   return rows
     .map(({ id, name, type }): CollectionCenterResolved | null => {
@@ -22,7 +27,7 @@ export const resolveCollectionCenters = async (rows: CollectionCenterApiRow[]): 
 
       let resolvedType = type;
       if (!resolvedType) {
-        if (ccSettingsId) {
+        if (ccSettings?.warehouseMode) {
           resolvedType = hit.warehouse ? "Warehouse" : "Branch";
         } else {
           resolvedType = "Branch";

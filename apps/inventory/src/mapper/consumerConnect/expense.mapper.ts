@@ -1,11 +1,21 @@
-import { BASE_URL } from "@/config/index.js";
+import { BASE_URL } from "@repo/shared";
 import { expenseHeadService } from "@/services/master/expenseHead.service.js";
 
-import { ExpenseDTO, ExpenseInput, ExpenseInputRequest } from "@/types/consumerConnect/expense.js";
+import {
+  ExpenseDTO,
+  ExpenseInput,
+  ExpenseInputRequest,
+} from "@/types/consumerConnect/expense.js";
 import { ExpenseHeadDTO } from "@/types/master/expenseHead.js";
-import { Expense, ExpenseHead, MasterType } from "@prisma/client";
+import {
+  Expense,
+  ExpenseHead,
+  MasterType,
+} from "@repo/db/generated/prisma/client";
 
-export const toExpenseEntity = (expenseReq: ExpenseInputRequest): ExpenseInput => {
+export const toExpenseEntity = (
+  expenseReq: ExpenseInputRequest,
+): ExpenseInput => {
   const entity: ExpenseInput = {
     id: expenseReq.id ? Number(expenseReq.id) : undefined,
     name: expenseReq.name ?? undefined,
@@ -15,10 +25,18 @@ export const toExpenseEntity = (expenseReq: ExpenseInputRequest): ExpenseInput =
     documents: expenseReq.documents ?? undefined,
     note: expenseReq.note ?? undefined,
   };
-  if (expenseReq.expenseHeadId != null && expenseReq.expenseHeadId !== "" && !isNaN(Number(expenseReq.expenseHeadId))) {
+  if (
+    expenseReq.expenseHeadId != null &&
+    expenseReq.expenseHeadId !== "" &&
+    !isNaN(Number(expenseReq.expenseHeadId))
+  ) {
     entity.expenseHeadId = Number(expenseReq.expenseHeadId);
   }
-  if (expenseReq.ccId != null && expenseReq.ccId !== undefined && !isNaN(Number(expenseReq.ccId))) {
+  if (
+    expenseReq.ccId != null &&
+    expenseReq.ccId !== undefined &&
+    !isNaN(Number(expenseReq.ccId))
+  ) {
     entity.ccId = Number(expenseReq.ccId);
   }
 
@@ -36,10 +54,16 @@ export const toExpenseHeadDTO = (head: ExpenseHead): ExpenseHeadDTO => ({
 });
 
 export const toExpenseDTO = async (expense: Expense): Promise<ExpenseDTO> => {
-  const convertedDocuments = expense.documents !== null ? BASE_URL + expense.documents.replace(/\\/g, "/") : null;
+  const convertedDocuments =
+    expense.documents !== null
+      ? BASE_URL + expense.documents.replace(/\\/g, "/")
+      : null;
   let expenseHead: ExpenseHeadDTO | null = null;
   if (expense.expenseHeadId !== null) {
-    const rawHead = await expenseHeadService.getExpenseHeadById(expense.expenseHeadId, true);
+    const rawHead = await expenseHeadService.getExpenseHeadById(
+      expense.expenseHeadId,
+      true,
+    );
     if (rawHead) {
       expenseHead = toExpenseHeadDTO(rawHead);
     }
@@ -60,6 +84,8 @@ export const toExpenseDTO = async (expense: Expense): Promise<ExpenseDTO> => {
     expenseHead, // Add this line if you want to include expenseHead in the DTO
   };
 };
-export const toExpenseDTOs = async (expenses: Expense[]): Promise<ExpenseDTO[]> => {
+export const toExpenseDTOs = async (
+  expenses: Expense[],
+): Promise<ExpenseDTO[]> => {
   return Promise.all(expenses.map((expense) => toExpenseDTO(expense)));
 };

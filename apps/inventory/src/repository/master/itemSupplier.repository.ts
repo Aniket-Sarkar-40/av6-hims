@@ -12,7 +12,7 @@ import { customOmit } from "av6-utils";
 
 export async function createItemSupplierInDb(
   data: ItemSupplierCreateInput,
-): Promise<InvItemSupplier> {
+): Promise<ItemSupplierResponse> {
   logger.info("entering::createItemSupplierInDb::repository");
   const store = requestStorage.getStore();
   return await db.$transaction(
@@ -60,7 +60,7 @@ export async function createItemSupplierInDb(
 
 export async function updateItemSupplierInDb(
   data: ItemSupplierUpdateInput,
-): Promise<InvItemSupplier> {
+): Promise<ItemSupplierResponse> {
   logger.info("entering::updateItemSupplierInDb::repository");
   const store = requestStorage.getStore();
   const omitteditemSupplier = customOmit<

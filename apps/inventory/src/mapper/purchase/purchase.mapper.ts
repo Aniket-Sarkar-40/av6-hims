@@ -1,58 +1,94 @@
-import { coreRequests } from "@/client/core/request";
-import { requestStorage } from "@/config/requestContext";
-import { branchService } from "@/services/master/branch.service";
-import { itemMasterService } from "@/services/master/itemMaster.service";
-import { itemStoreService } from "@/services/master/itemStore.service";
-import { itemSupplierService } from "@/services/master/itemSupplier.service";
-import { warehouseService } from "@/services/master/warehouse.service";
-import { PurchaseOrderDetailDTO, PurchaseOrderDTO } from "@/types/purchase/purchase";
-import { itemMasterToDto } from "@/utils/commonResponse.utils";
-import { omitAudit, toIdValue } from "@/utils/idValue.utils";
-import { PurchaseOrder, PurchaseOrderDetails } from "@prisma/client";
+import { branchService } from "@/services/master/branch.service.js";
+import { itemMasterService } from "@/services/master/itemMaster.service.js";
+import { itemStoreService } from "@/services/master/itemStore.service.js";
+import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
+import { settingsService } from "@/services/master/settings.service.js";
+import { warehouseService } from "@/services/master/warehouse.service.js";
+import {
+  PurchaseOrderDetailDTO,
+  PurchaseOrderDTO,
+  PurchaseOrderWithDetails,
+} from "@/types/purchase/purchase.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { customOmit, omitAudit, toIdValue } from "av6-utils";
+import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 
 export const toPurchaseOrderDTO = async (
-  purchaseOrder: PurchaseOrder & {
-    purchaseOrderDetails: PurchaseOrderDetails[];
-  }
-): Promise<PurchaseOrderDTO> => {
-  const supplierDTO = purchaseOrder.supplierId
-    ? await itemSupplierService.getItemSupplierById(purchaseOrder.supplierId, true)
-    : null;
-  const storeDTO = purchaseOrder.storeId ? await itemStoreService.getItemStoreById(purchaseOrder.storeId, true) : null;
-  let warehouse, branch;
-  const warehouseMode = requestStorage.getStore()?.settings?.warehouseMode;
-  if (warehouseMode && purchaseOrder.ccId) {
-    warehouse = await warehouseService.getWarehouseById(purchaseOrder.ccId, true);
-  } else if (!warehouseMode && purchaseOrder.ccId) {
-    branch = await branchService.getBranchById(purchaseOrder.ccId, true);
-  }
+  purchaseOrders: PurchaseOrderWithDetails[],
+): Promise<PurchaseOrderDTO[]> => {
+  const suppliers = await itemSupplierService.getAllItemSupplier(true);
+  const stores = await itemStoreService.getAllItemStore(true);
+  const warehouses = await warehouseService.getAllWarehouse(true);
+  const branches = await branchService.getAllBranch(true);
+  const settings = await settingsService.getSettings();
+  const warehouseMode = settings?.warehouseMode;
 
-  const createdBy = purchaseOrder.createdBy ? await coreRequests.getEmployeeCache(purchaseOrder.createdBy) : null;
-  const updatedBy = purchaseOrder.updatedBy ? await coreRequests.getEmployeeCache(purchaseOrder.updatedBy) : null;
+  return Promise.all(
+    purchaseOrders.map(async (po) => {
+      const omittedPo = customOmit<
+        PurchaseOrderWithDetails,
+        "purchaseOrderDetails"
+      >(po, ["purchaseOrderDetails"]);
+      let warehouse, branch;
 
-  const detailDTO: PurchaseOrderDetailDTO[] = await Promise.all(
-    purchaseOrder.purchaseOrderDetails.map(async (detail) => {
-      const itemDTO = detail.itemId ? await itemMasterService.getItemMasterById({ itemId: detail.itemId }, true) : null;
-      const createdBy = detail.createdBy ? await coreRequests.getEmployeeCache(detail.createdBy) : null;
-      const updatedBy = detail.updatedBy ? await coreRequests.getEmployeeCache(detail.updatedBy) : null;
+      if (warehouseMode && po.ccId) {
+        warehouse = warehouses.find((wh) => wh.id === po.ccId);
+      } else if (!warehouseMode && po.ccId) {
+        branch = branches.find((br) => br.id === po.ccId);
+      }
+
+      const supplierDTO = suppliers.find(
+        (supplier) => supplier.id === po.supplierId,
+      );
+      const storeDTO = stores.find((store) => store.id === po.storeId);
+
+      const createdBy = po.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(po.createdBy, true)
+        : null;
+      const updatedBy = po.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(po.updatedBy, true)
+        : null;
+
+      const detailDTO: PurchaseOrderDetailDTO[] = await Promise.all(
+        po.purchaseOrderDetails.map(async (detail) => {
+          const itemDTO = detail.itemId
+            ? await itemMasterService.getItemMasterById(
+                { itemId: detail.itemId },
+                true,
+              )
+            : null;
+          const createdBy = detail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.createdBy,
+                true,
+              )
+            : null;
+          const updatedBy = detail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.updatedBy,
+                true,
+              )
+            : null;
+
+          return {
+            ...detail,
+            item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+            createdBy: createdBy,
+            updatedBy: updatedBy,
+          };
+        }),
+      );
 
       return {
-        ...detail,
-        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-        createdBy: createdBy,
-        updatedBy: updatedBy,
+        ...omittedPo.rest,
+        store: toIdValue(storeDTO, "itemStoreName"),
+        supplier: toIdValue(supplierDTO, "name"),
+        warehouse: toIdValue(warehouse, "name"),
+        branch: toIdValue(branch, "name"),
+        createdBy: omitAudit(createdBy),
+        updatedBy: omitAudit(updatedBy),
+        purchaseOrderDetails: omitAudit(detailDTO),
       };
-    })
+    }),
   );
-
-  return {
-    ...purchaseOrder,
-    store: toIdValue(storeDTO, "itemStoreName"),
-    supplier: toIdValue(supplierDTO, "name"),
-    warehouse: toIdValue(warehouse, "name"),
-    branch: toIdValue(branch, "name"),
-    createdBy: omitAudit(createdBy),
-    updatedBy: omitAudit(updatedBy),
-    purchaseOrderDetails: omitAudit(detailDTO),
-  };
 };

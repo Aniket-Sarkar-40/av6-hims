@@ -6,18 +6,21 @@ import {
   previewCustomUIN,
   previewUIN,
   updateUINConfig,
-} from "@/controllers/master/uinConfig.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/master/uinConfig.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateCreateConfig,
   validateGetUINConfig,
   validatePreviewCustomConfig,
   validateUpdateConfig,
-} from "@/validations/request/master/uinConfig.validation";
+} from "@/validations/request/master/uinConfig.validation.js";
 import { Router } from "express";
 
-export const uinConfigRouter = Router();
+export const uinConfigRouter: Router = Router();
 
 /**
  * @swagger
@@ -44,9 +47,9 @@ export const uinConfigRouter = Router();
 uinConfigRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("UIN_CONFIG", "CREATE")),
+  authorize(getPermission("INV", "UIN_CONFIG", "CREATE")),
   validateCreateConfig,
-  createUINConfig
+  createUINConfig,
 );
 
 /**
@@ -67,9 +70,12 @@ uinConfigRouter.post(
 uinConfigRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("UIN_CONFIG", "VIEW"), getPermission("UIN_CONFIG", "UPDATE")),
+  authorize(
+    getPermission("INV", "UIN_CONFIG", "VIEW"),
+    getPermission("INV", "UIN_CONFIG", "UPDATE"),
+  ),
   validateUpdateConfig,
-  updateUINConfig
+  updateUINConfig,
 );
 
 /**
@@ -88,7 +94,13 @@ uinConfigRouter.put(
  *           type: string
  *         description: Short code.
  */
-uinConfigRouter.get("/uin", verifyToken, authorize(getPermission("UIN_CONFIG", "VIEW")), validateGetUINConfig, getUIN);
+uinConfigRouter.get(
+  "/uin",
+  verifyToken,
+  authorize(getPermission("INV", "UIN_CONFIG", "VIEW")),
+  validateGetUINConfig,
+  getUIN,
+);
 
 /**
  * @swagger
@@ -109,9 +121,9 @@ uinConfigRouter.get("/uin", verifyToken, authorize(getPermission("UIN_CONFIG", "
 uinConfigRouter.get(
   "/uin-preview",
   verifyToken,
-  authorize(getPermission("UIN_CONFIG", "VIEW")),
+  authorize(getPermission("INV", "UIN_CONFIG", "VIEW")),
   validateGetUINConfig,
-  previewUIN
+  previewUIN,
 );
 
 /**
@@ -132,9 +144,9 @@ uinConfigRouter.get(
 uinConfigRouter.post(
   "/uin-custom-preview",
   verifyToken,
-  authorize(getPermission("UIN_CONFIG", "CREATE")),
+  authorize(getPermission("INV", "UIN_CONFIG", "CREATE")),
   validatePreviewCustomConfig,
-  previewCustomUIN
+  previewCustomUIN,
 );
 
 /**
@@ -145,7 +157,12 @@ uinConfigRouter.post(
  *     tags: [UinConfig]
  */
 // DELETE/:shortCode/:id
-uinConfigRouter.delete("/:id", verifyToken, authorize(getPermission("UIN_CONFIG", "DELETE")), deleteUINConfig);
+uinConfigRouter.delete(
+  "/:id",
+  verifyToken,
+  authorize(getPermission("INV", "UIN_CONFIG", "DELETE")),
+  deleteUINConfig,
+);
 
 /**
  * @swagger
@@ -158,6 +175,6 @@ uinConfigRouter.delete("/:id", verifyToken, authorize(getPermission("UIN_CONFIG"
 uinConfigRouter.get(
   "/uin-short-code",
   verifyToken,
-  authorize(getPermission("UIN_CONFIG", "VIEW")),
-  getAllUinShortCodes
+  authorize(getPermission("INV", "UIN_CONFIG", "VIEW")),
+  getAllUinShortCodes,
 );

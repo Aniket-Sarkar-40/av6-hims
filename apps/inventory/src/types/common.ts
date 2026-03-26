@@ -7,6 +7,8 @@ import {
   RoundFormat,
 } from "@repo/db/generated/prisma/client";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import { BranchDTOLocation } from "./master/branch.js";
+import { WarehouseDTOLocation } from "./master/warehouse.js";
 
 export interface LockUnlockParams {
   shortCode: string;
@@ -88,4 +90,20 @@ export interface CommonFindManyInput<M extends ModelName> {
   useActiveFlag?: boolean;
   where?: WhereMany<M>;
   args?: Omit<FindManyArgs<M>, "where">; // select/include/orderBy/skip/take/distinct...
+}
+
+type CCType = "Branch" | "Warehouse";
+
+export interface CollectionCenterResolved {
+  id: number;
+  name: string;
+  type: CCType;
+  branch: BranchDTOLocation | null;
+  warehouse: WarehouseDTOLocation | null;
+}
+
+export interface CollectionCenterApiRow {
+  id: number;
+  name: string;
+  type?: CCType; // optional from API
 }

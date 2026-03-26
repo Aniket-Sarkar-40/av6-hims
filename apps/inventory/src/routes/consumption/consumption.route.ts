@@ -7,18 +7,21 @@ import {
   getConsumptionByUserId,
   rejectConsumption,
   updateConsumption,
-} from "@/controllers/consumption/cosumption.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/consumption/cosumption.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateApproveConsumption,
   validateCommonConsumptionInput,
   validateCreateConsumption,
   validateUpdateConsumption,
-} from "@/validations/request/consumption/consumption.validation";
+} from "@/validations/request/consumption/consumption.validation.js";
 import { Router } from "express";
 
-export const consumptionRouter = Router();
+export const consumptionRouter: Router = Router();
 
 /**
  * @swagger
@@ -44,9 +47,9 @@ export const consumptionRouter = Router();
 consumptionRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("CONSUMPTION", "CREATE")),
+  authorize(getPermission("INV", "CONSUMPTION", "CREATE")),
   validateCreateConsumption,
-  createConsumption
+  createConsumption,
 );
 
 /**
@@ -68,9 +71,9 @@ consumptionRouter.post(
 consumptionRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("CONSUMPTION", "UPDATE")),
+  authorize(getPermission("INV", "CONSUMPTION", "UPDATE")),
   validateUpdateConsumption,
-  updateConsumption
+  updateConsumption,
 );
 
 /**
@@ -82,7 +85,12 @@ consumptionRouter.put(
  *  security:
  *    - bearerAuth: []
  */
-consumptionRouter.get("/", verifyToken, authorize(getPermission("CONSUMPTION", "VIEW")), getAllConsumption);
+consumptionRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
+  getAllConsumption,
+);
 
 /** * @swagger
  * /api/v1/consumption/id/{consumptionId}:
@@ -99,7 +107,12 @@ consumptionRouter.get("/", verifyToken, authorize(getPermission("CONSUMPTION", "
  *        type: string
  *      description: The consumptionId of the Consumption to retrieve
  */
-consumptionRouter.get("/id", verifyToken, authorize(getPermission("CONSUMPTION", "VIEW")), getConsumptionById);
+consumptionRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
+  getConsumptionById,
+);
 
 /**
  * @swagger
@@ -120,9 +133,9 @@ consumptionRouter.get("/id", verifyToken, authorize(getPermission("CONSUMPTION",
 consumptionRouter.put(
   "/approve",
   verifyToken,
-  authorize(getPermission("CONSUMPTION", "APPROVE")),
+  authorize(getPermission("INV", "CONSUMPTION", "APPROVE")),
   validateApproveConsumption,
-  approveConsumption
+  approveConsumption,
 );
 
 /**
@@ -143,9 +156,9 @@ consumptionRouter.put(
 consumptionRouter.delete(
   "/",
   verifyToken,
-  authorize(getPermission("CONSUMPTION", "DELETE")),
+  authorize(getPermission("INV", "CONSUMPTION", "DELETE")),
   validateCommonConsumptionInput,
-  deleteConsumptionById
+  deleteConsumptionById,
 );
 
 /**
@@ -166,9 +179,9 @@ consumptionRouter.delete(
 consumptionRouter.put(
   "/reject",
   verifyToken,
-  authorize(getPermission("CONSUMPTION", "REJECT")),
+  authorize(getPermission("INV", "CONSUMPTION", "REJECT")),
   validateCommonConsumptionInput,
-  rejectConsumption
+  rejectConsumption,
 );
 
 /**
@@ -186,4 +199,9 @@ consumptionRouter.put(
  *         description: The ID of the resource to get.
  */
 
-consumptionRouter.get("/by-user", verifyToken, authorize(getPermission("CONSUMPTION", "VIEW")), getConsumptionByUserId);
+consumptionRouter.get(
+  "/by-user",
+  verifyToken,
+  authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
+  getConsumptionByUserId,
+);

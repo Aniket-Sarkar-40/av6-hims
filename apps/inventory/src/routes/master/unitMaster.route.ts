@@ -3,13 +3,19 @@ import {
   getAllUnitMaster,
   getUnitMasterById,
   updateUnitMaster,
-} from "@/controllers/master/unitMaster.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateUnitMasterCreate, validateUnitMasterUpdate } from "@/validations/request/master/unitMaster.validation";
+} from "@/controllers/master/unitMaster.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  validateUnitMasterCreate,
+  validateUnitMasterUpdate,
+} from "@/validations/request/master/unitMaster.validation.js";
 import { Router } from "express";
 
-export const unitMasterRouter = Router();
+export const unitMasterRouter: Router = Router();
 
 /**
  * @swagger
@@ -36,9 +42,9 @@ export const unitMasterRouter = Router();
 unitMasterRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("UNIT_MASTER", "CREATE")),
+  authorize(getPermission("INV", "UNIT_MASTER", "CREATE")),
   validateUnitMasterCreate,
-  createUnitMaster
+  createUnitMaster,
 );
 
 /**
@@ -50,7 +56,12 @@ unitMasterRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-unitMasterRouter.get("/", verifyToken, authorize(getPermission("UNIT_MASTER", "VIEW")), getAllUnitMaster);
+unitMasterRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "UNIT_MASTER", "VIEW")),
+  getAllUnitMaster,
+);
 
 /**
  * @swagger
@@ -66,7 +77,12 @@ unitMasterRouter.get("/", verifyToken, authorize(getPermission("UNIT_MASTER", "V
  *       '404':
  *         description: Type not found
  */
-unitMasterRouter.get("/id", verifyToken, authorize(getPermission("UNIT_MASTER", "VIEW")), getUnitMasterById);
+unitMasterRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "UNIT_MASTER", "VIEW")),
+  getUnitMasterById,
+);
 
 /**
  * @swagger
@@ -93,7 +109,10 @@ unitMasterRouter.get("/id", verifyToken, authorize(getPermission("UNIT_MASTER", 
 unitMasterRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("UNIT_MASTER", "VIEW"), getPermission("UNIT_MASTER", "UPDATE")),
+  authorize(
+    getPermission("INV", "UNIT_MASTER", "VIEW"),
+    getPermission("INV", "UNIT_MASTER", "UPDATE"),
+  ),
   validateUnitMasterUpdate,
-  updateUnitMaster
+  updateUnitMaster,
 );

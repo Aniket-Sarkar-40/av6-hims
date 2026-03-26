@@ -4,16 +4,19 @@ import {
   getAllIncomeHead,
   getIncomeHeadId,
   updateIncomeHead,
-} from "@/controllers/master/incomeHead.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware.js";
-import { getPermission } from "@/utils/permissions.utils.js";
+} from "@/controllers/master/incomeHead.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateIncomeHeadCreate,
   validateIncomeHeadUpdate,
 } from "@/validations/request/master/incomeHead.validation.js";
 import { Router } from "express";
 
-export const incomeHeadRouter = Router();
+export const incomeHeadRouter: Router = Router();
 
 /**
  * @swagger
@@ -40,9 +43,9 @@ export const incomeHeadRouter = Router();
 incomeHeadRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("INCOME_HEAD", "CREATE")),
+  authorize(getPermission("INV", "INCOME_HEAD", "CREATE")),
   validateIncomeHeadCreate,
-  createIncomeHead
+  createIncomeHead,
 );
 
 /**
@@ -54,7 +57,12 @@ incomeHeadRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-incomeHeadRouter.get("/", verifyToken, authorize(getPermission("INCOME_HEAD", "VIEW")), getAllIncomeHead);
+incomeHeadRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "INCOME_HEAD", "VIEW")),
+  getAllIncomeHead,
+);
 
 /**
  * @swagger
@@ -72,7 +80,12 @@ incomeHeadRouter.get("/", verifyToken, authorize(getPermission("INCOME_HEAD", "V
  *           type: string
  *         description: The incomeHead ID.
  */
-incomeHeadRouter.get("/id", verifyToken, authorize(getPermission("INCOME_HEAD", "VIEW")), getIncomeHeadId);
+incomeHeadRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "INCOME_HEAD", "VIEW")),
+  getIncomeHeadId,
+);
 
 /**
  * @swagger
@@ -99,9 +112,12 @@ incomeHeadRouter.get("/id", verifyToken, authorize(getPermission("INCOME_HEAD", 
 incomeHeadRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("INCOME_HEAD", "VIEW"), getPermission("INCOME_HEAD", "UPDATE")),
+  authorize(
+    getPermission("INV", "INCOME_HEAD", "VIEW"),
+    getPermission("INV", "INCOME_HEAD", "UPDATE"),
+  ),
   validateIncomeHeadUpdate,
-  updateIncomeHead
+  updateIncomeHead,
 );
 
 /**
@@ -120,4 +136,9 @@ incomeHeadRouter.put(
  *           type: string
  *         description: The Income Head ID to delete.
  */
-incomeHeadRouter.delete("/", verifyToken, authorize(getPermission("INCOME_HEAD", "DELETE")), deleteIncomeHead);
+incomeHeadRouter.delete(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "INCOME_HEAD", "DELETE")),
+  deleteIncomeHead,
+);

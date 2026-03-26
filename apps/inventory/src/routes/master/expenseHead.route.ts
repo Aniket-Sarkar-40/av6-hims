@@ -4,16 +4,19 @@ import {
   getAllExpenseHeads,
   getExpenseHeadById,
   updateExpenseHead,
-} from "@/controllers/master/expenseHead.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware.js";
-import { getPermission } from "@/utils/permissions.utils.js";
+} from "@/controllers/master/expenseHead.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateExpenseHeadCreate,
   validateExpenseHeadUpdate,
 } from "@/validations/request/master/expenseHead.validation.js";
 import { Router } from "express";
 
-const expenseHeadRouter = Router();
+const expenseHeadRouter: Router = Router();
 /**
  * @swagger
  * tags:
@@ -40,9 +43,9 @@ const expenseHeadRouter = Router();
 expenseHeadRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("EXPENSE_HEAD", "CREATE")),
+  authorize(getPermission("INV", "EXPENSE_HEAD", "CREATE")),
   validateExpenseHeadCreate,
-  createExpenseHead
+  createExpenseHead,
 );
 /**
  * @swagger
@@ -53,7 +56,12 @@ expenseHeadRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-expenseHeadRouter.get("/", verifyToken, authorize(getPermission("EXPENSE_HEAD", "VIEW")), getAllExpenseHeads);
+expenseHeadRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "EXPENSE_HEAD", "VIEW")),
+  getAllExpenseHeads,
+);
 
 /**
  * @swagger
@@ -75,7 +83,12 @@ expenseHeadRouter.get("/", verifyToken, authorize(getPermission("EXPENSE_HEAD", 
  *         description: Success
  */
 
-expenseHeadRouter.get("/id", verifyToken, authorize(getPermission("EXPENSE_HEAD", "VIEW")), getExpenseHeadById);
+expenseHeadRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "EXPENSE_HEAD", "VIEW")),
+  getExpenseHeadById,
+);
 /**
  * @swagger
  * /api/v1/expense-head:
@@ -101,9 +114,12 @@ expenseHeadRouter.get("/id", verifyToken, authorize(getPermission("EXPENSE_HEAD"
 expenseHeadRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("EXPENSE_HEAD", "VIEW"), getPermission("EXPENSE_HEAD", "UPDATE")),
+  authorize(
+    getPermission("INV", "EXPENSE_HEAD", "VIEW"),
+    getPermission("INV", "EXPENSE_HEAD", "UPDATE"),
+  ),
   validateExpenseHeadUpdate,
-  updateExpenseHead
+  updateExpenseHead,
 );
 /**
  * @swagger
@@ -121,6 +137,11 @@ expenseHeadRouter.put(
  *           type: number
  *         description: The expenseHead ID to delete.
  */
-expenseHeadRouter.delete("/", verifyToken, authorize(getPermission("EXPENSE_HEAD", "DELETE")), deleteExpenseHead);
+expenseHeadRouter.delete(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "EXPENSE_HEAD", "DELETE")),
+  deleteExpenseHead,
+);
 
 export default expenseHeadRouter;

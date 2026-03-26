@@ -10,6 +10,9 @@ export interface ItemStoreUpdate extends ItemStoreReq {
   id: number;
 }
 
-export interface ItemStoreDTO extends Omit<InvItemStore, BaseModelAttr> {
+export interface ItemStoreDTO extends Omit<
+  InvItemStore,
+  BaseModelAttr | "ccId"
+> {
   collectionCenter: IdValue | null;
 }

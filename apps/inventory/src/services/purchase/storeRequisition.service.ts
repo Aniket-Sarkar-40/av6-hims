@@ -67,10 +67,12 @@ export const storeRequisitionService = {
 
     const dto = await Promise.all(
       records.map(async (sr) => {
-        return toStoreRequisitionDTO({
-          ...sr,
-          storeRequisitionDetails: sr.storeRequisitionDetails,
-        });
+        return toStoreRequisitionDTO([
+          {
+            ...sr,
+            storeRequisitionDetails: sr.storeRequisitionDetails,
+          },
+        ]);
       }),
     );
 
@@ -90,12 +92,11 @@ export const storeRequisitionService = {
       );
     }
 
-    const dto = await toStoreRequisitionDTO(storeReq);
+    const dto = await toStoreRequisitionDTO([storeReq]);
 
     logger.info("exiting::getStoreRequisitionById::service id=" + id);
-    return dto;
+    return dto[0];
   },
-
   async deleteStoreRequisition(id: number): Promise<void> {
     logger.info("entering::deleteStoreRequisition::service id=" + id);
 

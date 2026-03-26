@@ -44,8 +44,8 @@ export const branchService = {
       await addToCache(cacheKey, branch.id, branch);
     }
     logger.info("exiting::createBranch::service");
-    const branchDTO = await toBranchDTO(branch);
-    return branchDTO;
+    const branchDTO = await toBranchDTO([branch]);
+    return branchDTO[0];
   },
 
   async updateBranch(input: BranchReq): Promise<BranchDTO> {
@@ -61,8 +61,8 @@ export const branchService = {
     }
 
     logger.info("exiting::updateBranch::service");
-    const branchDTO = await toBranchDTO(updateBranch);
-    return branchDTO;
+    const branchDTO = await toBranchDTO([updateBranch]);
+    return branchDTO[0];
   },
 
   async getAllBranch(canNullReturnable: boolean = false): Promise<BranchDTO[]> {
@@ -83,10 +83,10 @@ export const branchService = {
       else return [];
     }
     const branchDTO = await Promise.all(
-      branch.map((branch) => toBranchDTO(branch)),
+      branch.map((branch) => toBranchDTO([branch])),
     );
     logger.info("exiting::getAllBranch::service");
-    return branchDTO;
+    return branchDTO[0];
   },
 
   async getBranchById(
@@ -113,9 +113,9 @@ export const branchService = {
         );
       else return null;
     }
-    const branchDTO = await toBranchDTO(branch);
+    const branchDTO = await toBranchDTO([branch]);
     logger.info("exiting::getBranchById::service");
-    return branchDTO;
+    return branchDTO[0];
   },
 
   async getBranchByIdWoDTO(
@@ -156,8 +156,8 @@ export const branchService = {
     }
 
     logger.info("exiting::reactivateBranch::service");
-    const branchDTO = await toBranchDTO(updateBranch);
-    return branchDTO;
+    const branchDTO = await toBranchDTO([updateBranch]);
+    return branchDTO[0];
   },
 
   async getBranchesByCcIds(ccIds: number[]): Promise<BranchDTO[]> {
@@ -165,7 +165,7 @@ export const branchService = {
     if (!ccIds.length) return [];
 
     const branches = await getBranchesByCcIdsFromDb(ccIds);
-    const dtos = await Promise.all(branches.map((b) => toBranchDTO(b)));
+    const dtos = await toBranchDTO(branches);
 
     logger.info("exiting::getBranchesByCcIds::service");
     return dtos;

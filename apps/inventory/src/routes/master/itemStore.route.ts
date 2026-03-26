@@ -3,13 +3,19 @@ import {
   getAllItemStore,
   getItemStoreById,
   updateItemStore,
-} from "@/controllers/master/itemStore.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateItemStoreCreate, validateItemStoreUpdate } from "@/validations/request/master/itemStore.validation";
+} from "@/controllers/master/itemStore.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  validateItemStoreCreate,
+  validateItemStoreUpdate,
+} from "@/validations/request/master/itemStore.validation.js";
 import { Router } from "express";
 
-export const itemStoreRouter = Router();
+export const itemStoreRouter: Router = Router();
 
 /**
  * @swagger
@@ -36,9 +42,9 @@ export const itemStoreRouter = Router();
 itemStoreRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_STORE", "CREATE")),
+  authorize(getPermission("INV", "ITEM_STORE", "CREATE")),
   validateItemStoreCreate,
-  createItemStore
+  createItemStore,
 );
 
 /**
@@ -50,7 +56,12 @@ itemStoreRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-itemStoreRouter.get("/", verifyToken, authorize(getPermission("ITEM_STORE", "VIEW")), getAllItemStore);
+itemStoreRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_STORE", "VIEW")),
+  getAllItemStore,
+);
 
 /**
  * @swagger
@@ -66,7 +77,12 @@ itemStoreRouter.get("/", verifyToken, authorize(getPermission("ITEM_STORE", "VIE
  *       '404':
  *         description: Type not found
  */
-itemStoreRouter.get("/id", verifyToken, authorize(getPermission("ITEM_STORE", "VIEW")), getItemStoreById);
+itemStoreRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_STORE", "VIEW")),
+  getItemStoreById,
+);
 
 /**
  * @swagger
@@ -93,7 +109,10 @@ itemStoreRouter.get("/id", verifyToken, authorize(getPermission("ITEM_STORE", "V
 itemStoreRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_STORE", "VIEW"), getPermission("ITEM_STORE", "UPDATE")),
+  authorize(
+    getPermission("INV", "ITEM_STORE", "VIEW"),
+    getPermission("INV", "ITEM_STORE", "UPDATE"),
+  ),
   validateItemStoreUpdate,
-  updateItemStore
+  updateItemStore,
 );

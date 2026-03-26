@@ -53,7 +53,7 @@ export const purchaseService = {
       );
     }
 
-    const dto = await Promise.all(pos.map(toPurchaseOrderDTO));
+    const dto = await toPurchaseOrderDTO(pos);
 
     logger.info("exiting::getAllPurchase::service");
     return dto;
@@ -78,10 +78,10 @@ export const purchaseService = {
       );
     }
 
-    const dto = await toPurchaseOrderDTO(po);
+    const dto = await toPurchaseOrderDTO([po]);
 
     logger.info("exiting::getPurchaseById::service id=" + id);
-    return dto;
+    return dto[0];
   },
 
   async deletePurchase(id: number): Promise<void> {

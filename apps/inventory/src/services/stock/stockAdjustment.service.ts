@@ -40,7 +40,8 @@ export const stockAdjustmentService = {
   async getStockAdjustmentById(id: number) {
     logger.info("entering::getStockAdjustmentById::service");
     const record = await validateIdStockAdjustment(id);
+    const dto = await toStockAdjustmentDTO([record]);
     logger.info("exiting::getStockAdjustmentById::service");
-    return await toStockAdjustmentDTO(record);
+    return dto[0];
   },
 };

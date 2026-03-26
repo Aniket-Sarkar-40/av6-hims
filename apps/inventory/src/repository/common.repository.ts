@@ -66,7 +66,7 @@ export const fetchTableData = async (table: string) => {
   // If not cached, fetch from DB
   let dbData;
   if (
-    table === "dynamicShortCode" ||
+    table === "invDynamicShortCode" ||
     table === "serviceEvent" ||
     table === "eventConfig" ||
     table === "eventNotificationAudit" ||

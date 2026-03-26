@@ -1,38 +1,37 @@
-import { ItemStoreDTO } from "@/types/master/itemStore";
-import { getAllBranchAndWarehouse, getBranchOrWarehouse } from "@/utils/getCollectionCenter.utils";
-import { customOmit } from "@/utils/helper.utils";
-import { toIdValue } from "@/utils/idValue.utils";
-import { ItemStore } from "@prisma/client";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
+import { ItemStoreDTO } from "@/types/master/itemStore.js";
+import { getAllBranchAndWarehouse } from "@/utils/getCollectionCenter.utils.js";
+import { customOmit, toIdValue } from "av6-utils";
+import { InvItemStore } from "@repo/db/generated/prisma/client";
 
-export const toItemStoreDTO = async (itemStore: ItemStore): Promise<ItemStoreDTO> => {
-  const omittedItemStore = customOmit<
-    ItemStore,
-    "isActive" | "createdBy" | "updatedBy" | "deletedBy" | "createdAt" | "updatedAt" | "deletedAt"
-  >(itemStore, ["isActive", "createdBy", "updatedBy", "deletedBy", "createdAt", "updatedAt", "deletedAt"]);
-  const cc = await getBranchOrWarehouse(itemStore.ccId);
-  return {
-    ...omittedItemStore.rest,
-    collectionCenter: cc ? toIdValue(cc, "name") : null,
-  };
-};
-
-export const toAllItemStoreDTO = async (itemStore: ItemStore[]): Promise<ItemStoreDTO[]> => {
-  const collectionCenters = await getAllBranchAndWarehouse();
+export const toItemStoreDTO = async (
+  data: InvItemStore[],
+): Promise<ItemStoreDTO[]> => {
+  const CollectionCenters = await getAllBranchAndWarehouse();
 
   const itemStoreDTOs = await Promise.all(
-    itemStore.map(async (item) => {
+    data.map(async (item) => {
       const omittedItemStore = customOmit<
-        ItemStore,
-        "isActive" | "createdBy" | "updatedBy" | "deletedBy" | "createdAt" | "updatedAt" | "deletedAt"
-      >(item, ["isActive", "createdBy", "updatedBy", "deletedBy", "createdAt", "updatedAt", "deletedAt"]);
+        InvItemStore,
+        BaseModelAttrWoCancel | "ccId"
+      >(item, [
+        "isActive",
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "ccId",
+      ]);
 
-      const cc = collectionCenters.find((center) => center.id === item.ccId);
+      const cc = CollectionCenters.find((center) => center.id === item.ccId);
 
       return {
         ...omittedItemStore.rest,
         collectionCenter: cc ? toIdValue(cc, "name") : null,
       };
-    })
+    }),
   );
 
   return itemStoreDTOs;

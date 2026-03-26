@@ -46,9 +46,9 @@ export const warehouseService = {
     if (isCacheable && warehouse) {
       await addToCache(cacheKey, warehouse.id, warehouse);
     }
-    const warehouseDTO = await toWarehouseDTO(warehouse);
+    const warehouseDTO = await toWarehouseDTO([warehouse]);
     logger.info("exiting::createWarehouse::service");
-    return warehouseDTO;
+    return warehouseDTO[0];
   },
 
   async updateWarehouse(input: WarehouseReq): Promise<WarehouseDTO> {
@@ -64,8 +64,8 @@ export const warehouseService = {
     }
 
     logger.info("exiting::updateWarehouse::service");
-    const updatedWarehouseDTO = await toWarehouseDTO(updatedWarehouse);
-    return updatedWarehouseDTO;
+    const updatedWarehouseDTO = await toWarehouseDTO([updatedWarehouse]);
+    return updatedWarehouseDTO[0];
   },
 
   async getAllWarehouse(
@@ -87,9 +87,7 @@ export const warehouseService = {
         );
       else return [];
     }
-    const warehouseDTO = await Promise.all(
-      warehouse.map((warehouse) => toWarehouseDTO(warehouse)),
-    );
+    const warehouseDTO = await toWarehouseDTO(warehouse);
     logger.info("exiting::getAllWarehouse::service");
     return warehouseDTO;
   },
@@ -111,13 +109,13 @@ export const warehouseService = {
       )) as WarehouseResponse | null;
 
       if (warehouse !== null) {
-        warehouseDTO = await toWarehouseDTO(warehouse);
+        warehouseDTO = await toWarehouseDTO([warehouse]);
       }
     } else {
       warehouse = await getWarehouseByIdFromDb(warehouseId);
 
       if (warehouse !== null) {
-        warehouseDTO = await toWarehouseDTO(warehouse);
+        warehouseDTO = await toWarehouseDTO([warehouse]);
       }
     }
 
@@ -131,7 +129,7 @@ export const warehouseService = {
     }
 
     logger.info("exiting::getWarehouseById::service");
-    return warehouseDTO;
+    return warehouseDTO[0];
   },
 
   async getWarehouseByIdWoDTO(
@@ -176,8 +174,8 @@ export const warehouseService = {
     }
 
     logger.info("exiting::reactivateWarehouse::service");
-    const warehouseDTO = await toWarehouseDTO(updateWarehouse);
-    return warehouseDTO;
+    const warehouseDTO = await toWarehouseDTO([updateWarehouse]);
+    return warehouseDTO[0];
   },
 
   async getWarehousesByCcIds(ccIds: number[]): Promise<WarehouseDTO[]> {
@@ -185,7 +183,7 @@ export const warehouseService = {
     if (!ccIds.length) return [];
 
     const warehouses = await getWarehousesByCcIdsFromDb(ccIds);
-    const dtos = await Promise.all(warehouses.map((w) => toWarehouseDTO(w)));
+    const dtos = await toWarehouseDTO(warehouses);
 
     logger.info("exiting::getWarehousesByCcIds::service");
     return dtos;

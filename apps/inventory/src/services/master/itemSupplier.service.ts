@@ -1,7 +1,4 @@
-import {
-  toAllItemSupplierDTO,
-  toItemSupplierDTO,
-} from "@/mapper/master/itemSupplier.mapper.js";
+import { toItemSupplierDTO } from "@/mapper/master/itemSupplier.mapper.js";
 import {
   createItemSupplierInDb,
   deleteItemSupplierByIdFromDb,
@@ -49,9 +46,10 @@ export const itemSupplierService = {
       await addToCache(cacheKey, itemSupplier.id, itemSupplier);
     }
     logger.info("exiting::createItemSupplier::service");
-
-    return await toItemSupplierDTO(itemSupplier);
+    const itemSupplierDTO = await toItemSupplierDTO([itemSupplier]);
+    return itemSupplierDTO[0];
   },
+
   async updateItemSupplier(
     input: ItemSupplierUpdateInput,
   ): Promise<ItemSupplierDTO> {
@@ -63,7 +61,8 @@ export const itemSupplierService = {
       await updateCache(cacheKey, input.id, updatedItemSupplier);
     }
     logger.info("exiting::updateItemSupplier::service");
-    return await toItemSupplierDTO(updatedItemSupplier);
+    const itemSupplierDTO = await toItemSupplierDTO([updatedItemSupplier]);
+    return itemSupplierDTO[0];
   },
   async getAllItemSupplier(
     canNullReturnable: boolean = false,
@@ -85,7 +84,7 @@ export const itemSupplierService = {
         );
       else return [];
     }
-    return toAllItemSupplierDTO(itemSupplier);
+    return toItemSupplierDTO(itemSupplier);
   },
   async getItemSupplierById(
     id: number,
@@ -114,7 +113,8 @@ export const itemSupplierService = {
     }
 
     logger.info("exiting::getItemSupplierById::service");
-    return await toItemSupplierDTO(itemSupplier);
+    const itemSupplierDTO = await toItemSupplierDTO([itemSupplier]);
+    return itemSupplierDTO[0];
   },
   async deleteItemSupplierById(id: number): Promise<void> {
     logger.info("entering::deleteItemSupplierById::service");

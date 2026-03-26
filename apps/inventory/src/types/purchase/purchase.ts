@@ -73,3 +73,18 @@ export type PurchaseOrderDetailResponse =
       itemMedUnit: true;
     };
   }>;
+
+export type PurchaseOrderWithDetails = Prisma.InvPurchaseOrderGetPayload<{
+  include: {
+    purchaseOrderDetails: {
+      include: {
+        item: {
+          include: {
+            itemCategory: true;
+            unit: true;
+          };
+        };
+      };
+    };
+  };
+}>;

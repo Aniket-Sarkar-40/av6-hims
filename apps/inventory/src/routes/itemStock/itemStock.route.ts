@@ -1,9 +1,16 @@
-import { exportItemStockExcel, getItemStock, getItemStockSummary } from "@/controllers/stock/itemStock.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+import {
+  exportItemStockExcel,
+  getItemStock,
+  getItemStockSummary,
+} from "@/controllers/stock/itemStock.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { Router } from "express";
 
-export const itemStockRouter = Router();
+export const itemStockRouter: Router = Router();
 
 /**
  * @swagger
@@ -30,8 +37,8 @@ export const itemStockRouter = Router();
 itemStockRouter.post(
   "/summary",
   verifyToken,
-  authorize(getPermission("ITEM_STOCK_SUMMARY", "VIEW")),
-  getItemStockSummary
+  authorize(getPermission("INV", "ITEM_STOCK_SUMMARY", "VIEW")),
+  getItemStockSummary,
 );
 /**
  * @swagger
@@ -48,7 +55,12 @@ itemStockRouter.post(
  *           schema:
  *             $ref: '#/components/itemStockSchema'
  */
-itemStockRouter.post("/", verifyToken, authorize(getPermission("ITEM_STOCK", "VIEW")), getItemStock);
+itemStockRouter.post(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
+  getItemStock,
+);
 
 /**
  * @swagger
@@ -69,6 +81,6 @@ itemStockRouter.post("/", verifyToken, authorize(getPermission("ITEM_STOCK", "VI
 itemStockRouter.post(
   "/export-excel",
   verifyToken,
-  authorize(getPermission("ITEM_STOCK", "VIEW")),
-  exportItemStockExcel
+  authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
+  exportItemStockExcel,
 );

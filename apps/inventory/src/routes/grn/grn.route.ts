@@ -1,10 +1,22 @@
-import { createGrn, deleteGrn, getAllGrn, getGrnById, printGrnById, updateGrn } from "@/controllers/grn/grn.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateGrn, validateGrnUpdate } from "@/validations/request/grn/grn.validation";
+import {
+  createGrn,
+  deleteGrn,
+  getAllGrn,
+  getGrnById,
+  updateGrn,
+} from "@/controllers/grn/grn.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  validateGrn,
+  validateGrnUpdate,
+} from "@/validations/request/grn/grn.validation.js";
 import { Router } from "express";
 
-export const grnRouter = Router();
+export const grnRouter: Router = Router();
 
 /**
  * @swagger
@@ -28,7 +40,13 @@ export const grnRouter = Router();
  *           schema:
  *             $ref: '#/components/grnSchema'
  */
-grnRouter.post("/", verifyToken, authorize(getPermission("GRN", "CREATE")), validateGrn, createGrn);
+grnRouter.post(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "GRN", "CREATE")),
+  validateGrn,
+  createGrn,
+);
 
 /**
  * @swagger
@@ -39,7 +57,12 @@ grnRouter.post("/", verifyToken, authorize(getPermission("GRN", "CREATE")), vali
  *     security:
  *       - bearerAuth: []
  */
-grnRouter.get("/", verifyToken, authorize(getPermission("GRN", "VIEW")), getAllGrn);
+grnRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "GRN", "VIEW")),
+  getAllGrn,
+);
 
 /**
  * @swagger
@@ -55,7 +78,12 @@ grnRouter.get("/", verifyToken, authorize(getPermission("GRN", "VIEW")), getAllG
  *       '404':
  *         description: Type not found
  */
-grnRouter.get("/id", verifyToken, authorize(getPermission("GRN", "VIEW")), getGrnById);
+grnRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "GRN", "VIEW")),
+  getGrnById,
+);
 
 /**
  * @swagger
@@ -82,9 +110,12 @@ grnRouter.get("/id", verifyToken, authorize(getPermission("GRN", "VIEW")), getGr
 grnRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("GRN", "VIEW"), getPermission("GRN", "UPDATE")),
+  authorize(
+    getPermission("INV", "GRN", "VIEW"),
+    getPermission("INV", "GRN", "UPDATE"),
+  ),
   validateGrnUpdate,
-  updateGrn
+  updateGrn,
 );
 
 /**
@@ -107,7 +138,12 @@ grnRouter.put(
  *           type: string
  *         description: The ID of the resource to delete.
  */
-grnRouter.delete("/", verifyToken, authorize(getPermission("GRN", "DELETE")), deleteGrn);
+grnRouter.delete(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "GRN", "DELETE")),
+  deleteGrn,
+);
 
 /**
  * @swagger
@@ -132,15 +168,9 @@ grnRouter.delete("/", verifyToken, authorize(getPermission("GRN", "DELETE")), de
 //   excelGrnReport
 // );
 
-/**
- * @swagger
- * /api/v1/grn/pdf:
- *   post:
- *     summary: Print Good Receive Note
- *     tags: [Good Receive Note]
- *     security:
- *       - bearerAuth: []
- */
-grnRouter.post("/pdf", verifyToken, authorize(getPermission("GRN_PDF", "VIEW")), printGrnById);
-
-grnRouter.delete("/", verifyToken, authorize(getPermission("GRN", "DELETE")), deleteGrn);
+grnRouter.delete(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "GRN", "DELETE")),
+  deleteGrn,
+);

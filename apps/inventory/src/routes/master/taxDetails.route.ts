@@ -1,10 +1,19 @@
-import { createTaxDetails, updateTaxDetails } from "@/controllers/master/taxDetails.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateTaxDetailsCreate, validateTaxDetailsUpdate } from "@/validations/request/master/taxDetails.validation";
+import {
+  createTaxDetails,
+  updateTaxDetails,
+} from "@/controllers/master/taxDetails.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  validateTaxDetailsCreate,
+  validateTaxDetailsUpdate,
+} from "@/validations/request/master/taxDetails.validation.js";
 import { Router } from "express";
 
-export const taxDetailsRouter = Router();
+export const taxDetailsRouter: Router = Router();
 
 /**
  * @swagger
@@ -31,9 +40,9 @@ export const taxDetailsRouter = Router();
 taxDetailsRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("TAX_DETAILS", "CREATE")),
+  authorize(getPermission("INV", "TAX_DETAILS", "CREATE")),
   validateTaxDetailsCreate,
-  createTaxDetails
+  createTaxDetails,
 );
 
 /**
@@ -61,7 +70,10 @@ taxDetailsRouter.post(
 taxDetailsRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("TAX_DETAILS", "VIEW"), getPermission("TAX_DETAILS", "UPDATE")),
+  authorize(
+    getPermission("INV", "TAX_DETAILS", "VIEW"),
+    getPermission("INV", "TAX_DETAILS", "UPDATE"),
+  ),
   validateTaxDetailsUpdate,
-  updateTaxDetails
+  updateTaxDetails,
 );

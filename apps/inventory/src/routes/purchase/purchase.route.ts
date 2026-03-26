@@ -3,14 +3,20 @@ import {
   getAllPurchase,
   getPurchaseById,
   updatePurchase,
-} from "@/controllers/purchase/purchase.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validatePurchase, validatePurchaseUpdate } from "@/validations/request/purchase/purchase.validation";
+} from "@/controllers/purchase/purchase.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  validatePurchase,
+  validatePurchaseUpdate,
+} from "@/validations/request/purchase/purchase.validation.js";
 
 import { Router } from "express";
 
-export const purchaseRouter = Router();
+export const purchaseRouter: Router = Router();
 
 /**
  * @swagger
@@ -37,9 +43,9 @@ export const purchaseRouter = Router();
 purchaseRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("PURCHASE_ORDER", "CREATE")),
+  authorize(getPermission("INV", "PURCHASE_ORDER", "CREATE")),
   validatePurchase,
-  createPurchase
+  createPurchase,
 );
 
 /**
@@ -51,7 +57,12 @@ purchaseRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-purchaseRouter.get("/", verifyToken, authorize(getPermission("PURCHASE_ORDER", "VIEW")), getAllPurchase);
+purchaseRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
+  getAllPurchase,
+);
 
 /**
  * @swagger
@@ -67,7 +78,12 @@ purchaseRouter.get("/", verifyToken, authorize(getPermission("PURCHASE_ORDER", "
  *       '404':
  *         description: Type not found
  */
-purchaseRouter.get("/id", verifyToken, authorize(getPermission("PURCHASE_ORDER", "VIEW")), getPurchaseById);
+purchaseRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
+  getPurchaseById,
+);
 
 /**
  * @swagger
@@ -94,9 +110,12 @@ purchaseRouter.get("/id", verifyToken, authorize(getPermission("PURCHASE_ORDER",
 purchaseRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("PURCHASE_ORDER", "VIEW"), getPermission("PURCHASE_ORDER", "UPDATE")),
+  authorize(
+    getPermission("INV", "PURCHASE_ORDER", "VIEW"),
+    getPermission("INV", "PURCHASE_ORDER", "UPDATE"),
+  ),
   validatePurchaseUpdate,
-  updatePurchase
+  updatePurchase,
 );
 
 /**

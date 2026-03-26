@@ -1,6 +1,5 @@
 import {
   mapRowToItemSupplierMapImportExcelInput,
-  toAllItemSupplierMapDTO,
   toItemSupplierMapDTO,
 } from "@/mapper/itemSupplierMap/itemSupplierMap.mapper.js";
 import {
@@ -41,8 +40,9 @@ export const itemSupplierMapService = {
     logger.info("entering::createItemSupplierMap::service");
     await createItemSupplierMapServiceValidation(input);
     const ItemSupplierMap = await createItemSupplierMapInDb(input);
+    const itemSupplierMapDTO = await toItemSupplierMapDTO([ItemSupplierMap]);
     logger.info("exiting::createItemSupplierMap::service");
-    return toItemSupplierMapDTO(ItemSupplierMap);
+    return itemSupplierMapDTO[0];
   },
   async updateItemSupplierMap(
     input: ItemSupplierMapUpdateInput,
@@ -50,8 +50,11 @@ export const itemSupplierMapService = {
     logger.info("entering::updateItemSupplierMap::service");
     await updateItemSupplierMapServiceValidation(input);
     const updatedItemSupplierMap = await updateItemSupplierMapInDb(input);
+    const itemSupplierMapDTO = await toItemSupplierMapDTO([
+      updatedItemSupplierMap,
+    ]);
     logger.info("exiting::updateItemSupplierMap::service");
-    return toItemSupplierMapDTO(updatedItemSupplierMap);
+    return itemSupplierMapDTO[0];
   },
   async getAllItemSupplierMap(
     canNullReturnable: boolean = false,
@@ -67,7 +70,7 @@ export const itemSupplierMapService = {
         );
       else return [];
     }
-    return toAllItemSupplierMapDTO(itemSupplierMap);
+    return toItemSupplierMapDTO(itemSupplierMap);
   },
   async getItemSupplierMapById(
     id: number,
@@ -87,7 +90,8 @@ export const itemSupplierMapService = {
     }
 
     logger.info("exiting::getItemSupplierMapById::service");
-    return toItemSupplierMapDTO(itemSupplierMap);
+    const itemSupplierMapDTO = await toItemSupplierMapDTO([itemSupplierMap]);
+    return itemSupplierMapDTO[0];
   },
   async deleteItemSupplierMapById(id: number): Promise<void> {
     logger.info("entering::deleteItemSupplierMapById::service");

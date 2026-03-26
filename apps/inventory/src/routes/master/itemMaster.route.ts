@@ -8,21 +8,24 @@ import {
   itemExcelSampleExport,
   itemSearch,
   updateItemMaster,
-} from "@/controllers/master/itemMaster.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { createUploadFieldsMiddleware } from "@/middlewares/imageUpload.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateBulkItemSupplierPrices } from "@/validations/request/itemSupplierMap/itemSupplierMap.validation";
+} from "@/controllers/master/itemMaster.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { createUploadFieldsMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { validateBulkItemSupplierPrices } from "@/validations/request/itemSupplierMap/itemSupplierMap.validation.js";
 import {
   validateGetItem,
   validateItemMasterCreate,
   validateItemMasterUpdate,
   validateItemSearch,
   validateItemStock,
-} from "@/validations/request/master/itemMaster.validation";
+} from "@/validations/request/master/itemMaster.validation.js";
 import { Router } from "express";
 
-export const itemMasterRouter = Router();
+export const itemMasterRouter: Router = Router();
 
 /**
  * @swagger
@@ -49,10 +52,15 @@ export const itemMasterRouter = Router();
 itemMasterRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM", "CREATE")),
-  createUploadFieldsMiddleware("item", ["frontImage", "backImage", "leftSideImage", "rightSideImage"]),
+  authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
+  createUploadFieldsMiddleware("item", [
+    "frontImage",
+    "backImage",
+    "leftSideImage",
+    "rightSideImage",
+  ]),
   validateItemMasterCreate,
-  createItemMaster
+  createItemMaster,
 );
 
 /**
@@ -64,7 +72,12 @@ itemMasterRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-itemMasterRouter.put("/active", verifyToken, authorize(getPermission("ITEM", "CREATE")), ActiveItem);
+itemMasterRouter.put(
+  "/active",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
+  ActiveItem,
+);
 
 /**
  * @swagger
@@ -75,7 +88,12 @@ itemMasterRouter.put("/active", verifyToken, authorize(getPermission("ITEM", "CR
  *     security:
  *       - bearerAuth: []
  */
-itemMasterRouter.get("/", verifyToken, authorize(getPermission("ITEM", "VIEW")), getAllItemMaster);
+itemMasterRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
+  getAllItemMaster,
+);
 
 /**
  * @swagger
@@ -91,7 +109,13 @@ itemMasterRouter.get("/", verifyToken, authorize(getPermission("ITEM", "VIEW")),
  *       '404':
  *         description: Type not found
  */
-itemMasterRouter.post("/id", verifyToken, authorize(getPermission("ITEM", "VIEW")), validateGetItem, getItemMasterById);
+itemMasterRouter.post(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
+  validateGetItem,
+  getItemMasterById,
+);
 
 /**
  * @swagger
@@ -118,10 +142,18 @@ itemMasterRouter.post("/id", verifyToken, authorize(getPermission("ITEM", "VIEW"
 itemMasterRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM", "VIEW"), getPermission("ITEM", "UPDATE")),
-  createUploadFieldsMiddleware("item", ["frontImage", "backImage", "leftSideImage", "rightSideImage"]),
+  authorize(
+    getPermission("INV", "ITEM_MASTER", "VIEW"),
+    getPermission("INV", "ITEM_MASTER", "UPDATE"),
+  ),
+  createUploadFieldsMiddleware("item", [
+    "frontImage",
+    "backImage",
+    "leftSideImage",
+    "rightSideImage",
+  ]),
   validateItemMasterUpdate,
-  updateItemMaster
+  updateItemMaster,
 );
 
 /**
@@ -142,9 +174,9 @@ itemMasterRouter.put(
 itemMasterRouter.post(
   "/search",
   verifyToken,
-  authorize(getPermission("ITEM_SEARCH", "CREATE")),
+  authorize(getPermission("INV", "ITEM_SEARCH", "CREATE")),
   validateItemSearch,
-  itemSearch
+  itemSearch,
 );
 
 /**
@@ -175,9 +207,9 @@ itemMasterRouter.post(
 itemMasterRouter.post(
   "/items",
   verifyToken,
-  authorize(getPermission("ITEMS_SUP", "VIEW")),
+  authorize(getPermission("INV", "ITEMS_SUP", "VIEW")),
   validateBulkItemSupplierPrices,
-  getBulkItemSupplierPrices
+  getBulkItemSupplierPrices,
 );
 
 /**
@@ -198,9 +230,9 @@ itemMasterRouter.post(
 itemMasterRouter.post(
   "/stock",
   verifyToken,
-  authorize(getPermission("ITEM_BATCHES", "VIEW")),
+  authorize(getPermission("INV", "ITEM_BATCHES", "VIEW")),
   validateItemStock,
-  getItemStocksByItemId
+  getItemStocksByItemId,
 );
 
 /**
@@ -211,4 +243,9 @@ itemMasterRouter.post(
  *     tags: [Common]
  */
 // POST /export
-itemMasterRouter.post("/export", verifyToken, authorize(getPermission("ITEM", "CREATE")), itemExcelSampleExport);
+itemMasterRouter.post(
+  "/export",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
+  itemExcelSampleExport,
+);

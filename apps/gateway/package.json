@@ -6,6 +6,7 @@
     "@apps/opd": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
+    "@apps/inv": "workspace:*",
     "express": "^5.1.0"
   },
   "devDependencies": {
