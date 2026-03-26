@@ -186,24 +186,24 @@ export const printGrnReturnById = TryCatch(
     const base64Image = imageToBase64("public/images/logo.png");
 
     // 4) Render PDF
-    const pdfBuffer = await generatePDF(bodyTpl, {
-      grnReturn,
-      base64Image,
-      reportFor: "Good Receive Return",
-      clinicName: grnReturn?.warehouse?.name,
-      clinicAddress: grnReturn?.warehouse?.address,
-      clinicPhone: grnReturn?.warehouse?.phone,
-      clinicEmail: grnReturn?.warehouse?.email,
-    });
+    // const pdfBuffer = await generatePDF(bodyTpl, {
+    //   grnReturn,
+    //   base64Image,
+    //   reportFor: "Good Receive Return",
+    //   clinicName: grnReturn?.warehouse?.name,
+    //   clinicAddress: grnReturn?.warehouse?.address,
+    //   clinicPhone: grnReturn?.warehouse?.phone,
+    //   clinicEmail: grnReturn?.warehouse?.email,
+    // });
+
+    // TODO: Implement PDF generation logic
 
     // 5) Stream down
-    res
-      .status(200)
-      .set({
-        "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="good_receive_return.pdf"',
-      })
-      .send(pdfBuffer);
+    res.status(200).set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": 'attachment; filename="good_receive_return.pdf"',
+    });
+    // .send(pdfBuffer);
 
     logger.info("exiting::printGrnReturnById::controller");
   },

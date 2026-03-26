@@ -7,7 +7,6 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
 import path from "path";
-import { authService } from "@/services/auth.service.js";
 import { FileInfo } from "@repo/shared/types/global.js";
 
 const UPLOADS_BASE = path.resolve(process.cwd(), "uploads");
@@ -31,7 +30,7 @@ export const createPatients = TryCatch(async (req: Request, res: Response) => {
     }
   }
   const patients = await patientsService.createPatients(input);
-  await authService.uploadInsuranceImagesExt(fileInfos);
+  // await authService.uploadInsuranceImagesExt(fileInfos);
 
   const response = new BaseResponse(
     {
@@ -67,7 +66,7 @@ export const updatePatients = TryCatch(async (req: Request, res: Response) => {
   }
 
   const updated = await patientsService.updatePatients(Number(id), input);
-  await authService.uploadInsuranceImagesExt(fileInfos);
+  // await authService.uploadInsuranceImagesExt(fileInfos);
 
   logger.info("exiting::updatePatients::controller");
 

@@ -124,7 +124,7 @@ export const printGrnById = TryCatch(async (req: Request, res: Response) => {
   const base64Image = imageToBase64("public/images/logo.png");
 
   // 4) Render PDF
-  const pdfBuffer = await generatePDF(bodyTpl, {
+  /* const pdfBuffer = await generatePDF(bodyTpl, {
     grn,
     base64Image,
     reportFor: "Good Receive Note",
@@ -132,16 +132,16 @@ export const printGrnById = TryCatch(async (req: Request, res: Response) => {
     clinicAddress: grn?.warehouse?.address,
     clinicPhone: grn?.warehouse?.phone,
     clinicEmail: grn?.warehouse?.email,
-  });
+  }); */
+
+  // TODO: Implement PDF generation logic
 
   // 5) Stream down
-  res
-    .status(200)
-    .set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="good_receive.pdf"',
-    })
-    .send(pdfBuffer);
+  res.status(200).set({
+    "Content-Type": "application/pdf",
+    "Content-Disposition": 'attachment; filename="good_receive.pdf"',
+  });
+  // .send(pdfBuffer);
 
   logger.info("exiting::printGrnById::controller");
 });

@@ -1,5 +1,6 @@
 import {
   CalculationMethod,
+  DiscMethod,
   PercentageOrAmount,
   Prisma,
   RoundFormat,
@@ -25,7 +26,7 @@ export interface CalculationRes {
 
 export interface CalculationInput {
   amount: number;
-  discountMethod: PercentageOrAmount;
+  discountMethod: DiscMethod;
   discount: number;
   taxMethod: TAX_METHOD;
   tax: number;

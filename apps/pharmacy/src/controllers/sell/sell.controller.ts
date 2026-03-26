@@ -1,4 +1,3 @@
-import { externalService } from "@repo/client/service/external.service.js";
 import { TryCatch } from "@repo/platform";
 import { printService } from "@/services/print/print.service.js";
 import { sellService } from "@/services/sell/sell.service.js";
@@ -12,7 +11,7 @@ import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generatePDF } from "@repo/shared/utils/pdfGenerator.utils.js";
+// import { generatePDF } from "@repo/shared/utils/pdfGenerator.utils.js";
 import {
   generateErrorMessage,
   generateSuccessMessage,
@@ -20,6 +19,7 @@ import {
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
 import path from "path";
+import { externalService } from "@/config/service/external.service.js";
 
 export const createSell = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createSell::controller");
@@ -167,22 +167,24 @@ export const getSellPdfById = TryCatch(async (req: Request, res: Response) => {
   const base64Image = imageToBase64("public/images/logo.png");
 
   // Generate PDF buffer
-  const pdfBuffer = await generatePDF(bodyTpl, {
-    sell,
-    base64Image,
-    reportFor: "Sell Receipt",
-    clinicName: sell.cc.colName,
-    clinicAddress: sell.cc.address,
-    clinicPhone: sell.cc.phone,
-    clinicEmail: sell.cc.email,
-  });
+  // const pdfBuffer = await generatePDF(bodyTpl, {
+  //   sell,
+  //   base64Image,
+  //   reportFor: "Sell Receipt",
+  //   clinicName: sell.cc.colName,
+  //   clinicAddress: sell.cc.address,
+  //   clinicPhone: sell.cc.phone,
+  //   clinicEmail: sell.cc.email,
+  // });
+
+  // TODO: Implement PDF generation logic
 
   // Set headers for PDF download
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", "attachment; filename=sell-receipt.pdf");
 
   // Send the PDF buffer directly to the client (binary stream)
-  res.send(pdfBuffer); // This sends the buffer as binary content to the client
+  // res.send(pdfBuffer); // This sends the buffer as binary content to the client
 
   logger.info("exiting::getSellPdfById::controller");
 });

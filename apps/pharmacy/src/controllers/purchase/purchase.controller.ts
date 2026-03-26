@@ -7,7 +7,7 @@ import {
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generatePDF } from "@repo/shared/utils/pdfGenerator.utils.js";
+// import { generatePDF } from "@/utils/pdfGenerator.utils.js";
 import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
@@ -169,24 +169,24 @@ export const printPOById = TryCatch(async (req: Request, res: Response) => {
   const base64Image = imageToBase64("public/images/logo.png");
 
   // 4) Render PDF
-  const pdfBuffer = await generatePDF(bodyTpl, {
-    po,
-    base64Image,
-    reportFor: "Purchase Order",
-    clinicName: po?.warehouse?.collectionCenter?.colName,
-    clinicAddress: po?.warehouse?.collectionCenter?.address,
-    clinicPhone: po?.warehouse?.collectionCenter?.phone,
-    clinicEmail: po?.warehouse?.collectionCenter?.email,
-  });
+  // const pdfBuffer = await generatePDF(bodyTpl, {
+  //   po,
+  //   base64Image,
+  //   reportFor: "Purchase Order",
+  //   clinicName: po?.warehouse?.collectionCenter?.colName,
+  //   clinicAddress: po?.warehouse?.collectionCenter?.address,
+  //   clinicPhone: po?.warehouse?.collectionCenter?.phone,
+  //   clinicEmail: po?.warehouse?.collectionCenter?.email,
+  // });
+
+  // TODO: Implement PDF generation logic
 
   // 5) Stream down
-  res
-    .status(200)
-    .set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="purchase_order.pdf"',
-    })
-    .send(pdfBuffer);
+  res.status(200).set({
+    "Content-Type": "application/pdf",
+    "Content-Disposition": 'attachment; filename="purchase_order.pdf"',
+  });
+  // .send(pdfBuffer);
 
   logger.info("exiting::printPOById::controller");
 });

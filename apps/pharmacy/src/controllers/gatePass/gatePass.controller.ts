@@ -134,24 +134,26 @@ export const getGatePassPdfById = TryCatch(
     const base64Image = imageToBase64("public/images/logo.png");
 
     // Generate PDF buffer
-    const pdfBuffer = await generatePDF(bodyTpl, {
-      gatePass,
-      base64Image,
-      reportFor: "Gate Pass",
-      format: "A5",
-      landscape: true,
-      clinicName: gatePass.warehouse?.name,
-      clinicAddress: gatePass.warehouse?.address,
-      clinicPhone: gatePass.warehouse?.phone,
-      clinicEmail: gatePass.warehouse?.email,
-    });
+    // const pdfBuffer = await generatePDF(bodyTpl, {
+    //   gatePass,
+    //   base64Image,
+    //   reportFor: "Gate Pass",
+    //   format: "A5",
+    //   landscape: true,
+    //   clinicName: gatePass.warehouse?.name,
+    //   clinicAddress: gatePass.warehouse?.address,
+    //   clinicPhone: gatePass.warehouse?.phone,
+    //   clinicEmail: gatePass.warehouse?.email,
+    // });
+
+    // TODO: Implement PDF generation logic
 
     // Set headers for PDF download
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "attachment; filename=gate-pass.pdf");
 
     // Send the PDF buffer directly to the client (binary stream)
-    res.send(pdfBuffer); // This sends the buffer as binary content to the client
+    // res.send(pdfBuffer); // This sends the buffer as binary content to the client
 
     logger.info("exiting::getGatePassPdfById::controller");
   },

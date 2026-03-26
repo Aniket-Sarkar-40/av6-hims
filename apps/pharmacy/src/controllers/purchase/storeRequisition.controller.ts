@@ -11,7 +11,7 @@ import {
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generatePDF } from "@repo/shared/utils/pdfGenerator.utils.js";
+// import { generatePDF } from "@repo/shared/utils/pdfGenerator.utils.js";
 import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
@@ -251,24 +251,24 @@ export const storeRequisitionPdfById = TryCatch(
     const base64Image = imageToBase64("public/images/logo.png");
 
     // 4) Render PDF
-    const pdfBuffer = await generatePDF(bodyTpl, {
-      str,
-      base64Image,
-      reportFor: "Store Requisition",
-      clinicName: str?.warehouse?.name,
-      clinicAddress: str?.warehouse?.address,
-      clinicPhone: str?.warehouse?.phone,
-      clinicEmail: str?.warehouse?.email,
-    });
+    // const pdfBuffer = await generatePDF(bodyTpl, {
+    //   str,
+    //   base64Image,
+    //   reportFor: "Store Requisition",
+    //   clinicName: str?.warehouse?.name,
+    //   clinicAddress: str?.warehouse?.address,
+    //   clinicPhone: str?.warehouse?.phone,
+    //   clinicEmail: str?.warehouse?.email,
+    // });
+
+    // TODO: Implement PDF generation logic
 
     // 5) Stream down
-    res
-      .status(200)
-      .set({
-        "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="store_requisition.pdf"',
-      })
-      .send(pdfBuffer);
+    res.status(200).set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": 'attachment; filename="store_requisition.pdf"',
+    });
+    // .send(pdfBuffer);
 
     logger.info("exiting::storeRequisitionPdfById::controller");
   },

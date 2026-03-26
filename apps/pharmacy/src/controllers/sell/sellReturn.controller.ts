@@ -7,7 +7,7 @@ import {
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generatePDF } from "@repo/shared/utils/pdfGenerator.utils.js";
+// import { generatePDF } from "@repo/shared/utils/pdfGenerator.utils.js";
 import {
   generateErrorMessage,
   generateSuccessMessage,
@@ -205,15 +205,17 @@ export const getSellReturnPdfById = TryCatch(
     const base64Image = imageToBase64("public/images/logo.png");
 
     // Generate PDF buffer
-    const pdfBuffer = await generatePDF(bodyTpl, {
-      sellReturn,
-      base64Image,
-      reportFor: "Sell Return Receipt",
-      clinicName: sellReturn.cc.colName,
-      clinicAddress: sellReturn.cc.address,
-      clinicPhone: sellReturn.cc.phone,
-      clinicEmail: sellReturn.cc.email,
-    });
+    // const pdfBuffer = await generatePDF(bodyTpl, {
+    //   sellReturn,
+    //   base64Image,
+    //   reportFor: "Sell Return Receipt",
+    //   clinicName: sellReturn.cc.colName,
+    //   clinicAddress: sellReturn.cc.address,
+    //   clinicPhone: sellReturn.cc.phone,
+    //   clinicEmail: sellReturn.cc.email,
+    // });
+
+    // TODO: Implement PDF generation logic
 
     // Set headers for PDF download
     res.setHeader("Content-Type", "application/pdf");
@@ -223,7 +225,7 @@ export const getSellReturnPdfById = TryCatch(
     );
 
     // Send the PDF buffer directly to the client (binary stream)
-    res.send(pdfBuffer); // This sends the buffer as binary content to the client
+    // res.send(pdfBuffer); // This sends the buffer as binary content to the client
 
     logger.info("exiting::getSellReturnPdfById::controller");
   },
