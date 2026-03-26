@@ -1,4 +1,4 @@
-import { toIncomeEntity } from "@apps/pharmacy/src/mapper/consumerConnect/income.mapper.js";
+import { toIncomeEntity } from "@/mapper/consumerConnect/income.mapper.js";
 import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { CreateIncomeInput } from "@/types/consumerConnect/income.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";

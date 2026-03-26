@@ -25,6 +25,7 @@ import {
   TransferableStockInp,
   updateBatchExpiryInput,
 } from "@/types/stock/stock.js";
+import { itemService } from "@/services/item/item.service.js";
 
 export const validateIdStockAdjustment = async (
   id: number,

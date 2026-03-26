@@ -4,6 +4,8 @@ import { Request, Response, NextFunction } from "express";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { ExpenseInput } from "../../../types/consumerConnect/expense.js";
 import { getPattern } from "av6-core";
+import { toExpenseEntity } from "@/mapper/consumerConnect/expense.mapper.js";
+import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
 
 export const expenseSchema = Joi.object<ExpenseInput>({
   id: Joi.number().integer().positive().optional().messages({

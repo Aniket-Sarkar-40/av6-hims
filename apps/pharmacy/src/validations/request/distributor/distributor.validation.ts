@@ -1,3 +1,4 @@
+import { toDistributorEntity } from "@/mapper/distributor/distributor.mapper.js";
 import { DistributorImageFiles } from "@/types/distributor/distributor.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { getPattern } from "av6-core";

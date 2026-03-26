@@ -1,7 +1,7 @@
 import {
   toInsuranceEntity,
   toInsuranceUpdateEntity,
-} from "@apps/pharmacy/src/mapper/insurance/insurance.mapper.js";
+} from "@/mapper/insurance/insurance.mapper.js";
 import { InsuranceImage, InsuranceReq } from "@/types/insurance/insurance.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { InsuranceBusinessMapping } from "@repo/db/generated/prisma/client";

@@ -24,11 +24,11 @@ import {
 } from "@/types/sell/sell.js";
 import {
   CalculationMethod,
+  CoPaymentSource,
   INCLUDE_EXCLUDE,
   PaymentModePharmacy,
   SELL_STATUS,
-} from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime/library";
+} from "@repo/db/generated/prisma/client";
 import dayjs from "dayjs";
 import { validateIdInsurance } from "../insurance/insurance.service.validation.js";
 import { validateIdPatientsInsurance } from "../insurance/patientInsurance.service.validation.js";
@@ -44,6 +44,11 @@ import { DOC_DESG_ID } from "@repo/shared";
 import { applyRound } from "av6-utils";
 import { CalculationInput } from "@repo/platform/types/common.js";
 import { calculation } from "@/utils/commonCalculation.utils.js";
+import { externalService } from "@/config/service/external.service.js";
+import { ISO_DATE_FORMAT } from "@repo/shared/utils/constants.utils.js";
+import { Decimal } from "@repo/db/generated/prisma/internal/prismaNamespace.js";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { sellService } from "@/services/sell/sell.service.js";
 //Validate Id Sell
 export const validateIdSell = async (id: number) => {
   logger.info("entering::validateIdSell service::validation");
@@ -84,7 +89,7 @@ export const createSellServiceValidation = async (
       if (!isAllowed) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("CREDIT_LIMIT_EXCEEDED", "Corporate Client"),
+          generateErrorMessage("NOT_EXCEED", "Corporate Client"),
         );
       }
     }
@@ -234,7 +239,7 @@ export const createSellServiceValidation = async (
         : 0;
       item.coPayPaymentType = insurancePricing.paymentMode;
       item.coPayPaymentValue = insurancePricing.paymentValue;
-      item.coPaySource = "settings";
+      item.coPaySource = CoPaymentSource.SETTINGS;
     } else if (corporateClientPricing) {
       itemCoPay =
         corporateClientPaymentMode === INCLUDE_EXCLUDE.Exclude
@@ -242,7 +247,7 @@ export const createSellServiceValidation = async (
           : item.totalAmount;
       item.coPayPaymentType = PaymentModePharmacy.co_pay;
       item.coPayPaymentValue = new Decimal(100);
-      item.coPaySource = "settings";
+      item.coPaySource = CoPaymentSource.SETTINGS;
     }
 
     itemCoPay = applyRound(itemCoPay, roundFormat, precision);
