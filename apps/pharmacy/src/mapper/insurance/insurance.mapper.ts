@@ -174,7 +174,7 @@ export const toInsuranceDto = (
     : "",
 
   paymentMode: insurance.paymentMode,
-  insuranceType: insurance.insuranceType,
+  insuranceType: insurance.insuranceType as InsuranceType | null,
   pharmacyPaymentType: insurance.pharmacyPaymentType,
   pharmacyPaymentValue: insurance.pharmacyPaymentValue,
   opdPaymentValue: insurance.opdPaymentValue,

@@ -73,9 +73,9 @@ export interface PurchaseOrderDetailsDto extends Omit<
   distributor: Distributor | null;
   warehouse: PmsWarehouse | null;
   createdBy: EmployeeCache | null;
-  approvedByL1: EmployeeCache | null;
-  approvedByL2: EmployeeCache | null;
-  approvedByL3: EmployeeCache | null;
+  // approvedByL1: EmployeeCache | null;
+  // approvedByL2: EmployeeCache | null;
+  // approvedByL3: EmployeeCache | null;
 }
 
 export interface PurchaseOrderDTO {
@@ -88,7 +88,7 @@ export interface PurchaseOrderDTO {
   status: PO_STATUS;
   notes: string | null;
   currency: string | null;
-  storage: Storage | null;
+  storage: PmsStorage | null;
   paymentTerms?: string | null;
   isActive: boolean;
   createdBy: EmployeeCache | null;

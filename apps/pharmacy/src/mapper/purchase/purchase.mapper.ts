@@ -38,7 +38,7 @@ export const toPurchaseOrderDTO = async (
       )
     : null;
 
-  let storage: Storage | null = null;
+  let storage: PmsStorage | null = null;
   if (purchaseOrder.storageId != null) {
     storage = await storageService.getStorageById(
       purchaseOrder.storageId,
@@ -127,10 +127,12 @@ export const toPurchaseOrderDetailsDto = async (
   const staffs = await employeeService.getAllEmployeesWoDto();
   const items = await itemService.getAllItemWoDto();
 
-  const approvalActions = await getAllApprovalActDetails(
-    "PURCHASE_ORDER",
-    "PHARMACY",
-  );
+  // const approvalActions = await getAllApprovalActDetails(
+  //   "PURCHASE_ORDER",
+  //   "PHARMACY",
+  // );
+
+  // TODO: Implement approval actions logic
 
   return Promise.all(
     poDetails.map(async (poDet) => {
@@ -147,37 +149,39 @@ export const toPurchaseOrderDetailsDto = async (
         : null;
       const item = items.find((item) => item.id === poDet.itemId) ?? null;
 
-      const currApprovalActions = approvalActions.filter(
-        (act) => act.approvalInstance.subjectId === poDet.purchaseId,
-      );
+      // const currApprovalActions = approvalActions.filter(
+      //   (act) => act.approvalInstance.subjectId === poDet.purchaseId,
+      // );
 
-      const level1Action = currApprovalActions.find((act) => act.level === 1);
-      const level2Action = currApprovalActions.find((act) => act.level === 2);
-      const level3Action = currApprovalActions.find((act) => act.level === 3);
+      // const level1Action = currApprovalActions.find((act) => act.level === 1);
+      // const level2Action = currApprovalActions.find((act) => act.level === 2);
+      // const level3Action = currApprovalActions.find((act) => act.level === 3);
 
-      const level1Approver = level1Action?.actedBy
-        ? (staffs.find((st) => st.id === level1Action?.actedBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            level1Action?.actedBy,
-          )) ??
-          null)
-        : null;
+      // const level1Approver = level1Action?.actedBy
+      //   ? (staffs.find((st) => st.id === level1Action?.actedBy) ??
+      //     (await employeeService.getEmployeeByIdFrmCacheOrDb(
+      //       level1Action?.actedBy,
+      //     )) ??
+      //     null)
+      //   : null;
 
-      const level2Approver = level2Action?.actedBy
-        ? (staffs.find((st) => st.id === level2Action?.actedBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            level2Action?.actedBy,
-          )) ??
-          null)
-        : null;
+      // const level2Approver = level2Action?.actedBy
+      //   ? (staffs.find((st) => st.id === level2Action?.actedBy) ??
+      //     (await employeeService.getEmployeeByIdFrmCacheOrDb(
+      //       level2Action?.actedBy,
+      //     )) ??
+      //     null)
+      //   : null;
 
-      const level3Approver = level3Action?.actedBy
-        ? (staffs.find((st) => st.id === level3Action?.actedBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            level3Action?.actedBy,
-          )) ??
-          null)
-        : null;
+      // const level3Approver = level3Action?.actedBy
+      //   ? (staffs.find((st) => st.id === level3Action?.actedBy) ??
+      //     (await employeeService.getEmployeeByIdFrmCacheOrDb(
+      //       level3Action?.actedBy,
+      //     )) ??
+      //     null)
+      //   : null;
+
+      // TODO: Implement approval actions logic
 
       return {
         ...poDet,
@@ -185,9 +189,9 @@ export const toPurchaseOrderDetailsDto = async (
         distributor,
         warehouse,
         createdBy,
-        approvedByL1: level1Approver,
-        approvedByL2: level2Approver,
-        approvedByL3: level3Approver,
+        // approvedByL1: level1Approver,
+        // approvedByL2: level2Approver,
+        // approvedByL3: level3Approver,
       };
     }),
   );
