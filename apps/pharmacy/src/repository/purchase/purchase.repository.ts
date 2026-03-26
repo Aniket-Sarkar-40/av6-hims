@@ -1,4 +1,6 @@
 import { uinServiceFactory } from "@/config/core.config.js";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { emailConfigService } from "@/services/master/emailConfig.service.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import {
   CreatePurchaseOrderInput,

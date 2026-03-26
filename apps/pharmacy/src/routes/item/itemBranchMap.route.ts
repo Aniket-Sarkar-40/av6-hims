@@ -175,7 +175,7 @@ itemBranchRouter.post(
 itemBranchRouter.post(
   "/import",
   verifyToken,
-  createUploadMiddleware("excel", "excelFile"),
+  createUploadMiddleware("excelFile"),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
   branchItemMapExcelImport,
 );

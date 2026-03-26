@@ -7,10 +7,7 @@ import {
   toPublicImageUrl,
   toRelativeImagePath,
 } from "@repo/shared/utils/helper.utils.js";
-import {
-  InsuranceMaster,
-  InsuranceType,
-} from "@repo/db/generated/prisma/client";
+import { InsuranceMaster } from "@repo/db/generated/prisma/client";
 
 export const toInsuranceEntity = (
   insurance: InsuranceReq,
@@ -174,7 +171,7 @@ export const toInsuranceDto = (
     : "",
 
   paymentMode: insurance.paymentMode,
-  insuranceType: insurance.insuranceType as InsuranceType | null,
+  insuranceType: insurance.insuranceType,
   pharmacyPaymentType: insurance.pharmacyPaymentType,
   pharmacyPaymentValue: insurance.pharmacyPaymentValue,
   opdPaymentValue: insurance.opdPaymentValue,

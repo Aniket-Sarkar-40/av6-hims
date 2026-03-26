@@ -23,6 +23,8 @@ import {
   subInTransitStock,
 } from "../inTransitStock/inTransitStock.repository.js";
 import { Prisma } from "@repo/db/generated/prisma/client";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { emailConfigService } from "@/services/master/emailConfig.service.js";
 
 export const createStockTransfer = async (
   input: CreateItemStockTransferInput,

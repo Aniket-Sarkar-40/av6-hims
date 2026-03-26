@@ -12,6 +12,8 @@ import { customOmit } from "av6-core";
 import { addItemStock, subItemStock } from "../stock/stock.repository.js";
 import { API_TIMEOUT } from "@repo/shared";
 import { PmsGoodReceiveDetails } from "@repo/db/generated/prisma/client";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { emailConfigService } from "@/services/master/emailConfig.service.js";
 
 export const createGrnInDb = async (input: CreateGrnInput) => {
   logger.info("entering::createGrnInDb::repository");

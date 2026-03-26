@@ -41,7 +41,7 @@ expenseRouter.post(
   "/",
   verifyToken,
   authorize(getPermission("PMS", "EXPENSE_HEAD", "CREATE")),
-  createUploadMiddleware("expense", "documents"),
+  createUploadMiddleware("documents"),
   validateExpenseSchema,
   createExpense,
 );
@@ -116,7 +116,7 @@ expenseRouter.put(
     getPermission("PMS", "EXPENSE", "VIEW"),
     getPermission("PMS", "EXPENSE", "UPDATE"),
   ),
-  createUploadMiddleware("expense", "documents"),
+  createUploadMiddleware("documents"),
   validateExpenseSchema,
   updateExpense,
 );

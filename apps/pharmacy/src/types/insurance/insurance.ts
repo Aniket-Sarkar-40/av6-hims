@@ -1,7 +1,7 @@
 import {
   IncomeMaster,
   InsuranceMaster,
-  InsuranceType,
+  InsuranceTypeIns,
   InsurerStatus,
   PaymentModeInsurance,
   PaymentType,
@@ -35,7 +35,7 @@ export interface InsuranceReq {
   notificationConfig?: string | null;
   attachments?: string | null;
   paymentMode: PaymentModeInsurance | null;
-  insuranceType?: InsuranceType | null;
+  insuranceType?: InsuranceTypeIns | null;
   pharmacyPaymentType?: PaymentType | null;
   pharmacyPaymentValue?: Decimal | null;
   opdPaymentValue?: Decimal | null;

@@ -1,19 +1,6 @@
-import { db } from "@repo/db/client";
-import { commonCreateUpdateValidationMapping } from "@/mapper/commonValidation.mapper.js";
 import { dtoMapping } from "@/mapper/dtoMapping.js";
 import { mappingExport, mappingImport } from "@/mapper/excelMapping.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
-import * as prismaClient from "@repo/db/generated/prisma/client";
-import { commonService, NotificationEmitter, uinConfigService } from "av6-core";
-import {
-  envMode,
-  MASTER_TABLES,
-  REDIS_PREFIX,
-} from "@repo/shared/config/index.js";
-import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { db } from "@repo/db";
 import {
   addToCache,
   createCache,
@@ -21,7 +8,15 @@ import {
   getCacheById,
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { MASTER_TABLES, REDIS_PREFIX } from "@repo/shared";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { commonService, uinConfigService } from "av6-core";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
+import { PrismaClient } from "@repo/db/generated/prisma/client";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 
 export const commonServiceFactory = commonService({
   cacheAdapter: {
@@ -32,7 +27,7 @@ export const commonServiceFactory = commonService({
     addToCache: addToCache,
   },
   config: {
-    CACHE_KEY_NAME: "av6",
+    CACHE_KEY_NAME: "pms",
     REDIS_PREFIX: REDIS_PREFIX,
     MASTER_CACHE_KEY_NAME: "master",
     MASTER_KEY_MODELS: MASTER_TABLES,
@@ -45,7 +40,6 @@ export const commonServiceFactory = commonService({
   logger: logger,
   mapper: {
     dtoMapping: dtoMapping,
-    validationMapping: commonCreateUpdateValidationMapping,
     mappingExport: mappingExport,
     mappingImport: mappingImport,
   },
@@ -69,18 +63,7 @@ export const uinServiceFactory = uinConfigService({
     generateErrorMessage: generateErrorMessage,
   },
   logger: logger,
-  prisma: prismaClient,
+  prisma: PrismaClient,
   shortCode: SHORT_CODE.UIN_CONFIG,
   requestStorage: requestStorage,
-});
-
-export const notifier = new NotificationEmitter({
-  prisma: db,
-  logger,
-  envMode:
-    envMode.toLowerCase() === "production" ? "Production" : "Development",
-  helpers: {
-    ErrorHandler: ErrorHandler,
-    generateErrorMessage: generateErrorMessage,
-  },
 });

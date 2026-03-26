@@ -21,6 +21,7 @@ import {
   PmsOperation,
   Prisma,
 } from "@repo/db/generated/prisma/client";
+import { toStockEntity } from "@/mapper/stock/stockTransfer.mapper.js";
 
 type Tx = Prisma.TransactionClient;
 

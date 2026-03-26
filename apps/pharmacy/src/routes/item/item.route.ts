@@ -248,7 +248,7 @@ itemRouter.get(
 itemRouter.post(
   "/import",
   verifyToken,
-  createUploadMiddleware("excel", "excelFile"),
+  createUploadMiddleware("excelFile"),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
   itemExcelImport,
 );

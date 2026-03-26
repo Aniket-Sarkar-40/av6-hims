@@ -13,18 +13,21 @@ export const createInsuranceInDb = async (
   logger.info("entering::createInsurance::repository");
 
   const store = requestStorage.getStore();
+  const { id: _id, insuranceBusinessMapping, ...insuranceData } = data;
   const insurance = await db.insuranceMaster.create({
     data: {
-      ...data,
-      insuranceBusinessMapping: {
-        create: data.insuranceBusinessMapping?.map((ib) => ({
-          type: ib.type,
-          name: ib.name,
-          phone: ib.phone,
-          isDefault: ib.isDefault,
-          createdBy: store?.user?.id,
-        })),
-      },
+      ...insuranceData,
+      insuranceBusinessMapping: insuranceBusinessMapping
+        ? {
+            create: insuranceBusinessMapping.map((ib) => ({
+              type: ib.type,
+              name: ib.name,
+              phone: ib.phone,
+              isDefault: ib.isDefault,
+              createdBy: store?.user?.id,
+            })),
+          }
+        : undefined,
       createdBy: store?.user?.id,
     },
     include: {

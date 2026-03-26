@@ -45,7 +45,7 @@ incomeRouter.post(
   "/",
   verifyToken,
   authorize(getPermission("PMS", "INCOME_HEAD", "CREATE")),
-  createUploadMiddleware("income", "documents"),
+  createUploadMiddleware("documents"),
   validateIncome,
   createIncome,
 );
@@ -118,7 +118,7 @@ incomeRouter.put(
     getPermission("PMS", "INCOME_HEAD", "VIEW"),
     getPermission("PMS", "INCOME_HEAD", "UPDATE"),
   ),
-  createUploadMiddleware("income", "documents"),
+  createUploadMiddleware("documents"),
   validateUpdateIncome,
   updateIncome,
 );

@@ -13,6 +13,8 @@ import { RETURN_STS } from "@repo/db/generated/prisma/enums.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-core";
 import { subItemStock } from "../stock/stock.repository.js";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { emailConfigService } from "@/services/master/emailConfig.service.js";
 
 export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   logger.info("entering::createGrnReturnInDb::repository");

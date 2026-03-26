@@ -3,6 +3,7 @@ import { CreateDepartmentInput } from "@/types/staff/department.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { YesNoFlag } from "@repo/db/generated/prisma/enums.js";
 import { Department } from "@repo/db/generated/prisma/client";
+import { toDepartmentCreateData } from "@/mapper/staff/department.mapper.js";
 
 export const createDepartmentInDb = async (
   department: CreateDepartmentInput,

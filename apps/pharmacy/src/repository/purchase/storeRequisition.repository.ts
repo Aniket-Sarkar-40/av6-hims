@@ -24,6 +24,8 @@ import { db } from "@repo/db";
 import { PmsUinShortCode } from "@repo/db/generated/prisma/enums.js";
 import { API_TIMEOUT } from "@repo/shared";
 import { PmsRequisitionItemDetails } from "@repo/db/generated/prisma/client";
+import { emailConfigService } from "@/services/master/emailConfig.service.js";
+import { featureFlagService } from "@/services/feature/feature.service.js";
 
 export const createStoreRequisitionInDb = async (
   input: CreateStoreRequisitionInput,

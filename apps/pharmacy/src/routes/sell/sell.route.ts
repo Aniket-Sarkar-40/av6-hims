@@ -231,7 +231,7 @@ sellRouter.get("/sell-receipt", printReceiptBySellId);
  */
 sellRouter.post(
   "/stock-adjust",
-  authorizeCommonApproval(),
+  // authorizeCommonApproval(),
   validateSellStockAdjustmentInput,
   adjustSellStock,
 );

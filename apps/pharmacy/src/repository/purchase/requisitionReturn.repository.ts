@@ -21,6 +21,8 @@ import {
   subInTransitStock,
 } from "../inTransitStock/inTransitStock.repository.js";
 import { addItemStock, subItemStock } from "../stock/stock.repository.js";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { emailConfigService } from "@/services/master/emailConfig.service.js";
 
 export const createStoreRequisitionReturnInDb = async (
   input: CreateStoreRequisitionReturnInput,
