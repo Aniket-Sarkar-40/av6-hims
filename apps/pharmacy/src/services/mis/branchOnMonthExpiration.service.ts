@@ -29,7 +29,6 @@ import {
   Tooltip,
 } from "chart.js";
 
-import "chartjs-plugin-datalabels"; // ⬅ pulls in the module‑augmentation types
 import { toArrayBuffer } from "@repo/shared/utils/helper.utils.js";
 
 Chart.register(
