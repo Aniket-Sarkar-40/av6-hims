@@ -69,11 +69,15 @@ import { staffCollectionCenterRouter } from "./routes/staff/staffCollectionCente
 import stockAdjustmentRouter from "./routes/stock/stockAdjustment.route.js";
 import stockTransferRouter from "./routes/stock/stockTransfer.route.js";
 import { autoAlertRouter } from "./routes/master/autoAlert.route.js";
+import commonRouter from "./routes/common.route.js";
 
 export const pharmacyRouter: ExpressRouter = Router();
 
 // Cache
 pharmacyRouter.use("/cache", cacheRouter);
+
+// Common
+pharmacyRouter.use("/common", commonRouter);
 
 // Master
 pharmacyRouter.use("/master/med-compo", medCompoRouter);
