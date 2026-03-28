@@ -3,25 +3,10 @@ import { createCache } from "@repo/platform/cache/redis.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
 const tableWhereMap: Record<string, Record<string, unknown> | null> = {
-  // string "yes"
-  staffDesignation: { isActive: "yes" },
-  department: { isActive: "yes" },
-  incomeHead: { isActive: "yes" },
-  expenseHead: { isActive: "yes" },
-  emailConfig: { isActive: "yes" },
-  expense: { isActive: "yes" },
-
   // no isActive filter
   pmsDynamicShortCode: null,
   pmsWarehouse: null,
   pmsBranch: null,
-  country: null,
-
-  // string "true"
-  collectionCenter: { isActive: "true" },
-
-  // numeric 1
-  staff: { isActive: 1 },
 };
 
 export const fetchTableData = async (table: string) => {

@@ -9,7 +9,7 @@ export function createPharmacyApp(
   const app = express();
   setupPlatform(app);
   if (mode === "STANDALONE") {
-    app.use("/api/v1/pharmacy", pharmacyRouter);
+    app.use("/api/v1/pms", pharmacyRouter);
   } else {
     app.use("/", pharmacyRouter);
   }

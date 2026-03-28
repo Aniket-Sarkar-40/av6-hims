@@ -13,7 +13,7 @@ export const initializeCache = async (): Promise<void> => {
 
   logger.info("Initializing cache…");
   try {
-    const tablesToCache = await fetchTableData("opdDynamicShortCode");
+    const tablesToCache = await fetchTableData("pmsDynamicShortCode");
 
     setTimeout(async () => {
       for (const table of tablesToCache) {
@@ -58,7 +58,7 @@ export const loadCache = async (
     isCacheable: boolean;
   };
 
-  const dynamicShortCodes: DSCRow[] = await db.coreDynamicShortCode.findMany({
+  const dynamicShortCodes: DSCRow[] = await db.pmsDynamicShortCode.findMany({
     select: { shortCode: true, tableName: true, isCacheable: true },
   });
 

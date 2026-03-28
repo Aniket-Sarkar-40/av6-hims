@@ -93,6 +93,9 @@ importers:
       '@apps/opd':
         specifier: workspace:*
         version: link:../opd
+      '@apps/pharmacy':
+        specifier: workspace:*
+        version: link:../pharmacy
       '@repo/platform':
         specifier: workspace:*
         version: link:../../packages/platform

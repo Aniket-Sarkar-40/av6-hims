@@ -110,8 +110,6 @@ export enum PermissionResource {
 
   // PHARMACY
   STORE = "store",
-  INCOME_HEAD = "incomeHead",
-  EXPENSE_HEAD = "expenseHead",
   MEDICINE_UNIT = "medUnit",
   MEDICINE_CATEGORY = "medCategory",
   MEDICINE_DOSAGE = "medDosage",
@@ -124,7 +122,6 @@ export enum PermissionResource {
   MEDICINE_INSTRUCTIONS = "medInstruction",
   ITEM_BRANCH = "item-branch-price",
   ITEM_BRANCH_SELL = "item-branch-sell",
-  STORAGE = "storage",
   DISTRIBUTOR = "distributor",
   PURCHASE_ORDER_PDF = "purchase-pdf",
   GATE_PASS = "gatePass",
@@ -144,8 +141,6 @@ export enum PermissionResource {
   SELL_RETURN_EXCEL = "sellReturn-excel",
   SELL_RETURN = "sellReturn",
   SELL_RETURN_PDF = "sellReturn-pdf",
-  INCOME = "income",
-  EXPENSE = "expense",
   CUSTOMER = "customer",
   ITEM = "item",
   ITEM_DOSAGE_MAP = "item-dosage-map",
