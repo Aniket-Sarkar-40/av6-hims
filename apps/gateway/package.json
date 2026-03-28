@@ -3,10 +3,11 @@
   "version": "0.0.1",
   "dependencies": {
     "@apps/core": "workspace:*",
+    "@apps/inv": "workspace:*",
     "@apps/opd": "workspace:*",
+    "@apps/pharmacy": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
-    "@apps/inv": "workspace:*",
     "express": "^5.1.0"
   },
   "devDependencies": {

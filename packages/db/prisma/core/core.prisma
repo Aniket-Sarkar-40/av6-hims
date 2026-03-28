@@ -74,45 +74,51 @@ model Country {
     enShortName String? @map("en_short_name")
     nationality String? @map("nationality")
 
-    state       State[] // Relation to states
-    cities      City[] // Relation to cities
-    CountryCode CountryCode?
+    state         State[] // Relation to states
+    cities        City[] // Relation to cities
+    CountryCode   CountryCode?
+    pmsWarehouses PmsWarehouse[]
+    pmsBranches   PmsBranch[]
 
     @@map("countries")
 }
 
 model State {
-    id        Int       @id @default(autoincrement())
-    name      String
-    countryId Int       @map("country_id")
-    isActive  Boolean   @default(true) @map("is_active")
-    createdBy Int?      @map("created_by")
-    updatedBy Int?      @map("updated_by")
-    createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime  @updatedAt @map("updated_at")
-    deletedAt DateTime? @map("deleted_at")
-    deletedBy Int?      @map("deleted_by")
-    country   Country   @relation(fields: [countryId], references: [id])
-    cities    City[]
+    id            Int            @id @default(autoincrement())
+    name          String
+    countryId     Int            @map("country_id")
+    isActive      Boolean        @default(true) @map("is_active")
+    createdBy     Int?           @map("created_by")
+    updatedBy     Int?           @map("updated_by")
+    createdAt     DateTime       @default(now()) @map("created_at")
+    updatedAt     DateTime       @updatedAt @map("updated_at")
+    deletedAt     DateTime?      @map("deleted_at")
+    deletedBy     Int?           @map("deleted_by")
+    country       Country        @relation(fields: [countryId], references: [id])
+    cities        City[]
+    pmsWarehouses PmsWarehouse[]
+    pmsBranches   PmsBranch[]
 
     @@index([countryId], name: "state_country_id_idx")
     @@map("master_state")
 }
 
 model City {
-    id        Int       @id @default(autoincrement())
-    name      String
-    stateId   Int       @map("state_id")
-    countryId Int       @map("country_id")
-    isActive  Boolean   @default(true) @map("is_active")
-    createdBy Int?      @map("created_by")
-    updatedBy Int?      @map("updated_by")
-    createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime  @updatedAt @map("updated_at")
-    deletedAt DateTime? @map("deleted_at")
-    deletedBy Int?      @map("deleted_by")
-    state     State     @relation(fields: [stateId], references: [id])
-    country   Country   @relation(fields: [countryId], references: [id])
+    id            Int            @id @default(autoincrement())
+    name          String
+    stateId       Int            @map("state_id")
+    countryId     Int            @map("country_id")
+    isActive      Boolean        @default(true) @map("is_active")
+    createdBy     Int?           @map("created_by")
+    updatedBy     Int?           @map("updated_by")
+    createdAt     DateTime       @default(now()) @map("created_at")
+    updatedAt     DateTime       @updatedAt @map("updated_at")
+    deletedAt     DateTime?      @map("deleted_at")
+    deletedBy     Int?           @map("deleted_by")
+    state         State          @relation(fields: [stateId], references: [id])
+    country       Country        @relation(fields: [countryId], references: [id])
+    pmsWarehouses PmsWarehouse[]
+    pmsBranches   PmsBranch[]
 
     @@index([stateId], name: "city_state_id_idx")
     @@index([countryId], name: "city_countryId_id_idx")
@@ -204,6 +210,19 @@ model CollectionCenter {
     paymentTransactions        PaymentTransaction[]
     generalBillings            GeneralBilling[]
     generalBillPricing         GeneralBillPricing[]
+    pmsWarehouses              PmsWarehouse[]
+    pmsBranches                PmsBranch[]
+    stockTransferFrom          PmsStockTransfer[]         @relation(name: "From")
+    stockTransferTo            PmsStockTransfer[]         @relation(name: "To")
+    stockTransferCc            PmsStockTransfer[]         @relation(name: "cc")
+    pmsInTransitStockFrom      PmsInTransitStock[]        @relation(name: "From")
+    pmsInTransitStockTo        PmsInTransitStock[]        @relation(name: "To")
+    pmsSells                   PmsSell[]
+    pmsSellReturns             PmsSellReturn[]
+    approvalStepCCMappings     ApprovalStepCCMapping[]
+    approverMappings           ApproverMapping[]
+    printerSettings            PrinterSettings[]
+    stockAdjustments           StockAdjustment[]
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")
@@ -305,20 +324,26 @@ model Staff {
     // incentiveCalculationType     IncentiveCalculationType @default(STANDARD) @map("incentive_calculation_type")
     // isOpdConsultant              BinaryFlag               @default(false) @map("is_opd_consultant")
 
-    employee                  StaffMapping?
-    staffCollectionCenter     StaffCollectionCenter[]
-    notifications             Notification[]
-    doctorSchedule            DoctorSchedule[]
-    timeSlots                 TimeSlot[]
-    appointments              Appointment[]
-    patientReferToDoctors     PatientReferToDoctor[]
-    patientFollowUps          PatientFollowUp[]
-    chipsButtonMappings       ChipsButtonMapping[]
-    consultationNotesMappings ConsultationNotesMapping[]
-    testCategories            TestCategories[]
-    medicineTabs              MedicineTab[]
-    patientMedicines          PatientMedicine[]
-    paymentTransactions       PaymentTransaction[]
+    employee                   StaffMapping?
+    staffCollectionCenter      StaffCollectionCenter[]
+    notifications              Notification[]
+    doctorSchedule             DoctorSchedule[]
+    timeSlots                  TimeSlot[]
+    appointments               Appointment[]
+    patientReferToDoctors      PatientReferToDoctor[]
+    patientFollowUps           PatientFollowUp[]
+    chipsButtonMappings        ChipsButtonMapping[]
+    consultationNotesMappings  ConsultationNotesMapping[]
+    testCategories             TestCategories[]
+    medicineTabs               MedicineTab[]
+    patientMedicines           PatientMedicine[]
+    paymentTransactions        PaymentTransaction[]
+    pmsStoreRequisitions       PmsStoreRequisition[]
+    pmsStoreRequisitionReturns PmsStoreRequisitionReturn[]
+    pmsSells                   PmsSell[]
+    pmsSellReturns             PmsSellReturn[]
+    approverMappings           ApproverMapping[]
+    approvalActions            ApprovalAction[]
 
     @@map("staff")
 }
@@ -858,6 +883,8 @@ model Patient {
     consultationICDTenLists ConsultationICDTenList[]
     paymentTransactions     PaymentTransaction[]
     generalBillings         GeneralBilling[]
+    pmsSells                PmsSell[]
+    pmsSellReturns          PmsSellReturn[]
 
     @@index([patientUniqueId], name: "patient_unique_id")
     @@index([note], name: "note")
@@ -869,73 +896,104 @@ model Patient {
     @@map("patients")
 }
 
+model PatientInsurance {
+    id             Int           @id @default(autoincrement())
+    insurerId      Int           @map("insurer_id")
+    patientId      Int           @map("patient_id")
+    insuranceType  InsuranceType @map("insurance_type")
+    insurancePlan  String?       @map("insurance_plan") @db.VarChar(100)
+    policyNumber   String?       @map("policy_number") @db.VarChar(100)
+    relationship   String?       @db.VarChar(50)
+    issueDate      DateTime?     @map("issue_date") @db.Date
+    expireDate     DateTime?     @map("expire_date") @db.Date
+    cardFrontImage String?       @map("card_front_image") @db.VarChar(255)
+    cardBackImage  String?       @map("card_back_image") @db.VarChar(255)
+    createdBy      Int?          @map("created_by")
+    createdAt      DateTime      @default(now()) @map("created_at")
+    updatedAt      DateTime      @updatedAt @map("updated_at")
+
+    insurance        InsuranceMaster    @relation(fields: [insurerId], references: [id])
+    patient          Patient            @relation(fields: [patientId], references: [id])
+    patientProcedure PatientProcedure[]
+    appointments     Appointment[]
+    sell             PmsSell[]
+    SellReturn       PmsSellReturn[]
+
+    @@index([insurerId], name: "patient_insurance_insurer_id_idx")
+    @@index([patientId], name: "patient_insurance_patient_id_idx")
+    @@map("patients_insurance")
+}
+
 model ClientMaster {
-    id                            Int                      @id @default(autoincrement())
-    customerCode                  String                   @map("customer_code") @db.VarChar(50)
-    customerName                  String                   @map("customer_name") @db.VarChar(255)
-    contactNo                     String                   @map("contact_no") @db.VarChar(100)
-    email                         String                   @db.VarChar(255)
-    businessType1                 String?                  @map("business_type_1") @db.Char(10)
-    customerPlan1                 String?                  @map("customer_plan_1") @db.Char(100)
-    businessType                  BUSINESS_TYPE            @default(b2c) @map("business_type")
-    customerPlan                  CUSTOMER_PLAN            @default(postpaid) @map("customer_plan")
-    customerType                  Int?                     @map("customer_type")
-    isCashClient                  String?                  @map("is_cash_client") @db.Char(3)
-    creditAmt                     Decimal?                 @map("credit_amt") @db.Decimal(11, 2)
-    creditLimit                   String?                  @map("credit_limit") @db.VarChar(500)
-    asAdv                         Decimal?                 @map("as_adv") @db.Decimal(11, 2)
-    additionalCreditLimit         Decimal?                 @map("additional_credit_limit") @db.Decimal(10, 2)
-    creditPeriodInDays            String?                  @map("credit_period_in_days") @db.VarChar(10)
-    minInvoicePayment             String?                  @map("min_invoice_payment") @db.Char(10)
-    invoiceAgeing                 String?                  @map("invoice_ageing") @db.Char(10)
-    createdUser                   String?                  @map("created_user") @db.Char(100)
-    createdDate                   DateTime?                @map("created_date")
-    customerActiveFrom            DateTime?                @map("customer_active_from")
-    customerStatus                String?                  @map("customer_status") @db.Char(10)
-    status                        InsurerStatus            @default(active)
-    billEmail                     YesNoFlag                @default(no) @map("bill_email")
-    billSms                       YesNoFlag                @default(no) @map("bill_sms")
-    reportEmail                   YesNoFlag                @default(no) @map("report_email")
-    reportSms                     YesNoFlag                @default(no) @map("report_sms")
-    reportWithHeader              YesNoFlag                @default(no) @map("report_with_header")
-    logoImage                     String?                  @default("uploads/patient_images/no_image.png") @map("logo_image") @db.VarChar(255)
-    parentClientName              String?                  @map("parent_client_name") @db.VarChar(100)
-    adhaar                        String?                  @db.VarChar(100)
-    pan                           String?                  @db.VarChar(100)
-    gstNo                         String?                  @map("gst_no") @db.VarChar(100)
-    viewDashboard                 YesNoFlag                @default(yes) @map("view_dashboard")
-    viewRegistration              YesNoFlag                @default(yes) @map("view_registration")
-    viewServiceRate               String?                  @map("view_service_rate") @db.Char(3)
-    ccId                          Int?                     @map("cc_id")
-    isMaster                      MasterType?              @map("is_master")
-    reportMaxLimitToPrintDownload Int?                     @map("report_max_limit_to_print_download")
-    reportAllowPrintDownload      YesNoFlag                @default(no) @map("report_allow_print_download")
-    customeCustomerCode           String                   @map("custome_customer_code") @db.VarChar(255)
-    sapCode                       String?                  @map("sap_code") @db.VarChar(100)
-    prepaidThresholdAmount        Decimal                  @map("prepaid_threshold_amount") @db.Decimal(10, 0)
-    prepaidAccountBalance         Decimal                  @map("prepaid_account_balance") @db.Decimal(10, 0)
-    securityDepositAmount         Decimal                  @default(0.00) @map("security_deposit_amount") @db.Decimal(10, 2)
-    additionalCreditPeriodInDays  Int?                     @map("additional_credit_period_in_days")
-    statusChangeRemark            String?                  @map("status_change_remark") @db.VarChar(255)
-    billPrintEmailGrossNet        BillPrintEmailGrossNet   @default(gross) @map("bill_print_email_gross_net")
-    billPrint                     YesNoFlag                @default(yes) @map("bill_print")
-    billAddress                   String?                  @map("bill_address") @db.LongText
-    shiftAddress                  String?                  @map("shift_address") @db.LongText
-    uploadedDocuments             String?                  @map("uploaded_documents") @db.LongText
-    portalAccessConfig            String?                  @map("portal_access_config") @db.LongText
-    printConfig                   String?                  @map("print_config") @db.LongText
-    notificationConfig            String?                  @map("notification_config") @db.LongText
-    clientHead                    Int?                     @map("client_head")
-    odcCollectionCenterKey        String?                  @map("odc_collection_center_key") @db.VarChar(100)
-    odcOrganizationKey            String?                  @map("odc_organization_key") @db.VarChar(100)
-    odcInitial                    String?                  @map("odc_initial") @db.VarChar(100)
-    odcCode                       String?                  @map("odc_code") @db.VarChar(100)
-    attachments                   String?                  @db.LongText
-    parentClientId                Int?                     @map("parent_client_id")
+    id                            Int                             @id @default(autoincrement())
+    customerCode                  String                          @map("customer_code") @db.VarChar(50)
+    customerName                  String                          @map("customer_name") @db.VarChar(255)
+    contactNo                     String                          @map("contact_no") @db.VarChar(100)
+    email                         String                          @db.VarChar(255)
+    businessType1                 String?                         @map("business_type_1") @db.Char(10)
+    customerPlan1                 String?                         @map("customer_plan_1") @db.Char(100)
+    businessType                  BUSINESS_TYPE                   @default(b2c) @map("business_type")
+    customerPlan                  CUSTOMER_PLAN                   @default(postpaid) @map("customer_plan")
+    customerType                  Int?                            @map("customer_type")
+    isCashClient                  String?                         @map("is_cash_client") @db.Char(3)
+    creditAmt                     Decimal?                        @map("credit_amt") @db.Decimal(11, 2)
+    creditLimit                   String?                         @map("credit_limit") @db.VarChar(500)
+    asAdv                         Decimal?                        @map("as_adv") @db.Decimal(11, 2)
+    additionalCreditLimit         Decimal?                        @map("additional_credit_limit") @db.Decimal(10, 2)
+    creditPeriodInDays            String?                         @map("credit_period_in_days") @db.VarChar(10)
+    minInvoicePayment             String?                         @map("min_invoice_payment") @db.Char(10)
+    invoiceAgeing                 String?                         @map("invoice_ageing") @db.Char(10)
+    createdUser                   String?                         @map("created_user") @db.Char(100)
+    createdDate                   DateTime?                       @map("created_date")
+    customerActiveFrom            DateTime?                       @map("customer_active_from")
+    customerStatus                String?                         @map("customer_status") @db.Char(10)
+    status                        InsurerStatus                   @default(active)
+    billEmail                     YesNoFlag                       @default(no) @map("bill_email")
+    billSms                       YesNoFlag                       @default(no) @map("bill_sms")
+    reportEmail                   YesNoFlag                       @default(no) @map("report_email")
+    reportSms                     YesNoFlag                       @default(no) @map("report_sms")
+    reportWithHeader              YesNoFlag                       @default(no) @map("report_with_header")
+    logoImage                     String?                         @default("uploads/patient_images/no_image.png") @map("logo_image") @db.VarChar(255)
+    parentClientName              String?                         @map("parent_client_name") @db.VarChar(100)
+    adhaar                        String?                         @db.VarChar(100)
+    pan                           String?                         @db.VarChar(100)
+    gstNo                         String?                         @map("gst_no") @db.VarChar(100)
+    viewDashboard                 YesNoFlag                       @default(yes) @map("view_dashboard")
+    viewRegistration              YesNoFlag                       @default(yes) @map("view_registration")
+    viewServiceRate               String?                         @map("view_service_rate") @db.Char(3)
+    ccId                          Int?                            @map("cc_id")
+    isMaster                      MasterType?                     @map("is_master")
+    reportMaxLimitToPrintDownload Int?                            @map("report_max_limit_to_print_download")
+    reportAllowPrintDownload      YesNoFlag                       @default(no) @map("report_allow_print_download")
+    customeCustomerCode           String                          @map("custome_customer_code") @db.VarChar(255)
+    sapCode                       String?                         @map("sap_code") @db.VarChar(100)
+    prepaidThresholdAmount        Decimal                         @map("prepaid_threshold_amount") @db.Decimal(10, 0)
+    prepaidAccountBalance         Decimal                         @map("prepaid_account_balance") @db.Decimal(10, 0)
+    securityDepositAmount         Decimal                         @default(0.00) @map("security_deposit_amount") @db.Decimal(10, 2)
+    additionalCreditPeriodInDays  Int?                            @map("additional_credit_period_in_days")
+    statusChangeRemark            String?                         @map("status_change_remark") @db.VarChar(255)
+    billPrintEmailGrossNet        BillPrintEmailGrossNet          @default(gross) @map("bill_print_email_gross_net")
+    billPrint                     YesNoFlag                       @default(yes) @map("bill_print")
+    billAddress                   String?                         @map("bill_address") @db.LongText
+    shiftAddress                  String?                         @map("shift_address") @db.LongText
+    uploadedDocuments             String?                         @map("uploaded_documents") @db.LongText
+    portalAccessConfig            String?                         @map("portal_access_config") @db.LongText
+    printConfig                   String?                         @map("print_config") @db.LongText
+    notificationConfig            String?                         @map("notification_config") @db.LongText
+    clientHead                    Int?                            @map("client_head")
+    odcCollectionCenterKey        String?                         @map("odc_collection_center_key") @db.VarChar(100)
+    odcOrganizationKey            String?                         @map("odc_organization_key") @db.VarChar(100)
+    odcInitial                    String?                         @map("odc_initial") @db.VarChar(100)
+    odcCode                       String?                         @map("odc_code") @db.VarChar(100)
+    attachments                   String?                         @db.LongText
+    parentClientId                Int?                            @map("parent_client_id")
     patient                       Patient[]
     appointment                   Appointment[]
     opdClientMasterSetting        OpdClientMasterSetting[]
     patientProcedure              PatientProcedure[]
+    pmsSells                      PmsSell[]
+    pmsSellReturns                PmsSellReturn[]
+    pharmacyClientPaymentSettings PharmacyClientPaymentSettings[]
 
     @@map("client_master")
 }
@@ -985,6 +1043,9 @@ model InsuranceMaster {
     opdInsurerPaymentSetting OpdInsurerPaymentSetting[]
     appointment              Appointment[]
     patientProcedure         PatientProcedure[]
+    pmsSells                 PmsSell[]
+    pmsSellReturns           PmsSellReturn[]
+    insurerPaymentSettings   InsurerPaymentSettings[]
 
     @@map("insurer_master")
 }

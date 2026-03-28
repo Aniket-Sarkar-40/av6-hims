@@ -23,6 +23,7 @@
     "dev:gateway": "pnpm --filter @apps/gateway dev",
     "dev:inv": "pnpm --filter @apps/inv dev",
     "dev:opd": "pnpm --filter @apps/opd dev",
+    "dev:pms": "pnpm --filter @apps/pharmacy dev",
     "lint": "turbo run lint",
     "lint:monorepo": "sherif",
     "p:gen": "pnpm --filter @repo/db prisma:generate",

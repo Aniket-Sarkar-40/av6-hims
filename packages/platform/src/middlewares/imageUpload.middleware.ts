@@ -12,7 +12,8 @@ import { Service } from "@repo/shared/types/global.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { hetznerS3 } from "@repo/shared/config/hetznerS3.config.js";
 import { HETZNER_BUCKET, HETZNER_ENDPOINT } from "@repo/shared";
-
+import { logger } from "@/logging/logger.js";
+import fs from "fs";
 export const MAX_COUNT = 10;
 
 const ALLOWED = [
@@ -39,7 +40,7 @@ const ALLOWED = [
 export type AnyHandler = (
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => any;
 export type AnyHandlerArray = AnyHandler[];
 
@@ -49,7 +50,7 @@ export const createUploadMiddleware = (fieldName: string): AnyHandler => {
   const fileFilter = (
     req: Express.Request,
     file: Express.Multer.File,
-    cb: FileFilterCallback
+    cb: FileFilterCallback,
   ) => {
     if (ALLOWED.includes(file.mimetype)) {
       cb(null, true);
@@ -67,14 +68,14 @@ export const createUploadMiddleware = (fieldName: string): AnyHandler => {
 
 export const createUploadMiddlewareForCommon = (
   folder: string,
-  service: Service
+  service: Service,
 ) => {
   const storage = multer.memoryStorage();
 
   const fileFilter = (
     req: Express.Request,
     file: Express.Multer.File,
-    cb: FileFilterCallback
+    cb: FileFilterCallback,
   ) => {
     if (ALLOWED.includes(file.mimetype)) {
       cb(null, true);
@@ -97,7 +98,7 @@ export const createUploadMiddlewareForCommon = (
     (req: AuthRequest, res: Response, next: NextFunction) => {
       const fieldName = getFileAttrFromShortCode(
         service,
-        req.query.shortCode as string
+        req.query.shortCode as string,
       );
 
       const files = (req.files as Express.Multer.File[]) || [];
@@ -107,8 +108,8 @@ export const createUploadMiddlewareForCommon = (
         if (!matched) {
           return next(
             new Error(
-              `Missing file field "${fieldName}" for shortCode "${req.query.shortCode}"`
-            )
+              `Missing file field "${fieldName}" for shortCode "${req.query.shortCode}"`,
+            ),
           );
         }
 
@@ -126,14 +127,14 @@ export const createUploadMiddlewareForCommon = (
 
 export const createUploadMultiMiddleware = (
   folder: string,
-  fieldName: string
+  fieldName: string,
 ): AnyHandlerArray => {
   const storage = multer.memoryStorage();
 
   const fileFilter = (
     req: Express.Request,
     file: Express.Multer.File,
-    cb: FileFilterCallback
+    cb: FileFilterCallback,
   ) => {
     if (ALLOWED.includes(file.mimetype)) {
       cb(null, true);
@@ -157,11 +158,11 @@ export const createUploadMultiMiddleware = (
 function makeFileFilter(
   req: Express.Request,
   file: Express.Multer.File,
-  cb: FileFilterCallback
+  cb: FileFilterCallback,
 ) {
   if (!ALLOWED.includes(file.mimetype)) {
     return cb(
-      new ErrorHandler(400, "Only image, PDF, or Excel files are allowed!")
+      new ErrorHandler(400, "Only image, PDF, or Excel files are allowed!"),
     );
   }
   cb(null, true);
@@ -169,7 +170,7 @@ function makeFileFilter(
 
 export function createUploadFieldsMiddleware(
   folder: string,
-  fields: string[]
+  fields: string[],
 ): AnyHandlerArray {
   const upload = multer({
     storage: multer.memoryStorage(),
@@ -207,7 +208,7 @@ export function createUploadFieldsMiddleware(
               Key: key,
               Body: file.buffer,
               ContentType: file.mimetype,
-            })
+            }),
           );
 
           req.uploadedFiles.push({
@@ -227,3 +228,15 @@ export function createUploadFieldsMiddleware(
     },
   ];
 }
+
+export const deleteFileIfExists = (filePath: string): void => {
+  logger.info(`Deleting file: ${filePath}`);
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      logger.info(`Deleted file: ${filePath}`);
+    }
+  } catch (error) {
+    logger.error(`Error deleting file ${filePath}:`, error);
+  }
+};

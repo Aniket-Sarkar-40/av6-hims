@@ -6,6 +6,7 @@ enum VendorType {
 enum Action {
     ADDITION
     SUBTRACTION
+    UPDATE
 }
 
 enum Inv_Batch_Type {
@@ -96,6 +97,10 @@ enum Consumption_Status {
 
 enum EMAIL_TYPE {
     GENERAL
+    LOW_STOCK_ALERT
+    EXPIRED_ITEM_ALERT
+    EXPIRING_ITEM_ALERT
+    ERROR_ALERT
 }
 
 enum InvUinShortCode {

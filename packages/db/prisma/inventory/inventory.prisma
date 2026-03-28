@@ -918,8 +918,8 @@ model InvInTransitStock {
     deletedAt  DateTime? @map("deleted_at")
 
     item                InvItem                  @relation(fields: [itemId], references: [id])
-    from                CollectionCenter         @relation(name: "From", fields: [fromId], references: [id], map: "in_transit_stock_from_id_idx")
-    to                  CollectionCenter         @relation(name: "To", fields: [toId], references: [id], map: "in_transit_stock_item_id_idx")
+    from                CollectionCenter         @relation(name: "From", fields: [fromId], references: [id], map: "inv_in_transit_stock_from_id_idx")
+    to                  CollectionCenter         @relation(name: "To", fields: [toId], references: [id], map: "inv_in_transit_stock_to_id_idx")
     inTransitStockAudit InvInTransitStockAudit[]
 
     @@index([fromId], name: "in_transit_stock_from_id_idx")

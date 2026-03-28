@@ -1,0 +1,2355 @@
+model PmsDynamicShortCode {
+    id           Int      @id @default(autoincrement())
+    shortCode    String   @unique @map("short_code")
+    tableName    String   @map("table_name")
+    isDTO        Boolean  @default(false) @map("is_dto")
+    isCacheable  Boolean  @default(false) @map("is_cacheable")
+    isDropDown   Boolean  @default(false) @map("is_drop_down")
+    permission   String?
+    config       Json?    @map("config")
+    isSingleDto  Boolean  @default(true) @map("is_single_dto")
+    whereClause  Json?    @map("where_clause")
+    selectClause Json?    @map("select_clause")
+    createdBy    Int?     @map("created_by")
+    updatedBy    Int?     @map("updated_by")
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    @@map("pms_dynamic_short_code")
+}
+
+model PmsUINConfig {
+    id             Int                  @id @default(autoincrement())
+    shortCode      PmsUinShortCode      @map("short_code")
+    sequenceNo     BigInt               @default(0) @map("sequence_no")
+    seqResetDate   DateTime             @map("seq_reset_date") @db.Date
+    seqResetPolicy PMS_UIN_RESET_POLICY @default(no) @map("seq_reset_policy")
+    description    String?
+    uinSegments    Json                 @map("uin_segments")
+    isActive       Boolean              @default(true) @map("is_active")
+    createdBy      Int?                 @map("created_by")
+    updatedBy      Int?                 @map("updated_by")
+    createdAt      DateTime             @default(now()) @map("created_at")
+    updatedAt      DateTime             @updatedAt @map("updated_at")
+    deletedAt      DateTime?            @map("deleted_at")
+    deletedBy      Int?                 @map("deleted_by")
+
+    @@map("pms_uin_config")
+}
+
+model MedicineCompo {
+    id                      Int                          @id @default(autoincrement())
+    name                    String                       @map("med_compo_name")
+    description             String?
+    isActive                Boolean                      @default(true) @map("is_active")
+    createdBy               Int?                         @map("created_by")
+    updatedBy               Int?                         @map("updated_by")
+    createdAt               DateTime                     @default(now()) @map("created_at")
+    updatedAt               DateTime                     @updatedAt @map("updated_at")
+    item                    PmsItem[]
+    deletedAt               DateTime?                    @map("deleted_at")
+    deletedBy               Int?                         @map("deleted_by")
+    purchaseOrderDetails    PmsPurchaseOrderDetails[]
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+    sellDetails             PmsSellDetails[]
+    sellReturnDetails       PmsSellReturnDetails[]
+
+    @@map("pms_med_composition")
+}
+
+model MedicineUnit {
+    id                      Int                          @id @default(autoincrement())
+    name                    String
+    description             String?
+    isActive                Boolean                      @default(true) @map("is_active")
+    createdBy               Int?                         @map("created_by")
+    updatedBy               Int?                         @map("updated_by")
+    createdAt               DateTime                     @default(now()) @map("created_at")
+    updatedAt               DateTime                     @updatedAt @map("updated_at")
+    item                    PmsItem[]
+    deletedAt               DateTime?                    @map("deleted_at")
+    deletedBy               Int?                         @map("deleted_by")
+    purchaseOrderDetails    PmsPurchaseOrderDetails[]
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+    sellDetails             PmsSellDetails[]
+    sellReturnDetails       PmsSellReturnDetails[]
+
+    @@map("pms_med_unit")
+}
+
+model BoxSize {
+    id          Int       @id @default(autoincrement())
+    name        String
+    description String?
+    isActive    Boolean   @default(true) @map("is_active")
+    createdBy   Int?      @map("created_by")
+    updatedBy   Int?      @map("updated_by")
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+    deletedAt   DateTime? @map("deleted_at")
+    deletedBy   Int?      @map("deleted_by")
+    item        PmsItem[]
+
+    @@map("pms_box_size")
+}
+
+model MedCategory {
+    id                     Int       @id @default(autoincrement())
+    name                   String
+    description            String?
+    minMarginB2CPercentage Float     @default(0.00) @map("min_margin_b2c_percentage")
+    minMarginB2BPercentage Float     @default(0.00) @map("min_margin_b2b_percentage")
+    loyaltyPercentage      Float     @default(0.00) @map("loyalty_percentage")
+    isActive               Boolean   @default(true)
+    createdBy              Int?      @map("created_by")
+    updatedBy              Int?      @map("updated_by")
+    createdAt              DateTime  @default(now()) @map("created_at")
+    updatedAt              DateTime  @updatedAt @map("updated_at")
+    deletedAt              DateTime? @map("deleted_at")
+    deletedBy              Int?      @map("deleted_by")
+
+    item                    PmsItem[]
+    purchaseOrderDetails    PmsPurchaseOrderDetails[]
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+    sellDetails             PmsSellDetails[]
+    sellReturnDetails       PmsSellReturnDetails[]
+    branchCategoryMap       BranchCategoryMap[]
+
+    @@map("pms_med_category")
+}
+
+model MedType {
+    id          Int       @id @default(autoincrement())
+    name        String
+    description String?
+    isActive    Boolean   @default(true) @map("is_active")
+    createdBy   Int?      @map("created_by")
+    updatedBy   Int?      @map("updated_by")
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+    item        PmsItem[]
+
+    deletedAt               DateTime?                    @map("deleted_at")
+    deletedBy               Int?                         @map("deleted_by")
+    purchaseOrderDetails    PmsPurchaseOrderDetails[]
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+    sellDetails             PmsSellDetails[]
+    sellReturnDetails       PmsSellReturnDetails[]
+
+    @@map("pms_medicine_type")
+}
+
+model MedPackage {
+    id                      Int                          @id @default(autoincrement())
+    name                    String
+    description             String?
+    isActive                Boolean                      @default(true)
+    createdBy               Int?                         @map("created_by")
+    updatedBy               Int?                         @map("updated_by")
+    createdAt               DateTime                     @default(now()) @map("created_at")
+    updatedAt               DateTime                     @updatedAt @map("updated_at")
+    item                    PmsItem[]
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+
+    deletedAt            DateTime?                 @map("deleted_at")
+    deletedBy            Int?                      @map("deleted_by")
+    purchaseOrderDetails PmsPurchaseOrderDetails[]
+    sellDetails          PmsSellDetails[]
+    sellReturnDetails    PmsSellReturnDetails[]
+
+    @@map("pms_med_package")
+}
+
+model MedDrug {
+    id          Int       @id @default(autoincrement())
+    name        String
+    description String?
+    isActive    Boolean   @default(true)
+    createdBy   Int?      @map("created_by")
+    updatedBy   Int?      @map("updated_by")
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+    item        PmsItem[]
+
+    deletedAt               DateTime?                    @map("deleted_at")
+    deletedBy               Int?                         @map("deleted_by")
+    purchaseOrderDetails    PmsPurchaseOrderDetails[]
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+    sellDetails             PmsSellDetails[]
+    sellReturnDetails       PmsSellReturnDetails[]
+
+    @@map("pms_med_drug")
+}
+
+model Manufacture {
+    id          Int       @id @default(autoincrement())
+    name        String
+    description String?
+    isActive    Boolean   @default(true)
+    createdBy   Int?      @map("created_by")
+    updatedBy   Int?      @map("updated_by")
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+    item        PmsItem[]
+
+    deletedAt               DateTime?                    @map("deleted_at")
+    deletedBy               Int?                         @map("deleted_by")
+    purchaseOrderDetails    PmsPurchaseOrderDetails[]
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+    sellDetails             PmsSellDetails[]
+    sellReturnDetails       PmsSellReturnDetails[]
+
+    @@map("pms_manufacture")
+}
+
+model MedicineDosage {
+    id          Int      @id @default(autoincrement())
+    name        String
+    description String?
+    isActive    Boolean  @default(true)
+    createdBy   Int?     @map("created_by")
+    updatedBy   Int?     @map("updated_by")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    itemMedicineDosageMap ItemMedicineDosageMap[]
+
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("pms_medicine_dosage")
+}
+
+model MedicineInstruction {
+    id                 Int                  @id @default(autoincrement())
+    instructionName    String               @map("instruction_name") @db.LongText
+    isActive           Boolean              @default(true)
+    createdBy          Int?                 @map("created_by")
+    updatedBy          Int?                 @map("updated_by")
+    createdAt          DateTime             @default(now()) @map("created_at")
+    updatedAt          DateTime             @updatedAt @map("updated_at")
+    itemInstructionMap ItemInstructionMap[]
+
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("pms_medicine_instruction")
+}
+
+model PmsItem {
+    id Int @id @default(autoincrement())
+
+    itemNumber          String?        @map("item_number")
+    medicineName        String         @map("medicine_name")
+    medCategoryId       Int            @map("medicine_category_id")
+    storageId           Int?           @map("storage_id")
+    boxSizeId           Int?           @map("box_size_id")
+    medTypeId           Int            @map("medicine_type_id")
+    medCompId           Int            @map("medicine_composition_id")
+    medUnitId           Int            @map("medicine_unit_id")
+    manufacturerId      Int            @map("manufacturer_id")
+    minOrderDetails     String?        @map("min_order_details")
+    rackLocation        String?        @map("rack_location")
+    defaultDiscount     Decimal        @map("default_disc") @db.Decimal(13, 5)
+    defaultB2BDiscount  Decimal        @map("default_b2b_disc") @db.Decimal(13, 5)
+    isLockDiscount      Boolean        @default(false) @map("is_lock_disc")
+    isLockB2BDiscount   Boolean        @default(false) @map("is_lock_b2b_disc")
+    minStock            Int            @map("min_stock")
+    maxStock            Int            @map("max_stock")
+    tax                 Decimal        @map("tax") @db.Decimal(13, 5)
+    taxMethod           TAX_METHOD     @map("tax_method")
+    packSizeId          Int            @map("pack_size_id")
+    drugTypeId          Int            @map("drug_type_id")
+    isAllowLooseSale    Boolean        @default(false) @map("is_allow_loose_sale")
+    acceptOnlineOrder   Boolean        @default(true) @map("accept_online_order")
+    isReturnable        Boolean        @default(true) @map("is_returnable")
+    isSuggestionLock    Boolean        @default(false) @map("is_suggestion_lock")
+    cess                Float?
+    hsnCode             String?        @map("hsn_code")
+    status              PmsItemStatus  @default(AVAILABLE)
+    purchaseAmount      Decimal        @map("purchase_amount") @db.Decimal(13, 5)
+    saleAmount          Decimal        @map("sale_amount") @db.Decimal(13, 5)
+    remark              String?
+    onHoldSale          DateTime?      @map("on_hold_sale") @db.Date
+    medPackingType      PmsMedPackType @map("medicine_pack_type")
+    barcode             String?
+    itemAlias           String?        @map("item_alias")
+    tags                String?
+    insurancePercentage Decimal        @map("insurance_percentage") @db.Decimal(13, 5)
+    walkInPercentage    Decimal        @map("walk_in_percentage") @db.Decimal(13, 5)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    medCategory  MedCategory   @relation(fields: [medCategoryId], references: [id])
+    medType      MedType       @relation(fields: [medTypeId], references: [id])
+    medComp      MedicineCompo @relation(fields: [medCompId], references: [id])
+    medUnit      MedicineUnit  @relation(fields: [medUnitId], references: [id])
+    packSize     MedPackage    @relation(fields: [packSizeId], references: [id])
+    drugType     MedDrug       @relation(fields: [drugTypeId], references: [id])
+    manufacturer Manufacture   @relation(fields: [manufacturerId], references: [id])
+    storage      PmsStorage?   @relation(fields: [storageId], references: [id])
+    boxSize      BoxSize?      @relation(fields: [boxSizeId], references: [id])
+
+    itemImages                    ItemImages[]
+    itemMedicineDosageMap         ItemMedicineDosageMap[]
+    itemInstructionMap            ItemInstructionMap[]
+    purchaseOrderDetails          PmsPurchaseOrderDetails[]
+    medicineDistributorMap        MedicineDistributorMap[]
+    storeRequisitionDetails       PmsStoreRequisitionDetails[]
+    itemStock                     PmsItemStock[]
+    goodReceiveDetails            PmsGoodReceiveDetails[]
+    goodReceiveReturnDetails      PmsGoodReceiveReturnDetails[]
+    stockTransferDetails          PmsStockTransferDetails[]
+    requisitionItemDetails        PmsRequisitionItemDetails[]
+    sellDetails                   PmsSellDetails[]
+    sellReturnDetails             PmsSellReturnDetails[]
+    branchSellAmountMap           BranchItemMap[]
+    inTransitStock                PmsInTransitStock[]
+    storeRequisitionReturnDetails PmsStoreRequisitionReturnDetails[]
+    requisitionReturnItemDetails  PmsRequisitionReturnItemDetails[]
+
+    @@index([medCategoryId], name: "med_category_id_idx")
+    @@index([medCompId], name: "med_compo_id_idx")
+    @@index([medTypeId], name: "med_type_id_idx")
+    @@index([medUnitId], name: "med_unit_id_idx")
+    @@index([packSizeId], name: "pack_size_id_idx")
+    @@index([drugTypeId], name: "drug_type_id_idx")
+    @@index([manufacturerId], name: "manufacturer_id_idx")
+    @@index([storageId], name: "storage_id_idx")
+    @@index([boxSizeId], name: "item_box_size_id_idx")
+    @@map("pms_item")
+}
+
+model ItemMedicineDosageMap {
+    id Int @id @default(autoincrement())
+
+    itemId   Int @map("item_id")
+    dosageId Int @map("dosage_id")
+    qty      Int
+
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    item      PmsItem        @relation(fields: [itemId], references: [id])
+    medDosage MedicineDosage @relation(fields: [dosageId], references: [id])
+
+    @@unique([itemId, dosageId])
+    @@index([dosageId], name: "item_medicine_dosage_map_dosage_id_idx")
+    @@map("pms_item_dosage_map")
+}
+
+model ItemImages {
+    id Int @id @default(autoincrement())
+
+    name      IMAGE_NAME
+    url       String
+    isPrimary Boolean    @default(false) @map("is_primary")
+    itemId    Int        @map("item_id")
+
+    isActive  Boolean   @default(true)
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    item PmsItem @relation(fields: [itemId], references: [id])
+
+    @@index([itemId], name: "item_images_item_id_idx")
+    @@map("pms_item_images")
+}
+
+model PmsCustomer {
+    id                 Int       @id @default(autoincrement())
+    name               String
+    email              String
+    countryCode        String?   @map("country_code")
+    mobileNo           String    @map("mobile_no")
+    dob                DateTime
+    gender             PmsGender
+    address1           String    @map("address_1")
+    address2           String?   @map("address_2")
+    city               String?
+    pinCode            Int?      @map("pin_code")
+    lattitudeLongitude String?   @map("lattitude_longitude")
+    ghanaCardNo        String    @map("ghana_card_no")
+    tinNo              String?   @map("tin_no")
+    discount           Float?    @default(0)
+    createdBy          Int?      @map("created_by")
+    updatedBy          Int?      @map("updated_by")
+    isActive           Boolean   @default(true) @map("is_active")
+    createdAt          DateTime  @default(now()) @map("created_at")
+    updatedAt          DateTime? @updatedAt @map("updated_at")
+    deletedAt          DateTime? @map("deleted_at")
+    deletedBy          Int?      @map("deleted_by")
+
+    @@map("pms_customer")
+}
+
+model PmsWarehouse {
+    id                           Int                               @id
+    name                         String                            @map("name")
+    vatNo                        String                            @map("vat_no")
+    tinNo                        String                            @map("tin_no")
+    businessSubline              String?                           @map("business_subline_name")
+    contactPerson                String                            @map("contact_person")
+    countryCode                  String?                           @map("country_code")
+    phone                        String                            @map("phone")
+    countryId                    Int?                              @map("country_id")
+    cityId                       Int?                              @map("city_id")
+    stateId                      Int?                              @map("state_id")
+    email                        String                            @map("email")
+    address                      String                            @map("address")
+    area                         String?                           @map("area")
+    pinCode                      Int?                              @map("pin_code")
+    latitudeLongitude            String?                           @map("latitude_longitude")
+    isMain                       Boolean                           @default(false) @map("is_main")
+    isActive                     Boolean                           @default(true) @map("is_active")
+    createdBy                    Int?                              @map("created_by")
+    updatedBy                    Int?                              @map("updated_by")
+    createdAt                    DateTime                          @default(now()) @map("created_at")
+    updatedAt                    DateTime                          @updatedAt @map("updated_at")
+    deletedAt                    DateTime?                         @map("deleted_at")
+    deletedBy                    Int?                              @map("deleted_by")
+    country                      Country?                          @relation(fields: [countryId], references: [id])
+    city                         City?                             @relation(fields: [cityId], references: [id])
+    state                        State?                            @relation(fields: [stateId], references: [id])
+    collectionCenter             CollectionCenter                  @relation(fields: [id], references: [id])
+    purchaseOrder                PmsPurchaseOrder[]
+    storeRequisition             PmsStoreRequisition[]
+    goodReceive                  PmsGoodReceive[]
+    itemStock                    PmsItemStock[]
+    goodReceiveReturn            PmsGoodReceiveReturn[]
+    gatePass                     PmsGatePass[]
+    store                        Store[]
+    requisitionItemDetails       PmsRequisitionItemDetails[]
+    stockAdjustment              StockAdjustment[]
+    storeRequisitionReturn       PmsStoreRequisitionReturn[]
+    requisitionReturnItemDetails PmsRequisitionReturnItemDetails[]
+
+    @@index([countryId], name: "warehouse_country_id_idx")
+    @@index([cityId], name: "warehouse_city_id_idx")
+    @@index([stateId], name: "warehouse_state_id_idx")
+    @@map("pms_warehouse")
+}
+
+model Distributor {
+    id Int @id @default(autoincrement())
+
+    proInName      String  @map("pro_in_name")
+    proInEmail     String  @map("pro_in_email")
+    proCountryCode String? @map("pro_country_code")
+    proInPhone     String  @map("pro_in_phone")
+
+    dpName        String  @map("dp_name")
+    dpEmail       String  @map("dp_email")
+    dpCountryCode String? @map("dp_country_code")
+    dpPhone       String  @map("dp_phone")
+
+    posEmail             Boolean @default(false) @map("pos_email")
+    posPhoneNotification Boolean @default(false) @map("pos_phone_notification")
+    posWhatsapp          Boolean @default(false) @map("pos_whatsapp")
+    posSms               Boolean @default(false) @map("pos_sms")
+
+    grnEmail             Boolean @default(false) @map("grn_email")
+    grnPhoneNotification Boolean @default(false) @map("grn_phone_notification")
+    grnWhatsapp          Boolean @default(false) @map("grn_whatsapp")
+    grnSms               Boolean @default(false) @map("grn_sms")
+
+    returnEmail             Boolean @default(false) @map("return_email")
+    returnPhoneNotification Boolean @default(false) @map("return_phone_notification")
+    returnWhatsapp          Boolean @default(false) @map("return_whatsapp")
+    returnSms               Boolean @default(false) @map("return_sms")
+
+    billTo String? @map("bill_to") @db.Text
+    shipTo String? @map("ship_to") @db.Text
+
+    distLicNumber    String? @map("dist_lic_number")
+    distLicDocument  String? @map("dist_lic_document")
+    distAgreementDoc String? @map("dist_agreement_doc")
+    distGhanaDoc     String? @map("dist_ghana_doc")
+    distDrugDoc      String? @map("dist_drug_doc")
+
+    bankName             String  @map("bank_name")
+    bankAddress          String  @map("bank_address")
+    bankBranchName       String  @map("bank_branch_name")
+    swiftIfscCode        String  @map("swift_ifsc_code")
+    bankAccountNumber    String  @map("bank_account_number")
+    bankAccountType      String  @map("bank_account_type")
+    termAndCondition     String? @map("term_and_condition")
+    stockShipmentDetails String? @map("stock_shipment_details")
+    dueDate              Int     @map("due_date")
+
+    isActive                 Boolean                       @default(true) @map("is_active")
+    createdBy                Int?                          @map("created_by")
+    updatedBy                Int?                          @map("updated_by")
+    createdAt                DateTime                      @default(now()) @map("created_at")
+    updatedAt                DateTime                      @updatedAt @map("updated_at")
+    deletedAt                DateTime?                     @map("deleted_at")
+    deletedBy                Int?                          @map("deleted_by")
+    taxIdentificationDetails PmsTaxIdentificationDetails[]
+    purchaseOrder            PmsPurchaseOrder[]
+    medicineDistributorMap   MedicineDistributorMap[]
+    goodReceive              PmsGoodReceive[]
+    goodReceiveReturn        PmsGoodReceiveReturn[]
+    gatePass                 PmsGatePass[]
+
+    @@map("pms_distributor")
+}
+
+model PmsTaxIdentificationDetails {
+    id                     Int    @id @default(autoincrement())
+    distributorId          Int    @map("distributor_id")
+    taxIdentificationName  String @map("tax_identification_name")
+    taxIdentificationValue String @map("tax_identification_value")
+
+    isActive    Boolean     @default(true)
+    createdBy   Int?        @map("created_by")
+    updatedBy   Int?        @map("updated_by")
+    createdAt   DateTime    @default(now()) @map("created_at")
+    updatedAt   DateTime    @updatedAt @map("updated_at")
+    deletedAt   DateTime?   @map("deleted_at")
+    deletedBy   Int?        @map("deleted_by")
+    distributor Distributor @relation(fields: [distributorId], references: [id])
+
+    @@index([distributorId], name: "tax_identification_details_distributor_id_idx")
+    @@map("pms_tax_identification_details")
+}
+
+model PmsBranch {
+    id                Int     @id
+    name              String
+    vatNo             String  @map("gst_n")
+    tinNo             String
+    businessSubline   String? @map("business_subline")
+    pharmacistName    String  @map("pharmacist_name")
+    countryCode       String? @map("country_code")
+    phone             String
+    email             String
+    address           String
+    area              String?
+    pinCode           Int?    @map("pin_code")
+    countryId         Int?    @map("country_id")
+    cityId            Int?    @map("city_id")
+    stateId           Int?    @map("state_id")
+    latitudeLongitude String? @map("latitude_longitude")
+    isMain            Boolean @default(false) @map("is_main")
+    isAutonomous      Boolean @default(false) @map("is_autonomous")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    country                        Country?                          @relation(fields: [countryId], references: [id])
+    city                           City?                             @relation(fields: [cityId], references: [id])
+    state                          State?                            @relation(fields: [stateId], references: [id])
+    collectionCenter               CollectionCenter                  @relation(fields: [id], references: [id])
+    storeRequisition               PmsStoreRequisition[]
+    itemStock                      PmsItemStock[]
+    store                          Store[]
+    requisitionItemDetails         PmsRequisitionItemDetails[]
+    branchSellAmountMap            BranchItemMap[]
+    pharmacyInsurerPaymentSettings InsurerPaymentSettings[]
+    pharmacyClientPaymentSettings  PharmacyClientPaymentSettings[]
+    branchCategoryMap              BranchCategoryMap[]
+    stockAdjustment                StockAdjustment[]
+    storeRequisitionReturn         PmsStoreRequisitionReturn[]
+    requisitionReturnItemDetails   PmsRequisitionReturnItemDetails[]
+
+    @@index([countryId], name: "branch_country_id_idx")
+    @@index([cityId], name: "branch_city_id_idx")
+    @@index([stateId], name: "branch_state_id_idx")
+    @@map("pms_branch")
+}
+
+model ItemInstructionMap {
+    id Int @id @default(autoincrement())
+
+    itemId        Int      @map("item_id")
+    instructionId Int      @map("instruction_id")
+    isActive      Boolean  @default(true)
+    createdBy     Int?     @map("created_by")
+    updatedBy     Int?     @map("updated_by")
+    createdAt     DateTime @default(now()) @map("created_at")
+    updatedAt     DateTime @updatedAt @map("updated_at")
+
+    item        PmsItem             @relation(fields: [itemId], references: [id])
+    instruction MedicineInstruction @relation(fields: [instructionId], references: [id])
+    deletedAt   DateTime?           @map("deleted_at")
+    deletedBy   Int?                @map("deleted_by")
+
+    @@unique([itemId, instructionId])
+    @@index([instructionId], name: "item_instruction_map_instruction_id_idx")
+    @@index([itemId], name: "item_instruction_map_item_id_idx")
+    @@map("pms_item_instruction_map")
+}
+
+model Store {
+    id          Int       @id @default(autoincrement())
+    name        String
+    stockCode   String?   @map("stock_code")
+    description String?
+    branchId    Int?      @map("branch_id")
+    wareHouseId Int?      @map("wearHouse_id")
+    isActive    Boolean   @default(true) @map("is_active")
+    createdBy   Int?      @map("created_by")
+    updatedBy   Int?      @map("updated_by")
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+    deletedAt   DateTime? @map("deleted_at")
+    deletedBy   Int?      @map("deleted_by")
+
+    branch    PmsBranch?    @relation(fields: [branchId], references: [id])
+    wareHouse PmsWarehouse? @relation(fields: [wareHouseId], references: [id])
+
+    @@index([branchId], name: "store_branch_id_idx")
+    @@index([wareHouseId], name: "store_warehouse_id_idx")
+    @@map("pms_store")
+}
+
+model PmsPurchaseOrder {
+    id            Int       @id @default(autoincrement())
+    poNumber      String    @map("po_number")
+    date          DateTime  @db.Date
+    distributorId Int       @map("distributor_id")
+    warehouseId   Int       @map("warehouse_id")
+    grandTotal    Decimal   @map("grand_total") @db.Decimal(13, 5)
+    status        PO_STATUS @default(SENT_FOR_APPROVAL)
+    notes         String?   @db.Text
+    currency      String?
+    storageId     Int?      @map("store_id")
+
+    paymentTerms         String?                   @db.Text
+    isActive             Boolean                   @default(true) @map("is_active")
+    createdBy            Int?                      @map("created_by")
+    updatedBy            Int?                      @map("updated_by")
+    deletedBy            Int?                      @map("deleted_by")
+    lastVerifiedBy       Int?                      @map("last_verified_by")
+    createdAt            DateTime                  @default(now()) @map("created_at")
+    updatedAt            DateTime                  @updatedAt @map("updated_at")
+    lastVerifiedAt       DateTime?                 @map("last_verified_at")
+    deletedAt            DateTime?                 @map("deleted_at")
+    distributor          Distributor               @relation(fields: [distributorId], references: [id])
+    warehouse            PmsWarehouse              @relation(fields: [warehouseId], references: [id])
+    storage              PmsStorage?               @relation(fields: [storageId], references: [id])
+    purchaseOrderDetails PmsPurchaseOrderDetails[]
+    goodReceive          PmsGoodReceive[]
+    goodReceiveReturn    PmsGoodReceiveReturn[]
+
+    @@index([distributorId], name: "purchase_order_distributor_id_idx")
+    @@index([warehouseId], name: "purchase_order_warehouse_id_idx")
+    @@index([storageId], name: "purchase_order_storage_id_idx")
+    @@map("pms_purchase_order")
+}
+
+model PmsPurchaseOrderDetails {
+    id              Int     @id @default(autoincrement())
+    uom             String? @map("unit_of_measure")
+    purchaseId      Int     @map("purchase_id")
+    itemId          Int     @map("item_id")
+    itemCategoryId  Int?    @map("item_cat_id")
+    itemMedCategory String  @map("item_medicine_category")
+
+    medType      String @map("medicine_type")
+    medComp      String @map("medicine_composition")
+    medUnit      String @map("medicine_unit")
+    manufacturer String @map("manufacturer")
+    packSize     String @map("pack_size")
+    drugType     String @map("drug_type")
+
+    medTypeId      Int @map("medicine_type_id")
+    medCompId      Int @map("medicine_composition_id")
+    medUnitId      Int @map("medicine_unit_id")
+    manufacturerId Int @map("manufacturer_Id")
+    packSizeId     Int @map("pack_size_id")
+    drugTypeId     Int @map("drug_type_id")
+
+    mrp            Decimal?  @db.Decimal(13, 5)
+    purchasedPrice Decimal   @map("purchased_price") @db.Decimal(13, 5)
+    packingQty     String?   @map("packing_qty")
+    quantity       Float     @map("quantity")
+    receivedQty    Float     @default(0) @map("received_qty")
+    totalAmount    Decimal   @map("total_amount") @db.Decimal(13, 5)
+    isActive       Boolean   @default(true) @map("is_active")
+    createdBy      Int?      @map("created_by")
+    updatedBy      Int?      @map("updated_by")
+    deletedBy      Int?      @map("deleted_by")
+    createdAt      DateTime  @default(now()) @map("created_at")
+    updatedAt      DateTime  @updatedAt @map("updated_at")
+    deletedAt      DateTime? @map("deleted_at")
+
+    item         PmsItem          @relation(fields: [itemId], references: [id])
+    purchase     PmsPurchaseOrder @relation(fields: [purchaseId], references: [id])
+    itemCategory MedCategory?     @relation(fields: [itemCategoryId], references: [id])
+    itemMedType  MedType          @relation(fields: [medTypeId], references: [id])
+    itemMedComp  MedicineCompo    @relation(fields: [medCompId], references: [id])
+    itemMedUnit  MedicineUnit     @relation(fields: [medUnitId], references: [id])
+    manufacture  Manufacture      @relation(fields: [manufacturerId], references: [id])
+    packageSize  MedPackage       @relation(fields: [packSizeId], references: [id])
+    medDrug      MedDrug          @relation(fields: [drugTypeId], references: [id])
+
+    @@index([packSizeId], name: "purchase_order_details_pack_size_id_idx")
+    @@index([medUnitId], name: "purchase_order_details_med_unit_id_idx")
+    @@index([itemId], name: "purchase_order_details_item_id_idx")
+    @@index([purchaseId], name: "purchase_order_details_purchase_id_idx")
+    @@index([itemCategoryId], name: "purchase_order_details_item_cat_id_idx")
+    @@index([medTypeId], name: "purchase_order_details_med_type_id_idx")
+    @@index([medCompId], name: "purchase_order_details_med_comp_id_idx")
+    @@index([manufacturerId], name: "purchase_order_details_manufacturer_id_idx")
+    @@index([drugTypeId], name: "purchase_order_details_drug_type_id_idx")
+    @@map("pms_po_details")
+}
+
+model MedicineDistributorMap {
+    id            Int         @id @default(autoincrement())
+    itemId        Int         @map("item_id")
+    distributorId Int         @map("distributor_id")
+    price         Float       @map("price")
+    expiryDate    DateTime?   @map("expiry_date") @db.Date
+    isActive      Boolean     @default(true) @map("is_active")
+    createdBy     Int?        @map("created_by")
+    updatedBy     Int?        @map("updated_by")
+    createdAt     DateTime    @default(now()) @map("created_at")
+    updatedAt     DateTime    @updatedAt @map("updated_at")
+    deletedAt     DateTime?   @map("deleted_at")
+    deletedBy     Int?        @map("deleted_by")
+    item          PmsItem     @relation(fields: [itemId], references: [id])
+    distributor   Distributor @relation(fields: [distributorId], references: [id])
+
+    @@index([itemId], name: "medicine_distributor_map_item_id_idx")
+    @@index([distributorId], name: "medicine_distributor_map_distributor_id_idx")
+    @@map("pms_medicine_distributor_map")
+}
+
+model PmsStoreRequisition {
+    id       Int    @id @default(autoincrement())
+    srNumber String @map("sr_number")
+
+    requisitionFrom   Int                  @map("req_from")
+    branchId          Int                  @map("branch_id")
+    warehouseId       Int                  @map("warehouse_id")
+    storeReqStatus    STORE_REQ_STATUS     @default(Pending) @map("store_req_status")
+    storeReqAckStatus STORE_REQ_ACK_STATUS @default(ACK_PENDING) @map("store_req_ack_status")
+    storeReqDetails   String?              @map("store_req_details") @db.Text
+    date              DateTime             @default(now())
+
+    isActive          Boolean   @default(true) @map("is_active")
+    createdBy         Int?      @map("created_by")
+    updatedBy         Int?      @map("updated_by")
+    deletedBy         Int?      @map("deleted_by")
+    approvedBy        Int?      @map("approved_by")
+    rejectBy          Int?      @map("reject_by")
+    createdAt         DateTime  @default(now()) @map("created_at")
+    updatedAt         DateTime  @updatedAt @map("updated_at")
+    deletedAt         DateTime? @map("deleted_at")
+    approvedAt        DateTime? @map("approved_at")
+    rejectAt          DateTime? @map("reject_at")
+    acknowledgementBy Int?      @map("acknowledgement_by")
+    acknowledgementAt DateTime? @map("acknowledgement_at")
+
+    storeRequisitionDetails PmsStoreRequisitionDetails[]
+
+    staff                  Staff                       @relation(fields: [requisitionFrom], references: [id])
+    warehouse              PmsWarehouse                @relation(fields: [warehouseId], references: [id])
+    branch                 PmsBranch                   @relation(fields: [branchId], references: [id])
+    requisitionItemDetails PmsRequisitionItemDetails[]
+    storeRequisitionReturn PmsStoreRequisitionReturn[]
+
+    @@index([requisitionFrom], name: "store_requisition_requisition_from_idx")
+    @@index([warehouseId], name: "store_requisition_warehouse_id_idx")
+    @@index([branchId], name: "store_requisition_to_branch_id_idx")
+    @@map("pms_store_requisition")
+}
+
+model PmsStoreRequisitionDetails {
+    id                 Int @id @default(autoincrement())
+    storeRequisitionId Int @map("store_requisition_id")
+
+    itemId Int @map("item_id")
+
+    itemCategoryName String @map("item_category")
+    medType          String @map("medicine_type")
+    medComp          String @map("medicine_composition")
+    medUnit          String @map("medicine_unit")
+    manufacturer     String @map("manufacturer")
+    packSize         String @map("pack_size")
+    drugType         String @map("drug_type")
+
+    itemCategoryId Int @map("item_category_id")
+    medTypeId      Int @map("medicine_type_id")
+    medCompId      Int @map("medicine_composition_id")
+    medUnitId      Int @map("medicine_unit_id")
+    manufacturerId Int @map("manufacturer_Id")
+    packSizeId     Int @map("pack_size_id")
+    drugTypeId     Int @map("drug_type_id")
+
+    reqQuantity          Float   @map("req_quantity")
+    assignedQuantity     Float   @default(0) @map("assigned_quantity")
+    acknowledgedQuantity Float   @default(0) @map("acknowledged_quantity")
+    returnedQuantity     Float   @default(0) @map("returned_quantity")
+    comment              String? @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    storeRequisition              PmsStoreRequisition                @relation(fields: [storeRequisitionId], references: [id])
+    item                          PmsItem                            @relation(fields: [itemId], references: [id])
+    itemCategory                  MedCategory?                       @relation(fields: [itemCategoryId], references: [id])
+    itemMedType                   MedType                            @relation(fields: [medTypeId], references: [id])
+    itemMedComp                   MedicineCompo                      @relation(fields: [medCompId], references: [id])
+    itemMedUnit                   MedicineUnit                       @relation(fields: [medUnitId], references: [id])
+    manufacture                   Manufacture                        @relation(fields: [manufacturerId], references: [id])
+    packageSize                   MedPackage                         @relation(fields: [packSizeId], references: [id])
+    medDrug                       MedDrug                            @relation(fields: [drugTypeId], references: [id])
+    requisitionItemDetails        PmsRequisitionItemDetails[]
+    storeRequisitionReturnDetails PmsStoreRequisitionReturnDetails[]
+
+    @@index([storeRequisitionId], name: "store_requisition_id_idx")
+    @@index([itemId], name: "item_id_idx")
+    @@index([itemCategoryId], name: "item_category_id_idx")
+    @@index([medTypeId], name: "med_type_id_idx")
+    @@index([medCompId], name: "med_comp_id_idx")
+    @@index([medUnitId], name: "med_unit_id_idx")
+    @@index([manufacturerId], name: "manufacturer_id_idx")
+    @@index([packSizeId], name: "pack_size_id_idx")
+    @@index([drugTypeId], name: "drug_type_id_idx")
+    @@map("pms_store_requisition_details")
+}
+
+model PmsRequisitionItemDetails {
+    id Int @id @default(autoincrement())
+
+    storeRequisitionId        Int @map("store_requisition_id")
+    storeRequisitionDetailsId Int @map("store_requisition_details_id")
+    itemStockId               Int @map("item_stock_id")
+    itemId                    Int @map("item_id")
+
+    assignedQty     Int       @map("assign_qty")
+    batchNo         String    @map("batch_no")
+    isFoc           Boolean   @map("is_foc")
+    expiryDate      DateTime? @map("expiry_date") @db.Date
+    acknowledgedQty Int       @default(0) @map("acknowledged_qty")
+    returnedQty     Int       @default(0) @map("returned_qty")
+
+    isCompleted Boolean @default(false) @map("is_completed")
+
+    ackCCId Int? @map("ack_cc_id")
+    ccId    Int  @map("cc_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    storeRequisition             PmsStoreRequisition               @relation(fields: [storeRequisitionId], references: [id])
+    storeRequisitionDetails      PmsStoreRequisitionDetails        @relation(fields: [storeRequisitionDetailsId], references: [id])
+    item                         PmsItem                           @relation(fields: [itemId], references: [id])
+    stock                        PmsItemStock                      @relation(fields: [itemStockId], references: [id])
+    warehouse                    PmsWarehouse                      @relation(fields: [ccId], references: [id])
+    branch                       PmsBranch?                        @relation(fields: [ackCCId], references: [id])
+    requisitionReturnItemDetails PmsRequisitionReturnItemDetails[]
+
+    @@index([storeRequisitionId], name: "store_requisition_id_idx")
+    @@index([storeRequisitionDetailsId], name: "store_requisition_details_id_idx")
+    @@index([itemId], name: "item_id_idx")
+    @@index([itemStockId], name: "item_stock_id_idx")
+    @@index([ccId], name: "warehouse_id_idx")
+    @@index([ackCCId], name: "branch_id_idx")
+    @@map("pms_requisition_item_details")
+}
+
+model PmsStoreRequisitionReturn {
+    id                 Int    @id @default(autoincrement())
+    srrNumber          String @map("srr_number")
+    storeRequisitionId Int    @map("store_requisition_id")
+
+    requisitionFrom Int @map("req_from")
+    branchId        Int @map("branch_id")
+    warehouseId     Int @map("warehouse_id")
+
+    returnStatus STORE_REQ_STATUS     @default(Pending) @map("return_status")
+    ackStatus    STORE_REQ_ACK_STATUS @default(ACK_PENDING) @map("ack_status")
+
+    returnReason  String?  @map("return_reason") @db.Text
+    returnDetails String?  @map("return_details") @db.Text
+    date          DateTime @default(now())
+
+    isActive          Boolean   @default(true) @map("is_active")
+    createdBy         Int?      @map("created_by")
+    updatedBy         Int?      @map("updated_by")
+    deletedBy         Int?      @map("deleted_by")
+    approvedBy        Int?      @map("approved_by")
+    rejectBy          Int?      @map("reject_by")
+    createdAt         DateTime  @default(now()) @map("created_at")
+    updatedAt         DateTime  @updatedAt @map("updated_at")
+    deletedAt         DateTime? @map("deleted_at")
+    approvedAt        DateTime? @map("approved_at")
+    rejectAt          DateTime? @map("reject_at")
+    acknowledgementBy Int?      @map("acknowledgement_by")
+    acknowledgementAt DateTime? @map("acknowledgement_at")
+
+    // relations
+    storeRequisition PmsStoreRequisition @relation(fields: [storeRequisitionId], references: [id], map: "fk_srr_store_requisition_id")
+    staff            Staff               @relation(fields: [requisitionFrom], references: [id], map: "fk_srr_req_from")
+    branch           PmsBranch           @relation(fields: [branchId], references: [id], map: "fk_srr_branch_id")
+    warehouse        PmsWarehouse        @relation(fields: [warehouseId], references: [id], map: "fk_srr_warehouse_id")
+
+    storeRequisitionReturnDetails PmsStoreRequisitionReturnDetails[]
+
+    @@index([storeRequisitionId], name: "srr_store_requisition_id_idx")
+    @@index([requisitionFrom], name: "srr_requisition_from_idx")
+    @@index([branchId], name: "srr_branch_id_idx")
+    @@index([warehouseId], name: "srr_warehouse_id_idx")
+    @@map("pms_store_requisition_return")
+}
+
+// ===== Details (item-level) =====
+model PmsStoreRequisitionReturnDetails {
+    id                        Int @id @default(autoincrement())
+    storeRequisitionReturnId  Int @map("store_requisition_return_id")
+    storeRequisitionDetailsId Int @map("store_requisition_details_id")
+
+    itemId Int @map("item_id")
+
+    requestedReturnQty    Float @map("requested_return_qty")
+    acknowledgedReturnQty Float @default(0) @map("acknowledged_return_qty")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    // relations (+ unique FK names)
+    storeRequisitionReturn  PmsStoreRequisitionReturn  @relation(fields: [storeRequisitionReturnId], references: [id], map: "fk_srrd_srr_id")
+    storeRequisitionDetails PmsStoreRequisitionDetails @relation(fields: [storeRequisitionDetailsId], references: [id], map: "fk_srrd_sr_id")
+    item                    PmsItem                    @relation(fields: [itemId], references: [id], map: "fk_srrd_item_id")
+
+    requisitionReturnItemDetails PmsRequisitionReturnItemDetails[] @relation("ReturnDetailsToReturnItems")
+
+    @@index([storeRequisitionReturnId], name: "srrd_store_requisition_return_id_idx")
+    @@index([storeRequisitionDetailsId], name: "srrd_store_requisition_details_id_idx")
+    @@index([itemId], name: "srrd_item_id_idx")
+    @@map("pms_store_requisition_return_details")
+}
+
+// ===== Lot/Batch-level =====
+model PmsRequisitionReturnItemDetails {
+    id Int @id @default(autoincrement())
+
+    storeRequisitionReturnDetailsId Int @map("store_requisition_return_details_id")
+    requisitionItemDetailsId        Int @map("requisition_item_details_id")
+
+    itemId Int @map("item_id")
+
+    returnQty       Int @map("return_qty")
+    acknowledgedQty Int @default(0) @map("acknowledged_qty")
+
+    batchNo    String    @map("batch_no")
+    isFoc      Boolean   @map("is_foc")
+    expiryDate DateTime? @map("expiry_date") @db.Date
+
+    comment String? @db.Text
+
+    isCompleted Boolean @default(false) @map("is_completed")
+
+    sourceBranchId         Int @map("source_branch_id")
+    destinationWarehouseId Int @map("destination_warehouse_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    // relations (+ unique FK names)
+    item                 PmsItem      @relation(fields: [itemId], references: [id], map: "fk_rrid_item_id")
+    sourceBranch         PmsBranch    @relation(fields: [sourceBranchId], references: [id], map: "fk_rrid_source_branch_id")
+    destinationWarehouse PmsWarehouse @relation(fields: [destinationWarehouseId], references: [id], map: "fk_rrid_dest_warehouse_id")
+
+    storeRequisitionReturnDetails PmsStoreRequisitionReturnDetails @relation(name: "ReturnDetailsToReturnItems", fields: [storeRequisitionReturnDetailsId], references: [id], map: "fk_rrid_srrd_id")
+    requisitionItemDetails        PmsRequisitionItemDetails        @relation(fields: [requisitionItemDetailsId], references: [id], map: "fk_rrid_orig_req_item_details_id")
+
+    @@index([requisitionItemDetailsId], name: "rrid_requisition_item_details_id_idx")
+    @@index([storeRequisitionReturnDetailsId], name: "rrid_store_requisition_return_details_id_idx")
+    @@index([itemId], name: "rrid_item_id_idx")
+    @@index([sourceBranchId], name: "rrid_source_branch_id_idx")
+    @@index([destinationWarehouseId], name: "rrid_destination_warehouse_id_idx")
+    @@map("pms_requisition_return_item_details")
+}
+
+model PmsGoodReceive {
+    id Int @id @default(autoincrement())
+
+    poNumber      String   @map("po_number")
+    grnNumber     String   @map("grn_number")
+    poId          Int      @map("po_id")
+    date          DateTime @db.Date
+    distributorId Int      @map("distributor_id")
+    warehouseId   Int      @map("warehouse_id")
+    totalAmount   Decimal  @map("total_amount") @db.Decimal(13, 5)
+
+    discount       Decimal    @default(0) @map("discount") @db.Decimal(13, 5)
+    discountMethod DiscMethod @map("discount_method")
+    netDiscount    Decimal    @map("net_discount") @db.Decimal(13, 5)
+    netTotal       Decimal    @map("net_total") @db.Decimal(13, 5)
+
+    paidAmount    Decimal        @default(0) @map("paid_amount") @db.Decimal(13, 5)
+    notes         String?        @db.Text
+    paymentStatus PAYMENT_STATUS @default(UNPAID) @map("payment_status")
+    status        GRN_STATUS     @default(COMPLETED) @map("status")
+
+    billNo         String?   @map("bill_no")
+    billDate       DateTime? @map("bill_date") @db.Date
+    dueDate        DateTime  @map("due_date") @db.Date
+    tax            Decimal   @default(0) @db.Decimal(13, 5)
+    netTax         Decimal   @map("net_tax") @db.Decimal(13, 5)
+    shipping       Decimal   @default(0) @db.Decimal(13, 5)
+    returnedAmount Decimal   @default(0) @db.Decimal(13, 5)
+    margin         Decimal   @default(0) @db.Decimal(13, 5)
+    gatePassId     Int       @map("gate_pass_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    po          PmsPurchaseOrder @relation(fields: [poId], references: [id])
+    distributor Distributor      @relation(fields: [distributorId], references: [id])
+    warehouse   PmsWarehouse     @relation(fields: [warehouseId], references: [id])
+    gatePass    PmsGatePass      @relation(fields: [gatePassId], references: [id], name: "GoodReceiveToGatePass")
+
+    goodReceiveDetails PmsGoodReceiveDetails[]
+    goodReceiveReturn  PmsGoodReceiveReturn[]
+
+    @@index([poId], name: "good_receive_po_id_idx")
+    @@index([distributorId], name: "good_receive_distributor_id_idx")
+    @@index([warehouseId], name: "good_receive_warehouse_id_idx")
+    @@index([gatePassId], name: "good_receive_gate_pass_id_idx")
+    @@map("pms_good_receive")
+}
+
+model PmsGoodReceiveDetails {
+    id            Int @id @default(autoincrement())
+    goodReceiveId Int @map("good_receive_id")
+    itemId        Int @map("item_id")
+
+    itemCategoryId  Int?       @map("item_cat_id")
+    itemMedCategory String     @map("item_medicine_category")
+    medType         String     @map("medicine_type")
+    medComp         String     @map("medicine_composition")
+    medUnit         String     @map("medicine_unit")
+    manufacturer    String     @map("manufacturer")
+    packSize        String     @map("pack_size")
+    drugType        String     @map("drug_type")
+    medTypeId       Int        @map("medicine_type_id")
+    medCompId       Int        @map("medicine_composition_id")
+    medUnitId       Int        @map("medicine_unit_id")
+    manufacturerId  Int        @map("manufacturer_Id")
+    packSizeId      Int        @map("pack_size_id")
+    drugTypeId      Int        @map("drug_type_id")
+    mrp             Decimal?   @db.Decimal(13, 5)
+    purchasedPrice  Decimal    @map("purchased_price") @db.Decimal(13, 5)
+    focQuantity     Float      @map("foc_quantity")
+    tax             Decimal    @default(0) @db.Decimal(13, 5)
+    netTax          Decimal    @map("net_tax") @db.Decimal(13, 5)
+    taxMethod       TAX_METHOD @map("tax_method")
+    batchNo         String     @map("batch_no")
+    expiryDate      DateTime?  @map("expiry_date") @db.Date
+    quantity        Float      @default(0)
+    returnQuantity  Float      @default(0) @map("return_quantity")
+    orderQuantity   Float      @default(0) @map("order_quantity")
+    totalAmount     Decimal    @map("total_amount") @db.Decimal(13, 5)
+    netAmount       Decimal    @map("net_amount") @db.Decimal(13, 5)
+    netDiscount     Decimal    @map("net_discount") @db.Decimal(13, 5)
+    discountMethod  DiscMethod @map("discount_method")
+    discount        Decimal?   @map("discount_amount") @db.Decimal(13, 5)
+    isActive        Boolean    @default(true) @map("is_active")
+    createdBy       Int?       @map("created_by")
+    updatedBy       Int?       @map("updated_by")
+    deletedBy       Int?       @map("deleted_by")
+    createdAt       DateTime   @default(now()) @map("created_at")
+    updatedAt       DateTime?  @updatedAt @map("updated_at")
+    deletedAt       DateTime?  @map("deleted_at")
+
+    goodReceive              PmsGoodReceive                @relation(fields: [goodReceiveId], references: [id])
+    item                     PmsItem                       @relation(fields: [itemId], references: [id])
+    goodReceiveReturnDetails PmsGoodReceiveReturnDetails[]
+
+    @@index([goodReceiveId], name: "good_receive_details_good_receive_id_idx")
+    @@index([itemId], name: "good_receive_details_item_id_idx")
+    @@map("pms_good_receive_details")
+}
+
+model PmsItemStock {
+    id Int @id @default(autoincrement())
+
+    itemId      Int       @map("item_id")
+    warehouseId Int?      @map("warehouse_id")
+    branchId    Int?      @map("branch_id")
+    quantity    Float     @default(0)
+    batchNo     String?   @map("batch_no")
+    expiryDate  DateTime? @map("expiry_date") @db.Date
+    isFoc       Boolean   @default(false) @map("is_foc")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedBy Int?      @map("deleted_by")
+    deletedAt DateTime? @map("deleted_at")
+
+    item                   PmsItem                     @relation(fields: [itemId], references: [id])
+    warehouse              PmsWarehouse?               @relation(fields: [warehouseId], references: [id])
+    branch                 PmsBranch?                  @relation(fields: [branchId], references: [id])
+    itemStockHistory       PmsItemStockAudit[]
+    requisitionItemDetails PmsRequisitionItemDetails[]
+
+    @@index([branchId], name: "item_stock_branch_id_idx")
+    @@index([itemId], name: "item_stock_item_id_idx")
+    @@index([warehouseId], name: "item_stock_warehouse_id_idx")
+    @@map("pms_item_stock")
+}
+
+model PmsItemStockAudit {
+    id Int @id @default(autoincrement())
+
+    itemStockId   Int          @map("item_stock_id")
+    quantity      Float        @default(0)
+    action        Action       @map("action")
+    operation     PmsOperation @map("operation")
+    refId         Int?         @map("ref_id")
+    refDetailsId  Int?         @map("ref_details_id")
+    refNo         String?      @map("ref_no")
+    refDate       DateTime?    @map("ref_date") @db.Date
+    refApprovedBy Int?         @map("ref_approved_by")
+    refApprovedAt DateTime?    @map("ref_approved_at") @db.Date
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedBy Int?      @map("updated_by")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedBy Int?      @map("deleted_by")
+    deletedAt DateTime? @map("deleted_at")
+
+    itemStock PmsItemStock @relation(fields: [itemStockId], references: [id])
+
+    @@index([itemStockId], name: "item_stock_history_item_stock_id_idx")
+    @@map("pms_item_stock_audit")
+}
+
+model PmsGoodReceiveReturn {
+    id             Int        @id @default(autoincrement())
+    grnId          Int        @map("grn_id")
+    poNumber       String     @map("po_number")
+    grnNumber      String     @map("grn_number")
+    poId           Int        @map("po_id")
+    date           DateTime   @db.Date
+    distributorId  Int        @map("distributor_id")
+    warehouseId    Int        @map("warehouse_id")
+    totalAmount    Decimal    @map("total_amount") @db.Decimal(13, 5)
+    discount       Decimal    @default(0) @map("discount") @db.Decimal(13, 5)
+    discountMethod DiscMethod @map("discount_method")
+    netDiscount    Decimal?   @map("net_discount") @db.Decimal(13, 5)
+
+    netTotal      Decimal        @map("net_total") @db.Decimal(13, 5)
+    paidAmount    Decimal        @default(0) @map("paid_amount") @db.Decimal(13, 5)
+    notes         String?        @db.Text
+    paymentStatus PAYMENT_STATUS @default(UNPAID) @map("payment_status")
+    status        RETURN_STS     @default(PENDING) @map("status")
+
+    billNo   String?   @map("bill_no")
+    billDate DateTime? @map("bill_date") @db.Date
+    dueDate  DateTime  @map("due_date") @db.Date
+    tax      Decimal   @default(0) @db.Decimal(13, 5)
+    netTax   Decimal   @map("net_tax") @db.Decimal(13, 5)
+    shipping Decimal   @default(0) @db.Decimal(13, 5)
+
+    creditNoteType String @map("credit_note_type")
+    creditNoteNo   Float  @map("credit_note_")
+
+    approvedBy Int?      @map("approved_by")
+    approveAt  DateTime? @map("approve_at")
+    isActive   Boolean   @default(true) @map("is_active")
+    createdBy  Int?      @map("created_by")
+    updatedBy  Int?      @map("updated_by")
+    deletedBy  Int?      @map("deleted_by")
+    rejectedBy Int?      @map("rejected_by")
+    createdAt  DateTime  @default(now()) @map("created_at")
+    updatedAt  DateTime? @updatedAt @map("updated_at")
+    deletedAt  DateTime? @map("deleted_at")
+    rejectedAt DateTime? @map("rejected_at")
+
+    grn                      PmsGoodReceive                @relation(fields: [grnId], references: [id])
+    po                       PmsPurchaseOrder              @relation(fields: [poId], references: [id])
+    distributor              Distributor                   @relation(fields: [distributorId], references: [id])
+    warehouse                PmsWarehouse                  @relation(fields: [warehouseId], references: [id])
+    goodReceiveReturnDetails PmsGoodReceiveReturnDetails[]
+
+    @@index([grnId], name: "good_receive_return_grn_id_idx")
+    @@index([poId], name: "good_receive_return_po_id_idx")
+    @@index([distributorId], name: "good_receive_return_distributor_id_idx")
+    @@index([warehouseId], name: "good_receive_return_warehouse_id_idx")
+    @@map("pms_good_receive_return")
+}
+
+model PmsGoodReceiveReturnDetails {
+    id              Int       @id @default(autoincrement())
+    grnReturnId     Int       @map("good_receive_return_id")
+    grnDetailId     Int       @map("good_receive_detail_id")
+    itemId          Int       @map("item_id")
+    itemCategoryId  Int?      @map("item_cat_id")
+    itemMedCategory String    @map("item_medicine_category")
+    batchNo         String    @map("batch_no")
+    expiryDate      DateTime? @map("expiry_date") @db.Date
+    totalAmount     Decimal   @map("total_amount") @db.Decimal(13, 5)
+
+    tax       Decimal    @default(0) @db.Decimal(13, 5)
+    netTax    Decimal    @map("net_tax") @db.Decimal(13, 5)
+    taxMethod TAX_METHOD @map("tax_method")
+
+    netAmount      Decimal    @map("net_amount") @db.Decimal(13, 5)
+    discountMethod DiscMethod @map("discount_method")
+    discount       Decimal?   @map("discount") @db.Decimal(13, 5)
+    netDiscount    Decimal    @map("net_Discount") @db.Decimal(13, 5)
+
+    quantity Float @default(0)
+    orderQty Float @map("order_quantity")
+    grnQty   Float @map("grn_qty")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    goodReceiveReturn PmsGoodReceiveReturn  @relation(fields: [grnReturnId], references: [id])
+    goodReceiveDetail PmsGoodReceiveDetails @relation(fields: [grnDetailId], references: [id])
+    item              PmsItem               @relation(fields: [itemId], references: [id])
+
+    @@index([grnReturnId], name: "good_receive_return_details_grn_return_id_idx")
+    @@index([itemId], name: "good_receive_return_details_item_id_idx")
+    @@index([grnDetailId], name: "good_receive_details_id_idx")
+    @@map("pms_good_receive_return_details")
+}
+
+model PmsStockTransfer {
+    id                  Int                    @id @default(autoincrement())
+    stockTransferNumber String                 @map("stock_transfer_number")
+    staffId             Int                    @map("staff_id")
+    ccId                Int                    @map("cc_id")
+    fromId              Int                    @map("from_id")
+    toId                Int                    @map("to_id")
+    date                DateTime               @db.Date
+    status              PMS_STR_STATUS         @default(CREATED)
+    returnStatus        PMS_STR_RETURN_STATUS? @map("return_status")
+    isActive            Boolean                @default(true) @map("is_active")
+    createdBy           Int?                   @map("created_by")
+    updatedBy           Int?                   @map("updated_by")
+    deletedBy           Int?                   @map("deleted_by")
+    approvedBy          Int?                   @map("approved_by")
+    acknowledgedBy      Int?                   @map("acknowledged_by")
+    returnApprovedBy    Int?                   @map("return_approved_by")
+    createdAt           DateTime               @default(now()) @map("created_at")
+    updatedAt           DateTime?              @updatedAt @map("updated_at")
+    deletedAt           DateTime?              @map("deleted_at")
+    approvedAt          DateTime?              @map("approved_at")
+    acknowledgedAt      DateTime?              @map("acknowledge_at")
+    returnApprovedAt    DateTime?              @map("return_approved_at")
+
+    stockTransferDetails PmsStockTransferDetails[]
+    from                 CollectionCenter          @relation(name: "From", fields: [fromId], references: [id], map: "tock_transfer_from_id_idx")
+    to                   CollectionCenter          @relation(name: "To", fields: [fromId], references: [id])
+    cc                   CollectionCenter          @relation(name: "cc", fields: [ccId], references: [id])
+
+    @@index([ccId], name: "stock_transfer_cc_id_idx")
+    @@index([fromId], name: "stock_transfer_from_id_idx")
+    @@index([toId], name: "stock_transfer_to_id_idx")
+    @@map("pms_stock_transfer")
+}
+
+model PmsStockTransferDetails {
+    id                   Int       @id @default(autoincrement())
+    stId                 Int       @map("st_id")
+    itemId               Int       @map("item_id")
+    batchNo              String    @map("batch_no")
+    isFoc                Boolean   @map("is_foc")
+    expiryDate           DateTime  @map("expiry_date") @db.Date
+    quantity             Float     @default(0)
+    acknowledgedQuantity Float     @default(0) @map("acknowledged_quantity")
+    returnQuantity       Float     @default(0) @map("return_quantity")
+    isActive             Boolean   @default(true) @map("is_active")
+    createdBy            Int?      @map("created_by")
+    updatedBy            Int?      @map("updated_by")
+    deletedBy            Int?      @map("deleted_by")
+    createdAt            DateTime  @default(now()) @map("created_at")
+    updatedAt            DateTime? @updatedAt @map("updated_at")
+    deletedAt            DateTime? @map("deleted_at")
+
+    stockTransfer PmsStockTransfer @relation(fields: [stId], references: [id])
+    item          PmsItem          @relation(fields: [itemId], references: [id])
+
+    @@index([stId], name: "stock_transfer_details_st_id_idx")
+    @@index([itemId], name: "stock_transfer_details_item_id_idx")
+    @@map("pms_stock_transfer_details")
+}
+
+model PmsGatePass {
+    id             Int           @id @default(autoincrement())
+    distributorId  Int           @map("distributor_id")
+    warehouseId    Int           @map("warehouse_id")
+    totalQuantity  Float         @map("total_quantity")
+    poNumber       String        @map("po_number")
+    poDate         DateTime      @map("po_date") @db.Date
+    date           DateTime      @default(now()) @map("date")
+    boxCount       Int           @map("box_count")
+    billAmount     Decimal       @map("bill_amount") @db.Decimal(13, 5)
+    gatePassNumber String        @map("gate_pass_number")
+    invoiceNumber  String?       @map("invoice_number")
+    remarks        String?       @db.Text
+    priority       PMS_PRIORITY? @default(NORMAL) @map("priority")
+    status         GPStatus      @default(PENDING)
+    isActive       Boolean       @default(true) @map("is_active")
+    createdBy      Int?          @map("created_by")
+    updatedBy      Int?          @map("updated_by")
+    deletedBy      Int?          @map("deleted_by")
+    createdAt      DateTime      @default(now()) @map("created_at")
+    updatedAt      DateTime?     @updatedAt @map("updated_at")
+    deletedAt      DateTime?     @map("deleted_at")
+
+    distributor  Distributor      @relation(fields: [distributorId], references: [id])
+    warehouse    PmsWarehouse     @relation(fields: [warehouseId], references: [id])
+    goodReceives PmsGoodReceive[] @relation("GoodReceiveToGatePass")
+
+    @@index([distributorId], name: "gate_pass_distributor_id_idx")
+    @@index([warehouseId], name: "gate_pass_warehouse_id_idx")
+    @@map("pms_gate_pass")
+}
+
+model PmsSettings {
+    id Int @id @default(autoincrement())
+
+    isEmail                Boolean           @default(true) @map("is_email")
+    isSMS                  Boolean           @default(false) @map("is_sms")
+    isWhatsapp             Boolean           @default(false) @map("is_whatsapp")
+    expiryInMonth          Int               @map("expiry_in_month")
+    countryCode            String?           @map("county_code")
+    slowMovingTimeInMonth  Int?              @map("slow_moving_time_in_month")
+    batchSize              Int               @default(100) @map("batch_size")
+    defaultPrecision       Int               @default(2) @map("default_precision")
+    poPrecision            Int               @default(2) @map("po_precision")
+    itemPrecision          Int               @default(2) @map("item_precision")
+    sellPrecision          Int               @default(2) @map("sell_precision")
+    grnPrecision           Int               @default(2) @map("grn_precision")
+    poCalculationMethod    CalculationMethod @default(STEP_WISE) @map("po_calculation_method")
+    grnCalculationMethod   CalculationMethod @default(FINAL) @map("grn_calculation_method")
+    sellCalculationMethod  CalculationMethod @default(FINAL) @map("sell_calculation_method")
+    grnRoundedFormat       RoundFormat       @default(TO_FIXED) @map("grn_rounded_format")
+    sellRoundedFormat      RoundFormat       @default(ROUND) @map("sell_rounded_format")
+    sellFinalRoundedFormat RoundFormat       @default(SPECIAL_ROUND) @map("sell_final_round_format")
+    grnFinalRoundedFormat  RoundFormat       @default(TO_FIXED) @map("grn_final_round_format")
+    defaultEmailPostfix    String?           @map("default_email_postfix")
+
+    isActive Boolean @default(true) @map("is_active")
+
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("pms_settings")
+}
+
+model PmsSell {
+    id                 Int          @id @default(autoincrement())
+    sellRefNo          String       @map("sell_ref_no")
+    ccId               Int          @map("cc_id")
+    staffId            Int?         @map("staff_id")
+    aptId              Int?         @map("apt_id")
+    aptNo              String?      @map("apt_no")
+    deliveryType       DeliveryType @map("delivery_type")
+    paymentMode        PaymentMode? @map("payment_mode")
+    isHomeDelivery     Boolean?     @default(false) @map("is_home_delivery")
+    billDate           DateTime     @default(now()) @map("bill_date")
+    customerId         Int          @map("customer_id")
+    patientUniqueId    Int?         @map("patient_unique_id")
+    billingFor         BILL_FOR     @map("billing_for")
+    insuranceId        Int?         @map("insurance_id")
+    patientInsuranceId Int?         @map("patient_insurance_id")
+    corporateClientId  Int?         @map("corporate_client_id")
+    doctorId           Int          @map("doctor_id")
+
+    netAmount Decimal @map("net_amount") @db.Decimal(13, 5)
+
+    discountMethod DiscMethod @map("discount_method")
+    discount       Decimal    @default(0) @db.Decimal(13, 5)
+    netDiscount    Decimal    @default(0) @map("net_discount") @db.Decimal(13, 5)
+    discountNote   String?    @map("discount_note") @db.VarChar(255)
+
+    billNo String? @map("bill_no")
+
+    taxMethod TAX_METHOD @map("tax_method")
+    tax       Decimal    @default(0) @db.Decimal(13, 5)
+    netTax    Decimal    @default(0) @map("net_tax") @db.Decimal(13, 5)
+
+    totalAmount       Decimal             @map("total_amount") @db.Decimal(13, 5)
+    paidAmount        Decimal             @default(0) @map("paid_amount") @db.Decimal(13, 5)
+    coPayAmount       Decimal             @default(0) @map("co_pay_amount") @db.Decimal(13, 5)
+    customerPayAmount Decimal             @default(0) @map("customer_pay_amount") @db.Decimal(13, 5)
+    paymentStatus     SELL_PAYMENT_STATUS @default(UNPAID) @map("payment_status")
+    status            SELL_STATUS         @default(COMPLETED) @map("status")
+    returnStatus      RETURN_STS_SELL?    @map("return_status")
+    returnedAmount    Decimal             @default(0) @map("returned_amount") @db.Decimal(13, 5)
+    refundedAmount    Decimal             @default(0) @map("total_returned_amount") @db.Decimal(13, 5)
+    isStockAdjusted   Boolean             @default(false) @map("is_stock_adjusted")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    cc               CollectionCenter  @relation(fields: [ccId], references: [id])
+    customer         Patient           @relation(fields: [customerId], references: [id])
+    doctor           Staff             @relation(fields: [doctorId], references: [id])
+    patientInsurance PatientInsurance? @relation(fields: [patientInsuranceId], references: [id])
+    insurance        InsuranceMaster?  @relation(fields: [insuranceId], references: [id])
+    corporateClient  ClientMaster?     @relation(fields: [corporateClientId], references: [id])
+    sellReturn       PmsSellReturn[]
+    sellDetails      PmsSellDetails[]
+
+    @@index([ccId], name: "sell_details_cc_id_idx")
+    @@index([customerId], name: "sell_customer_id_idx")
+    @@index([doctorId], name: "sell_doctor_id_idx")
+    @@index([insuranceId], name: "sell_insurance_id_idx")
+    @@index([patientInsuranceId], name: "sell_patient_insurance_id_idx")
+    @@index([corporateClientId], name: "sell_corporate_client_id_idx")
+    @@map("pms_sell")
+}
+
+model PmsSellDetails {
+    id     Int @id @default(autoincrement())
+    sellId Int @map("sell_id")
+    itemId Int @map("item_id")
+
+    itemCategoryName String @map("item_category")
+    medType          String @map("medicine_type")
+    medComp          String @map("medicine_composition")
+    medUnit          String @map("medicine_unit")
+    manufacturer     String
+    packSize         String @map("pack_size")
+    drugType         String @map("drug_type")
+
+    itemCategoryId Int @map("item_category_id")
+    medTypeId      Int @map("medicine_type_id")
+    medCompId      Int @map("medicine_composition_id")
+    medUnitId      Int @map("medicine_unit_id")
+    manufacturerId Int @map("manufacturer_Id")
+    packSizeId     Int @map("pack_size_id")
+    drugTypeId     Int @map("drug_type_id")
+
+    batchNo        String   @map("batch_no")
+    isFoc          Boolean  @map("is_foc")
+    expiryDate     DateTime @map("expiry_date") @db.Date
+    mrp            Decimal  @db.Decimal(13, 5)
+    quantity       Float    @default(0)
+    returnQuantity Float    @default(0) @map("return_quantity")
+    netAmount      Decimal  @map("net_amount") @db.Decimal(13, 5)
+
+    discountMethod DiscMethod @map("discount_method")
+    discount       Decimal    @default(0) @db.Decimal(13, 5)
+    netDiscount    Decimal    @default(0) @map("net_discount") @db.Decimal(13, 5)
+
+    taxMethod TAX_METHOD @map("tax_method")
+    tax       Decimal    @default(0) @db.Decimal(13, 5)
+    netTax    Decimal    @map("net_tax") @db.Decimal(13, 5)
+
+    totalAmount       Decimal @map("total_amount") @db.Decimal(13, 5)
+    coPayAmount       Decimal @default(0) @map("co_pay_amount") @db.Decimal(13, 5)
+    customerPayAmount Decimal @default(0) @map("customer_pay_amount") @db.Decimal(13, 5)
+
+    coPayPaymentValue       Decimal?                    @map("copayment_value")
+    coPayPaymentType        PaymentModePharmacy?        @map("copayment_type")
+    coPaySource             CoPaymentSource?            @map("co_payment_source")
+    coPayModificationStatus CO_PAY_MODIFICATION_STATUS? @map("co_pay_modofication_status")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    sell              PmsSell                @relation(fields: [sellId], references: [id])
+    item              PmsItem                @relation(fields: [itemId], references: [id])
+    itemCategory      MedCategory?           @relation(fields: [itemCategoryId], references: [id])
+    itemMedType       MedType                @relation(fields: [medTypeId], references: [id])
+    itemMedComp       MedicineCompo          @relation(fields: [medCompId], references: [id])
+    itemMedUnit       MedicineUnit           @relation(fields: [medUnitId], references: [id])
+    manufacture       Manufacture            @relation(fields: [manufacturerId], references: [id])
+    packageSize       MedPackage             @relation(fields: [packSizeId], references: [id])
+    medDrug           MedDrug                @relation(fields: [drugTypeId], references: [id])
+    sellReturnDetails PmsSellReturnDetails[]
+
+    @@index([sellId], name: "sell_details_sell_id_idx")
+    @@index([itemId], name: "sell_details_item_id_idx")
+    @@index([itemCategoryId], name: "sell_details_item_category_id_idx")
+    @@index([medTypeId], name: "sell_details_medicine_type_id_idx")
+    @@index([medCompId], name: "sell_details_medicine_composition_id_idx")
+    @@index([medUnitId], name: "sell_details_medicine_unit_id_idx")
+    @@index([manufacturerId], name: "sell_details_manufacturer_id_idx")
+    @@index([packSizeId], name: "sell_details_pack_size_id_idx")
+    @@index([drugTypeId], name: "sell_details_drug_type_id_idx")
+    @@map("pms_sell_details")
+}
+
+model PmsSellReturn {
+    id Int @id @default(autoincrement())
+
+    sellId              Int     @map("sell_id")
+    sellNumber          String  @map("sell_number")
+    sellReturnRefNumber String? @map("sell_return_ref_number")
+
+    ccId    Int     @map("cc_id")
+    staffId Int?    @map("staff_id")
+    aptId   Int?    @map("apt_id")
+    aptNo   String? @map("apt_no")
+
+    deliveryType       DeliveryType @map("delivery_type")
+    paymentMode        PaymentMode? @map("payment_mode")
+    isHomeDelivery     Boolean?     @default(false) @map("is_home_delivery")
+    billDate           DateTime     @map("bill_date")
+    customerId         Int          @map("customer_id")
+    patientUniqueId    Int?         @map("patient_unique_id")
+    billingFor         BILL_FOR     @map("billing_for")
+    insuranceId        Int?         @map("insurance_id")
+    patientInsuranceId Int?         @map("patient_insurance_id")
+    corporateClientId  Int?         @map("corporate_client_id")
+    doctorId           Int          @map("doctor_id")
+
+    returnDate DateTime @default(now()) @map("return_date")
+
+    discountMethod DiscMethod @map("discount_method")
+    discount       Decimal    @default(0) @db.Decimal(13, 5)
+    netDiscount    Decimal    @default(0) @map("net_discount") @db.Decimal(13, 5)
+    discountNote   String?    @map("discount_note") @db.VarChar(255)
+
+    taxMethod TAX_METHOD @map("tax_method")
+    tax       Decimal    @default(0) @db.Decimal(13, 5)
+    netTax    Decimal    @default(0) @map("net_tax") @db.Decimal(13, 5)
+
+    netAmount         Decimal @map("net_amount") @db.Decimal(13, 5)
+    totalAmount       Decimal @map("total_amount") @db.Decimal(13, 5)
+    paidAmount        Decimal @default(0) @map("paid_amount") @db.Decimal(13, 5)
+    creditNoteNo      String? @map("credit_note_no")
+    coPayAmount       Decimal @default(0) @map("co_pay_amount") @db.Decimal(13, 5)
+    customerPayAmount Decimal @default(0) @map("customer_pay_amount") @db.Decimal(13, 5)
+
+    paymentStatus SELL_PAYMENT_STATUS @default(UNPAID) @map("payment_status")
+    status        RETURN_STS          @default(PENDING) @map("status")
+
+    isActive   Boolean @default(true) @map("is_active")
+    createdBy  Int?    @map("created_by")
+    updatedBy  Int?    @map("updated_by")
+    deletedBy  Int?    @map("deleted_by")
+    approvedBy Int?    @map("approved_by")
+    rejectedBy Int?    @map("rejected_by")
+
+    createdAt         DateTime               @default(now()) @map("created_at")
+    updatedAt         DateTime?              @updatedAt @map("updated_at")
+    deletedAt         DateTime?              @map("deleted_at")
+    rejectedAt        DateTime?              @map("rejected_at")
+    approvedAt        DateTime?              @map("approved_at")
+    sellReturnDetails PmsSellReturnDetails[]
+
+    cc               CollectionCenter  @relation(fields: [ccId], references: [id])
+    customer         Patient           @relation(fields: [customerId], references: [id])
+    doctor           Staff             @relation(fields: [doctorId], references: [id])
+    patientInsurance PatientInsurance? @relation(fields: [patientInsuranceId], references: [id])
+    insurance        InsuranceMaster?  @relation(fields: [insuranceId], references: [id])
+    corporateClient  ClientMaster?     @relation(fields: [corporateClientId], references: [id])
+    sell             PmsSell?          @relation(fields: [sellId], references: [id])
+
+    @@index([ccId], name: "sell_return_details_cc_id_idx")
+    @@index([customerId], name: "sell_return_customer_id_idx")
+    @@index([doctorId], name: "sell_return_doctor_id_idx")
+    @@index([insuranceId], name: "sell_return_ins_id_idx")
+    @@index([patientInsuranceId], name: "sell_return_patient_ins_id_idx")
+    @@index([corporateClientId], name: "sell_return_corp_cli_id_idx")
+    @@index([sellId], name: "sell_return_sell_id_idx")
+    @@map("pms_sell_return")
+}
+
+model PmsSellReturnDetails {
+    id            Int @id @default(autoincrement())
+    sellReturnId  Int @map("sell_return_id")
+    itemId        Int @map("item_id")
+    sellDetailsId Int @map("sell_details_id")
+
+    itemCategoryName String @map("item_category")
+    medType          String @map("medicine_type")
+    medComp          String @map("medicine_composition")
+    medUnit          String @map("medicine_unit")
+    manufacturer     String
+    packSize         String @map("pack_size")
+    drugType         String @map("drug_type")
+
+    itemCategoryId Int @map("item_category_id")
+    medTypeId      Int @map("medicine_type_id")
+    medCompId      Int @map("medicine_composition_id")
+    medUnitId      Int @map("medicine_unit_id")
+    manufacturerId Int @map("manufacturer_Id")
+    packSizeId     Int @map("pack_size_id")
+    drugTypeId     Int @map("drug_type_id")
+
+    batchNo      String   @map("batch_no")
+    isFoc        Boolean  @map("is_foc")
+    expiryDate   DateTime @map("expiry_date") @db.Date
+    mrp          Decimal  @db.Decimal(13, 5)
+    quantity     Float    @default(0)
+    netAmount    Decimal  @map("net_amount") @db.Decimal(13, 5)
+    sellQuantity Float    @default(0) @map("sell_quantity")
+
+    discountMethod DiscMethod @map("discount_method")
+    discount       Decimal    @default(0) @db.Decimal(13, 5)
+    netDiscount    Decimal    @default(0) @map("net_discount") @db.Decimal(13, 5)
+
+    taxMethod TAX_METHOD @map("tax_method")
+    tax       Decimal    @default(0) @db.Decimal(13, 5)
+    netTax    Decimal    @map("net_tax") @db.Decimal(13, 5)
+
+    totalAmount       Decimal @map("total_amount") @db.Decimal(13, 5)
+    coPayAmount       Decimal @default(0) @map("co_pay_amount") @db.Decimal(13, 5)
+    customerPayAmount Decimal @default(0) @map("customer_pay_amount") @db.Decimal(13, 5)
+
+    coPayPaymentValue Decimal?             @map("co_pay_payment_value")
+    coPayPaymentType  PaymentModePharmacy? @map("co_pay_payment_type")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    sellReturn   PmsSellReturn  @relation(fields: [sellReturnId], references: [id])
+    sellDetails  PmsSellDetails @relation(fields: [sellDetailsId], references: [id])
+    item         PmsItem        @relation(fields: [itemId], references: [id])
+    itemCategory MedCategory?   @relation(fields: [itemCategoryId], references: [id])
+    itemMedType  MedType        @relation(fields: [medTypeId], references: [id])
+    itemMedComp  MedicineCompo  @relation(fields: [medCompId], references: [id])
+    itemMedUnit  MedicineUnit   @relation(fields: [medUnitId], references: [id])
+    manufacture  Manufacture    @relation(fields: [manufacturerId], references: [id])
+    packageSize  MedPackage     @relation(fields: [packSizeId], references: [id])
+    medDrug      MedDrug        @relation(fields: [drugTypeId], references: [id])
+
+    @@index([sellReturnId], name: "sell_details_sell_return_id_idx")
+    @@index([sellDetailsId], name: "sell_details_id_sell_return_id_idx")
+    @@index([itemId], name: "sell_return_details_item_id_idx")
+    @@index([itemCategoryId], name: "sell_return_details_item_category_id_idx")
+    @@index([medTypeId], name: "sell_return_details_medicine_type_id_idx")
+    @@index([medCompId], name: "sell_return_details_medicine_composition_id_idx")
+    @@index([medUnitId], name: "sell_return_details_medicine_unit_id_idx")
+    @@index([manufacturerId], name: "sell_return_details_manufacturer_id_idx")
+    @@index([packSizeId], name: "sell_return_details_pack_size_id_idx")
+    @@index([drugTypeId], name: "sell_return_details_drug_type_id_idx")
+    @@map("pms_sell_return_details")
+}
+
+model BranchItemMap {
+    id Int @id @default(autoincrement())
+
+    branchId Int @map("branch_id")
+    itemId   Int @map("item_id")
+
+    defaultDiscount     Decimal?    @map("default_disc") @db.Decimal(13, 5)
+    defaultB2BDiscount  Decimal?    @map("default_b2b_disc") @db.Decimal(13, 5)
+    tax                 Decimal?    @map("tax") @db.Decimal(13, 5)
+    taxMethod           TAX_METHOD? @map("tax_method")
+    purchaseAmount      Decimal?    @map("purchase_amount") @db.Decimal(13, 5)
+    saleAmount          Decimal?    @map("sale_amount") @db.Decimal(13, 5)
+    insurancePercentage Decimal?    @map("insurance_percentage") @db.Decimal(13, 5)
+    walkInPercentage    Decimal?    @map("walk_in_percentage") @db.Decimal(13, 5)
+    onHoldSale          DateTime?   @map("on_hold_sale") @db.Date
+
+    isActive  Boolean   @default(true)
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+
+    item   PmsItem   @relation(fields: [itemId], references: [id])
+    branch PmsBranch @relation(fields: [branchId], references: [id])
+
+    @@index([itemId], name: "branch_sell_amount_item_id_idx")
+    @@index([branchId], name: "branch_sell_amount_branch_id_idx")
+    @@map("pms_branch_item")
+}
+
+model PmsInTransitStock {
+    id         Int       @id @default(autoincrement())
+    fromId     Int       @map("from_id")
+    toId       Int       @map("to_Id")
+    itemId     Int       @map("item_id")
+    quantity   Float     @default(0)
+    batchNo    String    @map("batch_no")
+    expiryDate DateTime? @map("expiry_date") @db.Date
+    isFoc      Boolean   @default(false) @map("is_foc")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedBy Int?      @map("deleted_by")
+    deletedAt DateTime? @map("deleted_at")
+
+    item                PmsItem               @relation(fields: [itemId], references: [id])
+    from                CollectionCenter      @relation(name: "From", fields: [fromId], references: [id], map: "in_transit_stock_from_id_idx")
+    to                  CollectionCenter      @relation(name: "To", fields: [toId], references: [id], map: "in_transit_stock_item_id_idx")
+    inTransitStockAudit InTransitStockAudit[]
+
+    @@index([fromId], name: "in_transit_stock_from_id_idx")
+    @@index([toId], name: "in_transit_stock_to_id_idx")
+    @@index([itemId], name: "in_transit_stock_item_id_idx")
+    @@map("pms_in_transit_stock")
+}
+
+model InTransitStockAudit {
+    id               Int          @id @default(autoincrement())
+    inTransitStockId Int
+    quantity         Float        @default(0)
+    action           Action       @map("action")
+    operation        PmsOperation @map("operation")
+    refId            Int?         @map("ref_id")
+    refDetailsId     Int?         @map("ref_details_id")
+    refNo            String?      @map("ref_no")
+    refDate          DateTime?    @map("ref_date") @db.Date
+    refApprovedBy    Int?         @map("ref_approved_by")
+    refApprovedAt    DateTime?    @map("ref_approved_at") @db.Date
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedBy Int?      @map("updated_by")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedBy Int?      @map("deleted_by")
+    deletedAt DateTime? @map("deleted_at")
+
+    inTransitStock PmsInTransitStock @relation(fields: [inTransitStockId], references: [id])
+
+    @@index([inTransitStockId], name: "item_stock_history_in_transit_stock_id_idx")
+    @@map("pms_in_transit_stock_audit")
+}
+
+model PmsStorage {
+    id            Int                @id @default(autoincrement())
+    name          String
+    description   String?
+    isActive      Boolean            @default(true) @map("is_active")
+    createdBy     Int?               @map("created_by")
+    updatedBy     Int?               @map("updated_by")
+    deletedBy     Int?               @map("deleted_by")
+    createdAt     DateTime           @default(now()) @map("created_at")
+    updatedAt     DateTime           @updatedAt @map("updated_at")
+    deletedAt     DateTime?          @map("deleted_at")
+    purchaseOrder PmsPurchaseOrder[]
+    Item          PmsItem[]
+
+    @@map("pms_storage")
+}
+
+model InsurerPaymentSettings {
+    id                  Int                 @id @default(autoincrement())
+    insuranceId         Int                 @map("insurance_id")
+    ccId                Int                 @map("cc_id")
+    type                PaymentTypePharmacy @default(Pharmacy)
+    medId               Int                 @map("med_id")
+    mrp                 Decimal             @map("mrp") @db.Decimal(10, 2)
+    insurancePercentage Decimal             @default(0.00) @map("insurance_percentage") @db.Decimal(10, 2)
+    paymentMode         PaymentModePharmacy @map("payment_mode")
+    paymentValue        Decimal             @map("payment_value") @db.Decimal(10, 2)
+    coPay               Decimal             @default(0.00) @map("co_pay") @db.Decimal(10, 2)
+    patientPay          Decimal             @default(0.00) @map("patient_pay") @db.Decimal(10, 2)
+    status              Boolean             @default(true)
+    createdBy           Int?                @map("created_by")
+    createdAt           DateTime            @default(now()) @map("created_at")
+    updatedAt           DateTime            @updatedAt @map("updated_at")
+    insurance           InsuranceMaster     @relation(fields: [insuranceId], references: [id])
+    branch              PmsBranch           @relation(fields: [ccId], references: [id])
+
+    @@index([insuranceId], name: "pharmacy_insurer_payment_settings_insurance_id_idx")
+    @@index([ccId], name: "pharmacy_insurer_payment_settings_cc_id_idx")
+    @@map("pharmacy_insurer_payment_settings")
+}
+
+// duplicate removed above; using the one at the end of file
+
+model ItemExcel {
+    id Int @id @default(autoincrement())
+
+    rowNo              Int?       @map("row_no")
+    itemNumber         String?    @map("item_number")
+    medicineName       String     @map("medicine_name")
+    medCategory        String     @map("medicine_category")
+    medType            String     @map("medicine_type")
+    medComp            String     @map("medicine_composition")
+    medUnit            String     @map("medicine_unit")
+    boxSize            String?    @map("box_size")
+    manufacturer       String     @map("manufacturer")
+    minOrderDetails    String?    @map("min_order_details")
+    rackLocation       String?    @map("rack_location")
+    defaultDiscount    Decimal    @map("default_disc") @db.Decimal(13, 5)
+    defaultB2BDiscount Decimal    @map("default_b2b_disc") @db.Decimal(13, 5)
+    isLockDiscount     Boolean    @default(false) @map("is_lock_disc")
+    isLockB2BDiscount  Boolean    @default(false) @map("is_lock_b2b_disc")
+    minStock           Int        @map("min_stock")
+    maxStock           Int        @map("max_stock")
+    tax                Decimal    @map("tax") @db.Decimal(13, 5)
+    taxMethod          TAX_METHOD @map("tax_method")
+    packSize           String     @map("pack_size")
+    drugType           String     @map("drug_type")
+    isAllowLooseSale   Boolean    @default(false) @map("is_allow_loose_sale")
+    acceptOnlineOrder  Boolean    @default(true) @map("accept_online_order")
+    isReturnable       Boolean    @default(true) @map("is_returnable")
+    isSuggestionLock   Boolean    @default(false) @map("is_suggestion_lock")
+    cess               Float?
+
+    hsnCode             String?        @map("hsn_code")
+    status              PmsItemStatus  @default(AVAILABLE)
+    purchaseAmount      Decimal        @map("purchase_amount") @db.Decimal(13, 5)
+    saleAmount          Decimal        @map("sale_amount") @db.Decimal(13, 5)
+    remark              String?
+    onHoldSale          DateTime?      @map("on_hold_sale") @db.Date
+    medPackingType      PmsMedPackType @map("medicine_pack_type")
+    barcode             String?
+    itemAlias           String?        @map("item_alias")
+    tags                String?
+    insurancePercentage Decimal        @map("insurance_percentage") @db.Decimal(13, 5)
+    walkInPercentage    Decimal        @map("walk_in_percentage") @db.Decimal(13, 5)
+    batchJobId          Int            @map("batch_job_id")
+    batchNo             String?        @map("batch_no")
+    expiryDate          DateTime?      @map("expiry_date") @db.Date
+    quantity            Int?           @map("quantity")
+
+    batchJob PmsBatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], name: "item_excel_batch_job_id_idx")
+    @@map("pms_item_excel")
+}
+
+model PmsBatchJob {
+    id Int @id @default(autoincrement())
+
+    type         Batch_Type
+    status       Batch_Status @default(PENDING)
+    batchJobNo   String?      @map("batch_job_no")
+    totalQty     Int          @map("total_qty")
+    processedQty Int          @default(0) @map("processed_qty")
+    successCount Int          @default(0) @map("success_count")
+    failureCount Int          @default(0) @map("failure_count")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    batchJobDetails    PmsBatchJobDetails[]
+    itemExcel          ItemExcel[]
+    branchItemMapExcel PmsBranchItemMapExcel[]
+
+    @@map("pms_batch_job")
+}
+
+model PmsBatchJobDetails {
+    id Int @id @default(autoincrement())
+
+    batchId  Int                  @map("batch_id")
+    type     BT_JOB_DET_TYPE      @default(CREATE)
+    rowTitle String?              @map("row_title")
+    rowNo    Int?                 @map("row_no")
+    refId    Int?                 @map("ref_id")
+    refNo    String?              @map("ref_no")
+    status   Batch_Details_Status
+    errorMsg String?              @map("error_msg") @db.Text
+
+    batch PmsBatchJob @relation(fields: [batchId], references: [id])
+
+    @@index([batchId], name: "batch_job_details_batch_id_idx")
+    @@map("pms_batch_job_details")
+}
+
+model ApprovalFlow {
+    id          Int      @id @default(autoincrement())
+    service     String
+    subjectType String   @map("subject_type") // same values as in ApprovalInstance
+    name        String
+    flowType    FlowType @default(STATUS) @map("flow_type")
+    isActive    Boolean  @default(true) @map("is_active")
+    createdBy   Int?     @map("created_by")
+    updatedBy   Int?     @map("updated_by")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    steps            ApprovalStep[]
+    approvalInstance ApprovalInstance[]
+
+    @@map("core_approval_flow")
+}
+
+model ApprovalStep {
+    id          Int      @id @default(autoincrement())
+    flowId      Int      @map("flow_id") // Make sure to ensure flowId and level are unique together when status is active
+    level       Int
+    minAmount   Decimal? @map("min_amount") // lower bound netTotal
+    maxAmount   Decimal? @map("max_amount") // NULL = no upper bound
+    stepType    StepType @default(MIN_MAX) @map("step_type") // enum below
+    config      Json?
+    childConfig Json?    @map("child_config")
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    approvalFlow          ApprovalFlow?           @relation(fields: [flowId], references: [id])
+    approvalStepCCMapping ApprovalStepCCMapping[]
+    approverMapping       ApproverMapping[]
+
+    @@index([flowId], name: "approval_step_flow_id_idx")
+    @@map("core_approval_step")
+}
+
+model ApprovalStepCCMapping {
+    id     Int @id @default(autoincrement())
+    stepId Int @map("step_id") // FK → ApprovalStep.id
+    ccId   Int @map("cc_id") // FK → CollectionCenter.id
+    level  Int
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    approvalStep     ApprovalStep     @relation(fields: [stepId], references: [id])
+    collectionCenter CollectionCenter @relation(fields: [ccId], references: [id])
+
+    @@index([stepId], name: "approval_step_cc_mapping_step_id_idx")
+    @@index([ccId], name: "approval_step_cc_mapping_cc_id_idx")
+    @@map("core_approval_step_cc_mapping")
+}
+
+model ApproverMapping {
+    id      Int  @id @default(autoincrement())
+    staffId Int? @map("staff_id") // FK → Staff.userId
+    stepId  Int  @map("step_id") // FK → ApprovalStep.id
+    ccId    Int  @map("cc_id") // FK → CollectionCenter.id
+    roleId  Int? @map("role_id") // FK → Role.id (optional, if staff is not a role)
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    staff Staff?           @relation(fields: [staffId], references: [id])
+    step  ApprovalStep     @relation(fields: [stepId], references: [id])
+    cc    CollectionCenter @relation(fields: [ccId], references: [id])
+
+    @@index([staffId], name: "approver_mapping_staff_id_idx")
+    @@index([stepId], name: "approver_mapping_step_id_idx")
+    @@index([ccId], name: "approver_mapping_cc_id_idx")
+    @@map("core_approver_mapping")
+}
+
+model ApprovalInstance {
+    id          Int            @id @default(autoincrement())
+    flowId      Int            @map("flow_id") // snapshot pointer
+    subjectType String         @map("subject_type") // same values as in ApprovalFlow
+    service     String         @map("service") // same values as in ApprovalFlow
+    subjectId   Int            @map("subject_id") // PK of the PO/GRN/Return etc.
+    refNo       String?        @map("ref_no")
+    currentStep Int            @map("current_step")
+    netTotal    Decimal?       @map("net_total") // total amount to be approved
+    status      ApprovalStatus @default(PENDING) // enum below
+
+    extra Json? @map("extra")
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    actions ApprovalAction[]
+    flow    ApprovalFlow?    @relation(fields: [flowId], references: [id])
+
+    @@index([flowId], name: "approval_instance_flow_id_idx")
+    @@map("core_approval_instance")
+}
+
+model ApprovalAction {
+    id          Int            @id @default(autoincrement())
+    instanceId  Int            @map("instance_id") // FK → ApprovalInstance.id
+    level       Int
+    actedBy     Int            @map("acted_by") // staffId
+    statusAfter ApprovalStatus @map("status_after") // enum below
+    comment     String?
+    actedAt     DateTime       @default(now()) @map("acted_at")
+    isActive    Boolean        @default(true) @map("is_active")
+
+    approvalInstance ApprovalInstance @relation(fields: [instanceId], references: [id])
+    actedByStaff     Staff            @relation(fields: [actedBy], references: [id])
+
+    @@index([instanceId], name: "approval_action_approval_instance_id_idx")
+    @@index([actedBy], name: "approval_action_acted_by_idx")
+    @@map("core_approval_action")
+}
+
+model ChildCommonDetails {
+    id          Int    @id @default(autoincrement())
+    childId     Int    @map("child_id")
+    parentId    Int    @map("parent_id")
+    subjectType String @map("subject_type")
+    service     String @map("service")
+
+    discountValue  Decimal?    @map("discount_value") @db.Decimal(13, 5)
+    discountType   DiscMethod? @map("discount_type")
+    discountAmount Decimal?    @map("discount_amount") @db.Decimal(13, 5)
+
+    copayValue  Decimal?    @map("co_pay_value") @db.Decimal(13, 5)
+    copayType   DiscMethod? @map("co_pay_type")
+    copayAmount Decimal?    @map("co_pay_amount") @db.Decimal(13, 5)
+
+    coPayModificationStatus String? @map("co_pay_modofication_status")
+
+    isActive Boolean @default(true) @map("is_active")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("core_child_common_details")
+}
+
+model ParentCommonDetails {
+    id          Int    @id @default(autoincrement())
+    parentId    Int    @map("parent_id")
+    subjectType String @map("subject_type")
+    service     String @map("service")
+
+    refundAmount   Decimal?    @map("refund_amount") @db.Decimal(13, 5)
+    discountType   DiscMethod? @map("discount_type")
+    discountValue  Decimal?    @map("discount_value") @db.Decimal(13, 5)
+    discountAmount Decimal?    @map("discount_amount") @db.Decimal(13, 5)
+    dueAmount      Decimal?    @map("due_amount") @db.Decimal(13, 5)
+    grossAmount    Decimal?    @map("gross_amount") @db.Decimal(13, 5)
+    netAmount      Decimal?    @map("net_amount") @db.Decimal(13, 5)
+
+    totalCopaymentAmount Decimal? @map("total_copayment_amount") @db.Decimal(13, 5)
+    isApproved           String?  @map("is_approved")
+
+    status        String? @map("status")
+    paymentStatus String? @map("payment_status")
+
+    isActive Boolean @default(true) @map("is_active")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("core_parent_common_details")
+}
+
+model BranchItemMapAudit {
+    id         Int  @id @default(autoincrement())
+    ccId       Int  @map("cc_id")
+    fromBranch Int? @map("from_Branch")
+    toBranch   Int  @map("to_Branch")
+    itemId     Int  @map("item_id")
+    actionBy   Int? @map("action_by")
+
+    isActive                  Boolean                     @default(true) @map("is_active")
+    createdAt                 DateTime                    @default(now()) @map("created_at")
+    updatedAt                 DateTime                    @updatedAt @map("updated_at")
+    branchItemMapAuditDetails BranchItemMapAuditDetails[]
+
+    @@map("pms_branch_item_map_audit")
+}
+
+model BranchItemMapAuditDetails {
+    id         Int     @id @default(autoincrement())
+    auditId    Int     @map("audit_id")
+    field      String
+    changeFrom String? @map("change_from")
+    changeTo   String? @map("change_to")
+
+    isActive Boolean            @default(true) @map("is_active")
+    audit    BranchItemMapAudit @relation(fields: [auditId], references: [id])
+
+    @@index([auditId], name: "branch_item_map_audit_details_audit_id_idx")
+    @@map("pms_branch_item_map_audit_details")
+}
+
+model PmsBranchItemMapExcel {
+    id Int @id @default(autoincrement())
+
+    rowNo               Int?       @map("row_no")
+    branchId            Int        @map("branch_id")
+    branchName          String     @map("branch_map")
+    itemId              Int        @map("item_id")
+    itemNumber          String     @map("item_number")
+    itemName            String     @map("item_name")
+    itemCategory        String     @map("item_category")
+    defaultDiscount     Decimal    @map("default_disc") @db.Decimal(13, 5)
+    defaultB2BDiscount  Decimal    @map("default_b2b_disc") @db.Decimal(13, 5)
+    tax                 Decimal    @map("tax") @db.Decimal(13, 5)
+    taxMethod           TAX_METHOD @map("tax_method")
+    purchaseAmount      Decimal    @map("purchase_amount") @db.Decimal(13, 5)
+    saleAmount          Decimal    @map("sale_amount") @db.Decimal(13, 5)
+    insurancePercentage Decimal    @map("insurance_percentage") @db.Decimal(13, 5)
+    walkInPercentage    Decimal    @map("walk_in_percentage") @db.Decimal(13, 5)
+    onHoldSale          DateTime?  @map("on_hold_sale") @db.Date
+    batchJobId          Int        @map("batch_job_id")
+
+    batchJob PmsBatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], name: "branch_item_map_excel_batch_job_id_idx")
+    @@map("pms_branch_item_map_excel")
+}
+
+model PrinterSettings {
+    id           Int          @id @default(autoincrement())
+    ccId         Int          @map("cc_id")
+    printerName  String       @map("printer_name")
+    printerType  Printer_Type @default(NORMAL) @map("printer_type")
+    printerWidth Int          @map("printer_width")
+    isActive     Boolean      @default(true) @map("is_active")
+    createdBy    Int?         @map("created_by")
+    updatedBy    Int?         @map("updated_by")
+    createdAt    DateTime     @default(now()) @map("created_at")
+    updatedAt    DateTime     @updatedAt @map("updated_at")
+    deletedAt    DateTime?    @map("deleted_at")
+    deletedBy    Int?         @map("deleted_by")
+
+    cc CollectionCenter @relation(fields: [ccId], references: [id])
+
+    @@index([ccId], name: "printer_settings_cc_id_idx")
+    @@map("core_printer_settings")
+}
+
+model PharmacyClientPaymentSettings {
+    id          Int                 @id @default(autoincrement())
+    clientId    Int                 @map("client_id")
+    ccId        Int                 @map("cc_id")
+    type        PaymentTypePharmacy @default(Pharmacy)
+    medId       Int                 @map("med_id")
+    paymentMode INCLUDE_EXCLUDE     @map("payment_mode")
+    status      Boolean             @default(true)
+    createdBy   Int?                @map("created_by")
+    updatedBy   Int?                @map("updated_by")
+    createdAt   DateTime            @default(now()) @map("created_at")
+    updatedAt   DateTime            @updatedAt @map("updated_at")
+
+    client ClientMaster @relation(fields: [clientId], references: [id])
+    branch PmsBranch    @relation(fields: [ccId], references: [id])
+
+    @@index([clientId], name: "pharmacy_client_payment_settings_client_id_idx")
+    @@index([ccId], name: "pharmacy_client_payment_settings_cc_id_idx")
+    @@map("pharmacy_client_payment_settings")
+}
+
+model FeatureFlag {
+    id            Int     @id @default(autoincrement())
+    shortCode     String  @map("short_code")
+    flagName      String  @map("flag_name")
+    isEnabled     Boolean @map("is_enabled")
+    description   String  @db.LongText
+    featureConfig Json?   @map("feature_config")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("pms_feature_flag")
+}
+
+model Migration {
+    id            Int                @id @default(autoincrement())
+    refType       Migration_Ref_Type @map("ref_type")
+    refNo         String             @map("ref_no")
+    migrationType Migration_Type     @map("migration_type")
+
+    ref        Json @map("ref")
+    refDetails Json @map("ref_details")
+
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("pms_migration")
+}
+
+model BranchCategoryMap {
+    id         Int @id @default(autoincrement())
+    branchId   Int @map("branch_id")
+    categoryId Int @map("category_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    branch   PmsBranch   @relation(fields: [branchId], references: [id])
+    category MedCategory @relation(fields: [categoryId], references: [id])
+
+    @@index([branchId], name: "branch_category_map_branch_id_idx")
+    @@index([categoryId], name: "branch_category_map_category_id_idx")
+    @@map("pms_branch_category_map")
+}
+
+model StockAdjustment {
+    id          Int                      @id @default(autoincrement())
+    ccId        Int                      @map("cc_id")
+    branchId    Int?                     @map("branch_id")
+    warehouseId Int?                     @map("warehouse_id")
+    date        DateTime
+    refNo       String                   @map("ref_no")
+    description String?                  @db.LongText
+    status      STOCK_ADJUSTMENT_STATUS?
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    cc                     CollectionCenter         @relation(fields: [ccId], references: [id])
+    branch                 PmsBranch?               @relation(fields: [branchId], references: [id])
+    warehouse              PmsWarehouse?            @relation(fields: [warehouseId], references: [id])
+    stockAdjustmentDetails StockAdjustmentDetails[]
+
+    @@index([ccId], name: "stock_adjustment_cc_id_idx")
+    @@index([branchId], name: "stock_adjustment_branch_id_idx")
+    @@index([warehouseId], name: "stock_adjustment_warehouse_id_idx")
+    @@map("pms_stock_adjustment")
+}
+
+model StockAdjustmentDetails {
+    id                Int       @id @default(autoincrement())
+    stockAdjustmentId Int       @map("stock_adjustment_id")
+    itemId            Int       @map("item_id")
+    batchNo           String?   @map("batch_no")
+    expiryDate        DateTime? @map("expiry_date") @db.Date
+    isFoc             Boolean?  @default(false) @map("is_foc")
+    quantity          Int
+    adjustType        Action    @map("adjust_type")
+    availableQty      Int?      @map("available_qty")
+    batchId           Int?      @map("batch_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    stockAdjustment StockAdjustment @relation(fields: [stockAdjustmentId], references: [id])
+
+    @@index([stockAdjustmentId], name: "stock_adjustment_details_stock_adjustment_id_idx")
+    @@map("pms_stock_adjustment_details")
+}
+
+model AutoAlertEmail {
+    id        Int        @id @default(autoincrement())
+    shortCode ALERT_TYPE @map("short_code")
+    to        String     @db.Text
+    cc        String?    @db.Text
+    bcc       String?    @db.Text
+
+    isActive        Boolean          @default(true) @map("is_active")
+    createdBy       Int?             @map("created_by")
+    createdAt       DateTime         @default(now()) @map("created_at")
+    updatedBy       Int?             @map("updated_by")
+    updatedAt       DateTime         @updatedAt @map("updated_at")
+    deletedAt       DateTime?        @map("deleted_at")
+    deletedBy       Int?             @map("deleted_by")
+    autoAlertAudits AutoAlertAudit[]
+
+    @@map("pms_auto_alert_email")
+}
+
+model AutoAlertAudit {
+    id             Int                   @id @default(autoincrement())
+    recipientId    Int?                  @map("recipient_id")
+    runDate        DateTime              @map("run_date")
+    deliveryMethod ALERT_DELIVERY_METHOD @map("delivery_method")
+    alertType      ALERT_TYPE            @map("alert_type")
+
+    status         ALERT_STATUS @default(PENDING)
+    errorMsg       String?      @map("error_msg") @db.Text
+    isResend       Boolean      @default(false) @map("is_resend")
+    resendMasterId Int?         @map("resend_master_id")
+    successDate    DateTime?    @map("success_date")
+    alertMode      ALERT_MODE   @default(SYSTEM) @map("alert_mode")
+
+    createdAt DateTime        @default(now()) @map("created_at")
+    updatedAt DateTime        @updatedAt @map("updated_at")
+    createdBy Int?            @map("created_by")
+    updatedBy Int?            @map("updated_by")
+    recipient AutoAlertEmail? @relation(fields: [recipientId], references: [id])
+
+    @@index([recipientId], name: "auto_alert_audit_recipient_id_idx")
+    @@map("pms_auto_alert_audit")
+}

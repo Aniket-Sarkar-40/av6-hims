@@ -1,7 +1,7 @@
 import { Prisma } from "@repo/db/generated/prisma/client";
 
 export type BatchJobInput = Omit<
-  Prisma.BatchJobCreateManyInput,
+  Prisma.OpdBatchJobCreateInput,
   "id" | "createdAt" | "updatedAt"
 >;
 export type BatchDetailsInput = Omit<

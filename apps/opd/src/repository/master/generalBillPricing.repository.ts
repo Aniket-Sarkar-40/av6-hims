@@ -160,7 +160,7 @@ export async function generalBillPricingBatchJob(batchJobId: number) {
   const store = requestStorage.getStore();
   const BATCH_SIZE = store?.settings?.batchSize || 100;
 
-  await db.batchJob.update({
+  await db.opdBatchJob.update({
     where: { id: batchJobId },
     data: { status: "IN_PROGRESS" },
   });
@@ -227,7 +227,7 @@ export async function generalBillPricingBatchJob(batchJobId: number) {
               },
             });
 
-            await tx.batchJob.update({
+            await tx.opdBatchJob.update({
               where: { id: batchJobId },
               data: {
                 processedQty: { increment: 1 },
@@ -259,7 +259,7 @@ export async function generalBillPricingBatchJob(batchJobId: number) {
           },
         });
 
-        await db.batchJob.update({
+        await db.opdBatchJob.update({
           where: { id: batchJobId },
           data: {
             processedQty: { increment: 1 },
@@ -272,7 +272,7 @@ export async function generalBillPricingBatchJob(batchJobId: number) {
     skip += BATCH_SIZE;
   }
 
-  const batchInfo = await db.batchJob.findUnique({
+  const batchInfo = await db.opdBatchJob.findUnique({
     where: { id: batchJobId },
   });
 
@@ -281,7 +281,7 @@ export async function generalBillPricingBatchJob(batchJobId: number) {
   });
 
   if (batchInfo && batchInfo.totalQty === batchInfo.processedQty) {
-    await db.batchJob.update({
+    await db.opdBatchJob.update({
       where: { id: batchJobId },
       data: {
         status: "COMPLETED",

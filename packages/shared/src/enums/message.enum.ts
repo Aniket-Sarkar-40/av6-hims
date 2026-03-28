@@ -61,6 +61,7 @@ export enum ErrorMessageType {
   NOT_AVAILABLE = "%1 not available",
   DELETE_RESTRICTED = "Deletion is not allowed because all medicines under this record have been sold.",
   NOT_EXCEED = "%1 cannot exceed %2",
+  FAILED = "%1 failed",
 }
 
 export enum ValidationErrorMessage {

@@ -1,6 +1,8 @@
 import {
   CalculationMethod,
+  DiscMethod,
   PercentageOrAmount,
+  Prisma,
   RoundFormat,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/client";
@@ -24,7 +26,7 @@ export interface CalculationRes {
 
 export interface CalculationInput {
   amount: number;
-  discountMethod: PercentageOrAmount;
+  discountMethod: DiscMethod;
   discount: number;
   taxMethod: TAX_METHOD;
   tax: number;
@@ -33,3 +35,11 @@ export interface CalculationInput {
   roundFormat: RoundFormat;
   precision: number;
 }
+
+export type DecimalToNumber<T> = T extends Prisma.Decimal
+  ? number
+  : T extends (infer U)[]
+    ? DecimalToNumber<U>[]
+    : T extends object
+      ? { [K in keyof T]: DecimalToNumber<T[K]> }
+      : T;

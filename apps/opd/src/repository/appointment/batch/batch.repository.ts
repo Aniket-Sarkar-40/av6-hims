@@ -10,7 +10,7 @@ type Tx = Prisma.TransactionClient;
 
 export const createBatchJobInDb = async (tx: Tx, inp: BatchJobInput) => {
   logger.info("entering::createBatchJobInDb::repository");
-  return tx.batchJob.create({
+  return tx.opdBatchJob.create({
     data: inp,
   });
 };
