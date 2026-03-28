@@ -1,18 +1,21 @@
 import { Router } from "express";
-import { verifyToken, authorize } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateItemCategoryCreate,
   validateItemCategoryUpdate,
-} from "@/validations/request/master/itemCategory.validation";
+} from "@/validations/request/master/itemCategory.validation.js";
 import {
   createItemCategory,
   getAllItemCategory,
   getItemCategoryById,
   updateItemCategory,
-} from "@/controllers/master/itemCategory.controller";
+} from "@/controllers/master/itemCategory.controller.js";
 
-export const itemCategoryRouter = Router();
+export const itemCategoryRouter: Router = Router();
 
 /**
  * @swagger
@@ -39,9 +42,9 @@ export const itemCategoryRouter = Router();
 itemCategoryRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_CATEGORY", "CREATE")),
+  authorize(getPermission("INV", "ITEM_CATEGORY", "CREATE")),
   validateItemCategoryCreate,
-  createItemCategory
+  createItemCategory,
 );
 
 /**
@@ -53,7 +56,12 @@ itemCategoryRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-itemCategoryRouter.get("/", verifyToken, authorize(getPermission("ITEM_CATEGORY", "VIEW")), getAllItemCategory);
+itemCategoryRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_CATEGORY", "VIEW")),
+  getAllItemCategory,
+);
 
 /**
  * @swagger
@@ -69,7 +77,12 @@ itemCategoryRouter.get("/", verifyToken, authorize(getPermission("ITEM_CATEGORY"
  *       '404':
  *         description: Type not found
  */
-itemCategoryRouter.get("/id", verifyToken, authorize(getPermission("ITEM_CATEGORY", "VIEW")), getItemCategoryById);
+itemCategoryRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_CATEGORY", "VIEW")),
+  getItemCategoryById,
+);
 
 /**
  * @swagger
@@ -96,7 +109,10 @@ itemCategoryRouter.get("/id", verifyToken, authorize(getPermission("ITEM_CATEGOR
 itemCategoryRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_CATEGORY", "VIEW"), getPermission("ITEM_CATEGORY", "UPDATE")),
+  authorize(
+    getPermission("INV", "ITEM_CATEGORY", "VIEW"),
+    getPermission("INV", "ITEM_CATEGORY", "UPDATE"),
+  ),
   validateItemCategoryUpdate,
-  updateItemCategory
+  updateItemCategory,
 );

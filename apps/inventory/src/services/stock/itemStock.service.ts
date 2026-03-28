@@ -1,8 +1,11 @@
-import { itemStock, itemStockSummary } from "@/repository/stock/stock.repository";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
+import {
+  itemStock,
+  itemStockSummary,
+} from "@/repository/stock/stock.repository.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import ExcelJs from "exceljs";
 
 export const itemStockService = {
@@ -78,7 +81,10 @@ export const itemStockService = {
       { header: "PO Received Qty", key: "po_received_qty" },
       { header: "PO Pend Qty(poq-prq)", key: "po_pending_qty_poq_prq" },
       { header: "Total Stock", key: "total_stock_ppq_sq_srrq+cq" },
-      { header: "GRN(ReqQT-RetrQty-ConsQTY)Stock", key: "grn_recQT_retrQty_consQTY_stock" },
+      {
+        header: "GRN(ReqQT-RetrQty-ConsQTY)Stock",
+        key: "grn_recQT_retrQty_consQTY_stock",
+      },
       // { header: "Variance vs Stock", key: "variance_vs_stock" },
     ];
 

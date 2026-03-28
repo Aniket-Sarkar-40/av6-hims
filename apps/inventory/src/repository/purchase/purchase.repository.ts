@@ -4,6 +4,7 @@ import { eventEmailService } from "@/services/master/emailConfig.service.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   CreatePurchaseOrderInput,
+  PurchaseOrderWithDetails,
   UpdatePurchaseOrder,
 } from "@/types/purchase/purchase.js";
 import { applyRound } from "av6-utils";
@@ -227,7 +228,7 @@ export const getCountPODetailsFromDb = async (
 };
 
 export const getAllPurchaseFromDb = async (): Promise<
-  (InvPurchaseOrder & { purchaseOrderDetails: InvPurchaseOrderDetails[] })[]
+  PurchaseOrderWithDetails[]
 > => {
   logger.info("entering::getAllPurchaseFromDb::repository");
   const allPOs = await db.invPurchaseOrder.findMany({
@@ -235,6 +236,14 @@ export const getAllPurchaseFromDb = async (): Promise<
     include: {
       purchaseOrderDetails: {
         where: { isActive: true },
+        include: {
+          item: {
+            include: {
+              itemCategory: true,
+              unit: true,
+            },
+          },
+        },
       },
     },
   });
@@ -244,30 +253,26 @@ export const getAllPurchaseFromDb = async (): Promise<
 
 export const getPurchaseByIdFromDb = async (
   id: number,
-): Promise<
-  | (InvPurchaseOrder & {
-      purchaseOrderDetails: (InvPurchaseOrderDetails & {
-        item: { item: string };
-      })[];
-    })
-  | null
-> => {
+): Promise<PurchaseOrderWithDetails | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository id=${id}`);
+
   const po = await db.invPurchaseOrder.findUnique({
     where: { id, isActive: true },
     include: {
       purchaseOrderDetails: {
-        where: {
-          isActive: true,
-        },
+        where: { isActive: true },
         include: {
           item: {
-            select: { item: true },
+            include: {
+              itemCategory: true,
+              unit: true,
+            },
           },
         },
       },
     },
   });
+
   logger.info(`exiting::getPurchaseByIdFromDb::repository id=${id}`);
   return po;
 };

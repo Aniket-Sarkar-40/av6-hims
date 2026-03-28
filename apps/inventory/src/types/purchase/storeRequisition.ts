@@ -4,7 +4,7 @@ import {
   STORE_REQ_ACK_STATUS,
   STORE_REQ_STATUS,
 } from "@repo/db/generated/prisma/client";
-import { IdValue } from "@repo/shared/types/global.js";
+import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
 import { EmployeeCache } from "av6-core";
 import { ItemMasterToDto } from "../grn/grn.js";
 
@@ -42,6 +42,8 @@ export type StoreRequisitionResponse = Prisma.InvStoreRequisitionGetPayload<{
 
 export interface StoreRequisitionDTO extends Omit<
   ValStoreRequisitionResponse,
+  | BaseModelAttrWoCancel
+  | "ccId"
   | "createdBy"
   | "storeRequisitionDetails"
   | "approvedBy"

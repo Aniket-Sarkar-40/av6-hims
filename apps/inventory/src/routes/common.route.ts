@@ -12,9 +12,9 @@ import {
   commonUpdateStatus,
   fixedSearch,
   fixedSearchWoPaginationController,
-} from "@/controllers/common.controller";
-import { authorizeCommonSearch, verifyToken } from "@/middlewares/auth.middleware";
-import { createUploadMiddleware } from "@/middlewares/imageUpload.middleware";
+} from "@/controllers/common.controller.js";
+import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
+import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import {
   validateCommonCreate,
   validateCommonDelete,
@@ -29,10 +29,12 @@ import {
   validateFixedSearchFetch,
   validateFixedSearchWoPagination,
   validateSearchRequest,
-} from "@/validations/request/common.validation";
+} from "@/validations/request/common.validation.js";
 import { Router } from "express";
+import { authorizeCommonSearch } from "@/middleware/auth.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 
-export const commonRouter = Router();
+export const commonRouter: Router = Router();
 /**
  * @swagger
  * tags:
@@ -40,10 +42,28 @@ export const commonRouter = Router();
  *   description: Common endpoints
  */
 
-commonRouter.post("/lock", verifyToken, authorizeCommonSearch(), validateCommonLock, commonLockUnlock);
+commonRouter.post(
+  "/lock",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateCommonLock,
+  commonLockUnlock,
+);
 
-commonRouter.post("/create", verifyToken, authorizeCommonSearch(), validateCommonCreate, commonCreate);
-commonRouter.put("/update", verifyToken, authorizeCommonSearch(), validateCommonUpdate, commonUpdate);
+commonRouter.post(
+  "/create",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateCommonCreate,
+  commonCreate,
+);
+commonRouter.put(
+  "/update",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateCommonUpdate,
+  commonUpdate,
+);
 
 /**
  * @swagger
@@ -59,7 +79,13 @@ commonRouter.put("/update", verifyToken, authorizeCommonSearch(), validateCommon
  *             $ref: '#/components/fixedSearchSchema'
  */
 // POST /fixedSearch
-commonRouter.post("/fixedSearch", verifyToken, authorizeCommonSearch(), validateFixedSearchFetch, fixedSearch);
+commonRouter.post(
+  "/fixedSearch",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateFixedSearchFetch,
+  fixedSearch,
+);
 
 /**
  * @swagger
@@ -75,7 +101,13 @@ commonRouter.post("/fixedSearch", verifyToken, authorizeCommonSearch(), validate
  *             $ref: '#/components/searchRequestSchema'
  */
 // POST /users
-commonRouter.post("/search", verifyToken, authorizeCommonSearch(), validateSearchRequest, commonSearch);
+commonRouter.post(
+  "/search",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateSearchRequest,
+  commonSearch,
+);
 
 /**
  * @swagger
@@ -96,7 +128,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch
+  commonDropdownSearch,
 );
 
 /**
@@ -118,7 +150,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController
+  fixedSearchWoPaginationController,
 );
 
 /**
@@ -140,7 +172,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport
+  commonFSExcelExport,
 );
 
 /**
@@ -157,7 +189,13 @@ commonRouter.post(
  *             $ref: '#/components/commonFetchSchema'
  */
 // POST /fetch
-commonRouter.post("/fetch", verifyToken, authorizeCommonSearch(), validateCommonFetch, commonFetch);
+commonRouter.post(
+  "/fetch",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateCommonFetch,
+  commonFetch,
+);
 
 /**
  * @swagger
@@ -175,9 +213,10 @@ commonRouter.post("/fetch", verifyToken, authorizeCommonSearch(), validateCommon
 // POST /importExcel
 commonRouter.post(
   "/importExcel",
-  createUploadMiddleware("excel", "excelFile"),
+  createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport
+  commonExcelImport,
 );
 
 /**
@@ -204,7 +243,13 @@ commonRouter.post("/exportExcel", validateCommonExportExcel, commonExcelExport);
  *     tags: [Common]
  */
 // DELETE/:shortCode/:id
-commonRouter.delete("/", verifyToken, authorizeCommonSearch(), validateCommonDelete, commonDelete);
+commonRouter.delete(
+  "/",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateCommonDelete,
+  commonDelete,
+);
 
 /**
  * @swagger
@@ -225,7 +270,7 @@ commonRouter.patch(
   verifyToken,
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus
+  commonUpdateStatus,
 );
 
 // /**

@@ -3,7 +3,11 @@ import {
   InvItemStock,
   Prisma,
 } from "@repo/db/generated/prisma/client";
-import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
+import {
+  BaseModelAttr,
+  BaseModelAttrWoCancel,
+  IdValue,
+} from "@repo/shared/types/global.js";
 
 export interface CreateItemStockInput extends Omit<
   Prisma.InvItemStockUncheckedCreateInput,
@@ -25,7 +29,10 @@ export type ItemStockResponse = Prisma.InvItemStockGetPayload<{
     collectionCenter: true;
   };
 }>;
-export interface ItemStockDTO extends InvItemStock {
+export interface ItemStockDTO extends Omit<
+  InvItemStock,
+  BaseModelAttrWoCancel | "ccId" | "userId" | "itemId"
+> {
   item: InvItem | null;
   user: IdValue | null;
 }

@@ -9,6 +9,13 @@ export enum PermissionType {
 
 export enum PermissionResource {
   // INVENTORY
+  EXPENSE_HEAD = "expense-head",
+  EXPENSE = "expense",
+  INCOME_HEAD = "income-head",
+  INCOME = "income",
+  STORAGE = "storage",
+  TAX_DETAILS = "tax-details",
+  DYNAMIC_FROM = "dynamic-from",
   SETTING = "settings",
   ITEM_SUPPLIER = "item-supplier",
   ITEM_CATEGORY = "item-category",

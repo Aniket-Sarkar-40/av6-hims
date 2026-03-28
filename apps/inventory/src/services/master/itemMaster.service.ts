@@ -1,11 +1,10 @@
-import ExcelJs from "exceljs";
+import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import {
   toItemMasterDTO,
   toItemMasterDTOForItemSupplierMap,
   toItemSearchDTO,
   toItemStockDTO,
-} from "@/mapper/master/itemMaster.mapper";
-import { deleteFileIfExists } from "@/middlewares/imageUpload.middleware";
+} from "@/mapper/master/itemMaster.mapper.js";
 import {
   createItemMasterInDb,
   getAllItemMasterFromDb,
@@ -14,7 +13,7 @@ import {
   getItemStocksByItemId,
   toggleItemActiveInDb,
   updateItemMasterInDb,
-} from "@/repository/master/itemMaster.repository";
+} from "@/repository/master/itemMaster.repository.js";
 import {
   CreateItemSearch,
   GetItemReq,
@@ -26,37 +25,36 @@ import {
   ItemMasterReq,
   ItemMasterUpdateReq,
   ItemSearchDTO,
-} from "@/types/master/itemMaster";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import {
-  addToCache,
-  checkIsCacheable,
-  deleteCache,
-  getAllCache,
-  getCacheById,
-  updateCache,
-} from "@/utils/redisHelper.utils";
-import { getRedisKey } from "@/utils/redisKey.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { SHORT_CODE } from "@/utils/shortCode.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@/types/master/itemMaster.js";
 import {
   createItemMasterServiceValidation,
   updateIdItemMasterServiceValidation,
   validateBulkItemSupplierPricesService,
-} from "@/validations/service/master/itemMaster.service.validation";
-import { Item } from "@prisma/client";
+} from "@/validations/service/master/itemMaster.service.validation.js";
+import { InvItem } from "@repo/db/generated/prisma/client";
+import {
+  addToCache,
+  deleteCache,
+  getAllCache,
+  getCacheById,
+  updateCache,
+} from "@repo/platform/cache/redis.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import ExcelJs from "exceljs";
 
 export const cacheKey = getRedisKey("ITEM", "all");
 export const cacheKeyForItemSearch = getRedisKey("ITEM", "search");
 
-const deleteOldItemImageFiles = (item: Item) => {
-  deleteFileIfExists(process.cwd() + item.frontImage);
-  deleteFileIfExists(process.cwd() + item.backImage);
-  deleteFileIfExists(process.cwd() + item.leftSideImage);
-  deleteFileIfExists(process.cwd() + item.rightSideImage);
-};
+// const deleteOldItemImageFiles = (item: InvItem) => {
+//   deleteFileIfExists(process.cwd() + item.frontImage);
+//   deleteFileIfExists(process.cwd() + item.backImage);
+//   deleteFileIfExists(process.cwd() + item.leftSideImage);
+//   deleteFileIfExists(process.cwd() + item.rightSideImage);
+// };
 
 export const itemMasterService = {
   async createItemMaster(input: ItemMasterReq): Promise<ItemMasterDto> {
@@ -68,9 +66,11 @@ export const itemMasterService = {
       await addToCache(cacheKey, itemMaster.id, itemMaster);
     }
     logger.info("exiting::createItemMaster::service");
-    const itemForSearch = toItemMasterDTO(itemMaster);
-    await addToCache(cacheKeyForItemSearch, (await itemForSearch).id, itemForSearch);
-    return itemForSearch;
+    const itemForSearch = await toItemMasterDTO([itemMaster]);
+    if (isCacheable) {
+      await addToCache(cacheKeyForItemSearch, itemMaster.id, itemForSearch[0]);
+    }
+    return itemForSearch[0];
   },
 
   async getItemStocks(itemStockReq: GetItemStockRequest) {
@@ -90,8 +90,8 @@ export const itemMasterService = {
     if (!input.id) {
       throw new ErrorHandler(400, "Item Master ID is required");
     }
-    const oldItem = await updateIdItemMasterServiceValidation(input);
-    deleteOldItemImageFiles(oldItem);
+    // const oldItem = await updateIdItemMasterServiceValidation(input);
+    // deleteOldItemImageFiles(oldItem);
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
     const updatedItemMaster = await updateItemMasterInDb(input);
     if (isCacheable) {
@@ -99,75 +99,100 @@ export const itemMasterService = {
     }
 
     logger.info("exiting::updateItemMaster::service");
-    return toItemMasterDTO(updatedItemMaster);
+    const itemMasterDto = await toItemMasterDTO([updatedItemMaster]);
+    return itemMasterDto[0];
   },
 
-  async getAllItemMaster(canNullReturnable: boolean = false): Promise<ItemMasterDto[]> {
+  async getAllItemMaster(
+    canNullReturnable: boolean = false,
+  ): Promise<ItemMasterDto[]> {
     logger.info("entering::getAllItemMaster::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
-    let itemMaster: Item[];
+    let itemMaster: InvItem[];
     if (isCacheable) {
-      itemMaster = (await getAllCache(cacheKey)) as Item[];
+      itemMaster = (await getAllCache(cacheKey)) as InvItem[];
     } else {
       itemMaster = await getAllItemMasterFromDb();
     }
     if (itemMaster.length === 0) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Master"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Master"),
+        );
       else return [];
     }
     logger.info("exiting::getAllItemMaster::service");
-    return Promise.all(itemMaster.map((item) => toItemMasterDTO(item)));
+    const itemMasterDTO = await toItemMasterDTO(itemMaster);
+    return itemMasterDTO;
   },
 
-  async getAllItemMasterWoDto(): Promise<Item[]> {
+  async getAllItemMasterWoDto(): Promise<InvItem[]> {
     logger.info("entering::getAllItemMasterWoDto::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
-    let itemMaster: Item[];
+    let itemMaster: InvItem[];
     if (isCacheable) {
-      itemMaster = (await getAllCache(cacheKey)) as Item[];
+      itemMaster = (await getAllCache(cacheKey)) as InvItem[];
     } else {
       itemMaster = await getAllItemMasterFromDb();
     }
     if (itemMaster.length === 0) {
-      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Master"));
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Item Master"),
+      );
     }
     logger.info("exiting::getAllItemMasterWoDto::service");
     return itemMaster;
   },
 
-  async getItemMasterById(input: GetItemReq, canNullReturnable: boolean = false): Promise<ItemMasterDto | null> {
+  async getItemMasterById(
+    input: GetItemReq,
+    canNullReturnable: boolean = false,
+  ): Promise<ItemMasterDto | null> {
     logger.info("entering::getItemMasterById::service");
     const { itemId, ccId, supplierId } = input;
     validIdCheck(itemId);
     if (supplierId) validIdCheck(supplierId);
     if (ccId) validIdCheck(ccId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
-    let itemMaster: Item | null;
+    let itemMaster: InvItem | null;
     if (isCacheable) {
-      itemMaster = (await getCacheById(cacheKey, itemId)) as Item | null;
+      itemMaster = (await getCacheById(cacheKey, itemId)) as InvItem | null;
     } else {
       itemMaster = await getItemMasterByIdFromDb(itemId);
     }
     if (!itemMaster) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Master"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Master"),
+        );
       else return null;
     }
 
     logger.info("exiting::getItemMasterById::service");
     return toItemMasterDTOForItemSupplierMap(itemMaster, input);
   },
-  async getItemMasterByIdWoDto(itemId: number, canNullReturnable: boolean = false): Promise<Item | null> {
+  async getItemMasterByIdWoDto(
+    itemId: number,
+    canNullReturnable: boolean = false,
+  ): Promise<InvItem | null> {
     logger.info("entering::getItemMasterById::service");
     validIdCheck(itemId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
-    let itemMaster: Item | null;
+    let itemMaster: InvItem | null;
     if (isCacheable) {
-      itemMaster = (await getCacheById(cacheKey, itemId)) as Item | null;
+      itemMaster = (await getCacheById(cacheKey, itemId)) as InvItem | null;
     } else {
       itemMaster = await getItemMasterByIdFromDb(itemId);
     }
     if (!itemMaster) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item Master"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Master"),
+        );
       else return null;
     }
 
@@ -190,11 +215,15 @@ export const itemMasterService = {
     });
 
     if (input.unitId) {
-      filteredItems = filteredItems.filter((item) => item.unitId === input.unitId);
+      filteredItems = filteredItems.filter(
+        (item) => item.unitId === input.unitId,
+      );
     }
 
     if (input.itemCategoryId) {
-      filteredItems = filteredItems.filter((item) => item.itemCategoryId === input.itemCategoryId);
+      filteredItems = filteredItems.filter(
+        (item) => item.itemCategoryId === input.itemCategoryId,
+      );
     }
 
     // const categories = (await getAllCache(getRedisKey("ITEM_CATEGORY", "all"))) as ItemCategory[] | null;
@@ -207,12 +236,14 @@ export const itemMasterService = {
           item,
           categories: item.itemCategoryId,
           units: item.unitId,
-        })
-      )
+        }),
+      ),
     );
   },
 
-  async getItemSupplierPricesForSupplier(input: getItems): Promise<ItemMasterDtoStock[]> {
+  async getItemSupplierPricesForSupplier(
+    input: getItems,
+  ): Promise<ItemMasterDtoStock[]> {
     logger.info("entering::getItemSupplierPricesForSupplier::service");
     await validateBulkItemSupplierPricesService(input);
 
@@ -224,8 +255,8 @@ export const itemMasterService = {
           itemId: itm.id,
           supplierId: input.supplierId,
           ccId: input.ccId,
-        })
-      )
+        }),
+      ),
     );
 
     logger.info("exiting::getItemSupplierPricesForSupplier::service");

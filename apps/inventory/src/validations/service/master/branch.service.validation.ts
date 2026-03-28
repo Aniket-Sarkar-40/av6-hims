@@ -1,12 +1,11 @@
-import { getBranchByBranchNameFromDb } from "@/repository/master/branch.repository";
-import { BranchReq } from "@/types/master/branch";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
-
-import { branchService } from "@/services/master/branch.service";
-import { warehouseService } from "@/services/master/warehouse.service";
+import { getBranchByBranchNameFromDb } from "@/repository/master/branch.repository.js";
+import { BranchReq } from "@/types/master/branch.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import { branchService } from "@/services/master/branch.service.js";
+import { warehouseService } from "@/services/master/warehouse.service.js";
 
 export const validateIdBranch = async (branchId: number) => {
   logger.info("entering::validateIdBranch::service::validation");
@@ -22,7 +21,9 @@ export const validateIdBranch = async (branchId: number) => {
   return branch;
 };
 
-export const deleteBranchServiceValidation = async (branchId: number): Promise<void> => {
+export const deleteBranchServiceValidation = async (
+  branchId: number,
+): Promise<void> => {
   logger.info("entering::deleteBranchServiceValidation::service::validation");
 
   await validateIdBranch(branchId);
@@ -31,7 +32,9 @@ export const deleteBranchServiceValidation = async (branchId: number): Promise<v
   return;
 };
 
-export const getIdBranchServiceValidation = async (branchId: number): Promise<void> => {
+export const getIdBranchServiceValidation = async (
+  branchId: number,
+): Promise<void> => {
   logger.info("entering::getIdBranchServiceValidation::service::validation");
 
   await validateIdBranch(branchId);
@@ -40,22 +43,33 @@ export const getIdBranchServiceValidation = async (branchId: number): Promise<vo
   return;
 };
 
-export const updateIdBranchServiceValidation = async (branchId: number, body: BranchReq): Promise<void> => {
+export const updateIdBranchServiceValidation = async (
+  branchId: number,
+  body: BranchReq,
+): Promise<void> => {
   logger.info("entering::updateIdBranchServiceValidation::service::validation");
   await validateIdBranch(branchId);
 
   const branchByName = await getBranchByBranchNameFromDb(body.name);
   if (branchByName && branchByName.id !== branchId) {
-    throw new ErrorHandler(400, generateErrorMessage("DUPLICATE_ITEM", "Branch Name"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("DUPLICATE_ITEM", "Branch Name"),
+    );
   }
   logger.info("exiting::updateIdBranchServiceValidation::service::validation");
   return;
 };
 
-export const createBranchServiceValidation = async (body: BranchReq): Promise<void> => {
+export const createBranchServiceValidation = async (
+  body: BranchReq,
+): Promise<void> => {
   logger.info("entering::createBranchServiceValidation::service::validation");
   // await validateBranchForeignKeys(body);
-  const alreadyExistsWarehouse = await warehouseService.getWarehouseById(body.id, true);
+  const alreadyExistsWarehouse = await warehouseService.getWarehouseById(
+    body.id,
+    true,
+  );
   const alreadyExistsBranch = await branchService.getBranchById(body.id, true);
   if (alreadyExistsWarehouse || alreadyExistsBranch) {
     throw new ErrorHandler(400, "Collection center is already mapped");
@@ -63,7 +77,10 @@ export const createBranchServiceValidation = async (body: BranchReq): Promise<vo
 
   const branch = await getBranchByBranchNameFromDb(body.name);
   if (branch) {
-    throw new ErrorHandler(400, generateErrorMessage("DUPLICATE_ITEM", "Branch Name"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("DUPLICATE_ITEM", "Branch Name"),
+    );
   }
   logger.info("exiting::createBranchServiceValidation::service::validation");
 

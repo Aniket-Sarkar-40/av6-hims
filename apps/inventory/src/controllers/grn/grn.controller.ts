@@ -1,12 +1,11 @@
-import { TryCatch } from "@/middlewares/error.middleware";
-import { grnService } from "@/services/grn/grn.service";
-import { CreateGrnInput } from "@/types/grn/grn";
+import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
+import { grnService } from "@/services/grn/grn.service.js";
+import { CreateGrnInput } from "@/types/grn/grn.js";
 
-import { BaseResponse } from "@/utils/baseResponse.utils";
-import { imageToBase64 } from "@/utils/helper.utils";
-import { logger } from "@/utils/logger.utils";
-import { generatePDF } from "@/utils/pdfGenerator.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
 import path from "path";
 
@@ -14,7 +13,10 @@ export const createGrn = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createGrn::controller");
   const input = req.body;
   const grn = await grnService.createGrn(input);
-  const response = BaseResponse.success({ type: "CREATED", data: grn }, "Good Receive Note");
+  const response = BaseResponse.success(
+    { type: "CREATED", data: grn },
+    "Good Receive Note",
+  );
   logger.info("exiting::createGrn::controller");
   return res.status(201).json(response);
 });
@@ -28,14 +30,25 @@ export const updateGrn = TryCatch(async (req: Request, res: Response) => {
 
   logger.info("exiting::updateGrn::controller");
 
-  return res.status(200).json(BaseResponse.success({ type: "UPDATED", data: updated }, "Good Receive Note"));
+  return res
+    .status(200)
+    .json(
+      BaseResponse.success(
+        { type: "UPDATED", data: updated },
+        "Good Receive Note",
+      ),
+    );
 });
 
 export const getAllGrn = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::getAllGrn::controller");
   const grn = await grnService.getAllGrn();
   logger.info("exiting::getAllGrn::controller");
-  return res.status(200).json(BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note"));
+  return res
+    .status(200)
+    .json(
+      BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note"),
+    );
 });
 
 export const getGrnById = TryCatch(async (req: Request, res: Response) => {
@@ -48,12 +61,16 @@ export const getGrnById = TryCatch(async (req: Request, res: Response) => {
     return res.status(404).json(
       BaseResponse.error({
         message: generateErrorMessage("NOT_FOUND", "Good Receive Note"),
-      })
+      }),
     );
   }
 
   logger.info("exiting::getGrnById::controller");
-  return res.status(200).json(BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note"));
+  return res
+    .status(200)
+    .json(
+      BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note"),
+    );
 });
 
 export const deleteGrn = TryCatch(async (req, res) => {
@@ -63,7 +80,9 @@ export const deleteGrn = TryCatch(async (req, res) => {
   await grnService.deleteGrn(id);
 
   logger.info("exiting::deleteGrn::controller");
-  return res.status(200).json(BaseResponse.success({ type: "DELETED" }, "Good Receive Note"));
+  return res
+    .status(200)
+    .json(BaseResponse.success({ type: "DELETED" }, "Good Receive Note"));
 });
 
 // export const excelGrnReport = TryCatch(async (req: Request, res: Response) => {
@@ -76,34 +95,34 @@ export const deleteGrn = TryCatch(async (req, res) => {
 //   res.end();
 // });
 
-export const printGrnById = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::printGrnById::controller");
+// export const printGrnById = TryCatch(async (req: Request, res: Response) => {
+//   logger.info("entering::printGrnById::controller");
 
-  // 1) Read filters and fetch data
-  const { grnId } = req.query as { grnId: string };
+//   // 1) Read filters and fetch data
+//   const { grnId } = req.query as { grnId: string };
 
-  const grn = await grnService.getGrnById(Number(grnId));
+//   const grn = await grnService.getGrnById(Number(grnId));
 
-  // 3) Locate template & logo
-  const tplDir = path.join(process.cwd(), "src", "templates", "pdf", "reports-pdf", "grn");
-  const bodyTpl = path.join(tplDir, "grn.hbs");
-  const base64Image = imageToBase64("public/images/logo.png");
+//   // 3) Locate template & logo
+//   const tplDir = path.join(process.cwd(), "src", "templates", "pdf", "reports-pdf", "grn");
+//   const bodyTpl = path.join(tplDir, "grn.hbs");
+//   const base64Image = imageToBase64("public/images/logo.png");
 
-  // 4) Render PDF
-  const pdfBuffer = await generatePDF(bodyTpl, {
-    grn,
-    base64Image,
-    reportFor: "Good Receive Note",
-  });
+//   // 4) Render PDF
+//   const pdfBuffer = await generatePDF(bodyTpl, {
+//     grn,
+//     base64Image,
+//     reportFor: "Good Receive Note",
+//   });
 
-  // 5) Stream down
-  res
-    .status(200)
-    .set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="good_receive.pdf"',
-    })
-    .send(pdfBuffer);
+//   // 5) Stream down
+//   res
+//     .status(200)
+//     .set({
+//       "Content-Type": "application/pdf",
+//       "Content-Disposition": 'attachment; filename="good_receive.pdf"',
+//     })
+//     .send(pdfBuffer);
 
-  logger.info("exiting::printGrnById::controller");
-});
+//   logger.info("exiting::printGrnById::controller");
+// });

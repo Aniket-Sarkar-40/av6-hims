@@ -5,29 +5,29 @@ import {
   getCurrencyByIdFromDb,
   updateActiveCurrencyInDb,
   updateCurrencyInDb,
-} from "@/repository/master/currency.repository";
-import { CurrencyReq } from "@/types/master/currency";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
+} from "@/repository/master/currency.repository.js";
+import { CurrencyReq } from "@/types/master/currency.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
 import {
   addToCache,
-  checkIsCacheable,
   deleteCache,
   getAllCache,
   getCacheById,
   updateCache,
-} from "@/utils/redisHelper.utils";
-import { getMasterRedisKey } from "@/utils/redisKey.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { SHORT_CODE } from "@/utils/shortCode.utils";
-import { validIdCheck } from "@/validations/global.validation";
+} from "@repo/platform/cache/redis.utils.js";
+import { getMasterRedisKey } from "@/config/cache.config.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import { checkIsCacheable } from "@/config/cache.config.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createCurrencyServiceValidation,
   deleteCurrencyServiceValidation,
   updateIdCurrencyServiceValidation,
-} from "@/validations/service/master/currency.service.validation";
+} from "@/validations/service/master/currency.service.validation.js";
 
-import { Currency } from "@prisma/client";
+import { Currency } from "@repo/db/generated/prisma/client";
 
 const cacheKey = getMasterRedisKey("CURRENCY", "all");
 
@@ -49,7 +49,9 @@ export const currencyService = {
     return currency;
   },
 
-  async getAllCurrency(canNullReturnable: boolean = false): Promise<Currency[]> {
+  async getAllCurrency(
+    canNullReturnable: boolean = false,
+  ): Promise<Currency[]> {
     logger.info("entering::getAllCurrency::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.CURRENCY);
     let currencies: Currency[] = [];
@@ -63,7 +65,10 @@ export const currencyService = {
     logger.info("exiting::getAllCurrency::service");
     if (currencies.length === 0) {
       if (!canNullReturnable) {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Currency"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Currency"),
+        );
       } else {
         return [];
       }
@@ -71,7 +76,10 @@ export const currencyService = {
     return currencies;
   },
 
-  async getCurrencyById(currencyId: number, canNullReturnable: boolean = false): Promise<Currency | null> {
+  async getCurrencyById(
+    currencyId: number,
+    canNullReturnable: boolean = false,
+  ): Promise<Currency | null> {
     logger.info("entering::getCurrencyById::service");
     validIdCheck(currencyId);
 
@@ -85,7 +93,11 @@ export const currencyService = {
     }
 
     if (currency === null) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "currency"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "currency"),
+        );
       else return null;
     }
 

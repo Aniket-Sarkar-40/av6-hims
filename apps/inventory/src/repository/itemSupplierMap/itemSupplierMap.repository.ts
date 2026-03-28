@@ -2,6 +2,7 @@ import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { db } from "@repo/db/client";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
+  ItemSuppierMapDTO,
   ItemSupplierMapCreateInput,
   ItemSupplierMaplBatchJobInput,
   ItemSupplierMapUpdateInput,
@@ -103,7 +104,14 @@ export async function updateItemSupplierMapInDb(
       actionBy: store?.user?.id,
     });
 
-    const diff = findDifferences(existing, omittedResponse.rest);
+    const updatedItemSupplier: ItemSuppierMapDTO = {
+      ...omittedResponse.rest,
+      item: existing.item,
+      supplier: existing.supplier,
+      collectionCenter: existing.collectionCenter,
+    };
+
+    const diff = findDifferences(existing, updatedItemSupplier);
 
     for (const d of diff) {
       await CreateItemSupplierMapAuditDetails(tx, {
@@ -350,7 +358,7 @@ export async function ItemSupplierMapBatchJob(
               rowNo: item.rowNo,
             },
           });
-          await db.batchJob.update({
+          await db.invBatchJob.update({
             where: { id: batchJobId },
             data: {
               processedQty: { increment: 1 },
@@ -369,7 +377,7 @@ export async function ItemSupplierMapBatchJob(
               errorMsg: `${item.itemName} ---> ` + "Supplier Price is 0",
             },
           });
-          await db.batchJob.update({
+          await db.invBatchJob.update({
             where: { id: batchJobId },
             data: {
               processedQty: { increment: 1 },
@@ -400,7 +408,7 @@ export async function ItemSupplierMapBatchJob(
             errorMsg: `${item.itemName} ---> ` + errorMessage,
           },
         });
-        await db.batchJob.update({
+        await db.invBatchJob.update({
           where: { id: batchJobId },
           data: {
             processedQty: { increment: 1 },
@@ -413,12 +421,12 @@ export async function ItemSupplierMapBatchJob(
     skip += BATCH_SIZE;
   }
   // ✅ Final status update
-  const batchInfo = await db.batchJob.findUnique({
+  const batchInfo = await db.invBatchJob.findUnique({
     where: { id: batchJobId },
   });
   await db.invItemSupplierMapExcel.deleteMany();
   if (batchInfo && batchInfo.totalQty === batchInfo.processedQty) {
-    await db.batchJob.update({
+    await db.invBatchJob.update({
       where: { id: batchJobId },
       data: {
         status: "COMPLETED",

@@ -2,7 +2,11 @@ import {
   InvItemSupplierMapping,
   Prisma,
 } from "@repo/db/generated/prisma/client";
-import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
+import {
+  BaseModelAttr,
+  BaseModelAttrWoCancel,
+  IdValue,
+} from "@repo/shared/types/global.js";
 
 export type ItemSupplierMapCreateInput = Omit<
   Prisma.InvItemSupplierMappingUncheckedCreateInput,
@@ -36,7 +40,7 @@ export type ItemSupplierMapExcelRow = {
 
 export interface ItemSuppierMapDTO extends Omit<
   InvItemSupplierMapping,
-  BaseModelAttr
+  BaseModelAttrWoCancel | "ccId" | "itemId" | "supplierId"
 > {
   item: IdValue | null;
   supplier: IdValue | null;

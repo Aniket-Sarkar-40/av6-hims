@@ -13,7 +13,7 @@ export type CreatePurchaseOrderInput = Omit<
 > & {
   supplier: ItemSupplierDTO | null;
   purchaseOrderDetails: PurchaseOrderDetails[];
-  po: InvPurchaseOrder;
+  po: PurchaseOrderDTO;
 };
 
 export interface UpdatePurchaseOrder extends CreatePurchaseOrderInput {
@@ -73,3 +73,18 @@ export type PurchaseOrderDetailResponse =
       itemMedUnit: true;
     };
   }>;
+
+export type PurchaseOrderWithDetails = Prisma.InvPurchaseOrderGetPayload<{
+  include: {
+    purchaseOrderDetails: {
+      include: {
+        item: {
+          include: {
+            itemCategory: true;
+            unit: true;
+          };
+        };
+      };
+    };
+  };
+}>;

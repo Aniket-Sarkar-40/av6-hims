@@ -1,31 +1,53 @@
-import { branchService } from "@/services/master/branch.service";
-import { itemMasterService } from "@/services/master/itemMaster.service";
-import { warehouseService } from "@/services/master/warehouse.service";
-import { inTransitStockDTO } from "@/types/inTransitStock/inTransitStock";
-import { customOmit } from "@/utils/helper.utils";
-import { InTransitStock } from "@prisma/client";
-import { coreRequests } from "@/client/core/request";
-import { toIdValue } from "@/utils/idValue.utils";
+import { branchService } from "@/services/master/branch.service.js";
+import { itemMasterService } from "@/services/master/itemMaster.service.js";
+import { warehouseService } from "@/services/master/warehouse.service.js";
+import { inTransitStockDTO } from "@/types/inTransitStock/inTransitStock.js";
+import { customOmit } from "av6-utils";
+import { InvInTransitStock } from "@repo/db/generated/prisma/client";
+import { toIdValue } from "av6-utils";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
 
-export const toInTransitStockDTO = async (inStock: InTransitStock): Promise<inTransitStockDTO> => {
-  const omitted = customOmit<InTransitStock, "fromId" | "toId" | "itemId" | "isActive">(inStock, [
-    "fromId",
-    "toId",
-    "itemId",
-    "isActive",
-  ]);
+export const toInTransitStockDTO = async (
+  data: InvInTransitStock[],
+): Promise<inTransitStockDTO[]> => {
+  const warehouses = await warehouseService.getAllWarehouse(true);
+  const branches = await branchService.getAllBranch(true);
+  const items = await itemMasterService.getAllItemMaster(true);
 
-  const fromUser = await coreRequests.getEmployeeCache(inStock.fromId);
-  const toWarehouse = await warehouseService.getWarehouseById(inStock.toId, true);
-  const toBranch = await branchService.getBranchById(inStock.toId, true);
-  const item = await itemMasterService.getItemMasterByIdWoDto(inStock.itemId, true);
+  return Promise.all(
+    data.map(async (inStock) => {
+      const omittedInStock = customOmit<
+        InvInTransitStock,
+        BaseModelAttrWoCancel | "fromId" | "toId" | "itemId"
+      >(inStock, [
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "fromId",
+        "toId",
+        "itemId",
+      ]);
 
-  const toDTO = toWarehouse ? toWarehouse : toBranch;
+      const fromUser = await employeeService.getEmployeeByIdFrmCacheOrDb(
+        inStock.fromId,
+        true,
+      );
+      const toWarehouse = warehouses.find((wh) => wh.id === inStock.toId);
+      const toBranch = branches.find((br) => br.id === inStock.toId);
+      const item = items.find((it) => it.id === inStock.itemId);
 
-  return {
-    ...omitted.rest,
-    from: toIdValue(fromUser, "name"),
-    to: toIdValue(toDTO, "name"),
-    item: toIdValue(item, "item"),
-  };
+      const toDTO = toWarehouse ? toWarehouse : toBranch;
+
+      return {
+        ...omittedInStock.rest,
+        from: toIdValue(fromUser, "name"),
+        to: toDTO ? toIdValue(toDTO, "name") : null,
+        item: item ? toIdValue(item, "item") : null,
+      };
+    }),
+  );
 };

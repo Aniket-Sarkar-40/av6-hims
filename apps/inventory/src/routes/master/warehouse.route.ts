@@ -4,14 +4,17 @@ import {
   getWarehouseById,
   toggleActiveWarehouse,
   updateWarehouse,
-} from "@/controllers/master/warehouse.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateToggleActive } from "@/validations/request/common.validation";
-import { validateWarehouse } from "@/validations/request/master/warehouse.validation";
+} from "@/controllers/master/warehouse.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { validateToggleActive } from "@/validations/request/common.validation.js";
+import { validateWarehouse } from "@/validations/request/master/warehouse.validation.js";
 import { Router } from "express";
 
-const warehouseRouter = Router();
+export const warehouseRouter: Router = Router();
 
 /**
  * @swagger
@@ -38,9 +41,9 @@ const warehouseRouter = Router();
 warehouseRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("WAREHOUSE", "CREATE")),
+  authorize(getPermission("INV", "WAREHOUSE", "CREATE")),
   validateWarehouse,
-  createWarehouse
+  createWarehouse,
 );
 
 /**
@@ -52,7 +55,12 @@ warehouseRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-warehouseRouter.get("/", verifyToken, authorize(getPermission("WAREHOUSE", "VIEW")), getAllWarehouse);
+warehouseRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "WAREHOUSE", "VIEW")),
+  getAllWarehouse,
+);
 
 /**
  * @swagger
@@ -68,7 +76,12 @@ warehouseRouter.get("/", verifyToken, authorize(getPermission("WAREHOUSE", "VIEW
  *       '404':
  *         description: Type not found
  */
-warehouseRouter.get("/id", verifyToken, authorize(getPermission("WAREHOUSE", "VIEW")), getWarehouseById);
+warehouseRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "WAREHOUSE", "VIEW")),
+  getWarehouseById,
+);
 
 /**
  * @swagger
@@ -95,9 +108,12 @@ warehouseRouter.get("/id", verifyToken, authorize(getPermission("WAREHOUSE", "VI
 warehouseRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("WAREHOUSE", "VIEW"), getPermission("WAREHOUSE", "UPDATE")),
+  authorize(
+    getPermission("INV", "WAREHOUSE", "VIEW"),
+    getPermission("INV", "WAREHOUSE", "UPDATE"),
+  ),
   validateWarehouse,
-  updateWarehouse
+  updateWarehouse,
 );
 
 /**
@@ -118,9 +134,12 @@ warehouseRouter.put(
 warehouseRouter.post(
   "/toggle-active",
   verifyToken,
-  authorize(getPermission("WAREHOUSE", "VIEW"), getPermission("WAREHOUSE", "UPDATE")),
+  authorize(
+    getPermission("INV", "WAREHOUSE", "VIEW"),
+    getPermission("INV", "WAREHOUSE", "UPDATE"),
+  ),
   validateToggleActive,
-  toggleActiveWarehouse
+  toggleActiveWarehouse,
 );
 
 export default warehouseRouter;

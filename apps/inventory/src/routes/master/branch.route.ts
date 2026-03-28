@@ -4,14 +4,17 @@ import {
   getBranchById,
   toggleActiveBranch,
   updateBranch,
-} from "@/controllers/master/branch.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateToggleActive } from "@/validations/request/common.validation";
-import { validateBranch } from "@/validations/request/master/branch.validation";
+} from "@/controllers/master/branch.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { validateToggleActive } from "@/validations/request/common.validation.js";
+import { validateBranch } from "@/validations/request/master/branch.validation.js";
 import { Router } from "express";
 
-export const branchRouter = Router();
+export const branchRouter: Router = Router();
 
 /**
  * @swagger
@@ -35,7 +38,13 @@ export const branchRouter = Router();
  *           schema:
  *             $ref: '#/components/branchSchema'
  */
-branchRouter.post("/", verifyToken, authorize(getPermission("BRANCH", "CREATE")), validateBranch, createBranch);
+branchRouter.post(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "BRANCH", "CREATE")),
+  validateBranch,
+  createBranch,
+);
 
 /**
  * @swagger
@@ -46,7 +55,12 @@ branchRouter.post("/", verifyToken, authorize(getPermission("BRANCH", "CREATE"))
  *     security:
  *       - bearerAuth: []
  */
-branchRouter.get("/", verifyToken, authorize(getPermission("BRANCH", "VIEW")), getAllBranch);
+branchRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "BRANCH", "VIEW")),
+  getAllBranch,
+);
 
 /**
  * @swagger
@@ -62,7 +76,12 @@ branchRouter.get("/", verifyToken, authorize(getPermission("BRANCH", "VIEW")), g
  *       '404':
  *         description: Type not found
  */
-branchRouter.get("/id", verifyToken, authorize(getPermission("BRANCH", "VIEW")), getBranchById);
+branchRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "BRANCH", "VIEW")),
+  getBranchById,
+);
 
 /**
  * @swagger
@@ -82,9 +101,12 @@ branchRouter.get("/id", verifyToken, authorize(getPermission("BRANCH", "VIEW")),
 branchRouter.post(
   "/toggle-active",
   verifyToken,
-  authorize(getPermission("BRANCH", "VIEW"), getPermission("BRANCH", "UPDATE")),
+  authorize(
+    getPermission("INV", "BRANCH", "VIEW"),
+    getPermission("INV", "BRANCH", "UPDATE"),
+  ),
   validateToggleActive,
-  toggleActiveBranch
+  toggleActiveBranch,
 );
 
 /**
@@ -112,7 +134,10 @@ branchRouter.post(
 branchRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("BRANCH", "VIEW"), getPermission("BRANCH", "UPDATE")),
+  authorize(
+    getPermission("INV", "BRANCH", "VIEW"),
+    getPermission("INV", "BRANCH", "UPDATE"),
+  ),
   validateBranch,
-  updateBranch
+  updateBranch,
 );

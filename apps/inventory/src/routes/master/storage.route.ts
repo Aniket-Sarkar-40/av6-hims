@@ -1,10 +1,19 @@
-import { createStorage, updateStorage } from "@/controllers/master/storage.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { validateStorageCreate, validateStorageUpdate } from "@/validations/request/master/storage.validation";
+import {
+  createStorage,
+  updateStorage,
+} from "@/controllers/master/storage.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  validateStorageCreate,
+  validateStorageUpdate,
+} from "@/validations/request/master/storage.validation.js";
 import { Router } from "express";
 
-export const storageRouter = Router();
+export const storageRouter: Router = Router();
 
 /**
  * @swagger
@@ -31,9 +40,9 @@ export const storageRouter = Router();
 storageRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("STORAGE", "CREATE")),
+  authorize(getPermission("INV", "STORAGE", "CREATE")),
   validateStorageCreate,
-  createStorage
+  createStorage,
 );
 
 /**
@@ -61,7 +70,10 @@ storageRouter.post(
 storageRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("STORAGE", "VIEW"), getPermission("STORAGE", "UPDATE")),
+  authorize(
+    getPermission("INV", "STORAGE", "VIEW"),
+    getPermission("INV", "STORAGE", "UPDATE"),
+  ),
   validateStorageUpdate,
-  updateStorage
+  updateStorage,
 );

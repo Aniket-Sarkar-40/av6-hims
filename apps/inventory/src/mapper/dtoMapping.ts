@@ -1,5 +1,4 @@
 import { GrnResponse } from "@/types/grn/grn.js";
-import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import {
   Expense,
   Income,
@@ -8,8 +7,6 @@ import {
   InvItemStock,
   InvItemStore,
   InvItemSupplierMapping,
-  InvPurchaseOrder,
-  InvPurchaseOrderDetails,
   InvUINConfig,
 } from "@repo/db/generated/prisma/client";
 import { toGrnDTO } from "./grn/grn.mapper.js";
@@ -36,46 +33,38 @@ import { toStockAdjustmentDTO } from "./stock/stockAdjustment.mapper.js";
 import { StockAdjustmentResponse } from "@/types/stock/stockAdjustment.js";
 import { toExpenseDTO } from "./consumerConnect/expense.mapper.js";
 import { toIncomeDTO } from "./consumerConnect/income.mapper.js";
+import { PurchaseOrderWithDetails } from "@/types/purchase/purchase.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
 export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.UIN_CONFIG]: (data: unknown) =>
     toUINConfigDTO(data as InvUINConfig),
-  [SHORT_CODE.ITEM]: (data: unknown) => toItemMasterDTO(data as InvItem),
-  [SHORT_CODE.BRANCH]: (data: unknown) => toBranchDTO(data as BranchResponse),
+  [SHORT_CODE.ITEM]: (data: unknown) => toItemMasterDTO(data as InvItem[]),
+  [SHORT_CODE.BRANCH]: (data: unknown) => toBranchDTO(data as BranchResponse[]),
   [SHORT_CODE.WAREHOUSE]: (data: unknown) =>
-    toWarehouseDTO(data as WarehouseResponse),
+    toWarehouseDTO(data as WarehouseResponse[]),
   [SHORT_CODE.ITEM_STORE]: (data: unknown) =>
-    toItemStoreDTO(data as InvItemStore),
-  [SHORT_CODE.GRN]: (data: unknown) => toGrnDTO(data as GrnResponse),
+    toItemStoreDTO(data as InvItemStore[]),
+  [SHORT_CODE.GRN]: (data: unknown) => toGrnDTO(data as GrnResponse[]),
   [SHORT_CODE.GRN_RETURN]: (data: unknown) =>
-    toGrnReturnDTO(data as GrnReturnResponse),
+    toGrnReturnDTO(data as GrnReturnResponse[]),
   [SHORT_CODE.ITEM_SUPPLIER]: (data: unknown) =>
-    toItemSupplierDTO(data as ItemSupplierResponse),
+    toItemSupplierDTO(data as ItemSupplierResponse[]),
   [SHORT_CODE.ITEM_SUPPLIER_MAP]: (data: unknown) =>
-    toItemSupplierMapDTO(data as InvItemSupplierMapping),
+    toItemSupplierMapDTO(data as InvItemSupplierMapping[]),
   [SHORT_CODE.CONSUMPTION]: (data: unknown) =>
-    toConsumptionDTO(data as ConsumptionResponse),
-  [SHORT_CODE.STOCK]: (data: unknown) => toStockDTO(data as InvItemStock),
+    toConsumptionDTO(data as ConsumptionResponse[]),
+  [SHORT_CODE.STOCK]: (data: unknown) => toStockDTO(data as InvItemStock[]),
   [SHORT_CODE.ST_REQ]: (data: unknown) =>
-    toStoreRequisitionDTO(data as StoreRequisitionResponse),
+    toStoreRequisitionDTO(data as StoreRequisitionResponse[]),
   [SHORT_CODE.PO]: (data: unknown) =>
-    toPurchaseOrderDTO(
-      data as InvPurchaseOrder & {
-        purchaseOrderDetails: InvPurchaseOrderDetails[];
-      },
-    ),
+    toPurchaseOrderDTO(data as PurchaseOrderWithDetails[]),
   [SHORT_CODE.IN_TRANSIT_STOCK]: (data: unknown) =>
-    toInTransitStockDTO(data as InvInTransitStock),
+    toInTransitStockDTO(data as InvInTransitStock[]),
   [SHORT_CODE.STOCK_ADJUSTMENT]: (data: unknown) =>
-    toStockAdjustmentDTO(data as StockAdjustmentResponse),
+    toStockAdjustmentDTO(data as StockAdjustmentResponse[]),
   [SHORT_CODE.EXPENSE]: (data: unknown) => toExpenseDTO(data as Expense),
   [SHORT_CODE.INCOME]: (data: unknown) => toIncomeDTO(data as Income),
-  [SHORT_CODE.PO]: (data: unknown) =>
-    toPurchaseOrderDTO(
-      data as InvPurchaseOrder & {
-        purchaseOrderDetails: InvPurchaseOrderDetails[];
-      },
-    ),
 };

@@ -8,19 +8,22 @@ import {
   getstoreRequisitionById,
   rejectStoreRequisition,
   updateStoreRequisition,
-} from "@/controllers/purchase/storeRequisition.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/purchase/storeRequisition.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateAcknowledgeStoreRequisition,
   validateSentStoreRequisition,
   validateStoreRequisition,
   validateStoreRequisitionReject,
   validateStoreRequisitionUpdate,
-} from "@/validations/request/purchase/storeRequisition.validation";
+} from "@/validations/request/purchase/storeRequisition.validation.js";
 import { Router } from "express";
 
-export const storeRequisitionRouter = Router();
+export const storeRequisitionRouter: Router = Router();
 
 /**
  * @swagger
@@ -47,9 +50,9 @@ export const storeRequisitionRouter = Router();
 storeRequisitionRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION", "CREATE")),
+  authorize(getPermission("INV", "STORE_REQUISITION", "CREATE")),
   validateStoreRequisition,
-  createStoreRequisition
+  createStoreRequisition,
 );
 
 /**
@@ -64,8 +67,8 @@ storeRequisitionRouter.post(
 storeRequisitionRouter.get(
   "/",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisition
+  authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
+  getAllStoreRequisition,
 );
 
 /**
@@ -85,8 +88,8 @@ storeRequisitionRouter.get(
 storeRequisitionRouter.get(
   "/id",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionById
+  authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
+  getstoreRequisitionById,
 );
 
 /**
@@ -114,9 +117,12 @@ storeRequisitionRouter.get(
 storeRequisitionRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION", "VIEW"), getPermission("STORE_REQUISITION", "UPDATE")),
+  authorize(
+    getPermission("INV", "STORE_REQUISITION", "VIEW"),
+    getPermission("INV", "STORE_REQUISITION", "UPDATE"),
+  ),
   validateStoreRequisitionUpdate,
-  updateStoreRequisition
+  updateStoreRequisition,
 );
 
 /**
@@ -142,8 +148,8 @@ storeRequisitionRouter.put(
 storeRequisitionRouter.delete(
   "/",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION", "DELETE")),
-  deleteStoreRequisition
+  authorize(getPermission("INV", "STORE_REQUISITION", "DELETE")),
+  deleteStoreRequisition,
 );
 
 /**
@@ -164,9 +170,9 @@ storeRequisitionRouter.delete(
 storeRequisitionRouter.post(
   "/reject",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION_REJECT", "CREATE")),
+  authorize(getPermission("INV", "STORE_REQUISITION_REJECT", "CREATE")),
   validateStoreRequisitionReject,
-  rejectStoreRequisition
+  rejectStoreRequisition,
 );
 
 /**
@@ -187,9 +193,9 @@ storeRequisitionRouter.post(
 storeRequisitionRouter.post(
   "/approve",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION_SENT", "CREATE")),
+  authorize(getPermission("INV", "STORE_REQUISITION_SENT", "CREATE")),
   validateSentStoreRequisition,
-  approveStoreRequisition
+  approveStoreRequisition,
 );
 
 /**
@@ -210,9 +216,9 @@ storeRequisitionRouter.post(
 storeRequisitionRouter.post(
   "/acknowledge",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION_ACK", "CREATE")),
+  authorize(getPermission("INV", "STORE_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeStoreRequisition,
-  acknowledgeStoreRequisition
+  acknowledgeStoreRequisition,
 );
 
 /**
@@ -232,8 +238,8 @@ storeRequisitionRouter.post(
 storeRequisitionRouter.get(
   "/batch-wise-by-id",
   verifyToken,
-  authorize(getPermission("STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionBatchWiseById
+  authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
+  getstoreRequisitionBatchWiseById,
 );
 
 /**

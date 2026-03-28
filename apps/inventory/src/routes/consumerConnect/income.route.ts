@@ -5,13 +5,20 @@ import {
   getIncomeId,
   updateIncome,
 } from "@/controllers/consumerConnect/income.controller.js";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware.js";
-import { createUploadMiddleware } from "@/middlewares/imageUpload.middleware.js";
-import { getPermission } from "@/utils/permissions.utils.js";
-import { validateIncome, validateUpdateIncome } from "@/validations/request/consumerConnect/income.validation.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  validateIncome,
+  validateUpdateIncome,
+} from "@/validations/request/consumerConnect/income.validation.js";
 import { Router } from "express";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 
-export const incomeRouter = Router();
+export const incomeRouter: Router = Router();
 
 /**
  * @swagger
@@ -38,10 +45,11 @@ export const incomeRouter = Router();
 incomeRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("INCOME", "CREATE")),
-  createUploadMiddleware("income", "documents"),
+  authorize(getPermission("INV", "INCOME", "CREATE")),
+  createUploadMiddleware("income"),
+  uploadToHetzner("documents"),
   validateIncome,
-  createIncome
+  createIncome,
 );
 
 /**
@@ -53,7 +61,12 @@ incomeRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-incomeRouter.get("/", verifyToken, authorize(getPermission("INCOME", "VIEW")), getAllIncome);
+incomeRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "INCOME", "VIEW")),
+  getAllIncome,
+);
 
 /**
  * @swagger
@@ -71,7 +84,12 @@ incomeRouter.get("/", verifyToken, authorize(getPermission("INCOME", "VIEW")), g
  *           type: string
  *         description: The income ID.
  */
-incomeRouter.get("/id", verifyToken, authorize(getPermission("INCOME", "VIEW")), getIncomeId);
+incomeRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "INCOME", "VIEW")),
+  getIncomeId,
+);
 
 /**
  * @swagger
@@ -98,10 +116,14 @@ incomeRouter.get("/id", verifyToken, authorize(getPermission("INCOME", "VIEW")),
 incomeRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("INCOME", "VIEW"), getPermission("INCOME", "UPDATE")),
-  createUploadMiddleware("income", "documents"),
+  authorize(
+    getPermission("INV", "INCOME", "VIEW"),
+    getPermission("INV", "INCOME", "UPDATE"),
+  ),
+  createUploadMiddleware("income"),
+  uploadToHetzner("documents"),
   validateUpdateIncome,
-  updateIncome
+  updateIncome,
 );
 
 /**
@@ -115,6 +137,9 @@ incomeRouter.put(
 incomeRouter.delete(
   "/",
   verifyToken,
-  authorize(getPermission("INCOME", "VIEW"), getPermission("INCOME", "DELETE")),
-  deleteIncome
+  authorize(
+    getPermission("INV", "INCOME", "VIEW"),
+    getPermission("INV", "INCOME", "DELETE"),
+  ),
+  deleteIncome,
 );

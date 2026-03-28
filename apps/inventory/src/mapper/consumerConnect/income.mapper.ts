@@ -1,9 +1,16 @@
-import { BASE_URL } from "@/config/index.js";
+import { BASE_URL } from "@repo/shared";
 import { incomeHeadService } from "@/services/master/incomeHead.service.js";
-import { CreateIncomeInput, CreateIncomeReq, IncomeDTO, IncomeHeadDTO } from "@/types/consumerConnect/income.js";
-import { Income, IncomeHead } from "@prisma/client";
+import {
+  CreateIncomeInput,
+  CreateIncomeReq,
+  IncomeDTO,
+  IncomeHeadDTO,
+} from "@/types/consumerConnect/income.js";
+import { Income, IncomeHead } from "@repo/db/generated/prisma/client";
 
-export const toIncomeEntity = (incomeReq: CreateIncomeReq): CreateIncomeInput => {
+export const toIncomeEntity = (
+  incomeReq: CreateIncomeReq,
+): CreateIncomeInput => {
   const parsedAmount = incomeReq.amount ? parseFloat(incomeReq.amount) : null;
   const parsedDate = incomeReq.date ? new Date(incomeReq.date) : null;
 
@@ -28,11 +35,17 @@ export const toIncomeHeadDTO = (head: IncomeHead): IncomeHeadDTO => ({
 });
 
 export const toIncomeDTO = async (income: Income): Promise<IncomeDTO> => {
-  const convertedDocuments = income.documents !== null ? BASE_URL + income.documents.replace(/\\/g, "/") : null;
+  const convertedDocuments =
+    income.documents !== null
+      ? BASE_URL + income.documents.replace(/\\/g, "/")
+      : null;
 
   let incomeHead: IncomeHeadDTO | null = null;
   if (income.incHeadId !== null) {
-    const rawHead = await incomeHeadService.getIncomeHeadById(Number(income.incHeadId), true);
+    const rawHead = await incomeHeadService.getIncomeHeadById(
+      Number(income.incHeadId),
+      true,
+    );
     if (rawHead) {
       incomeHead = toIncomeHeadDTO(rawHead);
     }

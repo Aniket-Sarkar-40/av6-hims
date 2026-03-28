@@ -4,17 +4,20 @@ import {
   getAllItemSupplier,
   getItemSupplierById,
   updateItemSupplier,
-} from "@/controllers/master/itemSupplier.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/master/itemSupplier.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateCreateItemSupplier,
   validateUpdateItemSupplier,
-} from "@/validations/request/master/itemSupplier.validation";
+} from "@/validations/request/master/itemSupplier.validation.js";
 
 import { Router } from "express";
 
-export const itemSupplierRouter = Router();
+export const itemSupplierRouter: Router = Router();
 
 /**
  * @swagger
@@ -41,9 +44,9 @@ export const itemSupplierRouter = Router();
 itemSupplierRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER", "CREATE")),
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "CREATE")),
   validateCreateItemSupplier,
-  createItemSupplier
+  createItemSupplier,
 );
 
 /**
@@ -64,9 +67,9 @@ itemSupplierRouter.post(
 itemSupplierRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER", "UPDATE")),
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "UPDATE")),
   validateUpdateItemSupplier,
-  updateItemSupplier
+  updateItemSupplier,
 );
 
 /**
@@ -78,7 +81,12 @@ itemSupplierRouter.put(
  *     security:
  *       - bearerAuth: []
  */
-itemSupplierRouter.get("/", verifyToken, authorize(getPermission("ITEM_SUPPLIER", "VIEW")), getAllItemSupplier);
+itemSupplierRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
+  getAllItemSupplier,
+);
 
 /**
  * @swagger
@@ -97,7 +105,12 @@ itemSupplierRouter.get("/", verifyToken, authorize(getPermission("ITEM_SUPPLIER"
  *         description: The Item Supplier ID.
  */
 
-itemSupplierRouter.get("/id", verifyToken, authorize(getPermission("ITEM_SUPPLIER", "VIEW")), getItemSupplierById);
+itemSupplierRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
+  getItemSupplierById,
+);
 
 /**
  * @swagger
@@ -119,6 +132,6 @@ itemSupplierRouter.get("/id", verifyToken, authorize(getPermission("ITEM_SUPPLIE
 itemSupplierRouter.delete(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER", "DELETE")),
-  deleteItemSupplierById
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "DELETE")),
+  deleteItemSupplierById,
 );

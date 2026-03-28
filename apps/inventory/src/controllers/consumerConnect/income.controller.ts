@@ -1,12 +1,11 @@
 // src/controllers/incomeHead.controller.ts
 
-import { TryCatch } from "@/middlewares/error.middleware.js";
-import { deleteFileIfExists } from "@/middlewares/imageUpload.middleware.js";
+import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
 import { incomeService } from "@/services/consumerConnect/income.service.js";
 import { CreateIncomeInput } from "@/types/consumerConnect/income.js";
-import { BaseResponse } from "@/utils/baseResponse.utils.js";
-import { logger } from "@/utils/logger.utils.js";
-import { generateSuccessMessage } from "@/utils/responseMessage.utils.js";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
 import path from "path";
 
@@ -16,7 +15,9 @@ export const createIncome = TryCatch(async (req: Request, res: Response) => {
   if (req.file) {
     const absolutePath = req.file.path;
     const relativePath = absolutePath.replace(process.cwd(), "");
-    input.documents = relativePath.startsWith(path.sep) ? relativePath : path.sep + relativePath;
+    input.documents = relativePath.startsWith(path.sep)
+      ? relativePath
+      : path.sep + relativePath;
   }
   const newIncome = await incomeService.createIncome(input);
 
@@ -25,7 +26,7 @@ export const createIncome = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Income"),
     },
-    newIncome
+    newIncome,
   );
 
   logger.info("exiting::createIncome::controller");
@@ -55,7 +56,9 @@ export const updateIncome = TryCatch(async (req: Request, res: Response) => {
 
     const absolutePath = req.file.path;
     const relativePath = absolutePath.replace(process.cwd(), "");
-    body.documents = relativePath.startsWith(path.sep) ? relativePath : path.sep + relativePath;
+    body.documents = relativePath.startsWith(path.sep)
+      ? relativePath
+      : path.sep + relativePath;
   }
 
   // Update the income record
@@ -64,7 +67,7 @@ export const updateIncome = TryCatch(async (req: Request, res: Response) => {
   // Delete the old document if it exists
   if (oldImagePath) {
     try {
-      deleteFileIfExists(oldImagePath);
+      // deleteFileIfExists(oldImagePath);
       logger.info(`Deleted old document at ${oldImagePath}`);
     } catch (err) {
       logger.error(`Error deleting old document at ${oldImagePath}:`, err);
@@ -79,8 +82,8 @@ export const updateIncome = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Income"),
       },
-      updatedIncome
-    )
+      updatedIncome,
+    ),
   );
 });
 export const getIncomeId = TryCatch(async (req: Request, res: Response) => {
@@ -94,7 +97,7 @@ export const getIncomeId = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Income"),
     },
-    allIncomeById
+    allIncomeById,
   );
 
   logger.info("exiting::getIncomeId::controller");
@@ -111,7 +114,7 @@ export const getAllIncome = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Income "),
     },
-    allIncome
+    allIncome,
   );
 
   logger.info("exiting::getAllIncome::controller");
@@ -138,7 +141,7 @@ export const deleteIncome = TryCatch(async (req: Request, res: Response) => {
     }
     const oldDocumentPath = path.join(process.cwd(), documentPath);
     try {
-      deleteFileIfExists(oldDocumentPath);
+      // deleteFileIfExists(oldDocumentPath);
       logger.info(`Deleted old document at ${oldDocumentPath}`);
     } catch (err) {
       logger.error(`Error deleting old document at ${oldDocumentPath}:`, err);
@@ -154,6 +157,6 @@ export const deleteIncome = TryCatch(async (req: Request, res: Response) => {
     new BaseResponse({
       success: true,
       message: generateSuccessMessage("DELETED", "Income"),
-    })
+    }),
   );
 });

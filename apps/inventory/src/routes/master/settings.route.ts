@@ -1,10 +1,16 @@
 import { Router } from "express";
-import { verifyToken, authorize } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
-import { getSettings, upsertSettings } from "@/controllers/master/settings.controller";
-import { validateSettings } from "@/validations/request/master/settings.validation";
+import {
+  verifyToken,
+  authorize,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import {
+  getSettings,
+  upsertSettings,
+} from "@/controllers/master/settings.controller.js";
+import { validateSettings } from "@/validations/request/master/settings.validation.js";
 
-const settingsRouter = Router();
+export const settingsRouter: Router = Router();
 
 /**
  * @swagger
@@ -28,7 +34,13 @@ const settingsRouter = Router();
  *           schema:
  *             $ref: '#/components/settingsSchema'
  */
-settingsRouter.post("/", verifyToken, authorize(getPermission("SETTING", "CREATE")), validateSettings, upsertSettings);
+settingsRouter.post(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "SETTING", "CREATE")),
+  validateSettings,
+  upsertSettings,
+);
 
 /**
  * @swagger
@@ -39,6 +51,11 @@ settingsRouter.post("/", verifyToken, authorize(getPermission("SETTING", "CREATE
  *     security:
  *       - bearerAuth: []
  */
-settingsRouter.get("/", verifyToken, authorize(getPermission("SETTING", "VIEW")), getSettings);
+settingsRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "SETTING", "VIEW")),
+  getSettings,
+);
 
 export default settingsRouter;

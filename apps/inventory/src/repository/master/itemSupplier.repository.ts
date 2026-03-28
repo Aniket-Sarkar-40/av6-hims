@@ -1,18 +1,18 @@
-import { API_TIMEOUT } from "@repo/shared/config/index.js";
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
 import {
   ItemSupplierCreateInput,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { db } from "@repo/db/client";
 import { InvItemSupplier } from "@repo/db/generated/prisma/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { API_TIMEOUT } from "@repo/shared/config/index.js";
+import { customOmit } from "av6-utils";
 
 export async function createItemSupplierInDb(
   data: ItemSupplierCreateInput,
-): Promise<InvItemSupplier> {
+): Promise<ItemSupplierResponse> {
   logger.info("entering::createItemSupplierInDb::repository");
   const store = requestStorage.getStore();
   return await db.$transaction(
@@ -60,7 +60,7 @@ export async function createItemSupplierInDb(
 
 export async function updateItemSupplierInDb(
   data: ItemSupplierUpdateInput,
-): Promise<InvItemSupplier> {
+): Promise<ItemSupplierResponse> {
   logger.info("entering::updateItemSupplierInDb::repository");
   const store = requestStorage.getStore();
   const omitteditemSupplier = customOmit<
@@ -180,7 +180,9 @@ export async function updateItemSupplierInDb(
   );
 }
 
-export async function getAllItemSupplierFromDb(): Promise<InvItemSupplier[]> {
+export async function getAllItemSupplierFromDb(): Promise<
+  ItemSupplierResponse[]
+> {
   logger.info("entering::getAllItemSupplierFromDb::repository");
 
   const itemSupplier = await db.invItemSupplier.findMany({
@@ -207,7 +209,7 @@ export async function getAllItemSupplierFromDb(): Promise<InvItemSupplier[]> {
 
 export async function getItemSupplierByIdFromDb(
   itemSupplierId: number,
-): Promise<InvItemSupplier | null> {
+): Promise<ItemSupplierResponse | null> {
   logger.info("entering::getItemSupplierByIdFromDb::repository");
 
   const itemSupplier = await db.invItemSupplier.findFirst({

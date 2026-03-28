@@ -8,11 +8,14 @@ import {
   getIncomeByIdFromDb,
   updateIncomeInDb,
 } from "@/repository/consumerConnect/income.repository.js";
-import { CreateIncomeInput, IncomeDTO } from "@/types/consumerConnect/income.js";
-import ErrorHandler from "@/utils/errorHandler.utils.js";
-import { logger } from "@/utils/logger.utils.js";
-import { generateErrorMessage } from "@/utils/responseMessage.utils.js";
-import { validIdCheck } from "@/validations/global.validation.js";
+import {
+  CreateIncomeInput,
+  IncomeDTO,
+} from "@/types/consumerConnect/income.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   createIncomeServiceValidation,
   updateIncomerServiceValidation,
@@ -57,7 +60,10 @@ export const incomeService = {
     return allDTO;
   },
 
-  async getIncomeById(incomeId: number, canNullReturnable: boolean = false): Promise<IncomeDTO | null> {
+  async getIncomeById(
+    incomeId: number,
+    canNullReturnable: boolean = false,
+  ): Promise<IncomeDTO | null> {
     logger.info("entering::getIncomeById::service");
 
     validIdCheck(incomeId);
@@ -66,7 +72,10 @@ export const incomeService = {
 
     if (!record) {
       if (!canNullReturnable) {
-        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Income"));
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Income"),
+        );
       }
       return null;
     }

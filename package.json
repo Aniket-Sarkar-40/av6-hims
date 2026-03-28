@@ -21,6 +21,7 @@
     "dev": "turbo run dev --parallel",
     "dev:core": "pnpm --filter @apps/core dev",
     "dev:gateway": "pnpm --filter @apps/gateway dev",
+    "dev:inv": "pnpm --filter @apps/inv dev",
     "dev:opd": "pnpm --filter @apps/opd dev",
     "lint": "turbo run lint",
     "lint:monorepo": "sherif",

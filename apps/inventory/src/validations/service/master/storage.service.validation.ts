@@ -1,11 +1,10 @@
-import { getStorageByStorageNameFromDb } from "@/repository/master/storage.repository";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { generateErrorMessage } from "@/utils/responseMessage.utils";
-import { validIdCheck } from "@/validations/global.validation";
-
-import { storageService } from "@/services/master/storage.service";
-import { CreateOrUpdateStorage } from "@/types/master/storage";
+import { getStorageByStorageNameFromDb } from "@/repository/master/storage.repository.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import { storageService } from "@/services/master/storage.service.js";
+import { CreateOrUpdateStorage } from "@/types/master/storage.js";
 
 export const validateIdStorage = async (storageId: number) => {
   logger.info("entering::validateIdStorage::service::validation");
@@ -21,25 +20,37 @@ export const validateIdStorage = async (storageId: number) => {
   return storage;
 };
 
-export const updateIdStorageServiceValidation = async (body: CreateOrUpdateStorage) => {
-  logger.info("entering::updateIdStorageServiceValidation::service::validation");
+export const updateIdStorageServiceValidation = async (
+  body: CreateOrUpdateStorage,
+) => {
+  logger.info(
+    "entering::updateIdStorageServiceValidation::service::validation",
+  );
   if (body.id) {
     await validateIdStorage(body.id);
   }
 
   const storageByName = await getStorageByStorageNameFromDb(body.name);
   if (storageByName && storageByName.id !== body.id) {
-    throw new ErrorHandler(400, generateErrorMessage("DUPLICATE_ITEM", "Storage Name"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("DUPLICATE_ITEM", "Storage Name"),
+    );
   }
   logger.info("exiting::updateIdStorageServiceValidation::service::validation");
   return;
 };
 
-export const createStorageServiceValidation = async (body: CreateOrUpdateStorage) => {
+export const createStorageServiceValidation = async (
+  body: CreateOrUpdateStorage,
+) => {
   logger.info("entering::createStorageServiceValidation::service::validation");
   const storageByName = await getStorageByStorageNameFromDb(body.name);
   if (storageByName) {
-    throw new ErrorHandler(400, generateErrorMessage("DUPLICATE_ITEM", "Storage Name"));
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("DUPLICATE_ITEM", "Storage Name"),
+    );
   }
   logger.info("exiting::createStorageServiceValidation::service::validation");
   return;

@@ -1,19 +1,28 @@
-import { API_TIMEOUT } from "@/config";
-import { requestStorage } from "@/config/requestContext";
-import db from "@/db/client";
-import { toStockEntity } from "@/mapper/purchase/storeRequisition.mapper";
-import { CreateItemStockInput, ItemStockAudit, ItemStockResponse, RawItemStock } from "@/types/stock/stock";
-import ErrorHandler from "@/utils/errorHandler.utils";
-import { logger } from "@/utils/logger.utils";
-import { Action, ItemStock, Prisma } from "@prisma/client";
-import { ItemStockByBatchInput } from "../../types/stock/stock";
+import { API_TIMEOUT } from "@repo/shared/config/index.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { db } from "@repo/db/client";
+import { toStockEntity } from "@/mapper/purchase/storeRequisition.mapper.js";
+import {
+  CreateItemStockInput,
+  ItemStockAudit,
+  ItemStockResponse,
+  RawItemStock,
+} from "@/types/stock/stock.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { Action, InvItemStock, Prisma } from "@repo/db/generated/prisma/client";
+import { ItemStockByBatchInput } from "../../types/stock/stock.js";
 
 type Tx = Prisma.TransactionClient;
 
-export const addItemStock = async (tx: Tx, data: CreateItemStockInput, detail: ItemStockAudit): Promise<void> => {
+export const addItemStock = async (
+  tx: Tx,
+  data: CreateItemStockInput,
+  detail: ItemStockAudit,
+): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
-  const isStockExists = await tx.itemStock.findFirst({
+  const isStockExists = await tx.invItemStock.findFirst({
     where: {
       itemId: data.itemId,
       ccId: data.ccId,
@@ -27,7 +36,7 @@ export const addItemStock = async (tx: Tx, data: CreateItemStockInput, detail: I
   let stockId: number = isStockExists ? isStockExists.id : 0;
   if (isStockExists) {
     //update the quantity
-    await tx.itemStock.update({
+    await tx.invItemStock.update({
       where: {
         id: isStockExists.id,
       },
@@ -37,7 +46,7 @@ export const addItemStock = async (tx: Tx, data: CreateItemStockInput, detail: I
       },
     });
   } else {
-    const created = await tx.itemStock.create({
+    const created = await tx.invItemStock.create({
       data: {
         ...data,
         expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
@@ -47,13 +56,15 @@ export const addItemStock = async (tx: Tx, data: CreateItemStockInput, detail: I
     stockId = created.id;
   }
 
-  await tx.itemStockAudit.create({
+  await tx.invItemStockAudit.create({
     data: {
       itemStockId: stockId,
       quantity: data.quantity,
       action: Action.ADDITION,
       operation: detail.operation,
-      refApprovedAt: detail.refApprovedAt ? new Date(detail.refApprovedAt) : null,
+      refApprovedAt: detail.refApprovedAt
+        ? new Date(detail.refApprovedAt)
+        : null,
       refApprovedBy: detail.refApprovedBy ?? null,
       refId: detail.refId ?? null,
       refDetailsId: detail.refDetailsId ?? null,
@@ -64,10 +75,14 @@ export const addItemStock = async (tx: Tx, data: CreateItemStockInput, detail: I
   });
 };
 
-export const subItemStock = async (tx: Tx, data: CreateItemStockInput, detail: ItemStockAudit): Promise<void> => {
+export const subItemStock = async (
+  tx: Tx,
+  data: CreateItemStockInput,
+  detail: ItemStockAudit,
+): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
-  const isStockExists = await tx.itemStock.findFirst({
+  const isStockExists = await tx.invItemStock.findFirst({
     where: {
       itemId: data.itemId,
       ccId: data.ccId,
@@ -83,7 +98,7 @@ export const subItemStock = async (tx: Tx, data: CreateItemStockInput, detail: I
     throw new ErrorHandler(400, "Insufficient stock to consume");
   }
 
-  await tx.itemStock.update({
+  await tx.invItemStock.update({
     where: {
       id: isStockExists.id,
     },
@@ -93,13 +108,15 @@ export const subItemStock = async (tx: Tx, data: CreateItemStockInput, detail: I
     },
   });
 
-  await tx.itemStockAudit.create({
+  await tx.invItemStockAudit.create({
     data: {
       itemStockId: isStockExists.id,
       quantity: data.quantity,
       action: Action.SUBTRACTION,
       operation: detail.operation,
-      refApprovedAt: detail.refApprovedAt ? new Date(detail.refApprovedAt) : null,
+      refApprovedAt: detail.refApprovedAt
+        ? new Date(detail.refApprovedAt)
+        : null,
       refApprovedBy: detail.refApprovedBy ?? null,
       refId: detail.refId ?? null,
       refDetailsId: detail.refDetailsId ?? null,
@@ -110,10 +127,12 @@ export const subItemStock = async (tx: Tx, data: CreateItemStockInput, detail: I
   });
 };
 
-export const getStockById = async (id: number): Promise<ItemStockResponse | null> => {
+export const getStockById = async (
+  id: number,
+): Promise<ItemStockResponse | null> => {
   logger.info(`entering::getStockById::repository`);
 
-  return db.itemStock.findFirst({
+  return db.invItemStock.findFirst({
     where: {
       id,
       isActive: true,
@@ -134,7 +153,7 @@ export const getItemStockQtyByBatchWise = async ({
 }: ItemStockByBatchInput) => {
   logger.info(`entering::getItemStockByLocation::repository`);
 
-  const sumResult = await db.itemStock.aggregate({
+  const sumResult = await db.invItemStock.aggregate({
     where: {
       itemId,
       ccId,
@@ -154,10 +173,16 @@ export const getItemStockQtyByBatchWise = async ({
   return totalQuantity;
 };
 
-export const getItemStockByBatchWise = async ({ itemId, batchNo, ccId, userId, expiryDate }: ItemStockByBatchInput) => {
+export const getItemStockByBatchWise = async ({
+  itemId,
+  batchNo,
+  ccId,
+  userId,
+  expiryDate,
+}: ItemStockByBatchInput) => {
   logger.info(`entering::getItemStockByBatchWise::repository`);
 
-  const stock = await db.itemStock.findFirst({
+  const stock = await db.invItemStock.findFirst({
     where: {
       itemId,
       ccId,
@@ -174,10 +199,13 @@ export const getItemStockByBatchWise = async ({ itemId, batchNo, ccId, userId, e
   return stock?.id ? stock : null;
 };
 
-export const getItemStockQtyByLocation = async (itemId: number, ccId: number) => {
+export const getItemStockQtyByLocation = async (
+  itemId: number,
+  ccId: number,
+) => {
   logger.info(`entering::getItemStockQtyByLocation::repository`);
 
-  const sumResult = await db.itemStock.aggregate({
+  const sumResult = await db.invItemStock.aggregate({
     where: {
       itemId,
       ccId,
@@ -194,7 +222,7 @@ export const getItemStockQtyByLocation = async (itemId: number, ccId: number) =>
 export const getItemStockQtyByUser = async (itemId: number, userId: number) => {
   logger.info(`entering::getItemStockQtyByUser::repository`);
 
-  const sumResult = await db.itemStock.aggregate({
+  const sumResult = await db.invItemStock.aggregate({
     where: {
       itemId,
       userId,
@@ -220,7 +248,7 @@ export const getItemStockQtyByCc = async (itemId: number, ccId: number) => {
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -229,8 +257,8 @@ export const getItemStocksByLocation = async (
   id: number,
   ccId?: number,
   userId?: number,
-  canTakeZero = false
-): Promise<ItemStock[]> => {
+  canTakeZero = false,
+): Promise<InvItemStock[]> => {
   logger.info(`entering::getItemStocksByLocation::repository (raw SQL)`);
   const store = requestStorage.getStore();
   const setting = store?.settings;
@@ -267,8 +295,8 @@ export const getItemStocksByLocationUserId = async (
   tx: Tx,
   itemId?: number,
   userId?: number,
-  canTakeZero = false
-): Promise<ItemStock[]> => {
+  canTakeZero = false,
+): Promise<InvItemStock[]> => {
   logger.info(`entering::getItemStocksByLocation::repository (raw SQL)`);
 
   const store = requestStorage.getStore();
@@ -792,11 +820,11 @@ export const getItemStockByItemOnly = async (
   ccId: number,
   batchNo?: string | null,
   expiryDate?: Date | null,
-  isFoc?: boolean
+  isFoc?: boolean,
 ) => {
   logger.info(`entering::getItemStockByItemOnly::repository`);
 
-  const stock = await db.itemStock.findFirst({
+  const stock = await db.invItemStock.findFirst({
     where: {
       itemId,
       ccId,
@@ -814,9 +842,11 @@ export const getItemStockByItemOnly = async (
   return stock?.id ? stock : null;
 };
 
-export const getStocksByIds = async (ids: number[]): Promise<ItemStock[]> => {
+export const getStocksByIds = async (
+  ids: number[],
+): Promise<InvItemStock[]> => {
   logger.info(`entering::getStocksByIds::repository`);
-  return await db.itemStock.findMany({
+  return await db.invItemStock.findMany({
     where: {
       id: {
         in: ids,
@@ -835,7 +865,7 @@ export const getStockInfo = async (input: {
   notInIds?: number[];
 }) => {
   logger.info(`entering::getStockInfo::repository`);
-  return await db.itemStock.findFirst({
+  return await db.invItemStock.findFirst({
     where: {
       itemId: input.itemId,
       batchNo: input.batchNo,

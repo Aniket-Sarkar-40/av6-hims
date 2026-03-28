@@ -1,61 +1,125 @@
-import { coreRequests } from "@/client/core/request";
-import { requestStorage } from "@/config/requestContext";
-import { getGrnDetailsByIdFromDb } from "@/repository/grn/grn.repository";
-import { getItemStockQtyByBatchWise } from "@/repository/stock/stock.repository";
-import { branchService } from "@/services/master/branch.service";
-import { itemMasterService } from "@/services/master/itemMaster.service";
-import { itemSupplierService } from "@/services/master/itemSupplier.service";
-import { warehouseService } from "@/services/master/warehouse.service";
-import { GoodReceiveReturnDetailDTO, GoodReceiveReturnDTO, GrnReturnResponse } from "@/types/grn/grnReturn";
-import { itemMasterToDto } from "@/utils/commonResponse.utils";
-import { omitAudit, toIdValue } from "@/utils/idValue.utils";
+import { getGrnDetailsByIdFromDb } from "@/repository/grn/grn.repository.js";
+import { getItemStockQtyByBatchWise } from "@/repository/stock/stock.repository.js";
+import { branchService } from "@/services/master/branch.service.js";
+import { itemMasterService } from "@/services/master/itemMaster.service.js";
+import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
+import { warehouseService } from "@/services/master/warehouse.service.js";
+import {
+  GoodReceiveReturnDetailDTO,
+  GoodReceiveReturnDTO,
+  GrnReturnResponse,
+} from "@/types/grn/grnReturn.js";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
+import { customOmit } from "av6-utils";
+import { omitAudit, toIdValue } from "av6-utils";
+import { itemMasterToDto } from "../master/itemMaster.mapper.js";
+import { settingsService } from "@/services/master/settings.service.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
 
-export const toGrnReturnDTO = async (grnReturn: GrnReturnResponse): Promise<GoodReceiveReturnDTO> => {
-  const itemSupplier = await itemSupplierService.getItemSupplierById(grnReturn.supplierId, true);
+export const toGrnReturnDTO = async (
+  data: GrnReturnResponse[],
+): Promise<GoodReceiveReturnDTO[]> => {
+  const suppliers = await itemSupplierService.getAllItemSupplier(true);
+  const settings = await settingsService.getSettings();
 
-  const ccSettingsId = requestStorage.getStore()?.settings?.warehouseMode;
-  let warehouseDTO, branchDTO;
-  if (ccSettingsId) {
-    warehouseDTO = await warehouseService.getWarehouseByIdWoDTO(grnReturn.ccId, true);
-  } else {
-    branchDTO = await branchService.getBranchByIdWoDTO(grnReturn.ccId, true);
-  }
+  return Promise.all(
+    data.map(async (grnReturn) => {
+      const omittedGrnReturn = customOmit<
+        GrnReturnResponse,
+        | BaseModelAttrWoCancel
+        | "grnId"
+        | "approvedBy"
+        | "rejectedBy"
+        | "createdBy"
+        | "goodReceiveReturnDetails"
+        | "poId"
+        | "ccId"
+        | "supplierId"
+      >(grnReturn, [
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "grnId",
+        "approvedBy",
+        "rejectedBy",
+        "goodReceiveReturnDetails",
+        "poId",
+        "ccId",
+        "supplierId",
+      ]);
 
-  const createdBy = grnReturn.createdBy ? await coreRequests.getEmployeeCache(grnReturn.createdBy) : null;
-  const approvedBy = grnReturn.approvedBy ? await coreRequests.getEmployeeCache(grnReturn.approvedBy) : null;
-  const rejectedBy = grnReturn.rejectedBy ? await coreRequests.getEmployeeCache(grnReturn.rejectedBy) : null;
+      const supplierDTO = suppliers.find(
+        (supplier) => supplier.id === grnReturn.supplierId,
+      );
+      const ccSettingsId = settings?.warehouseMode;
+      let warehouseDTO, branchDTO;
+      if (ccSettingsId) {
+        warehouseDTO = await warehouseService.getWarehouseById(
+          grnReturn.ccId,
+          true,
+        );
+      } else {
+        branchDTO = await branchService.getBranchById(grnReturn.ccId, true);
+      }
 
-  const detailDTO: GoodReceiveReturnDetailDTO[] = await Promise.all(
-    grnReturn.goodReceiveReturnDetails.map(async (detail) => {
-      const item = await itemMasterService.getItemMasterById({ itemId: detail.itemId }, true);
-      const inHandQty =
-        (await getItemStockQtyByBatchWise({
-          itemId: detail.itemId,
-          ccId: grnReturn.ccId,
-          batchNo: detail.batchNo,
-          expiryDate: detail.expiryDate,
-        })) || null;
+      const createdBy = grnReturn.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            grnReturn.createdBy,
+            true,
+          )
+        : null;
+      const approvedBy = grnReturn.approvedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            grnReturn.approvedBy,
+            true,
+          )
+        : null;
+      const rejectedBy = grnReturn.rejectedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            grnReturn.rejectedBy,
+            true,
+          )
+        : null;
 
-      const grnDetails = await getGrnDetailsByIdFromDb(detail.grnDetailId);
+      const detailDTO: GoodReceiveReturnDetailDTO[] = await Promise.all(
+        (grnReturn.goodReceiveReturnDetails || []).map(async (detail) => {
+          const item = await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true,
+          );
+          const inHandQty =
+            (await getItemStockQtyByBatchWise({
+              itemId: detail.itemId,
+              ccId: grnReturn.ccId,
+              batchNo: detail.batchNo,
+              expiryDate: detail.expiryDate,
+            })) || null;
+
+          const grnDetails = await getGrnDetailsByIdFromDb(detail.grnDetailId);
+
+          return {
+            ...detail,
+            inHandQty: inHandQty ? inHandQty : 0,
+            returnedQty: grnDetails?.returnQuantity ?? 0,
+            purchasePrice: grnDetails?.purchasedPrice ?? 0,
+            item: item ? await itemMasterToDto(item) : null,
+          };
+        }),
+      );
 
       return {
-        ...detail,
-        inHandQty: inHandQty ? inHandQty : 0,
-        returnedQty: grnDetails?.returnQuantity ?? 0,
-        purchasePrice: grnDetails?.purchasedPrice ?? 0,
-        item: item ? await itemMasterToDto(item) : null,
+        ...omittedGrnReturn.rest,
+        goodReceiveReturnDetails: omitAudit(detailDTO),
+        warehouse: ccSettingsId ? toIdValue(warehouseDTO, "name") : null,
+        branch: ccSettingsId ? null : toIdValue(branchDTO, "name"),
+        supplier: toIdValue(supplierDTO, "name"),
+        createdBy: createdBy,
+        approvedBy: approvedBy,
+        rejectedBy: rejectedBy,
       };
-    })
+    }),
   );
-
-  return {
-    ...grnReturn,
-    goodReceiveReturnDetails: omitAudit(detailDTO),
-    warehouse: ccSettingsId ? toIdValue(warehouseDTO, "name") : null,
-    branch: ccSettingsId ? null : toIdValue(branchDTO, "name"),
-    supplier: toIdValue(itemSupplier, "name"),
-    createdBy: createdBy,
-    approvedBy: approvedBy,
-    rejectedBy: rejectedBy,
-  };
 };

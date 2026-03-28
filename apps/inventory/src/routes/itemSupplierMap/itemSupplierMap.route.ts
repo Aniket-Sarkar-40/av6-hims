@@ -6,18 +6,22 @@ import {
   getItemSupplierMapById,
   importItemSupplierMapExcel,
   updateItemSupplierMap,
-} from "@/controllers/itemSupplierMap/itemSupplierMap.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { createUploadMiddleware } from "@/middlewares/imageUpload.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/itemSupplierMap/itemSupplierMap.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateCreateItemSupplierMap,
   validateImportExcelItemSupplierMap,
   validateUpdateItemSupplierMap,
-} from "@/validations/request/itemSupplierMap/itemSupplierMap.validation";
+} from "@/validations/request/itemSupplierMap/itemSupplierMap.validation.js";
 import { Router } from "express";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 
-export const itemSupplierMapRouter = Router();
+export const itemSupplierMapRouter: Router = Router();
 
 /**
  * @swagger
@@ -44,9 +48,9 @@ export const itemSupplierMapRouter = Router();
 itemSupplierMapRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER_MAP", "CREATE")),
+  authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "CREATE")),
   validateCreateItemSupplierMap,
-  createItemSupplierMap
+  createItemSupplierMap,
 );
 
 /**
@@ -67,9 +71,9 @@ itemSupplierMapRouter.post(
 itemSupplierMapRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER_MAP", "UPDATE")),
+  authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "UPDATE")),
   validateUpdateItemSupplierMap,
-  updateItemSupplierMap
+  updateItemSupplierMap,
 );
 
 /**
@@ -84,8 +88,8 @@ itemSupplierMapRouter.put(
 itemSupplierMapRouter.get(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER_MAP", "VIEW")),
-  getAllItemSupplierMap
+  authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
+  getAllItemSupplierMap,
 );
 
 /**
@@ -108,8 +112,8 @@ itemSupplierMapRouter.get(
 itemSupplierMapRouter.get(
   "/id",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER_MAP", "VIEW")),
-  getItemSupplierMapById
+  authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
+  getItemSupplierMapById,
 );
 
 /**
@@ -132,8 +136,8 @@ itemSupplierMapRouter.get(
 itemSupplierMapRouter.delete(
   "/",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER_MAP", "DELETE")),
-  deleteItemSupplierMapById
+  authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "DELETE")),
+  deleteItemSupplierMapById,
 );
 
 /**
@@ -149,8 +153,8 @@ itemSupplierMapRouter.delete(
 itemSupplierMapRouter.get(
   "/export",
   verifyToken,
-  authorize(getPermission("ITEM_SUPPLIER_MAP", "VIEW")),
-  exportItemSupplierMapExcel
+  authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
+  exportItemSupplierMapExcel,
 );
 
 /**
@@ -179,8 +183,9 @@ itemSupplierMapRouter.get(
 itemSupplierMapRouter.post(
   "/import",
   verifyToken,
-  createUploadMiddleware("excel", "excelFile"),
-  authorize(getPermission("ITEM_SUPPLIER_MAP", "CREATE")),
+  createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
+  authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "CREATE")),
   validateImportExcelItemSupplierMap,
-  importItemSupplierMapExcel
+  importItemSupplierMapExcel,
 );

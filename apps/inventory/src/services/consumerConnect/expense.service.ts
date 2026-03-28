@@ -6,18 +6,21 @@ import {
   deleteExpenseInDb,
 } from "@/repository/consumerConnect/expense.repository.js";
 
-import ErrorHandler from "@/utils/errorHandler.utils.js";
-import { logger } from "@/utils/logger.utils.js";
-import { generateErrorMessage } from "@/utils/responseMessage.utils.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   createExpenseServiceValidation,
   updateExpenseServiceValidation,
   deleteExpenseServiceValidation,
 } from "@/validations/service/consumerConnect/expense.service.validation.js";
-import { Expense } from "@prisma/client";
+import { Expense } from "@repo/db/generated/prisma/client";
 import { ExpenseDTO, ExpenseInput } from "@/types/consumerConnect/expense.js";
-import { toExpenseDTO, toExpenseDTOs } from "@/mapper/consumerConnect/expense.mapper.js";
-import { validIdCheck } from "@/validations/global.validation.js";
+import {
+  toExpenseDTO,
+  toExpenseDTOs,
+} from "@/mapper/consumerConnect/expense.mapper.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 
 export const expenseService = {
   async createExpense(input: ExpenseInput): Promise<ExpenseDTO> {
@@ -40,12 +43,19 @@ export const expenseService = {
     return allExpenses;
   },
 
-  async getExpenseById(id: number, canNullReturnable: boolean = false): Promise<ExpenseDTO | null> {
+  async getExpenseById(
+    id: number,
+    canNullReturnable: boolean = false,
+  ): Promise<ExpenseDTO | null> {
     logger.info("entering::getExpenseById::service");
     validIdCheck(id);
     const expense = await getExpenseByIdFromDb(id);
     if (!expense) {
-      if (!canNullReturnable) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Expense"));
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Expense"),
+        );
       else return null;
     }
     const getExpense = toExpenseDTO(expense);

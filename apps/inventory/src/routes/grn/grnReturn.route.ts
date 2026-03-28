@@ -4,21 +4,23 @@ import {
   deleteGrnReturn,
   getAllGrnReturn,
   getGrnReturnById,
-  printGrnReturnById,
   rejectedGrnReturn,
   updateGrnReturn,
-} from "@/controllers/grn/grnReturn.controller";
-import { authorize, verifyToken } from "@/middlewares/auth.middleware";
-import { getPermission } from "@/utils/permissions.utils";
+} from "@/controllers/grn/grnReturn.controller.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateGrnReturn,
   validateGrnReturnApprove,
   validateGrnReturnUpdate,
-} from "@/validations/request/grn/grnReturn.validation";
+} from "@/validations/request/grn/grnReturn.validation.js";
 
 import { Router } from "express";
 
-export const grnReturnRouter = Router();
+export const grnReturnRouter: Router = Router();
 
 /**
  * @swagger
@@ -45,9 +47,9 @@ export const grnReturnRouter = Router();
 grnReturnRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("GRN_RETURN", "CREATE")),
+  authorize(getPermission("INV", "GRN_RETURN", "CREATE")),
   validateGrnReturn,
-  createGrnReturn
+  createGrnReturn,
 );
 
 /**
@@ -59,7 +61,12 @@ grnReturnRouter.post(
  *     security:
  *       - bearerAuth: []
  */
-grnReturnRouter.get("/", verifyToken, authorize(getPermission("GRN_RETURN", "VIEW")), getAllGrnReturn);
+grnReturnRouter.get(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "GRN_RETURN", "VIEW")),
+  getAllGrnReturn,
+);
 
 /**
  * @swagger
@@ -75,7 +82,12 @@ grnReturnRouter.get("/", verifyToken, authorize(getPermission("GRN_RETURN", "VIE
  *       '404':
  *         description: Type not found
  */
-grnReturnRouter.get("/id", verifyToken, authorize(getPermission("GRN_RETURN", "VIEW")), getGrnReturnById);
+grnReturnRouter.get(
+  "/id",
+  verifyToken,
+  authorize(getPermission("INV", "GRN_RETURN", "VIEW")),
+  getGrnReturnById,
+);
 
 /**
  * @swagger
@@ -102,9 +114,12 @@ grnReturnRouter.get("/id", verifyToken, authorize(getPermission("GRN_RETURN", "V
 grnReturnRouter.put(
   "/",
   verifyToken,
-  authorize(getPermission("GRN_RETURN", "VIEW"), getPermission("GRN_RETURN", "UPDATE")),
+  authorize(
+    getPermission("INV", "GRN_RETURN", "VIEW"),
+    getPermission("INV", "GRN_RETURN", "UPDATE"),
+  ),
   validateGrnReturnUpdate,
-  updateGrnReturn
+  updateGrnReturn,
 );
 
 /**
@@ -127,7 +142,12 @@ grnReturnRouter.put(
  *           type: string
  *         description: The ID of the resource to delete.
  */
-grnReturnRouter.delete("/", verifyToken, authorize(getPermission("GRN_RETURN", "DELETE")), deleteGrnReturn);
+grnReturnRouter.delete(
+  "/",
+  verifyToken,
+  authorize(getPermission("INV", "GRN_RETURN", "DELETE")),
+  deleteGrnReturn,
+);
 
 /**
  * @swagger
@@ -147,9 +167,9 @@ grnReturnRouter.delete("/", verifyToken, authorize(getPermission("GRN_RETURN", "
 grnReturnRouter.post(
   "/approve",
   verifyToken,
-  authorize(getPermission("GRN_RETURN_APPROVE", "CREATE")),
+  authorize(getPermission("INV", "GRN_RETURN_APPROVE", "CREATE")),
   validateGrnReturnApprove,
-  approveGrnReturn
+  approveGrnReturn,
 );
 
 /**
@@ -170,8 +190,8 @@ grnReturnRouter.post(
 grnReturnRouter.post(
   "/rejected",
   verifyToken,
-  authorize(getPermission("GRN_RETURN_REJECTED", "CREATE")),
-  rejectedGrnReturn
+  authorize(getPermission("INV", "GRN_RETURN_REJECTED", "CREATE")),
+  rejectedGrnReturn,
 );
 
 /**
@@ -196,14 +216,3 @@ grnReturnRouter.post(
 //   validateGrnReturnExcel,
 //   excelGrnReturnReport
 // );
-
-/**
- * @swagger
- * /api/v1/grnReturn/pdf:
- *   post:
- *     summary: Print Good Receive Note
- *     tags: [Good Receive Note]
- *     security:
- *       - bearerAuth: []
- */
-grnReturnRouter.post("/pdf", verifyToken, authorize(getPermission("GRN_RETURN_PDF", "VIEW")), printGrnReturnById);

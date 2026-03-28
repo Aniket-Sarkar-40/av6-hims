@@ -1,9 +1,7 @@
-import { coreRequests } from "@/client/core/request";
-import { requestStorage } from "@/config/requestContext";
-import { getItemStockQtyByLocation, getItemStockQtyByUser } from "@/repository/stock/stock.repository";
-import { branchService } from "@/services/master/branch.service";
-import { itemMasterService } from "@/services/master/itemMaster.service";
-import { warehouseService } from "@/services/master/warehouse.service";
+import { branchService } from "@/services/master/branch.service.js";
+import { itemMasterService } from "@/services/master/itemMaster.service.js";
+import { warehouseService } from "@/services/master/warehouse.service.js";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import {
   RequisitionItemDetailDTO,
   RequisitionItemDetailResponse,
@@ -13,98 +11,173 @@ import {
   StoreRequisitionDetailDTOBranch,
   StoreRequisitionDTO,
   StoreRequisitionResponse,
-} from "@/types/purchase/storeRequisition";
-import { RawItemStock } from "@/types/stock/stock";
-import { itemMasterToDto } from "@/utils/commonResponse.utils";
-import { toIdValue } from "@/utils/idValue.utils";
-import { logger } from "@/utils/logger.utils";
-import { ItemStock } from "@prisma/client";
+} from "@/types/purchase/storeRequisition.js";
+import { itemMasterToDto } from "../master/itemMaster.mapper.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { customOmit, toIdValue } from "av6-utils";
+import { settingsService } from "@/services/master/settings.service.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import {
+  getItemStockQtyByLocation,
+  getItemStockQtyByUser,
+} from "@/repository/stock/stock.repository.js";
+import { RawItemStock } from "@/types/stock/stock.js";
+import { InvItemStock } from "@repo/db/generated/prisma/client";
 
 export const toStoreRequisitionDTO = async (
-  storeRequisition: StoreRequisitionResponse
-): Promise<StoreRequisitionDTO> => {
+  storeRequisition: StoreRequisitionResponse[],
+): Promise<StoreRequisitionDTO[]> => {
   logger.info("entering::toStoreRequisitionDTO::mapper");
-  let warehouse, branch;
+  const settings = await settingsService.getSettings();
+  const warehouseMode = settings?.warehouseMode;
 
-  const warehouseMode = requestStorage.getStore()?.settings?.warehouseMode;
+  return Promise.all(
+    storeRequisition.map(async (requisition) => {
+      const omittedRequisition = customOmit<
+        StoreRequisitionResponse,
+        BaseModelAttrWoCancel | "ccId"
+      >(requisition, [
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "ccId",
+      ]);
+      let warehouse, branch;
 
-  if (warehouseMode && storeRequisition.ccId) {
-    warehouse = await warehouseService.getWarehouseById(storeRequisition.ccId, true);
-  } else if (!warehouseMode && storeRequisition.ccId) {
-    branch = await branchService.getBranchById(storeRequisition.ccId, true);
-  }
-  const createdBy = storeRequisition.createdBy ? await coreRequests.getEmployeeCache(storeRequisition.createdBy) : null;
-  const reqFrom = storeRequisition.requisitionFrom
-    ? await coreRequests.getEmployeeCache(storeRequisition.requisitionFrom)
-    : null;
-  const updatedBy = storeRequisition.updatedBy ? await coreRequests.getEmployeeCache(storeRequisition.updatedBy) : null;
-  const approvedBy = storeRequisition.approvedBy
-    ? await coreRequests.getEmployeeCache(storeRequisition.approvedBy)
-    : null;
-  const rejectBy = storeRequisition.rejectBy ? await coreRequests.getEmployeeCache(storeRequisition.rejectBy) : null;
-
-  const acknowledgementBy = storeRequisition.acknowledgementBy
-    ? await coreRequests.getEmployeeCache(storeRequisition.acknowledgementBy)
-    : null;
-
-  const detailDTO: StoreRequisitionDetailDTOBranch[] = await Promise.all(
-    storeRequisition.storeRequisitionDetails.map(async (detail) => {
-      const itemDTO = detail.itemId ? await itemMasterService.getItemMasterById({ itemId: detail.itemId }, true) : null;
-
-      const qtyAtCc = await getItemStockQtyByLocation(detail.itemId, storeRequisition.ccId);
-
-      let inHandWarehouseQty: number | null = null;
-      let inHandBranchQty: number | null = null;
-
-      const warehouseRow = await warehouseService.getWarehouseById(storeRequisition.ccId, true);
-      if (warehouseRow) {
-        inHandWarehouseQty = qtyAtCc;
-      } else {
-        const branchRow = await branchService.getBranchById(storeRequisition.ccId, true);
-        if (branchRow) inHandBranchQty = qtyAtCc;
+      if (warehouseMode && requisition.ccId) {
+        warehouse = await warehouseService.getWarehouseById(
+          requisition.ccId,
+          true,
+        );
+      } else if (!warehouseMode && requisition.ccId) {
+        branch = await branchService.getBranchById(requisition.ccId, true);
       }
+      const createdBy = requisition.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            requisition.createdBy,
+            true,
+          )
+        : null;
+      const reqFrom = requisition.requisitionFrom
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            requisition.requisitionFrom,
+            true,
+          )
+        : null;
+      const updatedBy = requisition.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            requisition.updatedBy,
+            true,
+          )
+        : null;
+      const approvedBy = requisition.approvedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            requisition.approvedBy,
+            true,
+          )
+        : null;
+      const rejectBy = requisition.rejectBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            requisition.rejectBy,
+            true,
+          )
+        : null;
 
-      let userInHandStock: number | null = null;
-      if (storeRequisition.requisitionFrom) {
-        userInHandStock = await getItemStockQtyByUser(detail.itemId, storeRequisition.requisitionFrom);
-      }
+      const acknowledgementBy = requisition.acknowledgementBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            requisition.acknowledgementBy,
+            true,
+          )
+        : null;
+
+      const detailDTO: StoreRequisitionDetailDTOBranch[] = await Promise.all(
+        requisition.storeRequisitionDetails.map(async (detail) => {
+          const itemDTO = detail.itemId
+            ? await itemMasterService.getItemMasterById(
+                { itemId: detail.itemId },
+                true,
+              )
+            : null;
+
+          const qtyAtCc = await getItemStockQtyByLocation(
+            detail.itemId,
+            requisition.ccId,
+          );
+          let inHandWarehouseQty: number | null = null;
+          let inHandBranchQty: number | null = null;
+
+          const warehouseRow = await warehouseService.getWarehouseById(
+            requisition.ccId,
+            true,
+          );
+          if (warehouseRow) {
+            inHandWarehouseQty = qtyAtCc;
+          } else {
+            const branchRow = await branchService.getBranchById(
+              requisition.ccId,
+              true,
+            );
+            if (branchRow) inHandBranchQty = qtyAtCc;
+          }
+
+          let userInHandStock: number | null = null;
+          if (requisition.requisitionFrom) {
+            userInHandStock = await getItemStockQtyByUser(
+              detail.itemId,
+              requisition.requisitionFrom,
+            );
+          }
+
+          return {
+            ...detail,
+            warehouseInHandStock: inHandWarehouseQty,
+            branchInHandStock: inHandBranchQty,
+            userInHandStock: userInHandStock,
+            item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+          };
+        }),
+      );
 
       return {
-        ...detail,
-        warehouseInHandStock: inHandWarehouseQty,
-        branchInHandStock: inHandBranchQty,
-        userInHandStock: userInHandStock,
-        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        ...omittedRequisition.rest,
+        warehouse: toIdValue(warehouse, "name"),
+        branch: toIdValue(branch, "name"),
+        storeRequisitionDetails: detailDTO,
+        createdBy: createdBy,
+        requisitionFrom: toIdValue(reqFrom, "name") ?? null,
+        updatedBy: updatedBy,
+        approvedBy: approvedBy,
+        rejectBy: rejectBy,
+        staff: reqFrom ?? null,
+        acknowledgementBy: acknowledgementBy,
       };
-    })
+    }),
   );
-
-  return {
-    ...storeRequisition,
-    warehouse: toIdValue(warehouse, "name"),
-    branch: toIdValue(branch, "name"),
-    storeRequisitionDetails: detailDTO,
-    createdBy: createdBy,
-    requisitionFrom: toIdValue(reqFrom, "name") ?? null,
-    updatedBy: updatedBy,
-    approvedBy: approvedBy,
-    rejectBy: rejectBy,
-    staff: reqFrom ?? null,
-    acknowledgementBy: acknowledgementBy,
-  };
 };
 
 export const toRequisitionItemDetailDTO = async (
-  storeRequisition: RequisitionItemDetailResponse
+  storeRequisition: RequisitionItemDetailResponse,
 ): Promise<RequisitionItemDetailDTO> => {
   const itemDTO = storeRequisition.itemId
-    ? await itemMasterService.getItemMasterById({ itemId: storeRequisition.itemId }, true)
+    ? await itemMasterService.getItemMasterById(
+        { itemId: storeRequisition.itemId },
+        true,
+      )
     : null;
 
   const inHandBranchQty = storeRequisition.ackCCId
-    ? await getItemStockQtyByLocation(storeRequisition.itemId, storeRequisition.ackCCId)
+    ? await getItemStockQtyByLocation(
+        storeRequisition.itemId,
+        storeRequisition.ackCCId,
+      )
     : null;
-  const inHandWarehouseQty = await getItemStockQtyByLocation(storeRequisition.itemId, storeRequisition.ccId);
+  const inHandWarehouseQty = await getItemStockQtyByLocation(
+    storeRequisition.itemId,
+    storeRequisition.ccId,
+  );
 
   const detailDTO: StoreRequisitionDetailDTO = {
     ...storeRequisition.storeRequisitionDetails,
@@ -120,20 +193,31 @@ export const toRequisitionItemDetailDTO = async (
 };
 
 export const toStoreRequisitionBatchWiseDTO = async (
-  storeRequisition: StoreReqBatchWiseResponse
+  storeRequisition: StoreReqBatchWiseResponse,
 ): Promise<StoreRequisitionBatchWiseDTO> => {
+  const settings = await settingsService.getSettings();
   let warehouse, branch;
 
-  const warehouseMode = requestStorage.getStore()?.settings?.warehouseMode;
+  const warehouseMode = settings?.warehouseMode;
 
   if (warehouseMode && storeRequisition.ccId) {
-    warehouse = await warehouseService.getWarehouseById(storeRequisition.ccId, true);
+    warehouse = await warehouseService.getWarehouseById(
+      storeRequisition.ccId,
+      true,
+    );
   } else {
     branch = await branchService.getBranchById(storeRequisition.ccId, true);
   }
-  const reqFrom = await coreRequests.getEmployeeCache(storeRequisition.requisitionFrom);
+  const reqFrom = storeRequisition.requisitionFrom
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+        storeRequisition.requisitionFrom,
+        true,
+      )
+    : null;
   const detailDTO: RequisitionItemDetailDTO[] = await Promise.all(
-    storeRequisition.requisitionItemDetails.map(async (detail) => await toRequisitionItemDetailDTO(detail))
+    storeRequisition.requisitionInvItemDetails.map(
+      async (detail) => await toRequisitionItemDetailDTO(detail),
+    ),
   );
 
   return {
@@ -145,7 +229,7 @@ export const toStoreRequisitionBatchWiseDTO = async (
   };
 };
 
-export const toStockEntity = (raw: RawItemStock): ItemStock => {
+export const toStockEntity = (raw: RawItemStock): InvItemStock => {
   return {
     id: raw.id,
     itemId: raw.item_id,

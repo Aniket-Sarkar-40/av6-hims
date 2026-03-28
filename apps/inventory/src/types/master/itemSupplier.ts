@@ -1,5 +1,9 @@
 import { InvItemSupplier, Prisma } from "@repo/db/generated/prisma/client";
-import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
+import {
+  BaseModelAttr,
+  BaseModelAttrWoCancel,
+  IdValue,
+} from "@repo/shared/types/global.js";
 
 export type ItemSupplierCreateInput = Omit<
   Prisma.InvItemSupplierUncheckedCreateInput,
@@ -22,7 +26,7 @@ export type ItemSupplierResponse = Prisma.InvItemSupplierGetPayload<{
 }>;
 export interface ItemSupplierDTO extends Omit<
   ItemSupplierResponse,
-  BaseModelAttr
+  BaseModelAttrWoCancel | "branchDetailsId" | "taxDetailsId"
 > {
   taxDetails: IdValue | null;
   collectionCenter: IdValue | null;
