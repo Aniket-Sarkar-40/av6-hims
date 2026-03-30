@@ -3,15 +3,16 @@ import dotenv from "dotenv";
 import { defineConfig } from "prisma/config";
 
 dotenv.config({
-  path: path.resolve(process.cwd(), "../../.env")
+  path: path.resolve(process.cwd(), "../../.env"),
 });
 
 export default defineConfig({
   schema: "prisma",
   migrations: {
-    path: "prisma/migrations"
+    path: "prisma/migrations",
+    seed: "tsx ./seedRunner.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL ?? ""
-  }
+    url: process.env.DATABASE_URL ?? "",
+  },
 });
