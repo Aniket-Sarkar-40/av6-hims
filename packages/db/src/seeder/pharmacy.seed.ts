@@ -230,7 +230,7 @@ export async function runSeed() {
       permission: "pms:country:view",
       isDropDown: true,
       whereClause: JSON.stringify({}),
-      selectClause: JSON.stringify({ id: "numCode", value: "enShortName" }),
+      selectClause: JSON.stringify({ id: "id", value: "enShortName" }),
     },
     {
       shortCode: "CITY",

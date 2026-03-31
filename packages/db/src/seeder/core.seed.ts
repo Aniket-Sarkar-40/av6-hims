@@ -71,7 +71,7 @@ export async function runSeed() {
   const dynamicShortCodes: DynamicShortCodeSeeder[] = [
     {
       shortCode: "UIN_CONFIG",
-      tableName: "CoreUINConfig",
+      tableName: "coreUINConfig",
       isDTO: true,
       isCacheable: true,
       permission: "core:uinConfig:view",
@@ -93,7 +93,7 @@ export async function runSeed() {
       permission: "core:country:view",
       isDropDown: true,
       whereClause: JSON.stringify({}),
-      selectClause: JSON.stringify({ id: "numCode", value: "enShortName" }),
+      selectClause: JSON.stringify({ id: "id", value: "enShortName" }),
     },
 
     {

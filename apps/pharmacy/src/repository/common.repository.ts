@@ -27,7 +27,7 @@ export const fetchTableData = async (table: string) => {
       ? await model.findMany()
       : await model.findMany({ where });
 
-  await createCache(table, dbData);
+  await createCache(table, dbData, "pms");
 
   logger.info("exiting::fetchTableData::repository");
 
