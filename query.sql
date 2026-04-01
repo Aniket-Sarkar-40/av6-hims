@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `sch_collection_center` ADD COLUMN `inv_cc_type` ENUM('BRANCH', 'WAREHOUSE') NOT NULL DEFAULT 'BRANCH',
+    ADD COLUMN `pms_cc_type` ENUM('BRANCH', 'WAREHOUSE') NOT NULL DEFAULT 'BRANCH';

@@ -13,8 +13,8 @@ import {
   DiscMethod,
   INCLUDE_EXCLUDE,
   PAYMENT_STATUS,
-  PaymentMode,
   PaymentModePharmacy,
+  PmsPaymentMode,
   RETURN_STS_SELL,
   SELL_PAYMENT_STATUS,
   SELL_STATUS,
@@ -32,7 +32,7 @@ export interface SellInput {
   aptId?: number | null;
   aptNo?: string | null;
   deliveryType: DeliveryType;
-  paymentMode?: PaymentMode | null;
+  paymentMode?: PmsPaymentMode | null;
   isHomeDelivery?: boolean;
   billDate?: Date;
   customerId: number;
@@ -124,24 +124,25 @@ export interface CalculationOutput {
   netTax: number;
 }
 
-export interface SellDTO extends Omit<
-  SellResponse,
-  | "createdBy"
-  | "sellDetails"
-  | "insurance"
-  | "corporateClient"
-  | "coPayAmount"
-  | "customerPayAmount"
-  | "netAmount"
-  | "totalAmount"
-  | "tax"
-  | "netTax"
-  | "discount"
-  | "netDiscount"
-  | "paidAmount"
-  | "returnedAmount"
-  | "refundedAmount"
-> {
+export interface SellDTO
+  extends Omit<
+    SellResponse,
+    | "createdBy"
+    | "sellDetails"
+    | "insurance"
+    | "corporateClient"
+    | "coPayAmount"
+    | "customerPayAmount"
+    | "netAmount"
+    | "totalAmount"
+    | "tax"
+    | "netTax"
+    | "discount"
+    | "netDiscount"
+    | "paidAmount"
+    | "returnedAmount"
+    | "refundedAmount"
+  > {
   staff?: EmployeeCache | null;
   insurance?: IdValue | null;
   corporateClient?: IdValue | null;
@@ -186,19 +187,20 @@ export interface PaymentTransaction {
   refundAmount?: number;
 }
 
-export interface SellDetailDTO extends Omit<
-  PmsSellDetails,
-  | "mrp"
-  | "netAmount"
-  | "totalAmount"
-  | "coPayAmount"
-  | "customerPayAmount"
-  | "discount"
-  | "netDiscount"
-  | "tax"
-  | "netTax"
-  | "coPayPaymentValue"
-> {
+export interface SellDetailDTO
+  extends Omit<
+    PmsSellDetails,
+    | "mrp"
+    | "netAmount"
+    | "totalAmount"
+    | "coPayAmount"
+    | "customerPayAmount"
+    | "discount"
+    | "netDiscount"
+    | "tax"
+    | "netTax"
+    | "coPayPaymentValue"
+  > {
   item: DecimalToNumber<PmsItem> | null;
   itemCategory: MedCategory | null;
   insuredCoPay: number | null;
@@ -267,7 +269,7 @@ export interface sellExcelFilter {
   branchId?: number;
   staffId?: number;
   deliveryType?: DeliveryType;
-  paymentMode?: PaymentMode;
+  paymentMode?: PmsPaymentMode;
   isHomeDelivery?: boolean;
   startDate?: Date;
   endDate?: Date;

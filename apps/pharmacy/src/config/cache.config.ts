@@ -14,7 +14,7 @@ export enum RedisResource {
   COUNTRY_CODE = "countryCode",
   DEPARTMENT = "department",
   DISTRIBUTOR = "distributor",
-  DYNAMIC_SHORT_CODE = "dynamicShortCode",
+  DYNAMIC_SHORT_CODE = "pmsDynamicShortCode",
   EMAIL_CONFIG = "emailConfig",
   EVENT_EMAIL = "eventEmail",
   EXPENSE_HEAD = "expenseHead",
@@ -32,7 +32,7 @@ export enum RedisResource {
   STAFF = "staff",
   STAFF_DESIGNATION = "staffDesignation",
   STORAGE = "storage",
-  UIN_CONFIG = "uINConfig",
+  UIN_CONFIG = "pmsUINConfig",
   WAREHOUSE = "warehouse",
   CUSTOMER = "customer",
   CITY = "city",
@@ -51,14 +51,14 @@ export enum RedisResource {
 
 export const getRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string,
+  type: string
 ): string => {
   return `${REDIS_PREFIX}pms:${RedisResource[resource]}:${type}`;
 };
 
 export const getMasterRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string,
+  type: string
 ): string => {
   return `${REDIS_PREFIX}master:${RedisResource[resource]}:${type}`;
 };

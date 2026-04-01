@@ -185,6 +185,8 @@ model CollectionCenter {
     connectionCode             String                     @map("connection_code") @db.VarChar(100)
     barcodePrinterName         String?                    @map("barcode_printer_name") @db.VarChar(255)
     isActive                   BinaryFlag                 @default(true) @map("is_active")
+    pmsCcType                  CcType                     @default(BRANCH) @map("pms_cc_type")
+    invCcType                  CcType                     @default(BRANCH) @map("inv_cc_type")
     staffCollectionCenter      StaffCollectionCenter[]
     notifications              Notification[]
     warehouse                  InvWarehouse[]

@@ -14,9 +14,9 @@ export enum RedisResource {
   LOGIN = "login",
 
   SETTINGS = "settings",
-  DYNAMIC_SHORT_CODE = "dynamicShortCode",
+  DYNAMIC_SHORT_CODE = "coreDynamicShortCode",
 
-  UIN_CONFIG = "uINConfig",
+  UIN_CONFIG = "coreUINConfig",
 
   CITY = "city",
   COUNTRY = "country",

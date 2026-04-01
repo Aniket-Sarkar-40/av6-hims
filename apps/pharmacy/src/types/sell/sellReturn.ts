@@ -4,8 +4,8 @@ import {
   DiscMethod,
   INCLUDE_EXCLUDE,
   PAYMENT_STATUS,
-  PaymentMode,
   PaymentModePharmacy,
+  PmsPaymentMode,
   RETURN_STS,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/enums.js";
@@ -32,7 +32,7 @@ export interface SellReturnInput {
   aptId?: number | null;
   aptNo?: string | null;
   deliveryType: DeliveryType;
-  paymentMode?: PaymentMode | null;
+  paymentMode?: PmsPaymentMode | null;
   isHomeDelivery?: boolean;
   billDate: Date;
   customerId: number;
@@ -151,24 +151,25 @@ export type ValSellReturnResponse = Prisma.PmsSellReturnGetPayload<{
   };
 }>;
 
-export interface SellReturnDTO extends Omit<
-  SellReturnResponse,
-  | "createdBy"
-  | "approvedBy"
-  | "rejectedBy"
-  | "insurance"
-  | "corporateClient"
-  | "discount"
-  | "tax"
-  | "netDiscount"
-  | "netTax"
-  | "paidAmount"
-  | "netAmount"
-  | "totalAmount"
-  | "customerPayAmount"
-  | "coPayAmount"
-  | "sellReturnDetails"
-> {
+export interface SellReturnDTO
+  extends Omit<
+    SellReturnResponse,
+    | "createdBy"
+    | "approvedBy"
+    | "rejectedBy"
+    | "insurance"
+    | "corporateClient"
+    | "discount"
+    | "tax"
+    | "netDiscount"
+    | "netTax"
+    | "paidAmount"
+    | "netAmount"
+    | "totalAmount"
+    | "customerPayAmount"
+    | "coPayAmount"
+    | "sellReturnDetails"
+  > {
   tax: number;
   netTax: number;
   discount: number;
@@ -187,18 +188,19 @@ export interface SellReturnDTO extends Omit<
   sellReturnDetails: SellReturnDetailDTO[];
 }
 
-export interface SellReturnDetailDTO extends Omit<
-  PmsSellReturnDetails,
-  | "mrp"
-  | "discount"
-  | "netDiscount"
-  | "tax"
-  | "netTax"
-  | "totalAmount"
-  | "coPayAmount"
-  | "customerPayAmount"
-  | "netAmount"
-> {
+export interface SellReturnDetailDTO
+  extends Omit<
+    PmsSellReturnDetails,
+    | "mrp"
+    | "discount"
+    | "netDiscount"
+    | "tax"
+    | "netTax"
+    | "totalAmount"
+    | "coPayAmount"
+    | "customerPayAmount"
+    | "netAmount"
+  > {
   mrp: number;
   discount: number;
   netDiscount: number;
@@ -227,7 +229,7 @@ export interface SellReturnExcelFilter {
   branchId?: number;
   staffId?: number;
   deliveryType?: DeliveryType;
-  paymentMode?: PaymentMode;
+  paymentMode?: PmsPaymentMode;
   isHomeDelivery?: boolean;
   startDate?: Date;
   endDate?: Date;

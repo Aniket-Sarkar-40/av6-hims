@@ -9,13 +9,13 @@ export async function checkIsCacheable(shortCode: string): Promise<boolean> {
 }
 
 export enum RedisResource {
-  DYNAMIC_SHORT_CODE = "dynamicShortCode",
+  DYNAMIC_SHORT_CODE = "invDynamicShortCode",
   ITEM = "item",
   SETTINGS = "settings",
   ITEM_CATEGORY = "itemCategory",
   ITEM_STORE = "itemStore",
   UNIT_MASTER = "unitMaster",
-  UIN_CONFIG = "uINConfig",
+  UIN_CONFIG = "invUINConfig",
   TAX_DETAILS = "taxDetails",
   BRANCH = "branch",
   COLLECTION_CENTER = "collectionCenter",
@@ -30,14 +30,14 @@ export enum RedisResource {
 
 export const getRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string,
+  type: string
 ): string => {
   return `${REDIS_PREFIX}core:${RedisResource[resource]}:${type}`;
 };
 
 export const getMasterRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string,
+  type: string
 ): string => {
   return `${REDIS_PREFIX}master:${RedisResource[resource]}:${type}`;
 };
