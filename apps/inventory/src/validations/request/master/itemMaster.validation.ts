@@ -19,7 +19,7 @@ import Joi from "joi";
 // Define the schema for item master creation
 export const itemMasterSchema = Joi.object<ItemMasterReq | ItemMasterUpdateReq>(
   {
-    item: strRequired("Item Name", 3),
+    item: strRequired("Item Name"),
 
     itemCode: strOptional("Item Code"),
 
@@ -48,7 +48,7 @@ export const itemMasterSchema = Joi.object<ItemMasterReq | ItemMasterUpdateReq>(
     backImage: strOptional("Back Image"),
     leftSideImage: strOptional("Left Image"),
     rightSideImage: strOptional("Right Image"),
-  },
+  }
 );
 
 const multipleDocsAttr = [

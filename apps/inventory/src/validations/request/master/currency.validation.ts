@@ -12,7 +12,7 @@ export const currencySchema = Joi.object<CurrencyReq>({
 
   name: strRequired("Name", 100).min(1),
 
-  symbol: strOptional("Symbol").min(5),
+  symbol: strOptional("Symbol"),
 });
 
 export const currencyUpdateSchema = currencySchema.keys({

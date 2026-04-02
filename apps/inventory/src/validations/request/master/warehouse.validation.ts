@@ -13,7 +13,7 @@ import Joi from "joi";
 
 export const warehouseSchema = Joi.object<InvWarehouse>({
   id: idRequired("Collection Center Id"),
-  name: strRequired("Name", 2),
+  name: strRequired("Name"),
   vatNo: strRequired("Vat"),
   tinNo: strRequired("Tin No"),
   businessSubline: strOptional("Business sub line"),

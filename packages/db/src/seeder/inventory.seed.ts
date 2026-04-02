@@ -304,7 +304,7 @@ export async function runSeed() {
       permission: "inv:store-requisition:view",
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true }),
-      selectClause: JSON.stringify({ id: "id", value: "srnNumber" }),
+      selectClause: JSON.stringify({ id: "id", value: "srNumber" }),
     },
     {
       shortCode: "INCOME_HEAD",
