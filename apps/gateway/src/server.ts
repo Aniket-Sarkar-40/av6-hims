@@ -2,7 +2,7 @@ import { createCoreApp } from "@apps/core";
 import express from "express";
 import { connectRedis } from "@repo/platform/cache/redisClient.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { IS_REDIS, PORT } from "@repo/shared";
+import { FRONTEND_URLS, IS_REDIS, PORT } from "@repo/shared";
 import { initializeCache as initializeCoreCache } from "@apps/core/config/redisClient.js";
 import { initializeCache as initializeOpdCache } from "@apps/opd/config/redisClient.js";
 import { initializeCache as initializeInvCache } from "@apps/inv/config/redisClient.js";
@@ -10,10 +10,30 @@ import { initializeCache as initializePharmacyCache } from "@apps/pharmacy/confi
 import { createOpdApp } from "@apps/opd";
 import { createInvApp } from "@apps/inv";
 import { createPharmacyApp } from "@apps/pharmacy";
+import cors from "cors";
+
 const app = express();
 
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, cb) => {
+    if (!origin || FRONTEND_URLS.includes(origin)) return cb(null, true);
+    cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Cache-Control",
+    "X-Trace-Id",
+  ],
+  exposedHeaders: ["Set-Cookie", "X-Trace-Id"],
+};
+
+app.use(cors(corsOptions));
+
 const enabled = new Set(
-  (process.env.ENABLED_APPS ?? "core,opd,pms").split(","),
+  (process.env.ENABLED_APPS ?? "core,opd,pms").split(",")
 );
 
 if (enabled.has("core")) app.use("/api/v1/core", createCoreApp("GATEWAY"));

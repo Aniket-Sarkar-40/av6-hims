@@ -1,11 +1,12 @@
 import { getRedisClient } from "@/cache/redisClient.js";
 import { logger } from "@/logging/logger.js";
+import { bigintToStringDeep, toItemSearch } from "@/utils/prisma.utils.js";
+import { PmsItem } from "@repo/db/generated/prisma/client";
 import {
   IS_REDIS,
   MASTER_TABLES,
   REDIS_PREFIX,
 } from "@repo/shared/config/index.js";
-import { bigintToStringDeep } from "@repo/shared/utils/helper.utils.js";
 
 export type DataType = {
   id: number;
@@ -15,6 +16,8 @@ export type DataType = {
 };
 
 export type Prefix = "core" | "inv" | "opd" | "pms";
+
+export const cacheKeyForItemSearch = `${REDIS_PREFIX}pms:pmsItem:search`;
 
 /**
  * Create cache entries from an array of DataType.
@@ -32,6 +35,15 @@ export async function createCache(
   const redisClient = getRedisClient();
   if (redisClient === null) return;
   for (const element of data) {
+    if (table === "item") {
+      const itemForSearch = toItemSearch(element as PmsItem);
+
+      await redisClient.hSet(
+        cacheKeyForItemSearch,
+        element.id.toString(),
+        JSON.stringify(itemForSearch)
+      );
+    }
     if (table === "eventEmail" && element.emailType) {
       const toCache = bigintToStringDeep(element);
 
