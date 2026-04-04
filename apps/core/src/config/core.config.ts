@@ -72,6 +72,7 @@ export const uinServiceFactory = uinConfigService({
   cacheKey: getRedisKey("UIN_CONFIG", "all"),
 
   db: db,
+  modelName: "coreUINConfig",
   helpers: {
     ErrorHandler: ErrorHandler,
     generateErrorMessage: generateErrorMessage,
