@@ -20,11 +20,11 @@ export enum RedisResource {
 
   CITY = "city",
   COUNTRY = "country",
-  COUNTRY_CODE = "country-code",
+  COUNTRY_CODE = "countryCode",
   STATE = "state",
   ITEM_CATEGORY = "itemCategory",
 
-  COLLECTION_CENTER = "collection-center",
+  COLLECTION_CENTER = "collectionCenter",
   DEPARTMENT = "department",
   STAFF_DESIGNATION = "staffDesignation",
   EMPLOYEE = "employee",

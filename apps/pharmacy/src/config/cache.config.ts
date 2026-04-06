@@ -9,7 +9,7 @@ export async function checkIsCacheable(shortCode: string): Promise<boolean> {
 }
 
 export enum RedisResource {
-  BRANCH = "branch",
+  BRANCH = "pmsBranch",
   COLLECTION_CENTER = "collectionCenter",
   COUNTRY_CODE = "countryCode",
   DEPARTMENT = "department",
@@ -28,13 +28,13 @@ export enum RedisResource {
   MED_TYPE = "medType",
   MEDICINE_COMPO = "medicineCompo",
   MEDICINE_UNIT = "medicineUnit",
-  SETTINGS = "settings",
+  SETTINGS = "pmsSettings",
   STAFF = "staff",
   STAFF_DESIGNATION = "staffDesignation",
-  STORAGE = "storage",
+  STORAGE = "pmsStorage",
   UIN_CONFIG = "pmsUINConfig",
-  WAREHOUSE = "warehouse",
-  CUSTOMER = "customer",
+  WAREHOUSE = "pmsWarehouse",
+  CUSTOMER = "pmsCustomer",
   CITY = "city",
   COUNTRY = "country",
   STATE = "state",
