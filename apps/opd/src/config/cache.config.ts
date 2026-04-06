@@ -19,7 +19,7 @@ export enum RedisResource {
   CONSULTATION_NOTES_MAPPING = "consultationNotesMapping",
   MEDICINE_TAB = "medicineTab",
   PROCEDURE = "procedureMaster",
-  ICD_TEN = "icdTen",
+  ICD_TEN = "iCDTen",
   GENERAL_BILL_ITEM = "generalBillItem",
 }
 

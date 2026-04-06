@@ -6,13 +6,13 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { OpdDepartmentPrefix } from "@repo/db/generated/prisma/client";
 
 export const createOpdDepartmentPrefixInDb = async (
-  data: CreateOrUpdateOpdDepartmentPrefix,
+  data: CreateOrUpdateOpdDepartmentPrefix
 ): Promise<OpdDepartmentPrefix> => {
   logger.info("entering::createOpdDepartmentInDb::repository");
   const store = requestStorage.getStore();
   const opdDepartmentOmit = customOmit<CreateOrUpdateOpdDepartmentPrefix, "id">(
     data,
-    ["id"],
+    ["id"]
   );
   return db.opdDepartmentPrefix.create({
     data: {
@@ -23,7 +23,7 @@ export const createOpdDepartmentPrefixInDb = async (
 };
 
 export const updateOpdDepartmentPrefixInDb = async (
-  data: CreateOrUpdateOpdDepartmentPrefix,
+  data: CreateOrUpdateOpdDepartmentPrefix
 ): Promise<OpdDepartmentPrefix> => {
   logger.info("entering::updateOpdDepartmentInDb::repository");
   const store = requestStorage.getStore();
@@ -38,7 +38,7 @@ export const updateOpdDepartmentPrefixInDb = async (
 
 export const getOpdDepartmentPrefixByNameFromDb = async (
   prefix: string,
-  opdDepartmentId: number,
+  opdDepartmentId: number
 ): Promise<OpdDepartmentPrefix | null> => {
   logger.info("entering::getOpdDepartmentByNameFromDb::repository");
   return db.opdDepartmentPrefix.findFirst({
@@ -47,7 +47,7 @@ export const getOpdDepartmentPrefixByNameFromDb = async (
 };
 
 export const getOpdDepartmentPrefixByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<OpdDepartmentPrefix | null> => {
   logger.info("entering::getOpdDepartmentByIdFromDb::repository");
   return db.opdDepartmentPrefix.findUnique({
@@ -56,9 +56,11 @@ export const getOpdDepartmentPrefixByIdFromDb = async (
 };
 
 export const getOpdDepartmentPrefixByDepartmentIdFromDb = async (
-  opdDepartmentId: number,
+  opdDepartmentId: number
 ): Promise<OpdDepartmentPrefix[]> => {
-  logger.info("entering::getOpdDepartmentByDepartmentIdFromDb::repository");
+  logger.info(
+    "entering::getOpdDepartmentPrefixByDepartmentIdFromDb::repository"
+  );
   return db.opdDepartmentPrefix.findMany({
     where: { opdDepartmentId, isActive: true },
   });
