@@ -6,14 +6,14 @@ import {
   updateExpenseHead,
 } from "@/controllers/master/expenseHead.controller.js";
 import {
+  validateExpenseHeadCreate,
+  validateExpenseHeadUpdate,
+} from "@/validations/request/master/expenseHead.validation.js";
+import {
   authorize,
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
-import {
-  validateExpenseHeadCreate,
-  validateExpenseHeadUpdate,
-} from "@/validations/request/master/expenseHead.validation.js";
 import { Router } from "express";
 
 export const expenseHeadRouter: Router = Router();
@@ -45,7 +45,7 @@ expenseHeadRouter.post(
   verifyToken,
   authorize(getPermission("PMS", "EXPENSE_HEAD", "CREATE")),
   validateExpenseHeadCreate,
-  createExpenseHead,
+  createExpenseHead
 );
 /**
  * @swagger
@@ -60,7 +60,7 @@ expenseHeadRouter.get(
   "/",
   verifyToken,
   authorize(getPermission("PMS", "EXPENSE_HEAD", "VIEW")),
-  getAllExpenseHeads,
+  getAllExpenseHeads
 );
 
 /**
@@ -87,7 +87,7 @@ expenseHeadRouter.get(
   "/id",
   verifyToken,
   authorize(getPermission("PMS", "EXPENSE_HEAD", "VIEW")),
-  getExpenseHeadById,
+  getExpenseHeadById
 );
 /**
  * @swagger
@@ -116,10 +116,10 @@ expenseHeadRouter.put(
   verifyToken,
   authorize(
     getPermission("PMS", "EXPENSE_HEAD", "VIEW"),
-    getPermission("PMS", "EXPENSE_HEAD", "UPDATE"),
+    getPermission("PMS", "EXPENSE_HEAD", "UPDATE")
   ),
   validateExpenseHeadUpdate,
-  updateExpenseHead,
+  updateExpenseHead
 );
 /**
  * @swagger
@@ -141,7 +141,7 @@ expenseHeadRouter.delete(
   "/",
   verifyToken,
   authorize(getPermission("PMS", "EXPENSE_HEAD", "DELETE")),
-  deleteExpenseHead,
+  deleteExpenseHead
 );
 
 export default expenseHeadRouter;

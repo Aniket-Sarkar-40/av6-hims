@@ -17,9 +17,6 @@ import { SellReturnResponse } from "@/types/sell/sellReturn.js";
 import { StaffEntity } from "@/types/staff/doctor.js";
 import { ItemStockAuditDetails } from "@/types/stock/stock.js";
 import { StockAdjustmentResponse } from "@/types/stock/stockAdjustment.js";
-
-import { toExpenseDTO } from "./consumerConnect/expense.mapper.js";
-import { toIncomeDTO } from "./consumerConnect/income.mapper.js";
 import { toDistributorDto } from "./distributor/distributor.mapper.js";
 import { toGatePassDTO } from "./gatePass/gatePass.mapper.js";
 import { toGrnDetailsDTO, toGrnDTO } from "./grn/grn.mapper.js";
@@ -76,8 +73,6 @@ import {
   Country,
   CountryCode,
   Distributor,
-  Expense,
-  Income,
   ItemImages,
   ItemInstructionMap,
   ItemMedicineDosageMap,
@@ -112,13 +107,11 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.GATE_PASS]: (data: unknown) => toGatePassDTO(data as PmsGatePass),
   [SHORT_CODE.ITEM]: (data: unknown) =>
     toItemDto(data as PmsItem & { itemImages: ItemImages[] }),
-  [SHORT_CODE.EXPENSE]: (data: unknown) => toExpenseDTO(data as Expense),
-  [SHORT_CODE.INCOME]: (data: unknown) => toIncomeDTO(data as Income),
   [SHORT_CODE.PO]: (data: unknown) =>
     toPurchaseOrderDTO(
       data as PmsPurchaseOrder & {
         purchaseOrderDetails: PmsPurchaseOrderDetails[];
-      },
+      }
     ),
   [SHORT_CODE.DISTRIBUTOR]: (data: unknown) =>
     toDistributorDto(data as Distributor),
@@ -139,7 +132,7 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toStockTransferDTO(
       data as PmsStockTransfer & {
         stockTransferDetails: PmsStockTransferDetails[];
-      },
+      }
     ),
   [SHORT_CODE.STORE]: (data: unknown) => toStoreDTO(data as Store),
   [SHORT_CODE.MED_DOSAGE_MAP]: (data: unknown) =>

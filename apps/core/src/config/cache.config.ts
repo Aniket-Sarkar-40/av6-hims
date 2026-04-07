@@ -35,6 +35,7 @@ export enum RedisResource {
   PDF_TEMPLATE = "pdfTemplate",
 
   INCOME_HEAD = "incomeHead",
+  EXPENSE_HEAD = "expenseHead",
 }
 
 export const getRedisKey = (

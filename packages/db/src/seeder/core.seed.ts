@@ -279,6 +279,36 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: "yes" }),
       selectClause: JSON.stringify({ id: "id", value: "incomeCategory" }),
     },
+    {
+      shortCode: "EXPENSE_HEAD",
+      tableName: "expenseHead",
+      isDTO: false,
+      isCacheable: true,
+      permission: "core:expenseHead:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: "yes" }),
+      selectClause: JSON.stringify({ id: "id", value: "expenseCategory" }),
+    },
+    {
+      shortCode: "EXPENSE",
+      tableName: "expense",
+      isDTO: true,
+      isCacheable: false,
+      permission: "core:expense:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: "yes" }),
+      selectClause: JSON.stringify({ id: "id", value: "name" }),
+    },
+    {
+      shortCode: "INCOME",
+      tableName: "income",
+      isDTO: true,
+      isCacheable: false,
+      permission: "core:income:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: "yes" }),
+      selectClause: JSON.stringify({ id: "id", value: "name" }),
+    },
   ];
   const pdfTemplates: PdfTemplateSeeder[] = [
     {

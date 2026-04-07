@@ -17,7 +17,6 @@ export enum RedisResource {
   DYNAMIC_SHORT_CODE = "pmsDynamicShortCode",
   EMAIL_CONFIG = "emailConfig",
   EVENT_EMAIL = "eventEmail",
-  EXPENSE_HEAD = "expenseHead",
   ITEM = "pmsItem",
   LOGIN = "login",
   MANUFACTURE = "manufacture",

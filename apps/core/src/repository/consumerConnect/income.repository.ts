@@ -1,13 +1,9 @@
 import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
+import { db } from "@repo/db";
 import { CreateIncomeInput } from "@/types/consumerConnect/income.js";
-import { applyRound } from "av6-utils";
 import { logger } from "@repo/platform/logging/logger.js";
-import {
-  Income,
-  RoundFormat,
-  YesNoFlag,
-} from "@repo/db/generated/prisma/client";
+import { applyRound, RoundFormat } from "av6-utils";
+import { Income, YesNoFlag } from "@repo/db/generated/prisma/client";
 
 export async function getIncomeById(id: number): Promise<Income | null> {
   logger.info("entering::getIncomeById::repository");
@@ -17,13 +13,12 @@ export async function getIncomeById(id: number): Promise<Income | null> {
 }
 
 export const createIncomeInDb = async (
-  income: CreateIncomeInput,
+  income: CreateIncomeInput
 ): Promise<Income> => {
   logger.info("entering::createIncomeInDb::repository");
   // Exclude 'id' from the data object if present
-  const store = requestStorage.getStore();
-  const setting = store?.settings;
-  const precision = setting?.defaultPrecision;
+  const setting = await requestStorage.getStore()?.settings;
+  const precision = setting?.defaultPrecision ?? 2;
   return db.income.create({
     data: {
       ...income,
@@ -41,7 +36,7 @@ export const createIncomeInDb = async (
 
 export const updateIncomeInDb = async (
   id: number,
-  income: CreateIncomeInput,
+  income: CreateIncomeInput
 ): Promise<Income> => {
   logger.info("entering::updateIncomeInDb::repository");
   const store = requestStorage.getStore();
@@ -64,7 +59,7 @@ export const updateIncomeInDb = async (
 };
 
 export const getIncomeByInvoiceNoFromDb = async (
-  invoiceNo: string,
+  invoiceNo: string
 ): Promise<Income | null> => {
   logger.info("entering:: getIncomeByInvoiceNoFromDb::repository");
   return db.income.findFirst({
@@ -80,7 +75,7 @@ export const getAllIncomeFromDb = async (): Promise<Income[]> => {
 };
 
 export const getIncomeByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<Income | null> => {
   logger.info("entering::getIncomeByIdFromDb::repository");
   return db.income.findUnique({

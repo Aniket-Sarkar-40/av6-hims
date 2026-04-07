@@ -10,11 +10,10 @@ import {
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateExpenseSchema } from "@/validations/request/consumerConnect/expense.validation.js";
 
 import { Router } from "express";
-import { getPermission } from "@repo/shared/utils/permission.utils.js";
-import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 export const expenseRouter: Router = Router();
 
 /**
@@ -41,11 +40,10 @@ export const expenseRouter: Router = Router();
 expenseRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("INV", "EXPENSE", "CREATE")),
-  createUploadMiddleware("expense"),
-  uploadToHetzner("documents"),
+  authorize(getPermission("PMS", "EXPENSE_HEAD", "CREATE")),
+  createUploadMiddleware("documents"),
   validateExpenseSchema,
-  createExpense,
+  createExpense
 );
 /**
  * @swagger
@@ -59,8 +57,8 @@ expenseRouter.post(
 expenseRouter.get(
   "/",
   verifyToken,
-  authorize(getPermission("INV", "EXPENSE", "VIEW")),
-  getAllExpense,
+  authorize(getPermission("PMS", "EXPENSE", "VIEW")),
+  getAllExpense
 );
 
 /**
@@ -86,8 +84,8 @@ expenseRouter.get(
 expenseRouter.get(
   "/id",
   verifyToken,
-  authorize(getPermission("INV", "EXPENSE", "VIEW")),
-  getExpenseById,
+  authorize(getPermission("PMS", "EXPENSE", "VIEW")),
+  getExpenseById
 );
 /**
  * @swagger
@@ -115,13 +113,12 @@ expenseRouter.put(
   "/",
   verifyToken,
   authorize(
-    getPermission("INV", "EXPENSE", "VIEW"),
-    getPermission("INV", "EXPENSE", "UPDATE"),
+    getPermission("PMS", "EXPENSE", "VIEW"),
+    getPermission("PMS", "EXPENSE", "UPDATE")
   ),
-  createUploadMiddleware("expense"),
-  uploadToHetzner("documents"),
+  createUploadMiddleware("documents"),
   validateExpenseSchema,
-  updateExpense,
+  updateExpense
 );
 /**
  * @swagger
@@ -143,8 +140,8 @@ expenseRouter.delete(
   "/",
   verifyToken,
   authorize(
-    getPermission("INV", "EXPENSE", "VIEW"),
-    getPermission("INV", "EXPENSE", "DELETE"),
+    getPermission("PMS", "EXPENSE", "VIEW"),
+    getPermission("PMS", "EXPENSE", "DELETE")
   ),
-  deleteExpense,
+  deleteExpense
 );

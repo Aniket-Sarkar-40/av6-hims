@@ -31,8 +31,6 @@ import { toPurchaseOrderDTO } from "./purchase/purchase.mapper.js";
 import { toInTransitStockDTO } from "./inTransitStock/inTransitStock.mapper.js";
 import { toStockAdjustmentDTO } from "./stock/stockAdjustment.mapper.js";
 import { StockAdjustmentResponse } from "@/types/stock/stockAdjustment.js";
-import { toExpenseDTO } from "./consumerConnect/expense.mapper.js";
-import { toIncomeDTO } from "./consumerConnect/income.mapper.js";
 import { PurchaseOrderWithDetails } from "@/types/purchase/purchase.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 
@@ -65,6 +63,4 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toInTransitStockDTO(data as InvInTransitStock[]),
   [SHORT_CODE.STOCK_ADJUSTMENT]: (data: unknown) =>
     toStockAdjustmentDTO(data as StockAdjustmentResponse[]),
-  [SHORT_CODE.EXPENSE]: (data: unknown) => toExpenseDTO(data as Expense),
-  [SHORT_CODE.INCOME]: (data: unknown) => toIncomeDTO(data as Income),
 };

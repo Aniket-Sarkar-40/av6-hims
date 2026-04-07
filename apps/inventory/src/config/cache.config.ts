@@ -24,7 +24,6 @@ export enum RedisResource {
   EVENT_EMAIL = "eventEmail",
   CURRENCY = "currency",
   STORAGE = "invStorage",
-  EXPENSE_HEAD = "expenseHead",
 }
 
 export const getRedisKey = (

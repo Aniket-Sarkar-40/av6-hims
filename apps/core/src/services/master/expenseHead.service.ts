@@ -1,11 +1,4 @@
 import {
-  createExpenseHeadInDb,
-  deleteExpenseHeadInDb,
-  getAllExpenseHeadsFromDb,
-  getExpenseHeadByIdFromDb,
-  updateExpenseHeadInDb,
-} from "@/repository/master/expenseHead.repository.js";
-import {
   createExpenseHeadInput,
   updateExpenseHeadInput,
 } from "@/types/master/expenseHead.js";
@@ -20,15 +13,22 @@ import {
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+
+import { ExpenseHead } from "@repo/db/generated/prisma/client";
 import {
   createExpenseHeadServiceValidation,
   deleteExpenseHeadServiceValidation,
   updateExpenseHeadServiceValidation,
 } from "@/validations/service/master/expenseHead.service.validation.js";
-
-import { ExpenseHead } from "@repo/db/generated/prisma/client";
+import {
+  createExpenseHeadInDb,
+  deleteExpenseHeadInDb,
+  getAllExpenseHeadsFromDb,
+  getExpenseHeadByIdFromDb,
+  updateExpenseHeadInDb,
+} from "@/repository/master/expenseHead.repository.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
 
 const cacheKey = getRedisKey("EXPENSE_HEAD", "all");
 export const expenseHeadService = {
@@ -58,7 +58,7 @@ export const expenseHeadService = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Expense Heads"),
+          generateErrorMessage("NOT_FOUND", "Expense Heads")
         );
       }
     } else {
@@ -66,7 +66,7 @@ export const expenseHeadService = {
       if (expenseHeads.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Expense Heads"),
+          generateErrorMessage("NOT_FOUND", "Expense Heads")
         );
       }
       logger.info("exiting::getAllExpenseHeads::service");
@@ -76,7 +76,7 @@ export const expenseHeadService = {
 
   async getExpenseHeadById(
     id: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<ExpenseHead | null> {
     logger.info("entering::getExpenseHeadById::service");
     validIdCheck(id);
@@ -84,7 +84,7 @@ export const expenseHeadService = {
     if (isCacheable) {
       const cachedExpenseHead = (await getCacheById(
         cacheKey,
-        id,
+        id
       )) as ExpenseHead | null;
 
       if (cachedExpenseHead) {
@@ -93,7 +93,7 @@ export const expenseHeadService = {
         if (!canNullReturnable)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Expense Head"),
+            generateErrorMessage("NOT_FOUND", "Expense Head")
           );
         else return null;
       }
@@ -103,7 +103,7 @@ export const expenseHeadService = {
         if (!canNullReturnable)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Expense Head"),
+            generateErrorMessage("NOT_FOUND", "Expense Head")
           );
         else return null;
       }

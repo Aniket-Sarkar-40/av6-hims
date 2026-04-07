@@ -1,16 +1,12 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
 import { ExpenseInput } from "@/types/consumerConnect/expense.js";
-import { applyRound } from "av6-utils";
+import { db } from "@repo/db";
+import { Expense, YesNoFlag } from "@repo/db/generated/prisma/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import {
-  Expense,
-  RoundFormat,
-  YesNoFlag,
-} from "@repo/db/generated/prisma/client";
+import { applyRound, RoundFormat } from "av6-utils";
 
 export const createExpenseInDb = async (
-  expense: ExpenseInput,
+  expense: ExpenseInput
 ): Promise<Expense> => {
   logger.info("entering:: createExpenseInDb::repository");
   const store = requestStorage.getStore();
@@ -28,12 +24,11 @@ export const createExpenseInDb = async (
 };
 export const updateExpenseInDb = async (
   id: number,
-  expense: ExpenseInput,
+  expense: ExpenseInput
 ): Promise<Expense> => {
   logger.info("entering:: updateExpenseInDb::repository");
-  const store = requestStorage.getStore();
-  const setting = store?.settings;
-  const precision = setting?.defaultPrecision;
+  const setting = await requestStorage.getStore()?.settings;
+  const precision = setting?.defaultPrecision ?? 2;
   return db.expense.update({
     where: { id: id },
     data: {
@@ -46,7 +41,7 @@ export const updateExpenseInDb = async (
   });
 };
 export const getExpenseByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<Expense | null> => {
   logger.info("entering:: getExpenseByIdFromDb::repository");
   return db.expense.findUnique({
@@ -54,7 +49,7 @@ export const getExpenseByIdFromDb = async (
   });
 };
 export const getExpenseByInvoiceNoFromDb = async (
-  invoiceNo: string,
+  invoiceNo: string
 ): Promise<Expense | null> => {
   logger.info("entering:: getExpenseByNameFromDb::repository");
   return db.expense.findFirst({

@@ -23,6 +23,9 @@ import { registerPharmacyApprovalCallbacks } from "@/modules/callbacks/approvalC
 import { eventBus } from "@/events/eventBus.js";
 import { registerApprovalEmailListeners } from "@/modules/notifications/approvalEmailListener.js";
 import { incomeHeadRouter } from "@/routes/master/incomeHead.route.js";
+import expenseHeadRouter from "@/routes/master/expenseHead.route.js";
+import { incomeRouter } from "@/routes/consumerConnect/income.route.js";
+import { expenseRouter } from "@/routes/consumerConnect/expense.route.js";
 
 registerApprovalEmailListeners(eventBus); // notifications
 registerPharmacyApprovalCallbacks(); // stock updates
@@ -58,3 +61,7 @@ coreRouter.use("/event/event-config", eventConfigRouter);
 coreRouter.use("/event/template", templateRouter);
 coreRouter.use("/event/rule", eventRecipientRuleRouter);
 coreRouter.use("/master/income-head", incomeHeadRouter);
+coreRouter.use("/master/expense-head", expenseHeadRouter);
+
+coreRouter.use("/income", incomeRouter);
+coreRouter.use("/expense", expenseRouter);

@@ -306,16 +306,6 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "srNumber" }),
     },
-    {
-      shortCode: "EXPENSE_HEAD",
-      tableName: "expenseHead",
-      isDTO: false,
-      isCacheable: true,
-      permission: "pms:expenseHead:view",
-      isDropDown: true,
-      whereClause: JSON.stringify({ isActive: "yes" }),
-      selectClause: JSON.stringify({ id: "id", value: "expenseCategory" }),
-    },
   ];
 
   const eventEmails: EventEmailSeeder[] = [

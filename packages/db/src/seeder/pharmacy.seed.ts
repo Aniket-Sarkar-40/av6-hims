@@ -327,16 +327,6 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: "yes" }),
       selectClause: JSON.stringify({ id: "id", value: "departmentName" }),
     },
-    {
-      shortCode: "EXPENSE_HEAD",
-      tableName: "expenseHead",
-      isDTO: false,
-      isCacheable: true,
-      permission: "pms:expenseHead:view",
-      isDropDown: true,
-      whereClause: JSON.stringify({ isActive: "yes" }),
-      selectClause: JSON.stringify({ id: "id", value: "expenseCategory" }),
-    },
 
     {
       shortCode: "GATE_PASS",
@@ -357,26 +347,6 @@ export async function runSeed() {
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: "yes" }),
       selectClause: JSON.stringify({ id: "id", value: "designation" }),
-    },
-    {
-      shortCode: "EXPENSE",
-      tableName: "expense",
-      isDTO: true,
-      isCacheable: false,
-      permission: "pms:expense:view",
-      isDropDown: true,
-      whereClause: JSON.stringify({ isActive: "yes" }),
-      selectClause: JSON.stringify({ id: "id", value: "name" }),
-    },
-    {
-      shortCode: "INCOME",
-      tableName: "income",
-      isDTO: true,
-      isCacheable: false,
-      permission: "pms:income:view",
-      isDropDown: true,
-      whereClause: JSON.stringify({ isActive: "yes" }),
-      selectClause: JSON.stringify({ id: "id", value: "name" }),
     },
     {
       shortCode: "PO",

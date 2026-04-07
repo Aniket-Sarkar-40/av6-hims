@@ -3,8 +3,6 @@ import express from "express";
 import path from "path";
 
 import cacheRouter from "./routes/cacheRoute/cache.route.js";
-import { expenseRouter } from "./routes/consumerConnect/expense.route.js";
-import { incomeRouter } from "./routes/consumerConnect/income.route.js";
 import { customerRouter } from "./routes/customer/customer.route.js";
 import { distributorRouter } from "./routes/distributor/distributor.route.js";
 import emailConfigRouter from "./routes/email/email.route.js";
@@ -27,7 +25,6 @@ import collectionCenterRouter from "./routes/master/collectionCenter.route.js";
 import countryRouter from "./routes/master/country.route.js";
 import countryCodeRouter from "./routes/master/countryCode.route.js";
 import currencyRouter from "./routes/master/currency.route.js";
-import expenseHeadRouter from "./routes/master/expenseHead.route.js";
 import manufactureRouter from "./routes/master/manufacture.route.js";
 import medCategoryRouter from "./routes/master/medCategory.route.js";
 import medCompoRouter from "./routes/master/medComposition.route.js";
@@ -125,9 +122,6 @@ pharmacyRouter.use("/item-branch", itemBranchRouter);
 
 // Customer / Income / Expense
 pharmacyRouter.use("/customer", customerRouter);
-pharmacyRouter.use("/income", incomeRouter);
-pharmacyRouter.use("/expense-head", expenseHeadRouter);
-pharmacyRouter.use("/expense", expenseRouter);
 
 // Distributor
 pharmacyRouter.use("/distributor", distributorRouter);

@@ -1,10 +1,10 @@
 import Joi from "joi";
 import { Request, Response, NextFunction } from "express";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import {
   createExpenseHeadInput,
   updateExpenseHeadInput,
 } from "@/types/master/expenseHead.js";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 
 export const expenseHeadCreateSchema = Joi.object<createExpenseHeadInput>({
   expenseCategory: Joi.string().min(2).max(255).trim().required().messages({
@@ -51,7 +51,7 @@ export const expenseHeadUpdateSchema = Joi.object<updateExpenseHeadInput>({
 export const validateExpenseHeadCreate = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = expenseHeadCreateSchema.validate(req.body, {
     abortEarly: false,
@@ -63,7 +63,7 @@ export const validateExpenseHeadCreate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
   next();
@@ -72,7 +72,7 @@ export const validateExpenseHeadCreate = (
 export const validateExpenseHeadUpdate = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = expenseHeadUpdateSchema.validate(req.body, {
     abortEarly: false,
@@ -84,7 +84,7 @@ export const validateExpenseHeadUpdate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
   next();
