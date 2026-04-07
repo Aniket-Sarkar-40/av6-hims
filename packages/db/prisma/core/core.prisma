@@ -1093,3 +1093,185 @@ model MobileMoneyMethod {
 
     @@map("mobile_money_methods")
 }
+
+model ApprovalFlow {
+    id          Int      @id @default(autoincrement())
+    service     String
+    subjectType String   @map("subject_type") // same values as in ApprovalInstance
+    name        String
+    flowType    FlowType @default(STATUS) @map("flow_type")
+    isActive    Boolean  @default(true) @map("is_active")
+    createdBy   Int?     @map("created_by")
+    updatedBy   Int?     @map("updated_by")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    steps            ApprovalStep[]
+    approvalInstance ApprovalInstance[]
+
+    @@map("core_approval_flow")
+}
+
+model ApprovalStep {
+    id          Int      @id @default(autoincrement())
+    flowId      Int      @map("flow_id") // Make sure to ensure flowId and level are unique together when status is active
+    level       Int
+    minAmount   Decimal? @map("min_amount") // lower bound netTotal
+    maxAmount   Decimal? @map("max_amount") // NULL = no upper bound
+    stepType    StepType @default(MIN_MAX) @map("step_type") // enum below
+    config      Json?
+    childConfig Json?    @map("child_config")
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    approvalFlow          ApprovalFlow?           @relation(fields: [flowId], references: [id])
+    approvalStepCCMapping ApprovalStepCCMapping[]
+    approverMapping       ApproverMapping[]
+
+    @@index([flowId], name: "approval_step_flow_id_idx")
+    @@map("core_approval_step")
+}
+
+model ApprovalStepCCMapping {
+    id     Int @id @default(autoincrement())
+    stepId Int @map("step_id") // FK → ApprovalStep.id
+    ccId   Int @map("cc_id") // FK → CollectionCenter.id
+    level  Int
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    approvalStep     ApprovalStep     @relation(fields: [stepId], references: [id])
+    collectionCenter CollectionCenter @relation(fields: [ccId], references: [id])
+
+    @@index([stepId], name: "approval_step_cc_mapping_step_id_idx")
+    @@index([ccId], name: "approval_step_cc_mapping_cc_id_idx")
+    @@map("core_approval_step_cc_mapping")
+}
+
+model ApproverMapping {
+    id      Int  @id @default(autoincrement())
+    staffId Int? @map("staff_id") // FK → Staff.userId
+    stepId  Int  @map("step_id") // FK → ApprovalStep.id
+    ccId    Int  @map("cc_id") // FK → CollectionCenter.id
+    roleId  Int? @map("role_id") // FK → Role.id (optional, if staff is not a role)
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    staff Staff?           @relation(fields: [staffId], references: [id])
+    step  ApprovalStep     @relation(fields: [stepId], references: [id])
+    cc    CollectionCenter @relation(fields: [ccId], references: [id])
+
+    @@index([staffId], name: "approver_mapping_staff_id_idx")
+    @@index([stepId], name: "approver_mapping_step_id_idx")
+    @@index([ccId], name: "approver_mapping_cc_id_idx")
+    @@map("core_approver_mapping")
+}
+
+model ApprovalInstance {
+    id          Int            @id @default(autoincrement())
+    flowId      Int            @map("flow_id") // snapshot pointer
+    subjectType String         @map("subject_type") // same values as in ApprovalFlow
+    service     String         @map("service") // same values as in ApprovalFlow
+    subjectId   Int            @map("subject_id") // PK of the PO/GRN/Return etc.
+    refNo       String?        @map("ref_no")
+    currentStep Int            @map("current_step")
+    netTotal    Decimal?       @map("net_total") // total amount to be approved
+    status      ApprovalStatus @default(PENDING) // enum below
+
+    extra Json? @map("extra")
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    actions ApprovalAction[]
+    flow    ApprovalFlow?    @relation(fields: [flowId], references: [id])
+
+    @@index([flowId], name: "approval_instance_flow_id_idx")
+    @@map("core_approval_instance")
+}
+
+model ApprovalAction {
+    id          Int            @id @default(autoincrement())
+    instanceId  Int            @map("instance_id") // FK → ApprovalInstance.id
+    level       Int
+    actedBy     Int            @map("acted_by") // staffId
+    statusAfter ApprovalStatus @map("status_after") // enum below
+    comment     String?
+    actedAt     DateTime       @default(now()) @map("acted_at")
+    isActive    Boolean        @default(true) @map("is_active")
+
+    approvalInstance ApprovalInstance @relation(fields: [instanceId], references: [id])
+    actedByStaff     Staff            @relation(fields: [actedBy], references: [id])
+
+    @@index([instanceId], name: "approval_action_approval_instance_id_idx")
+    @@index([actedBy], name: "approval_action_acted_by_idx")
+    @@map("core_approval_action")
+}
+
+model ChildCommonDetails {
+    id          Int    @id @default(autoincrement())
+    childId     Int    @map("child_id")
+    parentId    Int    @map("parent_id")
+    subjectType String @map("subject_type")
+    service     String @map("service")
+
+    discountValue  Decimal?    @map("discount_value") @db.Decimal(13, 5)
+    discountType   DiscMethod? @map("discount_type")
+    discountAmount Decimal?    @map("discount_amount") @db.Decimal(13, 5)
+
+    copayValue  Decimal?    @map("co_pay_value") @db.Decimal(13, 5)
+    copayType   DiscMethod? @map("co_pay_type")
+    copayAmount Decimal?    @map("co_pay_amount") @db.Decimal(13, 5)
+
+    coPayModificationStatus String? @map("co_pay_modofication_status")
+
+    isActive Boolean @default(true) @map("is_active")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("core_child_common_details")
+}
+
+model ParentCommonDetails {
+    id          Int    @id @default(autoincrement())
+    parentId    Int    @map("parent_id")
+    subjectType String @map("subject_type")
+    service     String @map("service")
+
+    refundAmount   Decimal?    @map("refund_amount") @db.Decimal(13, 5)
+    discountType   DiscMethod? @map("discount_type")
+    discountValue  Decimal?    @map("discount_value") @db.Decimal(13, 5)
+    discountAmount Decimal?    @map("discount_amount") @db.Decimal(13, 5)
+    dueAmount      Decimal?    @map("due_amount") @db.Decimal(13, 5)
+    grossAmount    Decimal?    @map("gross_amount") @db.Decimal(13, 5)
+    netAmount      Decimal?    @map("net_amount") @db.Decimal(13, 5)
+
+    totalCopaymentAmount Decimal? @map("total_copayment_amount") @db.Decimal(13, 5)
+    isApproved           String?  @map("is_approved")
+
+    status        String? @map("status")
+    paymentStatus String? @map("payment_status")
+
+    isActive Boolean @default(true) @map("is_active")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("core_parent_common_details")
+}

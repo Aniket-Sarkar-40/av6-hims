@@ -60,3 +60,5 @@ export const MASTER_SERVICE_URL =
 export const EXT_COLLECTION_CENTER_BY_STAFF = `${MASTER_SERVICE_URL}/api/v1/master/collection-center/staffId`;
 export const EXT_COUNTRY_URL = `${MASTER_SERVICE_URL}/api/v1/master/country`;
 export const EXT_BASE_URL = process.env.EXT_BASE_URL;
+
+export const CLIENT_ID = process.env.CLIENT_ID || "";

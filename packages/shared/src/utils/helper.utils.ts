@@ -1,9 +1,10 @@
-import { BASE_URL } from "@repo/shared/config/index.js";
+import { BASE_URL, CLIENT_ID } from "@repo/shared/config/index.js";
 import { DecodedToken } from "@/types/auth.js";
 import fs from "fs";
 import path from "path";
 import jwt from "jsonwebtoken";
 import { Decimal } from "@prisma/client/runtime/client";
+import crypto from "crypto";
 
 export const toRelativeImagePath = (absolutePath: string): string => {
   if (
@@ -170,3 +171,12 @@ export function toNumberDeep<T>(val: T): DecimalToNumber<T> {
   }
   return val as any;
 }
+
+export function generateMd5(text: string) {
+  return crypto.createHash("md5").update(text).digest("hex");
+}
+
+export const generateHashForAuth = (randomNum: string) => {
+  const firstHash = generateMd5(CLIENT_ID);
+  return generateMd5(firstHash + randomNum);
+};

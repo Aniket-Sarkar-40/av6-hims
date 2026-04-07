@@ -19,6 +19,12 @@ import eventRecipientRuleRouter from "./routes/event/eventRecipientRule.route.js
 import serviceEventRouter from "./routes/event/serviceEvent.route.js";
 import eventConfigRouter from "./routes/event/eventConfig.route.js";
 import templateRouter from "./routes/event/template.route.js";
+import { registerPharmacyApprovalCallbacks } from "@/modules/callbacks/approvalCallback.js";
+import { eventBus } from "@/events/eventBus.js";
+import { registerApprovalEmailListeners } from "@/modules/notifications/approvalEmailListener.js";
+
+registerApprovalEmailListeners(eventBus); // notifications
+registerPharmacyApprovalCallbacks(); // stock updates
 
 export const coreRouter: ExpressRouter = Router();
 
