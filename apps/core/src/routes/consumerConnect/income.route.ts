@@ -44,10 +44,10 @@ export const incomeRouter: Router = Router();
 incomeRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("PMS", "INCOME_HEAD", "CREATE")),
+  authorize(getPermission("CORE", "INCOME", "CREATE")),
   createUploadMiddleware("documents"),
   validateIncome,
-  createIncome,
+  createIncome
 );
 
 /**
@@ -62,8 +62,8 @@ incomeRouter.post(
 incomeRouter.get(
   "/",
   verifyToken,
-  authorize(getPermission("PMS", "INCOME_HEAD", "VIEW")),
-  getAllIncome,
+  authorize(getPermission("CORE", "INCOME", "VIEW")),
+  getAllIncome
 );
 
 /**
@@ -85,8 +85,8 @@ incomeRouter.get(
 incomeRouter.get(
   "/id",
   verifyToken,
-  authorize(getPermission("PMS", "INCOME_HEAD", "VIEW")),
-  getIncomeId,
+  authorize(getPermission("CORE", "INCOME", "VIEW")),
+  getIncomeId
 );
 
 /**
@@ -115,12 +115,12 @@ incomeRouter.put(
   "/",
   verifyToken,
   authorize(
-    getPermission("PMS", "INCOME_HEAD", "VIEW"),
-    getPermission("PMS", "INCOME_HEAD", "UPDATE"),
+    getPermission("CORE", "INCOME", "VIEW"),
+    getPermission("CORE", "INCOME", "UPDATE")
   ),
   createUploadMiddleware("documents"),
   validateUpdateIncome,
-  updateIncome,
+  updateIncome
 );
 
 /**
@@ -135,8 +135,8 @@ incomeRouter.delete(
   "/",
   verifyToken,
   authorize(
-    getPermission("PMS", "INCOME_HEAD", "VIEW"),
-    getPermission("PMS", "INCOME_HEAD", "DELETE"),
+    getPermission("CORE", "INCOME", "VIEW"),
+    getPermission("CORE", "INCOME", "DELETE")
   ),
-  deleteIncome,
+  deleteIncome
 );

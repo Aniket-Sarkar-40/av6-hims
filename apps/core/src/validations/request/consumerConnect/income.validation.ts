@@ -62,7 +62,7 @@ export const incomeUpdateSchema = incomeCreateSchema.keys({
 export const validateIncome = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   req.body = toIncomeEntity(req.body);
   delete req.body.id;
@@ -81,7 +81,7 @@ export const validateIncome = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -91,7 +91,7 @@ export const validateIncome = (
 export const validateUpdateIncome = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   req.body = toIncomeEntity(req.body);
 
@@ -109,7 +109,7 @@ export const validateUpdateIncome = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 

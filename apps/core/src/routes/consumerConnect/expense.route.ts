@@ -40,7 +40,7 @@ export const expenseRouter: Router = Router();
 expenseRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("PMS", "EXPENSE_HEAD", "CREATE")),
+  authorize(getPermission("CORE", "EXPENSE", "CREATE")),
   createUploadMiddleware("documents"),
   validateExpenseSchema,
   createExpense
@@ -57,7 +57,7 @@ expenseRouter.post(
 expenseRouter.get(
   "/",
   verifyToken,
-  authorize(getPermission("PMS", "EXPENSE", "VIEW")),
+  authorize(getPermission("CORE", "EXPENSE", "VIEW")),
   getAllExpense
 );
 
@@ -84,7 +84,7 @@ expenseRouter.get(
 expenseRouter.get(
   "/id",
   verifyToken,
-  authorize(getPermission("PMS", "EXPENSE", "VIEW")),
+  authorize(getPermission("CORE", "EXPENSE", "VIEW")),
   getExpenseById
 );
 /**
@@ -113,8 +113,8 @@ expenseRouter.put(
   "/",
   verifyToken,
   authorize(
-    getPermission("PMS", "EXPENSE", "VIEW"),
-    getPermission("PMS", "EXPENSE", "UPDATE")
+    getPermission("CORE", "EXPENSE", "VIEW"),
+    getPermission("CORE", "EXPENSE", "UPDATE")
   ),
   createUploadMiddleware("documents"),
   validateExpenseSchema,
@@ -140,8 +140,8 @@ expenseRouter.delete(
   "/",
   verifyToken,
   authorize(
-    getPermission("PMS", "EXPENSE", "VIEW"),
-    getPermission("PMS", "EXPENSE", "DELETE")
+    getPermission("CORE", "EXPENSE", "VIEW"),
+    getPermission("CORE", "EXPENSE", "DELETE")
   ),
   deleteExpense
 );
