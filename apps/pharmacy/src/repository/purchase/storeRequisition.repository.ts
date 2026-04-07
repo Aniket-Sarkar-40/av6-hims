@@ -28,7 +28,7 @@ import { emailConfigService } from "@/services/master/emailConfig.service.js";
 import { featureFlagService } from "@/services/feature/feature.service.js";
 
 export const createStoreRequisitionInDb = async (
-  input: CreateStoreRequisitionInput,
+  input: CreateStoreRequisitionInput
 ) => {
   logger.info("entering::createStoreRequisition::repository");
 
@@ -77,7 +77,7 @@ export const createStoreRequisitionInDb = async (
       const emailTemplate = await emailConfigService.getEventEmail();
       const feature = await featureFlagService.getFeatureFlagByShortCode(
         "STORE_REQ_NOTIFICATION",
-        true,
+        true
       );
       // if (emailTemplate && emailTemplate.emailBody && store?.user?.email && feature?.isEnabled) {
       //   sendTemplatedEmail({
@@ -102,12 +102,12 @@ export const createStoreRequisitionInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
 export const updateStoreRequisitionInDb = async (
-  input: CreateStoreRequisitionInput,
+  input: CreateStoreRequisitionInput
 ) => {
   logger.info("entering::updateStoreRequisition::repository");
 
@@ -126,16 +126,16 @@ export const updateStoreRequisitionInDb = async (
   const currentUser = store?.user?.id;
 
   const toUpdate = omittedInput.omitted.storeRequisitionDetails.filter(
-    (d) => typeof d.id === "number",
+    (d) => typeof d.id === "number"
   );
   const toCreate = omittedInput.omitted.storeRequisitionDetails.filter(
-    (d) => typeof d.id !== "number",
+    (d) => typeof d.id !== "number"
   );
   const toDelete = omittedInput.omitted.storeReq.storeRequisitionDetails.filter(
     (d) =>
       !omittedInput.omitted.storeRequisitionDetails.some(
-        (item) => item.id === d.id,
-      ),
+        (item) => item.id === d.id
+      )
   );
 
   return await db.$transaction(
@@ -197,13 +197,13 @@ export const updateStoreRequisitionInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
 export const getCountSRDetailsFromDb = async (
   detailIds: number[],
-  storeRequisitionId: number,
+  storeRequisitionId: number
 ): Promise<number> => {
   return db.pmsStoreRequisitionDetails.count({
     where: {
@@ -232,7 +232,7 @@ export const getAllStoreRequisitionFromDb = async (): Promise<
 };
 
 export const getStoreRequisitionByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<StoreRequisitionResponse | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository id=${id}`);
   const storeReq = await db.pmsStoreRequisition.findUnique({
@@ -249,7 +249,7 @@ export const getStoreRequisitionByIdFromDb = async (
 };
 
 export const validateStoreRequisitionByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<ValStoreRequisitionResponse | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository id=${id}`);
   const storeReq = await db.pmsStoreRequisition.findUnique({
@@ -290,12 +290,12 @@ export const deleteStoreRequisitionFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteStoreRequisitionFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteStoreRequisitionFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
 export const rejectStoreRequisition = async (
-  inp: RejectStoreRequisitionInput,
+  inp: RejectStoreRequisitionInput
 ) => {
   logger.info(`entering::rejectStoreRequisition::repository id=${inp.id}`);
   const store = requestStorage.getStore();
@@ -315,7 +315,7 @@ export const rejectStoreRequisition = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 
   logger.info(`exiting::rejectStoreRequisition::repository id=${inp.id}`);
@@ -348,7 +348,7 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
               number,
               { storeRequisitionDetailsId: number; assignQty: number }
             >,
-            item,
+            item
           ) => {
             const id = item.storeRequisitionDetailsId;
             if (!acc[id]) {
@@ -357,8 +357,8 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
             acc[id].assignQty += item.assignedQty;
             return acc;
           },
-          {},
-        ),
+          {}
+        )
       );
 
       for (const element of result) {
@@ -405,7 +405,7 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
             refId: inp.storeReqId,
             refNo: inp.storeReqNo,
             refApprovedAt: new Date(),
-          },
+          }
         );
 
         await addInTransitStock(
@@ -429,20 +429,20 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
             refId: inp.storeReqId,
             refNo: inp.storeReqNo,
             refApprovedAt: new Date(),
-          },
+          }
         );
       }
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 
   logger.info(`exiting::approveStoreRequisition::repository`);
 };
 
 export const acknowledgeStoreRequisition = async (
-  inp: AcknowledgeRequisition,
+  inp: AcknowledgeRequisition
 ) => {
   logger.info(`entering::approveStoreRequisition::repository`);
 
@@ -483,7 +483,7 @@ export const acknowledgeStoreRequisition = async (
               refDetailsId: detail.storeRequisitionDetailsId,
               refId: inp.storeReqId,
               refNo: inp.storeReqNo,
-            },
+            }
           );
 
           await subInTransitStock(
@@ -505,7 +505,7 @@ export const acknowledgeStoreRequisition = async (
               refDetailsId: detail.storeRequisitionDetailsId,
               refId: inp.storeReqId,
               refNo: inp.storeReqNo,
-            },
+            }
           );
         }
 
@@ -533,14 +533,14 @@ export const acknowledgeStoreRequisition = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 
   logger.info(`exiting::approveStoreRequisition::repository`);
 };
 
 export const getRequisitionItemDetailsFromDb = async (
-  id: number,
+  id: number
 ): Promise<PmsRequisitionItemDetails | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository id=${id}`);
   const storeReq = await db.pmsRequisitionItemDetails.findUnique({
@@ -551,10 +551,10 @@ export const getRequisitionItemDetailsFromDb = async (
 };
 
 export const getStoreRequisitionBatchWiseFromDb = async (
-  id: number,
+  id: number
 ): Promise<StoreReqBatchWiseResponse | null> => {
   logger.info(
-    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
+    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
   );
   const storeReq = await db.pmsStoreRequisition.findUnique({
     where: { id, isActive: true },
@@ -571,16 +571,16 @@ export const getStoreRequisitionBatchWiseFromDb = async (
     },
   });
   logger.info(
-    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
+    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
   );
   return storeReq;
 };
 
 export const valStoreRequisitionBatchWiseFromDb = async (
-  id: number,
+  id: number
 ): Promise<StoreReqBatchWiseResponse | null> => {
   logger.info(
-    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
+    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
   );
   const storeReq = await db.pmsStoreRequisition.findUnique({
     where: { id, isActive: true },
@@ -596,16 +596,16 @@ export const valStoreRequisitionBatchWiseFromDb = async (
     },
   });
   logger.info(
-    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
+    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
   );
   return storeReq;
 };
 
 export const valStoreRequisitionFromDb = async (
-  id: number,
+  id: number
 ): Promise<StoreReqValResponse | null> => {
   logger.info(
-    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
+    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
   );
   const storeReq = await db.pmsStoreRequisition.findUnique({
     where: { id, isActive: true },
@@ -623,7 +623,7 @@ export const valStoreRequisitionFromDb = async (
     },
   });
   logger.info(
-    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
+    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
   );
   return storeReq;
 };
@@ -632,7 +632,7 @@ export const getItemRequisitionDetails = async (
   itemId: number,
   location: { storeRequisitionId?: number; storeRequisitionDetailsId?: number },
   batchNo: string,
-  expiryDate?: Date | null,
+  expiryDate?: Date | null
 ) => {
   logger.info(`entering::getItemStockByBatchWise::repository`);
 
@@ -650,7 +650,7 @@ export const getItemRequisitionDetails = async (
 };
 
 export const getStoreReqForExcelInDb = async (
-  input: StoreReqExcelFilter,
+  input: StoreReqExcelFilter
 ): Promise<StoreRequisitionResponse[]> => {
   logger.info(`entering::getStoreReqForExcelInDb::repository`);
   return db.pmsStoreRequisition.findMany({

@@ -507,7 +507,7 @@ export async function runSeed() {
     },
     {
       shortCode: "SELL",
-      tableName: "PmsSell",
+      tableName: "pmsSell",
       isDTO: true,
       isCacheable: false,
       permission: "pms:sell:view",
