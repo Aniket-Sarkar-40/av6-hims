@@ -307,16 +307,6 @@ export async function runSeed() {
       selectClause: JSON.stringify({ id: "id", value: "srNumber" }),
     },
     {
-      shortCode: "INCOME_HEAD",
-      tableName: "incomeHead",
-      isDTO: false,
-      isCacheable: true,
-      permission: "pms:incomeHead:view",
-      isDropDown: true,
-      whereClause: JSON.stringify({ isActive: "yes" }),
-      selectClause: JSON.stringify({ id: "id", value: "incomeCategory" }),
-    },
-    {
       shortCode: "EXPENSE_HEAD",
       tableName: "expenseHead",
       isDTO: false,

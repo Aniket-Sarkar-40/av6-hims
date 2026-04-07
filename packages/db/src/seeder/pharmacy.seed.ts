@@ -261,16 +261,6 @@ export async function runSeed() {
       }),
     },
     {
-      shortCode: "INCOME_HEAD",
-      tableName: "incomeHead",
-      isDTO: false,
-      isCacheable: true,
-      permission: "pms:incomeHead:view",
-      isDropDown: true,
-      whereClause: JSON.stringify({ isActive: "yes" }),
-      selectClause: JSON.stringify({ id: "id", value: "incomeCategory" }),
-    },
-    {
       shortCode: "BRANCH",
       tableName: "pmsBranch",
       isDTO: true,

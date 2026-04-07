@@ -1,12 +1,4 @@
 // src/services/master/incomeHead.service.ts
-
-import {
-  createIncomeHeadInDb,
-  deleteIncomeHeadInDb,
-  getAllIncomeHeadFromDb,
-  getIncomeHeadByIdFromDb,
-  updateIncomeHeadInDb,
-} from "@/repository/master/incomeHead.repository.js";
 import {
   CreateIncomeHeadInput,
   UpdateIncomeHeadInput,
@@ -22,14 +14,22 @@ import {
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+
+import { IncomeHead } from "@repo/db/generated/prisma/client";
+import {
+  createIncomeHeadInDb,
+  deleteIncomeHeadInDb,
+  getAllIncomeHeadFromDb,
+  getIncomeHeadByIdFromDb,
+  updateIncomeHeadInDb,
+} from "@/repository/master/incomeHead.repository.js";
 import {
   createIncomeHeadServiceValidation,
   updateIdIncomeHeadServiceValidation,
   validateIdIncomeHead,
 } from "@/validations/service/master/incomeHead.service.validation.js";
-import { IncomeHead } from "@repo/db/generated/prisma/client";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
 
 const cacheKey = getRedisKey("INCOME_HEAD", "all");
 
@@ -74,7 +74,7 @@ export const incomeHeadService = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Income Head"),
+          generateErrorMessage("NOT_FOUND", "Income Head")
         );
       }
     } else {
@@ -82,7 +82,7 @@ export const incomeHeadService = {
       if (all.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Income Head"),
+          generateErrorMessage("NOT_FOUND", "Income Head")
         );
       }
       logger.info("exiting::getAllIncomeHead::service");
@@ -92,7 +92,7 @@ export const incomeHeadService = {
 
   async getIncomeHeadById(
     incomeHeadId: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<IncomeHead | null> {
     logger.info("entering::getIncomeHeadById::service");
     validIdCheck(incomeHeadId);
@@ -103,7 +103,7 @@ export const incomeHeadService = {
     if (isCacheable) {
       record = (await getCacheById(
         cacheKey,
-        incomeHeadId,
+        incomeHeadId
       )) as IncomeHead | null;
     } else {
       record = await getIncomeHeadByIdFromDb(incomeHeadId);
@@ -113,7 +113,7 @@ export const incomeHeadService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Income Head"),
+          generateErrorMessage("NOT_FOUND", "Income Head")
         );
       }
       return null;

@@ -18,7 +18,6 @@ export enum RedisResource {
   EMAIL_CONFIG = "emailConfig",
   EVENT_EMAIL = "eventEmail",
   EXPENSE_HEAD = "expenseHead",
-  INCOME_HEAD = "incomeHead",
   ITEM = "pmsItem",
   LOGIN = "login",
   MANUFACTURE = "manufacture",

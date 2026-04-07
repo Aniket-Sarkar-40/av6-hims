@@ -269,6 +269,16 @@ export async function runSeed() {
       isDropDown: false,
       whereClause: JSON.stringify({ isActive: true }),
     },
+    {
+      shortCode: "INCOME_HEAD",
+      tableName: "incomeHead",
+      isDTO: false,
+      isCacheable: true,
+      permission: "core:incomeHead:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: "yes" }),
+      selectClause: JSON.stringify({ id: "id", value: "incomeCategory" }),
+    },
   ];
   const pdfTemplates: PdfTemplateSeeder[] = [
     {

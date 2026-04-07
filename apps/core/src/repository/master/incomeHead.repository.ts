@@ -1,4 +1,4 @@
-import { db } from "@repo/db/client";
+import { db } from "@repo/db";
 import {
   CreateIncomeHeadInput,
   UpdateIncomeHeadInput,
@@ -7,7 +7,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { IncomeHead, YesNoFlag } from "@repo/db/generated/prisma/client";
 
 export const createIncomeHeadInDb = async (
-  incomeHead: CreateIncomeHeadInput,
+  incomeHead: CreateIncomeHeadInput
 ): Promise<IncomeHead> => {
   logger.info("entering::createIncomeHeadInDb::repository");
   return db.incomeHead.create({
@@ -16,7 +16,7 @@ export const createIncomeHeadInDb = async (
 };
 
 export const updateIncomeHeadInDb = async (
-  incomeHead: UpdateIncomeHeadInput,
+  incomeHead: UpdateIncomeHeadInput
 ): Promise<IncomeHead> => {
   logger.info("entering::updateIncomeHeadInDb::repository");
   return db.incomeHead.update({
@@ -26,7 +26,7 @@ export const updateIncomeHeadInDb = async (
 };
 
 export const getIncomeHeadByIncomeHeadNameFromDb = async (
-  incomeCategory: string,
+  incomeCategory: string
 ): Promise<IncomeHead | null> => {
   logger.info("entering::getIncomeHeadByIncomeHeadNameFromDb::repository");
   return db.incomeHead.findFirst({
@@ -35,7 +35,7 @@ export const getIncomeHeadByIncomeHeadNameFromDb = async (
 };
 
 export const getIncomeHeadByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<IncomeHead | null> => {
   logger.info("entering::getIncomeHeadByIdFromDb::repository");
   return db.incomeHead.findUnique({

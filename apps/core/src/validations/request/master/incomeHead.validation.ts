@@ -39,7 +39,7 @@ export const incomeHeadCreateSchema = Joi.object<CreateIncomeHeadInput>({
 export const validateIncomeHeadCreate = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = incomeHeadCreateSchema.validate(req.body, {
     abortEarly: false,
@@ -52,7 +52,7 @@ export const validateIncomeHeadCreate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -98,7 +98,7 @@ export const incomeHeadUpdateSchema = Joi.object<UpdateIncomeHeadInput>({
 export const validateIncomeHeadUpdate = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = incomeHeadUpdateSchema.validate(req.body, {
     abortEarly: false,
@@ -111,7 +111,7 @@ export const validateIncomeHeadUpdate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 

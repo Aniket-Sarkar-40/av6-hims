@@ -6,14 +6,14 @@ import {
   updateIncomeHead,
 } from "@/controllers/master/incomeHead.controller.js";
 import {
+  validateIncomeHeadCreate,
+  validateIncomeHeadUpdate,
+} from "@/validations/request/master/incomeHead.validation.js";
+import {
   authorize,
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
-import {
-  validateIncomeHeadCreate,
-  validateIncomeHeadUpdate,
-} from "@/validations/request/master/incomeHead.validation.js";
 import { Router } from "express";
 
 export const incomeHeadRouter: Router = Router();
@@ -43,9 +43,9 @@ export const incomeHeadRouter: Router = Router();
 incomeHeadRouter.post(
   "/",
   verifyToken,
-  authorize(getPermission("INV", "INCOME_HEAD", "CREATE")),
+  authorize(getPermission("CORE", "INCOME_HEAD", "CREATE")),
   validateIncomeHeadCreate,
-  createIncomeHead,
+  createIncomeHead
 );
 
 /**
@@ -60,8 +60,8 @@ incomeHeadRouter.post(
 incomeHeadRouter.get(
   "/",
   verifyToken,
-  authorize(getPermission("INV", "INCOME_HEAD", "VIEW")),
-  getAllIncomeHead,
+  authorize(getPermission("CORE", "INCOME_HEAD", "VIEW")),
+  getAllIncomeHead
 );
 
 /**
@@ -83,8 +83,8 @@ incomeHeadRouter.get(
 incomeHeadRouter.get(
   "/id",
   verifyToken,
-  authorize(getPermission("INV", "INCOME_HEAD", "VIEW")),
-  getIncomeHeadId,
+  authorize(getPermission("CORE", "INCOME_HEAD", "VIEW")),
+  getIncomeHeadId
 );
 
 /**
@@ -113,11 +113,11 @@ incomeHeadRouter.put(
   "/",
   verifyToken,
   authorize(
-    getPermission("INV", "INCOME_HEAD", "VIEW"),
-    getPermission("INV", "INCOME_HEAD", "UPDATE"),
+    getPermission("CORE", "INCOME_HEAD", "VIEW"),
+    getPermission("CORE", "INCOME_HEAD", "UPDATE")
   ),
   validateIncomeHeadUpdate,
-  updateIncomeHead,
+  updateIncomeHead
 );
 
 /**
@@ -139,6 +139,6 @@ incomeHeadRouter.put(
 incomeHeadRouter.delete(
   "/",
   verifyToken,
-  authorize(getPermission("INV", "INCOME_HEAD", "DELETE")),
-  deleteIncomeHead,
+  authorize(getPermission("CORE", "INCOME_HEAD", "DELETE")),
+  deleteIncomeHead
 );

@@ -28,7 +28,6 @@ import countryRouter from "./routes/master/country.route.js";
 import countryCodeRouter from "./routes/master/countryCode.route.js";
 import currencyRouter from "./routes/master/currency.route.js";
 import expenseHeadRouter from "./routes/master/expenseHead.route.js";
-import { incomeHeadRouter } from "./routes/master/incomeHead.route.js";
 import manufactureRouter from "./routes/master/manufacture.route.js";
 import medCategoryRouter from "./routes/master/medCategory.route.js";
 import medCompoRouter from "./routes/master/medComposition.route.js";
@@ -126,7 +125,6 @@ pharmacyRouter.use("/item-branch", itemBranchRouter);
 
 // Customer / Income / Expense
 pharmacyRouter.use("/customer", customerRouter);
-pharmacyRouter.use("/income-head", incomeHeadRouter);
 pharmacyRouter.use("/income", incomeRouter);
 pharmacyRouter.use("/expense-head", expenseHeadRouter);
 pharmacyRouter.use("/expense", expenseRouter);
@@ -178,5 +176,5 @@ pharmacyRouter.use("/migration", migrationRouter);
 // Uploads
 pharmacyRouter.use(
   "/uploads",
-  express.static(path.join(process.cwd(), "uploads")),
+  express.static(path.join(process.cwd(), "uploads"))
 );

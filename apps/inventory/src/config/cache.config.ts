@@ -24,7 +24,6 @@ export enum RedisResource {
   EVENT_EMAIL = "eventEmail",
   CURRENCY = "currency",
   STORAGE = "invStorage",
-  INCOME_HEAD = "incomeHead",
   EXPENSE_HEAD = "expenseHead",
 }
 
