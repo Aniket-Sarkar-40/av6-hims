@@ -94,8 +94,8 @@ export const deleteIncomeHead = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::deleteIncomeHead::controller");
 
-    const { IncomeHeadId } = req.query as { IncomeHeadId: string };
-    await incomeHeadService.deleteIncomeHead(Number(IncomeHeadId));
+    const { incomeHeadId } = req.query as { incomeHeadId: string };
+    await incomeHeadService.deleteIncomeHead(Number(incomeHeadId));
     logger.info("exiting::deleteIncomeHead::controller");
 
     return res.status(200).json(
