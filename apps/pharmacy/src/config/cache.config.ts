@@ -11,7 +11,6 @@ export async function checkIsCacheable(shortCode: string): Promise<boolean> {
 export enum RedisResource {
   BRANCH = "pmsBranch",
   COLLECTION_CENTER = "collectionCenter",
-  COUNTRY_CODE = "countryCode",
   DEPARTMENT = "department",
   DISTRIBUTOR = "distributor",
   DYNAMIC_SHORT_CODE = "pmsDynamicShortCode",
@@ -33,9 +32,6 @@ export enum RedisResource {
   UIN_CONFIG = "pmsUINConfig",
   WAREHOUSE = "pmsWarehouse",
   CUSTOMER = "pmsCustomer",
-  CITY = "city",
-  COUNTRY = "country",
-  STATE = "state",
   CURRENCY = "currency",
   MED_DOSAGE = "medicineDosage",
   MED_DIST_MAP = "medicineDistMap",

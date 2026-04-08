@@ -1,17 +1,23 @@
 import { DistributorResponse } from "@/types/distributor/distributor.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 import { createDistributorServiceValidation } from "@/validations/service/distributor/distributor.service.validation.js";
-import { createCityServiceValidation } from "@/validations/service/master/city.service.validation.js";
-import { createCountryServiceValidation } from "@/validations/service/master/country.service.validation.js";
-import { nameStateServiceValidation } from "@/validations/service/master/state.service.validation.js";
 import { City, State } from "@repo/db/generated/prisma/client";
 import {
   fromDistributorExcel,
   toDistributorExcel,
 } from "./distributor/distributor.mapper.js";
-import { toCityFromExcel, toExcelFromCity } from "./master/city.mapper.js";
-import { toCountryFromExcel } from "./master/country.mapper.js";
-import { toExcelFromState, toStateFromExcel } from "./master/state.mapper.js";
+import { toCountryFromExcel } from "@apps/core/mapper/master/country.mapper.js";
+import { createCountryServiceValidation } from "@apps/core/validations/service/master/country.service.validation.js";
+import {
+  toExcelFromState,
+  toStateFromExcel,
+} from "@apps/core/mapper/master/state.mapper.js";
+import {
+  toCityFromExcel,
+  toExcelFromCity,
+} from "@apps/core/mapper/master/city.mapper.js";
+import { createCityServiceValidation } from "@apps/core/validations/service/master/city.service.validation.js";
+import { nameStateServiceValidation } from "@apps/core/validations/service/master/state.service.validation.js";
 
 export const mappingExport: {
   [key: string]: (record: unknown) => unknown;

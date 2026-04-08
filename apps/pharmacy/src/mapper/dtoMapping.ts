@@ -39,12 +39,8 @@ import {
 import { toAutoAlertAuditDTO } from "./master/autoAlert.mapper.js";
 import { toBankHeadDTO } from "./master/bankHead.mapper.js";
 import { toBranchDTO } from "./master/branch.mapper.js";
-import { toCityDTOOnlyForCity } from "./master/city.mapper.js";
-import { toCountryDto } from "./master/country.mapper.js";
-import { toCountryCodeDTO } from "./master/countryCode.mapper.js";
 import { toMedCategoryDTO } from "./master/medCategory.mapper.js";
 import { toMobileMoneyMethodDTO } from "./master/mobileMoney.mapper.js";
-import { toStateDTOForState } from "./master/state.mapper.js";
 import { toStoreDTO } from "./master/store.mapper.js";
 import { toUINConfigDTO } from "./master/uinConfig.mapper.js";
 import { toWarehouseDTO } from "./master/warehouse.mapper.js";
@@ -97,10 +93,8 @@ import {
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
 export const dtoMapping: Record<string, DtoMappingFunction> = {
-  [SHORT_CODE.CITY]: (data: unknown) => toCityDTOOnlyForCity(data as City),
   [SHORT_CODE.UIN_CONFIG]: (data: unknown) =>
     toUINConfigDTO(data as PmsUINConfig),
-  [SHORT_CODE.STATE]: (data: unknown) => toStateDTOForState(data as State),
   [SHORT_CODE.WAREHOUSE]: (data: unknown) =>
     toWarehouseDTO(data as PmsWarehouse),
   [SHORT_CODE.BRANCH]: (data: unknown) => toBranchDTO(data as BranchResponce),
@@ -150,11 +144,8 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.STOCK_INT]: (data: unknown) =>
     toInTransitStockDTO(data as PmsInTransitStock),
   [SHORT_CODE.STOCK]: (data: unknown) => toItemStockDTO(data as PmsItemStock),
-  [SHORT_CODE.COUNTRY_CODE]: (data: unknown) =>
-    toCountryCodeDTO(data as CountryCode),
   [SHORT_CODE.PATIENTS_INSURANCE]: (data: unknown) =>
     toPatientInsuranceDto(data as PatientInsurance),
-  [SHORT_CODE.COUNTRY]: (data: unknown) => toCountryDto(data as Country),
   [SHORT_CODE.STOCK_ADJUSTMENT]: (data: unknown) =>
     toStockAdjustmentDTO(data as StockAdjustmentResponse),
   [SHORT_CODE.STOCK_AUDIT]: (data: unknown) =>

@@ -1,5 +1,5 @@
+import { CityDTO } from "@apps/core/types/master/city.js";
 import { CollectionCenter, Prisma } from "@repo/db/generated/prisma/client";
-import { CityDTO } from "./city.js";
 import { IdValue } from "@repo/shared/types/global.js";
 
 export interface BranchReq {
