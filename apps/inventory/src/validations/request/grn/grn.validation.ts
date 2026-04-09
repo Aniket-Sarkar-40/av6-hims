@@ -30,11 +30,11 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
 
   poDetailsId: idRequired("PO details Id"),
 
-  purchasedPrice: numberWithMaxDecimalsRequired("purchasedPrice"),
+  purchasedPrice: priceRequired("purchasedPrice"),
 
   focQuantity: idRequired("FOC Quantity"),
 
-  netTax: idRequired("Net Tax"),
+  netTax: priceRequired("Net Tax"),
 
   isBatch: boolRequired("Is Batch"),
 
@@ -79,7 +79,7 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   ccId: idRequired("CC Id"),
 
-  totalAmount: numberWithMaxDecimalsRequired("totalAmount"),
+  totalAmount: priceRequired("totalAmount"),
 
   discount: idRequired("Discount"),
 
@@ -87,9 +87,9 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   netDiscount: priceRequired("Net Discount amount"),
 
-  netTotal: numberWithMaxDecimalsRequired("netTotal"),
+  netTotal: priceRequired("netTotal"),
 
-  netTax: idRequired("Net Tax"),
+  netTax: priceRequired("Net Tax"),
 
   storeId: idOptional("Store Id"),
 

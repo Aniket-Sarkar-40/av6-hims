@@ -14,6 +14,7 @@ import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateExpenseSchema } from "@/validations/request/consumerConnect/expense.validation.js";
 
 import { Router } from "express";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 export const expenseRouter: Router = Router();
 
 /**
@@ -42,6 +43,7 @@ expenseRouter.post(
   verifyToken,
   authorize(getPermission("CORE", "EXPENSE", "CREATE")),
   createUploadMiddleware("documents"),
+  uploadToHetzner("Documents"),
   validateExpenseSchema,
   createExpense
 );

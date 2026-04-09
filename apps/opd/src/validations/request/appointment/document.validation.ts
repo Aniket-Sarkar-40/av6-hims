@@ -10,6 +10,7 @@ import { DocumentName } from "@repo/db/generated/prisma/client";
 import { getPattern } from "av6-core";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const documentSchema = Joi.object<DocumentMasterReq>({
   documentType: Joi.string()
@@ -20,11 +21,11 @@ export const documentSchema = Joi.object<DocumentMasterReq>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Document Type",
-        Object.values(DocumentName).join(", "),
+        Object.values(DocumentName).join(", ")
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Document Type",
+        "Document Type"
       ),
     }),
 
@@ -35,11 +36,11 @@ export const documentSchema = Joi.object<DocumentMasterReq>({
       "number.base": generateValidationErrorMessage("NUMBER", "Appointment ID"),
       "number.integer": generateValidationErrorMessage(
         "INTEGER",
-        "Appointment ID",
+        "Appointment ID"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Appointment ID",
+        "Appointment ID"
       ),
     }),
   filePath: Joi.string()
@@ -48,35 +49,15 @@ export const documentSchema = Joi.object<DocumentMasterReq>({
     .messages({
       "string.pattern.base": generateValidationErrorMessage(
         "INVALID_FILE",
-        "File Path",
+        "File Path"
       ),
       "string.base": generateValidationErrorMessage("STRING", "File Path"),
       "any.required": generateValidationErrorMessage("REQUIRED", "File Path"),
     }),
 });
-export const validateDocumentCreate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  if (req.file?.path) {
-    req.body.filePath = toRelativeImagePath(req.file.path);
-  }
-  req.body = toDocumentEntity(req.body as DocumentMasterEntity);
-  const { error } = documentSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    // if (req.file && req.file.path) {
-    //   deleteFileIfExists(req.file.path);
-    // }
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
 
-  next();
-};
+export const validateDocumentCreate = validationHandler({
+  schema: documentSchema,
+  type: "FORMDATA",
+  imgAttr: "filePath",
+});

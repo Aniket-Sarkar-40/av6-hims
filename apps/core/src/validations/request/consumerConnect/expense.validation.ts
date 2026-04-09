@@ -6,6 +6,7 @@ import { ExpenseInput } from "../../../types/consumerConnect/expense.js";
 import { getPattern } from "av6-core";
 import { toExpenseEntity } from "@/mapper/consumerConnect/expense.mapper.js";
 import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const expenseSchema = Joi.object<ExpenseInput>({
   id: Joi.number().integer().positive().optional().messages({
@@ -72,27 +73,33 @@ export const expenseSchema = Joi.object<ExpenseInput>({
   }),
 });
 
-export const validateExpenseSchema = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  req.body = toExpenseEntity(req.body);
-  const { error } = expenseSchema.validate(req.body, {
-    abortEarly: false,
-  });
-  if (error) {
-    if (req.file && req.file.path) {
-      deleteFileIfExists(req.file.path);
-    }
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-  next();
-};
+export const validateExpenseSchema = validationHandler({
+  schema: expenseSchema,
+  type: "FORMDATA",
+  imgAttr: "documents",
+});
+
+// export const validateExpenseSchema = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ) => {
+//   req.body = toExpenseEntity(req.body);
+//   const { error } = expenseSchema.validate(req.body, {
+//     abortEarly: false,
+//   });
+//   if (error) {
+//     if (req.file && req.file.path) {
+//       deleteFileIfExists(req.file.path);
+//     }
+//     return res.status(400).json(
+//       new BaseResponse({
+//         success: false,
+//         errorCode: "PARAMETER_INVALID",
+//         errorMessage: error.message,
+//         errors: error.details,
+//       }),
+//     );
+//   }
+//   next();
+// };

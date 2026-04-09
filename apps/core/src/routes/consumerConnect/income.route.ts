@@ -14,6 +14,7 @@ import {
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { Router } from "express";
 
@@ -46,6 +47,7 @@ incomeRouter.post(
   verifyToken,
   authorize(getPermission("CORE", "INCOME", "CREATE")),
   createUploadMiddleware("documents"),
+  uploadToHetzner("Documents"),
   validateIncome,
   createIncome
 );

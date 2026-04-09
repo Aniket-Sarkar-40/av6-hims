@@ -480,6 +480,10 @@ export async function runSeed() {
       permission: "opd:general-bill-pricing:view",
       isDropDown: false,
       whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({
+        id: "id",
+        value: "price",
+      }),
     },
   ];
 

@@ -13,13 +13,6 @@ import path from "path";
 export const createIncome = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createIncome::controller");
   const input = req.body as CreateIncomeInput;
-  if (req.file) {
-    const absolutePath = req.file.path;
-    const relativePath = absolutePath.replace(process.cwd(), "");
-    input.documents = relativePath.startsWith(path.sep)
-      ? relativePath
-      : path.sep + relativePath;
-  }
   const newIncome = await incomeService.createIncome(input);
 
   const response = new BaseResponse(
@@ -27,7 +20,7 @@ export const createIncome = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Income"),
     },
-    newIncome,
+    newIncome
   );
 
   logger.info("exiting::createIncome::controller");
@@ -83,8 +76,8 @@ export const updateIncome = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Income"),
       },
-      updatedIncome,
-    ),
+      updatedIncome
+    )
   );
 });
 export const getIncomeId = TryCatch(async (req: Request, res: Response) => {
@@ -98,7 +91,7 @@ export const getIncomeId = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Income"),
     },
-    allIncomeById,
+    allIncomeById
   );
 
   logger.info("exiting::getIncomeId::controller");
@@ -115,7 +108,7 @@ export const getAllIncome = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Income "),
     },
-    allIncome,
+    allIncome
   );
 
   logger.info("exiting::getAllIncome::controller");
@@ -158,6 +151,6 @@ export const deleteIncome = TryCatch(async (req: Request, res: Response) => {
     new BaseResponse({
       success: true,
       message: generateSuccessMessage("DELETED", "Income"),
-    }),
+    })
   );
 });

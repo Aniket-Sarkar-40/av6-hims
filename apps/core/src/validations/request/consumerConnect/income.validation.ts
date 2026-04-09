@@ -5,41 +5,32 @@ import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { getPattern } from "av6-core";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
+import {
+  dateOptional,
+  idRequired,
+  numberWithMaxDecimals,
+  priceOptional,
+  priceRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
 
 /**
  * Joi schema for creating a new Income.
  */
 export const incomeCreateSchema = Joi.object<CreateIncomeInput>({
-  incHeadId: Joi.number().integer().required().strict().messages({
-    "number.base": "Income Head ID must be a number",
-    "number.max": "Income Head ID cannot exceed 11",
-    "any.required": "Income Head ID is required",
-  }),
+  incHeadId: idRequired("Income head Id"),
 
-  name: Joi.string().max(50).required().strict().messages({
-    "string.base": "Income name must be a string",
-    "string.max": "Income name cannot exceed 50 characters",
-    "any.required": "Income name is required",
-  }),
+  name: strRequired("Name"),
 
-  invoiceNo: Joi.string().max(200).required().strict().messages({
-    "string.base": "Invoice number must be a string",
-    "string.empty": "Invoice number is required",
-    "any.required": "Invoice number is required",
-    "string.max": "Invoice number cannot exceed 200 characters",
-  }),
+  invoiceNo: strRequired("Invoice number"),
 
-  date: Joi.date().allow(null).optional().strict().messages({
-    "date.base": "Date must be a valid date",
-  }),
+  date: dateOptional("Date"),
 
-  amount: Joi.number().positive().allow(null).optional().strict().messages({
-    "number.base": "Amount must be a number",
-  }),
+  amount: priceOptional("Amount"),
 
-  note: Joi.string().allow(null, "").optional().strict().messages({
-    "string.base": "Note must be a string",
-  }),
+  note: strOptional("Note"),
 
   documents: Joi.string()
     .trim()
@@ -59,59 +50,71 @@ export const incomeUpdateSchema = incomeCreateSchema.keys({
   }),
 });
 
-export const validateIncome = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  req.body = toIncomeEntity(req.body);
-  delete req.body.id;
+export const validateIncome = validationHandler({
+  schema: incomeCreateSchema,
+  type: "FORMDATA",
+  imgAttr: "documents",
+});
 
-  const { error } = incomeCreateSchema.validate(req.body, {
-    abortEarly: false,
-  });
+export const validateUpdateIncome = validationHandler({
+  schema: incomeUpdateSchema,
+  type: "FORMDATA",
+  imgAttr: "documents",
+});
 
-  if (error) {
-    if (req.file && req.file.path) {
-      deleteFileIfExists(req.file.path);
-    }
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
+// export const validateIncome = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   req.body = toIncomeEntity(req.body);
+//   delete req.body.id;
 
-  next();
-};
+//   const { error } = incomeCreateSchema.validate(req.body, {
+//     abortEarly: false,
+//   });
 
-export const validateUpdateIncome = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  req.body = toIncomeEntity(req.body);
+//   if (error) {
+//     if (req.file && req.file.path) {
+//       deleteFileIfExists(req.file.path);
+//     }
+//     return res.status(400).json(
+//       new BaseResponse({
+//         success: false,
+//         errorCode: "PARAMETER_INVALID",
+//         errorMessage: error.message,
+//         errors: error.details,
+//       })
+//     );
+//   }
 
-  const { error } = incomeUpdateSchema.validate(req.body, {
-    abortEarly: false,
-  });
+//   next();
+// };
 
-  if (error) {
-    if (req.file && req.file.path) {
-      deleteFileIfExists(req.file.path);
-    }
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
+// export const validateUpdateIncome = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   req.body = toIncomeEntity(req.body);
 
-  next();
-};
+//   const { error } = incomeUpdateSchema.validate(req.body, {
+//     abortEarly: false,
+//   });
+
+//   if (error) {
+//     if (req.file && req.file.path) {
+//       deleteFileIfExists(req.file.path);
+//     }
+//     return res.status(400).json(
+//       new BaseResponse({
+//         success: false,
+//         errorCode: "PARAMETER_INVALID",
+//         errorMessage: error.message,
+//         errors: error.details,
+//       })
+//     );
+//   }
+
+//   next();
+// };

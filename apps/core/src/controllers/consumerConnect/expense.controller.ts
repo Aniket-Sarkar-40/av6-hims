@@ -15,13 +15,6 @@ import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middl
 export const createExpense = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createExpense::controller");
   const data = req.body as ExpenseInput;
-  if (req.file) {
-    const absolutePath = req.file.path;
-    const relativePath = absolutePath.replace(process.cwd(), "");
-    data.documents = relativePath.startsWith(path.sep)
-      ? relativePath
-      : path.sep + relativePath;
-  }
   const expense = await expenseService.createExpense(data);
 
   const response = new BaseResponse(
@@ -29,7 +22,7 @@ export const createExpense = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Expense "),
     },
-    expense,
+    expense
   );
   logger.info("exiting::createExpense::controller");
   return res.status(201).json(response);
@@ -43,7 +36,7 @@ export const getAllExpense = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Expense"),
     },
-    expenses,
+    expenses
   );
   logger.info("exiting::getAllExpense::controller");
   return res.status(200).json(response);
@@ -59,7 +52,7 @@ export const getExpenseById = TryCatch(async (req: Request, res: Response) => {
       new BaseResponse({
         success: false,
         message: generateErrorMessage("NOT_FOUND", "Expense"),
-      }),
+      })
     );
   }
   const response = new BaseResponse(
@@ -67,7 +60,7 @@ export const getExpenseById = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Expense "),
     },
-    expense,
+    expense
   );
   logger.info("exiting::getExpenseById::controller");
   return res.status(200).json(response);
@@ -112,7 +105,7 @@ export const updateExpense = TryCatch(async (req: Request, res: Response) => {
     } catch (error) {
       logger.error(
         `Failed to delete old image file at ${oldImagePath}:`,
-        error,
+        error
       );
     }
   }
@@ -122,7 +115,7 @@ export const updateExpense = TryCatch(async (req: Request, res: Response) => {
       new BaseResponse({
         success: false,
         message: generateErrorMessage("NOT_FOUND", "Expense "),
-      }),
+      })
     );
   }
   const response = new BaseResponse(
@@ -130,7 +123,7 @@ export const updateExpense = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("UPDATED", "Expense "),
     },
-    updatedExpense,
+    updatedExpense
   );
   logger.info("exiting::updateExpense::controller");
   return res.status(200).json(response);
@@ -145,7 +138,7 @@ export const deleteExpense = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("DELETED", "Expense"),
     },
-    result,
+    result
   );
   logger.info("exiting::deleteExpense::controller");
   return res.status(200).json(response);
