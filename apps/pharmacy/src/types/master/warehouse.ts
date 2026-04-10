@@ -1,5 +1,5 @@
+import { CityDTO } from "@apps/core/types/master/city.js";
 import { CollectionCenter } from "@repo/db/generated/prisma/client";
-import { CityDTO } from "./city.js";
 
 export interface WarehouseReq {
   id: number;

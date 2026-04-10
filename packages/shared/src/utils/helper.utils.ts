@@ -1,39 +1,10 @@
-import { BASE_URL } from "@repo/shared/config/index.js";
+import { BASE_URL, CLIENT_ID } from "@repo/shared/config/index.js";
 import { DecodedToken } from "@/types/auth.js";
 import fs from "fs";
 import path from "path";
 import jwt from "jsonwebtoken";
-
-/**
- * Recursively convert any BigInt properties to strings.
- */
-export function bigintToStringDeep(obj: any): any {
-  if (obj === null || obj === undefined) {
-    return obj;
-  }
-  // If it’s a BigInt, return it as string
-  if (typeof obj === "bigint") {
-    return obj.toString();
-  }
-  // If it’s an array, sanitize each element
-  if (Array.isArray(obj)) {
-    return obj.map((el) => bigintToStringDeep(el));
-  }
-  // If it’s a Date, just keep it (or you could toISOString() if you prefer)
-  if (obj instanceof Date) {
-    return obj;
-  }
-  // If it’s a plain object, loop its keys
-  if (typeof obj === "object") {
-    const out: any = {};
-    for (const [k, v] of Object.entries(obj)) {
-      out[k] = bigintToStringDeep(v);
-    }
-    return out;
-  }
-  // Primitive (string, number, boolean, etc.)
-  return obj;
-}
+import { Decimal } from "@prisma/client/runtime/client";
+import crypto from "crypto";
 
 export const toRelativeImagePath = (absolutePath: string): string => {
   if (
@@ -64,10 +35,12 @@ export function toPublicImageUrl(filePath?: string | null): string | null {
 
 export const toImageApiUrl = (
   fileName: string,
-  directoryPath: string,
+  directoryPath: string
 ): string => {
   const baseUrl = BASE_URL;
-  return `${baseUrl}/api/v1/common/image/${fileName}?path=${encodeURIComponent(directoryPath)}`;
+  return `${baseUrl}/api/v1/common/image/${fileName}?path=${encodeURIComponent(
+    directoryPath
+  )}`;
 };
 
 export const imageToBase64 = (imagePath: string) => {
@@ -102,12 +75,12 @@ export type RemoveUndefined<T> = {
 
 export function omitUndefined<T extends object>(obj: T): RemoveUndefined<T> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([, v]) => v !== undefined),
+    Object.entries(obj).filter(([, v]) => v !== undefined)
   ) as RemoveUndefined<T>;
 }
 
 export const processAndRecreateJWT = (
-  token: string,
+  token: string
 ): { permissions: string[]; roles: Record<string, string>[] } => {
   try {
     // Decode the existing JWT token
@@ -174,3 +147,36 @@ export function calculateAge(dob: string | Date): number {
 
   return age;
 }
+
+export type DecimalToNumber<T> = T extends Decimal
+  ? number
+  : T extends (infer U)[]
+  ? DecimalToNumber<U>[]
+  : T extends object
+  ? { [K in keyof T]: DecimalToNumber<T[K]> }
+  : T;
+
+export function toNumberDeep<T>(val: T): DecimalToNumber<T> {
+  if (val === null || val === undefined) return val as any;
+  if (val instanceof Decimal) return val.toNumber() as any;
+  if (Array.isArray(val)) return val.map(toNumberDeep) as any;
+  // If it’s a Date, just keep it (or you could toISOString() if you prefer)
+  if (val instanceof Date) {
+    return val as any;
+  }
+  if (typeof val === "object") {
+    const out: any = {};
+    for (const [k, v] of Object.entries(val as any)) out[k] = toNumberDeep(v);
+    return out;
+  }
+  return val as any;
+}
+
+export function generateMd5(text: string) {
+  return crypto.createHash("md5").update(text).digest("hex");
+}
+
+export const generateHashForAuth = (randomNum: string) => {
+  const firstHash = generateMd5(CLIENT_ID);
+  return generateMd5(firstHash + randomNum);
+};

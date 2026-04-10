@@ -7,7 +7,12 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
 import * as prismaClient from "@repo/db/generated/prisma/client";
-import { commonService, NotificationEmitter, uinConfigService } from "av6-core";
+import {
+  commonService,
+  DataType,
+  NotificationEmitter,
+  uinConfigService,
+} from "av6-core";
 import {
   envMode,
   MASTER_TABLES,
@@ -23,9 +28,12 @@ import {
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
 
+const createOpdCache = async (table: string, data: DataType[]) =>
+  await createCache(table, data, "opd");
+
 export const commonServiceFactory = commonService({
   cacheAdapter: {
-    createCache: createCache,
+    createCache: createOpdCache,
     deleteCache: deleteCache,
     getCacheById: getCacheById,
     updateCache: updateCache,
@@ -54,7 +62,7 @@ export const commonServiceFactory = commonService({
 
 export const uinServiceFactory = uinConfigService({
   cacheAdapter: {
-    createCache: createCache,
+    createCache: createOpdCache,
     deleteCache: deleteCache,
     getCacheById: getCacheById,
     updateCache: updateCache,
@@ -64,6 +72,7 @@ export const uinServiceFactory = uinConfigService({
   cacheKey: getRedisKey("UIN_CONFIG", "all"),
 
   db: db,
+  modelName: "opdUINConfig",
   helpers: {
     ErrorHandler: ErrorHandler,
     generateErrorMessage: generateErrorMessage,

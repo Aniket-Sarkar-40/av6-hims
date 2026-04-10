@@ -3,8 +3,6 @@ import express from "express";
 import path from "path";
 
 import cacheRouter from "./routes/cacheRoute/cache.route.js";
-import { expenseRouter } from "./routes/consumerConnect/expense.route.js";
-import { incomeRouter } from "./routes/consumerConnect/income.route.js";
 import { customerRouter } from "./routes/customer/customer.route.js";
 import { distributorRouter } from "./routes/distributor/distributor.route.js";
 import emailConfigRouter from "./routes/email/email.route.js";
@@ -22,13 +20,8 @@ import { itemDosageRouter } from "./routes/item/itemDosageMap.route.js";
 import { itemInstructionRouter } from "./routes/item/itemInstructionMap.route.js";
 import { boxSizeRouter } from "./routes/master/boxSize.route.js";
 import { branchRouter } from "./routes/master/branch.route.js";
-import cityRouter from "./routes/master/city.route.js";
 import collectionCenterRouter from "./routes/master/collectionCenter.route.js";
-import countryRouter from "./routes/master/country.route.js";
-import countryCodeRouter from "./routes/master/countryCode.route.js";
 import currencyRouter from "./routes/master/currency.route.js";
-import expenseHeadRouter from "./routes/master/expenseHead.route.js";
-import { incomeHeadRouter } from "./routes/master/incomeHead.route.js";
 import manufactureRouter from "./routes/master/manufacture.route.js";
 import medCategoryRouter from "./routes/master/medCategory.route.js";
 import medCompoRouter from "./routes/master/medComposition.route.js";
@@ -41,7 +34,6 @@ import medTypeRouter from "./routes/master/medType.route.js";
 import medUnitRouter from "./routes/master/medUnit.route.js";
 import printerSettingsRouter from "./routes/master/printerSettings.route.js";
 import settingsRouter from "./routes/master/settings.route.js";
-import stateRouter from "./routes/master/state.route.js";
 import storage from "./routes/master/storage.route.js";
 import { storeRouter } from "./routes/master/store.route.js";
 import { uinConfigRouter } from "./routes/master/uinConfig.route.js";
@@ -86,9 +78,6 @@ pharmacyRouter.use("/master/med-category", medCategoryRouter);
 pharmacyRouter.use("/master/med-type", medTypeRouter);
 pharmacyRouter.use("/master/med-package", medPackageRouter);
 pharmacyRouter.use("/master/med-drug", medDrugRouter);
-pharmacyRouter.use("/master/country", countryRouter);
-pharmacyRouter.use("/master/state", stateRouter);
-pharmacyRouter.use("/master/city", cityRouter);
 pharmacyRouter.use("/master/warehouse", warehouseRouter);
 pharmacyRouter.use("/master/collection-center", collectionCenterRouter);
 pharmacyRouter.use("/master/branch", branchRouter);
@@ -100,7 +89,6 @@ pharmacyRouter.use("/master/medicine-dist-map", medicineDistMapRouter);
 pharmacyRouter.use("/master/uin-config", uinConfigRouter);
 pharmacyRouter.use("/master/settings", settingsRouter);
 pharmacyRouter.use("/master/printer-settings", printerSettingsRouter);
-pharmacyRouter.use("/master/country-code", countryCodeRouter);
 pharmacyRouter.use("/master/currency", currencyRouter);
 pharmacyRouter.use("/master/storage", storage);
 pharmacyRouter.use("/master/box-size", boxSizeRouter);
@@ -126,10 +114,6 @@ pharmacyRouter.use("/item-branch", itemBranchRouter);
 
 // Customer / Income / Expense
 pharmacyRouter.use("/customer", customerRouter);
-pharmacyRouter.use("/income-head", incomeHeadRouter);
-pharmacyRouter.use("/income", incomeRouter);
-pharmacyRouter.use("/expense-head", expenseHeadRouter);
-pharmacyRouter.use("/expense", expenseRouter);
 
 // Distributor
 pharmacyRouter.use("/distributor", distributorRouter);
@@ -178,5 +162,5 @@ pharmacyRouter.use("/migration", migrationRouter);
 // Uploads
 pharmacyRouter.use(
   "/uploads",
-  express.static(path.join(process.cwd(), "uploads")),
+  express.static(path.join(process.cwd(), "uploads"))
 );

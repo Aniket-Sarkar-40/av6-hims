@@ -14,17 +14,17 @@ export enum RedisResource {
   LOGIN = "login",
 
   SETTINGS = "settings",
-  DYNAMIC_SHORT_CODE = "dynamicShortCode",
+  DYNAMIC_SHORT_CODE = "coreDynamicShortCode",
 
-  UIN_CONFIG = "uINConfig",
+  UIN_CONFIG = "coreUINConfig",
 
   CITY = "city",
   COUNTRY = "country",
-  COUNTRY_CODE = "country-code",
+  COUNTRY_CODE = "countryCode",
   STATE = "state",
   ITEM_CATEGORY = "itemCategory",
 
-  COLLECTION_CENTER = "collection-center",
+  COLLECTION_CENTER = "collectionCenter",
   DEPARTMENT = "department",
   STAFF_DESIGNATION = "staffDesignation",
   EMPLOYEE = "employee",
@@ -33,6 +33,9 @@ export enum RedisResource {
   TEMPLATE = "template",
   EVENT_CONFIG = "eventConfig",
   PDF_TEMPLATE = "pdfTemplate",
+
+  INCOME_HEAD = "incomeHead",
+  EXPENSE_HEAD = "expenseHead",
 }
 
 export const getRedisKey = (

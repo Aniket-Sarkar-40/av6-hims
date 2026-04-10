@@ -1,13 +1,7 @@
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
-import {
-  City,
-  Country,
-  EventConfig,
-  PdfTemplate,
-  ServiceEvent,
-  State,
-  InvUINConfig,
-} from "@repo/db/generated/prisma/client";
+import { Expense, Income } from "@repo/db/generated/prisma/client";
+import { toExpenseDTO } from "@/mapper/consumerConnect/expense.mapper.js";
+import { toIncomeDTO } from "@/mapper/consumerConnect/income.mapper.js";
 // import { toCityDTOOnlyForCity } from "@repo/core/mapper/master/city.mapper.js";
 // import { toCountryDto } from "@repo/core/mapper/master/country.mapper.js";
 // import { toStateDTOForState } from "@repo/core/mapper/master/state.mapper.js";
@@ -19,6 +13,8 @@ import {
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
 export const dtoMapping: Record<string, DtoMappingFunction> = {
+  [SHORT_CODE.EXPENSE]: (data: unknown) => toExpenseDTO(data as Expense),
+  [SHORT_CODE.INCOME]: (data: unknown) => toIncomeDTO(data as Income),
   // [SHORT_CODE.CITY]: (data: unknown) => toCityDTOOnlyForCity(data as City),
   // [SHORT_CODE.UIN_CONFIG]: (data: unknown) => toUINConfigDTO(data as UINConfig),
   // [SHORT_CODE.STATE]: (data: unknown) => toStateDTOForState(data as State),

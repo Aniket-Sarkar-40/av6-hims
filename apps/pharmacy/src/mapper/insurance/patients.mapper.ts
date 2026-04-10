@@ -1,6 +1,5 @@
 // import { countryService } from "@/services/master/country.service.js";
 import { getCorporateClientById } from "@/repository/opd/corporate.repository.js";
-import { countryService } from "@/services/master/country.service.js";
 import {
   PatientCreateFormData,
   PatientDto,
@@ -12,16 +11,17 @@ import { toImageApiUrl } from "@repo/shared/utils/helper.utils.js";
 import { IncomeMaster, Patient } from "@repo/db/generated/prisma/client";
 import path from "path";
 import { toIdValue } from "av6-utils";
+import { countryService } from "@apps/core/services/master/country.service.js";
 
 const patientUrlPhp = "patient_images/patient_captured_images";
 
 export const toPatientEntity = (
   patient: PatientCreateFormData,
-  patientImage?: PatientImage,
+  patientImage?: PatientImage
 ): PatientReq => ({
   admissionDate: patient.admissionDate
     ? new Date(patient.admissionDate).toISOString()
-    : (patient.admissionDate ?? null),
+    : patient.admissionDate ?? null,
   patientName: patient.patientName || null,
   age: patient.age,
   month: patient.month,
@@ -90,7 +90,7 @@ export const toPatientEntity = (
 
 export const toPatientUpdateEntity = (
   patient: PatientUpdateFormData,
-  patientImage?: PatientImage,
+  patientImage?: PatientImage
 ): PatientReq => ({
   id: Number(patient.id),
   ...toPatientEntity(patient, patientImage),

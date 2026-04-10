@@ -218,3 +218,8 @@ enum PaymentTransactionMode {
     ONLINE_GATEWAY
     WALLET
 }
+
+enum CcType {
+    BRANCH
+    WAREHOUSE
+}

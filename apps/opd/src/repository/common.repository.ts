@@ -38,7 +38,7 @@ export const fetchTableData = async (table: string) => {
     });
   }
 
-  await createCache(table, dbData);
+  await createCache(table, dbData, "opd");
 
   logger.info("exiting::fetchTableData::repository");
 

@@ -3,7 +3,7 @@ import {
   DeliveryType,
   DiscMethod,
   PAYMENT_STATUS,
-  PaymentMode,
+  PmsPaymentMode,
   SELL_STATUS,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/enums.js";
@@ -137,7 +137,9 @@ export const sellDetailInputSchema = Joi.object<SellDetailInput>({
     .required()
     .messages({
       "string.base": "Discount method must be a string",
-      "any.only": `Discount method must be one of ${Object.values(DiscMethod).join(", ")}`,
+      "any.only": `Discount method must be one of ${Object.values(
+        DiscMethod
+      ).join(", ")}`,
       "any.required": "Discount method is required",
     }),
   discount: joiDecimalFromSettings({
@@ -168,7 +170,9 @@ export const sellDetailInputSchema = Joi.object<SellDetailInput>({
     .required()
     .messages({
       "string.base": "Tax method must be a string",
-      "any.only": `Tax method must be one of ${Object.values(TAX_METHOD).join(", ")}`,
+      "any.only": `Tax method must be one of ${Object.values(TAX_METHOD).join(
+        ", "
+      )}`,
       "any.required": "Tax method is required",
     }),
   tax: joiDecimalFromSettings({
@@ -246,15 +250,19 @@ export const sellInputSchema = Joi.object<SellInput>({
     .required()
     .messages({
       "string.base": "Delivery type must be a string",
-      "string.enum": `Delivery type must be one of the following: ${Object.values(DeliveryType).join(", ")}`,
+      "string.enum": `Delivery type must be one of the following: ${Object.values(
+        DeliveryType
+      ).join(", ")}`,
       "any.required": "Delivery type is required",
     }),
   paymentMode: Joi.string()
-    .valid(...Object.values(PaymentMode))
+    .valid(...Object.values(PmsPaymentMode))
     .optional()
     .messages({
       "string.base": "Payment mode must be a string",
-      "string.enum": `Payment mode must be one of the following: ${Object.values(PaymentMode).join(", ")}`,
+      "string.enum": `Payment mode must be one of the following: ${Object.values(
+        PmsPaymentMode
+      ).join(", ")}`,
     }),
   isHomeDelivery: Joi.boolean().optional().default(false).messages({
     "boolean.base": "Is home delivery must be a boolean",
@@ -272,7 +280,9 @@ export const sellInputSchema = Joi.object<SellInput>({
     .required()
     .messages({
       "string.base": "Billing for must be a string",
-      "string.enum": `Billing for must be one of the following: ${Object.values(BILL_FOR).join(", ")}`,
+      "string.enum": `Billing for must be one of the following: ${Object.values(
+        BILL_FOR
+      ).join(", ")}`,
       "any.required": "Billing for is required",
     }),
   insuranceId: Joi.number().integer().optional().allow(null).strict().messages({
@@ -315,7 +325,9 @@ export const sellInputSchema = Joi.object<SellInput>({
     .optional()
     .messages({
       "string.base": "Discount method must be a string",
-      "string.enum": `Discount method must be one of the following: ${Object.values(DiscMethod).join(", ")}`,
+      "string.enum": `Discount method must be one of the following: ${Object.values(
+        DiscMethod
+      ).join(", ")}`,
     }),
   discount: joiDecimalFromSettings({
     key: "sellPrecision",
@@ -342,7 +354,9 @@ export const sellInputSchema = Joi.object<SellInput>({
     .required()
     .messages({
       "string.base": "Tax method must be a string",
-      "string.enum": `Tax method must be one of the following: ${Object.values(TAX_METHOD).join(", ")}`,
+      "string.enum": `Tax method must be one of the following: ${Object.values(
+        TAX_METHOD
+      ).join(", ")}`,
       "any.required": "Tax method is required",
     }),
   tax: joiDecimalFromSettings({
@@ -384,13 +398,17 @@ export const sellInputSchema = Joi.object<SellInput>({
     .valid(...Object.values(PAYMENT_STATUS))
     .messages({
       "string.base": "Payment status must be a string",
-      "string.enum": `Payment status must be one of the following: ${Object.values(PAYMENT_STATUS).join(", ")}`,
+      "string.enum": `Payment status must be one of the following: ${Object.values(
+        PAYMENT_STATUS
+      ).join(", ")}`,
     }),
   status: Joi.string()
     .valid(...Object.values(SELL_STATUS))
     .messages({
       "string.base": "Status must be a string",
-      "string.enum": `Status must be one of the following: ${Object.values(SELL_STATUS).join(", ")}`,
+      "string.enum": `Status must be one of the following: ${Object.values(
+        SELL_STATUS
+      ).join(", ")}`,
     }),
   sellDetails: Joi.array()
     .items(sellDetailInputSchema)
@@ -459,13 +477,17 @@ export const sellExcelFilterSchema = Joi.object({
     .valid(...Object.values(DeliveryType))
     .optional()
     .messages({
-      "any.only": `Delivery type must be one of ${Object.values(DeliveryType).join(", ")}`,
+      "any.only": `Delivery type must be one of ${Object.values(
+        DeliveryType
+      ).join(", ")}`,
     }),
   paymentMode: Joi.string()
-    .valid(...Object.values(PaymentMode))
+    .valid(...Object.values(PmsPaymentMode))
     .optional()
     .messages({
-      "any.only": `Payment mode must be one of ${Object.values(PaymentMode).join(", ")}`,
+      "any.only": `Payment mode must be one of ${Object.values(
+        PmsPaymentMode
+      ).join(", ")}`,
     }),
   isHomeDelivery: Joi.boolean().optional().messages({
     "boolean.base": `Is home delivery must be a boolean`,
@@ -489,7 +511,9 @@ export const sellExcelFilterSchema = Joi.object({
     .valid(...Object.values(BILL_FOR))
     .optional()
     .messages({
-      "any.only": `Billing for must be one of ${Object.values(BILL_FOR).join(", ")}`,
+      "any.only": `Billing for must be one of ${Object.values(BILL_FOR).join(
+        ", "
+      )}`,
     }),
   doctorId: Joi.number().integer().positive().optional().messages({
     "number.base": `Doctor id must be a number`,
@@ -507,7 +531,7 @@ export const sellExcelFilterSchema = Joi.object({
 export const validateSellInput = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = sellInputSchema.validate(req.body, {
     abortEarly: false,
@@ -520,7 +544,7 @@ export const validateSellInput = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -530,7 +554,7 @@ export const validateSellInput = (
 export const validateSellUpdate = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = sellUpdateSchema.validate(req.body, {
     abortEarly: false,
@@ -543,7 +567,7 @@ export const validateSellUpdate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -553,7 +577,7 @@ export const validateSellUpdate = (
 export const validateExcelFilterSell = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = sellExcelFilterSchema.validate(req.body, {
     abortEarly: false,
@@ -569,7 +593,7 @@ export const validateExcelFilterSell = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -592,7 +616,7 @@ export const sellStockAdjustmentInputSchema =
 export const validateSellStockAdjustmentInput = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = sellStockAdjustmentInputSchema.validate(req.body, {
     abortEarly: false,
@@ -608,7 +632,7 @@ export const validateSellStockAdjustmentInput = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -765,7 +789,7 @@ export const sellPaymentInputSchema = Joi.object<SellPaymentInput>({
 export const validateSellPaymentInput = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = sellPaymentInputSchema.validate(req.body, {
     abortEarly: false,
@@ -781,7 +805,7 @@ export const validateSellPaymentInput = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -832,7 +856,7 @@ export const sellCoPaySetInputSchema = Joi.object({
 export const validateSetSellCoPayInput = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = sellCoPaySetInputSchema.validate(req.body, {
     abortEarly: false,
@@ -848,7 +872,7 @@ export const validateSetSellCoPayInput = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 

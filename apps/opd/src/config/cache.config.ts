@@ -10,8 +10,8 @@ export async function checkIsCacheable(shortCode: string): Promise<boolean> {
 
 export enum RedisResource {
   SETTINGS = "settings",
-  DYNAMIC_SHORT_CODE = "dynamicShortCode",
-  UIN_CONFIG = "uinConfig",
+  DYNAMIC_SHORT_CODE = "opdDynamicShortCode",
+  UIN_CONFIG = "opdUINConfig",
   OPD_DEPARTMENT = "opdDepartment",
   OPD_DEPARTMENT_PREFIX = "opdDepartmentPrefix",
   CHIPS_BUTTON_MAPPING = "chipsButtonMapping",
@@ -19,20 +19,20 @@ export enum RedisResource {
   CONSULTATION_NOTES_MAPPING = "consultationNotesMapping",
   MEDICINE_TAB = "medicineTab",
   PROCEDURE = "procedureMaster",
-  ICD_TEN = "icdTen",
+  ICD_TEN = "iCDTen",
   GENERAL_BILL_ITEM = "generalBillItem",
 }
 
 export const getRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string,
+  type: string
 ): string => {
   return `${REDIS_PREFIX}opd:${RedisResource[resource]}:${type}`;
 };
 
 export const getMasterRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string,
+  type: string
 ): string => {
   return `${REDIS_PREFIX}master:${RedisResource[resource]}:${type}`;
 };

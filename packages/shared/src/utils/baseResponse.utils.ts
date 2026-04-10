@@ -3,10 +3,11 @@ import { ValidationErrorItem } from "joi";
 import ErrorHandler from "./errorHandler.utils.js";
 import { SuccessMessageType } from "@/enums/message.enum.js";
 import { generateSuccessMessage } from "./responseMessage.utils.js";
+import { DecimalToNumber, toNumberDeep } from "./helper.utils.js";
 
 export class BaseResponse<T> {
   public success: boolean;
-  public data?: T;
+  public data?: DecimalToNumber<NonNullable<T>>;
   public errors?: ValidationErrorItem[];
   public message!: string;
   public errorCode!: ErrorCode;
@@ -14,7 +15,7 @@ export class BaseResponse<T> {
   public err!: ErrorHandler;
 
   constructor(response: ApiResponse, data?: T) {
-    if (data) this.data = data;
+    if (data) this.data = toNumberDeep(data);
     this.success = response.success;
     if (response.errors) this.errors = response.errors;
     if (response.errorCode) this.errorCode = response.errorCode;
@@ -36,7 +37,7 @@ export class BaseResponse<T> {
   ): BaseResponse<T> {
     return new BaseResponse<T>(
       { success: true, message: generateSuccessMessage(type, ...variables) },
-      data,
+      data
     );
   }
 

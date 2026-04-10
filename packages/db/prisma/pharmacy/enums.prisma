@@ -219,3 +219,13 @@ enum IncentiveCalculationType {
     STANDARD
     IGNORE_DISCOUNT @map("IGNORE_DISCOUNT")
 }
+
+enum PmsPaymentMode {
+    CASH
+    CHEQUE
+    BANK_TRANSFER
+    CREDIT_CARD
+    DEBIT_CARD
+    MOBILE_PAYMENT
+    CREDIT_NOTE
+}

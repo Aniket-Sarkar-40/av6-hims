@@ -7,12 +7,12 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
-import { validIdState } from "./state.service.validation.js";
-import { validIdCity } from "./city.service.validation.js";
-import { validIdCountry } from "./country.service.validation.js";
 import { validateIdCollectionCenter } from "./collectionCenter.service.validation.js";
 import { getWarehouseByIdFromDb } from "@/repository/master/warehouse.repository.js";
 import { medCategoryService } from "@/services/master/medCategory.service.js";
+import { validIdState } from "@apps/core/validations/service/master/state.service.validation.js";
+import { validIdCity } from "@apps/core/validations/service/master/city.service.validation.js";
+import { validIdCountry } from "@apps/core/validations/service/master/country.service.validation.js";
 
 export const validateIdBranch = async (branchId: number) => {
   logger.info("entering::validateIdBranch::service::validation");
@@ -29,7 +29,7 @@ export const validateIdBranch = async (branchId: number) => {
 };
 
 export const deleteBranchServiceValidation = async (
-  branchId: number,
+  branchId: number
 ): Promise<void> => {
   logger.info("entering::deleteBranchServiceValidation::service::validation");
 
@@ -40,7 +40,7 @@ export const deleteBranchServiceValidation = async (
 };
 
 export const getIdBranchServiceValidation = async (
-  branchId: number,
+  branchId: number
 ): Promise<void> => {
   logger.info("entering::getIdBranchServiceValidation::service::validation");
 
@@ -52,7 +52,7 @@ export const getIdBranchServiceValidation = async (
 
 export const updateIdBranchServiceValidation = async (
   branchId: number,
-  body: BranchReq,
+  body: BranchReq
 ): Promise<void> => {
   logger.info("entering::updateIdBranchServiceValidation::service::validation");
   await validateIdBranch(branchId);
@@ -64,7 +64,7 @@ export const updateIdBranchServiceValidation = async (
   if (branchByName && branchByName.id !== branchId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Branch Name"),
+      generateErrorMessage("DUPLICATE_ITEM", "Branch Name")
     );
   }
   logger.info("exiting::updateIdBranchServiceValidation::service::validation");
@@ -72,7 +72,7 @@ export const updateIdBranchServiceValidation = async (
 };
 
 export const createBranchServiceValidation = async (
-  body: BranchReq,
+  body: BranchReq
 ): Promise<void> => {
   logger.info("entering::createBranchServiceValidation::service::validation");
   // await validateBranchForeignKeys(body);
@@ -89,14 +89,14 @@ export const createBranchServiceValidation = async (
   if (branch) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Branch Name"),
+      generateErrorMessage("DUPLICATE_ITEM", "Branch Name")
     );
   }
   if (body.categories && body.categories.length !== 0) {
     await Promise.all(
       body.categories.map(async (category) => {
         await medCategoryService.getMedCategoryById(category);
-      }),
+      })
     );
   }
   logger.info("exiting::createBranchServiceValidation::service::validation");

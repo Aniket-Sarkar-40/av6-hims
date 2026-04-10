@@ -36,8 +36,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
       av6-core:
-        specifier: ^1.7.5
-        version: 1.7.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+        specifier: ^1.7.11
+        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
       av6-pdf-engine:
         specifier: ^1.0.9
         version: 1.0.9(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
@@ -102,10 +102,16 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      cors:
+        specifier: ^2.8.6
+        version: 2.8.6
       express:
         specifier: ^5.1.0
         version: 5.2.1
     devDependencies:
+      '@types/cors':
+        specifier: ^2.8.19
+        version: 2.8.19
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
@@ -131,8 +137,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
       av6-core:
-        specifier: ^1.7.5
-        version: 1.7.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+        specifier: ^1.7.11
+        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -180,8 +186,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
       av6-core:
-        specifier: ^1.7.5
-        version: 1.7.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+        specifier: ^1.7.11
+        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -232,8 +238,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
       av6-core:
-        specifier: ^1.7.5
-        version: 1.7.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+        specifier: ^1.7.11
+        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -295,6 +301,9 @@ importers:
       dotenv:
         specifier: ^16.4.0
         version: 16.6.1
+      redis:
+        specifier: ^5.11.0
+        version: 5.11.0
     devDependencies:
       '@types/node':
         specifier: ^25.4.0
@@ -378,6 +387,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1003.0
         version: 3.1003.0
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -1463,6 +1475,9 @@ packages:
     peerDependencies:
       '@types/express': '*'
 
+  '@types/cors@2.8.19':
+    resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
+
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -1583,8 +1598,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  av6-core@1.7.5:
-    resolution: {integrity: sha512-Biz/chboE9pux6UEaPdpfER2Lf3tUCD6d9cfOtDOdX4nrpq00qUB/6xjxFMja45izygrTrZUhHIMYpizSuDNkg==}
+  av6-core@1.7.11:
+    resolution: {integrity: sha512-NWlHwwm7nhebbz5iSaIp4SPNewXJyUko1r6Q2rNFSSy57wMjlBYh4pT504KRH64+2K73mRlY2grUCWUT1k03xw==}
     peerDependencies:
       '@prisma/client': ^6.19.0
       winston: ^3.17.0
@@ -1876,6 +1891,10 @@ packages:
 
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
+
+  cors@2.8.6:
+    resolution: {integrity: sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw==}
+    engines: {node: '>= 0.10'}
 
   crc-32@1.2.2:
     resolution: {integrity: sha512-ROmzCKrTnOwybPcJApAA6WBWij23HVfGVNKqqrZpuyZOHqK2CwHSvpGuyt/UNNvaIjEd8X5IFGp4Mh+Ie1IHJQ==}
@@ -4895,6 +4914,10 @@ snapshots:
     dependencies:
       '@types/express': 5.0.6
 
+  '@types/cors@2.8.19':
+    dependencies:
+      '@types/node': 25.4.0
+
   '@types/estree@1.0.8': {}
 
   '@types/express-serve-static-core@5.1.1':
@@ -5037,7 +5060,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  av6-core@1.7.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0):
+  av6-core@1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0):
     dependencies:
       '@prisma/client': 7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2)
       av6-utils: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -5369,6 +5392,11 @@ snapshots:
   cookie@0.7.2: {}
 
   core-util-is@1.0.3: {}
+
+  cors@2.8.6:
+    dependencies:
+      object-assign: 4.1.1
+      vary: 1.1.2
 
   crc-32@1.2.2: {}
 

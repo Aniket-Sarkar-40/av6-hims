@@ -4,7 +4,8 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.0.0",
     "@prisma/client": "^7.0.0",
-    "dotenv": "^16.4.0"
+    "dotenv": "^16.4.0",
+    "redis": "^5.11.0"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",
@@ -30,12 +31,16 @@
     "./models/*": "./dist/generated/prisma/models/*"
   },
   "main": "./dist/src/index.js",
+  "prisma": {
+    "seed": "tsx seedRunner.ts"
+  },
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.generated.json",
     "p:deploy": "prisma migrate deploy",
     "p:gen": "prisma generate",
     "p:mig": "prisma migrate dev",
+    "p:seed": "prisma db seed",
     "p:studio": "prisma studio",
     "p:validate": "prisma validate"
   },

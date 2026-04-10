@@ -8,10 +8,10 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
-import { validIdCity } from "./city.service.validation.js";
 import { validateIdCollectionCenter } from "./collectionCenter.service.validation.js";
-import { validIdCountry } from "./country.service.validation.js";
-import { validIdState } from "./state.service.validation.js";
+import { validIdState } from "@apps/core/validations/service/master/state.service.validation.js";
+import { validIdCity } from "@apps/core/validations/service/master/city.service.validation.js";
+import { validIdCountry } from "@apps/core/validations/service/master/country.service.validation.js";
 
 export const validateWarehouseId = async (warehouseId: number) => {
   logger.info("entering::validateWarehouseId::service::validation");
@@ -22,7 +22,7 @@ export const validateWarehouseId = async (warehouseId: number) => {
   if (!warehouse) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", `Warehouse id: ${warehouseId}`),
+      generateErrorMessage("NOT_FOUND", `Warehouse id: ${warehouseId}`)
     );
   }
   logger.info("exiting::validateWarehouseId::service::validation");
@@ -31,10 +31,10 @@ export const validateWarehouseId = async (warehouseId: number) => {
 };
 
 export const deleteWarehouseServiceValidation = async (
-  warehouseId: number,
+  warehouseId: number
 ): Promise<void> => {
   logger.info(
-    "entering::deleteWarehouseServiceValidation::service::validation",
+    "entering::deleteWarehouseServiceValidation::service::validation"
   );
 
   await validateWarehouseId(warehouseId);
@@ -44,7 +44,7 @@ export const deleteWarehouseServiceValidation = async (
 };
 
 export const getIdWarehouseServiceValidation = async (
-  warehouseId: number,
+  warehouseId: number
 ): Promise<void> => {
   logger.info("entering::getIdWarehouseServiceValidation::service::validation");
 
@@ -55,10 +55,10 @@ export const getIdWarehouseServiceValidation = async (
 };
 
 export const updateIdWarehouseServiceValidation = async (
-  body: WarehouseReq,
+  body: WarehouseReq
 ): Promise<void> => {
   logger.info(
-    "entering::updateIdWarehouseServiceValidation::service::validation",
+    "entering::updateIdWarehouseServiceValidation::service::validation"
   );
   await validateWarehouseId(body.id);
   if (body.stateId) await validIdState(body.stateId);
@@ -70,20 +70,20 @@ export const updateIdWarehouseServiceValidation = async (
   if (warehouseByName && warehouseByName.id !== body.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name"),
+      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name")
     );
   }
   logger.info(
-    "exiting::updateIdWarehouseServiceValidation::service::validation",
+    "exiting::updateIdWarehouseServiceValidation::service::validation"
   );
   return;
 };
 
 export const createWarehouseServiceValidation = async (
-  body: WarehouseReq,
+  body: WarehouseReq
 ): Promise<void> => {
   logger.info(
-    "entering::createWarehouseServiceValidation::service::validation",
+    "entering::createWarehouseServiceValidation::service::validation"
   );
   // await validateWarehouseForeignKeys(body);
   const alreadyExistsWarehouse = await getWarehouseByIdFromDb(body.id);
@@ -100,7 +100,7 @@ export const createWarehouseServiceValidation = async (
   if (warehouse) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name"),
+      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name")
     );
   }
   logger.info("exiting::createWarehouseServiceValidation::service::validation");

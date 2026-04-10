@@ -1,7 +1,7 @@
 import { FormData } from "@repo/shared/utils/types.utils.js";
 import { IncomeMaster } from "@repo/db/generated/prisma/enums.js";
-import { CountryDTO } from "../master/country.js";
 import { IdValue } from "@repo/shared/types/global.js";
+import { CountryDTO } from "@apps/core/types/master/country.js";
 
 export interface CommonPatient {
   admissionDate: string | null;

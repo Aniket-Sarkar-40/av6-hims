@@ -13,14 +13,17 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { MASTER_TABLES, REDIS_PREFIX } from "@repo/shared";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { commonService, uinConfigService } from "av6-core";
+import { commonService, DataType, uinConfigService } from "av6-core";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
 import { PrismaClient } from "@repo/db/generated/prisma/client";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 
+const createPmsCache = async (table: string, data: DataType[]) =>
+  await createCache(table, data, "core");
+
 export const commonServiceFactory = commonService({
   cacheAdapter: {
-    createCache: createCache,
+    createCache: createPmsCache,
     deleteCache: deleteCache,
     getCacheById: getCacheById,
     updateCache: updateCache,
@@ -48,7 +51,7 @@ export const commonServiceFactory = commonService({
 
 export const uinServiceFactory = uinConfigService({
   cacheAdapter: {
-    createCache: createCache,
+    createCache: createPmsCache,
     deleteCache: deleteCache,
     getCacheById: getCacheById,
     updateCache: updateCache,
@@ -58,6 +61,7 @@ export const uinServiceFactory = uinConfigService({
   cacheKey: getRedisKey("UIN_CONFIG", "all"),
 
   db: db,
+  modelName: "pmsUINConfig",
   helpers: {
     ErrorHandler: ErrorHandler,
     generateErrorMessage: generateErrorMessage,

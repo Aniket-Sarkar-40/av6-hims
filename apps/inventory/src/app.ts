@@ -2,8 +2,6 @@ import express, { Router, type Router as ExpressRouter } from "express";
 import path from "path";
 import { cacheRouter } from "./routes/cache.route.js";
 import { commonRouter } from "./routes/common.route.js";
-import { expenseRouter } from "./routes/consumerConnect/expense.route.js";
-import { incomeRouter } from "./routes/consumerConnect/income.route.js";
 import { consumptionRouter } from "./routes/consumption/consumption.route.js";
 import { grnRouter } from "./routes/grn/grn.route.js";
 import { grnReturnRouter } from "./routes/grn/grnReturn.route.js";
@@ -12,8 +10,6 @@ import { itemSupplierMapRouter } from "./routes/itemSupplierMap/itemSupplierMap.
 import { locationRouter } from "./routes/location/location.route.js";
 import { branchRouter } from "./routes/master/branch.route.js";
 import currencyRouter from "./routes/master/currency.route.js";
-import expenseHeadRouter from "./routes/master/expenseHead.route.js";
-import { incomeHeadRouter } from "./routes/master/incomeHead.route.js";
 import { itemCategoryRouter } from "./routes/master/itemCategory.route.js";
 import { itemMasterRouter } from "./routes/master/itemMaster.route.js";
 import { itemStoreRouter } from "./routes/master/itemStore.route.js";
@@ -54,15 +50,8 @@ inventoryRouter.use("/master/tax-details", taxDetailsRouter);
 //uploads
 inventoryRouter.use(
   "/uploads",
-  express.static(path.join(process.cwd(), "uploads")),
+  express.static(path.join(process.cwd(), "uploads"))
 );
-
-//customer
-// inventoryRouter.use("/customer", customerRouter);
-inventoryRouter.use("/income-head", incomeHeadRouter);
-inventoryRouter.use("/income", incomeRouter);
-inventoryRouter.use("/expense-head", expenseHeadRouter);
-inventoryRouter.use("/expense", expenseRouter);
 
 // Purchase Order
 inventoryRouter.use("/purchase/purchase-order", purchaseRouter);

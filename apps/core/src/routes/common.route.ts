@@ -1,4 +1,5 @@
 import {
+  commonApproval,
   commonDelete,
   commonDropdownSearch,
   commonExcelExport,
@@ -9,6 +10,9 @@ import {
   commonUpdateStatus,
   fixedSearch,
   fixedSearchWoPaginationController,
+  getApprovalActDetails,
+  getStaffPendingApproval,
+  startApprovalFlow,
 } from "@/controllers/common.controller.js";
 import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
@@ -28,8 +32,16 @@ import {
   validateSearchRequest,
 } from "@/validations/request/common.validation.js";
 import { Router } from "express";
-import { authorizeCommonSearch } from "@/middleware/auth.middleware.js";
+import {
+  authorizeCommonApproval,
+  authorizeCommonSearch,
+} from "@/middleware/auth.middleware.js";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import {
+  validateApprovalRequest,
+  validateGetMyApprovalSchema,
+  validateStartFlowRequest,
+} from "@/validations/request/approval/approval.validation.js";
 
 const commonRouter: Router = Router();
 /**
@@ -245,6 +257,76 @@ commonRouter.patch(
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
   commonUpdateStatus
+);
+
+/**
+ * @swagger
+ * /api/v1/common/approval:
+ *   patch:
+ *     summary: Approve or reject a resource
+ *     tags: [Common]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/commonUpdateStatusSchema'
+ */
+commonRouter.patch(
+  "/approval",
+  verifyToken,
+  validateApprovalRequest,
+  commonApproval
+);
+commonRouter.patch(
+  "/approval-ext",
+  authorizeCommonApproval(),
+  validateApprovalRequest,
+  commonApproval
+);
+
+/**
+ * @swagger
+ * /api/v1/common/approval:
+ *   patch:
+ *     summary: Approve or reject a resource
+ *     tags: [Common]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/commonUpdateStatusSchema'
+ */
+commonRouter.post(
+  "/approval",
+  verifyToken,
+  validateGetMyApprovalSchema,
+  getStaffPendingApproval
+);
+commonRouter.post(
+  "/approval-ext",
+  authorizeCommonApproval(),
+  validateGetMyApprovalSchema,
+  getStaffPendingApproval
+);
+
+/**
+ * @swagger
+ * /api/v1/common/getApprovalActions:
+ */
+commonRouter.post("/getApprovalActions", verifyToken, getApprovalActDetails);
+commonRouter.post(
+  "/getApprovalActions-ext",
+  authorizeCommonApproval(),
+  getApprovalActDetails
+);
+
+commonRouter.post(
+  "/start-flow-ext",
+  authorizeCommonApproval(),
+  validateStartFlowRequest,
+  startApprovalFlow
 );
 
 export default commonRouter;
