@@ -41,3 +41,10 @@ yarn-error.log*
 *.pem
 
 packages/db/generated
+packages/db/prisma/migrations/
+
+apps/core/uploads/
+apps/gateway/uploads/
+apps/opd/uploads/
+apps/inventory/uploads/
+apps/pharmacy/uploads/
