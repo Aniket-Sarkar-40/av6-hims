@@ -7,6 +7,12 @@ import {
   CreateIncomeHeadInput,
   UpdateIncomeHeadInput,
 } from "@/types/master/incomeHead.js";
+import {
+  idRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 /**
  * Joi schema for creating a new IncomeHead.
@@ -14,50 +20,17 @@ import {
  * - description: optional, string or null, max length 255
  */
 export const incomeHeadCreateSchema = Joi.object<CreateIncomeHeadInput>({
-  incomeCategory: Joi.string().min(2).max(255).trim().required().messages({
-    "string.base": "Income Category must be a string",
-    "string.empty": "Income Category is required",
-    "string.min": "Income Category must be at least 2 characters",
-    "string.max": "Income Category cannot exceed 255 characters",
-    "any.required": "Income Category is required",
-  }),
+  incomeCategory: strRequired("Income Category", 2),
 
-  description: Joi.string()
-    .max(255)
-    .trim()
-    .allow(null, "")
-    .optional()
-    .messages({
-      "string.base": "Description must be a string or null",
-      "string.max": "Description cannot exceed 255 characters",
-    }),
+  description: strOptional("Description"),
 });
 
 /**
  * Middleware to validate request body against incomeHeadCreateSchema.
  */
-export const validateIncomeHeadCreate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = incomeHeadCreateSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
+export const validateIncomeHeadCreate = validationHandler({
+  schema: incomeHeadCreateSchema,
+});
 
 /**
  * Joi schema for updating an existing IncomeHead.
@@ -66,54 +39,16 @@ export const validateIncomeHeadCreate = (
  * - description: optional, string or null, max length 255
  */
 export const incomeHeadUpdateSchema = Joi.object<UpdateIncomeHeadInput>({
-  id: Joi.number().integer().positive().required().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "number.positive": "ID must be a positive number",
-    "any.required": "ID is required",
-  }),
+  id: idRequired("Income head id"),
 
-  incomeCategory: Joi.string().min(2).max(255).trim().required().messages({
-    "string.base": "Income Category must be a string",
-    "string.empty": "Income Category is required",
-    "string.min": "Income Category must be at least 2 characters",
-    "string.max": "Income Category cannot exceed 255 characters",
-    "any.required": "Income Category is required",
-  }),
+  incomeCategory: strRequired("Income Category", 2),
 
-  description: Joi.string()
-    .max(255)
-    .trim()
-    .allow(null, "")
-    .optional()
-    .messages({
-      "string.base": "Description must be a string or null",
-      "string.max": "Description cannot exceed 255 characters",
-    }),
+  description: strOptional("Description"),
 });
 
 /**
  * Middleware to validate request body against incomeHeadUpdateSchema.
  */
-export const validateIncomeHeadUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = incomeHeadUpdateSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
+export const validateIncomeHeadUpdate = validationHandler({
+  schema: incomeHeadUpdateSchema,
+});

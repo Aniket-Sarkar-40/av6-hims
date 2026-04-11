@@ -1,70 +1,22 @@
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { NextFunction, Request, Response } from "express";
+import { idRequired, strRequired } from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import Joi from "joi";
 
 export const citySchema = Joi.object({
-  name: Joi.string().required().min(2).messages({
-    "string.base": "Name must be a string",
-    "any.required": "Name is required",
-  }),
+  name: strRequired("City Name"),
 
-  countryId: Joi.number().required().messages({
-    "number.base": "Country ID must be a number",
-    "any.required": "Country ID is required",
-  }),
+  countryId: idRequired("Country ID"),
 
-  stateId: Joi.number().required().messages({
-    "number.base": "State ID must be a number",
-    "any.required": "State ID is required",
-  }),
+  stateId: idRequired("State ID"),
 });
 
 export const updateCitySchema = (citySchema as Joi.ObjectSchema).keys({
-  id: Joi.number().integer().positive().required().strict().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "number.positive": "ID must be a positive integer",
-    "any.required": "ID is required",
-  }),
+  id: idRequired("City ID"),
 });
-export const validateCity = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = citySchema.validate(req.body, { abortEarly: false });
+export const validateCity = validationHandler({
+  schema: citySchema,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
-
-export const validateCityUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = updateCitySchema.validate(req.body, { abortEarly: false });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
+export const validateCityUpdate = validationHandler({
+  schema: updateCitySchema,
+});

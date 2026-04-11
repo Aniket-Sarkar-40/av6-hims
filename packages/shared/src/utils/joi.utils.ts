@@ -39,15 +39,17 @@ export const dateOptional = (label: string) =>
       "date.base": `${label} must be a valid date`,
     });
 
-export const strRequired = (label: string, max = 255) =>
+export const strRequired = (label: string, min = 1, max = 255) =>
   Joi.string()
     .trim()
     .max(max)
+    .min(min)
     .required()
     .messages({
       "any.required": `${label} is required`,
       "string.base": `${label} must be a string`,
       "string.max": `${label} must be at most ${max} characters`,
+      "string.min": `${label} must be at least ${min} characters`,
     });
 
 export const strOptional = (label: string, max = 255) =>
@@ -80,7 +82,7 @@ export const boolRequired = (label: string, defaultValue: boolean = false) =>
 
 export const enumRequired = <T extends Record<string, string>>(
   label: string,
-  enumObj: T,
+  enumObj: T
 ) =>
   Joi.string()
     .valid(...(Object.values(enumObj) as string[]))
@@ -91,13 +93,13 @@ export const enumRequired = <T extends Record<string, string>>(
       "any.required": `${label} is required`,
       "string.base": `${label} must be a string`,
       "any.only": `${label} must be one of [${Object.values(enumObj).join(
-        ", ",
+        ", "
       )}]`,
     });
 
 export const enumOptional = <T extends Record<string, string>>(
   label: string,
-  enumObj: T,
+  enumObj: T
 ) =>
   Joi.string()
     .valid(...(Object.values(enumObj) as string[]))
@@ -107,14 +109,14 @@ export const enumOptional = <T extends Record<string, string>>(
     .messages({
       "string.base": `${label} must be a string`,
       "any.only": `${label} must be one of [${Object.values(enumObj).join(
-        ", ",
+        ", "
       )}]`,
     });
 
 export const idRequired = (
   label: string,
   min?: number | Joi.Reference,
-  max?: number | Joi.Reference,
+  max?: number | Joi.Reference
 ) => {
   let schema = Joi.number().integer().required();
 
@@ -131,7 +133,7 @@ export const idRequired = (
     "number.min": generateValidationErrorMessage(
       "MIN_VALUE",
       label,
-      String(min),
+      String(min)
     ),
     "number.max": generateValidationErrorMessage("MAX_VALUE", label),
     "any.required": generateValidationErrorMessage("REQUIRED", label),
@@ -166,61 +168,13 @@ export const jsonObjectOptional = (label: string) =>
       "any.required": generateValidationErrorMessage("REQUIRED", label),
     });
 
-export const EmailOptional = (label: string) =>
-  Joi.string()
-    .trim()
-    .email({ tlds: { allow: false } })
-    .pattern(getPattern.emailPattern!)
-    .allow(null, "")
-    .optional()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", label),
-      "string.email": generateValidationErrorMessage("EMAIL", label),
-      "string.pattern.base": generateValidationErrorMessage("INVALID", label),
-    });
-
-export const EmailRequired = (label: string) =>
-  Joi.string()
-    .trim()
-    .email({ tlds: { allow: false } })
-    .pattern(getPattern.emailPattern!)
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", label),
-      "string.email": generateValidationErrorMessage("EMAIL", label),
-      "string.pattern.base": generateValidationErrorMessage("INVALID", label),
-      "any.required": generateValidationErrorMessage("REQUIRED", label),
-    });
-
-export const PhoneOptional = (label: string) =>
-  Joi.string()
-    .trim()
-    .pattern(getPattern.phonePattern!)
-    .allow(null, "")
-    .optional()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", label),
-      "string.pattern.base": generateValidationErrorMessage("INVALID", label),
-    });
-
-export const PhoneRequired = (label: string) =>
-  Joi.string()
-    .trim()
-    .pattern(getPattern.phonePattern!)
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", label),
-      "string.pattern.base": generateValidationErrorMessage("INVALID", label),
-      "any.required": generateValidationErrorMessage("REQUIRED", label),
-    });
-
 const baseArray = (
   label: string,
   itemSchema: SchemaLikeWithoutArray,
   options?: {
     min?: number;
     required?: boolean;
-  },
+  }
 ) => {
   let schema = Joi.array().items(itemSchema);
 
@@ -240,7 +194,7 @@ const baseArray = (
       "array.min": generateValidationErrorMessage(
         "MIN",
         label,
-        String(options.min),
+        String(options.min)
       ),
     }),
     ...(options?.required && {
@@ -252,18 +206,17 @@ const baseArray = (
 export const arrayRequired = (
   label: string,
   itemSchema: SchemaLikeWithoutArray,
-  min = 1,
+  min = 1
 ) => baseArray(label, itemSchema, { min, required: true });
 
 export const arrayOptional = (
   label: string,
   itemSchema: SchemaLikeWithoutArray,
-  min?: number,
+  min?: number
 ) => baseArray(label, itemSchema, { min });
 
 export const numberWithMaxDecimals = (fieldName: string, precision = 2) => {
   return Joi.number()
-    .strict()
     .positive()
     .messages({
       "number.base": `${fieldName} must be a valid number`,
@@ -297,7 +250,7 @@ export const emailRequired = (label: string) =>
       "string.email": generateValidationErrorMessage("EMAIL", label),
       "string.pattern.base": generateValidationErrorMessage(
         "INVALID_FORMAT",
-        label,
+        label
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", label),
       "string.empty": generateValidationErrorMessage("REQUIRED", label),
@@ -315,7 +268,7 @@ export const emailOptional = (label: string) =>
       "string.email": generateValidationErrorMessage("EMAIL", label),
       "string.pattern.base": generateValidationErrorMessage(
         "INVALID_FORMAT",
-        label,
+        label
       ),
     });
 
@@ -382,4 +335,48 @@ export const aadharOptional = (label: string) =>
     .messages({
       "string.base": generateValidationErrorMessage("STRING", label),
       "string.pattern.base": generateValidationErrorMessage("AADHAR", label),
+    });
+
+export const intRequired = (label: string) =>
+  Joi.number()
+    .integer()
+    .required()
+    .messages({
+      "number.base": generateValidationErrorMessage("NUMBER", label),
+      "number.integer": generateValidationErrorMessage("INTEGER", label),
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+    });
+export const intOptional = (label: string) =>
+  Joi.number()
+    .integer()
+    .optional()
+    .allow(null)
+    .messages({
+      "number.base": generateValidationErrorMessage("NUMBER", label),
+      "number.integer": generateValidationErrorMessage("INTEGER", label),
+    });
+
+export const patternRequired = (label: string, pattern: RegExp) =>
+  Joi.string()
+    .trim()
+    .strict()
+    .pattern(pattern)
+    .required()
+    .messages({
+      "string.base": generateValidationErrorMessage("STRING", label),
+      "string.pattern.base": generateValidationErrorMessage("PATTERN", label),
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+    });
+
+export const patternOptional = (label: string, pattern: RegExp) =>
+  Joi.string()
+    .trim()
+    .strict()
+    .pattern(pattern)
+    .optional()
+    .allow(null)
+    .empty("")
+    .messages({
+      "string.base": generateValidationErrorMessage("STRING", label),
+      "string.pattern.base": generateValidationErrorMessage("PATTERN", label),
     });

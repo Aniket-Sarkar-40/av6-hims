@@ -11,7 +11,10 @@ import {
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
-import { validateExpenseSchema } from "@/validations/request/consumerConnect/expense.validation.js";
+import {
+  validateExpenseSchema,
+  validateUpdateExpenseSchema,
+} from "@/validations/request/consumerConnect/expense.validation.js";
 
 import { Router } from "express";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
@@ -119,7 +122,7 @@ expenseRouter.put(
     getPermission("CORE", "EXPENSE", "UPDATE")
   ),
   createUploadMiddleware("documents"),
-  validateExpenseSchema,
+  validateUpdateExpenseSchema,
   updateExpense
 );
 /**
