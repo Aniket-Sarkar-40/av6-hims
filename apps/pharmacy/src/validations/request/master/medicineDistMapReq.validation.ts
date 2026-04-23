@@ -1,88 +1,33 @@
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { MedicineDistributorMap } from "@repo/db/generated/prisma/client";
-import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
+import {
+  dateOptional,
+  idOptional,
+  idRequired,
+  intRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const medicineDistMapSchema = Joi.object<MedicineDistributorMap>({
-  id: Joi.number().integer().optional().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-  }),
+  id: idOptional("ID"),
 
-  itemId: Joi.number().integer().required().strict().messages({
-    "number.base": "Item ID must be a number",
-    "number.integer": "Item ID must be an integer",
-    "any.required": "Item ID is required",
-  }),
+  itemId: idRequired("Item ID"),
 
-  distributorId: Joi.number().integer().required().strict().messages({
-    "number.base": "Distributor ID must be a number",
-    "number.integer": "Distributor ID must be an integer",
-    "any.required": "Distributor ID is required",
-  }),
+  distributorId: idRequired("Distributor ID"),
 
-  price: Joi.number().required().strict().messages({
-    "string.base": "Price must be a string",
-    "any.required": "Price is required",
-    "number.base": "Price must be a number",
-    "number.integer": "Price must be an integer",
-  }),
+  price: intRequired("Price"),
 
-  expiryDate: Joi.date().optional().messages({
-    "date.base": "Expiry date must be a valid date",
-  }),
+  expiryDate: dateOptional("Expiry Date"),
 });
 
-export const validateMedicineDistMap = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = medicineDistMapSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateMedicineDistMap = validationHandler({
+  schema: medicineDistMapSchema,
+});
 
 export const medicineDistMapSchemaUpdate = medicineDistMapSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "any.required": "ID is required",
-  }),
+  id: idRequired("ID"),
 });
 
-export const validateMedicineDistMapUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = medicineDistMapSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateMedicineDistMapUpdate = validationHandler({
+  schema: medicineDistMapSchemaUpdate,
+});

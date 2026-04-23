@@ -176,16 +176,36 @@ const baseArray = (
     required?: boolean;
   }
 ) => {
-  let schema = Joi.array().items(itemSchema);
+  let schema = Joi.alternatives().try(
+    Joi.array().items(itemSchema),
+    Joi.string().custom((value, helpers) => {
+      try {
+        const parsed = JSON.parse(value);
+
+        if (!Array.isArray(parsed)) {
+          return helpers.error("array.base");
+        }
+
+        return parsed;
+      } catch (err) {
+        return helpers.error("array.base");
+      }
+    })
+  );
 
   if (options?.min !== undefined) {
-    schema = schema.min(options.min);
+    schema = schema.custom((value, helpers) => {
+      if (Array.isArray(value) && value.length < options.min!) {
+        return helpers.error("array.min");
+      }
+      return value;
+    });
   }
 
   if (options?.required) {
     schema = schema.required();
   } else {
-    schema = schema.optional();
+    schema = schema.optional().allow(null);
   }
 
   return schema.messages({
@@ -214,6 +234,94 @@ export const arrayOptional = (
   itemSchema: SchemaLikeWithoutArray,
   min?: number
 ) => baseArray(label, itemSchema, { min });
+
+export const numberArrayRequired = (label: string, min = 1) => {
+  return Joi.any()
+    .custom((value, helpers) => {
+      let finalValue = value;
+
+      // 🔁 Handle JSON string input
+      if (typeof value === "string") {
+        try {
+          finalValue = JSON.parse(value);
+        } catch {
+          return helpers.error("array.base");
+        }
+      }
+
+      // ❌ Must be array
+      if (!Array.isArray(finalValue)) {
+        return helpers.error("array.base");
+      }
+
+      // ❌ Min validation
+      if (finalValue.length < min) {
+        return helpers.error("array.min");
+      }
+
+      // ❌ Strict number validation
+      for (const item of finalValue) {
+        if (typeof item !== "number" || !Number.isInteger(item) || item <= 0) {
+          return helpers.error("array.includes");
+        }
+      }
+
+      return finalValue;
+    })
+    .required()
+    .messages({
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+      "array.base": generateValidationErrorMessage("ARRAY", label),
+      "array.min": generateValidationErrorMessage("MIN", label, String(min)),
+      "array.includes": `${label} must contain only positive integers`,
+    });
+};
+
+export const numberArrayOptional = (label: string, min?: number) => {
+  return Joi.any()
+    .custom((value, helpers) => {
+      if (value === null || value === undefined) return value;
+
+      let finalValue = value;
+
+      // 🔁 Handle JSON string
+      if (typeof value === "string") {
+        try {
+          finalValue = JSON.parse(value);
+        } catch {
+          return helpers.error("array.base");
+        }
+      }
+
+      // ❌ Must be array
+      if (!Array.isArray(finalValue)) {
+        return helpers.error("array.base");
+      }
+
+      // ❌ Min check (if provided)
+      if (min !== undefined && finalValue.length < min) {
+        return helpers.error("array.min");
+      }
+
+      // ❌ Strict number validation
+      for (const item of finalValue) {
+        if (typeof item !== "number" || !Number.isInteger(item) || item <= 0) {
+          return helpers.error("array.includes");
+        }
+      }
+
+      return finalValue;
+    })
+    .optional()
+    .allow(null)
+    .messages({
+      "array.base": generateValidationErrorMessage("ARRAY", label),
+      ...(min !== undefined && {
+        "array.min": generateValidationErrorMessage("MIN", label, String(min)),
+      }),
+      "array.includes": `${label} must contain only positive integers`,
+    });
+};
 
 export const numberWithMaxDecimals = (fieldName: string, precision = 2) => {
   return Joi.number()
@@ -337,24 +445,50 @@ export const aadharOptional = (label: string) =>
       "string.pattern.base": generateValidationErrorMessage("AADHAR", label),
     });
 
-export const intRequired = (label: string) =>
-  Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", label),
-      "number.integer": generateValidationErrorMessage("INTEGER", label),
-      "any.required": generateValidationErrorMessage("REQUIRED", label),
-    });
-export const intOptional = (label: string) =>
-  Joi.number()
-    .integer()
-    .optional()
-    .allow(null)
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", label),
-      "number.integer": generateValidationErrorMessage("INTEGER", label),
-    });
+export const intRequired = (label: string, min?: number, max?: number) => {
+  let schema = Joi.number().integer().required();
+
+  if (min !== undefined) schema = schema.min(min);
+  if (max !== undefined) schema = schema.max(max);
+
+  return schema.messages({
+    "number.base": generateValidationErrorMessage("NUMBER", label),
+    "number.integer": generateValidationErrorMessage("INTEGER", label),
+    "number.min": generateValidationErrorMessage(
+      "MIN_VALUE",
+      label,
+      String(min)
+    ),
+    "number.max": generateValidationErrorMessage(
+      "MAX_VALUE",
+      label,
+      String(max)
+    ),
+    "any.required": generateValidationErrorMessage("REQUIRED", label),
+  });
+};
+
+export const intOptional = (label: string, min?: number, max?: number) => {
+  let schema = Joi.number().integer().optional().allow(null);
+
+  if (min !== undefined) schema = schema.min(min);
+  if (max !== undefined) schema = schema.max(max);
+
+  return schema.messages({
+    "number.base": generateValidationErrorMessage("NUMBER", label),
+    "number.integer": generateValidationErrorMessage("INTEGER", label),
+    "number.min": generateValidationErrorMessage(
+      "MIN_VALUE",
+      label,
+      String(min)
+    ),
+    "number.max": generateValidationErrorMessage(
+      "MAX_VALUE",
+      label,
+      String(max)
+    ),
+  });
+};
 
 export const patternRequired = (label: string, pattern: RegExp) =>
   Joi.string()
@@ -379,4 +513,35 @@ export const patternOptional = (label: string, pattern: RegExp) =>
     .messages({
       "string.base": generateValidationErrorMessage("STRING", label),
       "string.pattern.base": generateValidationErrorMessage("PATTERN", label),
+    });
+
+export const decimalRequired = (label: string, precision = 2) =>
+  Joi.number()
+    .strict()
+    .precision(precision)
+    .required()
+    .messages({
+      "number.base": generateValidationErrorMessage("NUMBER", label),
+      "number.precision": generateValidationErrorMessage(
+        "DECIMAL",
+        label,
+        String(precision)
+      ),
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+    });
+
+export const decimalOptional = (label: string, precision = 2) =>
+  Joi.number()
+    .strict()
+    .precision(precision)
+    .optional()
+    .allow(null)
+    .empty("")
+    .messages({
+      "number.base": generateValidationErrorMessage("NUMBER", label),
+      "number.precision": generateValidationErrorMessage(
+        "DECIMAL",
+        label,
+        String(precision)
+      ),
     });
