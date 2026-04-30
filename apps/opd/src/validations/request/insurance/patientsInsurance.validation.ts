@@ -7,131 +7,69 @@ import {
   PatientInsuranceReq,
 } from "@/types/insurance/patientsInsurance.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import {
+  dateOptional,
+  enumOptional,
+  enumRequired,
+  idRequired,
+  strOptional,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
 export const patientsInsuranceSchema = Joi.object<PatientInsuranceReq>({
-  insurerId: Joi.number().integer().required().messages({
-    "number.base": "Insurer ID must be a number",
-    "number.integer": "Insurer ID must be an integer",
-    "any.required": "Insurer ID is required",
+  insurerId: idRequired("Insurer Id"),
+
+  patientId: idRequired("Patient Id"),
+
+  insuranceType: enumRequired("Insurance Type", {
+    primary: "primary",
+    secondary: "secondary",
+    tertiary: "tertiary",
   }),
 
-  patientId: Joi.number().integer().required().messages({
-    "number.base": "Patient ID must be a number",
-    "number.integer": "Patient ID must be an integer",
-    "any.required": "Patient ID is required",
+  insurancePlan: strOptional("Insurance Plan"),
+
+  policyNumber: strOptional("Policy Number"),
+
+  relationship: enumOptional("Relationship", {
+    self: "self",
+    spouse: "spouse",
+    child: "child",
   }),
 
-  insuranceType: Joi.string()
-    .valid("primary", "secondary", "tertiary")
-    .required()
-    .messages({
-      "string.base": "Insurance Type must be a string",
-      "any.required": "Insurance Type is required",
-      "any.only":
-        "Patients Insurance Type must be one of 'primary', 'secondary', 'tertiary'",
-    }),
+  issueDate: dateOptional("Issue Date"),
 
-  insurancePlan: Joi.string().allow(null).optional().messages({
-    "string.base": "patientsInsurance Plan must be a string",
-  }),
+  expireDate: dateOptional("Expire Date"),
 
-  policyNumber: Joi.string().allow(null).optional().messages({
-    "string.base": "Policy Number must be a string",
-  }),
+  cardFrontImage: strOptional("Card Front Image"),
 
-  relationship: Joi.string()
-    .allow(null)
-    .optional()
-    .valid("self", "spouse", "child")
-    .messages({
-      "string.base": "Relationship must be a string",
-    }),
-
-  issueDate: Joi.date().allow(null).optional().messages({
-    "date.base": "Issue Date must be a valid date",
-  }),
-
-  expireDate: Joi.date().allow(null).optional().messages({
-    "date.base": "Expire Date must be a valid date",
-  }),
-
-  cardFrontImage: Joi.string().allow(null).optional().messages({
-    "string.base": "Card Front Image must be a string",
-  }),
-
-  cardBackImage: Joi.string().allow(null).optional().messages({
-    "string.base": "Card Back Image must be a string",
-  }),
+  cardBackImage: strOptional("Card Back Image"),
 });
 
 export const patientsInsuranceUpdateSchema = patientsInsuranceSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-    "any.required": "Id is required",
-  }),
+  id: idRequired("Patient Insurance Id"),
 });
 
-export const validatePatientsInsurance = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  req.body = toPatientInsuranceEntity(
-    req.body,
-    req.files as InsuranceCardImages,
-  );
-  const { error } = patientsInsuranceSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validatePatientsInsurance = validationHandler({
+  schema: patientsInsuranceSchema,
+  type: "FORMDATA_WITH_MULTIPLE_DOCS",
+  multipleDocsAttr: [
+    { key: "cardFrontImage", path: "cardFrontImage" },
+    { key: "cardBackImage", path: "cardBackImage" },
+  ],
+});
 
 export const patientsInsuranceSchemaUpdate = patientsInsuranceSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-    "any.required": "Id is required",
-  }),
+  id: idRequired("Patient Insurance Id"),
 });
 
-export const validatePatientsInsuranceUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  req.body = toPatientInsuranceUpdateEntity(
-    req.body,
-    req.files as InsuranceCardImages,
-  );
-  const { error } = patientsInsuranceSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validatePatientsInsuranceUpdate = validationHandler({
+  schema: patientsInsuranceSchemaUpdate,
+  type: "FORMDATA_WITH_MULTIPLE_DOCS",
+  multipleDocsAttr: [
+    { key: "cardFrontImage", path: "cardFrontImage" },
+    { key: "cardBackImage", path: "cardBackImage" },
+  ],
+});

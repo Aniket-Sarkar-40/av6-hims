@@ -1,29 +1,11 @@
 import { CreateConsultationInput } from "@/types/appointment/consultation.js";
+import { idRequired } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import Joi from "joi";
 
 export const CreateConsultationSchema = Joi.object<CreateConsultationInput>({
-  appointmentId: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Appointment ID"),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Appointment ID",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Appointment ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Appointment ID",
-      ),
-    }),
+  appointmentId: idRequired("Appointment Id"),
 
   //need to fix error message for consultationNotes
   consultationNotes: Joi.object()
@@ -55,23 +37,23 @@ export const CreateConsultationSchema = Joi.object<CreateConsultationInput>({
     .messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Consultation Notes",
+        "Consultation Notes"
       ),
       "object.base": generateValidationErrorMessage(
         "JSON_OBJECT",
-        "Consultation Notes",
+        "Consultation Notes"
       ),
       "any.invalid": generateValidationErrorMessage(
         "INVALID",
-        "Consultation Notes keys/values",
+        "Consultation Notes keys/values"
       ),
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Consultation Notes values",
+        "Consultation Notes values"
       ),
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Consultation Notes keys",
+        "Consultation Notes keys"
       ),
     }),
 });

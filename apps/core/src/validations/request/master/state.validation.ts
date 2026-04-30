@@ -1,64 +1,19 @@
-import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { idRequired, strRequired } from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const stateSchema = Joi.object({
-  name: Joi.string().required().min(2).messages({
-    "string.base": "Name must be a string",
-    "any.required": "Name is required",
-  }),
+  name: strRequired("State Name", 2),
 
-  countryId: Joi.number().required().messages({
-    "number.base": "Country Id must be a number",
-    "any.required": "Country Id is required",
-  }),
+  countryId: idRequired("Country ID"),
 });
 export const UpdateStateSchema = stateSchema.keys({
-  id: Joi.number().integer().positive().required().strict().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "number.positive": "ID must be a positive integer",
-    "any.required": "ID is required",
-  }),
+  id: idRequired("State ID"),
 });
-export const validateState = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = stateSchema.validate(req.body, { abortEarly: false });
+export const validateState = validationHandler({
+  schema: stateSchema,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
-
-export const validateStateUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = UpdateStateSchema.validate(req.body, { abortEarly: false });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
+export const validateStateUpdate = validationHandler({
+  schema: UpdateStateSchema,
+});

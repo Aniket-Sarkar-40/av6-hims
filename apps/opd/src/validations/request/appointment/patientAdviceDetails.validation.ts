@@ -1,117 +1,33 @@
 import { CreatePatientAdviceDetailsInput } from "@/types/appointment/patientAdviceDetails.js";
+import {
+  boolOptional,
+  idRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import Joi from "joi";
 
 export const createPatientAdviceDetailsSchema =
   Joi.object<CreatePatientAdviceDetailsInput>({
-    appointmentId: Joi.number()
-      .integer()
-      .positive()
-      .required()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Appointment ID",
-        ),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Appointment ID",
-        ),
-        "number.positive": generateValidationErrorMessage(
-          "POSITIVE",
-          "Appointment ID",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Appointment ID",
-        ),
-      }),
+    appointmentId: idRequired("Appointment Id"),
 
-    advice: Joi.string()
-      .optional()
-      .allow(null, "")
-      .messages({
-        "string.base": generateValidationErrorMessage("STRING", "Advice"),
-      }),
+    advice: strOptional("Advice"),
 
-    initialComplaint: Joi.string()
-      .required()
-      .messages({
-        "string.base": generateValidationErrorMessage(
-          "STRING",
-          "Initial Complaint",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Initial Complaint",
-        ),
-      }),
+    initialComplaint: strRequired("Initial Complaint"),
 
-    referToEmergency: Joi.boolean()
-      .optional()
-      .default(false)
-      .messages({
-        "boolean.base": generateValidationErrorMessage(
-          "BOOLEAN",
-          "Refer to Emergency",
-        ),
-      }),
-    referToAdmission: Joi.boolean()
-      .optional()
-      .default(false)
-      .messages({
-        "boolean.base": generateValidationErrorMessage(
-          "BOOLEAN",
-          "Refer to Admission",
-        ),
-      }),
-    visitComplete: Joi.boolean()
-      .optional()
-      .default(false)
-      .messages({
-        "boolean.base": generateValidationErrorMessage(
-          "BOOLEAN",
-          "Visit Complete",
-        ),
-      }),
-    referToMentalHealth: Joi.boolean()
-      .optional()
-      .default(false)
-      .messages({
-        "boolean.base": generateValidationErrorMessage(
-          "BOOLEAN",
-          "Refer to Mental Health",
-        ),
-      }),
-    referToAntenatalCare: Joi.boolean()
-      .optional()
-      .default(false)
-      .messages({
-        "boolean.base": generateValidationErrorMessage(
-          "BOOLEAN",
-          "Refer to Antenatal Care",
-        ),
-      }),
-    surgeryRequest: Joi.boolean()
-      .optional()
-      .default(false)
-      .messages({
-        "boolean.base": generateValidationErrorMessage(
-          "BOOLEAN",
-          "Surgery Request",
-        ),
-      }),
-    referToOutsideHospital: Joi.boolean()
-      .optional()
-      .default(false)
-      .messages({
-        "boolean.base": generateValidationErrorMessage(
-          "BOOLEAN",
-          "Refer to Outside Hospital",
-        ),
-      }),
+    referToEmergency: boolOptional("Refer to Emergency").default(false),
+    referToAdmission: boolOptional("Refer to Admission").default(false),
+    visitComplete: boolOptional("Visit Complete").default(false),
+
+    referToMentalHealth: boolOptional("Refer to Mental Health").default(false),
+    referToAntenatalCare: boolOptional("Refer to Antenatal Care").default(
+      false
+    ),
+    surgeryRequest: boolOptional("Surgery Request").default(false),
+    referToOutsideHospital: boolOptional("Refer to Outside Hospital").default(
+      false
+    ),
   });
 
 export const validatePatientAdviceDetailsCreate = validationHandler({

@@ -7,98 +7,53 @@ import {
   PO_STATUS,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/enums.js";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { NextFunction, Request, Response } from "express";
-import Joi, { ValidationErrorItem } from "joi";
+import {
+  arrayRequired,
+  dateOptional,
+  dateRequired,
+  enumOptional,
+  enumRequired,
+  idOptional,
+  idRequired,
+  intRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
+import Joi from "joi";
 
 export const grnDetailSchema = Joi.object<GrnDetailInput>({
-  id: Joi.number().integer().optional().strict().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-  }),
+  id: idOptional("Id"),
 
-  itemId: Joi.number().integer().required().strict().messages({
-    "number.base": "Item Id must be a number",
-    "number.integer": "Item Id must be an integer",
-    "any.required": "Item Id is required",
-  }),
+  itemId: idRequired("Item Id"),
 
-  poDetailsId: Joi.number().integer().required().strict().messages({
-    "number.base": "PO details Id must be a number",
-    "number.integer": "PO details Id must be an integer",
-    "any.required": "PO details Id is required",
-  }),
+  poDetailsId: idRequired("PO Details Id"),
 
-  itemMedCategory: Joi.string().required().messages({
-    "string.base": "Item Medicine Category must be a string",
-    "any.required": "Item Medicine Category is required",
-  }),
+  itemMedCategory: strRequired("Medicine Category"),
 
-  medType: Joi.string().required().messages({
-    "string.base": "Medicine Type must be a string",
-    "any.required": "Medicine Type is required",
-  }),
+  medType: strRequired("Medicine Type"),
 
-  medComp: Joi.string().required().messages({
-    "string.base": "Medicine Composition must be a string",
-    "any.required": "Medicine Composition is required",
-  }),
+  medComp: strRequired("Medicine Composition"),
 
-  medUnit: Joi.string().required().messages({
-    "string.base": "Medicine Unit must be a string",
-    "any.required": "Medicine Unit is required",
-  }),
+  medUnit: strRequired("Medicine Unit"),
 
-  manufacturer: Joi.string().required().messages({
-    "string.base": "Manufacturer must be a string",
-    "any.required": "Manufacturer is required",
-  }),
+  manufacturer: strRequired("Manufacturer"),
 
-  packSize: Joi.string().required().messages({
-    "string.base": "Pack Size must be a string",
-    "any.required": "Pack Size is required",
-  }),
+  packSize: strRequired("Pack Size"),
 
-  drugType: Joi.string().required().messages({
-    "string.base": "Drug Type must be a string",
-    "any.required": "Drug Type is required",
-  }),
+  drugType: strRequired("Drug Type"),
 
-  medTypeId: Joi.number().integer().required().strict().messages({
-    "number.base": "Medicine Type Id must be a number",
-    "number.integer": "Medicine Type Id must be an integer",
-    "any.required": "Medicine Type Id is required",
-  }),
+  medTypeId: idRequired("Medicine Type Id"),
 
-  medCompId: Joi.number().integer().required().strict().messages({
-    "number.base": "Medicine Composition Id must be a number",
-    "number.integer": "Medicine Composition Id must be an integer",
-    "any.required": "Medicine Composition Id is required",
-  }),
+  medCompId: idRequired("Medicine Composition Id"),
 
-  medUnitId: Joi.number().integer().required().strict().messages({
-    "number.base": "Medicine Unit Id must be a number",
-    "number.integer": "Medicine Unit Id must be an integer",
-    "any.required": "Medicine Unit Id is required",
-  }),
+  medUnitId: idRequired("Medicine Unit Id"),
 
-  manufacturerId: Joi.number().integer().required().strict().messages({
-    "number.base": "Manufacturer Id must be a number",
-    "number.integer": "Manufacturer Id must be an integer",
-    "any.required": "Manufacturer Id is required",
-  }),
+  manufacturerId: idRequired("Manufacturer Id"),
 
-  packSizeId: Joi.number().integer().required().strict().messages({
-    "number.base": "Pack Size Id must be a number",
-    "number.integer": "Pack Size Id must be an integer",
-    "any.required": "Pack Size Id is required",
-  }),
+  packSizeId: idRequired("Pack Size Id"),
 
-  drugTypeId: Joi.number().integer().required().strict().messages({
-    "number.base": "Drug Type Id must be a number",
-    "number.integer": "Drug Type Id must be an integer",
-    "any.required": "Drug Type Id is required",
-  }),
+  drugTypeId: idRequired("Drug Type Id"),
 
   purchasedPrice: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -109,10 +64,7 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     "any.required": "Purchased Price is required",
   }),
 
-  focQuantity: Joi.number().required().strict().messages({
-    "number.base": "FOC Quantity must be a number",
-    "any.required": "FOC Quantity is required",
-  }),
+  focQuantity: intRequired("FOC Quantity"),
 
   netTax: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -123,20 +75,9 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     "any.required": "Net Tax is required",
   }),
 
-  taxMethod: Joi.string()
-    .valid(...Object.values(TAX_METHOD))
-    .required()
-    .strict()
-    .messages({
-      "string.base": "Tax method must be a string",
-      "any.only": `Tax method must be one of ${Object.values(TAX_METHOD).join(", ")}`,
-      "any.required": "Tax method is required",
-    }),
+  taxMethod: enumRequired("Tax Method", TAX_METHOD),
 
-  batchNo: Joi.string().required().messages({
-    "string.base": "Batch number must be a string",
-    "any.required": "Batch number is required",
-  }),
+  batchNo: strRequired("Batch No"),
 
   totalAmount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -156,20 +97,9 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     "any.required": "Net amount is required",
   }),
 
-  discountMethod: Joi.string().required().messages({
-    "string.base": "Discount Method must be a string",
-    "any.required": "Discount Method is required",
-  }),
+  discountMethod: strRequired("Discount Method"),
 
-  itemCategoryId: Joi.number()
-    .integer()
-    .optional()
-    .allow(null)
-    .strict()
-    .messages({
-      "number.base": "Item Category Id must be a number",
-      "number.integer": "Item Category Id must be an integer",
-    }),
+  itemCategoryId: idOptional("Item Category Id"),
 
   mrp: joiDecimalFromSettings({ key: "grnPrecision", required: false })
     .optional()
@@ -187,14 +117,9 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     "number.precision": "Tax must have {{#limit}} decimal places",
   }),
 
-  expiryDate: Joi.date().optional().allow(null).messages({
-    "date.base": "Expiry date must be a valid date",
-  }),
+  expiryDate: dateOptional("Expiry Date"),
 
-  quantity: Joi.number().required().strict().messages({
-    "number.base": "Quantity must be a number",
-    "any.required": "Quantity is required",
-  }),
+  quantity: intRequired("Quantity"),
 
   discount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -215,38 +140,17 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
 });
 
 export const grnSchema = Joi.object<CreateGrnInput>({
-  id: Joi.number().integer().optional().strict().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-  }),
+  id: idOptional("Id"),
 
-  poNumber: Joi.string().required().messages({
-    "string.base": "PO number must be a string",
-    "any.required": "PO number is required",
-  }),
+  poNumber: strRequired("PO Number"),
 
-  poId: Joi.number().integer().required().strict().messages({
-    "number.base": "PO Id must be a number",
-    "number.integer": "PO Id must be an integer",
-    "any.required": "PO Id is required",
-  }),
+  poId: idRequired("PO Id"),
 
-  date: Joi.date().required().messages({
-    "date.base": "Date must be a valid date",
-    "any.required": "Date is required",
-  }),
+  date: dateRequired("Date"),
 
-  distributorId: Joi.number().integer().required().strict().messages({
-    "number.base": "Distributor Id must be a number",
-    "number.integer": "Distributor Id must be an integer",
-    "any.required": "Distributor Id is required",
-  }),
+  distributorId: idRequired("Distributor Id"),
 
-  warehouseId: Joi.number().integer().required().strict().messages({
-    "number.base": "Warehouse Id must be a number",
-    "number.integer": "Warehouse Id must be an integer",
-    "any.required": "Warehouse Id is required",
-  }),
+  warehouseId: idRequired("Warehouse Id"),
 
   totalAmount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -262,14 +166,7 @@ export const grnSchema = Joi.object<CreateGrnInput>({
     "number.precision": "Discount must have {{#limit}} decimal places",
   }),
 
-  discountMethod: Joi.string()
-    .valid(...Object.values(DiscMethod))
-    .required()
-    .messages({
-      "string.base": "Discount method must be a string",
-      "any.only": `Discount method must be one of ${Object.values(DiscMethod).join(", ")}`,
-      "any.required": "Discount method is required",
-    }),
+  discountMethod: enumRequired("Discount Method", DiscMethod),
 
   netDiscount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -289,10 +186,7 @@ export const grnSchema = Joi.object<CreateGrnInput>({
     "any.required": "Net total is required",
   }),
 
-  dueDate: Joi.date().required().messages({
-    "date.base": "Due date must be a valid date",
-    "any.required": "Due date is required",
-  }),
+  dueDate: dateRequired("Due Date"),
 
   netTax: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -303,11 +197,7 @@ export const grnSchema = Joi.object<CreateGrnInput>({
     "any.required": "Net tax is required",
   }),
 
-  gatePassId: Joi.number().integer().required().strict().messages({
-    "number.base": "Gate pass Id must be a number",
-    "number.integer": "Gate pass Id must be an integer",
-    "any.required": "Gate pass Id is required",
-  }),
+  gatePassId: idRequired("Gate Pass Id"),
 
   paidAmount: joiDecimalFromSettings({ key: "grnPrecision", required: false })
     .optional()
@@ -316,33 +206,15 @@ export const grnSchema = Joi.object<CreateGrnInput>({
       "number.precision": "Paid amount must have {{#limit}} decimal places",
     }),
 
-  notes: Joi.string().optional().allow(null, "").messages({
-    "string.base": "Notes must be a string or null",
-  }),
+  notes: strOptional("Notes"),
 
-  paymentStatus: Joi.string()
-    .valid(...Object.values(PAYMENT_STATUS))
-    .optional()
-    .messages({
-      "string.base": "Payment status must be a string",
-      "any.only": `Payment status must be one of ${Object.values(PAYMENT_STATUS).join(", ")}`,
-    }),
+  paymentStatus: enumOptional("Payment Status", PAYMENT_STATUS),
 
-  status: Joi.string()
-    .valid(...Object.values(GRN_STATUS))
-    .optional()
-    .messages({
-      "string.base": "Status must be a string",
-      "any.only": `Status must be one of ${Object.values(GRN_STATUS).join(", ")}`,
-    }),
+  status: enumOptional("Status", GRN_STATUS),
 
-  billNo: Joi.string().optional().allow(null).messages({
-    "string.base": "Bill number must be a string or null",
-  }),
+  billNo: strOptional("Bill No"),
 
-  billDate: Joi.date().optional().allow(null).messages({
-    "date.base": "Bill date must be a valid date or null",
-  }),
+  billDate: dateOptional("Bill Date"),
 
   tax: joiDecimalFromSettings({ key: "grnPrecision", required: false })
     .optional()
@@ -375,146 +247,35 @@ export const grnSchema = Joi.object<CreateGrnInput>({
       "number.precision": "Margin must have {{#limit}} decimal places",
     }),
 
-  goodReceiveDetails: Joi.array()
-    .items(grnDetailSchema)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": "Good Receive Details must be an array",
-      "array.min": "At least one Good Receive Details is required",
-      "any.required": "Good Receive Details is required",
-    }),
+  goodReceiveDetails: arrayRequired("Good Receive Details", grnDetailSchema, 1),
 });
 
 export const grnExcelFilterSchema = Joi.object({
-  id: Joi.number().integer().positive().optional().messages({
-    "number.base": `Id must be a number`,
-    "number.integer": `Id must be an integer`,
-    "number.positive": `Id must be a positive number`,
-  }),
-  poNumber: Joi.string().optional().messages({
-    "string.base": `Po number must be a string`,
-  }),
-  startDate: Joi.string().isoDate().optional().messages({
-    "string.base": `Start date must be a string`,
-    "string.isoDate": `Start date must be in ISO 8601 date format (YYYY-MM-DD)`,
-  }),
+  id: idOptional("Id"),
+  poNumber: strOptional("PO Number"),
+  startDate: dateOptional("Start Date"),
 
-  endDate: Joi.string().isoDate().optional().messages({
-    "string.base": `End date must be a string`,
-    "string.isoDate": `End date must be in ISO 8601 date format (YYYY-MM-DD)`,
-  }),
-  warehouseId: Joi.number().integer().optional().messages({
-    "number.base": `Warehouse id must be a number`,
-    "number.integer": `Warehouse id must be an integer`,
-  }),
-  distributorId: Joi.number().integer().optional().messages({
-    "number.base": `Distributor id must be a number`,
-    "number.integer": `Distributor id must be an integer`,
-  }),
-  status: Joi.string()
-    .valid(...Object.values(GRN_STATUS))
-    .optional()
-    .messages({
-      "string.base": `Status must be a string`,
-      "any.only": `Status must be one of ${Object.values(GRN_STATUS).join(", ")}`,
-    }),
-  paymentStatus: Joi.string()
-    .valid(...Object.values(PAYMENT_STATUS))
-    .optional()
-    .messages({
-      "string.base": `Status must be a string`,
-      "any.only": `Status must be one of ${Object.values(PAYMENT_STATUS).join(", ")}`,
-    }),
-  poStatus: Joi.string()
-    .valid(...Object.values(PO_STATUS))
-    .optional()
-    .messages({
-      "string.base": `Status must be a string`,
-      "any.only": `Status must be one of ${Object.values(PO_STATUS).join(", ")}`,
-    }),
-  gatePassId: Joi.number().integer().optional().messages({
-    "number.base": `Gate pass id must be a number`,
-    "number.integer": `Gate pass id must be an integer`,
-  }),
+  endDate: dateOptional("End Date"),
+  warehouseId: idOptional("Warehouse Id"),
+  distributorId: idOptional("Distributor Id"),
+  status: enumOptional("Status", GRN_STATUS),
+  paymentStatus: enumOptional("Payment Status", PAYMENT_STATUS),
+  poStatus: enumOptional("PO Status", PO_STATUS),
+  gatePassId: idOptional("Gate Pass Id"),
 });
 
-export const validateGrn = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = grnSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateGrn = validationHandler({
+  schema: grnSchema,
+});
 
 export const grnSchemaUpdate = grnSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-    "any.required": "Id is required",
-  }),
+  id: idRequired("Id"),
 });
 
-export const validateGrnUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = grnSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
+export const validateGrnUpdate = validationHandler({
+  schema: grnSchemaUpdate,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
-
-export const validateExcelFilterGrn = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = grnExcelFilterSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateExcelFilterGrn = validationHandler({
+  schema: grnExcelFilterSchema,
+});

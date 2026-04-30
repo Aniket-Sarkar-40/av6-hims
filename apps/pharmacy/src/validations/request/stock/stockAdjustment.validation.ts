@@ -1,11 +1,21 @@
-import Joi, { ValidationErrorItem } from "joi";
+import Joi from "joi";
 import {
   Action,
   STOCK_ADJUSTMENT_STATUS,
 } from "@repo/db/generated/prisma/enums.js";
-import { NextFunction, Request, Response } from "express";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { updateBatchExpiryInput } from "@/types/stock/stock.js";
+import {
+  boolOptional,
+  dateOptional,
+  dateRequired,
+  enumRequired,
+  idOptional,
+  idRequired,
+  intRequired,
+  numberArrayRequired,
+  strOptional,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 // helper (keep outside schema)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,96 +30,34 @@ const normalizeExpiry = (v: any) => {
 
 // -------------------- StockAdjustmentDetails Schema --------------------
 export const stockAdjustmentDetailsSchema = Joi.object({
-  itemId: Joi.number().required().strict().messages({
-    "number.base": "Item Id must be a number",
-    "any.required": "Item Id is required",
-  }),
+  itemId: idRequired("Item Id"),
 
-  batchNo: Joi.string().trim().allow(null, "").optional().messages({
-    "string.base": "Batch No must be a string",
-  }),
-  expiryDate: Joi.date().allow(null).optional().messages({
-    "date.base": "Expiry Date must be a valid date",
-    "date.format": "Expiry Date must be in ISO format (YYYY-MM-DD)",
-  }),
+  batchNo: strOptional("Batch No"),
+  expiryDate: dateOptional("Expiry Date"),
 
-  isFoc: Joi.boolean().messages({
-    "boolean.base": "Is FOC must be a boolean value",
-  }),
+  isFoc: boolOptional("isFoc"),
 
-  quantity: Joi.number().integer().positive().required().strict().messages({
-    "number.base": "Quantity must be a number",
-    "number.integer": "Quantity must be an integer",
-    "number.positive": "Quantity must be a positive number",
-    "any.required": "Quantity is required",
-  }),
+  quantity: intRequired("Quantity", 0),
 
-  adjustType: Joi.string()
-    .valid(...Object.values(Action))
-    .required()
-    .messages({
-      "string.base": "Adjust Type must be a string",
-      "any.only": `Adjust Type must be one of: ${Object.values(Action).join(", ")}`,
-      "any.required": "Adjust Type is required",
-    }),
-  availableQty: Joi.number().integer().min(0).required().strict().messages({
-    "number.base": "Available Quantity must be a number",
-    "number.integer": "Available Quantity must be an integer",
-    "number.min": "Available Quantity must be greater than or equal to 0",
-    "any.required": "Available Quantity is required",
-  }),
-  batchId: Joi.number().integer().positive().required().strict().messages({
-    "number.base": "Batch Id must be a number",
-    "number.integer": "Batch Id must be an integer",
-    "number.positive": "Batch Id must be a positive number",
-    "any.required": "Batch Id is required",
-  }),
+  adjustType: enumRequired("Adjust Type", Action),
+  availableQty: intRequired("Available Qty", 0),
+  batchId: idRequired("Batch Id"),
 });
 
 // -------------------- StockAdjustment Schema --------------------
 export const stockAdjustmentSchema = Joi.object({
-  ccId: Joi.number().required().strict().messages({
-    "number.base": "Collection Center Id must be a number",
-    "any.required": "Collection Center Id is required",
-  }),
+  ccId: idRequired("CC Id"),
 
-  branchId: Joi.number().integer().positive().allow(null).optional().messages({
-    "number.base": "Branch Id must be a number",
-    "number.integer": "Branch Id must be an integer",
-    "number.positive": "Branch Id must be a positive number",
-  }),
+  branchId: idOptional("Branch Id"),
 
-  warehouseId: Joi.number()
-    .integer()
-    .positive()
-    .allow(null)
-    .optional()
-    .messages({
-      "number.base": "Warehouse Id must be a number",
-      "number.integer": "Warehouse Id must be an integer",
-      "number.positive": "Warehouse Id must be a positive number",
-    }),
+  warehouseId: idOptional("Warehouse Id"),
 
-  date: Joi.date().required().messages({
-    "date.base": "Date must be a valid date",
-    "any.required": "Date is required",
-  }),
+  date: dateRequired("Date"),
 
-  description: Joi.string().allow(null, "").optional().messages({
-    "string.base": "Description must be a string",
-  }),
-  status: Joi.string()
-    .valid(...Object.values(STOCK_ADJUSTMENT_STATUS))
-    .required()
-    .messages({
-      "string.base": "Status must be a string",
-      "any.only": `Status must be one of: ${Object.values(STOCK_ADJUSTMENT_STATUS).join(", ")}`,
-      "any.required": "Status is required",
-    }),
+  description: strOptional("Description"),
+  status: enumRequired("Status", STOCK_ADJUSTMENT_STATUS),
 
-  isAvailQtyCheck: Joi.boolean().default(false).optional().messages({
-    "boolean.base": "Available Qty Check must be a boolean value",
-  }),
+  isAvailQtyCheck: boolOptional("Is Available Qty Check").default(false),
 
   stockAdjustmentDetails: Joi.array()
     .items(stockAdjustmentDetailsSchema)
@@ -164,18 +112,11 @@ export const stockAdjustmentSchema = Joi.object({
 
 export const updateStockAdjustmentDetailsSchema =
   stockAdjustmentDetailsSchema.keys({
-    id: Joi.number().integer().optional().strict().messages({
-      "number.base": "Details id must be a number",
-      "number.integer": "Details id must be an integer",
-    }),
+    id: idOptional("Id"),
   });
 
 export const updateStockAdjustmentSchema = stockAdjustmentSchema.keys({
-  id: Joi.number().integer().required().strict().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-    "any.required": "Id is required",
-  }),
+  id: idRequired("Id"),
 
   stockAdjustmentDetails: Joi.array()
     .items(updateStockAdjustmentDetailsSchema)
@@ -218,102 +159,21 @@ export const updateStockAdjustmentSchema = stockAdjustmentSchema.keys({
 });
 
 export const updateBatchExpirySchema = Joi.object<updateBatchExpiryInput>({
-  ids: Joi.array()
-    .items(Joi.number().integer().positive())
-    .required()
-    .strict()
-    .messages({
-      "array.base": "Ids must be an array",
-      "array.items": "Ids must be an array of numbers",
-      "array.positive": "Ids must be an array of positive numbers",
-      "any.required": "Ids are required",
-    }),
-  newExp: Joi.date().required().messages({
-    "date.base": "New Expiry Date must be a valid date",
-    "any.required": "New Expiry Date is required",
-  }),
+  ids: numberArrayRequired("Ids"),
+  newExp: dateRequired("New Exp"),
 }).messages({
   "object.missing": "Ids and New Expiry Date are required",
 });
 
 // -------------------- Middleware --------------------
-export function validateStockAdjustment(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  const { error } = stockAdjustmentSchema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
+export const validateStockAdjustment = validationHandler({
+  schema: stockAdjustmentSchema,
+});
 
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
+export const validateUpdateStockAdjustment = validationHandler({
+  schema: updateStockAdjustmentSchema,
+});
 
-  next();
-}
-export function validateUpdateStockAdjustment(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  const { error } = updateStockAdjustmentSchema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-}
-export function validateUpdateBatchExpiry(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  const { error, value } = updateBatchExpirySchema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
-
-  req.body = value;
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-}
+export const validateUpdateBatchExpiry = validationHandler({
+  schema: updateBatchExpirySchema,
+});

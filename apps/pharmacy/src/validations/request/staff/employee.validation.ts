@@ -1,127 +1,38 @@
 import { CreateOrUpdateEmployee } from "@/types/staff/employee.js";
-import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 import { getPattern } from "av6-core";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import {
+  dateRequired,
+  emailRequired,
+  idOptional,
+  phoneOptional,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const employeeSchema = Joi.object<CreateOrUpdateEmployee>({
-  name: Joi.string()
-    .trim()
-    .min(2)
-    .max(30)
-    .pattern(getPattern.nameWithNumPattern)
-    .required()
-    .messages({
-      "string.base": "Name must be a string",
-      "string.empty": "Name is required",
-      "string.min": "Name must be at least 2 characters long",
-      "string.max": "Name must be at most 30 characters long",
-      "string.pattern.base": "Name contains invalid characters",
-      "any.required": "Name is required",
-    }),
+  name: strRequired("name", 2, 30).pattern(getPattern.nameWithNumPattern),
 
-  surname: Joi.string()
-    .trim()
-    .min(2)
-    .max(30)
-    .pattern(getPattern.nameWithNumPattern)
-    .required()
-    .messages({
-      "string.base": "Surname must be a string",
-      "string.empty": "Surname is required",
-      "string.min": "Surname must be at least 2 characters long",
-      "string.max": "Surname must be at most 30 characters long",
-      "string.pattern.base": "Surname contains invalid characters",
-      "any.required": "Surname is required",
-    }),
+  surname: strRequired("Surname", 2, 30).pattern(getPattern.nameWithNumPattern),
 
-  employeeId: Joi.string().trim().min(2).max(50).required().messages({
-    "string.base": "Employee Id must be a string",
-    "string.empty": "Employee Id is required",
-    "string.min": "Employee Id must be at least 2 characters long",
-    "string.max": "Employee Id must be at most 50 characters long",
-    "any.required": "Employee Id is required",
-  }),
+  employeeId: strRequired("Employee Id", 2, 50),
 
-  dob: Joi.date().iso().required().messages({
-    "date.base": "Date of Birth must be a valid date",
-    "date.isoDate":
-      "Date of Birth must be in ISO 8601 format (e.g., 2025-05-31)",
-    "any.required": "Date of Birth is required",
-  }),
+  dob: dateRequired("dob"),
 
-  title: Joi.string()
-    .trim()
-    .min(2)
-    .max(50)
-    .optional()
-    .allow(null, "")
-    .messages({
-      "string.base": "Title must be a string",
-      "string.empty": "Title is required",
-      "string.min": "Title must be at least 2 characters long",
-      "string.max": "Title must be at most 50 characters long",
-    }),
+  title: strOptional("Title", 50),
 
-  phone: Joi.string()
-    .pattern(getPattern.phonePattern)
-    .optional()
-    .allow(null)
-    .messages({
-      "string.base": "Phone must be a string",
-      "string.pattern.base": "Please enter a valid phone number",
-    }),
+  phone: phoneOptional("Phone"),
 
-  email: Joi.string()
-    .email()
-    .pattern(getPattern.emailPattern)
-    .required()
-    .messages({
-      "string.base": "Email must be a string",
-      "string.email": "Please provide a valid email address",
-      "string.pattern.base": "Please provide a valid email address",
-      "any.required": "Email is required",
-    }),
+  email: emailRequired("Email"),
 
-  notes: Joi.string()
-    .trim()
-    .min(2)
-    .max(200)
-    .optional()
-    .allow(null, "")
-    .messages({
-      "string.base": "Notes must be a string",
-      "string.empty": "Notes are required",
-      "string.min": "Notes must be at least 2 characters long",
-      "string.max": "Notes must be at most 200 characters long",
-    }),
+  notes: strOptional("Notes", 200),
 
-  departmentId: Joi.number().strict().optional().allow(null).messages({
-    "number.base": "Department Id must be a number",
-  }),
+  departmentId: idOptional("Department Id"),
 
-  designationId: Joi.number().strict().optional().allow(null).messages({
-    "number.base": "Designation Id must be a number",
-  }),
+  designationId: idOptional("Designation Id"),
 });
 
-export const validateEmployee = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = employeeSchema.validate(req.body, { abortEarly: false });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateEmployee = validationHandler({
+  schema: employeeSchema,
+});

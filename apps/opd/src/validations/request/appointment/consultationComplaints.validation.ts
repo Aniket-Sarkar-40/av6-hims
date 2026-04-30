@@ -1,4 +1,5 @@
 import { CreateConsultationComplaintsInput } from "@/types/appointment/consultationComplaint.js";
+import { idRequired, strRequired } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import Joi from "joi";
@@ -6,27 +7,7 @@ import Joi from "joi";
 export const createConsultationComplaintsSchema =
   Joi.object<CreateConsultationComplaintsInput>({
     complaint: Joi.array()
-      .items(
-        Joi.string()
-          .trim()
-          .max(255)
-          .required()
-          .messages({
-            "string.base": generateValidationErrorMessage(
-              "STRING",
-              "Complaint",
-            ),
-            "string.empty": generateValidationErrorMessage(
-              "REQUIRED",
-              "Complaint",
-            ),
-            "string.max": generateValidationErrorMessage(
-              "STRING_MAX",
-              "Complaint",
-              "255",
-            ),
-          }),
-      )
+      .items(strRequired("Complaint"))
       .min(1)
       .unique((a, b) => a.trim().toLowerCase() === b.trim().toLowerCase())
       .required()
@@ -35,38 +16,16 @@ export const createConsultationComplaintsSchema =
         "array.min": generateValidationErrorMessage(
           "ARRAY_MIN_LENGTH",
           "Complaints",
-          "1",
+          "1"
         ),
         "array.unique": generateValidationErrorMessage("UNIQUE", "Complaints"),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Complaints",
+          "Complaints"
         ),
       }),
 
-    appointmentId: Joi.number()
-      .integer()
-      .positive()
-      .required()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Appointment ID",
-        ),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Appointment ID",
-        ),
-        "number.positive": generateValidationErrorMessage(
-          "POSITIVE",
-          "Appointment ID",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Appointment ID",
-        ),
-      }),
+    appointmentId: idRequired("Appointment Id"),
   });
 
 export const validateConsultationComplaintsCreate = validationHandler({

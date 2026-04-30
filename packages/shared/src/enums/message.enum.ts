@@ -121,4 +121,5 @@ export enum ValidationErrorMessage {
   INVALID_FILE = "%1 file is invalid",
   ONLY_NULL = "%1 must be null",
   DUPLICATE = "Duplicate %1 exists.",
+  PATTERN = "%1 must match the pattern",
 }

@@ -1,18 +1,17 @@
 import Joi from "joi";
-import { Request, Response, NextFunction } from "express";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { MedCategoryInput } from "@/types/master/medCategory.js";
 import { joiDecimalFromSettings } from "@/utils/commonCalculation.utils.js";
+import {
+  idRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const MedCategoryInputSchema = Joi.object<MedCategoryInput>({
-  name: Joi.string().required().min(2).trim().messages({
-    "string.base": "Name must be a string",
-    "any.required": "Name is required",
-  }),
+  name: strRequired("Name", 2),
 
-  description: Joi.string().trim().allow(null, "").optional().messages({
-    "string.base": "Description must be a string or null",
-  }),
+  description: strOptional("Description"),
   minMarginB2CPercentage: joiDecimalFromSettings({
     key: "itemPrecision",
     max: 100,
@@ -45,43 +44,17 @@ export const MedCategoryInputSchema = Joi.object<MedCategoryInput>({
   }),
 });
 
-export const validateMedCategoryInput = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = MedCategoryInputSchema.validate(req.body, {
-    abortEarly: false,
-  });
+export const validateMedCategoryInput = validationHandler({
+  schema: MedCategoryInputSchema,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
 export const MedCategoryInputSchemaUpdate = Joi.object<MedCategoryInput>({
-  id: Joi.number().required().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "any.required": "ID is required",
-  }),
+  id: idRequired("Med Category Id"),
 
-  name: Joi.string().required().trim().messages({
-    "string.base": "Name must be a string",
-    "any.required": "Name is required",
-  }),
+  name: strRequired("Name", 2),
 
-  description: Joi.string().trim().allow(null, "").optional().messages({
-    "string.base": "Description must be a string or null",
-  }),
+  description: strOptional("Description"),
+
   minMarginB2CPercentage: joiDecimalFromSettings({
     key: "itemPrecision",
     max: 100,
@@ -114,25 +87,6 @@ export const MedCategoryInputSchemaUpdate = Joi.object<MedCategoryInput>({
   }),
 });
 
-export const validateMedCategoryInputUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = MedCategoryInputSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateMedCategoryInputUpdate = validationHandler({
+  schema: MedCategoryInputSchemaUpdate,
+});
