@@ -1,50 +1,12 @@
 import { CreateFollowUpInput } from "@/types/appointment/followUp.js";
+import { idRequired, intRequired } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import Joi from "joi";
 
 export const CreateFollowUpSchema = Joi.object<CreateFollowUpInput>({
-  appointmentId: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Appointment ID"),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Appointment ID",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Appointment ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Appointment ID",
-      ),
-    }),
+  appointmentId: idRequired("Appointment Id"),
 
-  followUpDays: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Follow Up Days"),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Follow Up Days",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Follow Up Days",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Follow Up Days",
-      ),
-    }),
+  followUpDays: intRequired("Follow Up Days", 0),
 });
 
 export const validateCreateFollowUp = validationHandler({

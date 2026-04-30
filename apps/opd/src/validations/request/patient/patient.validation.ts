@@ -1,11 +1,5 @@
+import { PatientReq } from "@/types/patient/patient.js";
 import {
-  toPatientEntity,
-  toPatientUpdateEntity,
-} from "@/mapper/patient/patient.mapper.js";
-import { PatientImage, PatientReq } from "@/types/patient/patient.js";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import {
-  dateOptional,
   dateRequired,
   emailOptional,
   emailRequired,
@@ -20,7 +14,6 @@ import {
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
 export const patientsSchema = Joi.object<PatientReq>({

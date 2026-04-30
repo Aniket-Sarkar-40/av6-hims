@@ -2,6 +2,17 @@ import Joi from "joi";
 import { Request, Response, NextFunction } from "express";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import {
+  arrayRequired,
+  boolOptional,
+  enumRequired,
+  idOptional,
+  idRequired,
+  intOptional,
+  intRequired,
+  strOptional,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export enum Type {
   OPD = "OPD",
@@ -9,290 +20,74 @@ export enum Type {
 }
 
 export const patientMedicineDetailSchema = Joi.object({
-  medId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Medicine"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Medicine"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Medicine"),
-    }),
+  medId: idRequired("Medicine Id"),
 
-  morn: Joi.number()
-    .integer()
-    .optional()
-    .allow(null, "")
-    .default(0)
-    .messages({
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Morning Dose",
-      ),
-    }),
+  morn: intOptional("Morning Dose").default(0),
 
-  aft: Joi.number()
-    .integer()
-    .optional()
-    .allow(null, "")
-    .default(0)
-    .messages({
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Afternoon Dose",
-      ),
-    }),
+  aft: intOptional("Afternoon Dose").default(0),
 
-  night: Joi.number()
-    .integer()
-    .optional()
-    .allow(null, "")
-    .default(0)
-    .messages({
-      "number.integer": generateValidationErrorMessage("INTEGER", "Night Dose"),
-    }),
+  night: intOptional("Night Dose").default(0),
 
-  sos: Joi.boolean()
-    .default(false)
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "SOS"),
-    }),
+  sos: boolOptional("SOS").default(false),
 
-  duration: Joi.number()
-    .integer()
-    .min(1)
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Duration"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Duration"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Duration"),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Duration",
-        "1",
-      ),
-    }),
+  duration: intRequired("Duration", 1),
 
-  notes: Joi.string()
-    .allow(null, "")
-    .max(255)
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Notes"),
-      "string.max": generateValidationErrorMessage("MAX_VALUE", "Notes", "255"),
-    }),
+  notes: strOptional("Notes"),
 }).custom((v, h) =>
   ["morn", "aft", "night"].some((k) => Number(v[k]) > 0)
     ? v
     : h.error("any.custom", {
         message:
           "Please enter at least one dose (morning, afternoon, or night).",
-      }),
+      })
 );
 
 export const createPatientMedicineSchema = Joi.object({
-  appointmentId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Appointment ID"),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Appointment ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Appointment ID",
-      ),
-    }),
+  appointmentId: idRequired("Appointment Id"),
 
-  patientId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Patient ID"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Patient ID"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Patient ID"),
-    }),
+  patientId: idRequired("Patient Id"),
 
-  projectType: Joi.string()
-    .valid(...Object.values(Type))
-    .required()
-    .messages({
-      "any.only": generateValidationErrorMessage(
-        "VALID_ENUM",
-        "Project Type",
-        Object.values(Type).join(", "),
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Project Type",
-      ),
-    }),
+  projectType: enumRequired("Project Type", Type),
 
-  notes: Joi.string()
-    .allow(null, "")
-    .max(255)
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Notes"),
-      "string.max": generateValidationErrorMessage("MAX_VALUE", "Notes", "255"),
-    }),
+  notes: strOptional("Notes"),
 
-  details: Joi.array()
-    .items(patientMedicineDetailSchema)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": generateValidationErrorMessage("ARRAY", "Details"),
-      "array.min": generateValidationErrorMessage("MIN", "Details", "1"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Details"),
-    }),
+  details: arrayRequired("Details", patientMedicineDetailSchema, 1),
 });
 
 const patientMedicineDetailSchemaUpdate = patientMedicineDetailSchema.keys({
-  id: Joi.number()
-    .integer()
-    .optional()
-    .allow(null)
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Detail ID"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Detail ID"),
-    }),
+  id: idOptional("Patient Medicine Detail Id"),
 });
 
 export const updatePatientMedicineSchema = createPatientMedicineSchema.keys({
-  id: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Master ID"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Master ID"),
-    }),
+  id: idRequired("Patient Medicine Id"),
 
-  details: Joi.array()
-    .items(patientMedicineDetailSchemaUpdate)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": generateValidationErrorMessage("ARRAY", "Details"),
-      "array.min": generateValidationErrorMessage("MIN", "Details", "1"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Details"),
-    }),
+  details: arrayRequired("Details", patientMedicineDetailSchemaUpdate, 1),
 });
 
-export const validateCreatePatientMedicine = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = createPatientMedicineSchema.validate(req.body, {
-    abortEarly: false,
-  });
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: "Invalid patient medicine data",
-        errors: error.details,
-      }),
-    );
-  }
-  next();
-};
+export const validateCreatePatientMedicine = validationHandler({
+  schema: createPatientMedicineSchema,
+});
 
-export const validateUpdatePatientMedicine = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = updatePatientMedicineSchema.validate(req.body, {
-    abortEarly: false,
-  });
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: "Invalid update patient medicine data",
-        errors: error.details,
-      }),
-    );
-  }
-  next();
-};
+export const validateUpdatePatientMedicine = validationHandler({
+  schema: updatePatientMedicineSchema,
+});
 
 export const searchMedicineSchema = Joi.object({
-  ccId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Collection Center ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Collection Center ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Collection Center ID",
-      ),
-    }),
+  ccId: idRequired("Collection Center Id"),
 
-  aptId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Appointment ID"),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Appointment ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Appointment ID",
-      ),
-    }),
+  aptId: idRequired("Appointment Id"),
 
-  searchText: Joi.string()
-    .allow(null, "")
-    .trim()
+  searchText: strOptional("Search Text", 100)
     .min(3)
-    .max(100)
     .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Search Text"),
       "string.min": generateValidationErrorMessage(
-        "MIN_VALUE",
+        "STRING_MIN",
         "Search Text",
-        "3",
-      ),
-      "string.max": generateValidationErrorMessage(
-        "MAX_VALUE",
-        "Search Text",
-        "100",
+        "3"
       ),
     }),
 });
 
-export const validateSearchMedicine = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = searchMedicineSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: "Invalid search parameters",
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateSearchMedicine = validationHandler({
+  schema: searchMedicineSchema,
+});

@@ -1,357 +1,77 @@
 import { CreatePatientConsultationInput } from "@/types/appointment/patientConsultation.js";
+import {
+  enumOptional,
+  idRequired,
+  intOptional,
+  intRequired,
+  numberWithMaxDecimals,
+  numberWithMaxDecimalsRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import Joi from "joi";
 
 export const createPatientConsultationSchema =
   Joi.object<CreatePatientConsultationInput>({
-    appointmentId: Joi.number()
-      .integer()
-      .positive()
-      .required()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Appointment ID",
-        ),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Appointment ID",
-        ),
-        "number.positive": generateValidationErrorMessage(
-          "POSITIVE",
-          "Appointment ID",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Appointment ID",
-        ),
-      }),
+    appointmentId: idRequired("Appointment Id"),
 
-    bloodPressure: Joi.string()
-      .required()
-      .messages({
-        "string.base": generateValidationErrorMessage(
-          "STRING",
-          "Blood Pressure",
-        ),
-        "string.empty": generateValidationErrorMessage(
-          "REQUIRED",
-          "Blood Pressure",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Blood Pressure",
-        ),
-      }),
+    bloodPressure: strRequired("Blood Pressure"),
 
-    notes: Joi.string()
-      .optional()
-      .allow(null, "")
-      .messages({
-        "string.base": generateValidationErrorMessage("STRING", "Notes"),
-        "string.empty": generateValidationErrorMessage("REQUIRED", "Notes"),
-        "any.required": generateValidationErrorMessage("REQUIRED", "Notes"),
-      }),
+    notes: strOptional("Notes"),
 
-    temperature: Joi.number()
-      .precision(2)
-      .min(0)
-      .required()
+    temperature: numberWithMaxDecimals("Temperature", 2).required(),
 
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Temperature"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Temperature",
-          "0",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Temperature",
-        ),
-      }),
+    weight: numberWithMaxDecimals("Weight", 2),
 
-    weight: Joi.number()
-      .precision(2)
-      .min(0)
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Weight"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Weight",
-          "0",
-        ),
-      }),
+    spO2: intOptional("SpO2", 0),
 
-    spO2: Joi.number()
-      .min(0)
+    pulse: intOptional("Pulse", 0),
 
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "SpO2"),
-        "number.min": generateValidationErrorMessage("MIN_VALUE", "SpO2", "0"),
-      }),
+    height: numberWithMaxDecimals("Height", 2).required(),
 
-    pulse: Joi.number()
-      .integer()
-      .min(0)
+    bmi: numberWithMaxDecimals("BMI", 2),
 
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Pulse"),
-        "number.integer": generateValidationErrorMessage("INTEGER", "Pulse"),
-        "number.min": generateValidationErrorMessage("MIN_VALUE", "Pulse", "0"),
-      }),
+    systolicBp: intOptional("Systolic BP", 0),
 
-    height: Joi.number()
-      .precision(2)
-      .min(0)
-      .required()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Height"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Height",
-          "0",
-        ),
-        "any.required": generateValidationErrorMessage("REQUIRED", "Height"),
-      }),
+    diastolicBp: intOptional("Diastolic BP", 0),
 
-    bmi: Joi.number()
-      .precision(2)
-      .min(0)
+    respiratoryRate: intOptional("Respiratory Rate", 0),
 
-      .required()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "BMI"),
-        "number.min": generateValidationErrorMessage("MIN_VALUE", "BMI", "0"),
-        "any.required": generateValidationErrorMessage("REQUIRED", "BMI"),
-      }),
+    heartRateBpm: intOptional("Heart Rate BPM", 0),
 
-    systolicBp: Joi.number()
-      .integer()
-      .min(0)
+    urineOutput: numberWithMaxDecimals("Urine Output", 2).optional(),
 
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Systolic BP"),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Systolic BP",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Systolic BP",
-          "0",
-        ),
-      }),
+    bloodSugarF: numberWithMaxDecimals("Blood Sugar F", 2).optional(),
 
-    diastolicBp: Joi.number()
-      .integer()
-      .min(0)
+    bloodSugarR: numberWithMaxDecimals("Blood Sugar R", 2).optional(),
 
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Diastolic BP"),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Diastolic BP",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Diastolic BP",
-          "0",
-        ),
-      }),
+    oxygenSupplementation: intOptional("Oxygen Supplementation", 0),
 
-    respiratoryRate: Joi.number()
-      .integer()
-      .min(0)
+    intake: intOptional("Intake", 0),
 
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Respiratory Rate",
-        ),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Respiratory Rate",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Respiratory Rate",
-          "0",
-        ),
-      }),
+    output: intOptional("Output", 0),
 
-    heartRateBpm: Joi.number()
-      .integer()
-      .min(0)
+    bloodGroup: enumOptional("Blood Group", {
+      A_POSITIVE: "A_POSITIVE",
+      A_NEGATIVE: "A_NEGATIVE",
+      B_POSITIVE: "B_POSITIVE",
+      B_NEGATIVE: "B_NEGATIVE",
+      AB_POSITIVE: "AB_POSITIVE",
+      AB_NEGATIVE: "AB_NEGATIVE",
+      O_POSITIVE: "O_POSITIVE",
+      O_NEGATIVE: "O_NEGATIVE",
+    }),
 
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Heart Rate BPM",
-        ),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Heart Rate BPM",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Heart Rate BPM",
-          "0",
-        ),
-      }),
+    comments: strOptional("Comments"),
 
-    urineOutput: Joi.number()
-      .precision(2)
-      .min(0)
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Urine Output"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Urine Output",
-          "0",
-        ),
-      }),
-
-    bloodSugarF: Joi.number()
-      .precision(2)
-      .min(0)
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Blood Sugar F",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Blood Sugar F",
-          "0",
-        ),
-      }),
-
-    bloodSugarR: Joi.number()
-      .precision(2)
-      .min(0)
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Blood Sugar R",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Blood Sugar R",
-          "0",
-        ),
-      }),
-
-    oxygenSupplementation: Joi.number()
-      .min(0)
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Oxygen Supplementation",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Oxygen Supplementation",
-          "0",
-        ),
-      }),
-
-    intake: Joi.number()
-      .min(0)
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Intake"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Intake",
-          "0",
-        ),
-      }),
-
-    output: Joi.number()
-      .min(0)
-      .optional()
-      .allow(null)
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Output"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Output",
-          "0",
-        ),
-      }),
-
-    bloodGroup: Joi.string()
-      .valid(
-        "A_POSITIVE",
-        "A_NEGATIVE",
-        "B_POSITIVE",
-        "B_NEGATIVE",
-        "AB_POSITIVE",
-        "AB_NEGATIVE",
-        "O_POSITIVE",
-        "O_NEGATIVE",
-      )
-      .optional()
-      .allow(null)
-      .messages({
-        "string.base": generateValidationErrorMessage("STRING", "Blood Group"),
-        "any.only": generateValidationErrorMessage("INVALID", "Blood Group"),
-      }),
-
-    comments: Joi.string()
-      .optional()
-      .allow(null)
-      .messages({
-        "string.base": generateValidationErrorMessage("STRING", "Comments"),
-      }),
-
-    blood: Joi.string()
-      .optional()
-      .allow(null)
-      .messages({
-        "string.base": generateValidationErrorMessage("STRING", "Blood"),
-      }),
+    blood: strOptional("Blood"),
   });
 
 export const patientConsultationUpdateSchema =
   createPatientConsultationSchema.keys({
-    id: Joi.number()
-      .integer()
-      .required()
-      .positive()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "ID"),
-        "number.integer": generateValidationErrorMessage("INTEGER", "ID"),
-        "number.positive": generateValidationErrorMessage("POSITIVE", "ID"),
-        "any.required": generateValidationErrorMessage("REQUIRED", "ID"),
-      }),
+    id: idRequired("Patient Consultation Id"),
   });
 
 export const validatePatientConsultationCreate = validationHandler({
