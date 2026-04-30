@@ -1,24 +1,8 @@
-export interface CreateIncomeInput {
-  id?: number;
-  incHeadId: number;
-  name: string;
-  invoiceNo: string;
-  date?: Date | null;
-  amount?: number | null;
-  note?: string | null;
-  documents?: string | null;
-}
+import { Prisma } from "@repo/db/generated/prisma/client";
 
-export interface CreateIncomeReq {
-  id?: string;
-  incHeadId: string;
-  name: string;
-  invoiceNo: string;
-  date?: string | null;
-  amount?: string | null;
-  note?: string | null;
-  documents?: string | null;
-}
+export type CreateIncomeReq = Prisma.IncomeUncheckedCreateInput;
+
+export type CreateIncomeInput = CreateIncomeReq;
 
 export interface IncomeDTO {
   id: number;
@@ -42,5 +26,5 @@ export interface IncomeHeadDTO {
 }
 
 export interface UpdateIncomeReq extends CreateIncomeReq {
-  id: string;
+  id: number;
 }

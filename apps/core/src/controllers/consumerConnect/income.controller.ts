@@ -32,41 +32,8 @@ export const updateIncome = TryCatch(async (req: Request, res: Response) => {
   const body = req.body as CreateIncomeInput;
   const id = body.id;
 
-  const income = await incomeService.getIncomeById(Number(id));
-  let oldImagePath: string | null = null;
-
-  if (req.file) {
-    if (income?.documents) {
-      let documentPath = income.documents;
-      if (documentPath.startsWith("http")) {
-        try {
-          documentPath = new URL(documentPath).pathname;
-        } catch (e) {
-          logger.error("Error converting document URL to pathname", e);
-        }
-      }
-      oldImagePath = path.join(process.cwd(), documentPath);
-    }
-
-    const absolutePath = req.file.path;
-    const relativePath = absolutePath.replace(process.cwd(), "");
-    body.documents = relativePath.startsWith(path.sep)
-      ? relativePath
-      : path.sep + relativePath;
-  }
-
   // Update the income record
   const updatedIncome = await incomeService.updateIncome(Number(id), body);
-
-  // Delete the old document if it exists
-  if (oldImagePath) {
-    try {
-      deleteFileIfExists(oldImagePath);
-      logger.info(`Deleted old document at ${oldImagePath}`);
-    } catch (err) {
-      logger.error(`Error deleting old document at ${oldImagePath}:`, err);
-    }
-  }
 
   logger.info("exiting::updateIncome::controller");
   // Return success response

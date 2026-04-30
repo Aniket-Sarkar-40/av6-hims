@@ -1,17 +1,10 @@
-export interface CountryDTO {
-  id: number;
-  alpha2Code: string;
-  alpha3Code: string;
-  name: string;
-  nationality: string;
-}
+import { Country, Prisma } from "@repo/db/generated/prisma/client";
+import { BaseModelAttr } from "@repo/shared/types/global.js";
 
-export interface CreateCountryInput {
-  alpha2Code: string | null;
-  alpha3Code: string | null;
-  enShortName: string;
-  nationality: string;
-}
+export type CountryDTO = Omit<Country, BaseModelAttr>;
+
+export type CreateCountryInput = Prisma.CountryUncheckedCreateInput;
+
 export interface ExcelCountryRow {
   alpha2Code: string;
   alpha3Code: string;

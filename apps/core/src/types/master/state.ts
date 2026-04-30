@@ -1,10 +1,10 @@
-import { State } from "@repo/db/generated/prisma/client";
+import { Prisma, State } from "@repo/db/generated/prisma/client";
 import { CountryDTO } from "./country.js";
+import { BaseModelAttr } from "@repo/shared/types/global.js";
 
-export interface StateDTO {
-  state: State;
+export type StateDTO = Omit<State, BaseModelAttr | "countryId"> & {
   country: CountryDTO | null;
-}
+};
 
 export interface StateDTOForState {
   name: string;
@@ -16,10 +16,7 @@ export interface StateDTOForState {
   country: CountryDTO | null;
 }
 
-export interface CreateStateInput {
-  name: string;
-  countryId: number;
-}
+export type CreateStateInput = Prisma.StateUncheckedCreateInput;
 
 export interface ExcelStateRow {
   Name: string;

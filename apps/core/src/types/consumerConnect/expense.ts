@@ -1,20 +1,10 @@
 import { IncomeMaster } from "@repo/db/generated/prisma/enums.js";
 import { ExpenseHeadDTO } from "../master/expenseHead.js";
+import { Prisma } from "@repo/db/generated/prisma/client";
 // import { ExpenseHeadDTO } from "./expenseHead.js";
 
-export interface ExpenseInput {
-  id?: number;
-  expenseHeadId?: number | null;
-  name?: string | null;
-  invoiceNo: string;
-  date?: Date | null;
-  amount?: number | null;
-  //   expMethod?: ExpMethod;
-  documents?: string | null;
-  note?: string | null;
-  ccId?: number;
-  isMaster?: IncomeMaster | null;
-}
+export type ExpenseInput = Prisma.ExpenseUncheckedCreateInput;
+
 export interface ExpenseInputRequest {
   id?: string | null;
   expenseHeadId?: string | null;

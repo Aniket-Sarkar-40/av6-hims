@@ -1,8 +1,7 @@
-import { City, State } from "@repo/db/generated/prisma/client";
+import { City, Prisma, State } from "@repo/db/generated/prisma/client";
 import { CountryDTO } from "./country.js";
 
-export interface CityDTO {
-  city: City;
+export interface CityDTO extends Omit<City, "stateId" | "countryId"> {
   state: State | null;
   country: CountryDTO | null;
 }
@@ -19,11 +18,13 @@ export interface CityDTOForCity {
   country: CountryDTO | null;
 }
 
-export interface CreateCityInput {
-  name: string;
-  stateId: number;
-  countryId: number;
-}
+export type CreateCityInput = Prisma.CityUncheckedCreateInput;
+
+// export interface CreateCityInput {
+//   name: string;
+//   stateId: number;
+//   countryId: number;
+// }
 export interface ExcelCityRow {
   Name: string;
   State: string;

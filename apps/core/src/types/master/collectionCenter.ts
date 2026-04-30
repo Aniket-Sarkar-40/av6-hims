@@ -1,26 +1,6 @@
-export interface CollectionCenterReq {
-  id?: number;
-  colName: string;
-  email: string;
-  phone: string;
-  address: string;
-  langId: number;
-  dateFormat: string;
-  timeFormat: string;
-  currency: string;
-  currencySymbol: string;
-  timezone: string;
-  testPrefix: string;
-  barcodePrefix: string;
-  invoicePrefix: string;
-  disabledOn: Date | null;
-  disabledBy: string | null;
-  collectionAbbreviationName?: string | null;
-  isSubOrganization: boolean;
-  diseCode: string;
-  connectionCode: string;
-  barcodePrinterName: string | null;
-}
+import { Prisma } from "@repo/db/generated/prisma/client";
+
+export type CollectionCenterReq = Prisma.CollectionCenterUncheckedCreateInput;
 
 export interface CollectionCenterDTO {
   id: number;

@@ -1,6 +1,3 @@
-export interface CurrencyReq {
-  id?: number;
-  code: string;
-  name: string;
-  symbol: string;
-}
+import { Prisma } from "@repo/db/generated/prisma/client";
+
+export type CurrencyReq = Prisma.CurrencyUncheckedCreateInput;

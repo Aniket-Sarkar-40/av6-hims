@@ -1,10 +1,6 @@
-export interface CreateIncomeHeadInput {
-  incomeCategory: string;
-  description?: string | null;
-}
+import { Prisma } from "@repo/db/generated/prisma/client";
 
-export interface UpdateIncomeHeadInput {
+export type CreateIncomeHeadInput = Prisma.IncomeHeadUncheckedCreateInput;
+export interface UpdateIncomeHeadInput extends CreateIncomeHeadInput {
   id: number;
-  incomeCategory?: string;
-  description?: string | null;
 }
