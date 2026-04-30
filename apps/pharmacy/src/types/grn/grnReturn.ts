@@ -79,10 +79,11 @@ export interface CreateGrnReturnDetailsInput {
   inHandQty: number;
 }
 
-export interface GoodReceiveReturnDTO extends Omit<
-  GrnReturnResponse,
-  "createdBy" | "goodReceiveReturnDetails" | "rejectedBy" | "approvedBy"
-> {
+export interface GoodReceiveReturnDTO
+  extends Omit<
+    GrnReturnResponse,
+    "createdBy" | "goodReceiveReturnDetails" | "rejectedBy" | "approvedBy"
+  > {
   goodReceiveReturnDetails: GoodReceiveReturnDetailDTO[];
   distributor: Distributor | null;
   warehouse: PmsWarehouse | null;
@@ -91,7 +92,8 @@ export interface GoodReceiveReturnDTO extends Omit<
   rejectedBy: EmployeeCache | null;
 }
 
-export interface GoodReceiveReturnDetailDTO extends PmsGoodReceiveReturnDetails {
+export interface GoodReceiveReturnDetailDTO
+  extends PmsGoodReceiveReturnDetails {
   inHandQty: number | null;
   returnedQty: number | null;
   item: DecimalToNumber<PmsItem> | null;
@@ -134,10 +136,8 @@ export type GrnReturnDetailsResponseBase =
     };
   }>;
 
-export interface GrnReturnDetailsResponse extends Omit<
-  GrnReturnDetailsResponseBase,
-  "createdBy"
-> {
+export interface GrnReturnDetailsResponse
+  extends Omit<GrnReturnDetailsResponseBase, "createdBy"> {
   item: DecimalToNumber<PmsItem> | null;
   billTo: string | null;
   warehouse: PmsWarehouse | null;

@@ -1,10 +1,10 @@
 import { Prisma, State } from "@repo/db/generated/prisma/client";
 import { CountryDTO } from "./country.js";
-import { BaseModelAttr } from "@repo/shared/types/global.js";
 
-export type StateDTO = Omit<State, BaseModelAttr | "countryId"> & {
+export interface StateDTO {
+  state: State;
   country: CountryDTO | null;
-};
+}
 
 export interface StateDTOForState {
   name: string;

@@ -57,14 +57,15 @@ export interface StoreRequisitionDetailInput {
   comment?: string | null;
 }
 
-export interface StoreRequisitionDTO extends Omit<
-  StoreRequisitionResponse,
-  | "createdBy"
-  | "storeRequisitionDetails"
-  | "approvedBy"
-  | "rejectBy"
-  | "acknowledgementBy"
-> {
+export interface StoreRequisitionDTO
+  extends Omit<
+    StoreRequisitionResponse,
+    | "createdBy"
+    | "storeRequisitionDetails"
+    | "approvedBy"
+    | "rejectBy"
+    | "acknowledgementBy"
+  > {
   isAnyPendingReturn: boolean;
   branch: BranchDTO | null;
   warehouse: WarehouseDTO | null;
@@ -75,7 +76,8 @@ export interface StoreRequisitionDTO extends Omit<
   storeRequisitionDetails: StoreRequisitionDetailDTO[];
 }
 
-export interface StoreRequisitionBatchWiseDTO extends StoreReqBatchWiseResponse {
+export interface StoreRequisitionBatchWiseDTO
+  extends StoreReqBatchWiseResponse {
   branch: BranchDTO | null;
   warehouse: WarehouseDTO | null;
   requisitionItemDetails: RequisitionItemDetailDTO[];
@@ -88,7 +90,8 @@ export interface StoreRequisitionDetailDTO extends PmsStoreRequisitionDetails {
   branchInHandStock: number | null;
 }
 
-export interface RequisitionItemDetailDTO extends RequisitionItemDetailResponse {
+export interface RequisitionItemDetailDTO
+  extends RequisitionItemDetailResponse {
   storeRequisitionDetails: StoreRequisitionDetailDTO;
 }
 
@@ -210,14 +213,15 @@ export interface StoreReqExcelFilter {
   storeReqAckStatus?: STORE_REQ_ACK_STATUS;
 }
 
-export interface StoreRequisitionPdfDTO extends Omit<
-  StoreRequisitionBatchWiseDTO,
-  | "requisitionFrom"
-  | "createdBy"
-  | "approvedBy"
-  | "rejectBy"
-  | "acknowledgementBy"
-> {
+export interface StoreRequisitionPdfDTO
+  extends Omit<
+    StoreRequisitionBatchWiseDTO,
+    | "requisitionFrom"
+    | "createdBy"
+    | "approvedBy"
+    | "rejectBy"
+    | "acknowledgementBy"
+  > {
   requisitionFrom: EmployeeCache | null;
   createdBy: EmployeeCache | null;
   approvedBy: EmployeeCache | null;
@@ -232,10 +236,8 @@ export type RequisitionDetailsResponseBase =
     };
   }>;
 
-export interface RequisitionDetailsResponse extends Omit<
-  RequisitionDetailsResponseBase,
-  "createdBy"
-> {
+export interface RequisitionDetailsResponse
+  extends Omit<RequisitionDetailsResponseBase, "createdBy"> {
   item: DecimalToNumber<PmsItem> | null;
   acknowledgedBy: EmployeeCache | null;
   approvedBy: EmployeeCache | null;
@@ -252,10 +254,11 @@ export type ReqItemDetailsResponseBase =
     };
   }>;
 
-export interface StoreReq extends Omit<
-  PmsStoreRequisition,
-  "acknowledgedBy" | "approvedBy" | "createdBy"
-> {
+export interface StoreReq
+  extends Omit<
+    PmsStoreRequisition,
+    "acknowledgedBy" | "approvedBy" | "createdBy"
+  > {
   acknowledgedBy: EmployeeCache | null;
   approvedBy: EmployeeCache | null;
   createdBy: EmployeeCache | null;
@@ -263,17 +266,16 @@ export interface StoreReq extends Omit<
   branch: PmsBranch | null;
 }
 
-export interface ReqDetForReqItemDetails extends Omit<
-  RequisitionDetailsResponseBase,
-  "storeRequisition"
-> {
+export interface ReqDetForReqItemDetails
+  extends Omit<RequisitionDetailsResponseBase, "storeRequisition"> {
   item: DecimalToNumber<PmsItem> | null;
   storeRequisition: StoreReq;
 }
 
-export interface ReqItemDetailsResponse extends Omit<
-  ReqItemDetailsResponseBase,
-  "storeRequisitionDetails" | "storeRequisition"
-> {
+export interface ReqItemDetailsResponse
+  extends Omit<
+    ReqItemDetailsResponseBase,
+    "storeRequisitionDetails" | "storeRequisition"
+  > {
   storeRequisitionDetails: ReqDetForReqItemDetails;
 }

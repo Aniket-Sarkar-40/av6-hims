@@ -2,6 +2,7 @@ import {
   PmsInTransitStock,
   PmsItem,
   PmsOperation,
+  Prisma,
 } from "@repo/db/generated/prisma/client";
 import { BranchDTO } from "../master/branch.js";
 import { WarehouseDTO } from "../master/warehouse.js";
@@ -28,10 +29,8 @@ export interface inTransitStockAudit {
   refApprovedAt?: Date;
 }
 
-export interface inTransitStockDTO extends Omit<
-  PmsInTransitStock,
-  "fromId" | "toId" | "itemId" | "isActive"
-> {
+export interface inTransitStockDTO
+  extends Omit<PmsInTransitStock, "fromId" | "toId" | "itemId" | "isActive"> {
   from: WarehouseDTO | BranchDTO | null;
   to: WarehouseDTO | BranchDTO | null;
   item: DecimalToNumber<PmsItem> | null;

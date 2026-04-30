@@ -1,22 +1,16 @@
-export interface MedCategoryInput {
-  id?: number;
-  name: string;
-  description?: string | null;
-  minMarginB2CPercentage?: number | undefined;
-  minMarginB2BPercentage?: number | undefined;
-  loyaltyPercentage?: number | undefined;
-}
+import { MedCategory, Prisma } from "@repo/db/generated/prisma/client";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 
-export interface MedCategoryDTO {
-  id: number;
-  name: string;
-  description: string | null;
-  minMarginB2CPercentage: number;
-  minMarginB2BPercentage: number;
-  loyaltyPercentage: number;
+export type MedCategoryInput = Omit<
+  Prisma.MedCategoryUncheckedCreateInput,
+  BaseModelAttrWoCancel
+>;
+
+export interface MedCategoryDTO
+  extends Omit<MedCategory, BaseModelAttrWoCancel> {
   createdBy: number | null;
   updatedBy: number | null;
   createdAt: Date;
-  updatedAt: Date | null;
+  updatedAt: Date;
   itemCount: number;
 }

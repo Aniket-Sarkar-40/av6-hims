@@ -120,18 +120,17 @@ export type ItemStockAuditDetails = Prisma.PmsItemStockAuditGetPayload<{
   };
 }>;
 
-export interface StockAuditDTO extends Omit<
-  ItemStockAuditDetails,
-  "itemStock" | "itemStockId" | "createdBy"
-> {
+export interface StockAuditDTO
+  extends Omit<
+    ItemStockAuditDetails,
+    "itemStock" | "itemStockId" | "createdBy"
+  > {
   itemStock: StockResponse;
   createdBy: EmployeeCache | null;
 }
 
-export interface StockResponse extends Omit<
-  PmsItemStock,
-  "itemId" | "warehouseId" | "branchId"
-> {
+export interface StockResponse
+  extends Omit<PmsItemStock, "itemId" | "warehouseId" | "branchId"> {
   item: DecimalToNumber<PmsItem> | null;
   branch: PmsBranch | null;
   warehouse: PmsWarehouse | null;
@@ -174,18 +173,14 @@ export interface TransferableStockInp {
   toStock: PmsItemStock;
 }
 
-export interface ItemStockBatchWiseDTO extends Pick<
-  PmsItemStock,
-  "id" | "batchNo" | "expiryDate" | "quantity"
-> {
+export interface ItemStockBatchWiseDTO
+  extends Pick<PmsItemStock, "id" | "batchNo" | "expiryDate" | "quantity"> {
   item: DecimalToNumber<PmsItem> | null;
   stockDetails: StockDetails[];
 }
 
-export interface StockDetails extends Omit<
-  PmsItemStock,
-  "branchId" | "warehouseId"
-> {
+export interface StockDetails
+  extends Omit<PmsItemStock, "branchId" | "warehouseId"> {
   branch: PmsBranch | null;
   warehouse: PmsWarehouse | null;
 }

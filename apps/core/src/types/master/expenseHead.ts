@@ -1,13 +1,17 @@
-import { Expense, Prisma } from "@repo/db/generated/prisma/client";
-
-export type createExpenseHeadInput = Prisma.ExpenseHeadUncheckedCreateInput;
-
-export interface updateExpenseHeadInput extends createExpenseHeadInput {
+export interface createExpenseHeadInput {
+  expenseCategory: string;
+  description?: string | null;
+}
+export interface updateExpenseHeadInput {
   id: number;
+  expenseCategory: string;
+  description?: string | null;
 }
 
-export interface ExpenseHeadDTO
-  extends Omit<Expense, "createdAt" | "updatedAt"> {
+export interface ExpenseHeadDTO {
+  id: number;
+  expenseCategory: string | null;
+  description: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

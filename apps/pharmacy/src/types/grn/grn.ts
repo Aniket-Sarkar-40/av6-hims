@@ -80,10 +80,8 @@ export interface GrnDetailInput {
   netDiscount: number;
 }
 
-export interface GrnDTO extends Omit<
-  GrnResponse,
-  "createdBy" | "goodReceiveDetails"
-> {
+export interface GrnDTO
+  extends Omit<GrnResponse, "createdBy" | "goodReceiveDetails"> {
   distributor: Distributor | null;
   warehouse: WarehouseDTO | null;
   createdBy: EmployeeCache | null;
@@ -122,10 +120,8 @@ export type GrnDetailsResponseBase = Prisma.PmsGoodReceiveDetailsGetPayload<{
   };
 }>;
 
-export interface GrnDetailsResponse extends Omit<
-  GrnDetailsResponseBase,
-  "createdBy"
-> {
+export interface GrnDetailsResponse
+  extends Omit<GrnDetailsResponseBase, "createdBy"> {
   item: DecimalToNumber<PmsItem> | null;
   billTo: string | null;
   warehouse: PmsWarehouse | null;

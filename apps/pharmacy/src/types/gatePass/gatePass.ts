@@ -3,7 +3,9 @@ import { WarehouseDTO } from "../master/warehouse.js";
 import { EmployeeCache } from "../staff/employee.js";
 import {
   Distributor,
+  PmsGatePass,
   PmsPurchaseOrder,
+  Prisma,
 } from "@repo/db/generated/prisma/client";
 
 export interface CreateOrUpdateGatePassInput {

@@ -1,6 +1,10 @@
 import { CityDTO } from "@apps/core/types/master/city.js";
-import { CollectionCenter, Prisma } from "@repo/db/generated/prisma/client";
-import { IdValue } from "@repo/shared/types/global.js";
+import {
+  CollectionCenter,
+  PmsBranch,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
+import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
 
 export interface BranchReq {
   id: number;
@@ -24,28 +28,17 @@ export interface BranchReq {
   isAutonomous?: boolean;
 }
 
-export interface BranchDTO {
-  id: number;
-  name: string;
-  vatNo: string;
-  tinNo: string;
-  businessSubline: string | null;
-  pharmacistName: string;
-  countryCode: string | null;
-  phone: string;
-  email: string;
-  address: string;
-  area: string | null;
+export interface BranchDTO
+  extends Omit<
+    PmsBranch,
+    BaseModelAttrWoCancel | "countryId" | "cityId" | "stateId"
+  > {
   location: CityDTO | null;
-  latitudeLongitude: string | null;
   collectionCenter: CollectionCenter | null;
-  pinCode: number | null;
-  isMain: boolean;
+  categoryMapping: IdValue[];
   isActive: boolean;
   createdBy: number | null;
   updatedBy: number | null;
-  categoryMapping: IdValue[];
-  isAutonomous: boolean;
 }
 
 export interface BranchDropDown {

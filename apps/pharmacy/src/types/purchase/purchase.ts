@@ -10,6 +10,7 @@ import {
 import { WarehouseDTO } from "../master/warehouse.js";
 import { EmployeeCache } from "../staff/employee.js";
 import { DecimalToNumber } from "@repo/platform/types/common.js";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 // CreatePurchaseOrder interface
 export interface CreatePurchaseOrderInput {
   id?: number;
@@ -65,10 +66,8 @@ export type PurchaseOrderDetailsBase =
     };
   }>;
 
-export interface PurchaseOrderDetailsDto extends Omit<
-  PurchaseOrderDetailsBase,
-  "createdBy"
-> {
+export interface PurchaseOrderDetailsDto
+  extends Omit<PurchaseOrderDetailsBase, "createdBy"> {
   item: DecimalToNumber<PmsItem> | null;
   distributor: Distributor | null;
   warehouse: PmsWarehouse | null;

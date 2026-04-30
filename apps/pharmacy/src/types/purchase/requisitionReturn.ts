@@ -45,34 +45,32 @@ export interface ItemBatch {
   comment?: string;
 }
 
-export interface ApproveReturnItemBatch extends Omit<
-  ItemBatch,
-  "requisitionItemDetailsId"
-> {
+export interface ApproveReturnItemBatch
+  extends Omit<ItemBatch, "requisitionItemDetailsId"> {
   id: number;
 }
 
-export interface AcknowledgeReturnItemBatch extends Omit<
-  ItemBatch,
-  "requisitionItemDetailsId" | "returnQty" | "comment"
-> {
+export interface AcknowledgeReturnItemBatch
+  extends Omit<
+    ItemBatch,
+    "requisitionItemDetailsId" | "returnQty" | "comment"
+  > {
   id: number;
   acknowledgeQty: number;
   isCompleted: boolean;
 }
 
-export interface ApproveReturnItem extends Omit<
-  ReturnItem,
-  "itemBatch" | "storeRequisitionDetailsId"
-> {
+export interface ApproveReturnItem
+  extends Omit<ReturnItem, "itemBatch" | "storeRequisitionDetailsId"> {
   id: number;
   itemBatch: ApproveReturnItemBatch[];
 }
 
-export interface AcknowledgeReturnItem extends Omit<
-  ReturnItem,
-  "itemBatch" | "storeRequisitionDetailsId" | "requestedReturnQty"
-> {
+export interface AcknowledgeReturnItem
+  extends Omit<
+    ReturnItem,
+    "itemBatch" | "storeRequisitionDetailsId" | "requestedReturnQty"
+  > {
   id: number;
   acknowledgedQuantity: number;
   itemBatch: AcknowledgeReturnItemBatch[];
@@ -101,7 +99,8 @@ export type GetStoreRequisitionReturnResponse =
     };
   }>;
 
-export interface StoreRequisitionReturnDetailDTO extends PmsRequisitionReturnItemDetails {
+export interface StoreRequisitionReturnDetailDTO
+  extends PmsRequisitionReturnItemDetails {
   item: ItemDTO | null;
   storeRequisitionDetailsId: number;
   reqAcknowledgedQty: number | null;
@@ -112,15 +111,16 @@ export interface StoreRequisitionReturnDetailDTO extends PmsRequisitionReturnIte
   warehouseInHandStock: number;
 }
 
-export interface StoreRequisitionReturnDTO extends Omit<
-  PmsStoreRequisitionReturn,
-  | "requisitionFrom"
-  | "branchId"
-  | "warehouseId"
-  | "approvedBy"
-  | "rejectBy"
-  | "acknowledgementBy"
-> {
+export interface StoreRequisitionReturnDTO
+  extends Omit<
+    PmsStoreRequisitionReturn,
+    | "requisitionFrom"
+    | "branchId"
+    | "warehouseId"
+    | "approvedBy"
+    | "rejectBy"
+    | "acknowledgementBy"
+  > {
   requisitionFrom: IdValue | null;
   branch: IdValue | null;
   warehouse: IdValue | null;

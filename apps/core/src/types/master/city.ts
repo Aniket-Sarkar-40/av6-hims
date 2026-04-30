@@ -1,7 +1,8 @@
 import { City, Prisma, State } from "@repo/db/generated/prisma/client";
 import { CountryDTO } from "./country.js";
 
-export interface CityDTO extends Omit<City, "stateId" | "countryId"> {
+export interface CityDTO {
+  city: City;
   state: State | null;
   country: CountryDTO | null;
 }

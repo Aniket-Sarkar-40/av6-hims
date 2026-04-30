@@ -1,22 +1,19 @@
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { BranchDTO } from "./branch.js";
 import { WarehouseDTO } from "./warehouse.js";
+import { Prisma, Store } from "@repo/db/generated/prisma/browser.js";
 
-export interface StoreCreateInput {
-  name: string;
-  stockCode?: string | null;
-  description?: string | null;
-  branchId?: number | null;
-  wareHouseId?: number | null;
-}
+export type StoreCreateInput = Omit<
+  Prisma.StoreUncheckedCreateInput,
+  BaseModelAttrWoCancel | "id"
+>;
+
 export interface StoreUpdateInput extends StoreCreateInput {
   id: number;
 }
 
-export interface storeDTO {
-  id: number;
-  name: string;
-  stockCode: string | null;
-  description: string | null;
+export interface storeDTO
+  extends Omit<Store, BaseModelAttrWoCancel | "branchId" | "wareHouseId"> {
   branch: BranchDTO | null;
   wareHouse: WarehouseDTO | null;
   createdAt: Date;

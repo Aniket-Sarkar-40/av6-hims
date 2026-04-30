@@ -16,8 +16,10 @@ import {
   PmsItemStock,
   PmsMedPackType,
   PmsWarehouse,
+  Prisma,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/client";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 
 export interface CreateItemInput extends CommonItem {
   images?: Array<{ name: IMAGE_NAME; url: string; isPrimary?: boolean }>;
@@ -319,20 +321,21 @@ export interface SlowMovingItem extends RawItem {
   last_sold_date: Date;
 }
 
-export interface SlowMovingItemDTO extends Omit<
-  ItemDTO,
-  | "branchInHandStock"
-  | "warehouseInHandStock"
-  | "frontImage"
-  | "backImage"
-  | "leftImage"
-  | "rightImage"
-  | "insuredPatientPay"
-  | "insuredCoPay"
-  | "storage"
-  | "isActive"
-  | "corporateClientPaymentMode"
-> {
+export interface SlowMovingItemDTO
+  extends Omit<
+    ItemDTO,
+    | "branchInHandStock"
+    | "warehouseInHandStock"
+    | "frontImage"
+    | "backImage"
+    | "leftImage"
+    | "rightImage"
+    | "insuredPatientPay"
+    | "insuredCoPay"
+    | "storage"
+    | "isActive"
+    | "corporateClientPaymentMode"
+  > {
   lastSoldDate: Date;
 }
 
