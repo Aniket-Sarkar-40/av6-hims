@@ -2,6 +2,7 @@ import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { db } from "@repo/db/client";
 import {
   CreatePdfTemplateInput,
+  GetPdfTemplateByModuleAndTypeInput,
   MakeDefaultPdfTemplateInput,
   UpdatePdfTemplateInput,
 } from "@/types/pdf/pdfTemplate.js";
@@ -142,5 +143,14 @@ export const updatePdfTemplateImageUrl = async (url: string, id: number) => {
       sampleImageUrl: url,
       updatedBy: currentUser,
     },
+  });
+};
+
+export const getPdfTemplateByModuleAndTypeFromDb = async (
+  input: GetPdfTemplateByModuleAndTypeInput
+): Promise<PdfTemplate | null> => {
+  logger.info("entering::getPdfTemplateByModuleAndTypeFromDb::repository");
+  return db.pdfTemplate.findFirst({
+    where: { module: input.module, templateType: input.type, isActive: true },
   });
 };

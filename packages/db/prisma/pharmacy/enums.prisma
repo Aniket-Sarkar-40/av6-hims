@@ -127,20 +127,6 @@ enum Batch_Type {
     ITEM_PRICING
 }
 
-enum FlowType {
-    STATUS
-    CO_PAY
-    INDIVIDUAL_DISCOUNT
-    OVERALL_DISCOUNT
-    SPECIAL_DISCOUNT
-    REFUND
-}
-
-enum StepType {
-    MIN_MAX
-    NORMAL
-}
-
 enum INCLUDE_EXCLUDE {
     Exclude
     Include

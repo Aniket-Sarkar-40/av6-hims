@@ -1,7 +1,11 @@
 import { employeeService } from "@/services/staff/employee.service.js";
-import { ApprovalActionDto } from "@/types/approval/approval.js";
+import { EmployeeCache } from "@/types/staff/employee.js";
 import { ApprovalAction } from "@repo/db/generated/prisma/client";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
+
+interface ApprovalActionDto extends Omit<ApprovalAction, "actedBy"> {
+  actedByDetails: EmployeeCache | null;
+}
 
 export const toLastApproverDetailsDto = async (
   appAction: ApprovalAction

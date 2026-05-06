@@ -3,6 +3,7 @@ import {
   createPdfTemplate,
   deletePdfTemplate,
   getContractKeys,
+  getPdfTemplateByModuleAndType,
   makeDefaultPdfTemplate,
   updatePdfTemplate,
 } from "@/controllers/pdf/pdfTemplate.controller.js";
@@ -14,11 +15,13 @@ import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.m
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateCreatePdfTemplate,
+  validateGetPdfTemplateByModuleAndType,
   validatemakeDefaultPdfTemplate,
   validateUpdatePdfTemplate,
 } from "@/validations/request/pdf/pdfTemplate.validation.js";
 import { Router } from "express";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { authorizeExternal } from "@/middleware/auth.middleware.js";
 
 export const pdfTemplateRouter: Router = Router();
 
@@ -145,4 +148,19 @@ pdfTemplateRouter.get(
   authorize(getPermission("CORE", "PDF_CONTRACT", "VIEW")),
   // validatePdfTemplateUpdate,
   getContractKeys
+);
+
+pdfTemplateRouter.get(
+  "/module-and-type",
+  verifyToken,
+  authorize(getPermission("CORE", "PDF_TEMPLATE", "VIEW")),
+  validateGetPdfTemplateByModuleAndType,
+  getPdfTemplateByModuleAndType
+);
+
+pdfTemplateRouter.get(
+  "/module-and-type-ext",
+  authorizeExternal(),
+  validateGetPdfTemplateByModuleAndType,
+  getPdfTemplateByModuleAndType
 );

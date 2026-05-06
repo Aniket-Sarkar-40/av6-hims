@@ -2,6 +2,7 @@ import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
 import { pdfTemplateService } from "@/services/pdf/pdfTemplate.service.js";
 import {
   CreatePdfTemplateInput,
+  GetPdfTemplateByModuleAndTypeInput,
   MakeDefaultPdfTemplateInput,
   UpdatePdfTemplateInput,
 } from "@/types/pdf/pdfTemplate.js";
@@ -40,17 +41,15 @@ export const getContractKeys = TryCatch(
       })
     );
     logger.info("exiting::getContractKeys::controller");
-    return res
-      .status(200)
-      .json(
-        new BaseResponse(
-          {
-            success: true,
-            message: generateSuccessMessage("FETCHED", "Contract keys"),
-          },
-          keys
-        )
-      );
+    return res.status(200).json(
+      new BaseResponse(
+        {
+          success: true,
+          message: generateSuccessMessage("FETCHED", "Contract keys"),
+        },
+        keys
+      )
+    );
   }
 );
 
@@ -121,6 +120,22 @@ export const makeDefaultPdfTemplate = TryCatch(
     await pdfTemplateService.makeDefaultPdfTemplate(input);
     const response = BaseResponse.success({ type: "UPDATED" }, "Pdf Template");
     logger.info("exiting::makeDefaultPdfTemplate::controller");
+    return res.status(200).json(response);
+  }
+);
+
+export const getPdfTemplateByModuleAndType = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::getPdfTemplateByModuleAndType::controller");
+    const input = req.query as unknown as GetPdfTemplateByModuleAndTypeInput;
+    const pdfTemplate = await pdfTemplateService.getPdfTemplateByModuleAndType(
+      input
+    );
+    const response = BaseResponse.success(
+      { type: "FETCHED", data: pdfTemplate },
+      "Pdf Template"
+    );
+    logger.info("exiting::getPdfTemplateByModuleAndType::controller");
     return res.status(200).json(response);
   }
 );

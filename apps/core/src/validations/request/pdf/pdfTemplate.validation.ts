@@ -103,6 +103,41 @@ export const makeDefaultPdfTemplateSchema = Joi.object({
     }),
 });
 
+export const getPdfTemplateByModuleAndTypeSchema = Joi.object({
+  module: Joi.string()
+    .valid(...Object.values(ServiceCode))
+    .required()
+    .messages({
+      "string.base": generateValidationErrorMessage("STRING", "Module"),
+      "any.only": generateValidationErrorMessage(
+        "VALID_ENUM",
+        "Module",
+        Object.values(ServiceCode).join(", ")
+      ),
+      "any.required": generateValidationErrorMessage("REQUIRED", "Module"),
+    }),
+  type: Joi.string()
+    .valid(...Object.values(PdfTemplateType))
+    .required()
+    .messages({
+      "string.base": generateValidationErrorMessage("STRING", "Template Type"),
+      "any.only": generateValidationErrorMessage(
+        "VALID_ENUM",
+        "Template Type",
+        Object.values(PdfTemplateType).join(", ")
+      ),
+      "any.required": generateValidationErrorMessage(
+        "REQUIRED",
+        "Template Type"
+      ),
+    }),
+});
+
+export const validateGetPdfTemplateByModuleAndType = validationHandler({
+  schema: getPdfTemplateByModuleAndTypeSchema,
+  path: "query",
+});
+
 export const validateCreatePdfTemplate = validationHandler({
   schema: createPdfTemplateSchema,
   type: "FORMDATA",

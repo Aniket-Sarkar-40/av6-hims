@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { ExpenseInput } from "../../../types/consumerConnect/expense.js";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import { toExpenseEntity } from "@/mapper/consumerConnect/expense.mapper.js";
 import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";

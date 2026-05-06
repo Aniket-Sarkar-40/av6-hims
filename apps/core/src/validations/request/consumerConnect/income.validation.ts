@@ -2,7 +2,7 @@ import { toIncomeEntity } from "@/mapper/consumerConnect/income.mapper.js";
 import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { CreateIncomeInput } from "@/types/consumerConnect/income.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";

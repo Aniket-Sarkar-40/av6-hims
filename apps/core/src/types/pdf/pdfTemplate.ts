@@ -25,3 +25,8 @@ export interface MakeDefaultPdfTemplateInput {
   module: ServiceCode;
   templateType: PdfTemplateType;
 }
+
+export interface GetPdfTemplateByModuleAndTypeInput {
+  module: ServiceCode;
+  type: PdfTemplateType;
+}
