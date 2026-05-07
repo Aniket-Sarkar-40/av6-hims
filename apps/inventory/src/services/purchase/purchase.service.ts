@@ -1,10 +1,14 @@
-import { toPurchaseOrderDTO } from "@/mapper/purchase/purchase.mapper.js";
+import {
+  toPurchaseOrderDTO,
+  toPurchaseOrderPdfDTO,
+} from "@/mapper/purchase/purchase.mapper.js";
 import {
   createPurchaseOrder,
   deletePurchaseOrderFromDb,
   getAllPurchaseFromDb,
   getPurchaseByIdFromDb,
   updatePurchaseOrderInDb,
+  updatePurchaseOrderStatusFromDb,
 } from "@/repository/purchase/purchase.repository.js";
 import {
   CreatePurchaseOrderInput,
@@ -19,7 +23,12 @@ import {
   createPOServiceValidation,
   deletePOServiceValidation,
   updatePOServiceValidation,
+  updatePurchaseOrderStatusServiceValidation,
 } from "@/validations/service/purchase/purchase.service.validation.js";
+import { CustomDocDefinition, renderCustomPdfToBuffer } from "av6-pdf-engine";
+import { resolvePdfTemplate } from "@repo/shared/utils/applyTemplate.utils.js";
+import { PO_STATUS } from "@repo/db/generated/prisma/enums.js";
+import { pdfTemplateService } from "@apps/core/services/pdf/pdfTemplate.service.js";
 
 export const purchaseService = {
   async createPurchaseOrder(input: CreatePurchaseOrderInput) {
@@ -49,7 +58,7 @@ export const purchaseService = {
     if (pos.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Purchase Order"),
+        generateErrorMessage("NOT_FOUND", "Purchase Order")
       );
     }
 
@@ -61,7 +70,7 @@ export const purchaseService = {
 
   async getPurchaseById(
     id: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<PurchaseOrderDTO | null> {
     logger.info("entering::getPurchaseById::service id=" + id);
 
@@ -74,7 +83,7 @@ export const purchaseService = {
       }
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "PurchaseOrder"),
+        generateErrorMessage("NOT_FOUND", "PurchaseOrder")
       );
     }
 
@@ -91,5 +100,67 @@ export const purchaseService = {
 
     await deletePurchaseOrderFromDb(id);
     logger.info("exiting::deletePurchase::service id=" + id);
+  },
+
+  async updatePurchaseOrderStatus(
+    id: number,
+    status: PO_STATUS
+  ): Promise<void> {
+    logger.info(
+      "entering::updatePurchaseOrderStatus::service id=" +
+        id +
+        " status=" +
+        status
+    );
+
+    await updatePurchaseOrderStatusServiceValidation(id);
+
+    await updatePurchaseOrderStatusFromDb(id, status);
+
+    logger.info(
+      "exiting::updatePurchaseOrderStatus::service id=" +
+        id +
+        " status=" +
+        status
+    );
+  },
+
+  async generatePoPdf(id: number): Promise<Buffer> {
+    logger.info("entering::generatePayrollPdf::service");
+    const purchase = await getPurchaseByIdFromDb(id);
+    if (!purchase) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Purchase Order")
+      );
+    }
+    const [purchaseDto] = await toPurchaseOrderPdfDTO([purchase]);
+
+    if (!purchase) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Purchase Order")
+      );
+    }
+
+    const pdfTemplate = await pdfTemplateService.getPdfTemplateByModuleAndType({
+      module: "INVENTORY",
+      type: "PURCHASE_ORDER",
+    });
+
+    if (!pdfTemplate) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "PDF template")
+      );
+    }
+
+    const filledDef = resolvePdfTemplate(
+      pdfTemplate.bodyJson as unknown as CustomDocDefinition,
+      purchaseDto
+    );
+    const pdfBuffer = await renderCustomPdfToBuffer(filledDef);
+
+    return pdfBuffer;
   },
 };

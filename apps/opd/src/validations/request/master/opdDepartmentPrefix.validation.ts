@@ -4,44 +4,17 @@ import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
-import { ValidationErrorItem } from "av6-core";
+import { ValidationErrorItem } from "av6-core-v2";
+import { idRequired, strRequired } from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 // Base schema for both create and update
 export const opdDepartmentPrefixBaseSchema = {
-  opdDepartmentId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Opd Department Prefix ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Opd Department Prefix ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Opd Department Prefix ID",
-      ),
-    }),
+  opdDepartmentId: idRequired("OPD Department ID"),
 
-  prefix: Joi.string()
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Prefix"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Prefix"),
-    }),
+  prefix: strRequired("Prefix"),
 
-  licenseType: Joi.string()
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "License Type"),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "License Type",
-      ),
-    }),
+  licenseType: strRequired("License Type"),
 };
 
 // Schema for creating a new record (no ID)
@@ -51,71 +24,16 @@ export const opdDepartmentPrefixCreateSchema = Joi.object({
 
 // Schema for updating an existing record (ID required)
 export const opdDepartmentPrefixUpdateSchema = Joi.object({
-  id: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "ID"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "ID"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "ID"),
-    }),
+  id: idRequired("Id"),
   ...opdDepartmentPrefixBaseSchema,
 });
 
 // Middleware to validate create request
-export const validateOpdDepartmentPrefixCreate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = opdDepartmentPrefixCreateSchema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateOpdDepartmentPrefixCreate = validationHandler({
+  schema: opdDepartmentPrefixCreateSchema,
+});
 
 // Middleware to validate update request
-export const validateOpdDepartmentPrefixUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = opdDepartmentPrefixUpdateSchema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateOpdDepartmentPrefixUpdate = validationHandler({
+  schema: opdDepartmentPrefixUpdateSchema,
+});

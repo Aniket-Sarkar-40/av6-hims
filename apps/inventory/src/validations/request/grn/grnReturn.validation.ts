@@ -12,6 +12,7 @@ import {
   enumRequired,
   idOptional,
   idRequired,
+  intRequired,
   priceOptional,
   priceRequired,
   strOptional,
@@ -47,22 +48,22 @@ export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
 
   totalAmount: numberWithMaxDecimalsRequired("totalAmount"),
 
-  tax: idOptional("Tax"),
+  tax: priceOptional("Tax"),
 
-  netTax: idRequired("Net Tax"),
+  netTax: priceRequired("Net Tax"),
 
   netAmount: numberWithMaxDecimalsRequired("netAmount"),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  discount: idRequired("Discount", 0),
+  discount: intRequired("Discount", 0),
   netDiscount: priceRequired("Net Discount amount"),
 
-  orderQty: idRequired("Order quantity"),
+  orderQty: intRequired("Order quantity"),
 
-  inHandQty: idRequired("In-hand quantity"),
+  inHandQty: intRequired("In-hand quantity"),
 
-  grnQty: idRequired("GRN quantity"),
+  grnQty: intRequired("GRN quantity"),
 
   grnDetailId: idRequired("Grn Detail Id"),
 
@@ -103,12 +104,12 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
 
   tax: priceOptional("Tax"),
 
-  netTax: idRequired("Net tax"),
+  netTax: priceRequired("Net tax"),
 
   goodReceiveReturnDetails: arrayRequired(
     "Good receive return details",
     grnReturnDetailSchema,
-    1,
+    1
   ),
 });
 
@@ -135,7 +136,7 @@ export const grnReturnSchemaUpdate = grnReturnSchema.keys({
     grnReturnDetailSchema.keys({
       id: idOptional("Id"),
       grnDetailId: idOptional("GRN details ID"),
-    }),
+    })
   ),
 });
 

@@ -11,7 +11,7 @@ import {
 } from "@repo/db/generated/prisma/client";
 import { toGrnDTO } from "./grn/grn.mapper.js";
 import { toItemMasterDTO } from "./master/itemMaster.mapper.js";
-import { toUINConfigDTO } from "av6-core";
+import { toUINConfigDTO } from "av6-core-v2";
 import { toItemSupplierDTO } from "./master/itemSupplier.mapper.js";
 import { ItemSupplierResponse } from "@/types/master/itemSupplier.js";
 import { toItemSupplierMapDTO } from "./itemSupplierMap/itemSupplierMap.mapper.js";

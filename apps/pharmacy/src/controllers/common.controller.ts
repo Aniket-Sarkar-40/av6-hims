@@ -25,7 +25,7 @@ import {
   SearchRequest,
   UpdateConfigByCodeInput,
   updateStatusParams,
-} from "av6-core";
+} from "av6-core-v2";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
 
@@ -52,7 +52,7 @@ export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      }),
+      })
     );
   }
 
@@ -72,7 +72,7 @@ export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
 
   const response = new BaseResponse(
     { success: true, message: "Data fetched successfully." },
-    searchData,
+    searchData
   );
   logger.info("exiting::fixedSearch::controller");
   return res.status(200).json(response);
@@ -99,7 +99,7 @@ export const commonSearch = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      }),
+      })
     );
   }
 
@@ -117,7 +117,7 @@ export const commonSearch = TryCatch(async (req: Request, res: Response) => {
 
   const response = new BaseResponse(
     { success: true, message: "Data fetched successfully." },
-    searchData,
+    searchData
   );
   logger.info("exiting::commonSearch::controller");
   return res.status(200).json(response);
@@ -146,7 +146,7 @@ export const commonDropdownSearch = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        }),
+        })
       );
     }
 
@@ -165,11 +165,11 @@ export const commonDropdownSearch = TryCatch(
 
     const response = new BaseResponse(
       { success: true, message: "Data fetched successfully." },
-      searchData,
+      searchData
     );
     logger.info("exiting::commonDropdownSearch::controller");
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const fixedSearchWoPaginationController = TryCatch(
@@ -194,7 +194,7 @@ export const fixedSearchWoPaginationController = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        }),
+        })
       );
     }
 
@@ -213,11 +213,11 @@ export const fixedSearchWoPaginationController = TryCatch(
 
     const response = new BaseResponse(
       { success: true, message: "Data fetched successfully." },
-      searchData,
+      searchData
     );
     logger.info("exiting::fixedSearchWoPaginationController::controller");
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const commonFetch = TryCatch(async (req: Request, res: Response) => {
@@ -232,7 +232,7 @@ export const commonFetch = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      }),
+      })
     );
   }
 
@@ -248,7 +248,7 @@ export const commonFetch = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Data"),
     },
-    fetchData,
+    fetchData
   );
   logger.info("exiting::commonFetch::controller");
   return res.status(200).json(response);
@@ -267,7 +267,7 @@ export const commonExcelImport = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        }),
+        })
       );
     }
 
@@ -288,11 +288,11 @@ export const commonExcelImport = TryCatch(
 
     const response = new BaseResponse(
       { success: true, message: "Data Imported successfully." },
-      excelImport,
+      excelImport
     );
     logger.info("exiting::commonExcelImport::controller");
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const commonExcelExport = TryCatch(
@@ -309,7 +309,7 @@ export const commonExcelExport = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        }),
+        })
       );
     }
 
@@ -321,15 +321,15 @@ export const commonExcelExport = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${shortCodeData.tableName}.xlsx"`,
+      `attachment; filename="${shortCodeData.tableName}.xlsx"`
     );
     await wb.xlsx.write(res);
     res.end();
-  },
+  }
 );
 
 export const commonDelete = TryCatch(async (req: Request, res: Response) => {
@@ -345,7 +345,7 @@ export const commonDelete = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      }),
+      })
     );
   }
 
@@ -376,7 +376,7 @@ export const commonUpdateStatus = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        }),
+        })
       );
     }
 
@@ -392,11 +392,11 @@ export const commonUpdateStatus = TryCatch(
         success: true,
         message: generateSuccessMessage("UPDATED", "Data"),
       },
-      data,
+      data
     );
     logger.info("exiting::commonUpdateStatus::controller");
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const commonCreate = TryCatch(async (req: Request, res: Response) => {
@@ -407,7 +407,7 @@ export const commonCreate = TryCatch(async (req: Request, res: Response) => {
   if (!shortCode) {
     throw new ErrorHandler(
       400,
-      generateValidationErrorMessage("REQUIRED", `short code`),
+      generateValidationErrorMessage("REQUIRED", `short code`)
     );
   }
 
@@ -420,7 +420,7 @@ export const commonCreate = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      }),
+      })
     );
   }
   const data = await commonServiceFactory.create({
@@ -442,7 +442,7 @@ export const commonUpdate = TryCatch(async (req: Request, res: Response) => {
   if (!shortCode) {
     throw new ErrorHandler(
       400,
-      generateValidationErrorMessage("REQUIRED", `short code`),
+      generateValidationErrorMessage("REQUIRED", `short code`)
     );
   }
 
@@ -455,7 +455,7 @@ export const commonUpdate = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      }),
+      })
     );
   }
 
@@ -463,7 +463,7 @@ export const commonUpdate = TryCatch(async (req: Request, res: Response) => {
   if (!cfg) {
     throw new ErrorHandler(
       500,
-      `Configuration not found for short code: ${shortCodeData.shortCode}`,
+      `Configuration not found for short code: ${shortCodeData.shortCode}`
     );
   }
 
@@ -472,7 +472,7 @@ export const commonUpdate = TryCatch(async (req: Request, res: Response) => {
   if (!pkField || !pkLocation) {
     throw new ErrorHandler(
       500,
-      `Primary key configuration not found for short code: ${shortCodeData.shortCode}`,
+      `Primary key configuration not found for short code: ${shortCodeData.shortCode}`
     );
   }
 
@@ -480,8 +480,8 @@ export const commonUpdate = TryCatch(async (req: Request, res: Response) => {
     pkLocation === "body"
       ? input[pkField]
       : pkLocation === "params"
-        ? req.params[pkField]
-        : req.query[pkField];
+      ? req.params[pkField]
+      : req.query[pkField];
 
   if (isNaN(Number(pkValue))) {
     throw new ErrorHandler(400, `Invalid primary key value: ${pkValue}`);
@@ -505,7 +505,7 @@ export const commonFSExcelExport = TryCatch(
 
     const inp = req.body as CommonExcelRequest<DynamicShortCode>;
     const shortCodeData = await shortCodeService.getShortCodeByCode(
-      inp.shortCode,
+      inp.shortCode
     );
 
     if (!shortCodeData) {
@@ -515,7 +515,7 @@ export const commonFSExcelExport = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        }),
+        })
       );
     }
 
@@ -526,15 +526,15 @@ export const commonFSExcelExport = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${inp.sheetName}.xlsx"`,
+      `attachment; filename="${inp.sheetName}.xlsx"`
     );
     await wb.xlsx.write(res);
     res.end();
-  },
+  }
 );
 
 export const updateConfigByCode = TryCatch(
@@ -546,7 +546,7 @@ export const updateConfigByCode = TryCatch(
     if (!shortCode) {
       throw new ErrorHandler(
         400,
-        generateValidationErrorMessage("REQUIRED", `short code`),
+        generateValidationErrorMessage("REQUIRED", `short code`)
       );
     }
     await validateUpdateDynamicShortCodeConfig(input);
@@ -555,12 +555,12 @@ export const updateConfigByCode = TryCatch(
 
     const response = BaseResponse.success(
       { type: "UPDATED", data },
-      "Short Code Config",
+      "Short Code Config"
     );
 
     logger.info("exiting::updateConfigByCode::controller");
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const getConfigByShortCode = TryCatch(
@@ -571,7 +571,7 @@ export const getConfigByShortCode = TryCatch(
     if (!shortCode) {
       throw new ErrorHandler(
         400,
-        generateValidationErrorMessage("REQUIRED", `short code`),
+        generateValidationErrorMessage("REQUIRED", `short code`)
       );
     }
 
@@ -584,7 +584,7 @@ export const getConfigByShortCode = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        }),
+        })
       );
     }
 
@@ -592,7 +592,7 @@ export const getConfigByShortCode = TryCatch(
     if (!cfg) {
       throw new ErrorHandler(
         404,
-        `Configuration not found for short code: ${shortCodeData.shortCode}`,
+        `Configuration not found for short code: ${shortCodeData.shortCode}`
       );
     }
 
@@ -604,12 +604,12 @@ export const getConfigByShortCode = TryCatch(
           permission: shortCodeData.permission,
         },
       },
-      "Short Code Config",
+      "Short Code Config"
     );
 
     logger.info("exiting::getConfigByShortCode::controller");
     return res.status(200).json(response);
-  },
+  }
 );
 
 // export const commonApproval = TryCatch(async (req: Request, res: Response) => {

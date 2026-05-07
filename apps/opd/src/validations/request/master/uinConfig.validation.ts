@@ -9,7 +9,7 @@ import {
   UINPreviewRequest,
   UINSegment,
   UpdateUINConfigRequest,
-} from "av6-core";
+} from "av6-core-v2";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
@@ -66,26 +66,26 @@ const UINSegmentSchema = Joi.object<UINSegment>({
       .messages({
         "number.base": generateValidationErrorMessage(
           "NUMBER",
-          "Min Sequence Length",
+          "Min Sequence Length"
         ),
         "number.integer": generateValidationErrorMessage(
           "INTEGER",
-          "Min Sequence Length",
+          "Min Sequence Length"
         ),
         "number.min": generateValidationErrorMessage(
           "MIN",
           "Min Sequence Length",
-          "1",
+          "1"
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Min Sequence Length",
+          "Min Sequence Length"
         ),
       }),
     otherwise: Joi.forbidden().messages({
       "any.unknown": generateValidationErrorMessage(
         "FORBIDDEN",
-        "Min Sequence Length",
+        "Min Sequence Length"
       ),
     }),
   }),
@@ -107,7 +107,7 @@ export const createUINConfigSchema = Joi.object<CreateUINConfigRequest>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Short Code",
-        Object.values(OpdUinShortCode).join(", "),
+        Object.values(OpdUinShortCode).join(", ")
       ),
     }),
 
@@ -117,12 +117,14 @@ export const createUINConfigSchema = Joi.object<CreateUINConfigRequest>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Sequence Reset Policy",
+        "Sequence Reset Policy"
       ),
-      "any.only": `Sequence Reset Policy must be one of [${Object.values(UIN_RESET_POLICY).join(", ")}]`,
+      "any.only": `Sequence Reset Policy must be one of [${Object.values(
+        UIN_RESET_POLICY
+      ).join(", ")}]`,
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Sequence Reset Policy",
+        "Sequence Reset Policy"
       ),
     }),
 
@@ -143,7 +145,7 @@ export const createUINConfigSchema = Joi.object<CreateUINConfigRequest>({
       "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "UIN Segments",
+        "UIN Segments"
       ),
     }),
 });
@@ -176,7 +178,7 @@ export const updateUINConfigSchema = Joi.object<UpdateUINConfigRequest>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Short Code",
-        Object.values(OpdUinShortCode).join(", "),
+        Object.values(OpdUinShortCode).join(", ")
       ),
     }),
 
@@ -186,12 +188,14 @@ export const updateUINConfigSchema = Joi.object<UpdateUINConfigRequest>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Sequence Reset Policy",
+        "Sequence Reset Policy"
       ),
-      "any.only": `Sequence Reset Policy must be one of [${Object.values(UIN_RESET_POLICY).join(", ")}]`,
+      "any.only": `Sequence Reset Policy must be one of [${Object.values(
+        UIN_RESET_POLICY
+      ).join(", ")}]`,
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Sequence Reset Policy",
+        "Sequence Reset Policy"
       ),
     }),
 
@@ -212,7 +216,7 @@ export const updateUINConfigSchema = Joi.object<UpdateUINConfigRequest>({
       "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "UIN Segments",
+        "UIN Segments"
       ),
     }),
 });
@@ -230,7 +234,7 @@ export const previewConfigSchema = Joi.object<UINPreviewRequest>({
       "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "UIN Segments",
+        "UIN Segments"
       ),
     }),
 });
@@ -248,7 +252,7 @@ export const OpdUinShortCodeSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Short Code",
-        Object.values(OpdUinShortCode).join(", "),
+        Object.values(OpdUinShortCode).join(", ")
       ),
     }),
 });
@@ -256,7 +260,7 @@ export const OpdUinShortCodeSchema = Joi.object({
 export const validateCreateConfig = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = createUINConfigSchema.validate(req.body, {
     abortEarly: false,
@@ -269,7 +273,7 @@ export const validateCreateConfig = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -279,7 +283,7 @@ export const validateCreateConfig = (
 export const validateUpdateConfig = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = updateUINConfigSchema.validate(req.body, {
     abortEarly: false,
@@ -292,7 +296,7 @@ export const validateUpdateConfig = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -301,7 +305,7 @@ export const validateUpdateConfig = (
 export const validateGetUINConfig = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = OpdUinShortCodeSchema.validate(req.query, {
     abortEarly: false,
@@ -314,7 +318,7 @@ export const validateGetUINConfig = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -324,7 +328,7 @@ export const validateGetUINConfig = (
 export const validatePreviewCustomConfig = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { error } = previewConfigSchema.validate(req.body, {
     abortEarly: false,
@@ -337,7 +341,7 @@ export const validatePreviewCustomConfig = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      }),
+      })
     );
   }
 

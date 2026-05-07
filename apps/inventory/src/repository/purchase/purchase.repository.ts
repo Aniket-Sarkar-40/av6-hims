@@ -15,7 +15,9 @@ import {
   InvPurchaseOrderDetails,
   RoundFormat,
   InvUinShortCode,
+  PO_STATUS,
 } from "@repo/db/generated/prisma/client";
+import { approvalService } from "@apps/core/services/approval/approval.service.js";
 
 export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
   logger.info("entering::createPurchaseOrder::repository");
@@ -32,63 +34,67 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
   const poUin = await uinServiceFactory.generateUIN(InvUinShortCode.PO);
 
   const poCreate = await db.$transaction(async (tx) => {
-    const createdPurchaseOrder = await tx.invPurchaseOrder.create({
-      data: {
-        ...omittedPO.rest,
-        poNumber: poUin,
-        createdBy: currentUser,
-        purchaseOrderDetails: {
-          create: omittedPO.omitted.purchaseOrderDetails.map((detail) => ({
-            ...detail,
-            purchasedPrice: applyRound(
-              detail.purchasedPrice,
-              RoundFormat.TO_FIXED,
-              precision,
-            ),
-            totalAmount: applyRound(
-              detail.totalAmount,
-              RoundFormat.TO_FIXED,
-              precision,
-            ),
-            createdBy: currentUser,
-          })),
-        },
-      },
-      include: {
-        purchaseOrderDetails: {
-          where: {
-            isActive: true,
+    const [createdPurchaseOrder] = await Promise.all([
+      tx.invPurchaseOrder.create({
+        data: {
+          ...omittedPO.rest,
+          poNumber: poUin,
+          createdBy: currentUser,
+          purchaseOrderDetails: {
+            create: omittedPO.omitted.purchaseOrderDetails.map((detail) => ({
+              ...detail,
+              purchasedPrice: applyRound(
+                detail.purchasedPrice,
+                RoundFormat.TO_FIXED,
+                precision
+              ),
+              totalAmount: applyRound(
+                detail.totalAmount,
+                RoundFormat.TO_FIXED,
+                precision
+              ),
+              createdBy: currentUser,
+            })),
           },
         },
-      },
-    });
+        include: {
+          purchaseOrderDetails: {
+            where: {
+              isActive: true,
+            },
+          },
+          collectionCenter: true,
+        },
+      }),
+      ...omittedPO.omitted.purchaseOrderDetails.map((detail) =>
+        tx.invItem.update({
+          where: { id: detail.itemId },
+          data: {
+            lastPurchasedPrice: detail.purchasedPrice,
+          },
+        })
+      ),
+    ]);
 
     return createdPurchaseOrder;
   });
 
-  const supplier = omittedPO.omitted.supplier;
-
-  if (supplier?.isPoEmail && supplier.email) {
-    const emailTemplate = await eventEmailService.getEventEmail();
-
-    if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
-      // sendTemplatedEmail({
-      //   template: emailTemplate,
-      //   to: [supplier.email],
-      //   variables: {
-      //     name: store.user.userName || "User",
-      //     companyDetails: "Aerial View-6 Infotech Pvt. Ltd.",
-      //     message: `Po Created.`,
-      //     signature: `Aerial View-6 Pvt. Ltd.`,
-      //   },
-      // })
-      //   .then(() => {
-      //     logger.info("Email Sent Successfully.");
-      //   })
-      //   .catch((e: Error) => logger.error(`Email Failed:: ${e.message} `));
-      // TODO: Send notification
-    }
+  if (poCreate.status === "SENT_FOR_APPROVAL") {
+    await approvalService.startFlow({
+      ccId: poCreate.ccId,
+      netTotal: poCreate.grandTotal,
+      refNo: poCreate.poNumber,
+      service: "INVENTORY",
+      subjectType: "INV_PURCHASE_ORDER",
+      subjectId: poCreate.id,
+      extra: {
+        supplier: omittedPO.omitted.supplier?.name || null,
+        cc: poCreate.collectionCenter.colName || null,
+      },
+    });
   }
+
+  // TODO:Need to add notification
 
   return poCreate;
 };
@@ -131,13 +137,13 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
 
   const existingIds = new Set(existingDetails.map((d) => d.id));
   const toUpdate = incomingDetails.filter(
-    (d) => d.id != null && existingIds.has(d.id),
+    (d) => d.id != null && existingIds.has(d.id)
   );
   const toCreate = incomingDetails.filter(
-    (d) => d.id == null || !existingIds.has(d.id),
+    (d) => d.id == null || !existingIds.has(d.id)
   );
   const toDelete = omittedPO.omitted.purchaseOrderDetails.filter(
-    (d) => !incomingDetails.some((detail) => detail.id === d.id),
+    (d) => !incomingDetails.some((detail) => detail.id === d.id)
   );
 
   const toDeleteIds = toDelete
@@ -158,12 +164,12 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
             purchasedPrice: applyRound(
               d.purchasedPrice,
               RoundFormat.TO_FIXED,
-              precision,
+              precision
             ),
             totalAmount: applyRound(
               d.totalAmount,
               RoundFormat.TO_FIXED,
-              precision,
+              precision
             ),
             updatedBy: store?.user?.id,
           },
@@ -173,7 +179,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           purchasedPrice: applyRound(
             d.purchasedPrice,
             RoundFormat.TO_FIXED,
-            precision,
+            precision
           ),
           packingQty: d.packingQty,
           quantity: d.quantity,
@@ -181,7 +187,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           totalAmount: applyRound(
             d.totalAmount,
             RoundFormat.TO_FIXED,
-            precision,
+            precision
           ),
           createdBy: store?.user?.id,
         })),
@@ -216,7 +222,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
 
 export const getCountPODetailsFromDb = async (
   detailIds: number[],
-  purchaseOrderId: number,
+  purchaseOrderId: number
 ): Promise<number> => {
   return db.invPurchaseOrderDetails.count({
     where: {
@@ -252,7 +258,7 @@ export const getAllPurchaseFromDb = async (): Promise<
 };
 
 export const getPurchaseByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<PurchaseOrderWithDetails | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository id=${id}`);
 
@@ -303,7 +309,7 @@ export const deletePurchaseOrderFromDb = async (id: number): Promise<void> => {
   });
 
   logger.info(
-    `exiting::deletePurchaseOrderFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deletePurchaseOrderFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
@@ -325,7 +331,7 @@ export const deletePurchaseOrderFromDb = async (id: number): Promise<void> => {
 // }
 
 export const getPOByNumberFromDb = async (
-  poNumber: string,
+  poNumber: string
 ): Promise<
   | (InvPurchaseOrder & { purchaseOrderDetails: InvPurchaseOrderDetails[] })
   | null
@@ -345,4 +351,22 @@ export const getPOByNumberFromDb = async (
       },
     },
   });
+};
+
+export const updatePurchaseOrderStatusFromDb = async (
+  id: number,
+  status: PO_STATUS
+): Promise<void> => {
+  logger.info(
+    `entering::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`
+  );
+
+  await db.invPurchaseOrder.update({
+    where: { id },
+    data: { status },
+  });
+
+  logger.info(
+    `exiting::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`
+  );
 };

@@ -36,9 +36,9 @@ export enum PermissionResource {
   GRN_RETURN_REJECTED = "grn-return-rejected",
   GRN_RETURN_PDF = "grn-return-pdf",
   STORE_REQUISITION = "store-requisition",
-  STORE_REQUISITION_REJECT = "storeRequisition-reject",
-  STORE_REQUISITION_SENT = "storeRequisition-sent",
-  STORE_REQUISITION_ACK = "storeRequisition-acknowledge",
+  STORE_REQUISITION_REJECT = "store-requisition-reject",
+  STORE_REQUISITION_SENT = "store-requisition-sent",
+  STORE_REQUISITION_ACK = "store-requisition-acknowledge",
   LOCATION = "location",
   CONSUMPTION = "consumption",
   ITEM_BATCHES = "item-batch",
@@ -48,6 +48,7 @@ export enum PermissionResource {
   CURRENCY = "currency",
   STOCK_ADJUSTMENT = "stock-adjustment",
   COLLECTION_CENTER = "collection-center",
+  STOCK_TRANSFER_ACKNOWLEDGE = "stock-transfer-acknowledge",
 
   // CORE
   COUNTRY = "country",

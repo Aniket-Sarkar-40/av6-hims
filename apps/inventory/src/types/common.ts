@@ -107,3 +107,11 @@ export interface CollectionCenterApiRow {
   name: string;
   type?: CCType; // optional from API
 }
+
+export interface PaginatedResponse<T> {
+  totalRecords: number;
+  currentPageNumber: number;
+  lastPageNumber: number;
+  pageSize: number;
+  data: T[];
+}

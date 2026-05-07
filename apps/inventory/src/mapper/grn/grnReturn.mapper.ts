@@ -17,7 +17,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 
 export const toGrnReturnDTO = async (
-  data: GrnReturnResponse[],
+  data: GrnReturnResponse[]
 ): Promise<GoodReceiveReturnDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
   const settings = await settingsService.getSettings();
@@ -27,14 +27,10 @@ export const toGrnReturnDTO = async (
       const omittedGrnReturn = customOmit<
         GrnReturnResponse,
         | BaseModelAttrWoCancel
-        | "grnId"
         | "approvedBy"
         | "rejectedBy"
         | "createdBy"
         | "goodReceiveReturnDetails"
-        | "poId"
-        | "ccId"
-        | "supplierId"
       >(grnReturn, [
         "createdBy",
         "updatedBy",
@@ -42,24 +38,20 @@ export const toGrnReturnDTO = async (
         "createdAt",
         "updatedAt",
         "deletedAt",
-        "grnId",
         "approvedBy",
         "rejectedBy",
         "goodReceiveReturnDetails",
-        "poId",
-        "ccId",
-        "supplierId",
       ]);
 
       const supplierDTO = suppliers.find(
-        (supplier) => supplier.id === grnReturn.supplierId,
+        (supplier) => supplier.id === grnReturn.supplierId
       );
       const ccSettingsId = settings?.warehouseMode;
       let warehouseDTO, branchDTO;
       if (ccSettingsId) {
         warehouseDTO = await warehouseService.getWarehouseById(
           grnReturn.ccId,
-          true,
+          true
         );
       } else {
         branchDTO = await branchService.getBranchById(grnReturn.ccId, true);
@@ -68,19 +60,19 @@ export const toGrnReturnDTO = async (
       const createdBy = grnReturn.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             grnReturn.createdBy,
-            true,
+            true
           )
         : null;
       const approvedBy = grnReturn.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             grnReturn.approvedBy,
-            true,
+            true
           )
         : null;
       const rejectedBy = grnReturn.rejectedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             grnReturn.rejectedBy,
-            true,
+            true
           )
         : null;
 
@@ -88,7 +80,7 @@ export const toGrnReturnDTO = async (
         (grnReturn.goodReceiveReturnDetails || []).map(async (detail) => {
           const item = await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true,
+            true
           );
           const inHandQty =
             (await getItemStockQtyByBatchWise({
@@ -107,7 +99,7 @@ export const toGrnReturnDTO = async (
             purchasePrice: grnDetails?.purchasedPrice ?? 0,
             item: item ? await itemMasterToDto(item) : null,
           };
-        }),
+        })
       );
 
       return {
@@ -120,6 +112,6 @@ export const toGrnReturnDTO = async (
         approvedBy: approvedBy,
         rejectedBy: rejectedBy,
       };
-    }),
+    })
   );
 };

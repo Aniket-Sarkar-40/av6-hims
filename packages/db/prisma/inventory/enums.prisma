@@ -112,9 +112,47 @@ enum InvUinShortCode {
     BATCH_JOB
     CN
     STAJ
+    ST_TR
 }
 
 enum InvStockAdjustmentStatus {
     DRAFT
     COMPLETED
+}
+
+enum ST_STATUS {
+    CREATED
+    DISPATCHED
+    ACKNOWLEDGED
+    PARTIALLY_ACKNOWLEDGED
+}
+
+enum ST_RETURN_STATUS {
+    PENDING_RETURN
+    RETURNED
+}
+
+enum DefaultMenu {
+    b2c
+    b2b
+}
+
+enum EnableSas {
+    Yes
+    No
+}
+
+enum EnableYesNo {
+    Yes
+    No
+}
+
+enum CorporateReferralMode {
+    credit_control
+    corporate_client
+}
+
+enum LocationWiseRole {
+    enabled
+    disabled
 }

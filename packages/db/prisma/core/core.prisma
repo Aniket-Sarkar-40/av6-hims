@@ -225,6 +225,9 @@ model CollectionCenter {
     approverMappings           ApproverMapping[]
     printerSettings            PrinterSettings[]
     stockAdjustments           StockAdjustment[]
+    invStockTransferTo         InvStockTransfer[]         @relation(name: "To")
+    invStockTransferFrom       InvStockTransfer[]         @relation(name: "From")
+    invStockTransferCc         InvStockTransfer[]         @relation(name: "cc")
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")

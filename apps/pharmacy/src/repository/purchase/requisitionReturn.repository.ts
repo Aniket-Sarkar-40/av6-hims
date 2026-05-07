@@ -10,7 +10,7 @@ import {
   RejectStoreRequisitionReturnInput,
   ReturnItem,
 } from "@/types/purchase/requisitionReturn.js";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { logger } from "@repo/platform/logging/logger.js";
 import {
   PmsStoreRequisitionReturn,
@@ -25,7 +25,7 @@ import { featureFlagService } from "@/services/feature/feature.service.js";
 import { emailConfigService } from "@/services/master/emailConfig.service.js";
 
 export const createStoreRequisitionReturnInDb = async (
-  input: CreateStoreRequisitionReturnInput,
+  input: CreateStoreRequisitionReturnInput
 ) => {
   logger.info("entering::createStoreRequisitionReturn::repository");
 
@@ -57,7 +57,7 @@ export const createStoreRequisitionReturnInDb = async (
             create: omittedSRR.omitted.returnItems.map((ri) => {
               const omittedReturnItems = customOmit<ReturnItem, "itemBatch">(
                 ri,
-                ["itemBatch"],
+                ["itemBatch"]
               );
               return {
                 ...omittedReturnItems.rest,
@@ -94,7 +94,7 @@ export const createStoreRequisitionReturnInDb = async (
       const emailTemplate = await emailConfigService.getEventEmail();
       const feature = await featureFlagService.getFeatureFlagByShortCode(
         "STORE_REQ_RETURN_NOTIFICATION",
-        true,
+        true
       );
       // if (emailTemplate && emailTemplate.emailBody && store?.user?.email && feature?.isEnabled) {
       //   sendTemplatedEmail({
@@ -115,12 +115,12 @@ export const createStoreRequisitionReturnInDb = async (
 
       return created;
     },
-    { timeout: API_TIMEOUT },
+    { timeout: API_TIMEOUT }
   );
 };
 
 export const updateStoreRequisitionReturnInDb = async (
-  input: CreateStoreRequisitionReturnInput,
+  input: CreateStoreRequisitionReturnInput
 ) => {
   logger.info("entering::updateStoreRequisitionReturn::repository");
 
@@ -173,7 +173,7 @@ export const updateStoreRequisitionReturnInDb = async (
             create: omittedSRR.omitted.returnItems.map((ri) => {
               const omittedReturnItems = customOmit<ReturnItem, "itemBatch">(
                 ri,
-                ["itemBatch"],
+                ["itemBatch"]
               );
               return {
                 ...omittedReturnItems.rest,
@@ -208,15 +208,15 @@ export const updateStoreRequisitionReturnInDb = async (
 
       return updated;
     },
-    { timeout: API_TIMEOUT },
+    { timeout: API_TIMEOUT }
   );
 };
 
 export const getStoreRequisitionReturnByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<GetStoreRequisitionReturnResponse | null> => {
   logger.info(
-    `entering::getStoreRequisitionReturnByIdFromDb::repository id=${id}`,
+    `entering::getStoreRequisitionReturnByIdFromDb::repository id=${id}`
   );
   const storeReqReturn = await db.pmsStoreRequisitionReturn.findUnique({
     where: { id, isActive: true },
@@ -232,7 +232,7 @@ export const getStoreRequisitionReturnByIdFromDb = async (
     },
   });
   logger.info(
-    `exiting::getStoreRequisitionReturnByIdFromDb::repository id=${id}`,
+    `exiting::getStoreRequisitionReturnByIdFromDb::repository id=${id}`
   );
   return storeReqReturn;
 };
@@ -259,10 +259,10 @@ export const getAllStoreRequisitionReturnByFromDb = async (): Promise<
 };
 
 export const getPendingSRRFromSRId = async (
-  storeRequisitionId: number,
+  storeRequisitionId: number
 ): Promise<PmsStoreRequisitionReturn[]> => {
   logger.info(
-    `entering::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`,
+    `entering::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
   );
   const storeReqReturn = await db.pmsStoreRequisitionReturn.findMany({
     where: {
@@ -274,14 +274,14 @@ export const getPendingSRRFromSRId = async (
     },
   });
   logger.info(
-    `exiting::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`,
+    `exiting::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
   );
   return storeReqReturn;
 };
 
 export const deleteStoreRequisitionReturnFromDb = async (id: number) => {
   logger.info(
-    `entering::deleteStoreRequisitionReturnFromDb::repository id=${id}`,
+    `entering::deleteStoreRequisitionReturnFromDb::repository id=${id}`
   );
 
   const store = requestStorage.getStore();
@@ -322,15 +322,15 @@ export const deleteStoreRequisitionReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteStoreRequisitionReturnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteStoreRequisitionReturnFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
 export const rejectStoreRequisitionReturn = async (
-  inp: RejectStoreRequisitionReturnInput,
+  inp: RejectStoreRequisitionReturnInput
 ) => {
   logger.info(
-    `entering::rejectStoreRequisitionReturn::repository id=${inp.id}`,
+    `entering::rejectStoreRequisitionReturn::repository id=${inp.id}`
   );
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
@@ -349,17 +349,17 @@ export const rejectStoreRequisitionReturn = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 
   logger.info(`exiting::rejectStoreRequisition::repository id=${inp.id}`);
 };
 
 export const approveStoreRequisitionReturn = async (
-  inp: ApproveStoreReqReturnInput,
+  inp: ApproveStoreReqReturnInput
 ) => {
   logger.info(
-    `entering::approveStoreRequisitionReturn::repository id=${inp.id}`,
+    `entering::approveStoreRequisitionReturn::repository id=${inp.id}`
   );
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
@@ -473,7 +473,7 @@ export const approveStoreRequisitionReturn = async (
               refId: inp.id,
               refNo: inp.storeReqReturn.srrNumber,
               refApprovedAt: new Date(),
-            },
+            }
           );
 
           await addInTransitStock(
@@ -497,23 +497,23 @@ export const approveStoreRequisitionReturn = async (
               refId: inp.id,
               refNo: inp.storeReqReturn.srrNumber,
               refApprovedAt: new Date(),
-            },
+            }
           );
         }
       }
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 
   logger.info(
-    `exiting::approveStoreRequisitionReturn::repository id=${inp.id}`,
+    `exiting::approveStoreRequisitionReturn::repository id=${inp.id}`
   );
 };
 
 export const acknowledgeStoreRequisitionReturn = async (
-  inp: AcknowledgeRequisitionReturn,
+  inp: AcknowledgeRequisitionReturn
 ) => {
   logger.info(`entering::acknowledgeStoreRequisitionReturn::repository`);
 
@@ -553,7 +553,7 @@ export const acknowledgeStoreRequisitionReturn = async (
               refDetailsId: detail.id,
               refId: inp.id,
               refNo: inp.storeReqReturn.srrNumber,
-            },
+            }
           );
 
           await subInTransitStock(
@@ -575,7 +575,7 @@ export const acknowledgeStoreRequisitionReturn = async (
               refDetailsId: detail.id,
               refId: inp.id,
               refNo: inp.storeReqReturn.srrNumber,
-            },
+            }
           );
         }
 
@@ -603,7 +603,7 @@ export const acknowledgeStoreRequisitionReturn = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 
   logger.info(`exiting::acknowledgeStoreRequisition::repository`);

@@ -26,7 +26,7 @@ import {
   validateWarehouseId,
 } from "@/validations/service/master/warehouse.service.validation.js";
 import { PmsWarehouse } from "@repo/db/generated/prisma/client";
-import { ToggleActive } from "av6-core";
+import { ToggleActive } from "av6-core-v2";
 
 const cacheKey = getRedisKey("WAREHOUSE", "all");
 
@@ -62,7 +62,7 @@ export const warehouseService = {
   },
 
   async getAllWarehouse(
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<WarehouseDTO[]> {
     logger.info("entering::getAllWarehouse::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.WAREHOUSE);
@@ -72,13 +72,13 @@ export const warehouseService = {
         | null;
       if (cachedWarehouse && cachedWarehouse.length > 0) {
         return await Promise.all(
-          cachedWarehouse.map((warehouse) => toWarehouseDTO(warehouse)),
+          cachedWarehouse.map((warehouse) => toWarehouseDTO(warehouse))
         );
       } else {
         if (!canNullReturnable)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Warehouse"),
+            generateErrorMessage("NOT_FOUND", "Warehouse")
           );
         else return [];
       }
@@ -86,12 +86,12 @@ export const warehouseService = {
       const warehouse = await getAllWarehouseFromDb();
 
       const warehouseDTO = await Promise.all(
-        warehouse.map((warehouse) => toWarehouseDTO(warehouse)),
+        warehouse.map((warehouse) => toWarehouseDTO(warehouse))
       );
       if (warehouseDTO.length === 0 && !canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Warehouse"),
+          generateErrorMessage("NOT_FOUND", "Warehouse")
         );
       }
       logger.info("exiting::getAllWarehouse::service");
@@ -113,7 +113,7 @@ export const warehouseService = {
 
   async getWarehouseById(
     warehouseId: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<WarehouseDTO | null> {
     logger.info("entering::getWarehouseById::service");
     validIdCheck(warehouseId);
@@ -124,7 +124,7 @@ export const warehouseService = {
     if (isCacheable) {
       warehouse = (await getCacheById(
         cacheKey,
-        warehouseId,
+        warehouseId
       )) as PmsWarehouse | null;
 
       if (warehouse !== null) {
@@ -142,7 +142,7 @@ export const warehouseService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Warehouse"),
+          generateErrorMessage("NOT_FOUND", "Warehouse")
         );
       else return null;
     }
@@ -153,7 +153,7 @@ export const warehouseService = {
 
   async getWarehouseByIdWoDTO(
     warehouseId: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<PmsWarehouse | null> {
     logger.info("entering::getWarehouseByIdWoDTO::service");
     validIdCheck(warehouseId);
@@ -163,7 +163,7 @@ export const warehouseService = {
     if (isCacheable) {
       warehouse = (await getCacheById(
         cacheKey,
-        warehouseId,
+        warehouseId
       )) as PmsWarehouse | null;
     } else {
       warehouse = await getWarehouseByIdFromDb(warehouseId);
@@ -173,7 +173,7 @@ export const warehouseService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Warehouse"),
+          generateErrorMessage("NOT_FOUND", "Warehouse")
         );
       else return null;
     }

@@ -26,6 +26,7 @@ export const SHORT_CODE = {
   COLLECTION_CENTER: "COLLECTION_CENTER",
   STOCK_ADJUSTMENT: "STOCK_ADJUSTMENT",
   DYNAMIC_SHORT_CODE: "DYNAMIC_SHORT_CODE",
+  STOCK_TRANSFER: "STOCK_TRANSFER",
 };
 /*
 short code not  added till now fro the below mentioned tables 

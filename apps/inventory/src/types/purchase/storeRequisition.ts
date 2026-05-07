@@ -5,7 +5,7 @@ import {
   STORE_REQ_STATUS,
 } from "@repo/db/generated/prisma/client";
 import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
-import { EmployeeCache } from "av6-core";
+import { EmployeeCache } from "av6-core-v2";
 import { ItemMasterToDto } from "../grn/grn.js";
 
 export type StoreRequisitionDetailInput =
@@ -40,18 +40,19 @@ export type StoreRequisitionResponse = Prisma.InvStoreRequisitionGetPayload<{
   include: BaseInclude;
 }>;
 
-export interface StoreRequisitionDTO extends Omit<
-  ValStoreRequisitionResponse,
-  | BaseModelAttrWoCancel
-  | "ccId"
-  | "createdBy"
-  | "storeRequisitionDetails"
-  | "approvedBy"
-  | "rejectBy"
-  | "acknowledgementBy"
-  | "updatedBy"
-  | "requisitionFrom"
-> {
+export interface StoreRequisitionDTO
+  extends Omit<
+    ValStoreRequisitionResponse,
+    | BaseModelAttrWoCancel
+    | "ccId"
+    | "createdBy"
+    | "storeRequisitionDetails"
+    | "approvedBy"
+    | "rejectBy"
+    | "acknowledgementBy"
+    | "updatedBy"
+    | "requisitionFrom"
+  > {
   branch: IdValue | null;
   warehouse: IdValue | null;
   createdBy: EmployeeCache | null;
@@ -67,10 +68,11 @@ export interface StoreRequisitionDTO extends Omit<
 export type StoreRequisitionDetails =
   Prisma.InvStoreRequisitionDetailsGetPayload<Record<string, never>>;
 
-export interface StoreRequisitionBatchWiseDTO extends Omit<
-  StoreReqBatchWiseResponse,
-  "requisitionFrom" | "requisitionItemDetails"
-> {
+export interface StoreRequisitionBatchWiseDTO
+  extends Omit<
+    StoreReqBatchWiseResponse,
+    "requisitionFrom" | "requisitionItemDetails"
+  > {
   branch: IdValue | null;
   warehouse: IdValue | null;
   requisitionFrom: IdValue | null;
@@ -82,14 +84,16 @@ export interface StoreRequisitionDetailDTO extends StoreRequisitionDetails {
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
 }
-export interface StoreRequisitionDetailDTOBranch extends StoreRequisitionDetails {
+export interface StoreRequisitionDetailDTOBranch
+  extends StoreRequisitionDetails {
   item: ItemMasterToDto | null;
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
   userInHandStock: number | null;
 }
 
-export interface RequisitionItemDetailDTO extends RequisitionItemDetailResponse {
+export interface RequisitionItemDetailDTO
+  extends RequisitionItemDetailResponse {
   storeRequisitionDetails: StoreRequisitionDetailDTO;
 }
 

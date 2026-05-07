@@ -306,6 +306,15 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "srNumber" }),
     },
+    {
+      shortCode: "STOCK_TRANSFER",
+      tableName: "invStockTransfer",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:stock-transfer:view",
+      isDropDown: true,
+    },
   ];
 
   const eventEmails: EventEmailSeeder[] = [

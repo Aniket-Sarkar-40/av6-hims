@@ -6,7 +6,7 @@
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
     "av6-core-v2": "^1.0.5",
-    "av6-pdf-engine": "^1.0.9",
+    "av6-pdf-engine": "^1.2.0",
     "av6-utils": "^1.0.6",
     "axios": "^1.13.6",
     "dayjs": "^1.11.19",

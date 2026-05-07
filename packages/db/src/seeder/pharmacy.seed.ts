@@ -287,7 +287,7 @@ export async function runSeed() {
       permission: "pms:department:view",
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: "yes" }),
-      selectClause: JSON.stringify({ id: "id", value: "departmentName" }),
+      selectClause: JSON.stringify({ id: "id", value: "name" }),
     },
 
     {

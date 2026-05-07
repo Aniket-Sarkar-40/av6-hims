@@ -17,6 +17,7 @@ export const createOrUpdateSettingsSchema = Joi.object<CreateOrUpdateSettings>({
   isEmail: boolRequired("Is Email"),
   isSMS: boolRequired("Is SMS"),
   warehouseMode: boolRequired("Warehouse Mode"),
+  supplierMode: boolRequired("Supplier Mode"),
   isWhatsapp: boolRequired("Is Whatsapp"),
   expiryInMonth: idRequired("Expiry in month"),
   countryCode: strOptional("Country code"),

@@ -1,5 +1,5 @@
 import { db } from "@repo/db";
-import { PaginatedResponse } from "av6-core";
+import { PaginatedResponse } from "av6-core-v2";
 import {
   AppointmentMedicineSummary,
   AppointmentResponse,
@@ -19,7 +19,7 @@ import { Prisma } from "@repo/db/generated/prisma/client";
 import dayjs from "dayjs";
 
 export const fetchPendingPaginatedAppointments = async (
-  input: SearchRequestOpd,
+  input: SearchRequestOpd
 ): Promise<PaginatedResponse<AppointmentMedicineSummary>> => {
   const offset = (input.pageNo - 1) * input.pageSize;
   const pattern = input.searchText
@@ -31,7 +31,9 @@ export const fetchPendingPaginatedAppointments = async (
     filter += `AND at2.collection_center = ${input.ccId}`;
   }
   if (input.startDate && input.endDate) {
-    filter += ` AND at2.created_at BETWEEN '${fromTimestampToSqlDatetime(input.startDate)}' AND '${fromTimestampToSqlDatetime(input.endDate)}'`;
+    filter += ` AND at2.created_at BETWEEN '${fromTimestampToSqlDatetime(
+      input.startDate
+    )}' AND '${fromTimestampToSqlDatetime(input.endDate)}'`;
   }
 
   const [{ total }] = await db.$queryRawUnsafe<{ total: bigint }[]>(`
@@ -176,7 +178,7 @@ export const getOpdBill = async (id: number): Promise<OpdBill | null> => {
 };
 
 export const getMedicineInstructionFromDb = async (
-  id: number,
+  id: number
 ): Promise<MedicineInstruction[]> => {
   const result = await db.$queryRawUnsafe<RawMedicineInstruction[]>(`
     select
@@ -210,19 +212,21 @@ export const getMedicineInstructionFromDb = async (
       sos: item.sos === "SOS" ? "SOS" : "No SOS",
       duration: item.duration ? Number(item.duration) : 0,
       notes: item.notes || "",
-    }),
+    })
   );
 };
 
 export const fetchPendingPaginatedAppointmentsExcel = async (
-  input: SearchWithDate,
+  input: SearchWithDate
 ): Promise<AppointmentMedicineSummary[]> => {
   let filter = "";
   if (input.ccId) {
     filter += `AND at2.collection_center = ${input.ccId}`;
   }
   if (input.startDate && input.endDate) {
-    filter += ` AND at2.created_at BETWEEN '${fromTimestampToSqlDatetime(input.startDate)}' AND '${fromTimestampToSqlDatetime(input.endDate)}'`;
+    filter += ` AND at2.created_at BETWEEN '${fromTimestampToSqlDatetime(
+      input.startDate
+    )}' AND '${fromTimestampToSqlDatetime(input.endDate)}'`;
   }
 
   const data = await db.$queryRawUnsafe<AppointmentMedicineSummary[]>(`
@@ -261,13 +265,13 @@ export const insertIntoClientInvMapping = async (
   tx: Prisma.TransactionClient,
   clientId: number,
   sellRefNo: string,
-  amount: number,
+  amount: number
 ): Promise<void> => {
   const existingClientInvMapping = await tx.$queryRawUnsafe<{ id: number }[]>(
     `SELECT id FROM client_inv_map_path 
              WHERE path_invoice = ? AND client_id = ? AND lower(service_type) = 'pharmacy'`,
     sellRefNo,
-    clientId,
+    clientId
   );
 
   if (existingClientInvMapping && existingClientInvMapping.length > 0) {
@@ -292,10 +296,10 @@ export const handleClientPlanInvoiceForOpd = async (
     clientId: number;
     totalAmount: number;
     coPayAmount: number;
-  },
+  }
 ) => {
   logger.info(
-    `handleClientPlanInvoiceForOpd params --------->` + JSON.stringify(params),
+    `handleClientPlanInvoiceForOpd params --------->` + JSON.stringify(params)
   );
   const plan = (params.clientPlan || "").toLowerCase();
   if (plan !== "postpaid" && plan !== "prepaid") return;
@@ -304,7 +308,7 @@ export const handleClientPlanInvoiceForOpd = async (
     `SELECT id FROM pathology_b2b_invoice_amount_summary 
              WHERE case_id = ? AND b2b_client_id = ? AND lower(service_type) = 'pharmacy'`,
     params.sellRefNo,
-    params.clientId,
+    params.clientId
   );
 
   if (existingInvoices && existingInvoices.length > 0) {
@@ -315,7 +319,7 @@ export const handleClientPlanInvoiceForOpd = async (
                WHERE id = ?`,
       params.coPayAmount,
       params.totalAmount,
-      existingInvoices[0].id,
+      existingInvoices[0].id
     );
   } else {
     const creationDate = dayjs().format("YYYY-MM-DD HH:mm:ss");
@@ -324,7 +328,7 @@ export const handleClientPlanInvoiceForOpd = async (
 
     // 3) Find last payment detail for client
     const lastPayRows = await tx.$queryRawUnsafe<{ id: number }[]>(
-      `SELECT id FROM b2b_invoice_payment_detail WHERE b2b_client_id = ${params.clientId} ORDER BY date DESC LIMIT 1`,
+      `SELECT id FROM b2b_invoice_payment_detail WHERE b2b_client_id = ${params.clientId} ORDER BY date DESC LIMIT 1`
     );
     const invoicePaymentId = lastPayRows?.length
       ? Number(lastPayRows[0].id)
@@ -344,7 +348,7 @@ export const handleClientPlanInvoiceForOpd = async (
       creationDate,
       invoicePaymentId,
       today,
-      params.totalAmount,
+      params.totalAmount
     );
 
     // 5) Map client invoice
@@ -353,7 +357,7 @@ export const handleClientPlanInvoiceForOpd = async (
     tx,
     params.clientId,
     params.sellRefNo,
-    params.coPayAmount,
+    params.coPayAmount
   );
 };
 
@@ -366,7 +370,7 @@ export async function createOrUpdateInsurerInvoice(
     discountAmount: number;
     coPayment: number;
     netTotal: number;
-  },
+  }
 ) {
   // Check if invoice already exists
   const existingInvoices = await tx.$queryRawUnsafe<
@@ -375,7 +379,7 @@ export async function createOrUpdateInsurerInvoice(
     `SELECT id, invoice_no FROM insurer_invoice_details 
              WHERE case_id = ? AND insurer_id = ? AND lower(type) = 'pharmacy'`,
     params.caseId,
-    params.insurerId,
+    params.insurerId
   );
 
   const today = new Date();
@@ -394,7 +398,7 @@ export async function createOrUpdateInsurerInvoice(
       params.discountAmount,
       params.coPayment,
       params.netTotal,
-      existingInvoices[0].id,
+      existingInvoices[0].id
     );
     console.log(`Updated insurer invoice: ${existingInvoices[0].invoice_no}`);
   } else {
@@ -413,14 +417,14 @@ export async function createOrUpdateInsurerInvoice(
       params.grossTotal,
       params.discountAmount,
       params.coPayment,
-      params.netTotal,
+      params.netTotal
     );
     console.log(`Created new insurer invoice: ${invoiceNo}`);
   }
 }
 
 export const getAllLastAppointments = async (
-  patientId: number,
+  patientId: number
 ): Promise<LastAppointmentRes[]> => {
   logger.info("entering::getAllLastAppointments::repository");
   const result = await db.$queryRawUnsafe<LastAppointmentRes[]>(`
@@ -447,7 +451,7 @@ export const getAllLastAppointments = async (
 };
 
 export const getNotCompetedOpdBillWithMedicinesDetails = async (
-  appointmentId: number,
+  appointmentId: number
 ): Promise<NonCompletedMedicine[]> => {
   logger.info("entering::getNotCompetedOpdBillWithMedicines::repository");
 
@@ -508,7 +512,7 @@ export const getNotCompetedOpdBillWithMedicinesDetails = async (
 };
 
 export const getAppointmentById = async (
-  id: number,
+  id: number
 ): Promise<AppointmentResponse | null> => {
   const result = await db.$queryRaw<AppointmentResponse[]>(Prisma.sql`
     SELECT 

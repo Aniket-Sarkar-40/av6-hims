@@ -6,7 +6,7 @@ import {
   RETURN_STS,
 } from "@repo/db/generated/prisma/client";
 import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
-import { EmployeeCache } from "av6-core";
+import { EmployeeCache } from "av6-core-v2";
 import { ItemSupplierDTO } from "../master/itemSupplier.js";
 
 export interface GrnReturnDetailInput
@@ -17,10 +17,11 @@ export interface GrnReturnDetailInput
   isExpiry: boolean;
 }
 
-export interface CreateGrnReturnInput extends Omit<
-  Prisma.InvGoodReceiveReturnUncheckedCreateInput,
-  "goodReceiveReturnDetails" | BaseModelAttr
-> {
+export interface CreateGrnReturnInput
+  extends Omit<
+    Prisma.InvGoodReceiveReturnUncheckedCreateInput,
+    "goodReceiveReturnDetails" | BaseModelAttr
+  > {
   goodReceiveReturnDetails: GrnReturnDetailInput[];
   grnReturn: GoodReceivedReturnResponse;
   supplier: ItemSupplierDTO;
@@ -35,18 +36,18 @@ export type GoodReceivedReturnResponse = Prisma.InvGoodReceiveReturnGetPayload<{
   };
 }>;
 
-export interface GoodReceiveReturnDTO extends Omit<
-  GrnReturnResponse,
-  | BaseModelAttr
-  | "createdBy"
-  | "goodReceiveReturnDetails"
-  | "rejectedBy"
-  | "approvedBy"
-  | "grnId"
-  | "poId"
-  | "ccId"
-  | "supplierId"
-> {
+export interface GoodReceiveReturnDTO
+  extends Omit<
+    GrnReturnResponse,
+    | BaseModelAttr
+    | "createdBy"
+    | "goodReceiveReturnDetails"
+    | "rejectedBy"
+    | "approvedBy"
+    | "poId"
+    | "ccId"
+    | "supplierId"
+  > {
   goodReceiveReturnDetails: GoodReceiveReturnDetailDTO[];
   supplier: IdValue | null;
   branch: IdValue | null;
@@ -56,7 +57,8 @@ export interface GoodReceiveReturnDTO extends Omit<
   rejectedBy: EmployeeCache | null;
 }
 
-export interface GoodReceiveReturnDetailDTO extends InvGoodReceiveReturnDetails {
+export interface GoodReceiveReturnDetailDTO
+  extends InvGoodReceiveReturnDetails {
   inHandQty: number | null;
   returnedQty: number | null;
   item: InvItem | null;

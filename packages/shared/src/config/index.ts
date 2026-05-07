@@ -62,3 +62,6 @@ export const EXT_COUNTRY_URL = `${MASTER_SERVICE_URL}/api/v1/master/country`;
 export const EXT_BASE_URL = process.env.EXT_BASE_URL;
 
 export const CLIENT_ID = process.env.CLIENT_ID || "";
+export const EXT_EMP_CACHE = process.env.EXT_EMP_CACHE;
+
+export const CORE_SERVICE_URL = `${MASTER_SERVICE_URL}/api/v1/core`;

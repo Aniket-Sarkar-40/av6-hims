@@ -28,7 +28,7 @@ import {
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
-import EventEmitter from "events";
+import EventEmitter from "node:events";
 
 const createCoreCache = async (table: string, data: DataType[]) =>
   await createCache(table, data, "core");

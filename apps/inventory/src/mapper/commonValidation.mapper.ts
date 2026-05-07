@@ -1,3 +1,6 @@
-import { SingleValidationMapping } from "av6-core";
+import { SingleValidationMapping } from "av6-core-v2";
 
-export const commonCreateUpdateValidationMapping: Record<string, SingleValidationMapping> = {};
+export const commonCreateUpdateValidationMapping: Record<
+  string,
+  SingleValidationMapping
+> = {};

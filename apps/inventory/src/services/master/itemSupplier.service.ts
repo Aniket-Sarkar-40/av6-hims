@@ -30,12 +30,13 @@ import {
   updateItemSupplierServiceValidation,
 } from "@/validations/service/master/itemSupplier.service.validation.js";
 import { checkIsCacheable } from "@/config/cache.config.js";
+import { InvItemSupplier } from "@repo/db/generated/prisma/client";
 
 const cacheKey = getRedisKey("ITEM_SUPPLIER", "all");
 
 export const itemSupplierService = {
   async createItemSupplier(
-    input: ItemSupplierCreateInput,
+    input: ItemSupplierCreateInput
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::createItemSupplier::service");
     await createItemSupplierServiceValidation(input);
@@ -51,7 +52,7 @@ export const itemSupplierService = {
   },
 
   async updateItemSupplier(
-    input: ItemSupplierUpdateInput,
+    input: ItemSupplierUpdateInput
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::updateItemSupplier::service");
     await updateItemSupplierServiceValidation(input);
@@ -65,7 +66,7 @@ export const itemSupplierService = {
     return itemSupplierDTO[0];
   },
   async getAllItemSupplier(
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<ItemSupplierDTO[]> {
     logger.info("entering::getAllItemSupplier::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
@@ -80,7 +81,7 @@ export const itemSupplierService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier"),
+          generateErrorMessage("NOT_FOUND", "Item Supplier")
         );
       else return [];
     }
@@ -88,7 +89,7 @@ export const itemSupplierService = {
   },
   async getItemSupplierById(
     id: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<ItemSupplierDTO | null> {
     logger.info("entering::getItemSupplierById::service");
 
@@ -97,7 +98,7 @@ export const itemSupplierService = {
     if (isCacheable) {
       itemSupplier = (await getCacheById(
         cacheKey,
-        id,
+        id
       )) as ItemSupplierResponse | null;
     } else {
       itemSupplier = await getItemSupplierByIdFromDb(id);
@@ -107,7 +108,7 @@ export const itemSupplierService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier"),
+          generateErrorMessage("NOT_FOUND", "Item Supplier")
         );
       } else return null;
     }
@@ -125,5 +126,27 @@ export const itemSupplierService = {
       await deleteCache(cacheKey, id);
     }
     logger.info("exiting::deleteItemSupplierById::service");
+  },
+  async getAllItemSupplierWoDto(
+    canNullReturnable: boolean = false
+  ): Promise<InvItemSupplier[]> {
+    logger.info("entering::getAllItemSupplierWoDto::service");
+    const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
+    let itemSupplier: ItemSupplierResponse[];
+    if (isCacheable) {
+      itemSupplier = (await getAllCache(cacheKey)) as ItemSupplierResponse[];
+    } else {
+      itemSupplier = await getAllItemSupplierFromDb();
+    }
+    logger.info("exiting::getAllItemSupplierWoDto::service");
+    if (itemSupplier.length === 0) {
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Supplier")
+        );
+      else return [];
+    }
+    return itemSupplier;
   },
 };

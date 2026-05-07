@@ -8,6 +8,15 @@ import { joiDecimalFromSettings } from "@/utils/commonCalculation.utils.js";
 import { TAX_METHOD } from "@repo/db/generated/prisma/enums.js";
 import { NextFunction, Request, Response } from "express";
 import Joi, { ValidationErrorItem } from "joi";
+import {
+  arrayRequired,
+  dateOptional,
+  enumOptional,
+  idRequired,
+  intOptional,
+  numberArrayRequired,
+  priceOptional,
+} from "@repo/shared/utils/joi.utils.js";
 
 export const getItemBranchMapSchema = Joi.object<GetItemBranchPricing>({
   branchId: Joi.number().integer().positive().required().messages({
@@ -28,19 +37,9 @@ export const getItemBranchMapSchema = Joi.object<GetItemBranchPricing>({
 export const itemBranchMapSchema = Joi.object<
   ItemBranchMap | createItemBranchMapInput
 >({
-  branchId: Joi.number().integer().positive().required().messages({
-    "any.required": "Branch Id is required",
-    "number.base": "Branch Id must be a number",
-    "number.integer": "Branch Id must be an integer",
-    "number.positive": "Branch Id must be a positive number",
-  }),
+  branchId: idRequired("Branch Id"),
 
-  itemId: Joi.number().integer().positive().required().messages({
-    "any.required": "Item Id is required",
-    "number.base": "Item Id must be a number",
-    "number.integer": "Item Id must be an integer",
-    "number.positive": "Item Id must be a positive number",
-  }),
+  itemId: idRequired("Item Id"),
 
   defaultDiscount: joiDecimalFromSettings({
     key: "itemPrecision",
@@ -76,23 +75,11 @@ export const itemBranchMapSchema = Joi.object<
     "number.precision": "Tax must have {{#limit}} decimal places",
   }),
 
-  taxMethod: Joi.string()
-    .valid(...Object.values(TAX_METHOD))
-    .optional()
-    .messages({
-      "string.base": "Tax Method must be a string",
-      "any.only": `Tax Method must be one of [${Object.values(TAX_METHOD).join(", ")}]`,
-    }),
+  taxMethod: enumOptional("Tax Method", TAX_METHOD),
 
-  purchaseAmount: Joi.number().min(0).optional().messages({
-    "number.base": "Purchase Amount must be a number",
-    "number.min": "Purchase Amount cannot be less than 0",
-  }),
+  purchaseAmount: intOptional("Purchase amount", 0),
 
-  saleAmount: Joi.number().min(0).optional().messages({
-    "number.base": "Sale Amount must be a number",
-    "number.min": "Sale Amount cannot be less than 0",
-  }),
+  saleAmount: intOptional("Sale amount", 0),
 
   insurancePercentage: joiDecimalFromSettings({
     key: "itemPrecision",
@@ -118,29 +105,15 @@ export const itemBranchMapSchema = Joi.object<
       "Walk In Percentage must have {{#limit}} decimal places",
   }),
 
-  onHoldSale: Joi.date().optional().allow(null).messages({
-    "date.base": "On Hold Sale must be a valid date",
-  }),
+  onHoldSale: dateOptional("On Hold Sale"),
 });
 
 export const createItemBranchMapSchema = itemBranchMapSchema.keys({
-  branchId: Joi.array()
-    .items(Joi.number().integer().positive())
-    .min(1)
-    .required()
-    .messages({
-      "array.base": "Branch Id must be an array of numbers",
-      "array.min": "Branch Id must contain at least one branch",
-      "any.required": "Branch Id is required",
-    }),
+  branchId: numberArrayRequired("Branch Id", 1),
 });
 
 export const updateItemBranchMapSchema = itemBranchMapSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-    "any.required": "Id is required",
-  }),
+  id: idRequired("Id"),
 });
 
 export const InputExcelItemBranchMapSchema = Joi.object({
@@ -187,23 +160,15 @@ export const InputExcelItemBranchMapSchema = Joi.object({
     .optional()
     .messages({
       "string.base": "Tax Method must be a string",
-      "any.only": `Tax Method must be one of [${Object.values(TAX_METHOD).join(", ")}]`,
+      "any.only": `Tax Method must be one of [${Object.values(TAX_METHOD).join(
+        ", "
+      )}]`,
     }),
 });
 
 export const ItemWiseUpdateDetailSchema = Joi.object({
-  id: Joi.number().positive().integer().required().strict().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-    "number.positive": "Id must be a positive number",
-    "any.required": "Id is required",
-  }),
-  branchId: Joi.number().positive().integer().required().strict().messages({
-    "number.base": "Branch Id must be a number",
-    "number.integer": "Branch Id must be an integer",
-    "number.positive": "Branch Id must be a positive number",
-    "any.required": "Branch Id is required",
-  }),
+  id: idRequired("Id"),
+  branchId: idRequired("Branch Id"),
   insurancePercentage: joiDecimalFromSettings({
     key: "itemPrecision",
     max: 100,
@@ -229,7 +194,7 @@ export const ItemWiseUpdateDetailSchema = Joi.object({
       "number.base": "Sale Amount must be a number",
       "number.min": "Sale Amount cannot be less than 0",
       "number.precision": "Sale Amount must have {{#limit}} decimal places",
-    },
+    }
   ),
 })
   .or("insurancePercentage", "walkInPercentage", "saleAmount")
@@ -239,27 +204,9 @@ export const ItemWiseUpdateDetailSchema = Joi.object({
   });
 
 export const ItemWiseItemBranchMapUpdateSchema = Joi.object({
-  ccId: Joi.number().positive().integer().required().strict().messages({
-    "number.base": "ccId must be a number",
-    "number.integer": "ccId must be an integer",
-    "number.positive": "ccId must be a positive number",
-    "any.required": "ccId is required",
-  }),
-  itemId: Joi.number().positive().integer().required().strict().messages({
-    "number.base": "Item Id must be a number",
-    "number.integer": "Item Id must be an integer",
-    "number.positive": "Item Id must be a positive number",
-    "any.required": "Item Id is required",
-  }),
-  details: Joi.array()
-    .items(ItemWiseUpdateDetailSchema)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": "Details must be an array",
-      "array.min": "Details must contain at least one item",
-      "any.required": "Details is required",
-    }),
+  ccId: idRequired("ccId"),
+  itemId: idRequired("itemId"),
+  details: arrayRequired("details", ItemWiseUpdateDetailSchema, 1),
 });
 
 export const ItemBranchMapCopySchema = Joi.object({
@@ -286,7 +233,7 @@ export const ItemBranchMapCopySchema = Joi.object({
 export function validateCreateItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   const { error } = createItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -303,7 +250,7 @@ export function validateCreateItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -313,7 +260,7 @@ export function validateCreateItemBranchMap(
 export function validateGetItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   const { error } = getItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -330,7 +277,7 @@ export function validateGetItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -340,7 +287,7 @@ export function validateGetItemBranchMap(
 export function validateUpdateItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   const { error } = updateItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -357,7 +304,7 @@ export function validateUpdateItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -367,7 +314,7 @@ export function validateUpdateItemBranchMap(
 export function validateInputExcelItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   const { error } = InputExcelItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -384,7 +331,7 @@ export function validateInputExcelItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -394,7 +341,7 @@ export function validateInputExcelItemBranchMap(
 export function validateItemWiseItemBranchMapUpdate(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   const { error } = ItemWiseItemBranchMapUpdateSchema.validate(req.body, {
     abortEarly: false,
@@ -411,7 +358,7 @@ export function validateItemWiseItemBranchMapUpdate(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 
@@ -421,7 +368,7 @@ export function validateItemWiseItemBranchMapUpdate(
 export function validateItemBranchMapCopy(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   const { error } = ItemBranchMapCopySchema.validate(req.body, {
     abortEarly: false,
@@ -438,7 +385,7 @@ export function validateItemBranchMapCopy(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 

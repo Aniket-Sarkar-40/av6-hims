@@ -1,83 +1,32 @@
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import {
+  arrayRequired,
+  boolOptional,
+  idOptional,
+  idRequired,
+  intOptional,
+  intRequired,
+  strOptional,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
 export const medicineTabDetailsItemSchema = Joi.object({
-  medId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Medicine"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Medicine"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Medicine"),
-    }),
+  medId: idRequired("Medicine Id"),
 
-  morn: Joi.number()
-    .integer()
-    .optional()
-    .allow(null, "")
-    .messages({
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Morning Dose",
-      ),
-    }),
+  morn: intOptional("Morning Dose"),
 
-  aft: Joi.number()
-    .integer()
-    .optional()
-    .allow(null, "")
-    .messages({
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Afternoon Dose",
-      ),
-    }),
+  aft: intOptional("Afternoon Dose"),
 
-  night: Joi.number()
-    .integer()
-    .optional()
-    .allow(null, "")
-    .messages({
-      "number.integer": generateValidationErrorMessage("INTEGER", "Night Dose"),
-    }),
+  night: intOptional("Night Dose"),
 
-  sos: Joi.boolean()
-    .default(false)
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "SOS"),
-    }),
+  sos: boolOptional("SOS").default(false),
 
-  duration: Joi.number()
-    .integer()
-    .min(1)
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Duration"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Duration"),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Duration",
-        "1",
-      ),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Duration"),
-    }),
+  duration: intRequired("Duration", 1),
 
-  notes: Joi.string()
-    .max(255)
-    .allow(null, "")
-    .optional()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Notes"),
-      "string.max": generateValidationErrorMessage("MAX_VALUE", "Notes", "255"),
-    }),
+  notes: strOptional("Notes"),
 
-  isActive: Joi.boolean()
-    .default(true)
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Is Active"),
-    }),
+  isActive: boolOptional("Is Active").default(true),
 })
   .custom((v, h) => {
     if (!["morn", "aft", "night"].some((key) => Number(v[key]) > 0)) {
@@ -91,105 +40,33 @@ export const medicineTabDetailsItemSchema = Joi.object({
     "any.custom": generateValidationErrorMessage(
       "EMPTY",
       "Dose",
-      "Please enter at least one dose",
+      "Please enter at least one dose"
     ),
   });
 
 export const createMedicineTabDetailsSchema = Joi.object({
-  medicineTabId: Joi.number()
-    .integer()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Medicine Tab ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Medicine Tab ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Medicine Tab ID",
-      ),
-    }),
+  medicineTabId: idRequired("Medicine Tab Id"),
 
-  data: Joi.array()
-    .items(medicineTabDetailsItemSchema)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": generateValidationErrorMessage("ARRAY", "Data"),
-      "array.min": generateValidationErrorMessage("MIN", "Data", "1"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Data"),
-    }),
+  data: arrayRequired("Medicine Tab Details", medicineTabDetailsItemSchema, 1),
 });
 
-export const validateMedicineTabDetailsCreate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = createMedicineTabDetailsSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: "Invalid medicine tab details data",
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateMedicineTabDetailsCreate = validationHandler({
+  schema: createMedicineTabDetailsSchema,
+});
 
 const medicineTabDetailsItemUpdateSchema = medicineTabDetailsItemSchema.keys({
-  id: Joi.number()
-    .integer()
-    .optional()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Detail ID"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Detail ID"),
-    }),
+  id: idOptional("Medicine Tab Detail Id"),
 });
 
 export const updateMedicineTabDetailsSchema =
   createMedicineTabDetailsSchema.keys({
-    data: Joi.array()
-      .items(medicineTabDetailsItemUpdateSchema)
-      .min(1)
-      .required()
-      .messages({
-        "array.base": generateValidationErrorMessage("ARRAY", "Data"),
-        "array.min": generateValidationErrorMessage("MIN", "Data", "1"),
-        "any.required": generateValidationErrorMessage("REQUIRED", "Data"),
-      }),
+    data: arrayRequired(
+      "Medicine Tab Details",
+      medicineTabDetailsItemUpdateSchema,
+      1
+    ),
   });
 
-export const validateMedicineTabDetailsUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = updateMedicineTabDetailsSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: "Invalid medicine tab details update data",
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateMedicineTabDetailsUpdate = validationHandler({
+  schema: updateMedicineTabDetailsSchema,
+});

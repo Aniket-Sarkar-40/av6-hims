@@ -11,45 +11,36 @@ import {
   TAX_METHOD,
 } from "@repo/db/generated/prisma/enums.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import {
+  arrayRequired,
+  dateOptional,
+  dateRequired,
+  enumOptional,
+  enumRequired,
+  idOptional,
+  idRequired,
+  intRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
 export const grnReturnDetailSchema = Joi.object<CreateGrnReturnDetailsInput>({
-  itemId: Joi.number().integer().required().strict().messages({
-    "number.base": "Item Id must be a number",
-    "number.integer": "Item Id must be an integer",
-    "any.required": "Item Id is required",
-  }),
+  itemId: idRequired("Item Id"),
 
-  itemCategoryId: Joi.number().integer().optional().allow(null).messages({
-    "number.base": "Item category Id must be a number",
-    "number.integer": "Item category Id must be an integer",
-  }),
+  itemCategoryId: idOptional("Item Category Id"),
 
-  itemMedCategory: Joi.string().required().messages({
-    "string.base": "Item medical category must be a string",
-    "any.required": "Item medical category is required",
-  }),
+  itemMedCategory: strRequired("Item Medicine Category"),
 
-  grnDetailsId: Joi.number().integer().required().strict().messages({
-    "number.base": "GRN details Id must be a number",
-    "number.integer": "GRN details Id must be an integer",
-    "any.required": "GRN details Id is required",
-  }),
+  grnDetailsId: idRequired("GRN Details Id"),
 
-  batchNo: Joi.string().required().messages({
-    "string.base": "Batch number must be a string",
-    "any.required": "Batch number is required",
-  }),
+  batchNo: strRequired("Batch No"),
 
-  expiryDate: Joi.date().optional().allow(null).messages({
-    "date.base": "Expiry date must be a valid date",
-  }),
+  expiryDate: dateOptional("Expiry Date"),
 
-  quantity: Joi.number().integer().required().strict().messages({
-    "number.base": "Quantity must be a number",
-    "any.required": "Quantity is required",
-  }),
+  quantity: intRequired("Quantity"),
 
   purchasedPrice: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -83,15 +74,7 @@ export const grnReturnDetailSchema = Joi.object<CreateGrnReturnDetailsInput>({
     "any.required": "Net Tax is required",
   }),
 
-  taxMethod: Joi.string()
-    .valid(...Object.values(TAX_METHOD))
-    .required()
-    .strict()
-    .messages({
-      "string.base": "Tax method must be a string",
-      "any.only": `Tax method must be one of ${Object.values(TAX_METHOD).join(", ")}`,
-      "any.required": "Tax method is required",
-    }),
+  taxMethod: enumRequired("Tax Method", TAX_METHOD),
 
   netAmount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -102,15 +85,7 @@ export const grnReturnDetailSchema = Joi.object<CreateGrnReturnDetailsInput>({
     "any.required": "Net amount is required",
   }),
 
-  discountMethod: Joi.string()
-    .valid(...Object.values(DiscMethod))
-    .required()
-    .strict()
-    .messages({
-      "string.base": "Discount Method must be a string",
-      "any.only": `Discount Method must be one of ${Object.values(DiscMethod).join(", ")}`,
-      "any.required": "Discount Method is required",
-    }),
+  discountMethod: enumRequired("Discount Method", DiscMethod),
 
   discount: joiDecimalFromSettings({ key: "grnPrecision" }).messages({
     "number.base": "Discount must be a number",
@@ -126,67 +101,29 @@ export const grnReturnDetailSchema = Joi.object<CreateGrnReturnDetailsInput>({
     "any.required": "Net Discount is required",
   }),
 
-  orderQty: Joi.number().integer().required().strict().messages({
-    "number.base": "Order quantity must be a number",
-    "any.required": "Order quantity is required",
-  }),
+  orderQty: intRequired("Order Quantity"),
 
-  inHandQty: Joi.number().integer().required().strict().messages({
-    "number.base": "In-hand quantity must be a number",
-    "any.required": "In-hand quantity is required",
-  }),
+  inHandQty: intRequired("In Hand Quantity"),
 
-  grnQty: Joi.number().integer().required().strict().messages({
-    "number.base": "GRN quantity must be a number",
-    "any.required": "GRN quantity is required",
-  }),
+  grnQty: intRequired("GRN Quantity"),
 });
 
 export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
-  grnId: Joi.number().integer().required().strict().messages({
-    "number.base": "GRN ID must be a number",
-    "number.integer": "GRN ID must be an integer",
-    "any.required": "GRN ID is required",
-  }),
+  grnId: idRequired("GRN Id"),
 
-  poNumber: Joi.string().required().messages({
-    "string.base": "PO number must be a string",
-    "any.required": "PO number is required",
-  }),
+  poNumber: strRequired("PO Number"),
 
-  grnNumber: Joi.string().required().messages({
-    "string.base": "GRN number must be a string",
-    "any.required": "GRN number is required",
-  }),
+  grnNumber: strRequired("GRN Number"),
 
-  poId: Joi.number().integer().required().strict().messages({
-    "number.base": "PO ID must be a number",
-    "number.integer": "PO ID must be an integer",
-    "any.required": "PO ID is required",
-  }),
+  poId: idRequired("PO Id"),
 
-  date: Joi.date().required().messages({
-    "date.base": "Date must be a valid date",
-    "any.required": "Date is required",
-  }),
+  date: dateRequired("Date"),
 
-  distributorId: Joi.number().integer().required().strict().messages({
-    "number.base": "Distributor ID must be a number",
-    "number.integer": "Distributor ID must be an integer",
-    "any.required": "Distributor ID is required",
-  }),
+  distributorId: idRequired("Distributor Id"),
 
-  warehouseId: Joi.number().integer().required().strict().messages({
-    "number.base": "Warehouse ID must be a number",
-    "number.integer": "Warehouse ID must be an integer",
-    "any.required": "Warehouse ID is required",
-  }),
+  warehouseId: idRequired("Warehouse Id"),
 
-  ccId: Joi.number().integer().required().strict().messages({
-    "number.base": "CC ID must be a number",
-    "number.integer": "CC ID must be an integer",
-    "any.required": "CC ID is required",
-  }),
+  ccId: idRequired("CC Id"),
 
   totalAmount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -206,14 +143,7 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
     "number.precision": "Discount must have at most {{#limit}} decimal places.",
   }),
 
-  discountMethod: Joi.string()
-    .valid(...Object.values(DiscMethod))
-    .required()
-    .messages({
-      "string.base": "Discount method must be a string",
-      "any.only": `Discount method must be one of ${Object.values(DiscMethod).join(", ")}`,
-      "any.required": "Discount method is required",
-    }),
+  discountMethod: enumRequired("Discount Method", DiscMethod),
 
   netDiscount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -243,38 +173,17 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
       "Paid amount must have at most {{#limit}} decimal places.",
   }),
 
-  notes: Joi.string().optional().allow(null, "").messages({
-    "string.base": "Notes must be a string",
-  }),
+  notes: strOptional("Notes"),
 
-  paymentStatus: Joi.string()
-    .valid(...Object.values(PAYMENT_STATUS))
-    .optional()
-    .messages({
-      "string.base": "Payment status must be a string",
-      "any.only": `Payment status must be one of ${Object.values(PAYMENT_STATUS).join(", ")}`,
-    }),
+  paymentStatus: enumOptional("Payment Status", PAYMENT_STATUS),
 
-  status: Joi.string()
-    .valid(...Object.values(RETURN_STS))
-    .optional()
-    .messages({
-      "string.base": "Status must be a string",
-      "any.only": `Status must be one of ${Object.values(RETURN_STS).join(", ")}`,
-    }),
+  status: enumOptional("Status", RETURN_STS),
 
-  billNo: Joi.string().optional().allow(null).messages({
-    "string.base": "Bill number must be a string",
-  }),
+  billNo: strOptional("Bill No"),
 
-  billDate: Joi.date().optional().allow(null).messages({
-    "date.base": "Bill date must be a valid date",
-  }),
+  billDate: dateOptional("Bill Date"),
 
-  dueDate: Joi.date().required().messages({
-    "date.base": "Due date must be a valid date",
-    "any.required": "Due date is required",
-  }),
+  dueDate: dateRequired("Due Date"),
 
   tax: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -301,191 +210,56 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
     "number.precision": "Shipping must have at most {{#limit}} decimal places.",
   }),
 
-  creditNoteType: Joi.string().required().messages({
-    "string.base": "Credit note type must be a string",
-    "any.required": "Credit note type is required",
-  }),
+  creditNoteType: strRequired("Credit note type"),
 
-  creditNoteNo: Joi.number().required().messages({
-    "number.base": "Credit note number must be a number",
-    "any.required": "Credit note number is required",
-  }),
+  creditNoteNo: intRequired("Credit Note No"),
 
-  goodReceiveReturnDetails: Joi.array()
-    .items(grnReturnDetailSchema)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": "Good receive return details must be an array",
-      "array.min": "At least one Good receive return detail is required",
-      "any.required": "Good receive return details are required",
-    }),
-});
-
-export const grnReturnExcelSchema = Joi.object<GrnReturnReqExcelFilter>({
-  id: Joi.number().integer().optional().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-  }),
-  grnId: Joi.number().integer().optional().messages({
-    "number.base": "GRN ID must be a number",
-    "number.integer": "GRN ID must be an integer",
-  }),
-  grnNumber: Joi.string().optional().messages({
-    "string.base": "GRN number must be a string",
-  }),
-  poNumber: Joi.string().optional().allow(null, "").messages({
-    "string.base": "PO number must be a string",
-  }),
-  startDate: Joi.string().isoDate().optional().messages({
-    "string.base": `Start date must be a string`,
-    "string.isoDate": `Start date must be in ISO 8601 date format (YYYY-MM-DD)`,
-  }),
-  endDate: Joi.string().isoDate().optional().messages({
-    "string.base": `End date must be a string`,
-    "string.isoDate": `End date must be in ISO 8601 date format (YYYY-MM-DD)`,
-  }),
-  distributorId: Joi.number().integer().optional().messages({
-    "number.base": "Distributor ID must be a number",
-    "number.integer": "Distributor ID must be an integer",
-  }),
-  warehouseId: Joi.number().integer().optional().messages({
-    "number.base": "Warehouse ID must be a number",
-    "number.integer": "Warehouse ID must be an integer",
-  }),
-  status: Joi.string()
-    .valid(...Object.values(RETURN_STS))
-    .optional()
-    .messages({
-      "string.base": "Status must be a string",
-      "any.only": `Status must be one of ${Object.values(RETURN_STS).join(", ")}`,
-    }),
-  paymentStatus: Joi.string()
-    .valid(...Object.values(PAYMENT_STATUS))
-    .optional()
-    .messages({
-      "string.base": "Payment status must be a string",
-      "any.only": `Payment status must be one of ${Object.values(PAYMENT_STATUS).join(", ")}`,
-    }),
-});
-
-export const validateGrnReturn = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = grnReturnSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
-
-export const grnReturnSchemaUpdate = grnReturnSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "any.required": "ID is required",
-  }),
-  goodReceiveReturnDetails: Joi.array().items(
-    grnReturnDetailSchema.keys({
-      id: Joi.number().integer().optional().messages({
-        "number.base": "ID must be a number",
-        "number.integer": "ID must be an integer",
-        // "any.required": "ID is required",
-      }),
-      grnDetailsId: Joi.number().integer().optional().strict().messages({
-        "number.base": "GRN details ID must be a number",
-        "number.integer": "GRN details ID must be an integer",
-      }),
-    }),
+  goodReceiveReturnDetails: arrayRequired(
+    "Good Receive Return Details",
+    grnReturnDetailSchema,
+    1
   ),
 });
 
-export const validateGrnReturnUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = grnReturnSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
-
-export const grnReturnSchemaApprove = grnReturnSchemaUpdate.keys({
-  ccId: Joi.number().integer().required().strict().messages({
-    "number.base": "CC Id must be a number",
-    "number.integer": "CC Id must be an integer",
-    "any.required": "CC Id is required",
-  }),
+export const grnReturnExcelSchema = Joi.object<GrnReturnReqExcelFilter>({
+  id: idOptional("Id"),
+  grnId: idOptional("GRN Id"),
+  grnNumber: strOptional("GRN Number"),
+  poNumber: strOptional("PO Number"),
+  startDate: dateOptional("Start Date"),
+  endDate: dateOptional("End Date"),
+  distributorId: idOptional("Distributor Id"),
+  warehouseId: idOptional("Warehouse Id"),
+  status: enumOptional("Status", RETURN_STS),
+  paymentStatus: enumOptional("Payment Status", PAYMENT_STATUS),
 });
 
-export const validateGrnReturnApprove = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = grnReturnSchemaApprove.validate(req.body, {
-    abortEarly: false,
-  });
+export const validateGrnReturn = validationHandler({
+  schema: grnReturnSchema,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
+export const grnReturnSchemaUpdate = grnReturnSchema.keys({
+  id: idRequired("Id"),
+  goodReceiveReturnDetails: Joi.array().items(
+    grnReturnDetailSchema.keys({
+      id: idOptional("Id"),
+      grnDetailsId: idOptional("GRN Details Id"),
+    })
+  ),
+});
 
-  next();
-};
+export const validateGrnReturnUpdate = validationHandler({
+  schema: grnReturnSchemaUpdate,
+});
 
-export const validateGrnReturnExcel = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = grnReturnExcelSchema.validate(req.body, {
-    abortEarly: false,
-  });
+export const grnReturnSchemaApprove = grnReturnSchemaUpdate.keys({
+  ccId: idRequired("CC Id"),
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
+export const validateGrnReturnApprove = validationHandler({
+  schema: grnReturnSchemaApprove,
+});
 
-  next();
-};
+export const validateGrnReturnExcel = validationHandler({
+  schema: grnReturnExcelSchema,
+});
