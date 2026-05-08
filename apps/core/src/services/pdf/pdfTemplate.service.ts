@@ -2,12 +2,14 @@ import {
   createPdfTemplateInDb,
   deletePdfTemplateByIdFromDb,
   getPdfTemplateByIdFromDb,
+  getPdfTemplateByModuleAndTypeFromDb,
   makeDefaultPdfTemplateByIdFromDb,
   updatePdfTemplateImageUrl,
   updatePdfTemplateInDb,
 } from "@/repository/pdf/pdfTemplate.repository.js";
 import {
   CreatePdfTemplateInput,
+  GetPdfTemplateByModuleAndTypeInput,
   MakeDefaultPdfTemplateInput,
   UpdatePdfTemplateInput,
 } from "@/types/pdf/pdfTemplate.js";
@@ -17,6 +19,7 @@ import { createPdfThumbnail } from "@repo/shared/utils/pdfToPic.utils.js";
 import {
   addToCache,
   deleteCache,
+  getAllCache,
   getCacheById,
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
@@ -138,5 +141,41 @@ export const pdfTemplateService = {
     //   deleteFileIfExists(previousImageUrl);
     // }
     logger.info("exiting::createAndUpdatePdfThumbnail::service");
+  },
+
+  async getPdfTemplateByModuleAndType(
+    input: GetPdfTemplateByModuleAndTypeInput
+  ): Promise<PdfTemplate> {
+    logger.info("entering::getPdfTemplateByModuleAndType::service");
+
+    const isCacheable = await checkIsCacheable(SHORT_CODE.PDF_TEMPLATE);
+    if (isCacheable) {
+      const pdfTemplates = (await getAllCache(cacheKey)) as PdfTemplate[];
+
+      const filteredPdfTemplate = pdfTemplates.find(
+        (pdfTemplate) =>
+          pdfTemplate.module === input.module &&
+          pdfTemplate.templateType === input.type
+      );
+
+      if (filteredPdfTemplate) {
+        return filteredPdfTemplate;
+      } else {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Pdf Template")
+        );
+      }
+    } else {
+      const pdfTemplate = await getPdfTemplateByModuleAndTypeFromDb(input);
+      if (pdfTemplate) {
+        return pdfTemplate;
+      } else {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Pdf Template")
+        );
+      }
+    }
   },
 };

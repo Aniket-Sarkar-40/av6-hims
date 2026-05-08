@@ -76,3 +76,34 @@ export const authorizeCommonApproval =
       return next(error);
     }
   };
+
+export const authorizeExternal =
+  () => async (req: AuthRequest, res: Response, next: NextFunction) => {
+    logger.info("entering::authorizeCommonApproval ::middleware");
+    try {
+      const clientKey = req.header("client-key");
+      const clientId = req.header("client-id");
+
+      if (!clientKey) {
+        logger.error("Client Key is missing in the request header.");
+        throw new ErrorHandler(403, "You are not authorized.");
+      }
+      if (!clientId) {
+        logger.error("Client Key is missing in the request header.");
+        throw new ErrorHandler(403, "You are not authorized.");
+      }
+
+      if (clientKey !== generateHashForAuth(clientId)) {
+        logger.error(`Unauthorized client Key: ${clientKey}`);
+        throw new ErrorHandler(403, "You are not authorized.");
+      }
+
+      logger.info("exiting::authorizeCommonApproval ::middleware");
+      // only one next(), and we return it so nothing else runs
+      return next();
+    } catch (error) {
+      // log the actual Error object
+      logger.error("authorizeCommonApproval failed:", error);
+      return next(error);
+    }
+  };

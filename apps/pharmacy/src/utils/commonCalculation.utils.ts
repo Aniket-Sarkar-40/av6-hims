@@ -7,14 +7,14 @@ import {
   DecimalToNumber,
 } from "@repo/platform/types/common.js";
 import { PrecisionKey } from "@repo/shared/utils/helper.utils.js";
-import { CalculationRes } from "av6-core";
+import { CalculationRes } from "av6-core-v2";
 import { RoundFormat } from "av6-utils";
 import Joi from "joi";
 
 export function applyRound(
   value: number,
   format: RoundFormat,
-  precision = 2,
+  precision = 2
 ): number {
   switch (format) {
     case RoundFormat.NONE:

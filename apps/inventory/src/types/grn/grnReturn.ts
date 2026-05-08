@@ -6,7 +6,7 @@ import {
   RETURN_STS,
 } from "@repo/db/generated/prisma/client";
 import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
-import { EmployeeCache } from "av6-core";
+import { EmployeeCache } from "av6-core-v2";
 import { ItemSupplierDTO } from "../master/itemSupplier.js";
 
 export interface GrnReturnDetailInput

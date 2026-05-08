@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { CreateOrUpdateDoctor } from "@/types/staff/doctor.js";
 import {

@@ -36,7 +36,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 
 export const toItemMasterDTO = async (
-  data: InvItem[],
+  data: InvItem[]
 ): Promise<ItemMasterDto[]> => {
   const itemCategories = await commonService.getAllElements<"InvItemCategory">({
     cacheCode: "ITEM_CATEGORY",
@@ -122,15 +122,15 @@ export const toItemMasterDTO = async (
 
 export const toItemMasterDTOForItemSupplierMap = async (
   model: InvItem,
-  itemReq?: GetItemReq,
+  itemReq?: GetItemReq
 ): Promise<ItemMasterDtoStock> => {
   const itemCategoryRow = await itemCategoryService.getItemCategoryById(
     model.itemCategoryId,
-    true,
+    true
   );
   const unitMasterRow = await unitMasterService.getUnitMasterById(
     model.unitId,
-    true,
+    true
   );
   const taxDetailsRow = model.taxDetailsId
     ? await taxDetailsService.getTaxDetailsById(model.taxDetailsId, true)
@@ -139,11 +139,16 @@ export const toItemMasterDTOForItemSupplierMap = async (
     ? await storageService.getStorageById(model.storageId, true)
     : null;
 
+  const settings = await settingsService.getSettings(true);
+
+  const supplierMode = settings?.supplierMode;
+
   let finalBasePrice = model.basePrice;
   if (itemReq) {
-    if (itemReq.ccId && itemReq.supplierId) {
-      const itemSupplierMap =
-        await itemSupplierMapService.getItemSupplierMap(itemReq);
+    if (itemReq.ccId && itemReq.supplierId && supplierMode) {
+      const itemSupplierMap = await itemSupplierMapService.getItemSupplierMap(
+        itemReq
+      );
       if (itemSupplierMap) {
         finalBasePrice = Number(itemSupplierMap.purchasePrice);
       }
@@ -200,7 +205,7 @@ export const toItemMasterDTOForItemSupplierMap = async (
 };
 
 export const toItemSearchDTO = async (
-  input: ItemSearchInput,
+  input: ItemSearchInput
 ): Promise<ItemSearchDTO> => {
   const item = input.item;
 
@@ -235,11 +240,11 @@ export const toItemSearchDTO = async (
 };
 
 export const toItemStockDTO = async (
-  stock: InvItemStock,
+  stock: InvItemStock
 ): Promise<ItemStockDTO> => {
   const item = await itemMasterService.getItemMasterById(
     { itemId: stock.itemId },
-    true,
+    true
   );
   const user = stock.userId
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(stock.userId, true)
@@ -254,7 +259,7 @@ export const toItemStockDTO = async (
 
 export const toItemEntity = (
   item: ItemMasterEntity,
-  itemImage: ItemImageFiles,
+  itemImage: ItemImageFiles
 ): ItemMasterReq => {
   return {
     item: item.item,
@@ -296,7 +301,7 @@ export const toItemEntity = (
 
 export const toItemUpdateEntity = (
   item: ItemMasterUpdateEntity,
-  itemImage: ItemImageFiles,
+  itemImage: ItemImageFiles
 ): ItemMasterUpdateReq => {
   return {
     ...toItemEntity(item, itemImage),
@@ -331,6 +336,6 @@ export async function itemMasterToDto(item: ItemMasterDto) {
     "isBatchNumber",
     "isExpireDate",
     "isReturnable",
-    "isLock",
+    "isLock"
   ) as ItemMasterToDto | null;
 }

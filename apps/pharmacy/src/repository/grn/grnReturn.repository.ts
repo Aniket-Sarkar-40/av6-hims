@@ -11,7 +11,7 @@ import {
 import { API_TIMEOUT } from "@repo/shared";
 import { RETURN_STS } from "@repo/db/generated/prisma/enums.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { subItemStock } from "../stock/stock.repository.js";
 import { featureFlagService } from "@/services/feature/feature.service.js";
 import { emailConfigService } from "@/services/master/emailConfig.service.js";
@@ -50,7 +50,7 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
                   grnDetailId: omittedGrnRetDet.omitted.grnDetailsId,
                   createdBy: currentUser,
                 };
-              },
+              }
             ),
           },
         },
@@ -67,7 +67,7 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
 
       const feature = await featureFlagService.getFeatureFlagByShortCode(
         "GRN_RETURN_NOTIFICATION",
-        true,
+        true
       );
       if (distributor?.returnEmail) {
         const emailTemplate = await emailConfigService.getEventEmail();
@@ -95,7 +95,7 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
@@ -122,13 +122,13 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number",
+    (d) => typeof d.id === "number"
   );
   const toCreate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id !== "number",
+    (d) => typeof d.id !== "number"
   );
   const toDelete = grnReturn.goodReceiveReturnDetails.filter(
-    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id),
+    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id)
   );
 
   return await db.$transaction(
@@ -194,13 +194,13 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
 export const getCountGrnReturnDetailsFromDb = async (
   detailIds: number[],
-  grnReturnId: number,
+  grnReturnId: number
 ): Promise<number> => {
   logger.info("entering::getCountGrnReturnDetailsFromDb::repository");
 
@@ -233,7 +233,7 @@ export const getAllGrnReturnFromDb = async (): Promise<GrnReturnResponse[]> => {
 };
 
 export const getGrnReturnByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<GoodReceivedReturnResponse | null> => {
   logger.info(`entering::getGrnReturnByIdFromDb::repository id=${id}`);
 
@@ -278,7 +278,7 @@ export const deleteGrnReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
@@ -291,7 +291,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number",
+    (d) => typeof d.id === "number"
   );
   // const toCreate = goodReceiveReturnDetails.filter(
   //   (d) => typeof d.id !== "number"
@@ -346,7 +346,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
             refDetailsId: detail.id!,
             refId: id,
             refNo: grnReturnData.grnNumber,
-          },
+          }
         );
       }
 
@@ -364,7 +364,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
               },
             },
           });
-        }),
+        })
       );
 
       await tx.pmsGoodReceive.update({
@@ -380,7 +380,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
@@ -417,7 +417,7 @@ export const rejectGrnReturnInDb = async (input: {
 };
 
 export const getGrnReturnForExcelInDb = async (
-  input: GrnReturnReqExcelFilter,
+  input: GrnReturnReqExcelFilter
 ): Promise<GrnReturnResponse[]> => {
   logger.info("entering::getGrnReturnForExcelInDb::repository");
   const results = await db.pmsGoodReceiveReturn.findMany({

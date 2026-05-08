@@ -1,6 +1,6 @@
 import { DocumentMasterReq } from "@/types/appointment/document.js";
 import { DocumentName } from "@repo/db/generated/prisma/client";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import Joi from "joi";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import {

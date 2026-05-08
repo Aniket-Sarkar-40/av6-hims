@@ -17,7 +17,7 @@ import {
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 

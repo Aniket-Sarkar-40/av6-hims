@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import { CreateStaffDesignationInput } from "@/types/staff/designation.js";
 import { strRequired } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";

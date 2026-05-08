@@ -1,4 +1,4 @@
-import { CommonFilterWithDate } from "av6-core";
+import { CommonFilterWithDate } from "av6-core-v2";
 
 export interface SellInformation {
   id: number;

@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { DropDownName } from "@/types/master/dropDownName.js";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import {
   idRequired,
   patternRequired,

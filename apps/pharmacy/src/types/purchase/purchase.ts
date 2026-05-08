@@ -65,10 +65,8 @@ export type PurchaseOrderDetailsBase =
     };
   }>;
 
-export interface PurchaseOrderDetailsDto extends Omit<
-  PurchaseOrderDetailsBase,
-  "createdBy"
-> {
+export interface PurchaseOrderDetailsDto
+  extends Omit<PurchaseOrderDetailsBase, "createdBy"> {
   item: DecimalToNumber<PmsItem> | null;
   distributor: Distributor | null;
   warehouse: PmsWarehouse | null;

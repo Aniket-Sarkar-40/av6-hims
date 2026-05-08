@@ -35,12 +35,12 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      av6-core:
-        specifier: ^1.7.11
-        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+      av6-core-v2:
+        specifier: ^1.0.5
+        version: 1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0)
       av6-pdf-engine:
-        specifier: ^1.0.9
-        version: 1.0.9(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
+        specifier: ^1.2.0
+        version: 1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -136,9 +136,12 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      av6-core:
-        specifier: ^1.7.11
-        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+      av6-core-v2:
+        specifier: ^1.0.5
+        version: 1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0)
+      av6-pdf-engine:
+        specifier: ^1.2.0
+        version: 1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -185,9 +188,9 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      av6-core:
-        specifier: ^1.7.11
-        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+      av6-core-v2:
+        specifier: ^1.0.5
+        version: 1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -237,9 +240,9 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      av6-core:
-        specifier: ^1.7.11
-        version: 1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0)
+      av6-core-v2:
+        specifier: ^1.0.5
+        version: 1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -390,6 +393,9 @@ importers:
       '@prisma/client':
         specifier: ^7.0.0
         version: 7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2)
+      av6-pdf-engine:
+        specifier: ^1.2.0
+        version: 1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -1011,14 +1017,8 @@ packages:
       typescript:
         optional: true
 
-  '@prisma/config@6.19.2':
-    resolution: {integrity: sha512-kadBGDl+aUswv/zZMk9Mx0C8UZs1kjao8H9/JpI4Wh4SHZaM7zkTwiKn/iFLfRg+XtOAo/Z/c6pAYhijKl0nzQ==}
-
   '@prisma/config@7.4.2':
     resolution: {integrity: sha512-CftBjWxav99lzY1Z4oDgomdb1gh9BJFAOmWF6P2v1xRfXqQb56DfBub+QKcERRdNoAzCb3HXy3Zii8Vb4AsXhg==}
-
-  '@prisma/debug@6.19.2':
-    resolution: {integrity: sha512-lFnEZsLdFLmEVCVNdskLDCL8Uup41GDfU0LUfquw+ercJC8ODTuL0WNKgOKmYxCJVvFwf0OuZBzW99DuWmoH2A==}
 
   '@prisma/debug@7.2.0':
     resolution: {integrity: sha512-YSGTiSlBAVJPzX4ONZmMotL+ozJwQjRmZweQNIq/ER0tQJKJynNkRB3kyvt37eOfsbMCXk3gnLF6J9OJ4QWftw==}
@@ -1032,26 +1032,14 @@ packages:
   '@prisma/driver-adapter-utils@7.4.2':
     resolution: {integrity: sha512-REdjFpT/ye9KdDs+CXAXPIbMQkVLhne9G5Pe97sNY4Ovx4r2DAbWM9hOFvvB1Oq8H8bOCdu0Ri3AoGALquQqVw==}
 
-  '@prisma/engines-version@7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7':
-    resolution: {integrity: sha512-03bgb1VD5gvuumNf+7fVGBzfpJPjmqV423l/WxsWk2cNQ42JD0/SsFBPhN6z8iAvdHs07/7ei77SKu7aZfq8bA==}
-
   '@prisma/engines-version@7.5.0-10.94a226be1cf2967af2541cca5529f0f7ba866919':
     resolution: {integrity: sha512-5FIKY3KoYQlBuZC2yc16EXfVRQ8HY+fLqgxkYfWCtKhRb3ajCRzP/rPeoSx11+NueJDANdh4hjY36mdmrTcGSg==}
-
-  '@prisma/engines@6.19.2':
-    resolution: {integrity: sha512-TTkJ8r+uk/uqczX40wb+ODG0E0icVsMgwCTyTHXehaEfb0uo80M9g1aW1tEJrxmFHeOZFXdI2sTA1j1AgcHi4A==}
 
   '@prisma/engines@7.4.2':
     resolution: {integrity: sha512-B+ZZhI4rXlzjVqRw/93AothEKOU5/x4oVyJFGo9RpHPnBwaPwk4Pi0Q4iGXipKxeXPs/dqljgNBjK0m8nocOJA==}
 
-  '@prisma/fetch-engine@6.19.2':
-    resolution: {integrity: sha512-h4Ff4Pho+SR1S8XerMCC12X//oY2bG3Iug/fUnudfcXEUnIeRiBdXHFdGlGOgQ3HqKgosTEhkZMvGM9tWtYC+Q==}
-
   '@prisma/fetch-engine@7.4.2':
     resolution: {integrity: sha512-f/c/MwYpdJO7taLETU8rahEstLeXfYgQGlz5fycG7Fbmva3iPdzGmjiSWHeSWIgNnlXnelUdCJqyZnFocurZuA==}
-
-  '@prisma/get-platform@6.19.2':
-    resolution: {integrity: sha512-PGLr06JUSTqIvztJtAzIxOwtWKtJm5WwOG6xpsgD37Rc84FpfUBGLKz65YpJBGtkRQGXTYEFie7pYALocC3MtA==}
 
   '@prisma/get-platform@7.2.0':
     resolution: {integrity: sha512-k1V0l0Td1732EHpAfi2eySTezyllok9dXb6UQanajkJQzPUGi3vO2z7jdkz67SypFTdmbnyGYxvEvYZdZsMAVA==}
@@ -1598,14 +1586,14 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  av6-core@1.7.11:
-    resolution: {integrity: sha512-NWlHwwm7nhebbz5iSaIp4SPNewXJyUko1r6Q2rNFSSy57wMjlBYh4pT504KRH64+2K73mRlY2grUCWUT1k03xw==}
+  av6-core-v2@1.0.5:
+    resolution: {integrity: sha512-Gn8dA/u7Ilzhz6crVePpDscqZ2Mp3XqN8Um7XWvydSo+5ArUUeQyLN0Pe5+EmlO9gtOjARXqtd4w4nDyRfkOmQ==}
     peerDependencies:
-      '@prisma/client': ^6.19.0
+      '@prisma/client': ^7.4.0
       winston: ^3.17.0
 
-  av6-pdf-engine@1.0.9:
-    resolution: {integrity: sha512-DigzT5vmv9yTE1OQ47AU+HU6PFrswe8ADLp+KapO5XvQKeufszRTNtSOVAMvIZSt4GWDMxUGLzHWHLdbtRT1nA==}
+  av6-pdf-engine@1.2.0:
+    resolution: {integrity: sha512-1UXpHMUj7TDu5Q+u8LsLLjaAs339ATP7IvSO3AIs/+zMms7UltjFCr0rL4O6ZPdC8u6p8/o8I7KixzZe+Y1luQ==}
 
   av6-utils@1.0.6:
     resolution: {integrity: sha512-4mZiOrCt8Z8IzP5FiivIyR5n+R/ooLOcdsd10mAmN+/5fYBub1+WA/KQnqXf8rtMZhamXs2mHeHmrDkzgcUqzQ==}
@@ -2914,16 +2902,6 @@ packages:
     resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
     engines: {node: '>=14'}
     hasBin: true
-
-  prisma@6.19.2:
-    resolution: {integrity: sha512-XTKeKxtQElcq3U9/jHyxSPgiRgeYDKxWTPOf6NkXA0dNj5j40MfEsZkMbyNpwDWCUv7YBFUl7I2VK/6ALbmhEg==}
-    engines: {node: '>=18.18'}
-    hasBin: true
-    peerDependencies:
-      typescript: '>=5.1.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   prisma@7.4.2:
     resolution: {integrity: sha512-2bP8Ruww3Q95Z2eH4Yqh4KAENRsj/SxbdknIVBfd6DmjPwmpsC4OVFMLOeHt6tM3Amh8ebjvstrUz3V/hOe1dA==}
@@ -4345,15 +4323,6 @@ snapshots:
       prisma: 7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)
       typescript: 5.9.2
 
-  '@prisma/config@6.19.2':
-    dependencies:
-      c12: 3.1.0
-      deepmerge-ts: 7.1.5
-      effect: 3.18.4
-      empathic: 2.0.0
-    transitivePeerDependencies:
-      - magicast
-
   '@prisma/config@7.4.2':
     dependencies:
       c12: 3.1.0
@@ -4362,8 +4331,6 @@ snapshots:
       empathic: 2.0.0
     transitivePeerDependencies:
       - magicast
-
-  '@prisma/debug@6.19.2': {}
 
   '@prisma/debug@7.2.0': {}
 
@@ -4395,16 +4362,7 @@ snapshots:
     dependencies:
       '@prisma/debug': 7.4.2
 
-  '@prisma/engines-version@7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7': {}
-
   '@prisma/engines-version@7.5.0-10.94a226be1cf2967af2541cca5529f0f7ba866919': {}
-
-  '@prisma/engines@6.19.2':
-    dependencies:
-      '@prisma/debug': 6.19.2
-      '@prisma/engines-version': 7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7
-      '@prisma/fetch-engine': 6.19.2
-      '@prisma/get-platform': 6.19.2
 
   '@prisma/engines@7.4.2':
     dependencies:
@@ -4413,21 +4371,11 @@ snapshots:
       '@prisma/fetch-engine': 7.4.2
       '@prisma/get-platform': 7.4.2
 
-  '@prisma/fetch-engine@6.19.2':
-    dependencies:
-      '@prisma/debug': 6.19.2
-      '@prisma/engines-version': 7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7
-      '@prisma/get-platform': 6.19.2
-
   '@prisma/fetch-engine@7.4.2':
     dependencies:
       '@prisma/debug': 7.4.2
       '@prisma/engines-version': 7.5.0-10.94a226be1cf2967af2541cca5529f0f7ba866919
       '@prisma/get-platform': 7.4.2
-
-  '@prisma/get-platform@6.19.2':
-    dependencies:
-      '@prisma/debug': 6.19.2
 
   '@prisma/get-platform@7.2.0':
     dependencies:
@@ -5060,7 +5008,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  av6-core@1.7.11(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.2)(winston@3.19.0):
+  av6-core-v2@1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0):
     dependencies:
       '@prisma/client': 7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2)
       av6-utils: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -5073,16 +5021,20 @@ snapshots:
       node-cron: 4.2.1
       nodemailer: 7.0.13
       prettier: 3.8.1
-      prisma: 6.19.2(typescript@5.9.2)
+      prisma: 7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)
       winston: 3.19.0
     transitivePeerDependencies:
+      - '@types/react'
+      - better-sqlite3
       - debug
       - express
       - magicast
       - notistack
+      - react
+      - react-dom
       - typescript
 
-  av6-pdf-engine@1.0.9(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2):
+  av6-pdf-engine@1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2):
     dependencies:
       '@types/pdfkit': 0.13.9
       axios: 1.13.6
@@ -6440,15 +6392,6 @@ snapshots:
       tunnel-agent: 0.6.0
 
   prettier@3.8.1: {}
-
-  prisma@6.19.2(typescript@5.9.2):
-    dependencies:
-      '@prisma/config': 6.19.2
-      '@prisma/engines': 6.19.2
-    optionalDependencies:
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - magicast
 
   prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2):
     dependencies:

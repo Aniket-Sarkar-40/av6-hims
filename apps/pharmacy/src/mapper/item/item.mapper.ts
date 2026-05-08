@@ -56,11 +56,11 @@ import {
 } from "@repo/db/generated/prisma/client";
 import { DecimalToNumber } from "@repo/platform/types/common.js";
 import { toNumberDeep } from "@/utils/commonCalculation.utils.js";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 
 export const toItemEntity = (
   item: CreateItemReq,
-  images: ItemImageFiles | undefined,
+  images: ItemImageFiles | undefined
 ): CreateItemInput => {
   const imagesData: { name: IMAGE_NAME; url: string; isPrimary: boolean }[] =
     [];
@@ -141,7 +141,7 @@ export const toItemEntity = (
 };
 export const toItemUpdateEntity = (
   item: UpdateItemReq,
-  images: ItemImageFiles | undefined,
+  images: ItemImageFiles | undefined
 ): UpdateItemInput => {
   return {
     ...toItemEntity(item, images),
@@ -151,26 +151,26 @@ export const toItemUpdateEntity = (
 
 export const toItemDto = async (
   item: PmsItem & { itemImages: ItemImages[] },
-  itemReq?: GetItemReq,
+  itemReq?: GetItemReq
 ): Promise<ItemDTO> => {
   const drugDto = await medDrugService.getMedDrugById(item.drugTypeId, true);
   const compDto = await medCompositionService.getCMedCompoById(
     item.medCompId,
-    true,
+    true
   );
   const typeDto = await medTypeService.getMedTypeById(item.medTypeId, true);
   const unitDto = await medUnitService.getMedUnitById(item.medUnitId, true);
   const packDto = await medPackageService.getMedPackageById(
     item.packSizeId,
-    true,
+    true
   );
   const categoryDto = await medCategoryService.getMedCategoryByIdWODto(
     item.medCategoryId,
-    true,
+    true
   );
   const manufacture = await manufactureService.getManufactureById(
     item.manufacturerId,
-    true,
+    true
   );
   const boxSize = item.boxSizeId
     ? await boxSizeService.getBoxSizeById(item.boxSizeId, true)
@@ -204,14 +204,14 @@ export const toItemDto = async (
     insurancePricing = await getInsurancePricing(
       insuranceId,
       branchId,
-      item.id,
+      item.id
     );
   }
   if (isCustomPricing && corporateClientId && branchId) {
     corporateClientPricing = await getCorporateClientPaymentSettings(
       corporateClientId,
       branchId,
-      item.id,
+      item.id
     );
   }
 
@@ -251,7 +251,7 @@ export const toItemDto = async (
     } as Record<
       "frontImage" | "backImage" | "leftImage" | "rightImage",
       string | null
-    >,
+    >
   );
 
   let saleAmount = Number(item.saleAmount);
@@ -344,7 +344,7 @@ export const toItemDto = async (
 
 export const toItemWoDto = async (
   item: DecimalToNumber<PmsItem>,
-  branchId?: number,
+  branchId?: number
 ): Promise<DecimalToNumber<PmsItem>> => {
   let itemBranchPricing: BranchItemMap | null = null;
   let itemBranchPricingNumber: DecimalToNumber<BranchItemMap> | null = null;
@@ -412,7 +412,7 @@ export const toItemSearch = (item: PmsItem): ItemForSearch => {
 };
 
 export const toItemSearchDTO = async (
-  input: ItemSearchInput,
+  input: ItemSearchInput
 ): Promise<ItemSearchDTO> => {
   const item = input.item;
   // const drugDto =
@@ -488,12 +488,12 @@ export const toItemSearchDTO = async (
 };
 
 export const toItemStockDTO = async (
-  stock: PmsItemStock,
+  stock: PmsItemStock
 ): Promise<ItemStockDTO> => {
   const item = await itemService.getItemByIdWoDTO(
     stock.itemId,
     true,
-    stock.branchId ? stock.branchId : undefined,
+    stock.branchId ? stock.branchId : undefined
   );
   const warehouseDTO = stock.warehouseId
     ? await warehouseService.getWarehouseByIdWoDTO(stock.warehouseId, true)
@@ -512,7 +512,7 @@ export const toItemStockDTO = async (
 };
 
 export const toItemStockBatchDTO = async (
-  stocks: PmsItemStock[],
+  stocks: PmsItemStock[]
 ): Promise<ItemStockBatchWiseDTO[]> => {
   const map = new Map<string, ItemStockBatchWiseDTO>();
   const getAllItems = await itemService.getAllItemWoDto();
@@ -550,36 +550,36 @@ export const toItemStockBatchDTO = async (
 };
 
 export const toSlowMovingItemDTO = async (
-  item: SlowMovingItem,
+  item: SlowMovingItem
 ): Promise<SlowMovingItemDTO> => {
   const drugDto = await medDrugService.getMedDrugById(item.drug_type_id, true);
   const compDto = await medCompositionService.getCMedCompoById(
     item.medicine_composition_id,
-    true,
+    true
   );
   const typeDto = await medTypeService.getMedTypeById(
     item.medicine_type_id,
-    true,
+    true
   );
   const unitDto = await medUnitService.getMedUnitById(
     item.medicine_unit_id,
-    true,
+    true
   );
   const packDto = await medPackageService.getMedPackageById(
     item.pack_size_id,
-    true,
+    true
   );
   const categoryDto = await medCategoryService.getMedCategoryByIdWODto(
     item.medicine_category_id,
-    true,
+    true
   );
   const manufacture = await manufactureService.getManufactureById(
     item.manufacturer_id,
-    true,
+    true
   );
   const boxSizeDto = await boxSizeService.getBoxSizeById(
     item.box_size_id,
-    true,
+    true
   );
 
   return {
@@ -625,7 +625,7 @@ export const toSlowMovingItemDTO = async (
   };
 };
 export const toItemBranchPriceDTO = async (
-  itemBranch: BranchItemMap,
+  itemBranch: BranchItemMap
 ): Promise<ItemBranchMapDTO> => {
   const item = await itemService.getItemByIdWoDTO(itemBranch.itemId, true);
 
@@ -646,13 +646,13 @@ export const toItemBranchPriceDTO = async (
 };
 
 export const toItemDosageMapDTO = async (
-  itemDosageMap: ItemMedicineDosageMap,
+  itemDosageMap: ItemMedicineDosageMap
 ): Promise<ItemDosageMapDTO> => {
   const item = await itemService.getItemByIdWoDTO(itemDosageMap.itemId, true);
 
   const dosage = await medDosageService.getMedDosageById(
     itemDosageMap.dosageId,
-    true,
+    true
   );
 
   return {
@@ -664,13 +664,13 @@ export const toItemDosageMapDTO = async (
 };
 
 export const toItemInstructionMapDTO = async (
-  itemInstMap: ItemInstructionMap,
+  itemInstMap: ItemInstructionMap
 ): Promise<ItemInstructionMapDTO> => {
   const item = await itemService.getItemByIdWoDTO(itemInstMap.itemId, true);
 
   const instruction = await medInstructionService.getMedInstructionById(
     itemInstMap.instructionId,
-    true,
+    true
   );
 
   return {
@@ -681,7 +681,7 @@ export const toItemInstructionMapDTO = async (
 };
 
 export const toItemAppointmentDto = async (
-  item: PmsItem,
+  item: PmsItem
 ): Promise<ItemAppointmentDTO> => {
   const typeDto = await medTypeService.getMedTypeById(item.medTypeId, true);
 

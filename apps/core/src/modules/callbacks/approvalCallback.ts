@@ -1,12 +1,7 @@
-import { eventBus } from "@/events/eventBus.js";
-import {
-  commonParentChildUpdate,
-  commonStatusUpdate,
-} from "@/repository/approval/approval.repository.js";
-
-import { EventInstance } from "@/types/approval/approval.js";
+import { approvalServiceFactory, eventBus } from "@/config/core.config.js";
 import { getFlowWiseApprovalStatus } from "@/utils/approval.utils.js";
-import { fromTimestampToSqlDatetime } from "av6-core";
+import { fromTimestampToSqlDatetime } from "@repo/shared/utils/date.utils.js";
+import { EventInstance } from "av6-core-v2";
 
 export function registerPharmacyApprovalCallbacks() {
   eventBus.on("approval:APPROVED", async (inst: EventInstance) => {
@@ -20,7 +15,7 @@ export function registerPharmacyApprovalCallbacks() {
 
       switch (inst.flowType) {
         case "STATUS":
-          await commonStatusUpdate(config, {
+          await approvalServiceFactory.commonStatusUpdate(config, {
             approvalNote: inst.comment || null,
             approvedAt: fromTimestampToSqlDatetime(new Date().toISOString()),
             approvedBy: JSON.stringify(inst.approverId),
@@ -32,12 +27,12 @@ export function registerPharmacyApprovalCallbacks() {
               ],
           });
           break;
-        // case "REFUND":
-        //   await commonParentChildUpdate(config, childConfig, inst);
-        //   break;
-
         default:
-          await commonParentChildUpdate(config, childConfig, inst);
+          await approvalServiceFactory.commonParentChildUpdate(
+            config,
+            childConfig,
+            inst
+          );
           break;
       }
     } catch (err) {
@@ -56,7 +51,7 @@ export function registerPharmacyApprovalCallbacks() {
 
       switch (inst.flowType) {
         case "STATUS":
-          await commonStatusUpdate(config, {
+          await approvalServiceFactory.commonStatusUpdate(config, {
             approvalNote: inst.comment || null,
             approvedAt: fromTimestampToSqlDatetime(new Date().toISOString()),
             approvedBy: JSON.stringify(inst.approverId),
@@ -73,7 +68,11 @@ export function registerPharmacyApprovalCallbacks() {
         //   break;
 
         default:
-          await commonParentChildUpdate(config, childConfig, inst);
+          await approvalServiceFactory.commonParentChildUpdate(
+            config,
+            childConfig,
+            inst
+          );
           break;
       }
     } catch (err) {
@@ -92,7 +91,7 @@ export function registerPharmacyApprovalCallbacks() {
 
       switch (inst.flowType) {
         case "STATUS":
-          await commonStatusUpdate(config, {
+          await approvalServiceFactory.commonStatusUpdate(config, {
             approvalNote: inst.comment || null,
             approvedAt: fromTimestampToSqlDatetime(new Date().toISOString()),
             approvedBy: JSON.stringify(inst.approverId),
@@ -109,7 +108,11 @@ export function registerPharmacyApprovalCallbacks() {
         //   break;
 
         default:
-          await commonParentChildUpdate(config, childConfig, inst);
+          await approvalServiceFactory.commonParentChildUpdate(
+            config,
+            childConfig,
+            inst
+          );
           break;
       }
     } catch (err) {

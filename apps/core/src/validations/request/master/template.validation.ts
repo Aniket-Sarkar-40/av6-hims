@@ -1,7 +1,7 @@
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { TemplateType } from "@repo/db/generated/prisma/client";
-import { ValidationErrorItem } from "av6-core";
+import { ValidationErrorItem } from "av6-core-v2";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 

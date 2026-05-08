@@ -27,6 +27,8 @@ export const purchaseOrderDetailSchema = Joi.object<PurchaseOrderDetails>({
   receivedQty: idOptional("Received quantity").min(1),
 
   totalAmount: priceRequired("Total amount"),
+
+  purchasedPrice: priceRequired("Purchased price"),
 });
 
 export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
@@ -51,7 +53,7 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
   purchaseOrderDetails: arrayRequired(
     "Purchase order",
     purchaseOrderDetailSchema,
-    1,
+    1
   ),
 });
 

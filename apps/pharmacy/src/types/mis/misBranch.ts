@@ -1,4 +1,4 @@
-import { CommonFilterRequest } from "av6-core";
+import { CommonFilterRequest } from "av6-core-v2";
 
 export interface SearchRequestMisBranch extends CommonFilterRequest {
   ccId?: number;

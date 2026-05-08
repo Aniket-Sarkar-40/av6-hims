@@ -29,7 +29,7 @@ import {
   ProcedureMaster,
   OpdUINConfig,
 } from "@repo/db/generated/prisma/client";
-import { toUINConfigDTO } from "av6-core";
+import { toUINConfigDTO } from "av6-core-v2";
 import {
   toAppointmentDto,
   toLastAppointmentDto,

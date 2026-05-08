@@ -2,11 +2,12 @@ import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
 import { purchaseService } from "@/services/purchase/purchase.service.js";
 import { UpdatePurchaseOrder } from "@/types/purchase/purchase.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
-import path from "path";
+import { imageToBase64 } from "@repo/shared/utils/helper.utils.js";
+import path from "node:path";
+import { PO_STATUS } from "@repo/db/generated/prisma/enums.js";
 
 export const createPurchase = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createPurchase::controller");
@@ -14,7 +15,7 @@ export const createPurchase = TryCatch(async (req: Request, res: Response) => {
   const purchase = await purchaseService.createPurchaseOrder(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: purchase },
-    "Purchase Order",
+    "Purchase Order"
   );
   logger.info("exiting::createPurchase::controller");
   return res.status(201).json(response);
@@ -29,7 +30,7 @@ export const updatePurchase = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::updatePurchase::controller");
   const response = BaseResponse.success(
     { type: "UPDATED", data: updated },
-    "Purchase Order",
+    "Purchase Order"
   );
   return res.status(200).json(response);
 });
@@ -41,7 +42,7 @@ export const getAllPurchase = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "FETCHED", data: purchase },
-    "Purchase Order",
+    "Purchase Order"
   );
   return res.status(200).json(response);
 });
@@ -56,12 +57,12 @@ export const getPurchaseById = TryCatch(async (req: Request, res: Response) => {
     return res.status(400).json(
       new BaseResponse({
         success: false,
-      }),
+      })
     );
   }
   const response = BaseResponse.success(
     { type: "FETCHED", data: purchase },
-    "Purchase Order",
+    "Purchase Order"
   );
   logger.info("exiting::getPurchaseById::controller");
   return res.status(200).json(response);
@@ -80,86 +81,89 @@ export const deletePurchase = TryCatch(async (req, res) => {
   });
 });
 
-// export const purchaseApproval = TryCatch(async (req: Request, res: Response) => {
-//   logger.info("entering::purchaseApproval::controller");
+export const purchaseApproval = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::purchaseApproval::controller");
 
-//   const purchaseId = Number(req.params.id);
+    const purchaseId = Number(req.body.subjectId);
 
-//   const approvalPo = await purchaseService.purchaseApproval(purchaseId);
+    const approvalPo = await purchaseService.updatePurchaseOrderStatus(
+      purchaseId,
+      PO_STATUS.APPROVED
+    );
 
-//   const response = new BaseResponse(
-//     {
-//       success: true,
-//       message: generateSuccessMessage("UPDATED", "Purchase Order Verification"),
-//     },
-//     approvalPo
-//   );
+    const response = new BaseResponse(
+      {
+        success: true,
+        message: generateSuccessMessage("APPROVED", "Purchase Order"),
+      },
+      approvalPo
+    );
 
-//   logger.info("exiting::purchaseApproval::controller");
-//   return res.status(200).json(response);
-// });
+    logger.info("exiting::purchaseApproval::controller");
+    return res.status(200).json(response);
+  }
+);
 
-// export const excelPurchaseOrderReport = TryCatch(async (req: Request, res: Response) => {
-//   logger.info("entering::excelPurchaseOrderReport::controller");
-//   const input = req.body as PurchaseReqExcelFilter;
+export const purchasePartialApproval = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::purchaseApproval::controller");
 
-//   const wb: Workbook = await purchaseService.buildExcelJSWorkbookForPurchaseOrderByFilter(input);
-//   res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//   res.setHeader("Content-Disposition", `attachment; filename="purchase_order_report.xlsx"`);
-//   await wb.xlsx.write(res);
-//   logger.info("exiting::excelPurchaseOrderReport::controller");
-//   res.end();
-// });
-// export const pdfPurchase = TryCatch(async (req: Request, res: Response) => {
-//   logger.info("entering::createPurchase::controller");
-//   const input = req.body;
-//   const buffer = await pdfService.buildPdf(SHORT_CODE.PO, input);
+    const purchaseId = Number(req.body.subjectId);
 
-//   logger.info("exiting::createPurchase::controller");
-//   res
-//     .status(200)
-//     .set({
-//       "Content-Type": "application/pdf",
-//       "Content-Disposition": `inline; filename="invoice-${new Date()}.pdf"`,
-//     })
-//     .send(buffer);
-// });
+    const approvalPo = await purchaseService.updatePurchaseOrderStatus(
+      purchaseId,
+      PO_STATUS.PARTIALLY_APPROVED
+    );
 
-// export const printPOById = TryCatch(async (req: Request, res: Response) => {
-//   logger.info("entering::printPOById::controller");
+    const response = new BaseResponse(
+      {
+        success: true,
+        message: generateSuccessMessage("APPROVED", "Purchase Order"),
+      },
+      approvalPo
+    );
 
-//   // 1) Read filters and fetch data
-//   const { id } = req.query as { id: string };
+    logger.info("exiting::purchasePartialApproval::controller");
+    return res.status(200).json(response);
+  }
+);
 
-//   const po = await purchaseService.getPurchaseById(Number(id));
+export const purchaseRejection = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::purchaseRejection::controller");
 
-//   // 3) Locate template & logo
-//   const tplDir = path.join(
-//     process.cwd(),
-//     "src",
-//     "templates",
-//     "pdf",
-//     "reports-pdf",
-//     "purchase",
-//   );
-//   const bodyTpl = path.join(tplDir, "purchase.hbs");
-//   const base64Image = imageToBase64("public/images/logo.png");
+    const purchaseId = Number(req.body.subjectId);
 
-//   // 4) Render PDF
-//   const pdfBuffer = await generatePDF(bodyTpl, {
-//     po,
-//     base64Image,
-//     reportFor: "Purchase Order",
-//   });
+    const approvalPo = await purchaseService.updatePurchaseOrderStatus(
+      purchaseId,
+      PO_STATUS.REJECTED
+    );
 
-//   // 5) Stream down
-//   res
-//     .status(200)
-//     .set({
-//       "Content-Type": "application/pdf",
-//       "Content-Disposition": 'attachment; filename="purchase_order.pdf"',
-//     })
-//     .send(pdfBuffer);
+    const response = new BaseResponse(
+      {
+        success: true,
+        message: generateSuccessMessage("REJECTED", "Purchase Order"),
+      },
+      approvalPo
+    );
 
-//   logger.info("exiting::printPOById::controller");
-// });
+    logger.info("exiting::purchaseRejection::controller");
+    return res.status(200).json(response);
+  }
+);
+
+export const generatePurchaseOrderPdf = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::generatePayrollPdf::controller");
+    const input = req.query.id as string;
+    const pdfBuffer = await purchaseService.generatePoPdf(Number(input));
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="purchase-order-${input}.pdf"`
+    );
+    res.send(pdfBuffer);
+    logger.info("exiting::generatePurchaseOrderPdf::controller");
+  }
+);

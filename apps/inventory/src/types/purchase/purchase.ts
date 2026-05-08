@@ -1,7 +1,13 @@
-import { InvPurchaseOrder, Prisma } from "@repo/db/generated/prisma/client";
+import {
+  InvBranch,
+  InvItemSupplier,
+  InvPurchaseOrder,
+  InvWarehouse,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
 import { ItemSupplierDTO } from "../master/itemSupplier.js";
-import { EmployeeCache } from "av6-core";
+import { EmployeeCache } from "av6-core-v2";
 import { ItemMasterToDto } from "../grn/grn.js";
 
 export type PurchaseOrderDetails =
@@ -20,16 +26,17 @@ export interface UpdatePurchaseOrder extends CreatePurchaseOrderInput {
   id: number;
 }
 
-export interface PurchaseOrderDTO extends Omit<
-  POResponse,
-  | "supplier"
-  | "store"
-  | "purchaseOrderDetails"
-  | BaseModelAttr
-  | "storeId"
-  | "supplierId"
-  | "warehouseId"
-> {
+export interface PurchaseOrderDTO
+  extends Omit<
+    POResponse,
+    | "supplier"
+    | "store"
+    | "purchaseOrderDetails"
+    | BaseModelAttr
+    | "storeId"
+    | "supplierId"
+    | "warehouseId"
+  > {
   supplier: IdValue | null;
   store: IdValue | null;
   createdBy: EmployeeCache | null;
@@ -39,16 +46,17 @@ export interface PurchaseOrderDTO extends Omit<
   purchaseOrderDetails: PurchaseOrderDetailDTO[];
 }
 
-export interface PurchaseOrderDetailDTO extends Omit<
-  PurchaseOrderDetailResponse,
-  | "item"
-  | "itemCategory"
-  | BaseModelAttr
-  | "itemId"
-  | "itemCategoryId"
-  | "medUnitId"
-  | "itemMedUnit"
-> {
+export interface PurchaseOrderDetailDTO
+  extends Omit<
+    PurchaseOrderDetailResponse,
+    | "item"
+    | "itemCategory"
+    | BaseModelAttr
+    | "itemId"
+    | "itemCategoryId"
+    | "medUnitId"
+    | "itemMedUnit"
+  > {
   id: number;
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
@@ -88,3 +96,25 @@ export type PurchaseOrderWithDetails = Prisma.InvPurchaseOrderGetPayload<{
     };
   };
 }>;
+
+export interface PurchaseOrderPdfDTO
+  extends Omit<
+    POResponse,
+    | "supplier"
+    | "store"
+    | "purchaseOrderDetails"
+    | BaseModelAttr
+    | "storeId"
+    | "supplierId"
+    | "warehouseId"
+    | "date"
+  > {
+  date: string;
+  supplier: InvItemSupplier | null;
+  store: IdValue | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+
+  cc: InvBranch | InvWarehouse | null;
+  purchaseOrderDetails: PurchaseOrderDetailDTO[];
+}

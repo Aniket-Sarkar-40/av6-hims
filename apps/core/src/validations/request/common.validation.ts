@@ -1,7 +1,7 @@
 import { getPattern } from "av6-utils";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
-import { ToggleActive } from "av6-core";
+import { ToggleActive } from "av6-core-v2";
 import Joi from "joi";
 
 export const fixedFieldSchema = Joi.alternatives()

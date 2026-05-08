@@ -1,6 +1,6 @@
 import { CreateOrUpdateEmployee } from "@/types/staff/employee.js";
 import Joi from "joi";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import {
   dateRequired,
   emailRequired,

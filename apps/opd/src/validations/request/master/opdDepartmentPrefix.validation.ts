@@ -4,7 +4,7 @@ import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
-import { ValidationErrorItem } from "av6-core";
+import { ValidationErrorItem } from "av6-core-v2";
 import { idRequired, strRequired } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 

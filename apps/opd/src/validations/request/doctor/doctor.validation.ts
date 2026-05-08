@@ -5,7 +5,7 @@ import {
   UpdateDoctorScheduleInput,
 } from "@/types/doctor/doctor.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { getPattern } from "av6-core";
+import { getPattern } from "av6-core-v2";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { NextFunction, Request, Response } from "express";
 import Joi, { ValidationErrorItem } from "joi";

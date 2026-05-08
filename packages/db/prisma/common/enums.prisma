@@ -117,6 +117,7 @@ enum PdfTemplateType {
     BILL
     INVOICE
     REPORT
+    PURCHASE_ORDER
 }
 
 enum DiscMethod {
@@ -222,4 +223,31 @@ enum PaymentTransactionMode {
 enum CcType {
     BRANCH
     WAREHOUSE
+}
+
+enum ActionMode {
+    CONFIG_EVENT
+    WEBHOOK
+}
+
+enum ApprovalStatus {
+    PENDING
+    PARTIALLY_APPROVED
+    APPROVED
+    REJECTED
+    CANCELLED // optional
+}
+
+enum FlowType {
+    STATUS
+    CO_PAY
+    INDIVIDUAL_DISCOUNT
+    OVERALL_DISCOUNT
+    SPECIAL_DISCOUNT
+    REFUND
+}
+
+enum StepType {
+    MIN_MAX
+    NORMAL
 }

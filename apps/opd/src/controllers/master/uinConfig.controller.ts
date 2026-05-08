@@ -13,7 +13,7 @@ import {
   CreateUINConfigRequest,
   UINPreviewRequest,
   UpdateUINConfigRequest,
-} from "av6-core";
+} from "av6-core-v2";
 import { Request, Response } from "express";
 
 export const createUINConfig = TryCatch(async (req: Request, res: Response) => {
@@ -27,8 +27,8 @@ export const createUINConfig = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("CREATED", "UIN Config"),
       },
-      createdConfig,
-    ),
+      createdConfig
+    )
   );
 });
 
@@ -43,8 +43,8 @@ export const updateUINConfig = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "UIN Config"),
       },
-      updatedUINConfig,
-    ),
+      updatedUINConfig
+    )
   );
 });
 
@@ -54,7 +54,7 @@ export const getUIN = TryCatch(async (req: Request, res: Response) => {
   if (!shortCode)
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Short code"),
+      generateErrorMessage("FIELD_REQUIRED", "Short code")
     );
   const uin = await uinServiceFactory.generateUIN(shortCode);
   logger.info("exiting::getUIN::controller");
@@ -64,8 +64,8 @@ export const getUIN = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "UIN"),
       },
-      uin,
-    ),
+      uin
+    )
   );
 });
 
@@ -75,7 +75,7 @@ export const previewUIN = TryCatch(async (req: Request, res: Response) => {
   if (!shortCode)
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Short code"),
+      generateErrorMessage("FIELD_REQUIRED", "Short code")
     );
   const uin = await uinServiceFactory.previewConfig(shortCode);
   logger.info("exiting::previewUIN::controller");
@@ -85,8 +85,8 @@ export const previewUIN = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "UIN"),
       },
-      uin,
-    ),
+      uin
+    )
   );
 });
 
@@ -103,10 +103,10 @@ export const previewCustomUIN = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "UIN"),
         },
-        uin,
-      ),
+        uin
+      )
     );
-  },
+  }
 );
 
 export const deleteUINConfig = TryCatch(async (req: Request, res: Response) => {
@@ -119,7 +119,7 @@ export const deleteUINConfig = TryCatch(async (req: Request, res: Response) => {
     new BaseResponse({
       success: true,
       message: generateSuccessMessage("DELETED", "UIN Config"),
-    }),
+    })
   );
 });
 
@@ -136,8 +136,8 @@ export const getAllUinShortCodes = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "UIN Short Codes"),
         },
-        codes,
-      ),
+        codes
+      )
     );
-  },
+  }
 );

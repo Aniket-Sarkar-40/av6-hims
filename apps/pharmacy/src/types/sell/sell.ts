@@ -23,7 +23,7 @@ import {
 import { Decimal } from "@repo/db/generated/prisma/internal/prismaNamespace.js";
 import { DecimalToNumber } from "@repo/platform/types/common.js";
 import { IdValue } from "@repo/shared/types/global.js";
-import { EmployeeCache } from "av6-core";
+import { EmployeeCache } from "av6-core-v2";
 
 export interface SellInput {
   id?: number;

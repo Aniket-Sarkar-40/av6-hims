@@ -2,7 +2,7 @@ import {
   UIN_RESET_POLICY,
   InvUinShortCode,
 } from "@repo/db/generated/prisma/client";
-import { UINPreviewRequest, UINSegment } from "av6-core";
+import { UINPreviewRequest, UINSegment } from "av6-core-v2";
 import Joi from "joi";
 import {
   arrayRequired,
@@ -35,7 +35,7 @@ const UINSegmentSchema = Joi.object<UINSegment>({
     is: Joi.valid(
       UINPartType.TEXT,
       UINPartType.SEPARATOR,
-      UINPartType.DATE_FORMAT,
+      UINPartType.DATE_FORMAT
     ),
     then: strRequired("Value"),
     otherwise: forbiddenField("Value"),

@@ -6,7 +6,7 @@ import {
   CreatePurchaseOrderInput,
   PurchaseReqExcelFilter,
 } from "@/types/purchase/purchase.js";
-import { approvalService } from "@apps/core/events/eventBus.js";
+import { approvalService } from "@apps/core/services/approval/approval.service.js";
 import { db } from "@repo/db";
 import {
   PmsPurchaseOrder,
@@ -16,7 +16,7 @@ import { PmsUinShortCode } from "@repo/db/generated/prisma/enums.js";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { API_TIMEOUT } from "@repo/shared";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { applyRound, RoundFormat } from "av6-utils";
 
 export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
@@ -124,7 +124,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
       }
 
       if (createdPurchaseOrder.status === "SENT_FOR_APPROVAL") {
-        await approvalService.startFlow(tx, {
+        await approvalService.startFlow({
           service: "PHARMACY",
           subjectType: "PURCHASE_ORDER",
           subjectId: createdPurchaseOrder.id,
@@ -318,7 +318,7 @@ export const updatePurchaseOrderInDb = async (
     }
 
     if (updated.status === "SENT_FOR_APPROVAL") {
-      await approvalService.startFlow(tx, {
+      await approvalService.startFlow({
         service: "PHARMACY",
         subjectType: "PURCHASE_ORDER",
         subjectId: updated.id,
