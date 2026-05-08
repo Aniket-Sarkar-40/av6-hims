@@ -64,6 +64,9 @@ enum ServiceCode {
     GENERAL_BILL
     PROCEDURE
     RADIOLOGY
+    FIXUJI
+    STARTER
+    AMS
 }
 
 enum TemplateType {

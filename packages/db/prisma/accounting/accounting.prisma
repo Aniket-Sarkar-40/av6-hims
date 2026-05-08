@@ -1,0 +1,957 @@
+model AccDynamicShortCode {
+    id           Int      @id @default(autoincrement())
+    shortCode    String   @unique @map("short_code")
+    tableName    String   @map("table_name")
+    isDTO        Boolean  @default(false) @map("is_dto")
+    isCacheable  Boolean  @default(false) @map("is_cacheable")
+    isDropDown   Boolean  @default(false) @map("is_drop_down")
+    permission   String?
+    whereClause  Json?    @map("where_clause")
+    selectClause Json?    @map("select_clause")
+    config       Json?    @map("config")
+    isSingleDto  Boolean  @default(true) @map("is_single_dto")
+    createdBy    Int?     @map("created_by")
+    updatedBy    Int?     @map("updated_by")
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    @@map("accounting_dynamic_short_code")
+}
+
+model UINConfig {
+    id             Int              @id @default(autoincrement())
+    shortCode      UinShortCode     @map("short_code")
+    sequenceNo     BigInt           @default(0) @map("sequence_no")
+    seqResetDate   DateTime         @map("seq_reset_date") @db.Date
+    seqResetPolicy UIN_RESET_POLICY @default(no) @map("seq_reset_policy")
+    description    String?
+    uinSegments    Json             @map("uin_segments")
+    isActive       Boolean          @default(true) @map("is_active")
+    createdBy      Int?             @map("created_by")
+    updatedBy      Int?             @map("updated_by")
+    createdAt      DateTime         @default(now()) @map("created_at")
+    updatedAt      DateTime         @updatedAt @map("updated_at")
+    deletedAt      DateTime?        @map("deleted_at")
+    deletedBy      Int?             @map("deleted_by")
+
+    @@map("accounting_uin_config")
+}
+
+model AccEmailConfig {
+    id           Int              @id @default(autoincrement())
+    emailType    String?          @map("email_type")
+    smtpServer   String?          @map("smtp_server")
+    smtpPort     String?          @map("smtp_port")
+    smtpUsername String?          @map("smtp_username")
+    smtpPassword String?          @map("smtp_password")
+    sslTls       String?          @map("ssl_tls")
+    configType   EmailConfigType? @default(ADMIN) @map("config_type")
+
+    isActive Boolean @default(true) @map("is_active")
+
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@map("accounting_email_config")
+}
+
+model AccAuditConfig {
+    id          Int         @id @default(autoincrement())
+    module      ServiceCode @map("module")
+    service     String      @map("service")
+    method      String      @map("method")
+    message     String?     @map("message")
+    isAuditable Boolean     @default(true) @map("is_auditable")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("accounting_audit_config")
+}
+
+model AccCommonAudit {
+    id         Int         @id @default(autoincrement())
+    module     ServiceCode @map("module")
+    service    String      @map("service")
+    type       String      @map("type")
+    message    String      @map("message")
+    level1Id   Int?        @map("level1_id")
+    level2Id   Int?        @map("level2_id")
+    methodName String?     @map("method_name")
+    traceId    String?     @map("trace_id")
+
+    createdBy Int?     @map("created_by")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@map("accounting_common_audit")
+}
+
+model AccSettings {
+    id                Int               @id @default(autoincrement())
+    calculationMethod CalculationMethod @default(FINAL) @map("calculation_method")
+    roundingMethod    RoundFormat       @default(ROUND) @map("rounding_method")
+    roundingPrecision Int               @default(2) @map("rounding_precision")
+    timeZone          String?           @map("time_zone")
+    excelBatchSize    Int               @default(100) @map("excel_batch_size")
+
+    isActive  Boolean  @default(true) @map("is_active")
+    createdBy Int?     @map("created_by")
+    updatedBy Int?     @map("updated_by")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("accounting_settings")
+}
+
+model Company {
+    id             Int      @id @default(autoincrement())
+    code           String
+    name           String
+    legalName      String?  @map("legal_name")
+    status         Status   @default(ACTIVE)
+    booksBeginFrom DateTime @map("books_begin_from") @db.Date //go live date
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    companyAddresses        CompanyAddress[]
+    companyFinancialYears   CompanyFinancialYear[]
+    collectionCenters       CollectionCenter[]
+    groups                  Group[]
+    ledgers                 Ledger[]
+    ledgerOpeningBalances   LedgerOpeningBalance[]
+    companyStatutory        CompanyStatutory?
+    companyCurrencySettings CompanyCurrencySettings?
+    companyFeatures         CompanyFeatures?
+    voucherTypes            VoucherType[]
+    costCenters             CostCenter[]
+    vouchers                Voucher[]
+    costCenterAllocations   CostCenterAllocation[]
+    billDocuments           BillDocument[]
+    billAllocations         BillAllocation[]
+    bankStatements          BankStatement[]
+
+    @@map("accounting_company")
+}
+
+model CompanyAddress {
+    id           Int         @id @default(autoincrement())
+    companyId    Int         @map("company_id")
+    addressType  AddressType @map("address_type")
+    addressLine1 String      @map("address_line_1")
+    addressLine2 String?     @map("address_line_2")
+    cityId       Int         @map("city_id")
+    stateId      Int         @map("state_id")
+    countryId    Int         @map("country_id")
+    pinCode      String      @map("pin_code")
+    phoneNumber  String?     @map("phone_number")
+    email        String?
+    isDefault    Boolean     @default(false) @map("is_default")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company Company @relation(fields: [companyId], references: [id])
+    city    City    @relation(fields: [cityId], references: [id])
+    state   State   @relation(fields: [stateId], references: [id])
+    country Country @relation(fields: [countryId], references: [id])
+
+    @@index([companyId], name: "company_address_company_id_idx")
+    @@index([cityId], name: "company_address_city_id_idx")
+    @@index([stateId], name: "company_address_state_id_idx")
+    @@index([countryId], name: "company_address_country_id_idx")
+    @@map("accounting_company_address")
+}
+
+model CompanyStatutory {
+    id                  Int                  @id @default(autoincrement())
+    companyId           Int                  @unique @map("company_id")
+    pan                 String?
+    gstin               String? // Required if GST registered (Regular/Composition/SEZ etc.).
+    cin                 String?
+    tan                 String?
+    msmeNo              String?              @map("msme_no")
+    gstRegistrationType GstRegistrationType? @map("gst_registration_type")
+    gstStateCode        String?              @map("gst_state_code")
+    isGstEnabled        Boolean              @default(false) @map("is_gst_enabled")
+    gstEffectiveFrom    DateTime?            @map("gst_effective_from") @db.Date
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company Company @relation(fields: [companyId], references: [id])
+
+    @@index([companyId], name: "company_statutory_company_id_idx")
+    @@map("accounting_company_statutory")
+}
+
+model CompanyFinancialYear {
+    id             Int      @id @default(autoincrement())
+    companyId      Int      @map("company_id")
+    fyName         String   @map("fy_name")
+    startDate      DateTime @map("start_date") @db.Date
+    endDate        DateTime @map("end_date") @db.Date
+    booksBeginFrom DateTime @map("books_begin_from") @db.Date
+    isCurrent      Boolean  @default(false) @map("is_current")
+    isLocked       Boolean  @default(false) @map("is_locked")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company               Company                @relation(fields: [companyId], references: [id])
+    ledgerOpeningBalances LedgerOpeningBalance[]
+    vouchers              Voucher[]
+    billDocuments         BillDocument[]
+    billAllocations       BillAllocation[]
+    bankStatements        BankStatement[]
+
+    @@index([companyId], name: "company_financial_year_company_id_idx")
+    @@map("accounting_company_financial_year")
+}
+
+model CompanyCurrencySettings {
+    id               Int    @id @default(autoincrement())
+    companyId        Int    @unique @map("company_id")
+    baseCurrencyCode String @map("base_currency_code") //INR
+    symbol           String @map("symbol") //₹
+    currencyName     String @map("currency_name") //Indian Rupee
+    subUnitName      String @map("sub_unit_name") //Paise
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company Company @relation(fields: [companyId], references: [id])
+
+    @@index([companyId], name: "company_currency_settings_company_id_idx")
+    @@map("accounting_company_currency_settings")
+}
+
+model CompanyFeatures {
+    id                       Int     @id @default(autoincrement())
+    companyId                Int     @unique @map("company_id")
+    enableCostCenter         Boolean @default(false) @map("enable_cost_center")
+    enableBillWiseTracking   Boolean @default(true) @map("enable_bill_wise_tracking")
+    enableBankReconciliation Boolean @default(false) @map("enable_bank_reconciliation")
+    enableGst                Boolean @default(false) @map("enable_gst")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company Company @relation(fields: [companyId], references: [id])
+
+    @@index([companyId], name: "company_features_company_id_idx")
+    @@map("accounting_company_features")
+}
+
+model Group {
+    id        Int     @id @default(autoincrement())
+    companyId Int     @map("company_id")
+    name      String
+    alias     String?
+
+    isPrimaryGroup Boolean @default(false) @map("is_primary_group")
+    parentId       Int?    @map("parent_id")
+
+    primaryCategory    AccountingPrimaryCategory @map("primary_category")
+    reportType         AccountingReportType      @map("report_type")
+    nature             AccountingNature
+    affectsGrossProfit Boolean                   @default(false) @map("affects_gross_profit")
+
+    behavesLikeSubLedger Boolean @default(false) @map("behaves_like_sub_ledger")
+    netDrCrForReporting  Boolean @default(true) @map("net_dr_cr_for_reporting")
+    usedForCalculation   Boolean @default(false) @map("used_for_calculation")
+
+    // later we can add statutory details for primary groups 
+
+    isReserved Boolean @default(false) @map("is_reserved")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company                            Company                              @relation(fields: [companyId], references: [id])
+    parentGroup                        Group?                               @relation("GroupToSubGroups", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    subGroups                          Group[]                              @relation("GroupToSubGroups")
+    ledgers                            Ledger[]
+    accountingIntegrationConfigDetails AccountingIntegrationConfigDetails[]
+
+    @@index([companyId], map: "idx_group_company")
+    @@index([parentId], map: "idx_group_parent")
+    @@map("accounting_group")
+}
+
+model Ledger {
+    id        Int @id @default(autoincrement())
+    companyId Int @map("company_id")
+    groupId   Int @map("group_id")
+
+    name  String  @db.VarChar(150)
+    alias String? @db.VarChar(150)
+
+    ledgerType LedgerType @default(GENERAL) //remove this field in future
+
+    // behaviour flags
+    isBillWiseOn   Boolean @default(false) @map("is_bill_wise_on")
+    isCostCentreOn Boolean @default(false) @map("is_cost_centre_on")
+
+    isBankAccount Boolean @default(false) @map("is_bank_account")
+    isCashAccount Boolean @default(false) @map("is_cash_account")
+
+    isReserved Boolean @default(false) @map("is_reserved")
+
+    // optional bank/contact data (useful for party ledgers too)
+    bankName      String? @map("bank_name") @db.VarChar(120)
+    bankIfsc      String? @map("bank_ifsc") @db.VarChar(20)
+    bankAccountNo String? @map("bank_account_no") @db.VarChar(40)
+    upiId         String? @map("upi_id") @db.VarChar(120)
+
+    contactName String? @map("contact_name") @db.VarChar(120)
+    phone       String? @db.VarChar(30)
+    email       String? @db.VarChar(150)
+    address     String? @db.Text
+
+    // GST (optional - used later)These are mainly relevant for party ledgers and tax ledgers
+    gstType              LedgerGstType @default(NA) @map("gst_type")
+    gstin                String?
+    placeOfSupplyStateId Int?          @map("place_of_supply_state_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company               Company                @relation(fields: [companyId], references: [id])
+    group                 Group                  @relation(fields: [groupId], references: [id])
+    ledgerOpeningBalances LedgerOpeningBalance[]
+    voucherLines          VoucherLine[]
+    billDocuments         BillDocument[]
+    billAllocations       BillAllocation[]
+    clientLedgerMappings  ClientLedgerMapping[]
+    bankStatements        BankStatement[]
+
+    @@index([companyId], map: "idx_ledger_company")
+    @@index([groupId], map: "idx_ledger_group")
+    @@map("accounting_ledger")
+}
+
+model LedgerOpeningBalance {
+    id              Int @id @default(autoincrement())
+    companyId       Int @map("company_id")
+    financialYearId Int @map("financial_year_id")
+    ledgerId        Int @map("ledger_id")
+
+    // ccId         Int?  @map("cc_id") //only if branch-wise opening
+
+    asOnDate DateTime @map("as_on_date") @db.Date
+    amount   Decimal  @db.Decimal(18, 5)
+    drCr     DrCr     @map("dr_cr")
+
+    source String? @db.VarChar(30) // MANUAL / MIGRATION / SYSTEM (optional)
+    note   String? @db.VarChar(255)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company       Company              @relation(fields: [companyId], references: [id])
+    financialYear CompanyFinancialYear @relation(fields: [financialYearId], references: [id])
+    ledger        Ledger               @relation(fields: [ledgerId], references: [id])
+
+    @@index([companyId], map: "idx_ledger_opening_balance_company")
+    @@index([financialYearId], map: "idx_ledger_opening_balance_financial_year")
+    @@index([ledgerId], map: "idx_ledger_opening_balance_ledger")
+    @@map("accounting_ledger_opening_balances")
+}
+
+model VoucherType {
+    id                         Int                  @id @default(autoincrement())
+    companyId                  Int                  @map("company_id")
+    name                       String
+    nature                     VoucherTypeNature
+    numberingMode              VoucherNumberingMode @map("numbering_mode")
+    isNarrationMandatory       Boolean              @default(false) @map("is_narration_mandatory")
+    allowZeroValueTransactions Boolean              @default(false) @map("allow_zero_value_transactions")
+    requireBankOrCash          Boolean              @default(false) @map("require_bank_or_cash")
+    contraOnlyBankOrCash       Boolean              @default(false) @map("contra_only_bank_or_cash")
+    enableBillWiseTracking     Boolean              @default(false) @map("enable_bill_wise_tracking")
+    enableCostCenters          Boolean              @default(false) @map("enable_cost_centers")
+    isReserved                 Boolean              @default(false) @map("is_reserved")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company                      Company                       @relation(fields: [companyId], references: [id])
+    vouchers                     Voucher[]
+    accountingIntegrationConfigs AccountingIntegrationConfig[]
+
+    @@index([companyId], map: "idx_voucher_type_company")
+    @@map("accounting_voucher_type")
+}
+
+model CostCenter {
+    id        Int    @id @default(autoincrement())
+    companyId Int    @map("company_id")
+    name      String
+    parentId  Int?   @map("parent_id")
+    status    Status @default(ACTIVE)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company               Company                @relation(fields: [companyId], references: [id])
+    parent                CostCenter?            @relation("CostCenterParent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    children              CostCenter[]           @relation("CostCenterParent")
+    costCenterAllocations CostCenterAllocation[]
+
+    @@index([companyId], map: "idx_cost_center_company")
+    @@index([parentId], map: "idx_cost_center_parent")
+    @@map("accounting_cost_center")
+}
+
+model Voucher {
+    id              Int @id @default(autoincrement())
+    companyId       Int @map("company_id")
+    financialYearId Int @map("financial_year_id")
+    ccId            Int @map("cc_id")
+    voucherTypeId   Int @map("voucher_type_id")
+
+    voucherNo   String   @map("voucher_no")
+    voucherDate DateTime @map("voucher_date") @db.Date
+
+    refType    String? @map("ref_type")
+    subRefType String? @map("sub_ref_type")
+
+    refNo String? @map("ref_no")
+    refId Int?    @map("ref_id")
+
+    pId String? @map("p_id")
+
+    narration String?       @db.Text
+    status    VoucherStatus @default(POSTED)
+
+    totalDebit  Decimal? @map("total_debit") @db.Decimal(18, 5)
+    totalCredit Decimal? @map("total_credit") @db.Decimal(18, 5)
+
+    currencyId             Int?     @map("currency_id")
+    currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+
+    isActive   Boolean   @default(true) @map("is_active")
+    createdBy  Int?      @map("created_by")
+    updatedBy  Int?      @map("updated_by")
+    createdAt  DateTime  @default(now()) @map("created_at")
+    updatedAt  DateTime  @updatedAt @map("updated_at")
+    deletedAt  DateTime? @map("deleted_at")
+    deletedBy  Int?      @map("deleted_by")
+    approvedBy Int?      @map("approved_by")
+    approvedAt DateTime? @map("approved_at")
+
+    company          Company              @relation(fields: [companyId], references: [id])
+    financialYear    CompanyFinancialYear @relation(fields: [financialYearId], references: [id])
+    collectionCenter CollectionCenter     @relation(fields: [ccId], references: [id])
+    voucherType      VoucherType          @relation(fields: [voucherTypeId], references: [id])
+    currency         Currency?            @relation(fields: [currencyId], references: [id])
+
+    voucherLines          VoucherLine[]
+    costCenterAllocations CostCenterAllocation[]
+    billDocuments         BillDocument[]
+    billAllocations       BillAllocation[]
+
+    @@index([companyId], map: "idx_voucher_company")
+    @@index([financialYearId], map: "idx_voucher_financial_year")
+    @@index([voucherTypeId], map: "idx_voucher_type")
+    @@index([ccId], map: "idx_voucher_collection_center")
+    @@index([currencyId], map: "idx_voucher_currency")
+    @@map("accounting_voucher")
+}
+
+model VoucherLine {
+    id        Int @id @default(autoincrement())
+    voucherId Int @map("voucher_id")
+    lineNo    Int @map("line_no")
+
+    ledgerId Int     @map("ledger_id")
+    drCr     DrCr    @map("dr_cr")
+    amount   Decimal @db.Decimal(18, 5)
+
+    description String?
+
+    // Optional (helps statement printing & bank recon later)
+    instrumentNo   String?   @map("instrument_no")
+    instrumentDate DateTime? @map("instrument_date")
+
+    // Bank reconciliation fields
+    bankReferenceNo      String?             @map("bank_reference_no")
+    bankTransactionDate  DateTime?           @map("bank_transaction_date") @db.Date
+    bankClearedDate      DateTime?           @map("bank_cleared_date") @db.Date
+    bankReconcileStatus  BankReconcileStatus @default(UNRECONCILED) @map("bank_reconcile_status")
+    bankReconcileRemarks String?             @map("bank_reconcile_remarks") @db.Text
+    lastReconciledAt     DateTime?           @map("last_reconciled_at")
+    lastReconciledBy     Int?                @map("last_reconciled_by")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    voucher               Voucher                   @relation(fields: [voucherId], references: [id])
+    ledger                Ledger                    @relation(fields: [ledgerId], references: [id])
+    costCenterAllocations CostCenterAllocation[]
+    billAllocations       BillAllocation[]
+    bankMatches           BankReconciliationMatch[]
+
+    @@index([voucherId], map: "idx_voucher_line_voucher")
+    @@index([ledgerId], map: "idx_voucher_line_ledger")
+    @@map("accounting_voucher_line")
+}
+
+model CostCenterAllocation {
+    id        Int @id @default(autoincrement())
+    companyId Int @map("company_id")
+
+    voucherId     Int @map("voucher_id")
+    voucherLineId Int @map("voucher_line_id")
+
+    costCenterId Int @map("cost_center_id")
+
+    drCr   DrCr    @map("dr_cr") // usually same as voucher line's drCr
+    amount Decimal @db.Decimal(18, 5)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company     Company     @relation(fields: [companyId], references: [id])
+    voucher     Voucher     @relation(fields: [voucherId], references: [id])
+    costCenter  CostCenter  @relation(fields: [costCenterId], references: [id])
+    voucherLine VoucherLine @relation(fields: [voucherLineId], references: [id])
+
+    @@index([companyId], map: "idx_cc_alloc_company")
+    @@index([costCenterId], map: "idx_cc_alloc_cost_center")
+    @@index([voucherId], map: "idx_cc_alloc_voucher")
+    @@index([voucherLineId], map: "idx_cc_alloc_voucher_line")
+    @@map("accounting_cost_center_allocation")
+}
+
+model BillDocument {
+    id              Int @id @default(autoincrement())
+    companyId       Int @map("company_id")
+    financialYearId Int @map("financial_year_id")
+    partyLedgerId   Int @map("party_ledger_id") // ledger with isBillWiseOn=true
+
+    billType BillType  @map("bill_type")
+    refNo    String    @map("ref_no")
+    refDate  DateTime  @map("ref_date") @db.Date
+    dueDate  DateTime? @map("due_date") @db.Date
+
+    amount         Decimal    @db.Decimal(18, 5) // original bill
+    adjustedAmount Decimal    @default(0) @map("adjusted_amount") @db.Decimal(18, 5)
+    status         BillStatus @default(OPEN)
+
+    // Link back to source voucher that created the bill (NEW_REF from Sales/Purchase/Journal)
+    sourceVoucherId Int?    @map("source_voucher_id")
+    note            String? @db.VarChar(255)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company         Company              @relation(fields: [companyId], references: [id])
+    financialYear   CompanyFinancialYear @relation(fields: [financialYearId], references: [id])
+    partyLedger     Ledger               @relation(fields: [partyLedgerId], references: [id])
+    sourceVoucher   Voucher?             @relation(fields: [sourceVoucherId], references: [id])
+    billAllocations BillAllocation[]
+
+    @@index([companyId], map: "idx_bill_doc_company")
+    @@index([partyLedgerId], map: "idx_bill_doc_party_ledger")
+    @@index([financialYearId], map: "idx_bill_doc_financial_year")
+    @@index([sourceVoucherId], map: "idx_bill_doc_source_voucher")
+    @@map("accounting_bill_document")
+}
+
+model BillAllocation {
+    id              Int @id @default(autoincrement())
+    companyId       Int @map("company_id")
+    financialYearId Int @map("financial_year_id")
+
+    voucherId     Int @map("voucher_id")
+    voucherLineId Int @map("voucher_line_id")
+
+    partyLedgerId Int @map("party_ledger_id")
+
+    allocationType AllocationType @map("allocation_type")
+
+    // For AGAINST_REF
+    billDocumentId Int? @map("bill_document_id")
+
+    // For NEW_REF (create bill document on POST)
+    refNo   String?   @map("ref_no")
+    refDate DateTime? @map("ref_date") @db.Date
+    dueDate DateTime? @map("due_date") @db.Date
+
+    drCr   DrCr    @map("dr_cr")
+    amount Decimal @db.Decimal(18, 5)
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company       Company              @relation(fields: [companyId], references: [id])
+    financialYear CompanyFinancialYear @relation(fields: [financialYearId], references: [id])
+    voucher       Voucher              @relation(fields: [voucherId], references: [id])
+    voucherLine   VoucherLine          @relation(fields: [voucherLineId], references: [id])
+    partyLedger   Ledger               @relation(fields: [partyLedgerId], references: [id])
+    billDocument  BillDocument?        @relation(fields: [billDocumentId], references: [id])
+
+    @@index([companyId], map: "idx_bill_alloc_company")
+    @@index([financialYearId], map: "idx_bill_alloc_financial_year")
+    @@index([voucherId], map: "idx_bill_alloc_voucher")
+    @@index([voucherLineId], map: "idx_bill_alloc_voucher_line")
+    @@index([partyLedgerId], map: "idx_bill_alloc_party_ledger")
+    @@index([billDocumentId], map: "idx_bill_alloc_bill_document")
+    @@map("accounting_bill_allocation")
+}
+
+model Narration {
+    id            Int     @id @default(autoincrement())
+    name          String  @map("name")
+    voucherTypeId Int     @map("voucher_type_id")
+    description   String? @map("description")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("accounting_narration")
+}
+
+model AccountingIntegrationConfig {
+    id            Int                  @id @default(autoincrement())
+    refType       VoucherReferenceType @map("ref_type")
+    subRefType    ConfigSubRefType?    @map("sub_ref_type")
+    voucherTypeId Int                  @map("voucher_type_id")
+    narrationText String               @map("narration_text")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    voucherType                        VoucherType                          @relation(fields: [voucherTypeId], references: [id])
+    accountingIntegrationConfigDetails AccountingIntegrationConfigDetails[]
+
+    @@index([voucherTypeId], map: "idx_integration_config_voucher_type")
+    @@map("accounting_integration_config")
+}
+
+model AccountingIntegrationConfigDetails {
+    id                            Int              @id @default(autoincrement())
+    accountingIntegrationConfigId Int              @map("accounting_integration_config_id")
+    type                          ConfigType       @map("type")
+    ledgerType                    ConfigLedgerType @map("ledger_type")
+    ledgerValue                   String           @map("ledger_value")
+    policy                        DrCr             @map("policy")
+    amountKey                     String           @map("amount_key")
+    masterKey                     String?          @map("master_key")
+    groupId                       Int?             @map("group_id")
+    isPaymentRelated              Boolean          @map("is_payment_related")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    accountingIntegrationConfig AccountingIntegrationConfig @relation(fields: [accountingIntegrationConfigId], references: [id])
+    group                       Group?                      @relation(fields: [groupId], references: [id])
+
+    @@index([accountingIntegrationConfigId], map: "idx_integration_config_details_config")
+    @@index([groupId], map: "idx_integration_config_details_group")
+    @@map("accounting_integration_config_details")
+}
+
+model ClientLedgerMapping {
+    id         Int        @id @default(autoincrement())
+    clientType ClientType @map("client_type")
+    clientId   Int        @map("client_id")
+    ledgerId   Int        @map("ledger_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    ledger Ledger @relation(fields: [ledgerId], references: [id])
+
+    @@index([ledgerId], map: "idx_client_ledger_mapping_ledger")
+    @@map("accounting_client_ledger_mapping")
+}
+
+model BatchJob {
+    id Int @id @default(autoincrement())
+
+    type         Batch_Type
+    status       Batch_Status @default(PENDING)
+    batchJobNo   String?      @map("batch_job_no")
+    totalQty     Int          @map("total_qty")
+    processedQty Int          @default(0) @map("processed_qty")
+    successCount Int          @default(0) @map("success_count")
+    failureCount Int          @default(0) @map("failure_count")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    voucherEntryExcels  VoucherEntryExcel[]
+    bankStatementExcels BankStatementExcel[]
+    accBatchJobDetails  AccBatchJobDetails[]
+
+    @@map("accounting_batch_job")
+}
+
+model AccBatchJobDetails {
+    id Int @id @default(autoincrement())
+
+    batchId  Int                  @map("batch_id")
+    type     BT_JOB_DET_TYPE      @default(CREATE)
+    rowTitle String?              @map("row_title")
+    rowNo    Int?                 @map("row_no")
+    refId    Int?                 @map("ref_id")
+    refNo    String?              @map("ref_no")
+    status   Batch_Details_Status
+    errorMsg String?              @map("error_msg") @db.Text
+
+    batch BatchJob @relation(fields: [batchId], references: [id])
+
+    @@index([batchId], name: "batch_job_details_batch_id_idx")
+    @@map("accounting_batch_job_details")
+}
+
+model VoucherEntryExcel {
+    id               Int           @id @default(autoincrement())
+    rowNo            Int?          @map("row_no")
+    voucherDate      DateTime      @map("voucher_date") @db.Date
+    voucherType      String        @map("voucher_type")
+    refType          String?       @map("ref_type")
+    subRefType       String?       @map("sub_ref_type")
+    refNo            String?       @map("ref_no")
+    status           VoucherStatus @map("status")
+    narration        String        @map("narration")
+    partyLedger      String?       @map("party_ledger")
+    partyLedgerGroup String?       @map("party_ledger_group")
+    otherLedgers     Json          @map("other_ledgers")
+
+    batchJobId Int @map("batch_job_id")
+
+    batchJob BatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], name: "voucher_entry_excel_batch_job_id_idx")
+    @@map("accounting_voucher_entry_excel")
+}
+
+model BankStatement {
+    id              Int @id @default(autoincrement())
+    companyId       Int @map("company_id")
+    financialYearId Int @map("financial_year_id")
+    ledgerId        Int @map("ledger_id")
+
+    fileUrl       String?   @map("file_url")
+    statementFrom DateTime? @map("statement_from") @db.Date
+    statementTo   DateTime? @map("statement_to") @db.Date
+    remarks       String?   @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    ledger        Ledger               @relation(fields: [ledgerId], references: [id])
+    company       Company              @relation(fields: [companyId], references: [id])
+    financialYear CompanyFinancialYear @relation(fields: [financialYearId], references: [id])
+
+    statementRows BankStatementRow[]
+
+    @@index([companyId], map: "idx_bank_stmt_batch_company")
+    @@index([financialYearId], map: "idx_bank_stmt_batch_financial_year")
+    @@index([ledgerId], map: "idx_bank_stmt_batch_ledger")
+    @@map("accounting_bank_statement")
+}
+
+model BankStatementRow {
+    id              Int  @id @default(autoincrement())
+    bankStatementId Int? @map("bank_statement_id")
+
+    sourceType BankStatementSourceType @default(IMPORT) @map("source_type")
+
+    transactionDate DateTime  @map("transaction_date") @db.Date
+    valueDate       DateTime? @map("value_date") @db.Date
+    transactionId   String?   @map("transaction_id")
+    chequeNo        String?   @map("cheque_no")
+    description     String?   @db.Text
+
+    drCr   DrCr    @map("dr_cr")
+    amount Decimal @db.Decimal(18, 5)
+
+    voucherNo   String? @map("voucher_no")
+    voucherType String? @map("voucher_type")
+    ledgerName  String? @map("ledger_name")
+    bankName    String? @map("bank_name")
+
+    reconcileStatus  BankReconcileStatus @default(UNRECONCILED) @map("reconcile_status")
+    reconcileRemarks String?             @map("reconcile_remarks") @db.Text
+    lastReconciledAt DateTime?           @map("last_reconciled_at")
+    lastReconciledBy Int?                @map("last_reconciled_by")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    bankStatement BankStatement? @relation(fields: [bankStatementId], references: [id])
+
+    bankMatches BankReconciliationMatch[]
+
+    @@index([bankStatementId], map: "idx_bank_stmt_row_bank_statement")
+    @@map("accounting_bank_statement_row")
+}
+
+model BankReconciliationMatch {
+    id Int @id @default(autoincrement())
+
+    voucherLineId      Int @map("voucher_line_id")
+    bankStatementRowId Int @map("bank_statement_row_id")
+
+    matchedAmount Decimal   @map("matched_amount") @db.Decimal(18, 5)
+    clearedDate   DateTime? @map("cleared_date") @db.Date
+
+    matchType       BankMatchType       @default(MANUAL) @map("match_type")
+    matchConfidence BankMatchConfidence @default(MEDIUM) @map("match_confidence")
+    remarks         String?             @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    voucherLine      VoucherLine      @relation(fields: [voucherLineId], references: [id])
+    bankStatementRow BankStatementRow @relation(fields: [bankStatementRowId], references: [id])
+
+    @@index([voucherLineId], map: "idx_bank_recon_match_voucher_line")
+    @@index([bankStatementRowId], map: "idx_bank_recon_match_stmt_row")
+    @@index([matchType], map: "idx_bank_recon_match_type")
+    @@map("accounting_bank_reconciliation_match")
+}
+
+model BankStatementExcel {
+    id         Int @id @default(autoincrement())
+    batchJobId Int @map("batch_job_id")
+
+    rowNo             Int?      @map("row_no")
+    transactionDate   DateTime  @map("transaction_date") @db.Date
+    valueDate         DateTime? @map("value_date") @db.Date
+    transactionId     String?   @map("transaction_id")
+    chequeNo          String?   @map("cheque_no")
+    description       String?   @db.Text
+    drCr              DrCr      @map("dr_cr")
+    transactionAmount Decimal   @map("transaction_amount") @db.Decimal(18, 5)
+    voucherNo         String?   @map("voucher_no")
+    voucherType       String?   @map("voucher_type")
+    ledgerName        String?   @map("ledger_name")
+    bankName          String?   @map("bank_name")
+
+    batchJob BatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], map: "idx_bank_stmt_excel_batch_job")
+    @@map("accounting_bank_statement_excel")
+}
+
+// All Enums are here

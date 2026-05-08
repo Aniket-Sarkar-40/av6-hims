@@ -74,51 +74,54 @@ model Country {
     enShortName String? @map("en_short_name")
     nationality String? @map("nationality")
 
-    state         State[] // Relation to states
-    cities        City[] // Relation to cities
-    CountryCode   CountryCode?
-    pmsWarehouses PmsWarehouse[]
-    pmsBranches   PmsBranch[]
+    state          State[] // Relation to states
+    cities         City[] // Relation to cities
+    CountryCode    CountryCode?
+    pmsWarehouses  PmsWarehouse[]
+    pmsBranches    PmsBranch[]
+    CompanyAddress CompanyAddress[]
 
     @@map("countries")
 }
 
 model State {
-    id            Int            @id @default(autoincrement())
-    name          String
-    countryId     Int            @map("country_id")
-    isActive      Boolean        @default(true) @map("is_active")
-    createdBy     Int?           @map("created_by")
-    updatedBy     Int?           @map("updated_by")
-    createdAt     DateTime       @default(now()) @map("created_at")
-    updatedAt     DateTime       @updatedAt @map("updated_at")
-    deletedAt     DateTime?      @map("deleted_at")
-    deletedBy     Int?           @map("deleted_by")
-    country       Country        @relation(fields: [countryId], references: [id])
-    cities        City[]
-    pmsWarehouses PmsWarehouse[]
-    pmsBranches   PmsBranch[]
+    id               Int              @id @default(autoincrement())
+    name             String
+    countryId        Int              @map("country_id")
+    isActive         Boolean          @default(true) @map("is_active")
+    createdBy        Int?             @map("created_by")
+    updatedBy        Int?             @map("updated_by")
+    createdAt        DateTime         @default(now()) @map("created_at")
+    updatedAt        DateTime         @updatedAt @map("updated_at")
+    deletedAt        DateTime?        @map("deleted_at")
+    deletedBy        Int?             @map("deleted_by")
+    country          Country          @relation(fields: [countryId], references: [id])
+    cities           City[]
+    pmsWarehouses    PmsWarehouse[]
+    pmsBranches      PmsBranch[]
+    companyAddresses CompanyAddress[]
 
     @@index([countryId], name: "state_country_id_idx")
     @@map("master_state")
 }
 
 model City {
-    id            Int            @id @default(autoincrement())
-    name          String
-    stateId       Int            @map("state_id")
-    countryId     Int            @map("country_id")
-    isActive      Boolean        @default(true) @map("is_active")
-    createdBy     Int?           @map("created_by")
-    updatedBy     Int?           @map("updated_by")
-    createdAt     DateTime       @default(now()) @map("created_at")
-    updatedAt     DateTime       @updatedAt @map("updated_at")
-    deletedAt     DateTime?      @map("deleted_at")
-    deletedBy     Int?           @map("deleted_by")
-    state         State          @relation(fields: [stateId], references: [id])
-    country       Country        @relation(fields: [countryId], references: [id])
-    pmsWarehouses PmsWarehouse[]
-    pmsBranches   PmsBranch[]
+    id               Int              @id @default(autoincrement())
+    name             String
+    stateId          Int              @map("state_id")
+    countryId        Int              @map("country_id")
+    isActive         Boolean          @default(true) @map("is_active")
+    createdBy        Int?             @map("created_by")
+    updatedBy        Int?             @map("updated_by")
+    createdAt        DateTime         @default(now()) @map("created_at")
+    updatedAt        DateTime         @updatedAt @map("updated_at")
+    deletedAt        DateTime?        @map("deleted_at")
+    deletedBy        Int?             @map("deleted_by")
+    state            State            @relation(fields: [stateId], references: [id])
+    country          Country          @relation(fields: [countryId], references: [id])
+    pmsWarehouses    PmsWarehouse[]
+    pmsBranches      PmsBranch[]
+    companyAddresses CompanyAddress[]
 
     @@index([stateId], name: "city_state_id_idx")
     @@index([countryId], name: "city_countryId_id_idx")
@@ -228,6 +231,9 @@ model CollectionCenter {
     invStockTransferTo         InvStockTransfer[]         @relation(name: "To")
     invStockTransferFrom       InvStockTransfer[]         @relation(name: "From")
     invStockTransferCc         InvStockTransfer[]         @relation(name: "cc")
+    vouchers                   Voucher[]
+    company                    Company?                   @relation(fields: [companyId], references: [id])
+    companyId                  Int?
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")
@@ -416,6 +422,7 @@ model Currency {
     createdAt DateTime  @default(now()) @map("created_at")
     updatedAt DateTime? @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
+    vouchers  Voucher[]
 
     @@map("core_currency")
 }
