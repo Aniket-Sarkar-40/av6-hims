@@ -9,7 +9,7 @@ import {
   StockTransferUpdate,
   UpdateItemStockTransferInput,
 } from "@/types/stock/stockTransfer.js";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   PMS_STR_RETURN_STATUS,
@@ -27,7 +27,7 @@ import { featureFlagService } from "@/services/feature/feature.service.js";
 import { emailConfigService } from "@/services/master/emailConfig.service.js";
 
 export const createStockTransfer = async (
-  input: CreateItemStockTransferInput,
+  input: CreateItemStockTransferInput
 ) => {
   logger.info("entering::createStockTransfer::repository");
 
@@ -36,7 +36,7 @@ export const createStockTransfer = async (
 
   const omittedGrn = customOmit<CreateItemStockTransferInput, "warehouse">(
     input,
-    ["warehouse"],
+    ["warehouse"]
   );
 
   const { from, to, ccId, items, ...rest } = omittedGrn.rest;
@@ -69,13 +69,13 @@ export const createStockTransfer = async (
         include: { stockTransferDetails: true },
       });
     },
-    { timeout: API_TIMEOUT },
+    { timeout: API_TIMEOUT }
   );
 
   const wareHouse = omittedGrn.omitted.warehouse;
   const feature = await featureFlagService.getFeatureFlagByShortCode(
     "STOCK_TRANSFER_NOTIFICATION",
-    true,
+    true
   );
   if (wareHouse?.email && feature?.isEnabled) {
     const emailTemplate = await emailConfigService.getEventEmail();
@@ -104,7 +104,7 @@ export const createStockTransfer = async (
 };
 
 export const updateStockTransfer = async (
-  input: UpdateItemStockTransferInput,
+  input: UpdateItemStockTransferInput
 ) => {
   logger.info("entering::createStockTransfer::repository");
   const { items, stockTransfer } = input;
@@ -114,7 +114,7 @@ export const updateStockTransfer = async (
   const toUpdate = items.filter((d) => typeof d.id === "number");
   const toCreate = items.filter((d) => typeof d.id !== "number");
   const toDelete = stockTransfer.stockTransferDetails.filter(
-    (d) => !items.some((item) => item.id === d.id),
+    (d) => !items.some((item) => item.id === d.id)
   );
 
   return await db.$transaction(
@@ -177,7 +177,7 @@ export const updateStockTransfer = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
@@ -249,7 +249,7 @@ export const approveStockTransfer = async (input: StockTransferUpdate) => {
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails,
+          auditDetails
         );
         // Add Stock into in-transit stock
         await addInTransitStock(
@@ -263,7 +263,7 @@ export const approveStockTransfer = async (input: StockTransferUpdate) => {
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails,
+          auditDetails
         );
       }
 
@@ -271,12 +271,12 @@ export const approveStockTransfer = async (input: StockTransferUpdate) => {
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
 export const acknowledgeStockTransfer = async (
-  input: StockTransferAcknowledgeInput,
+  input: StockTransferAcknowledgeInput
 ) => {
   logger.info("entering::acknowledgeStockTransfer::repository");
   const store = requestStorage.getStore();
@@ -332,7 +332,7 @@ export const acknowledgeStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails,
+          auditDetails
         );
         // Subtract Stock from in-transit stock
         await subInTransitStock(
@@ -346,7 +346,7 @@ export const acknowledgeStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails,
+          auditDetails
         );
       }
 
@@ -354,7 +354,7 @@ export const acknowledgeStockTransfer = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
@@ -386,7 +386,7 @@ export const getAllStockTransfer = async () => {
 };
 
 export const searchStockTransfers = async (
-  params: StockTransferSearchInput,
+  params: StockTransferSearchInput
 ) => {
   logger.info("entering::searchStockTransfers::repository");
   const {
@@ -465,7 +465,7 @@ export const searchStockTransfers = async (
 };
 
 export const approveReturnStockTransfer = async (
-  input: StockTransferUpdate,
+  input: StockTransferUpdate
 ) => {
   logger.info("entering::approveReturnStockTransfer::repository");
   const store = requestStorage.getStore();
@@ -509,7 +509,7 @@ export const approveReturnStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails,
+          auditDetails
         );
         // Subtract Stock from in-transit stock
         await subInTransitStock(
@@ -523,7 +523,7 @@ export const approveReturnStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails,
+          auditDetails
         );
       }
 
@@ -531,6 +531,6 @@ export const approveReturnStockTransfer = async (
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };

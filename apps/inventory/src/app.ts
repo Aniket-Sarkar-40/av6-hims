@@ -23,6 +23,7 @@ import { warehouseRouter } from "./routes/master/warehouse.route.js";
 import { purchaseRouter } from "./routes/purchase/purchase.route.js";
 import { storeRequisitionRouter } from "./routes/purchase/storeRequisition.route.js";
 import { stockAdjustmentRouter } from "./routes/stock/stockAdjustment.route.js";
+import stockTransferRouter from "@/routes/stock/stockTransfer.route.js";
 
 export const inventoryRouter: ExpressRouter = Router();
 
@@ -64,3 +65,5 @@ inventoryRouter.use("/stock-adjustment", stockAdjustmentRouter);
 
 // Consumption
 inventoryRouter.use("/consumption", consumptionRouter);
+
+inventoryRouter.use("/stock-transfer", stockTransferRouter);

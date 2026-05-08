@@ -6,489 +6,65 @@ import {
   TAX_METHOD,
 } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
+import {
+  arrayRequired,
+  enumOptional,
+  idOptional,
+  idRequired,
+  priceOptional,
+  priceRequired,
+} from "@repo/shared/utils/joi.utils.js";
 
 export const PatientProcedureDetailsCreateSchema =
   Joi.object<PatientProcedureDetailsInput>({
-    procedureId: Joi.number()
-      .integer()
-      .positive()
-      .required()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Procedure ID"),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Procedure ID",
-        ),
-        "number.positive": generateValidationErrorMessage(
-          "POSITIVE",
-          "Procedure ID",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Procedure ID",
-        ),
-      }),
+    procedureId: idRequired("Procedure Id"),
 
-    subtotalAmount: Joi.number()
-      .min(0)
-      .required()
-      .precision(2)
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Procedure Charge",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Procedure Charge",
-          "0",
-        ),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Procedure Charge",
-          "2",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Procedure Charge",
-        ),
-      }),
+    subtotalAmount: priceRequired("Subtotal Amount"),
 
-    otherChargeAmount: Joi.number()
-      .min(0)
-      .optional()
-      .precision(2)
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Other Charge"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Other Charge",
-          "0",
-        ),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Other Charge",
-          "2",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Other Charge",
-        ),
-      }),
+    otherChargeAmount: priceOptional("Other Charge Amount"),
 
-    coPaymentAmount: Joi.number()
-      .min(0)
-      .optional()
-      .precision(2)
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Co Payment Amount",
-        ),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Co Payment Amount",
-          "2",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Co Payment Amount",
-          "0",
-        ),
-      }),
+    coPaymentAmount: priceOptional("Co Payment Amount"),
 
-    discountMode: Joi.string()
-      .valid(...Object.values(PercentageOrAmount))
-      .optional()
-      .allow(null)
-      .messages({
-        "string.base": generateValidationErrorMessage(
-          "STRING",
-          "Discount Mode",
-        ),
-        "any.only": generateValidationErrorMessage(
-          "VALID_ENUM",
-          "Discount Mode",
-          Object.values(PercentageOrAmount).join(", "),
-        ),
-      }),
+    discountMode: enumOptional("Discount Mode", PercentageOrAmount),
 
-    discountValue: Joi.number()
-      .min(0)
-      .precision(2)
-      .optional()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Discount Value",
-        ),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Discount Value",
-          "2",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Discount Value",
-          "0",
-        ),
-      }),
+    discountValue: priceOptional("Discount Value"),
 
-    discountAmount: Joi.number()
-      .min(0)
-      .precision(2)
-      .optional()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage(
-          "NUMBER",
-          "Discount Amount",
-        ),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Discount Amount",
-          "2",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Discount Amount",
-          "0",
-        ),
-      }),
-    taxMethod: Joi.string()
-      .valid(...Object.values(TAX_METHOD))
-      .optional()
-      .allow(null)
-      .messages({
-        "string.base": generateValidationErrorMessage("STRING", "Tax Method"),
-        "any.only": generateValidationErrorMessage(
-          "VALID_ENUM",
-          "Discount Type",
-          Object.values(TAX_METHOD).join(", "),
-        ),
-      }),
+    discountAmount: priceOptional("Discount Amount"),
+    taxMethod: enumOptional("Tax Method", TAX_METHOD),
 
-    taxValue: Joi.number()
-      .min(0)
-      .precision(2)
-      .optional()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Tax Value"),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Tax Value",
-          "2",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Tax Value",
-          "0",
-        ),
-      }),
+    taxValue: priceOptional("Tax Value"),
 
-    taxAmount: Joi.number()
-      .min(0)
-      .precision(2)
-      .optional()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Tax Amount"),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Tax Amount",
-          "2",
-        ),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Tax Amount",
-          "0",
-        ),
-      }),
+    taxAmount: priceOptional("Tax Amount"),
 
-    grossAmount: Joi.number()
-      .min(0)
-      .required()
-      .precision(2)
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Gross Amount"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Gross Amount",
-          "0",
-        ),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Gross Amount",
-          "2",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Gross Amount",
-        ),
-      }),
+    grossAmount: priceRequired("Gross Amount"),
 
-    netAmount: Joi.number()
-      .min(0)
-      .required()
-      .precision(2)
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Net Amount"),
-        "number.min": generateValidationErrorMessage(
-          "MIN_VALUE",
-          "Net Amount",
-          "0",
-        ),
-        "number.precision": generateValidationErrorMessage(
-          "DECIMAL",
-          "Net Amount",
-          "2",
-        ),
-        "any.required": generateValidationErrorMessage(
-          "REQUIRED",
-          "Net Amount",
-        ),
-      }),
+    netAmount: priceRequired("Net Amount"),
   });
 
 export const PatientProcedureCreateSchema = Joi.object({
-  ccId: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Collection Center ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Collection Center ID",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Collection Center ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Collection Center ID",
-      ),
-    }),
-  appointmentId: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Appointment ID"),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Appointment ID",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Appointment ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Appointment ID",
-      ),
-    }),
+  ccId: idRequired("Collection Center Id"),
+  appointmentId: idRequired("Appointment Id"),
 
-  additionalDiscountMode: Joi.string()
-    .valid(...Object.values(PercentageOrAmount))
-    .optional()
-    .allow(null)
-    .messages({
-      "string.base": generateValidationErrorMessage(
-        "STRING",
-        "Additional Discount Mode",
-      ),
-      "any.only": generateValidationErrorMessage(
-        "VALID_ENUM",
-        "Additional Discount Type",
-        Object.values(PercentageOrAmount).join(", "),
-      ),
-    }),
+  additionalDiscountMode: enumOptional(
+    "Additional Discount Mode",
+    PercentageOrAmount
+  ),
 
-  additionalDiscountValue: Joi.number()
-    .min(0)
-    .precision(2)
-    .optional()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Additional Discount Value",
-      ),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Additional Discount Value",
-        "0",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Additional Discount Value",
-        "2",
-      ),
-    }),
+  additionalDiscountValue: priceRequired("Additional Discount Value"),
 
-  subtotalAmount: Joi.number()
-    .min(0)
-    .precision(2)
-    .optional()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Subtotal Amount",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Subtotal Amount",
-        "2",
-      ),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Subtotal Amount",
-        "0",
-      ),
-    }),
+  subtotalAmount: priceOptional("Subtotal Amount"),
 
-  otherChargeAmount: Joi.number()
-    .min(0)
-    .required()
-    .precision(2)
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Other Charge"),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Other Charge",
-        "0",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Other Charge",
-        "2",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Other Charge",
-      ),
-    }),
+  otherChargeAmount: priceRequired("Other Charge Amount"),
 
-  discountTotalAmount: Joi.number()
-    .min(0)
-    .precision(2)
-    .optional()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Discount Total Amount",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Discount Total Amount",
-        "2",
-      ),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Discount Total Amount",
-        "0",
-      ),
-    }),
+  discountTotalAmount: priceRequired("Discount Total Amount"),
 
-  taxAmount: Joi.number()
-    .min(0)
-    .precision(2)
-    .optional()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Tax Amount"),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Tax Amount",
-        "0",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Tax Amount",
-        "2",
-      ),
-    }),
+  taxAmount: priceOptional("Tax Amount"),
 
-  grossAmount: Joi.number()
-    .min(0)
-    .required()
-    .precision(2)
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Gross Amount"),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Gross Amount",
-        "0",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Gross Amount",
-        "2",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Gross Amount",
-      ),
-    }),
+  grossAmount: priceRequired("Gross Amount"),
 
-  netAmount: Joi.number()
-    .min(0)
-    .required()
-    .precision(2)
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Net Amount"),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Net Amount",
-        "0",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Net Amount",
-        "2",
-      ),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Net Amount"),
-    }),
+  netAmount: priceRequired("Net Amount"),
 
-  coPaymentAmount: Joi.number()
-    .min(0)
-    .precision(2)
-    .optional()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Co Payment Amount",
-      ),
-      "number.precision": generateValidationErrorMessage(
-        "DECIMAL",
-        "Co Payment Amount",
-        "2",
-      ),
-      "number.min": generateValidationErrorMessage(
-        "MIN_VALUE",
-        "Co Payment Amount",
-        "0",
-      ),
-    }),
+  coPaymentAmount: priceOptional("Co-payment Amount"),
 
   patientProcedureDetails: Joi.array()
     .items(PatientProcedureDetailsCreateSchema)
@@ -498,16 +74,16 @@ export const PatientProcedureCreateSchema = Joi.object({
     .messages({
       "array.base": generateValidationErrorMessage(
         "ARRAY",
-        "Patient Procedure Details",
+        "Patient Procedure Details"
       ),
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Patient Procedure Details",
-        "1",
+        "1"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Patient Procedure Details",
+        "Patient Procedure Details"
       ),
       "array.unique": generateValidationErrorMessage("DUPLICATE", "Procedure"),
     }),
@@ -515,147 +91,26 @@ export const PatientProcedureCreateSchema = Joi.object({
 
 const PatientProcedureDetailsUpdateSchema =
   PatientProcedureDetailsCreateSchema.keys({
-    id: Joi.number()
-      .integer()
-      .positive()
-      .optional()
-      .strict()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "Procedure ID"),
-        "number.integer": generateValidationErrorMessage(
-          "INTEGER",
-          "Procedure ID",
-        ),
-        "number.positive": generateValidationErrorMessage(
-          "POSITIVE",
-          "Procedure ID",
-        ),
-      }),
+    id: idOptional("Patient Procedure Detail Id"),
   });
 
 export const PatientProcedureUpdateSchema = PatientProcedureCreateSchema.keys({
-  id: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Patient Procedure ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Patient Procedure ID",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Patient Procedure ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Patient Procedure ID",
-      ),
-    }),
-  patientProcedureDetails: Joi.array()
-    .items(PatientProcedureDetailsUpdateSchema)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": generateValidationErrorMessage(
-        "ARRAY",
-        "Patient Procedure Details",
-      ),
-      "array.min": generateValidationErrorMessage(
-        "ARRAY_MIN_LENGTH",
-        "Patient Procedure Details",
-        "1",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Patient Procedure Details",
-      ),
-    }),
+  id: idRequired("Patient Procedure Id"),
+  patientProcedureDetails: arrayRequired(
+    "Patient Procedure Details",
+    PatientProcedureDetailsUpdateSchema,
+    1
+  ),
 });
 
 export const PatientProcedureReturnSchema = Joi.object({
-  ccId: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "CC Id"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "CC Id"),
-      "number.positive": generateValidationErrorMessage("POSITIVE", "CId"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "CC  Id"),
-    }),
-  id: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage(
-        "NUMBER",
-        "Patient Procedure ID",
-      ),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Patient Procedure ID",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Patient Procedure ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Patient Procedure ID",
-      ),
-    }),
-  detailId: Joi.array()
-    .items(
-      Joi.number()
-        .integer()
-        .positive()
-        .required()
-        .strict()
-        .messages({
-          "number.base": generateValidationErrorMessage(
-            "NUMBER",
-            "Procedure Details ID",
-          ),
-          "number.integer": generateValidationErrorMessage(
-            "INTEGER",
-            "Procedure Details ID",
-          ),
-          "number.positive": generateValidationErrorMessage(
-            "POSITIVE",
-            "Procedure Details ID",
-          ),
-          "any.required": generateValidationErrorMessage(
-            "REQUIRED",
-            "Procedure Details ID",
-          ),
-        }),
-    )
-    .min(1)
-    .required()
-    .messages({
-      "array.base": generateValidationErrorMessage(
-        "ARRAY",
-        "Procedure Details ID",
-      ),
-      "array.min": generateValidationErrorMessage(
-        "ARRAY_MIN_LENGTH",
-        "Procedure Details ID",
-        "1",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Procedure Details ID",
-      ),
-    }),
+  ccId: idRequired("Collection Center Id"),
+  id: idRequired("Patient Procedure Id"),
+  detailId: arrayRequired(
+    "Patient Procedure Details ID",
+    idRequired("Patient Procedure Details ID"),
+    1
+  ),
 });
 export const validateCreatePatientProcedure = validationHandler({
   schema: PatientProcedureCreateSchema,

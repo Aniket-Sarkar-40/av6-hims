@@ -19,15 +19,13 @@ import eventRecipientRuleRouter from "./routes/event/eventRecipientRule.route.js
 import serviceEventRouter from "./routes/event/serviceEvent.route.js";
 import eventConfigRouter from "./routes/event/eventConfig.route.js";
 import templateRouter from "./routes/event/template.route.js";
-import { registerPharmacyApprovalCallbacks } from "@/modules/callbacks/approvalCallback.js";
-import { eventBus } from "@/events/eventBus.js";
-import { registerApprovalEmailListeners } from "@/modules/notifications/approvalEmailListener.js";
 import { incomeHeadRouter } from "@/routes/master/incomeHead.route.js";
 import expenseHeadRouter from "@/routes/master/expenseHead.route.js";
 import { incomeRouter } from "@/routes/consumerConnect/income.route.js";
 import { expenseRouter } from "@/routes/consumerConnect/expense.route.js";
+import { approvalRouter } from "@/routes/approval/approval.routes.js";
+import { registerPharmacyApprovalCallbacks } from "@/modules/callbacks/approvalCallback.js";
 
-registerApprovalEmailListeners(eventBus); // notifications
 registerPharmacyApprovalCallbacks(); // stock updates
 
 export const coreRouter: ExpressRouter = Router();
@@ -65,3 +63,5 @@ coreRouter.use("/master/expense-head", expenseHeadRouter);
 
 coreRouter.use("/income", incomeRouter);
 coreRouter.use("/expense", expenseRouter);
+
+coreRouter.use("/approval", approvalRouter);

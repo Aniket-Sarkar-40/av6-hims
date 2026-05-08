@@ -12,7 +12,7 @@ import {
   DataType,
   NotificationEmitter,
   uinConfigService,
-} from "av6-core";
+} from "av6-core-v2";
 import {
   envMode,
   MASTER_TABLES,

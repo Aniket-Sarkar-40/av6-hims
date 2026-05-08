@@ -6,7 +6,7 @@
     "@repo/db": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
-    "av6-core": "^1.7.11",
+    "av6-core-v2": "^1.0.5",
     "av6-utils": "^1.0.6",
     "axios": "^1.13.6",
     "chart.js": "^4.5.1",

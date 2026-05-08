@@ -13,119 +13,31 @@ import {
   TransactionType,
 } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
+import {
+  dateOptional,
+  enumRequired,
+  idRequired,
+  intRequired,
+  strOptional,
+} from "@repo/shared/utils/joi.utils.js";
 
 /*=============== Fetch Payment Schema =================*/
 export const getPaymentSchema = Joi.object<GetPaymentReq>({
-  ccId: Joi.number()
-    .integer()
-    .positive()
-    .strict()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "CC Id"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "CC Id"),
-      "number.positive": generateValidationErrorMessage("POSITIVE", "CId"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "CC  Id"),
-    }),
+  ccId: idRequired("Collection Center ID"),
 
-  pageNo: Joi.number()
-    .integer()
-    .positive()
-    .strict()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Page No"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Page No"),
-      "number.positive": generateValidationErrorMessage("POSITIVE", "Page No"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Page No"),
-    }),
-  pageSize: Joi.number()
-    .integer()
-    .positive()
-    .strict()
-    .required()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Page Size"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "Page Size"),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Page Size",
-      ),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Page Size"),
-    }),
-  paymentStatus: Joi.string()
-    .valid(...Object.values(PaymentStatus))
-    .required()
-    .trim()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Payment Status"),
-      "string.empty": generateValidationErrorMessage("EMPTY", "Payment Status"),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Payment Status",
-      ),
-      "any.only": generateValidationErrorMessage(
-        "VALID_ENUM",
-        "Payment Status",
-        Object.values(PaymentStatus).join(", "),
-      ),
-    }),
-  sortBy: Joi.string()
-    .valid("ASC", "DESC")
-    .trim()
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Sort By"),
-      "string.empty": generateValidationErrorMessage("EMPTY", "Sort By"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "Sort By"),
-      "any.only": generateValidationErrorMessage(
-        "VALID_ENUM",
-        "Sort By",
-        "ASC, DESC",
-      ),
-    }),
-  searchText: Joi.string()
-    .allow("")
-    .optional()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Search Text"),
-    }),
-  startDate: Joi.string()
-    .isoDate()
-    .optional()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Start Date"),
-      "string.empty": generateValidationErrorMessage("EMPTY", "Start Date"),
-      "string.isoDate": generateValidationErrorMessage("DATE", "Start Date"),
-    }),
-  endDate: Joi.string()
-    .isoDate()
-    .optional()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "End Date"),
-      "string.empty": generateValidationErrorMessage("EMPTY", "End Date"),
-      "string.isoDate": generateValidationErrorMessage("DATE", "End Date"),
-    }),
+  pageNo: intRequired("Page No"),
+  pageSize: intRequired("Page Size"),
+  paymentStatus: enumRequired("Payment Status", PaymentStatus),
+  sortBy: enumRequired("Sort By", { ASC: "ASC", DESC: "DESC" }),
+  searchText: strOptional("Search Text"),
+  startDate: dateOptional("Start Date").iso(),
+  endDate: dateOptional("End Date").iso(),
 });
 
 /*=============== Create Payment Schema =================*/
 
 const paymentDetailSchema = Joi.object<PaymentDetailInput>({
-  paymentMode: Joi.string()
-    .valid(...Object.values(PaymentTransactionMode))
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Payment Mode"),
-      "any.only": generateValidationErrorMessage(
-        "VALID_ENUM",
-        "Payment Mode",
-        Object.values(PaymentTransactionMode).join(", "),
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Payment Mode",
-      ),
-    }),
+  paymentMode: enumRequired("Payment Mode", PaymentTransactionMode),
   paidAmount: Joi.number()
     .min(0)
     .precision(2)
@@ -140,12 +52,12 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       "number.min": generateValidationErrorMessage(
         "MIN_VALUE",
         "Paid Amount",
-        "0",
+        "0"
       ),
       "number.precision": generateValidationErrorMessage(
         "DECIMAL",
         "Paid Amount",
-        "2",
+        "2"
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Paid Amount"),
       "any.only": generateValidationErrorMessage("ONLY_NULL", "Paid Amount"),
@@ -166,16 +78,16 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       "number.min": generateValidationErrorMessage(
         "MIN_VALUE",
         "Refund Amount",
-        "0",
+        "0"
       ),
       "number.precision": generateValidationErrorMessage(
         "DECIMAL",
         "Refund Amount",
-        "2",
+        "2"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Refund Amount",
+        "Refund Amount"
       ),
       "any.only": generateValidationErrorMessage("ONLY_NULL", "Refund Amount"),
     }),
@@ -185,7 +97,7 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
     .when("paymentMode", {
       is: Joi.valid(
         PaymentTransactionMode.BANK_TRANSFER,
-        PaymentTransactionMode.CHEQUE,
+        PaymentTransactionMode.CHEQUE
       ),
       then: Joi.required(),
       otherwise: Joi.valid(null),
@@ -199,7 +111,7 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
     .when("paymentMode", {
       is: Joi.valid(
         PaymentTransactionMode.BANK_TRANSFER,
-        PaymentTransactionMode.CHEQUE,
+        PaymentTransactionMode.CHEQUE
       ),
       then: Joi.required(),
       otherwise: Joi.valid(null),
@@ -208,7 +120,7 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       "string.base": generateValidationErrorMessage("STRING", "Account Number"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Account Number",
+        "Account Number"
       ),
       "any.only": generateValidationErrorMessage("ONLY_NULL", "Account Number"),
     }),
@@ -235,15 +147,15 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Card Holder Name",
+        "Card Holder Name"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Card Holder Name",
+        "Card Holder Name"
       ),
       "any.only": generateValidationErrorMessage(
         "ONLY_NULL",
-        "Card Holder Name",
+        "Card Holder Name"
       ),
     }),
 
@@ -257,11 +169,11 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       "date.base": generateValidationErrorMessage("DATE", "Card Expiry Date"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Card Expiry Date",
+        "Card Expiry Date"
       ),
       "any.only": generateValidationErrorMessage(
         "ONLY_NULL",
-        "Card Expiry Date",
+        "Card Expiry Date"
       ),
     }),
 
@@ -271,7 +183,7 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       is: Joi.valid(
         PaymentTransactionMode.ONLINE_GATEWAY,
         PaymentTransactionMode.UPI,
-        PaymentTransactionMode.WALLET,
+        PaymentTransactionMode.WALLET
       ),
       then: Joi.required(),
       otherwise: Joi.valid(null),
@@ -280,7 +192,7 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       "string.base": generateValidationErrorMessage("STRING", "Transaction ID"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Transaction ID",
+        "Transaction ID"
       ),
       "any.only": generateValidationErrorMessage("ONLY_NULL", "Transaction ID"),
     }),
@@ -294,7 +206,7 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       "number.base": generateValidationErrorMessage("NUMBER", "Bank Head ID"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Bank Head ID",
+        "Bank Head ID"
       ),
       "any.only": generateValidationErrorMessage("ONLY_NULL", "Bank Head ID"),
     }),
@@ -303,7 +215,7 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
       is: Joi.valid(
         PaymentTransactionMode.ONLINE_GATEWAY,
         PaymentTransactionMode.UPI,
-        PaymentTransactionMode.WALLET,
+        PaymentTransactionMode.WALLET
       ),
       then: Joi.required(),
       otherwise: Joi.valid(null),
@@ -311,15 +223,15 @@ const paymentDetailSchema = Joi.object<PaymentDetailInput>({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Mobile Money Method ID",
+        "Mobile Money Method ID"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Mobile Money Method ID",
+        "Mobile Money Method ID"
       ),
       "any.only": generateValidationErrorMessage(
         "ONLY_NULL",
-        "Mobile Money Method ID",
+        "Mobile Money Method ID"
       ),
     }),
 });
@@ -332,7 +244,7 @@ export const createPaymentSchema = Joi.object<CreatePaymentInput>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Module",
-        Object.values(ServiceCode).join(", "),
+        Object.values(ServiceCode).join(", ")
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Module"),
     }),
@@ -346,15 +258,15 @@ export const createPaymentSchema = Joi.object<CreatePaymentInput>({
       "number.base": generateValidationErrorMessage("NUMBER", "Reference ID"),
       "number.integer": generateValidationErrorMessage(
         "INTEGER",
-        "Reference ID",
+        "Reference ID"
       ),
       "number.positive": generateValidationErrorMessage(
         "POSITIVE",
-        "Reference ID",
+        "Reference ID"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Reference ID",
+        "Reference ID"
       ),
     }),
 
@@ -366,19 +278,19 @@ export const createPaymentSchema = Joi.object<CreatePaymentInput>({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Collection Center ID",
+        "Collection Center ID"
       ),
       "number.integer": generateValidationErrorMessage(
         "INTEGER",
-        "Collection Center ID",
+        "Collection Center ID"
       ),
       "number.positive": generateValidationErrorMessage(
         "POSITIVE",
-        "Collection Center ID",
+        "Collection Center ID"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Collection Center ID",
+        "Collection Center ID"
       ),
     }),
 
@@ -394,25 +306,25 @@ export const createPaymentSchema = Joi.object<CreatePaymentInput>({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Total Paid Amount",
+        "Total Paid Amount"
       ),
       "number.min": generateValidationErrorMessage(
         "MIN_VALUE",
         "Total Paid Amount",
-        "0",
+        "0"
       ),
       "number.precision": generateValidationErrorMessage(
         "DECIMAL",
         "Total Paid Amount",
-        "2",
+        "2"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Total Paid Amount",
+        "Total Paid Amount"
       ),
       "any.only": generateValidationErrorMessage(
         "ONLY_NULL",
-        "Total Paid Amount",
+        "Total Paid Amount"
       ),
     }),
   totalRefundAmount: Joi.number()
@@ -428,25 +340,25 @@ export const createPaymentSchema = Joi.object<CreatePaymentInput>({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Total Refund Amount",
+        "Total Refund Amount"
       ),
       "number.min": generateValidationErrorMessage(
         "MIN_VALUE",
         "Total Refund Amount",
-        "0",
+        "0"
       ),
       "number.precision": generateValidationErrorMessage(
         "DECIMAL",
         "Total Refund Amount",
-        "2",
+        "2"
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Total Refund Amount",
+        "Total Refund Amount"
       ),
       "any.only": generateValidationErrorMessage(
         "ONLY_NULL",
-        "Total Refund Amount",
+        "Total Refund Amount"
       ),
     }),
 
@@ -463,16 +375,16 @@ export const createPaymentSchema = Joi.object<CreatePaymentInput>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Transaction Type",
+        "Transaction Type"
       ),
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Payment Mode",
-        Object.values(TransactionType).join(", "),
+        Object.values(TransactionType).join(", ")
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Transaction Type",
+        "Transaction Type"
       ),
     }),
   details: Joi.array()
@@ -484,7 +396,7 @@ export const createPaymentSchema = Joi.object<CreatePaymentInput>({
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Details",
-        "1",
+        "1"
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Details"),
     }),
@@ -503,7 +415,7 @@ export const getPaymentDetailsModuleWiseSchema =
         "any.only": generateValidationErrorMessage(
           "VALID_ENUM",
           "Module",
-          Object.values(ServiceCode).join(", "),
+          Object.values(ServiceCode).join(", ")
         ),
       }),
     id: Joi.number()

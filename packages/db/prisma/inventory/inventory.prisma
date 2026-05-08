@@ -32,6 +32,7 @@ model InvSettings {
     grnRoundedFormat      RoundFormat       @default(TO_FIXED) @map("grn_rounded_format")
     grnFinalRoundedFormat RoundFormat       @default(TO_FIXED) @map("grn_final_round_format")
     warehouseMode         Boolean           @default(false) @map("warehouse_mode")
+    supplierMode          Boolean           @default(true) @map("supplier_mode")
     isActive              Boolean           @default(true) @map("is_active")
 
     createdBy Int?      @map("created_by")
@@ -303,19 +304,20 @@ model InvPurchaseOrderDetails {
 }
 
 model InvItem {
-    id              Int     @id @default(autoincrement())
-    item            String  @map("item")
-    itemCode        String? @map("item_code")
-    itemCategoryId  Int     @map("item_category_id")
-    storageId       Int?    @map("storage_id")
-    unitId          Int     @map("unit_id")
-    basePrice       Float?  @map("base_price")
-    reOrderLevel    Int?    @map("re_order_level")
-    taxDetailsId    Int?    @map("tax_details_id")
-    itemDescription String? @map("item_description")
-    isBatchNumber   Boolean @default(false) @map("is_batch_number")
-    isExpireDate    Boolean @default(false) @map("is_expire_date")
-    isReturnable    Boolean @default(false) @map("is_returnable")
+    id                 Int      @id @default(autoincrement())
+    item               String   @map("item")
+    itemCode           String?  @map("item_code")
+    itemCategoryId     Int      @map("item_category_id")
+    storageId          Int?     @map("storage_id")
+    unitId             Int      @map("unit_id")
+    basePrice          Float?   @map("base_price")
+    lastPurchasedPrice Decimal? @map("last_purchased_price") @db.Decimal(13, 5)
+    reOrderLevel       Int?     @map("re_order_level")
+    taxDetailsId       Int?     @map("tax_details_id")
+    itemDescription    String?  @map("item_description")
+    isBatchNumber      Boolean  @default(false) @map("is_batch_number")
+    isExpireDate       Boolean  @default(false) @map("is_expire_date")
+    isReturnable       Boolean  @default(false) @map("is_returnable")
 
     frontImage     String? @map("front_image")
     backImage      String? @map("back_image")
@@ -344,6 +346,7 @@ model InvItem {
     itemSupplierMapping       InvItemSupplierMapping[]
     consumptionDetails        ConsumptionDetails[]
     InvStorage                InvStorage?                   @relation(fields: [storageId], references: [id])
+    invStockTransferDetails   InvStockTransferDetails[]
 
     @@index([itemCategoryId], name: "idx_item_category_id")
     @@index([unitId], name: "idx_unit_id")
@@ -1040,4 +1043,131 @@ model InvStorage {
     InvItem     InvItem[]
 
     @@map("inv_storage")
+}
+
+model InvStockTransfer {
+    id                  Int               @id @default(autoincrement())
+    stockTransferNumber String            @map("stock_transfer_number")
+    staffId             Int               @map("staff_id")
+    ccId                Int               @map("cc_id")
+    fromId              Int               @map("from_id")
+    toId                Int               @map("to_id")
+    date                DateTime          @db.Date
+    status              ST_STATUS         @default(CREATED)
+    returnStatus        ST_RETURN_STATUS? @map("return_status")
+    isActive            Boolean           @default(true) @map("is_active")
+    createdBy           Int?              @map("created_by")
+    updatedBy           Int?              @map("updated_by")
+    deletedBy           Int?              @map("deleted_by")
+    approvedBy          Int?              @map("approved_by")
+    acknowledgedBy      Int?              @map("acknowledged_by")
+    returnApprovedBy    Int?              @map("return_approved_by")
+    createdAt           DateTime          @default(now()) @map("created_at")
+    updatedAt           DateTime?         @updatedAt @map("updated_at")
+    deletedAt           DateTime?         @map("deleted_at")
+    approvedAt          DateTime?         @map("approved_at")
+    acknowledgedAt      DateTime?         @map("acknowledge_at")
+    returnApprovedAt    DateTime?         @map("return_approved_at")
+
+    stockTransferDetails InvStockTransferDetails[]
+    from                 CollectionCenter          @relation(name: "From", fields: [fromId], references: [id], map: "stock_transfer_from_id_idx")
+    to                   CollectionCenter          @relation(name: "To", fields: [fromId], references: [id])
+    cc                   CollectionCenter          @relation(name: "cc", fields: [ccId], references: [id])
+
+    @@index([ccId], name: "stock_transfer_cc_id_idx")
+    @@index([fromId], name: "stock_transfer_from_id_idx")
+    @@index([toId], name: "stock_transfer_to_id_idx")
+    @@map("inv_stock_transfer")
+}
+
+model InvStockTransferDetails {
+    id                   Int       @id @default(autoincrement())
+    stId                 Int       @map("st_id")
+    itemId               Int       @map("item_id")
+    batchNo              String?   @map("batch_no")
+    isFoc                Boolean   @map("is_foc")
+    expiryDate           DateTime? @map("expiry_date") @db.Date
+    quantity             Int       @default(0) @map("quantity")
+    acknowledgedQuantity Int       @default(0) @map("acknowledged_quantity")
+    returnQuantity       Int       @default(0) @map("return_quantity")
+    isActive             Boolean   @default(true) @map("is_active")
+    createdBy            Int?      @map("created_by")
+    updatedBy            Int?      @map("updated_by")
+    deletedBy            Int?      @map("deleted_by")
+    createdAt            DateTime  @default(now()) @map("created_at")
+    updatedAt            DateTime? @updatedAt @map("updated_at")
+    deletedAt            DateTime? @map("deleted_at")
+
+    stockTransfer InvStockTransfer @relation(fields: [stId], references: [id])
+    item          InvItem          @relation(fields: [itemId], references: [id])
+
+    @@index([stId], name: "stock_transfer_details_st_id_idx")
+    @@index([itemId], name: "stock_transfer_details_item_id_idx")
+    @@map("inv_stock_transfer_details")
+}
+
+model CompanySettings {
+    id                              Int                    @id @map("id")
+    name                            String?                @map("name") @db.VarChar(100)
+    email                           String?                @map("email") @db.VarChar(100)
+    phone                           String?                @map("phone") @db.VarChar(50)
+    address                         String?                @map("address") @db.Text
+    langId                          Int?                   @map("lang_id")
+    diseCode                        String?                @map("dise_code") @db.VarChar(50)
+    dateFormat                      String                 @map("date_format") @db.VarChar(50)
+    timeFormat                      String?                @default("24-hour") @map("time_format") @db.VarChar(20)
+    currency                        String                 @map("currency") @db.VarChar(50)
+    currencySymbol                  String                 @map("currency_symbol") @db.VarChar(50)
+    isRtl                           String?                @default("disabled") @map("is_rtl") @db.VarChar(10)
+    timezone                        String?                @default("UTC") @map("timezone") @db.VarChar(30)
+    sessionId                       Int?                   @map("session_id")
+    startMonth                      String                 @map("start_month") @db.VarChar(40)
+    image                           String?                @map("image") @db.VarChar(100)
+    miniLogo                        String                 @map("mini_logo") @db.VarChar(200)
+    theme                           String                 @default("default.jpg") @map("theme") @db.VarChar(200)
+    creditLimit                     String?                @map("credit_limit") @db.VarChar(255)
+    opdRecordMonth                  String?                @map("opd_record_month") @db.VarChar(50)
+    isActive                        String?                @default("no") @map("is_active") @db.VarChar(255)
+    createdAt                       DateTime               @default(now()) @map("created_at")
+    updatedAt                       DateTime               @default(now()) @map("updated_at")
+    cronSecretKey                   String                 @map("cron_secret_key") @db.VarChar(100)
+    feeDueDays                      Int?                   @default(0) @map("fee_due_days") @db.Int
+    doctorRestriction               String                 @map("doctor_restriction") @db.VarChar(100)
+    superadminRestriction           String                 @map("superadmin_restriction") @db.VarChar(200)
+    activeQueue                     Int                    @map("active_queue")
+    waittingQueue                   Int                    @map("waitting_queue")
+    isRegistrationChargable         Int                    @map("is_registration_chargable")
+    collectionAbbreviationName      String?                @map("collection_abbreviation_name") @db.VarChar(255)
+    labOpenningTime                 DateTime               @map("lab_openning_time") @db.Time
+    labClosingTime                  DateTime               @map("lab_closing_time") @db.Time
+    dailyCutoffStart                DateTime               @map("daily_cutoff_start") @db.Time
+    dailyCutoffEnd                  DateTime               @map("daily_cutoff_end") @db.Time
+    reportBackground                String?                @map("report_background") @db.VarChar(100)
+    receiptBackground               String?                @map("receipt_background") @db.VarChar(100)
+    currencyLogo                    String?                @map("currency_logo") @db.VarChar(100)
+    reportStamp                     String?                @map("report_stamp") @db.VarChar(100)
+    defaultSign                     String?                @map("default_sign") @db.VarChar(100)
+    defaultMenu                     DefaultMenu            @default(b2c) @map("default_menu")
+    printDueReport                  BinaryFlag             @default(false) @map("print_due_report")
+    barcodePrintSize                String?                @default("60mmX22mm") @map("barcode_print_size") @db.VarChar(10)
+    ccId                            Int                    @unique @map("cc_id")
+    printReceiptHeader              String?                @map("print_receipt_header") @db.Text
+    contactEmail                    String?                @map("contact_email") @db.VarChar(255)
+    autoConsume                     BinaryFlag             @default(false) @map("auto_consume")
+    barcodePrinterName              String?                @map("barcode_printer_name") @db.VarChar(255)
+    mailServer                      String?                @map("mail_server") @db.VarChar(255)
+    autoFillPathoAmount             BinaryFlag             @default(true) @map("auto_fill_patho_amount")
+    receiptEndText                  String?                @map("receipt_end_text") @db.VarChar(256)
+    newPharmacy                     Boolean?               @map("new_pharmacy")
+    newOpd                          Boolean?               @map("new_opd")
+    corporateReferralMode           CorporateReferralMode? @default(credit_control) @map("corporate_referral_mode")
+    locationWiseRole                LocationWiseRole?      @default(disabled) @map("location_wise_role")
+    enableSas                       EnableSas?             @default(No) @map("enable_sas")
+    financialYearStart              String?                @default("04") @map("financial_year_start") @db.VarChar(100)
+    enableLocationWiseClientMaster  EnableYesNo?           @default(No) @map("enable_location_wise_client_master")
+    enableLocationWiseInsurerMaster EnableYesNo?           @default(No) @map("enable_location_wise_insurer_master")
+
+    @@index([langId], name: "lang_id")
+    @@index([sessionId], name: "session_id")
+    @@map("sch_settings")
 }

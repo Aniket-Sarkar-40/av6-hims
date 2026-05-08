@@ -4,7 +4,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { UpdateConfigByCodeInput } from "av6-core";
+import { UpdateConfigByCodeInput } from "av6-core-v2";
 
 export const commonShortCodeServiceValidation = async (
   shortCode: string,

@@ -115,14 +115,6 @@ enum FinancialChangeType {
     DISCOUNT
 }
 
-enum ApprovalStatus {
-    PENDING
-    PARTIALLY_APPROVED
-    APPROVED
-    REJECTED
-    CANCELLED // optional
-}
-
 enum ProjectType {
     IPD
     OPD

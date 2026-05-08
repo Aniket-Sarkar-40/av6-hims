@@ -13,7 +13,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { MASTER_TABLES, REDIS_PREFIX } from "@repo/shared";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { commonService, DataType, uinConfigService } from "av6-core";
+import { commonService, DataType, uinConfigService } from "av6-core-v2";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
 import { PrismaClient } from "@repo/db/generated/prisma/client";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";

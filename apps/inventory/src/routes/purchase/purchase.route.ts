@@ -1,7 +1,11 @@
 import {
   createPurchase,
+  generatePurchaseOrderPdf,
   getAllPurchase,
   getPurchaseById,
+  purchaseApproval,
+  purchasePartialApproval,
+  purchaseRejection,
   updatePurchase,
 } from "@/controllers/purchase/purchase.controller.js";
 import {
@@ -15,6 +19,7 @@ import {
 } from "@/validations/request/purchase/purchase.validation.js";
 
 import { Router } from "express";
+import { authorizeExternal } from "@apps/core/middleware/auth.middleware.js";
 
 export const purchaseRouter: Router = Router();
 
@@ -45,7 +50,7 @@ purchaseRouter.post(
   verifyToken,
   authorize(getPermission("INV", "PURCHASE_ORDER", "CREATE")),
   validatePurchase,
-  createPurchase,
+  createPurchase
 );
 
 /**
@@ -61,7 +66,7 @@ purchaseRouter.get(
   "/",
   verifyToken,
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
-  getAllPurchase,
+  getAllPurchase
 );
 
 /**
@@ -82,7 +87,7 @@ purchaseRouter.get(
   "/id",
   verifyToken,
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
-  getPurchaseById,
+  getPurchaseById
 );
 
 /**
@@ -112,10 +117,10 @@ purchaseRouter.put(
   verifyToken,
   authorize(
     getPermission("INV", "PURCHASE_ORDER", "VIEW"),
-    getPermission("INV", "PURCHASE_ORDER", "UPDATE"),
+    getPermission("INV", "PURCHASE_ORDER", "UPDATE")
   ),
   validatePurchaseUpdate,
-  updatePurchase,
+  updatePurchase
 );
 
 /**
@@ -202,3 +207,44 @@ purchaseRouter.put(
  *         description: The purchase ID.
  */
 // purchaseRouter.post("/pdf", verifyToken, authorize(getPermission("PURCHASE_ORDER_PDF", "VIEW")), printPOById);
+
+/**
+ * @swagger
+ * /api/v1/purchase/purchase-order/:{id}/approval:
+ *   post:
+ *     summary: Approve a Purchase Order
+ *     tags: [Purchase Order]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/purchaseSchema'
+ */
+purchaseRouter.post("/approval", authorizeExternal(), purchaseApproval);
+
+purchaseRouter.post(
+  "/partial-approval",
+  authorizeExternal(),
+  purchasePartialApproval
+);
+
+purchaseRouter.post("/rejection", authorizeExternal(), purchaseRejection);
+
+/**
+ * @swagger
+ * /api/v1/purchase/purchase-order/pdf:
+ *   get:
+ *     summary: Generate Purchase Order PDF
+ *     tags: [Purchase Order]
+ *     security:
+ *       - bearerAuth: []
+ */
+purchaseRouter.post(
+  "/pdf",
+  verifyToken,
+  authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
+  generatePurchaseOrderPdf
+);

@@ -2,12 +2,12 @@ import { API_TIMEOUT } from "@repo/shared/config/index.js";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { db } from "@repo/db";
 import { BranchReq } from "@/types/master/branch.js";
-import { customOmit, ToggleActive } from "av6-core";
+import { customOmit, ToggleActive } from "av6-core-v2";
 import { logger } from "@repo/platform/logging/logger.js";
 import { PmsBranch } from "@repo/db/generated/prisma/client";
 
 export const createBranchInDb = async (
-  branch: BranchReq,
+  branch: BranchReq
 ): Promise<PmsBranch> => {
   logger.info("entering::createBranchInDb::repository");
   const store = requestStorage.getStore();
@@ -38,7 +38,7 @@ export const createBranchInDb = async (
 };
 
 export const updateBranchInDb = async (
-  branch: BranchReq,
+  branch: BranchReq
 ): Promise<PmsBranch> => {
   logger.info("entering::updateBranchInDb::repository");
   const store = requestStorage.getStore();
@@ -68,12 +68,12 @@ export const updateBranchInDb = async (
       });
       return updatedBranch;
     },
-    { timeout: API_TIMEOUT },
+    { timeout: API_TIMEOUT }
   );
 };
 
 export const getBranchByBranchNameFromDb = async (
-  name: string,
+  name: string
 ): Promise<PmsBranch | null> => {
   logger.info("entering::getBranchByBranchNameFromDb::repository");
   return db.pmsBranch.findFirst({
@@ -82,7 +82,7 @@ export const getBranchByBranchNameFromDb = async (
 };
 
 export const getBranchByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<PmsBranch | null> => {
   logger.info("entering::getBranchByIdFromDb::repository");
   return db.pmsBranch.findUnique({
@@ -98,7 +98,7 @@ export const getAllBranchFromDb = async (): Promise<PmsBranch[]> => {
 };
 
 export const toggleActiveBranch = async (
-  input: ToggleActive,
+  input: ToggleActive
 ): Promise<PmsBranch> => {
   logger.info("entering::toggleActiveBranch::repository");
   const store = requestStorage.getStore();
@@ -126,7 +126,7 @@ export const getAllBranchIdOfItemBranchMapFromDb = async () => {
 };
 
 export const getBranchCategoryMapByBranchIdFromDb = async (
-  branchId: number,
+  branchId: number
 ) => {
   logger.info("entering::getBranchCategoryMapByBranchIdFromDb::repository");
   const results = await db.branchCategoryMap.findMany({

@@ -146,14 +146,14 @@ export const startFlowReqSchema = Joi.object({
   }),
 });
 
-export const validateApprovalRequest = validationHandler({
+export const validateStartFlowRequest = validationHandler({
+  schema: startFlowReqSchema,
+});
+
+export const validateCommonApprove = validationHandler({
   schema: commonApproveSchema,
 });
 
-export const validateGetMyApprovalSchema = validationHandler({
+export const validateGetMyApprovalFlow = validationHandler({
   schema: getMyApprovalFlowSchema,
-});
-
-export const validateStartFlowRequest = validationHandler({
-  schema: startFlowReqSchema,
 });

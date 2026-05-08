@@ -62,7 +62,7 @@ export const itemStoreService = {
     return itemStoreDTO[0];
   },
   async getAllItemStore(
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<ItemStoreDTO[]> {
     logger.info("entering::getAllItemStore::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_STORE);
@@ -77,7 +77,7 @@ export const itemStoreService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Store"),
+          generateErrorMessage("NOT_FOUND", "Item Store")
         );
       else return [];
     }
@@ -86,7 +86,7 @@ export const itemStoreService = {
 
   async getItemStoreById(
     itemStoreId: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<ItemStoreDTO | null> {
     logger.info("entering::getItemStoreById::service");
     validIdCheck(itemStoreId);
@@ -95,7 +95,7 @@ export const itemStoreService = {
     if (isCacheable) {
       itemStore = (await getCacheById(
         cacheKey,
-        itemStoreId,
+        itemStoreId
       )) as InvItemStore | null;
     } else {
       itemStore = await getItemStoreByIdFromDb(itemStoreId);
@@ -104,7 +104,7 @@ export const itemStoreService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Store"),
+          generateErrorMessage("NOT_FOUND", "Item Store")
         );
       else return null;
     }
@@ -116,7 +116,7 @@ export const itemStoreService = {
 
   async getItemStoreByIdFromCache(
     itemStoreId: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<ItemStoreDTO | null> {
     logger.info("entering::getItemStoreByIdFromCache::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_STORE);
@@ -125,13 +125,13 @@ export const itemStoreService = {
     validIdCheck(itemStoreId);
     const itemStore = (await getCacheById(
       cacheKey,
-      itemStoreId,
+      itemStoreId
     )) as InvItemStore | null;
     if (!itemStore) {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Store"),
+          generateErrorMessage("NOT_FOUND", "Item Store")
         );
       else return null;
     }
@@ -150,5 +150,28 @@ export const itemStoreService = {
 
     logger.info("exiting::getAllItemStoreFromCache::service");
     return await toItemStoreDTO(cachedItemStore);
+  },
+
+  async getAllItemStoreWoDto(
+    canNullReturnable: boolean = false
+  ): Promise<InvItemStore[]> {
+    logger.info("entering::getAllItemStoreWoDto::service");
+    const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_STORE);
+    let itemStore: InvItemStore[];
+    if (isCacheable) {
+      itemStore = (await getAllCache(cacheKey)) as InvItemStore[];
+    } else {
+      itemStore = await getAllItemStoreFromDb();
+    }
+    logger.info("exiting::getAllItemStoreWoDto::service");
+    if (itemStore.length === 0) {
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Store")
+        );
+      else return [];
+    }
+    return itemStore;
   },
 };

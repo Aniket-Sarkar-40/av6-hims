@@ -8,11 +8,11 @@ import {
   StockAdjustmentResponse,
 } from "@/types/stock/stockAdjustment.js";
 import { StockAdjustmentDetails } from "@repo/db/generated/prisma/client";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { toIdValue } from "av6-utils";
 
 export const toStockAdjustmentDTO = async (
-  input: StockAdjustmentResponse,
+  input: StockAdjustmentResponse
 ): Promise<StockAdjustmentDTO> => {
   const cc = await warehouseService.getWarehouseByIdWoDTO(input.ccId, true);
   const warehouse = input.warehouseId
@@ -78,7 +78,7 @@ export const toStockAdjustmentDTO = async (
         ...omittedDetail.rest,
         item,
       };
-    }),
+    })
   );
 
   return {

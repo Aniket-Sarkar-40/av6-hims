@@ -1,91 +1,25 @@
-import { commonServiceFactory } from "@/config/core.config.js";
-import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
-import { shortCodeService } from "@/services/shortCode.service.js";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
 import {
-  generateSuccessMessage,
-  generateValidationErrorMessage,
-} from "@repo/shared/utils/responseMessage.utils.js";
-import { validateUpdateDynamicShortCodeConfig } from "@/validations/service/common.service.validation.js";
-import {
-  CommonExcelRequest,
   DeleteParams,
   DropdownRequest,
-  DynamicCrudConfig,
-  DynamicShortCode,
   ExportExcel,
   FetchRequest,
   ImportExcel,
   NewFixedSearchRequest,
   SearchRequest,
-  UpdateConfigByCodeInput,
   updateStatusParams,
-} from "av6-core";
+  CommonExcelRequest,
+} from "av6-core-v2";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
-import {
-  CommonApproveReq,
-  CommonGetApprovalActionReq,
-  GetMyApprovalFlow,
-  StartFlowReq,
-} from "@/types/approval/approval.js";
-import { validIdCheck } from "@repo/platform/validation/global.validation.js";
-import { approvalService } from "@/events/eventBus.js";
-import { toLastApproverDetailsDto } from "@/mapper/approval/approval.mapper.js";
-import { db } from "@repo/db";
-
-export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::fixedSearch::controller");
-  const {
-    pageNo = 1,
-    pageSize = 10,
-    shortCode,
-    searchText,
-    sortBy,
-    sortDir,
-    searchColumns = [],
-    fixedNotSearch,
-    fixedSearch,
-    includes,
-    logic,
-  } = req.body as NewFixedSearchRequest;
-  const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
-
-  if (!shortCodeData) {
-    return res.status(404).json(
-      new BaseResponse({
-        success: false,
-        message: "Short code not found.",
-        errorCode: "NOT_FOUND",
-        errorMessage: "Short code not found.",
-      })
-    );
-  }
-
-  const searchData = await commonServiceFactory.fixedSearch({
-    pageNo,
-    pageSize,
-    shortCode,
-    searchText,
-    searchColumns,
-    sortBy,
-    sortDir,
-    shortCodeData,
-    fixedSearch,
-    fixedNotSearch,
-    includes,
-    logic,
-  });
-
-  const response = new BaseResponse(
-    { success: true, message: "Data fetched successfully." },
-    searchData
-  );
-  logger.info("exiting::fixedSearch::controller");
-  return res.status(200).json(response);
-});
+import { commonServiceFactory } from "@/config/core.config.js";
+import { shortCodeService } from "@/services/shortCode.service.js";
+import { TryCatch } from "@repo/platform";
+import { logger } from "@repo/platform/logging/logger.js";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { CoreDynamicShortCode } from "@repo/db/generated/prisma/client";
+import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { IMAGE_URL } from "@repo/shared";
 
 export const commonSearch = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::commonSearch::controller");
@@ -139,11 +73,8 @@ export const commonDropdownSearch = TryCatch(
       shortCode,
       searchText,
       searchColumns = [],
-      fixedSearch,
       fixedNotSearch,
-      selectColumns,
-      sortBy,
-      sortDir,
+      fixedSearch,
       logic,
     } = req.body as DropdownRequest;
     const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
@@ -164,11 +95,8 @@ export const commonDropdownSearch = TryCatch(
       searchText,
       searchColumns,
       shortCodeData,
-      fixedSearch,
       fixedNotSearch,
-      selectColumns,
-      sortBy,
-      sortDir,
+      fixedSearch,
       logic,
     });
 
@@ -180,6 +108,55 @@ export const commonDropdownSearch = TryCatch(
     return res.status(200).json(response);
   }
 );
+
+export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
+  logger.info("entering::fixedSearch::controller");
+  const {
+    pageNo = 1,
+    pageSize = 10,
+    shortCode,
+    searchText,
+    sortBy,
+    sortDir,
+    searchColumns = [],
+    fixedNotSearch,
+    fixedSearch,
+    includes,
+  } = req.body as NewFixedSearchRequest;
+  const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
+
+  if (!shortCodeData) {
+    return res.status(404).json(
+      new BaseResponse({
+        success: false,
+        message: "Short code not found.",
+        errorCode: "NOT_FOUND",
+        errorMessage: "Short code not found.",
+      })
+    );
+  }
+
+  const searchData = await commonServiceFactory.fixedSearch({
+    pageNo,
+    pageSize,
+    shortCode,
+    searchText,
+    searchColumns,
+    sortBy,
+    sortDir,
+    shortCodeData,
+    fixedSearch,
+    fixedNotSearch,
+    includes,
+  });
+
+  const response = new BaseResponse(
+    { success: true, message: "Data fetched successfully." },
+    searchData
+  );
+  logger.info("exiting::fixedSearch::controller");
+  return res.status(200).json(response);
+});
 
 export const fixedSearchWoPaginationController = TryCatch(
   async (req: Request, res: Response) => {
@@ -193,7 +170,6 @@ export const fixedSearchWoPaginationController = TryCatch(
       fixedNotSearch,
       fixedSearch,
       includes,
-      logic,
     } = req.body as Omit<NewFixedSearchRequest, "pageNo" | "pageSize">;
     const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
 
@@ -219,7 +195,6 @@ export const fixedSearchWoPaginationController = TryCatch(
         fixedSearch,
         fixedNotSearch,
         includes,
-        logic,
       });
 
     const response = new BaseResponse(
@@ -228,6 +203,44 @@ export const fixedSearchWoPaginationController = TryCatch(
     );
     logger.info("exiting::fixedSearchWoPaginationController::controller");
     return res.status(200).json(response);
+  }
+);
+
+export const commonFSExcelExport = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::commonExcelExport::controller");
+
+    const inp = req.body as CommonExcelRequest<CoreDynamicShortCode>;
+    const shortCodeData = await shortCodeService.getShortCodeByCode(
+      inp.shortCode
+    );
+
+    if (!shortCodeData) {
+      return res.status(404).json(
+        new BaseResponse({
+          success: false,
+          message: "Short code not found.",
+          errorCode: "NOT_FOUND",
+          errorMessage: "Short code not found.",
+        })
+      );
+    }
+
+    const wb: Workbook = await commonServiceFactory.commonExcelService({
+      ...inp,
+      shortCodeData,
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${inp.sheetName}.xlsx"`
+    );
+    await wb.xlsx.write(res);
+    res.end();
   }
 );
 
@@ -248,8 +261,8 @@ export const commonFetch = TryCatch(async (req: Request, res: Response) => {
   }
 
   const fetchData = await commonServiceFactory.fetch({
-    id,
     shortCode,
+    id,
     shortCodeData,
     includes,
   });
@@ -294,6 +307,8 @@ export const commonExcelImport = TryCatch(
       file: req.file,
       shortCodeData,
     });
+
+    deleteFileIfExists(req.file.path);
 
     const response = new BaseResponse(
       { success: true, message: "Data Imported successfully." },
@@ -343,7 +358,6 @@ export const commonExcelExport = TryCatch(
 
 export const commonDelete = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::commonDelete::controller");
-
   const { shortCode, id } = req.body as DeleteParams;
   const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
 
@@ -357,10 +371,9 @@ export const commonDelete = TryCatch(async (req: Request, res: Response) => {
       })
     );
   }
-
   await commonServiceFactory.delete({
-    id: Number(id),
     shortCode,
+    id: Number(id),
     shortCodeData,
   });
 
@@ -377,7 +390,6 @@ export const commonUpdateStatus = TryCatch(
     logger.info("entering::commonUpdateStatus::controller");
     const { shortCode, id, status } = req.body as updateStatusParams;
     const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
-
     if (!shortCodeData) {
       return res.status(404).json(
         new BaseResponse({
@@ -388,7 +400,6 @@ export const commonUpdateStatus = TryCatch(
         })
       );
     }
-
     const data = await commonServiceFactory.updateStatus({
       shortCode,
       id: Number(id),
@@ -408,347 +419,28 @@ export const commonUpdateStatus = TryCatch(
   }
 );
 
-export const commonCreate = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::commonCreate::controller");
-  const input = req.body as Record<string, unknown>;
-  const shortCode = req.query.shortCode as string;
+export const getImage = TryCatch(
+  async (req: Request, res: Response): Promise<void> => {
+    const fileName = req.params.fileName;
+    const directoryPath = req.query.path as string;
 
-  if (!shortCode) {
-    throw new ErrorHandler(
-      400,
-      generateValidationErrorMessage("REQUIRED", `short code`)
+    const fullFilePath = `${IMAGE_URL}/${directoryPath}`;
+    const response = await commonServiceFactory.fetchImageStream(
+      fullFilePath,
+      `/${fileName}`
     );
-  }
-
-  const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
-
-  if (!shortCodeData) {
-    return res.status(404).json(
-      new BaseResponse({
-        success: false,
-        message: "Short code not found.",
-        errorCode: "NOT_FOUND",
-        errorMessage: "Short code not found.",
-      })
-    );
-  }
-  const data = await commonServiceFactory.create({
-    body: input,
-    shortCodeData,
-  });
-
-  const response = BaseResponse.success(
-    { type: "CREATED", data },
-    shortCode.replace("_", " ")
-  );
-
-  logger.info("exiting::commonCreate::controller");
-  return res.status(201).json(response);
-});
-
-export const commonUpdate = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::commonUpdate::controller");
-  const input = req.body as Record<string, unknown>;
-  const shortCode = req.query.shortCode as string;
-
-  if (!shortCode) {
-    throw new ErrorHandler(
-      400,
-      generateValidationErrorMessage("REQUIRED", `short code`)
-    );
-  }
-
-  const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
-
-  if (!shortCodeData) {
-    return res.status(404).json(
-      new BaseResponse({
-        success: false,
-        message: "Short code not found.",
-        errorCode: "NOT_FOUND",
-        errorMessage: "Short code not found.",
-      })
-    );
-  }
-
-  const cfg = shortCodeData.config as unknown as DynamicCrudConfig;
-  if (!cfg) {
-    throw new ErrorHandler(
-      500,
-      `Configuration not found for short code: ${shortCodeData.shortCode}`
-    );
-  }
-
-  const pkField = cfg?.primaryKey;
-  const pkLocation = cfg?.operations?.update?.primaryKeyFrom;
-  if (!pkField || !pkLocation) {
-    throw new ErrorHandler(
-      500,
-      `Primary key configuration not found for short code: ${shortCodeData.shortCode}`
-    );
-  }
-
-  const pkValue =
-    pkLocation === "body"
-      ? input[pkField]
-      : pkLocation === "params"
-      ? req.params[pkField]
-      : req.query[pkField];
-
-  if (isNaN(Number(pkValue))) {
-    throw new ErrorHandler(400, `Invalid primary key value: ${pkValue}`);
-  }
-
-  const data = await commonServiceFactory.update({
-    body: input,
-    shortCodeData,
-    id: Number(pkValue),
-  });
-
-  const response = BaseResponse.success(
-    { type: "UPDATED", data },
-    shortCode.replace("_", " ")
-  );
-
-  logger.info("exiting::commonUpdate::controller");
-  return res.status(200).json(response);
-});
-
-export const commonMultiCreateUpdate = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::commonMultiCreateUpdate::controller");
-    const input = req.body as Record<string, unknown>;
-    const shortCode = req.query.shortCode as string;
-
-    if (!shortCode) {
-      throw new ErrorHandler(
-        400,
-        generateValidationErrorMessage("REQUIRED", `short code`)
-      );
-    }
-
-    const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
-
-    if (!shortCodeData) {
-      return res.status(404).json(
-        new BaseResponse({
-          success: false,
-          message: "Short code not found.",
-          errorCode: "NOT_FOUND",
-          errorMessage: "Short code not found.",
-        })
-      );
-    }
-
-    const data = await commonServiceFactory.commonBulkUpsert({
-      body: input,
-      shortCodeData,
-    });
-
-    const response = BaseResponse.success(
-      { type: "CREATED", data },
-      shortCode.replace("_", " ")
-    );
-
-    logger.info("exiting::commonMultiCreateUpdate::controller");
-    return res.status(201).json(response);
-  }
-);
-
-export const commonFSExcelExport = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::commonExcelExport::controller");
-
-    const inp = req.body as CommonExcelRequest<DynamicShortCode>;
-    const shortCodeData = await shortCodeService.getShortCodeByCode(
-      inp.shortCode
-    );
-
-    if (!shortCodeData) {
-      return res.status(404).json(
-        new BaseResponse({
-          success: false,
-          message: "Short code not found.",
-          errorCode: "NOT_FOUND",
-          errorMessage: "Short code not found.",
-        })
-      );
-    }
-
-    const wb: Workbook = await commonServiceFactory.commonExcelService({
-      ...inp,
-      shortCodeData,
-    });
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      (response.headers["content-type"] as string) || "application/octet-stream"
     );
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${inp.sheetName}.xlsx"`
-    );
-    await wb.xlsx.write(res);
-    res.end();
-  }
-);
-
-export const updateConfigByCode = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::updateConfigByCode::controller");
-    const input = req.body as UpdateConfigByCodeInput;
-    const shortCode = input.shortCode;
-
-    if (!shortCode) {
-      throw new ErrorHandler(
-        400,
-        generateValidationErrorMessage("REQUIRED", `short code`)
-      );
-    }
-    await validateUpdateDynamicShortCodeConfig(input);
-
-    const data = await commonServiceFactory.updateConfigByCode(input);
-
-    const response = BaseResponse.success(
-      { type: "UPDATED", data },
-      "Short Code Config"
-    );
-
-    logger.info("exiting::updateConfigByCode::controller");
-    return res.status(200).json(response);
-  }
-);
-
-export const getConfigByShortCode = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::getConfigByShortCode::controller");
-    const shortCode = req.query.shortCode as string;
-
-    if (!shortCode) {
-      throw new ErrorHandler(
-        400,
-        generateValidationErrorMessage("REQUIRED", `short code`)
+    if (response.headers["content-length"]) {
+      res.setHeader(
+        "Content-Length",
+        response.headers["content-length"] as string
       );
     }
 
-    const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
-
-    if (!shortCodeData) {
-      return res.status(404).json(
-        new BaseResponse({
-          success: false,
-          message: "Short code not found.",
-          errorCode: "NOT_FOUND",
-          errorMessage: "Short code not found.",
-        })
-      );
-    }
-
-    const cfg = shortCodeData.config as unknown as DynamicCrudConfig;
-    if (!cfg) {
-      throw new ErrorHandler(
-        404,
-        `Configuration not found for short code: ${shortCodeData.shortCode}`
-      );
-    }
-
-    const response = BaseResponse.success(
-      {
-        type: "FETCHED",
-        data: {
-          config: cfg,
-          permission: shortCodeData.permission,
-        },
-      },
-      "Short Code Config"
-    );
-
-    logger.info("exiting::getConfigByShortCode::controller");
-    return res.status(200).json(response);
-  }
-);
-
-export const commonApproval = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::commonApproval::controller");
-  const input = req.body as CommonApproveReq;
-
-  await approvalService.approve(input);
-
-  const response = new BaseResponse({
-    success: true,
-    message: generateSuccessMessage(
-      input.approveType === "APPROVE" ? "APPROVED" : "REJECTED",
-      `${input.subjectType.replace(/_/g, " ")}`
-    ),
-  });
-  logger.info("exiting::commonApproval::controller");
-  return res.status(200).json(response);
-});
-
-export const getApprovalActDetails = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::purchaseApproval::controller");
-    const input = req.body as CommonGetApprovalActionReq;
-
-    validIdCheck(input.id);
-
-    const actRecords = await approvalService.getApprovalActDetailsBySubjectId(
-      input.id,
-      input.subjectType,
-      input.service
-    );
-
-    const data = await Promise.all(actRecords.map(toLastApproverDetailsDto));
-
-    const response = new BaseResponse(
-      {
-        success: true,
-        message: generateSuccessMessage("UPDATED", "Data"),
-      },
-      data
-    );
-
-    logger.info("exiting::commonApproval::controller");
-    return res.status(200).json(response);
-  }
-);
-
-export const getStaffPendingApproval = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::getStaffPendingApproval::controller");
-    const input = req.body as GetMyApprovalFlow;
-
-    if (input.staffId) validIdCheck(input.staffId);
-    if (input.ccId) validIdCheck(input.ccId);
-
-    const pendingApprovalInst = await approvalService.getStaffPendingApproval(
-      input
-    );
-
-    const response = new BaseResponse(
-      {
-        success: true,
-        message: generateSuccessMessage("FETCHED", "Pending Approval"),
-      },
-      pendingApprovalInst
-    );
-    logger.info("exiting::getStaffPendingApproval::controller");
-    return res.status(200).json(response);
-  }
-);
-
-export const startApprovalFlow = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::startApprovalFlow::controller");
-    const input = req.body as StartFlowReq;
-
-    await approvalService.startFlow(db, input);
-
-    const response = new BaseResponse({
-      success: true,
-      message: generateSuccessMessage("STARTED", "Approval Flow"),
-    });
-    logger.info("exiting::startApprovalFlow::controller");
-    return res.status(200).json(response);
+    response.data.pipe(res);
   }
 );

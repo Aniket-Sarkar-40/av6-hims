@@ -16,11 +16,11 @@ import {
   TransactionType,
   OpdUinShortCode,
 } from "@repo/db/generated/prisma/client";
-import { PaginatedResponse } from "av6-core";
+import { PaginatedResponse } from "av6-core-v2";
 import { customOmit } from "av6-utils";
 
 export const getAllPaymentsFromDb = async (
-  input: GetPaymentReq,
+  input: GetPaymentReq
 ): Promise<PaginatedResponse<PaymentResponse>> => {
   logger.info("entering::getAllPaymentsFromDb::repository");
   const {
@@ -291,7 +291,7 @@ export const createPaymentInDb = async (input: CreatePaymentInput) => {
             createdBy: currentUser,
           },
         });
-      }),
+      })
     );
 
     // ========================= (UPDATE APPOINTMENT) ========================= //

@@ -18,7 +18,7 @@ import {
 import { addItemStock, subItemStock } from "../stock/stock.repository.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { db } from "@repo/db";
 import { PmsUinShortCode } from "@repo/db/generated/prisma/enums.js";

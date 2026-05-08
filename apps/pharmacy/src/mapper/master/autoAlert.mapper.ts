@@ -5,11 +5,11 @@ import {
   AutoAlertAudit,
   AutoAlertEmail,
 } from "@repo/db/generated/prisma/client";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { toIdValue } from "av6-utils";
 
 export const toAutoAlertAuditDTO = async (
-  input: AutoAlertAudit,
+  input: AutoAlertAudit
 ): Promise<AutoAlertAuditDTO> => {
   const createdBy = input.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(input.createdBy, true)

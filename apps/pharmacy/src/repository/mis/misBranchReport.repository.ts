@@ -1,6 +1,6 @@
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { db } from "@repo/db";
-import { fromTimestampToSqlDatetime, PaginatedResponse } from "av6-core";
+import { fromTimestampToSqlDatetime, PaginatedResponse } from "av6-core-v2";
 import {
   ItemStockSummary,
   SearchRequestMisBranch,

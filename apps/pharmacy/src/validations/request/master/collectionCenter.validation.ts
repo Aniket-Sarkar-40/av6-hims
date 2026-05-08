@@ -1,289 +1,106 @@
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { getPattern } from "av6-core";
 import { CollectionCenter } from "@repo/db/generated/prisma/client";
-import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
+import {
+  boolOptional,
+  dateOptional,
+  emailRequired,
+  idOptional,
+  idRequired,
+  phoneRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const collectionCenterSchema = Joi.object<CollectionCenter>({
-  id: Joi.number().integer().optional().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-  }),
+  id: idOptional("Id"),
 
-  colName: Joi.string().required().min(2).messages({
-    "string.base": "Name must be a string",
-    "any.required": "Name is required",
-  }),
-  email: Joi.string().email().required().messages({
-    "string.base": "Email must be a string",
-    "string.email": "Email must be a valid email address",
-    "any.required": "Email is required",
-  }),
+  colName: strRequired("Name", 2),
+  email: emailRequired("Email"),
 
-  phone: Joi.string()
-    .required()
-    .pattern(getPattern.phonePattern)
-    .strict()
-    .messages({
-      "number.base": "Phone must be a number",
-      "number.integer": "Phone must be an integer",
-      "any.required": "Phone is required",
-    }),
+  phone: phoneRequired("Phone"),
 
-  address: Joi.string().required().messages({
-    "string.base": "Address must be a string",
-    "string.empty": "Address cannot be empty",
-    "any.required": "Address is required",
-  }),
+  address: strRequired("Address"),
 
-  dateFormat: Joi.string().required().messages({
-    "string.base": "Date format must be a string",
-    "string.empty": "Date format cannot be empty",
-    "any.required": "Date format is required",
-  }),
-  langId: Joi.number().integer().required().strict().messages({
-    "number.base": "Language Id must be a number",
-    "number.integer": "Language Id must be an integer",
-    "any.required": "Language Id is required",
-  }),
+  dateFormat: strRequired("Date format"),
+  langId: idRequired("Language Id"),
 
-  timeFormat: Joi.string().required().messages({
-    "string.base": "Time format must be a string",
-    "string.empty": "Time format cannot be empty",
-    "any.required": "Time format is required",
-  }),
+  timeFormat: strRequired("Time format"),
 
-  currency: Joi.string().uppercase().length(3).required().messages({
-    "string.base": "Currency must be a string",
-    "string.length": "Currency must be a 3-letter ISO code (e.g., USD)",
-    "any.required": "Currency is required",
-  }),
+  currency: strRequired("Currency").uppercase().length(3),
 
-  currencySymbol: Joi.string().required().messages({
-    "string.base": "Currency symbol must be a string",
-    "string.empty": "Currency symbol cannot be empty",
-    "any.required": "Currency symbol is required",
-  }),
+  currencySymbol: strRequired("Currency symbol"),
 
-  timezone: Joi.string().required().messages({
-    "string.base": "Timezone must be a string",
-    "string.empty": "Timezone cannot be empty",
-    "any.required": "Timezone is required",
-  }),
+  timezone: strRequired("Timezone"),
 
-  testPrefix: Joi.string().required().messages({
-    "string.base": "Test prefix must be a string",
-    "string.empty": "Test prefix cannot be empty",
-    "any.required": "Test prefix is required",
-  }),
+  testPrefix: strRequired("Test prefix"),
 
-  barcodePrefix: Joi.string().required().messages({
-    "string.base": "Barcode prefix must be a string",
-    "string.empty": "Barcode prefix cannot be empty",
-    "any.required": "Barcode prefix is required",
-  }),
+  barcodePrefix: strRequired("Barcode prefix"),
 
-  invoicePrefix: Joi.string().required().messages({
-    "string.base": "Invoice prefix must be a string",
-    "string.empty": "Invoice prefix cannot be empty",
-    "any.required": "Invoice prefix is required",
-  }),
+  invoicePrefix: strRequired("Invoice prefix"),
 
-  diseCode: Joi.string().required().messages({
-    "string.base": "Dise code must be a string",
-    "string.empty": "Dise code cannot be empty",
-    "any.required": "Dise code is required",
-  }),
+  diseCode: strRequired("Dise code"),
 
-  disabledBy: Joi.string().optional().allow(null, "").messages({
-    "string.base": "Disabled By must be a string",
-  }),
+  disabledBy: strOptional("Disabled by"),
 
-  collectionAbbreviationName: Joi.string().optional().allow(null, "").messages({
-    "string.base": "Collection abbreviation name must be a string",
-  }),
+  collectionAbbreviationName: strOptional("Collection abbreviation name"),
 
-  connectionCode: Joi.string().required().messages({
-    "string.base": "Connection code must be a string",
-    "any.required": "Connection code is required",
-  }),
+  connectionCode: strRequired("Connection code"),
 
-  barcodePrinterName: Joi.string().optional().allow(null, "").messages({
-    "string.base": "Barcode printer name must be a string",
-  }),
+  barcodePrinterName: strOptional("Barcode printer name"),
 
-  disabledOn: Joi.date().iso().optional().allow(null).messages({
-    "date.base": "Disabled On must be a valid ISO date",
-    "date.format": "Disabled On must be in ISO 8601 format",
-  }),
+  disabledOn: dateOptional("Disabled on").iso(),
 
-  isSubOrganization: Joi.boolean().optional().messages({
-    "boolean.base": "Is Sub Organization must be a boolean",
-  }),
+  isSubOrganization: boolOptional("Is sub organization"),
 });
 
-export const validateCollectionCenter = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = collectionCenterSchema.validate(req.body, {
-    abortEarly: false,
-  });
+export const validateCollectionCenter = validationHandler({
+  schema: collectionCenterSchema,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
 export const collectionCenterSchemaUpdate = Joi.object<CollectionCenter>({
-  id: Joi.number().required().messages({
-    "number.base": "ID must be a number",
-  }),
+  id: idRequired("Id"),
 
-  colName: Joi.string().required().min(2).messages({
-    "string.base": "Name must be a string",
-    "any.required": "Name is required",
-  }),
+  colName: strRequired("Name", 2),
 
-  email: Joi.string().email().required().messages({
-    "string.base": "Email must be a string",
-    "string.email": "Email must be a valid email address",
-    "any.required": "Email is required",
-  }),
+  email: emailRequired("Email"),
 
-  phone: Joi.string()
-    .required()
-    .pattern(getPattern.phonePattern)
-    .strict()
-    .messages({
-      "number.base": "Phone must be a number",
-      "number.integer": "Phone must be an integer",
-      "any.required": "Phone is required",
-    }),
+  phone: phoneRequired("Phone"),
 
-  address: Joi.string().required().messages({
-    "string.base": "Address must be a string",
-    "string.empty": "Address cannot be empty",
-    "any.required": "Address is required",
-  }),
+  address: strRequired("Address"),
 
-  dateFormat: Joi.string().required().messages({
-    "string.base": "Date format must be a string",
-    "string.empty": "Date format cannot be empty",
-    "any.required": "Date format is required",
-  }),
-  langId: Joi.number().integer().required().strict().messages({
-    "number.base": "Language Id must be a number",
-    "number.integer": "Language Id must be an integer",
-    "any.required": "Language Id is required",
-  }),
+  dateFormat: strRequired("Date format"),
+  langId: idRequired("Language Id"),
 
-  timeFormat: Joi.string().required().messages({
-    "string.base": "Time format must be a string",
-    "string.empty": "Time format cannot be empty",
-    "any.required": "Time format is required",
-  }),
+  timeFormat: strRequired("Time format"),
 
-  currency: Joi.string().uppercase().length(3).required().strict().messages({
-    "string.base": "Currency must be a string",
-    "string.length": "Currency must be a 3-letter ISO code (e.g., USD)",
-    "any.required": "Currency is required",
-  }),
+  currency: strRequired("Currency").length(3).uppercase(),
 
-  currencySymbol: Joi.string().required().messages({
-    "string.base": "Currency symbol must be a string",
-    "string.empty": "Currency symbol cannot be empty",
-    "any.required": "Currency symbol is required",
-  }),
+  currencySymbol: strRequired("Currency symbol"),
 
-  timezone: Joi.string().required().messages({
-    "string.base": "Timezone must be a string",
-    "string.empty": "Timezone cannot be empty",
-    "any.required": "Timezone is required",
-  }),
+  timezone: strRequired("Timezone"),
 
-  testPrefix: Joi.string().required().messages({
-    "string.base": "Test prefix must be a string",
-    "string.empty": "Test prefix cannot be empty",
-    "any.required": "Test prefix is required",
-  }),
+  testPrefix: strRequired("Test prefix"),
 
-  barcodePrefix: Joi.string().required().messages({
-    "string.base": "Barcode prefix must be a string",
-    "string.empty": "Barcode prefix cannot be empty",
-    "any.required": "Barcode prefix is required",
-  }),
+  barcodePrefix: strRequired("Barcode prefix"),
 
-  invoicePrefix: Joi.string().required().messages({
-    "string.base": "Invoice prefix must be a string",
-    "string.empty": "Invoice prefix cannot be empty",
-    "any.required": "Invoice prefix is required",
-  }),
+  invoicePrefix: strRequired("Invoice prefix"),
 
-  diseCode: Joi.string().required().messages({
-    "string.base": "Dise code must be a string",
-    "string.empty": "Dise code cannot be empty",
-    "any.required": "Dise code is required",
-  }),
+  diseCode: strRequired("Dise code"),
 
-  disabledBy: Joi.string().optional().allow(null).strict().messages({
-    "string.base": "Disabled By must be a string",
-  }),
+  disabledBy: strOptional("Disabled by"),
 
-  collectionAbbreviationName: Joi.string()
-    .optional()
-    .allow(null)
-    .strict()
-    .messages({
-      "string.base": "Collection abbreviation name must be a string",
-    }),
+  collectionAbbreviationName: strOptional("Collection abbreviation name"),
 
-  connectionCode: Joi.string().optional().allow(null).strict().messages({
-    "string.base": "Connection code must be a string",
-  }),
+  connectionCode: strOptional("Connection code"),
 
-  barcodePrinterName: Joi.string().optional().allow(null).strict().messages({
-    "string.base": "Barcode printer name must be a string",
-  }),
+  barcodePrinterName: strOptional("Barcode printer name"),
 
-  disabledOn: Joi.date().iso().optional().allow(null).messages({
-    "date.base": "Disabled On must be a valid ISO date",
-    "date.format": "Disabled On must be in ISO 8601 format",
-  }),
+  disabledOn: dateOptional("Disabled on").iso(),
 
-  isSubOrganization: Joi.boolean().optional().messages({
-    "boolean.base": "Is Sub Organization must be a boolean",
-  }),
+  isSubOrganization: boolOptional("Is sub organization"),
 });
 
-export const validateCollectionCenterUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = collectionCenterSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateCollectionCenterUpdate = validationHandler({
+  schema: collectionCenterSchemaUpdate,
+});

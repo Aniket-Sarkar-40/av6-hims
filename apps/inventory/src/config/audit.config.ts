@@ -3,7 +3,7 @@ import {
   AuditCore,
   AuditLogger,
   AuditProxy,
-} from "av6-core";
+} from "av6-core-v2";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { db } from "@repo/db/client";
 

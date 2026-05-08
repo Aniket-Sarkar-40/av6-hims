@@ -2,6 +2,11 @@ import {
   CreateClinicalHistoryInput,
   UpdateClinicalHistoryInput,
 } from "@/types/appointment/clinicalHistory.js";
+import {
+  boolOptional,
+  idRequired,
+  strOptional,
+} from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import Joi from "joi";
@@ -9,245 +14,68 @@ import Joi from "joi";
 export const CreateClinicalHistorySchema = Joi.object<
   CreateClinicalHistoryInput | UpdateClinicalHistoryInput
 >({
-  appointmentId: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "Appointment ID"),
-      "number.integer": generateValidationErrorMessage(
-        "INTEGER",
-        "Appointment ID",
-      ),
-      "number.positive": generateValidationErrorMessage(
-        "POSITIVE",
-        "Appointment ID",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Appointment ID",
-      ),
-    }),
-  isSulphurDrugs: Joi.boolean()
-    .optional()
-    .messages({
-      "boolean.base": generateValidationErrorMessage(
-        "BOOLEAN",
-        "Sulphur Drugs",
-      ),
-    }),
-  isCodeine: Joi.boolean()
-    .optional()
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Codeine"),
-    }),
-  isPenicillin: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Penicillin"),
-    }),
-  isAspirin: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Aspirin"),
-    }),
-  isIbuprofen: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Ibuprofen"),
-    }),
-  isIodine: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Iodine"),
-    }),
-  allergiesNote: Joi.string()
-    .trim()
+  appointmentId: idRequired("Appointment Id"),
+  isSulphurDrugs: boolOptional("Is Sulphur Drugs"),
+  isCodeine: boolOptional("Is Codeine"),
+  isPenicillin: boolOptional("Is Penicillin"),
+  isAspirin: boolOptional("Is Aspirin"),
+  isIbuprofen: boolOptional("Is Ibuprofen"),
+  isIodine: boolOptional("Is Iodine"),
+  allergiesNote: strOptional("Allergies Note", 500)
     .min(5)
-    .max(500)
-    .optional()
-    .allow(null, "")
     .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Allergies Note"),
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Allergies Note",
-        "5",
-      ),
-      "string.max": generateValidationErrorMessage(
-        "STRING_MAX",
-        "Allergies Note",
-        "500",
+        "5"
       ),
     }),
 
-  isDiabetes: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Diabetes"),
-    }),
-  isCancer: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Cancer"),
-    }),
-  isHypertension: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Hypertension"),
-    }),
-  isAsthma: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Asthma"),
-    }),
-  isStd: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "STD"),
-    }),
-  isUlcer: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Ulcer"),
-    }),
-  isG6pdPartialDefect: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage(
-        "BOOLEAN",
-        "G6PD Partial Defect",
-      ),
-    }),
-  isSickleCellDisease: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage(
-        "BOOLEAN",
-        "Sickle Cell Disease",
-      ),
-    }),
-  isOtherDisease: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage(
-        "BOOLEAN",
-        "Other Disease",
-      ),
-    }),
-  otherNote: Joi.string()
-    .trim()
+  isDiabetes: boolOptional("Is Diabetes"),
+  isCancer: boolOptional("Is Cancer"),
+  isHypertension: boolOptional("Is Hypertension"),
+  isAsthma: boolOptional("Is Asthma"),
+  isStd: boolOptional("Is STD"),
+  isUlcer: boolOptional("Is Ulcer"),
+  isG6pdPartialDefect: boolOptional("Is G6PD Partial Defect"),
+  isSickleCellDisease: boolOptional("Is Sickle Cell Disease"),
+  isOtherDisease: boolOptional("Is Other Disease"),
+  otherNote: strOptional("Other Note", 500)
     .min(5)
-    .max(500)
-    .optional()
-    .allow(null, "")
     .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Other Note"),
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Other Note",
-        "5",
-      ),
-      "string.max": generateValidationErrorMessage(
-        "STRING_MAX",
-        "Other Note",
-        "500",
+        "5"
       ),
     }),
 
-  isSmoke: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Smoke"),
-    }),
-  isDrink: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Drink"),
-    }),
-  isSurgery: Joi.boolean()
-    .optional()
-
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Surgery"),
-    }),
-  surgeryNote: Joi.string()
-    .trim()
+  isSmoke: boolOptional("Is Smoke"),
+  isDrink: boolOptional("Is Drink"),
+  isSurgery: boolOptional("Is Surgery"),
+  surgeryNote: strOptional("Surgery Note", 500)
     .min(5)
-    .max(500)
-    .optional()
-    .allow(null)
     .messages({
-      "string.base": generateValidationErrorMessage("STRING", "Surgery Note"),
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Surgery Note",
-        "5",
-      ),
-      "string.max": generateValidationErrorMessage(
-        "STRING_MAX",
-        "Surgery Note",
-        "500",
+        "5"
       ),
     }),
 
-  isMedication: Joi.boolean()
-    .optional()
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Medication"),
-    }),
-  medicationNote: Joi.string()
-    .trim()
+  isMedication: boolOptional("Is Medication"),
+  medicationNote: strOptional("Medication Note", 500)
     .min(5)
-    .max(500)
-    .optional()
-    .allow(null)
     .messages({
-      "string.base": generateValidationErrorMessage(
-        "STRING",
-        "Medication Note",
-      ),
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Medication Note",
-        "5",
-      ),
-      "string.max": generateValidationErrorMessage(
-        "STRING_MAX",
-        "Medication Note",
-        "500",
+        "5"
       ),
     }),
 
-  isPregnant: Joi.boolean()
-    .optional()
-    .messages({
-      "boolean.base": generateValidationErrorMessage("BOOLEAN", "Pregnant"),
-    }),
-  isBreastFeeding: Joi.boolean()
-    .optional()
-    .messages({
-      "boolean.base": generateValidationErrorMessage(
-        "BOOLEAN",
-        "Breast Feeding",
-      ),
-    }),
+  isPregnant: boolOptional("Is Pregnant"),
+  isBreastFeeding: boolOptional("Is Breast Feeding"),
 });
 
 export const validateClinicalHistoryCreate = validationHandler({
@@ -255,17 +83,7 @@ export const validateClinicalHistoryCreate = validationHandler({
 });
 
 export const UpdateClinicalHistorySchema = CreateClinicalHistorySchema.keys({
-  id: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .strict()
-    .messages({
-      "number.base": generateValidationErrorMessage("NUMBER", "ID"),
-      "number.integer": generateValidationErrorMessage("INTEGER", "ID"),
-      "number.positive": generateValidationErrorMessage("POSITIVE", "ID"),
-      "any.required": generateValidationErrorMessage("REQUIRED", "ID"),
-    }),
+  id: idRequired("Clinical History Id"),
 });
 
 export const validateClinicalHistoryUpdate = validationHandler({

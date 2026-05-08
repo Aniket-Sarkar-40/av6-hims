@@ -8,11 +8,12 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
 import * as prismaClient from "@repo/db/generated/prisma/client";
 import {
+  ApprovalService,
   commonService,
   DataType,
   NotificationEmitter,
   uinConfigService,
-} from "av6-core";
+} from "av6-core-v2";
 import {
   envMode,
   MASTER_TABLES,
@@ -27,6 +28,7 @@ import {
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
+import EventEmitter from "node:events";
 
 const createCoreCache = async (table: string, data: DataType[]) =>
   await createCache(table, data, "core");
@@ -92,4 +94,17 @@ export const notifier = new NotificationEmitter({
     ErrorHandler: ErrorHandler,
     generateErrorMessage: generateErrorMessage,
   },
+});
+
+export const eventBus = new EventEmitter({ captureRejections: true });
+
+export const approvalServiceFactory = new ApprovalService({
+  eventBus: eventBus,
+  helpers: {
+    ErrorHandler: ErrorHandler,
+    generateErrorMessage: generateErrorMessage,
+  },
+  logger: logger,
+  prisma: db,
+  requestStorage: requestStorage,
 });

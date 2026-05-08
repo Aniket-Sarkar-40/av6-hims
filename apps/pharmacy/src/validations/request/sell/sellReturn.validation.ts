@@ -2,7 +2,6 @@ import {
   SellReturnDetailInput,
   SellReturnInput,
 } from "@/types/sell/sellReturn.js";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { joiDecimalFromSettings } from "@/utils/commonCalculation.utils.js";
 import {
   BILL_FOR,
@@ -13,91 +12,41 @@ import {
   RETURN_STS,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/enums.js";
-import { NextFunction, Request, Response } from "express";
-import Joi, { ValidationErrorItem } from "joi";
+import Joi from "joi";
+import {
+  arrayRequired,
+  boolOptional,
+  boolRequired,
+  dateOptional,
+  enumOptional,
+  enumRequired,
+  idOptional,
+  idRequired,
+  intRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const sellReturnDetailInputSchema = Joi.object<SellReturnDetailInput>({
-  itemId: Joi.number().integer().required().strict().messages({
-    "number.base": "Item Id must be a number",
-    "number.integer": "Item Id must be an integer",
-    "any.required": "Item Id is required",
-  }),
-  sellDetailsId: Joi.number().integer().required().strict().messages({
-    "number.base": "Sell Details Id must be a number",
-    "number.integer": "Sell Details Id must be an integer",
-    "any.required": "Sell Details Id is required",
-  }),
-  itemCategoryName: Joi.string().required().messages({
-    "string.base": "Item Medicine Category must be a string",
-    "any.required": "Item Medicine Category is required",
-  }),
-  medType: Joi.string().required().messages({
-    "string.base": "Medicine Type must be a string",
-    "any.required": "Medicine Type is required",
-  }),
-  medComp: Joi.string().required().messages({
-    "string.base": "Medicine Composition must be a string",
-    "any.required": "Medicine Composition is required",
-  }),
-  medUnit: Joi.string().required().messages({
-    "string.base": "Medicine Unit must be a string",
-    "any.required": "Medicine Unit is required",
-  }),
-  manufacturer: Joi.string().required().messages({
-    "string.base": "Manufacturer must be a string",
-    "any.required": "Manufacturer is required",
-  }),
-  packSize: Joi.string().required().messages({
-    "string.base": "Pack size must be a string",
-    "any.required": "Pack size is required",
-  }),
-  drugType: Joi.string().required().messages({
-    "string.base": "Drug type must be a string",
-    "any.required": "Drug type is required",
-  }),
-  itemCategoryId: Joi.number().integer().required().strict().messages({
-    "number.base": "Item category Id must be a number",
-    "number.integer": "Item category Id must be an integer",
-    "any.required": "Item category Id is required",
-  }),
-  medTypeId: Joi.number().integer().required().strict().messages({
-    "number.base": "Medicine type Id must be a number",
-    "number.integer": "Medicine type Id must be an integer",
-    "any.required": "Medicine type Id is required",
-  }),
-  medCompId: Joi.number().integer().required().strict().messages({
-    "number.base": "Medicine composition ID must be a number",
-    "number.integer": "Medicine composition ID must be an integer",
-    "any.required": "Medicine composition ID is required",
-  }),
-  medUnitId: Joi.number().integer().required().strict().messages({
-    "number.base": "Medicine unit Id must be a number",
-    "number.integer": "Medicine unit Id must be an integer",
-    "any.required": "Medicine unit Id is required",
-  }),
-  manufacturerId: Joi.number().integer().required().strict().messages({
-    "number.base": "Manufacturer Id must be a number",
-    "number.integer": "Manufacturer Id must be an integer",
-    "any.required": "Manufacturer Id is required",
-  }),
-  packSizeId: Joi.number().integer().required().strict().messages({
-    "number.base": "Pack size Id must be a number",
-    "number.integer": "Pack size Id must be an integer",
-    "any.required": "Pack size Id is required",
-  }),
-  drugTypeId: Joi.number().integer().required().strict().messages({
-    "number.base": "Drug type Id must be a number",
-    "number.integer": "Drug type Id must be an integer",
-    "any.required": "Drug type Id is required",
-  }),
-  batchNo: Joi.string().required().messages({
-    "string.base": "Batch number must be a string",
-    "any.required": "Batch number is required",
-  }),
-  isFoc: Joi.boolean().required().messages({
-    "boolean.base": "isFoc must be a boolean",
-    "any.required": "isFoc is required",
-  }),
+  itemId: idRequired("Item Id"),
+  sellDetailsId: idRequired("Sell Details Id"),
+  itemCategoryName: strRequired("Item Category Name"),
+  medType: strRequired("Medicine Type"),
+  medComp: strRequired("Medicine composition"),
+  medUnit: strRequired("Medicine unit"),
+  manufacturer: strRequired("Manufacturer"),
+  packSize: strRequired("Pack size"),
+  drugType: strRequired("Drug Type"),
+  itemCategoryId: idRequired("Item Category Id"),
+  medTypeId: idRequired("Medicine Type Id"),
+  medCompId: idRequired("Medicine composition Id"),
+  medUnitId: idRequired("Medicine unit Id"),
+  manufacturerId: idRequired("Manufacturer Id"),
+  packSizeId: idRequired("Pack size Id"),
+  drugTypeId: idRequired("Drug Type Id"),
+  batchNo: strRequired("Batch No"),
+  isFoc: boolRequired("Is Foc"),
   expiryDate: Joi.date().iso().optional().allow(null).messages({
     "date.base": "Expiry date must be a valid date",
   }),
@@ -112,10 +61,7 @@ export const sellReturnDetailInputSchema = Joi.object<SellReturnDetailInput>({
     "number.precision": "MRP must have {{#limit}} decimal places",
     "any.required": "MRP is required",
   }),
-  quantity: Joi.number().integer().strict().min(0).required().messages({
-    "number.min": "Quantity cannot be negative",
-    "any.required": "Quantity is required",
-  }),
+  quantity: intRequired("Quantity", 0),
 
   netAmount: joiDecimalFromSettings({
     key: "sellPrecision",
@@ -127,16 +73,7 @@ export const sellReturnDetailInputSchema = Joi.object<SellReturnDetailInput>({
     "number.precision": "Net amount must have {{#limit}} decimal places",
     "any.required": "Net amount is required",
   }),
-  discountMethod: Joi.string()
-    .valid(...Object.values(DiscMethod))
-    .required()
-    .messages({
-      "string.base": "Discount method must be a string",
-      "any.only": `Discount method must be one of ${Object.values(
-        DiscMethod
-      ).join(", ")}`,
-      "any.required": "Discount method is required",
-    }),
+  discountMethod: enumRequired("Discount Method", DiscMethod),
 
   discount: joiDecimalFromSettings({
     key: "sellPrecision",
@@ -161,16 +98,7 @@ export const sellReturnDetailInputSchema = Joi.object<SellReturnDetailInput>({
     "number.precision": "Net Discount must have {{#limit}} decimal places",
     "any.required": "Net discount is required",
   }),
-  taxMethod: Joi.string()
-    .valid(...Object.values(TAX_METHOD))
-    .required()
-    .messages({
-      "string.base": "Tax method must be a string",
-      "any.only": `Tax method must be one of ${Object.values(TAX_METHOD).join(
-        ", "
-      )}`,
-      "any.required": "Tax method is required",
-    }),
+  taxMethod: enumRequired("Tax Method", TAX_METHOD),
 
   tax: joiDecimalFromSettings({
     key: "sellPrecision",
@@ -206,10 +134,7 @@ export const sellReturnDetailInputSchema = Joi.object<SellReturnDetailInput>({
     "number.precision": "Total amount must have {{#limit}} decimal places",
     "any.required": "Total amount is required",
   }),
-  sellQuantity: Joi.number().strict().integer().min(0).required().messages({
-    "number.min": "Sell Quantity cannot be negative",
-    "any.required": "Sell Quantity is required",
-  }),
+  sellQuantity: intRequired("Sell Quantity", 0),
 
   coPayAmount: joiDecimalFromSettings({
     key: "sellPrecision",
@@ -236,102 +161,25 @@ export const sellReturnDetailInputSchema = Joi.object<SellReturnDetailInput>({
 });
 
 export const sellReturnInputSchema = Joi.object<SellReturnInput>({
-  sellId: Joi.number().integer().strict().required().messages({
-    "number.base": "Sell Id must be a number",
-    "number.integer": "Sell Id must be an integer",
-    "any.required": "Sell Id is required",
-  }),
+  sellId: idRequired("Sell Id"),
 
-  ccId: Joi.number().integer().strict().required().messages({
-    "number.base": "CC Id must be a number",
-    "number.integer": "CC Id must be an integer",
-    "any.required": "CC Id is required",
-  }),
+  ccId: idRequired("CC Id"),
 
-  sellNumber: Joi.string().required().messages({
-    "string.base": "Sell number must be a string",
-    "any.required": "Sell number is required",
-  }),
+  sellNumber: strRequired("Sell Number"),
 
-  staffId: Joi.number().integer().strict().optional().allow(null).messages({
-    "number.base": "Staff ID must be a number",
-    "number.integer": "Staff ID must be an integer",
-  }),
-  aptId: Joi.number().integer().optional().allow(null).strict().messages({
-    "number.base": "Appointment Id must be a number",
-    "number.integer": "Appointment Id must be an integer",
-  }),
-  aptNo: Joi.string().optional().allow(null).messages({
-    "string.base": "Appointment no must be a string",
-  }),
-  deliveryType: Joi.string()
-    .valid(...Object.values(DeliveryType))
-    .required()
-    .messages({
-      "string.base": "Delivery type must be a string",
-      "string.enum": `Delivery type must be one of the following: ${Object.values(
-        DeliveryType
-      ).join(", ")}`,
-      "any.required": "Delivery type is required",
-    }),
-  paymentMode: Joi.string()
-    .valid(...Object.values(PmsPaymentMode))
-    .optional()
-    .allow(null)
-    .messages({
-      "string.base": "Payment mode must be a string",
-      "string.enum": `Payment mode must be one of the following: ${Object.values(
-        PmsPaymentMode
-      ).join(", ")}`,
-    }),
-  isHomeDelivery: Joi.boolean().optional().default(false).messages({
-    "boolean.base": "Is home delivery must be a boolean",
-  }),
-  billDate: Joi.date().optional().allow(null).messages({
-    "date.base": "Bill date must be a valid date or null",
-  }),
-  customerId: Joi.number().integer().required().strict().messages({
-    "number.base": "Customer Id must be a number",
-    "number.integer": "Customer Id must be an integer",
-    "any.required": "Customer Id is required",
-  }),
-  billingFor: Joi.string()
-    .valid(...Object.values(BILL_FOR))
-    .required()
-    .messages({
-      "string.base": "Billing for must be a string",
-      "string.enum": `Billing for must be one of the following: ${Object.values(
-        BILL_FOR
-      ).join(", ")}`,
-      "any.required": "Billing for is required",
-    }),
-  insuranceId: Joi.number().integer().optional().allow(null).strict().messages({
-    "number.base": "Insurance Id must be a number",
-    "number.integer": "Insurance Id must be an integer",
-  }),
-  corporateClientId: Joi.number()
-    .integer()
-    .optional()
-    .allow(null)
-    .strict()
-    .messages({
-      "number.base": "Corporate Client Id must be a number",
-      "number.integer": "Corporate Client Id must be an integer",
-    }),
-  patientInsuranceId: Joi.number()
-    .integer()
-    .optional()
-    .allow(null)
-    .strict()
-    .messages({
-      "number.base": "Patient Insurance Id must be a number",
-      "number.integer": "Patient Insurance Id must be an integer",
-    }),
-  doctorId: Joi.number().integer().required().strict().messages({
-    "number.base": "Doctor Id must be a number",
-    "number.integer": "Doctor Id must be an integer",
-    "any.required": "Doctor Id is required",
-  }),
+  staffId: idOptional("Staff Id"),
+  aptId: idOptional("Apt Id"),
+  aptNo: strOptional("Apt No"),
+  deliveryType: enumRequired("Delivery Type", DeliveryType),
+  paymentMode: enumOptional("Payment Mode", PmsPaymentMode),
+  isHomeDelivery: boolOptional("Is Home Delivery").default(false),
+  billDate: dateOptional("Bill Date"),
+  customerId: idRequired("Customer Id"),
+  billingFor: enumRequired("Billing For", BILL_FOR),
+  insuranceId: idOptional("Insurance Id"),
+  corporateClientId: idOptional("Corporate Client Id"),
+  patientInsuranceId: idOptional("Patient Insurance Id"),
+  doctorId: idRequired("Doctor Id"),
   netAmount: joiDecimalFromSettings({
     key: "sellPrecision",
     required: true,
@@ -340,15 +188,7 @@ export const sellReturnInputSchema = Joi.object<SellReturnInput>({
     "number.precision": "Net amount must have {{#limit}} decimal places",
     "any.required": "Net amount is required",
   }),
-  discountMethod: Joi.string()
-    .valid(...Object.values(DiscMethod))
-    .optional()
-    .messages({
-      "string.base": "Discount method must be a string",
-      "string.enum": `Discount method must be one of the following: ${Object.values(
-        DiscMethod
-      ).join(", ")}`,
-    }),
+  discountMethod: enumOptional("Discount Method", DiscMethod),
   discount: joiDecimalFromSettings({
     key: "sellPrecision",
     min: 0,
@@ -366,19 +206,8 @@ export const sellReturnInputSchema = Joi.object<SellReturnInput>({
       "number.base": "Net discount must be a number",
       "number.precision": "Net discount must have {{#limit}} decimal places",
     }),
-  discountNote: Joi.string().optional().allow(null, "").messages({
-    "string.base": "Discount note must be a string",
-  }),
-  taxMethod: Joi.string()
-    .valid(...Object.values(TAX_METHOD))
-    .required()
-    .messages({
-      "string.base": "Tax method must be a string",
-      "string.enum": `Tax method must be one of the following: ${Object.values(
-        TAX_METHOD
-      ).join(", ")}`,
-      "any.required": "Tax method is required",
-    }),
+  discountNote: strOptional("Discount Note"),
+  taxMethod: enumRequired("Tax Method", TAX_METHOD),
   tax: joiDecimalFromSettings({
     key: "sellPrecision",
     required: true,
@@ -414,31 +243,13 @@ export const sellReturnInputSchema = Joi.object<SellReturnInput>({
       "number.base": "Paid amount must be a number",
       "number.precision": "Paid amount must have {{#limit}} decimal places",
     }),
-  paymentStatus: Joi.string()
-    .valid(...Object.values(PAYMENT_STATUS))
-    .messages({
-      "string.base": "Payment status must be a string",
-      "string.enum": `Payment status must be one of the following: ${Object.values(
-        PAYMENT_STATUS
-      ).join(", ")}`,
-    }),
-  status: Joi.string()
-    .valid(...Object.values(RETURN_STS))
-    .messages({
-      "string.base": "Status must be a string",
-      "string.enum": `Status must be one of the following: ${Object.values(
-        RETURN_STS
-      ).join(", ")}`,
-    }),
-  sellReturnDetails: Joi.array()
-    .items(sellReturnDetailInputSchema)
-    .min(1)
-    .required()
-    .messages({
-      "array.base": "Sell Return details must be an array",
-      "array.min": "At least one Sell Return detail is required",
-      "any.required": "Sell Return details is required",
-    }),
+  paymentStatus: enumOptional("Payment Status", PAYMENT_STATUS),
+  status: enumOptional("Status", RETURN_STS),
+  sellReturnDetails: arrayRequired(
+    "Sell Return Details",
+    sellReturnDetailInputSchema,
+    1
+  ),
   coPayAmount: joiDecimalFromSettings({
     key: "sellPrecision",
     min: 0,
@@ -463,193 +274,57 @@ export const sellReturnInputSchema = Joi.object<SellReturnInput>({
 });
 
 export const sellReturnSchemaUpdate = sellReturnInputSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "Id must be a number",
-    "number.integer": "Id must be an integer",
-    "any.required": "Id is required",
-  }),
+  id: idRequired("Id"),
   sellReturnDetails: Joi.array().items(
     sellReturnDetailInputSchema.keys({
-      id: Joi.number().integer().optional().messages({
-        "number.base": "Id must be a number",
-        "number.integer": "Id must be an integer",
-      }),
+      id: idRequired("Id"),
     })
   ),
 });
 
 export const sellReturnExcelFilterSchema = Joi.object({
-  id: Joi.number().integer().positive().optional().messages({
-    "number.base": `Id must be a number`,
-    "number.integer": `Id must be an integer`,
-    "number.positive": `Id must be a positive number`,
-  }),
+  id: idOptional("Id"),
 
-  sellRefNo: Joi.string().optional().messages({
-    "string.base": `Sell ref no must be a string`,
-  }),
+  sellRefNo: strOptional("Sell Ref No"),
 
-  sellReturnRefNo: Joi.string().optional().messages({
-    "string.base": `Sell return ref no must be a string`,
-  }),
+  sellReturnRefNo: strOptional("Sell Return Ref No"),
 
-  branchId: Joi.number().integer().positive().optional().messages({
-    "number.base": `Branch id must be a number`,
-    "number.integer": `Branch id must be an integer`,
-    "number.positive": `Branch id must be a positive number`,
-  }),
+  branchId: idOptional("Branch Id"),
 
-  staffId: Joi.number().integer().positive().optional().messages({
-    "number.base": `Staff id must be a number`,
-    "number.integer": `Staff id must be an integer`,
-    "number.positive": `Staff id must be a positive number`,
-  }),
+  staffId: idOptional("Staff Id"),
 
-  DeliveryType: Joi.string()
-    .valid(...Object.values(DeliveryType))
-    .optional()
-    .messages({
-      "any.only": `Delivery type must be one of ${Object.values(
-        DeliveryType
-      ).join(", ")}`,
-    }),
+  DeliveryType: enumOptional("Delivery type", DeliveryType),
 
-  paymentMode: Joi.string()
-    .valid(...Object.values(PmsPaymentMode))
-    .optional()
-    .allow(null)
-    .messages({
-      "any.only": `Payment mode must be one of ${Object.values(
-        PmsPaymentMode
-      ).join(", ")}`,
-    }),
+  paymentMode: enumOptional("Payment mode", PmsPaymentMode),
 
-  isHomeDelivery: Joi.boolean().optional().messages({
-    "boolean.base": `Is home delivery must be a boolean`,
-  }),
+  isHomeDelivery: boolOptional("Is home delivery"),
 
-  startDate: Joi.string().isoDate().optional().messages({
-    "string.base": `Start date must be a string`,
-    "string.isoDate": `Start date must be in ISO 8601 date format (YYYY-MM-DD)`,
-  }),
+  startDate: dateOptional("Start date"),
 
-  endDate: Joi.string().isoDate().optional().messages({
-    "string.base": `End date must be a string`,
-    "string.isoDate": `End date must be in ISO 8601 date format (YYYY-MM-DD)`,
-  }),
+  endDate: dateOptional("End date"),
 
-  customerId: Joi.number().integer().positive().optional().messages({
-    "number.base": `Customer id must be a number`,
-    "number.integer": `Customer id must be an integer`,
-    "number.positive": `Customer id must be a positive number`,
-  }),
+  customerId: idOptional("Customer Id"),
 
-  billingFor: Joi.string()
-    .valid(...Object.values(BILL_FOR))
-    .optional()
-    .messages({
-      "any.only": `Billing for must be one of ${Object.values(BILL_FOR).join(
-        ", "
-      )}`,
-    }),
+  billingFor: enumOptional("Billing for", BILL_FOR),
 
-  doctorId: Joi.number().integer().positive().optional().messages({
-    "number.base": `Doctor id must be a number`,
-    "number.integer": `Doctor id must be an integer`,
-    "number.positive": `Doctor id must be a positive number`,
-  }),
+  doctorId: idOptional("Doctor Id"),
 
-  paymentStatus: Joi.string()
-    .valid(...Object.values(PAYMENT_STATUS))
-    .optional()
-    .messages({
-      "any.only": `Payment status must be one of ${Object.values(
-        PAYMENT_STATUS
-      ).join(", ")}`,
-    }),
+  paymentStatus: enumOptional("Payment status", PAYMENT_STATUS),
 
-  status: Joi.string()
-    .valid(...Object.values(RETURN_STS))
-    .optional()
-    .messages({
-      "any.only": `Status must be one of ${Object.values(RETURN_STS).join(
-        ", "
-      )}`,
-    }),
+  status: enumOptional("Status", RETURN_STS),
 })
   .strict()
   .unknown(false)
   .messages({
     "object.unknown": `"{{#label}}" is not allowed`,
   });
-export const validateSellReturnInput = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = sellReturnInputSchema.validate(req.body, {
-    abortEarly: false,
-  });
+export const validateSellReturnInput = validationHandler({
+  schema: sellReturnInputSchema,
+});
+export const validateSellReturnUpdate = validationHandler({
+  schema: sellReturnSchemaUpdate,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
-export const validateSellReturnUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = sellReturnSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
-
-export const validateSellReturnExcelFilter = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = sellReturnExcelFilterSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
+export const validateSellReturnExcelFilter = validationHandler({
+  schema: sellReturnExcelFilterSchema,
+});

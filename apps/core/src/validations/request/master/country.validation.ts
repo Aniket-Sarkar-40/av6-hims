@@ -1,5 +1,5 @@
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { NextFunction, Request, Response } from "express";
+import { idRequired, strRequired } from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import Joi from "joi";
 
 export const countrySchema = Joi.object<{
@@ -8,104 +8,23 @@ export const countrySchema = Joi.object<{
   enShortName: string | null;
   nationality: string;
 }>({
-  alpha2Code: Joi.string()
-    .trim()
-    .length(2)
-    .uppercase()
-    .allow(null)
-    .required()
-    .messages({
-      "string.base": "Alpha-2 code must be a string",
-      "string.length": "Alpha-2 code must be exactly 2 characters",
-      "string.empty": "Alpha-2 code cannot be empty",
-      "any.required": "Alpha-2 code is required",
-    }),
+  alpha2Code: strRequired("Alpha-2 code", 2).allow(null).uppercase(),
 
-  alpha3Code: Joi.string()
-    .trim()
-    .length(3)
-    .uppercase()
-    .allow(null)
-    .required()
-    .messages({
-      "string.base": "Alpha-3 code must be a string",
-      "string.length": "Alpha-3 code must be exactly 3 characters",
-      "string.empty": "Alpha-3 code cannot be empty",
-      "any.required": "Alpha-3 code is required",
-    }),
+  alpha3Code: strRequired("Alpha-3 code", 3).allow(null).uppercase(),
 
-  enShortName: Joi.string()
-    .trim()
-    .min(2)
-    .max(52)
-    .allow(null)
-    .required()
-    .messages({
-      "string.base": "Short name must be a string",
-      "string.min": "Short name must be at least 2 characters",
-      "string.max": "Short name must be at most 52 characters",
-      "string.empty": "Short name cannot be empty",
-      "any.required": "Short name is required",
-    }),
+  enShortName: strRequired("English short name", 2, 52).allow(null),
 
-  nationality: Joi.string().trim().min(2).max(39).required().messages({
-    "string.base": "Nationality must be a string",
-    "string.empty": "Nationality is required",
-    "string.min": "Nationality must be at least 2 characters",
-    "string.max": "Nationality must be at most 39 characters",
-    "any.required": "Nationality is required",
-  }),
+  nationality: strRequired("Nationality", 2, 39).allow(null),
 });
 
 export const updateCountrySchema = (countrySchema as Joi.ObjectSchema).keys({
-  id: Joi.number().integer().positive().required().strict().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "number.positive": "ID must be a positive integer",
-    "any.required": "ID is required",
-  }),
+  id: idRequired("Country ID"),
 });
 
-export const validateCountry = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = countrySchema.validate(req.body, { abortEarly: false });
+export const validateCountry = validationHandler({
+  schema: countrySchema,
+});
 
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
-
-export const validateCountryUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { error } = updateCountrySchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      })
-    );
-  }
-
-  next();
-};
+export const validateCountryUpdate = validationHandler({
+  schema: updateCountrySchema,
+});

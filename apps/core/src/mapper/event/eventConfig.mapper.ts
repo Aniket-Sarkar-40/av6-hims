@@ -2,7 +2,7 @@ import { serviceEventService } from "@/services/event/serviceEvent.service.js";
 import { templateService } from "@/services/event/template.service.js";
 import { EventConfigDTO } from "@/types/event/eventConfig.js";
 import { EventConfig } from "@repo/db/generated/prisma/client";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { toIdValue } from "av6-utils";
 
 export const toEventConfigDTO = async (

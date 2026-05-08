@@ -4,48 +4,33 @@ import {
 } from "@/types/gatePass/gatePass.js";
 import { joiDecimalFromSettings } from "@/utils/commonCalculation.utils.js";
 import { GPStatus, PMS_PRIORITY } from "@repo/db/generated/prisma/enums.js";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { NextFunction, Request, Response } from "express";
+import {
+  dateOptional,
+  dateRequired,
+  enumOptional,
+  idOptional,
+  idRequired,
+  intRequired,
+  strOptional,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import Joi from "joi";
 
 export const gatePassSchema = Joi.object<CreateOrUpdateGatePassInput>({
-  id: Joi.number().integer().optional().strict().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-  }),
+  id: idOptional("Id"),
 
-  distributorId: Joi.number().integer().required().strict().messages({
-    "number.base": "Distributor ID must be a number",
-    "number.integer": "Distributor ID must be an integer",
-    "any.required": "Distributor ID is required",
-  }),
+  distributorId: idRequired("Distributor Id"),
 
-  warehouseId: Joi.number().integer().required().strict().messages({
-    "number.base": "Warehouse ID must be a number",
-    "number.integer": "Warehouse ID must be an integer",
-    "any.required": "Warehouse ID is required",
-  }),
+  warehouseId: idRequired("Warehouse Id"),
 
-  totalQuantity: Joi.number().required().integer().strict().messages({
-    "number.base": "Total quantity must be a number",
-    "any.required": "Total quantity is required",
-  }),
+  totalQuantity: intRequired("Total Quantity"),
 
-  poNumber: Joi.string().required().messages({
-    "string.base": "PO number must be a string",
-    "any.required": "PO number is required",
-  }),
+  poNumber: strRequired("PO Number"),
 
-  poDate: Joi.date().required().messages({
-    "date.base": "PO date must be a valid date",
-    "any.required": "PO date is required",
-  }),
+  poDate: dateRequired("PO Date"),
 
-  boxCount: Joi.number().integer().required().strict().messages({
-    "number.base": "Box count must be a number",
-    "number.integer": "Box count must be an integer",
-    "any.required": "Box count is required",
-  }),
+  boxCount: intRequired("Box Count"),
 
   billAmount: joiDecimalFromSettings({
     key: "grnPrecision",
@@ -56,107 +41,34 @@ export const gatePassSchema = Joi.object<CreateOrUpdateGatePassInput>({
     "any.required": "Bill amount is required",
   }),
 
-  invoiceNumber: Joi.string().optional().allow(null).messages({
-    "string.base": "Invoice number must be a string",
-  }),
+  invoiceNumber: strOptional("Invoice Number"),
 
-  remarks: Joi.string().optional().allow(null).messages({
-    "string.base": "Remarks must be a string",
-  }),
+  remarks: strOptional("Remarks"),
 
-  priority: Joi.string()
-    .valid(...Object.values(PMS_PRIORITY))
-    .optional()
-    .allow(null)
-    .messages({
-      "any.only": `Priority must be one of ${Object.values(PMS_PRIORITY).join(", ")}`,
-    }),
-  status: Joi.string()
-    .valid(...Object.values(GPStatus))
-    .optional()
-    .allow(null)
-    .messages({
-      "any.only": `Status must be one of ${Object.values(GPStatus).join(", ")}`,
-    }),
+  priority: enumOptional("Priority", PMS_PRIORITY),
+  status: enumOptional("Status", GPStatus),
 });
 
-export const validateGatePass = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = gatePassSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateGatePass = validationHandler({
+  schema: gatePassSchema,
+});
 
 export const gatePassSchemaUpdate = gatePassSchema.keys({
-  id: Joi.number().integer().required().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "any.required": "ID is required",
-  }),
+  id: idRequired("Id"),
 });
 
-export const validateGatePassUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = gatePassSchemaUpdate.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateGatePassUpdate = validationHandler({
+  schema: gatePassSchemaUpdate,
+});
 
 export const gatePassFilterSchema = Joi.object<GatePassFilter>({
-  poNumber: Joi.string().trim().optional().messages({
-    "string.base": `"poNumber" must be a string`,
-  }),
+  poNumber: strOptional("PO Number"),
 
-  poDateStart: Joi.date().iso().optional().messages({
-    "date.base": `"poDateStart" must be a valid ISO date`,
-    "date.format": `"poDateStart" must be in YYYY-MM-DD format`,
-  }),
+  poDateStart: dateOptional("PO Date Start"),
 
-  poDateEnd: Joi.date().iso().optional().messages({
-    "date.base": `"poDateEnd" must be a valid ISO date`,
-    "date.format": `"poDateEnd" must be in YYYY-MM-DD format`,
-  }),
+  poDateEnd: dateOptional("PO Date End"),
 
-  status: Joi.string()
-    .trim()
-    .valid(...Object.values(GPStatus))
-    .optional()
-    .messages({
-      "string.base": `"gender" must be a string`,
-      "any.only": `"gender" must be one of [${Object.values(GPStatus).join(", ")}]`,
-    }),
+  status: enumOptional("Status", GPStatus),
 })
   .with("poDateEnd", "poDateStart")
   .custom((obj, helpers) => {
@@ -169,25 +81,6 @@ export const gatePassFilterSchema = Joi.object<GatePassFilter>({
     "date.range": `"poDateStart" must be on or before "poDateEnd"`,
   });
 
-export const validateGatePassFilter = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = gatePassFilterSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  if (error) {
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: error.message,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateGatePassFilter = validationHandler({
+  schema: gatePassFilterSchema,
+});

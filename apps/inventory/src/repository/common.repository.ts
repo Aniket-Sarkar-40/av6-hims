@@ -16,7 +16,7 @@ import { createCache } from "@repo/platform/cache/redis.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { FetchRequestRepository } from "av6-core";
+import { FetchRequestRepository } from "av6-core-v2";
 
 export const commonLockUnlock = async ({
   id,

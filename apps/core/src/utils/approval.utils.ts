@@ -1,9 +1,4 @@
-import {
-  ApprovalStatus,
-  GRN_STATUS,
-  PO_STATUS,
-  STORE_REQ_STATUS,
-} from "@repo/db/generated/prisma/enums.js";
+import { ApprovalStatus } from "@repo/db/generated/prisma/enums.js";
 
 export const getFlowWiseApprovalStatus: Record<
   ApprovalStatus,
@@ -14,11 +9,11 @@ export const getFlowWiseApprovalStatus: Record<
       GRN_RETURN: "1",
       PURCHASE_ORDER: "3",
       REQUISITION: "1",
+      INV_PURCHASE_ORDER: "APPROVED",
     },
     PHARMACY: {
-      GRN_RETURN: GRN_STATUS.COMPLETED,
-      PURCHASE_ORDER: PO_STATUS.APPROVED,
-      REQUISITION: STORE_REQ_STATUS.Approved,
+      GRN_RETURN: "COMPLETED",
+      PURCHASE_ORDER: ApprovalStatus.APPROVED,
     },
   },
   PENDING: {
@@ -26,11 +21,12 @@ export const getFlowWiseApprovalStatus: Record<
       GRN_RETURN: "1",
       PURCHASE_ORDER: "0",
       REQUISITION: "1",
+      INV_PURCHASE_ORDER: "PENDING",
     },
     PHARMACY: {
-      GRN_RETURN: GRN_STATUS.DRAFT,
-      PURCHASE_ORDER: PO_STATUS.SENT_FOR_APPROVAL,
-      REQUISITION: STORE_REQ_STATUS.Pending,
+      GRN_RETURN: "DRAFT",
+      PURCHASE_ORDER: "SENT_FOR_APPROVAL",
+      REQUISITION: "Pending",
     },
   },
   REJECTED: {
@@ -38,11 +34,12 @@ export const getFlowWiseApprovalStatus: Record<
       GRN_RETURN: "0",
       PURCHASE_ORDER: "2",
       REQUISITION: "0",
+      INV_PURCHASE_ORDER: "REJECTED",
     },
     PHARMACY: {
-      GRN_RETURN: GRN_STATUS.COMPLETED,
-      PURCHASE_ORDER: PO_STATUS.REJECTED,
-      REQUISITION: STORE_REQ_STATUS.Reject,
+      GRN_RETURN: "COMPLETED",
+      PURCHASE_ORDER: "REJECTED",
+      REQUISITION: "Reject",
     },
   },
   CANCELLED: {
@@ -50,11 +47,12 @@ export const getFlowWiseApprovalStatus: Record<
       GRN_RETURN: "-1",
       PURCHASE_ORDER: "4",
       REQUISITION: "-1",
+      INV_PURCHASE_ORDER: "REJECTED",
     },
     PHARMACY: {
-      GRN_RETURN: GRN_STATUS.COMPLETED,
-      PURCHASE_ORDER: PO_STATUS.REJECTED,
-      REQUISITION: STORE_REQ_STATUS.Reject,
+      GRN_RETURN: "COMPLETED",
+      PURCHASE_ORDER: "REJECTED",
+      REQUISITION: "Reject",
     },
   },
   PARTIALLY_APPROVED: {
@@ -62,11 +60,13 @@ export const getFlowWiseApprovalStatus: Record<
       GRN_RETURN: "2",
       PURCHASE_ORDER: "6",
       REQUISITION: "2",
+      INV_PURCHASE_ORDER: "PARTIALLY_APPROVED",
     },
     PHARMACY: {
-      GRN_RETURN: GRN_STATUS.COMPLETED,
-      PURCHASE_ORDER: PO_STATUS.PARTIALLY_APPROVED,
-      REQUISITION: STORE_REQ_STATUS.Partially_Approved,
+      GRN_RETURN: "COMPLETED",
+      PURCHASE_ORDER: "PARTIALLY_APPROVED",
+      REQUISITION: "Partially_Approved",
+      INV_PURCHASE_ORDER: "PARTIALLY_APPROVED",
     },
   },
 };

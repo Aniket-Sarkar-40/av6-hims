@@ -8,7 +8,7 @@ import { db } from "@repo/db";
 import { PmsUinShortCode } from "@repo/db/generated/prisma/enums.js";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 import { addItemStock, subItemStock } from "../stock/stock.repository.js";
 import { API_TIMEOUT } from "@repo/shared";
 import { PmsGoodReceiveDetails } from "@repo/db/generated/prisma/client";
@@ -104,7 +104,7 @@ export const createGrnInDb = async (input: CreateGrnInput) => {
               refId: createdGrn.id,
               refDetailsId: detail.id,
               refNo: createdGrn.grnNumber,
-            },
+            }
           );
         }
 
@@ -125,7 +125,7 @@ export const createGrnInDb = async (input: CreateGrnInput) => {
               refId: createdGrn.id,
               refDetailsId: detail.id,
               refNo: createdGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -148,8 +148,8 @@ export const createGrnInDb = async (input: CreateGrnInput) => {
                 increment: detail.quantity ?? 0,
               },
             },
-          }),
-        ),
+          })
+        )
       );
 
       const distributor = omittedGrn.omitted.distributor;
@@ -157,7 +157,7 @@ export const createGrnInDb = async (input: CreateGrnInput) => {
       if (distributor?.grnEmail) {
         const feature = await featureFlagService.getFeatureFlagByShortCode(
           "GRN_NOTIFICATION",
-          true,
+          true
         );
         const emailTemplate = await emailConfigService.getEventEmail();
 
@@ -185,7 +185,7 @@ export const createGrnInDb = async (input: CreateGrnInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
@@ -278,7 +278,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
     });
 
     const prevMap = new Map<number, (typeof prevGrn.goodReceiveDetails)[0]>(
-      prevGrn.goodReceiveDetails.map((d) => [d.id, d]),
+      prevGrn.goodReceiveDetails.map((d) => [d.id, d])
     );
     const updatedMap = new Map<
       number,
@@ -304,7 +304,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (prevDetail.focQuantity > 0) {
@@ -324,7 +324,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -358,7 +358,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         } else if (delta < 0) {
           await subItemStock(
@@ -377,7 +377,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: updDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
 
@@ -398,7 +398,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         } else if (deltaFoc < 0) {
           await subItemStock(
@@ -417,7 +417,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: updDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
       } else {
@@ -438,7 +438,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.quantity > 0) {
@@ -458,7 +458,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
         if (prevDetail.focQuantity > 0) {
@@ -478,7 +478,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.focQuantity > 0) {
@@ -498,7 +498,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -523,7 +523,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.focQuantity > 0) {
@@ -543,7 +543,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -555,7 +555,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
 
 export const getCountGRNDetailsFromDb = async (
   detailIds: number[],
-  grnId: number,
+  grnId: number
 ): Promise<number> => {
   logger.info("entering::getCountGRNDetailsFromDb::repository");
 
@@ -606,7 +606,7 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
 };
 
 export const getGrnByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<GrnResponse | null> => {
   logger.info(`entering::getGrnByIdFromDb::repository id=${id}`);
 
@@ -642,7 +642,7 @@ export const getGrnByIdFromDb = async (
 };
 
 export const getGrnDetailsByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<PmsGoodReceiveDetails | null> => {
   logger.info(`entering::getGrnDetailsByIdFromDb::repository id=${id}`);
 
@@ -683,12 +683,12 @@ export const deleteGrnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteGrnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteGrnFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
 export const getGrnForExcelInDb = async (
-  input: GrnReqExcelFilter,
+  input: GrnReqExcelFilter
 ): Promise<GrnResponse[]> => {
   logger.info("entering::getGrnForExcelInDb::repository");
   const results = await db.pmsGoodReceive.findMany({

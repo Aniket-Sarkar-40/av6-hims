@@ -20,42 +20,42 @@ import {
   StoreRequisitionPdfDTO,
   StoreRequisitionResponse,
 } from "@/types/purchase/storeRequisition.js";
-import { customOmit } from "av6-core";
+import { customOmit } from "av6-core-v2";
 
 export const toStoreRequisitionDTO = async (
-  storeRequisition: StoreRequisitionResponse,
+  storeRequisition: StoreRequisitionResponse
 ): Promise<StoreRequisitionDTO> => {
   const branchDTO = await branchService.getBranchById(
     storeRequisition.branchId,
-    true,
+    true
   );
   const warehouseDTO = await warehouseService.getWarehouseById(
     storeRequisition.warehouseId,
-    true,
+    true
   );
   const createdBy = storeRequisition.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.createdBy,
-        true,
+        true
       )
     : null;
 
   const approvedBy = storeRequisition.approvedBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.approvedBy,
-        true,
+        true
       )
     : null;
   const rejectBy = storeRequisition.rejectBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.rejectBy,
-        true,
+        true
       )
     : null;
   const acknowledgementBy = storeRequisition.acknowledgementBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.acknowledgementBy,
-        true,
+        true
       )
     : null;
   const pendingSRR = await getPendingSRRFromSRId(storeRequisition.id);
@@ -66,7 +66,7 @@ export const toStoreRequisitionDTO = async (
       const item = await itemService.getItemByIdWoDTO(detail.itemId, true);
       const itemCategory = await medCategoryService.getMedCategoryByIdWODto(
         detail.itemCategoryId,
-        true,
+        true
       );
 
       const inHandBranchQty = await getItemStockQtyByLocation(detail.itemId, {
@@ -76,7 +76,7 @@ export const toStoreRequisitionDTO = async (
         detail.itemId,
         {
           warehouseId: storeRequisition.warehouseId,
-        },
+        }
       );
 
       return {
@@ -86,7 +86,7 @@ export const toStoreRequisitionDTO = async (
         item: item,
         itemCategory,
       };
-    }),
+    })
   );
 
   return {
@@ -103,18 +103,18 @@ export const toStoreRequisitionDTO = async (
 };
 
 export const toRequisitionItemDetailDTO = async (
-  storeRequisition: RequisitionItemDetailResponse,
+  storeRequisition: RequisitionItemDetailResponse
 ): Promise<RequisitionItemDetailDTO> => {
   const item = await itemService.getItemByIdWoDTO(
     storeRequisition.itemId,
-    true,
+    true
   );
   const itemCategory = await medCategoryService.getMedCategoryByIdWODto(
     storeRequisition.storeRequisitionDetails.itemCategoryId,
-    true,
+    true
   );
   const storeReq = await getStoreRequisitionByIdFromDb(
-    storeRequisition.storeRequisitionDetails.storeRequisitionId,
+    storeRequisition.storeRequisitionDetails.storeRequisitionId
   );
 
   const inHandBranchQty = storeReq
@@ -126,7 +126,7 @@ export const toRequisitionItemDetailDTO = async (
     storeRequisition.itemId,
     {
       warehouseId: storeRequisition.ccId,
-    },
+    }
   );
 
   const detailDTO: StoreRequisitionDetailDTO = {
@@ -144,20 +144,20 @@ export const toRequisitionItemDetailDTO = async (
 };
 
 export const toStoreRequisitionBatchWiseDTO = async (
-  storeRequisition: StoreReqBatchWiseResponse,
+  storeRequisition: StoreReqBatchWiseResponse
 ): Promise<StoreRequisitionBatchWiseDTO> => {
   const branchDTO = await branchService.getBranchById(
     storeRequisition.branchId,
-    true,
+    true
   );
   const warehouseDTO = await warehouseService.getWarehouseById(
     storeRequisition.warehouseId,
-    true,
+    true
   );
   const detailDTO: RequisitionItemDetailDTO[] = await Promise.all(
     storeRequisition.requisitionItemDetails.map(
-      async (detail) => await toRequisitionItemDetailDTO(detail),
-    ),
+      async (detail) => await toRequisitionItemDetailDTO(detail)
+    )
   );
 
   return {
@@ -169,37 +169,37 @@ export const toStoreRequisitionBatchWiseDTO = async (
 };
 
 export const toStoreRequisitionPdfDTO = async (
-  storeRequisition: StoreRequisitionBatchWiseDTO,
+  storeRequisition: StoreRequisitionBatchWiseDTO
 ): Promise<StoreRequisitionPdfDTO> => {
   const requisitionFrom = storeRequisition.requisitionFrom
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.requisitionFrom,
-        true,
+        true
       )
     : null;
   const createdBy = storeRequisition.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.createdBy,
-        true,
+        true
       )
     : null;
 
   const approvedBy = storeRequisition.approvedBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.approvedBy,
-        true,
+        true
       )
     : null;
   const rejectBy = storeRequisition.rejectBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.rejectBy,
-        true,
+        true
       )
     : null;
   const acknowledgementBy = storeRequisition.acknowledgementBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.acknowledgementBy,
-        true,
+        true
       )
     : null;
 
@@ -228,7 +228,7 @@ export const toStoreRequisitionPdfDTO = async (
 };
 
 export const toRequisitionDetailsDTO = async (
-  requisitionDetailsInput: RequisitionDetailsResponseBase[],
+  requisitionDetailsInput: RequisitionDetailsResponseBase[]
 ): Promise<RequisitionDetailsResponse[]> => {
   const items = await itemService.getAllItemWoDto();
   const staffs = await employeeService.getAllEmployeesWoDto();
@@ -239,40 +239,40 @@ export const toRequisitionDetailsDTO = async (
     requisitionDetailsInput.map(async (requisitionDetail) => {
       const item = items.find((item) => item.id === requisitionDetail.itemId);
       const createdBy = requisitionDetail.createdBy
-        ? (staffs.find((st) => st.id === requisitionDetail.createdBy) ??
+        ? staffs.find((st) => st.id === requisitionDetail.createdBy) ??
           (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisitionDetail.createdBy,
+            requisitionDetail.createdBy
           )) ??
-          null)
+          null
         : null;
       const acknowledgedBy = requisitionDetail.storeRequisition
         .acknowledgementBy
-        ? (staffs.find(
+        ? staffs.find(
             (st) =>
-              st.id === requisitionDetail.storeRequisition.acknowledgementBy,
+              st.id === requisitionDetail.storeRequisition.acknowledgementBy
           ) ??
           (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisitionDetail.storeRequisition.acknowledgementBy,
+            requisitionDetail.storeRequisition.acknowledgementBy
           )) ??
-          null)
+          null
         : null;
       const approvedBy = requisitionDetail.storeRequisition.approvedBy
-        ? (staffs.find(
-            (st) => st.id === requisitionDetail.storeRequisition.approvedBy,
+        ? staffs.find(
+            (st) => st.id === requisitionDetail.storeRequisition.approvedBy
           ) ??
           (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisitionDetail.storeRequisition.approvedBy,
+            requisitionDetail.storeRequisition.approvedBy
           )) ??
-          null)
+          null
         : null;
 
       const warehouse =
         warehouses.find(
-          (w) => w.id === requisitionDetail.storeRequisition.warehouseId,
+          (w) => w.id === requisitionDetail.storeRequisition.warehouseId
         ) ?? null;
       const branch =
         branches.find(
-          (b) => b.id === requisitionDetail.storeRequisition.branchId,
+          (b) => b.id === requisitionDetail.storeRequisition.branchId
         ) ?? null;
 
       return {
@@ -284,12 +284,12 @@ export const toRequisitionDetailsDTO = async (
         warehouse,
         branch,
       };
-    }),
+    })
   );
 };
 
 export const toReqItemDetailsDto = async (
-  reqItemDetails: ReqItemDetailsResponseBase[],
+  reqItemDetails: ReqItemDetailsResponseBase[]
 ): Promise<ReqItemDetailsResponse[]> => {
   const items = await itemService.getAllItemWoDto();
   const staffs = await employeeService.getAllEmployeesWoDto();
@@ -300,30 +300,30 @@ export const toReqItemDetailsDto = async (
     reqItemDetails.map(async (reqItem) => {
       const item =
         items.find(
-          (item) => item.id === reqItem.storeRequisitionDetails.itemId,
+          (item) => item.id === reqItem.storeRequisitionDetails.itemId
         ) ?? null;
       const createdBy = reqItem.storeRequisition.createdBy
-        ? (staffs.find((st) => st.id === reqItem.storeRequisition.createdBy) ??
+        ? staffs.find((st) => st.id === reqItem.storeRequisition.createdBy) ??
           (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            reqItem.storeRequisition.createdBy,
+            reqItem.storeRequisition.createdBy
           )) ??
-          null)
+          null
         : null;
       const acknowledgedBy = reqItem.storeRequisition.acknowledgementBy
-        ? (staffs.find(
-            (st) => st.id === reqItem.storeRequisition.acknowledgementBy,
+        ? staffs.find(
+            (st) => st.id === reqItem.storeRequisition.acknowledgementBy
           ) ??
           (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            reqItem.storeRequisition.acknowledgementBy,
+            reqItem.storeRequisition.acknowledgementBy
           )) ??
-          null)
+          null
         : null;
       const approvedBy = reqItem.storeRequisition.approvedBy
-        ? (staffs.find((st) => st.id === reqItem.storeRequisition.approvedBy) ??
+        ? staffs.find((st) => st.id === reqItem.storeRequisition.approvedBy) ??
           (await employeeService.getEmployeeByIdFrmCacheOrDb(
-            reqItem.storeRequisition.approvedBy,
+            reqItem.storeRequisition.approvedBy
           )) ??
-          null)
+          null
         : null;
 
       const warehouse =
@@ -350,6 +350,6 @@ export const toReqItemDetailsDto = async (
           },
         },
       };
-    }),
+    })
   );
 };

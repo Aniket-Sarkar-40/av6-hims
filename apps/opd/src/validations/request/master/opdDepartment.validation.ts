@@ -4,41 +4,19 @@ import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessa
 import { DepartmentType } from "@repo/db/generated/prisma/client";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
-import { ValidationErrorItem } from "av6-core";
+import { ValidationErrorItem } from "av6-core-v2";
+import {
+  enumRequired,
+  idRequired,
+  strRequired,
+} from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 // Define base schema
 export const opdDepartmentBaseSchema = {
-  departmentType: Joi.string()
-    .valid(...Object.values(DepartmentType))
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage(
-        "STRING",
-        "Department Type",
-      ),
-      "any.only": generateValidationErrorMessage(
-        "VALID_ENUM",
-        "Department Type",
-        Object.values(DepartmentType).join(", "),
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Department Type",
-      ),
-    }),
+  departmentType: enumRequired("Department Type", DepartmentType),
 
-  departmentName: Joi.string()
-    .required()
-    .messages({
-      "string.base": generateValidationErrorMessage(
-        "STRING",
-        "Department Name",
-      ),
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Department Name",
-      ),
-    }),
+  departmentName: strRequired("Department name"),
 };
 
 // Create schema
@@ -50,71 +28,16 @@ export const opdDepartmentCreateSchema =
 // Update schema (with ID)
 export const opdDepartmentUpdateSchema =
   Joi.object<CreateOrUpdateOpdDepartment>({
-    id: Joi.number()
-      .integer()
-      .required()
-      .messages({
-        "number.base": generateValidationErrorMessage("NUMBER", "ID"),
-        "number.integer": generateValidationErrorMessage("INTEGER", "ID"),
-        "any.required": generateValidationErrorMessage("REQUIRED", "ID"),
-      }),
+    id: idRequired("Id"),
     ...opdDepartmentBaseSchema,
   });
 
 // Validation handler for creation
-export const validateOpdDepartmentCreate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = opdDepartmentCreateSchema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateOpdDepartmentCreate = validationHandler({
+  schema: opdDepartmentCreateSchema,
+});
 
 // Validation handler for update
-export const validateOpdDepartmentUpdate = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { error } = opdDepartmentUpdateSchema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
-
-  if (error) {
-    const messages = (error.details as ValidationErrorItem[])
-      .map((d) => d.message.replace(/['"]/g, ""))
-      .join(", ");
-
-    return res.status(400).json(
-      new BaseResponse({
-        success: false,
-        errorCode: "PARAMETER_INVALID",
-        errorMessage: messages,
-        errors: error.details,
-      }),
-    );
-  }
-
-  next();
-};
+export const validateOpdDepartmentUpdate = validationHandler({
+  schema: opdDepartmentUpdateSchema,
+});
