@@ -65,3 +65,19 @@ export const CLIENT_ID = process.env.CLIENT_ID || "";
 export const EXT_EMP_CACHE = process.env.EXT_EMP_CACHE;
 
 export const CORE_SERVICE_URL = `${MASTER_SERVICE_URL}/api/v1/core`;
+
+export const CORE_REDIS_PREFIX = process.env.CORE_REDIS_PREFIX || "";
+export const FRONTEND_URL = process.env.FRONTEND_URL;
+export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "";
+export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "";
+export const CASH_BANK_GROUPS = process.env.CASH_BANK_GROUPS
+  ? process.env.CASH_BANK_GROUPS.split(",")
+  : [];
+export const RECEIVABLE_GROUPS = process.env.RECEIVABLE_GROUPS
+  ? process.env.RECEIVABLE_GROUPS.split(",")
+  : [];
+export const PAYABLE_GROUPS = process.env.PAYABLE_GROUPS
+  ? process.env.PAYABLE_GROUPS.split(",")
+  : [];
+export const DEFAULT_COMPANY_ID = Number(process.env.DEFAULT_COMPANY_ID) || 1;
+export const EXT_CURRENCY_URL = `${MASTER_SERVICE_URL}/api/v1/master/currency`;

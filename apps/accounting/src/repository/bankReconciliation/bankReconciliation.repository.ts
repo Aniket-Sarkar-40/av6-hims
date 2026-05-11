@@ -1,5 +1,4 @@
 import { uinServiceFactory } from "@/config/core.config.js";
-import { API_TIMEOUT } from "@/config/index.js";
 import { requestStorage } from "@/config/requestContext.js";
 import {
   BankStatementExcelBaseInput,
@@ -22,6 +21,7 @@ import {
 } from "@repo/db/generated/prisma/enums.js";
 import { db } from "@repo/db";
 import { Prisma } from "@repo/db/generated/prisma/client";
+import { API_TIMEOUT } from "@repo/shared";
 
 export const createBankStatementExcelInDb = async (
   input: CreateOrUpdateBankStatementExcelCreateInput[]

@@ -73,11 +73,6 @@ import {
 } from "av6-utils";
 import { commonGetService } from "../common.service.js";
 import { getLedgerBalancesNumber } from "./ledgerBalanceEngine.service.js";
-import {
-  CASH_BANK_GROUPS,
-  PAYABLE_GROUPS,
-  RECEIVABLE_GROUPS,
-} from "@/config/index.js";
 import { IdValue } from "@/types/global.js";
 import {
   CashFlowGroupRecursiveRow,
@@ -110,6 +105,11 @@ import { toPickFieldsWithoutNull } from "@/utils/helper.utils.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import {
+  CASH_BANK_GROUPS,
+  PAYABLE_GROUPS,
+  RECEIVABLE_GROUPS,
+} from "@repo/shared";
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 

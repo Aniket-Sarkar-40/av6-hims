@@ -5,7 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { IS_REDIS, REDIS_PREFIX } from "@repo/shared";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 
-export const initializeAccCache = async (): Promise<void> => {
+export const initializeCache = async (): Promise<void> => {
   if (!IS_REDIS) {
     logger.info("Redis is disabled: skipping cache initialization.");
     return;

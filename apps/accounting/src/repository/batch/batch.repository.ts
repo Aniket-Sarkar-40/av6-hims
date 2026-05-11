@@ -1,5 +1,4 @@
 import { uinServiceFactory } from "@/config/core.config.js";
-import { API_TIMEOUT } from "@/config/index.js";
 import {
   CreateOrUpdateBatchJobDetailsInput,
   CreateOrUpdateBatchJobInput,
@@ -17,6 +16,7 @@ import {
 } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { db } from "@repo/db";
+import { API_TIMEOUT } from "@repo/shared";
 
 export type PrismaTransactionClient = Omit<
   PrismaClient,

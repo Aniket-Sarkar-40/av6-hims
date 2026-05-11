@@ -1,5 +1,5 @@
+import { EXT_CONNECTION_TYPE } from "@repo/shared/config/index.js";
 import axios from "axios";
-import { EXT_CONNECTION_TYPE } from "./index.js";
 
 export const axiosClient = axios.create({
   headers: {

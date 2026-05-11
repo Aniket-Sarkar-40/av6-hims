@@ -12,7 +12,7 @@ import { createInvApp } from "@apps/inv";
 import { createPharmacyApp } from "@apps/pharmacy";
 import cors from "cors";
 import { createAccApp } from "@apps/acc";
-import { initializeAccCache } from "@apps/acc/config/redisClient.js";
+import { initializeCache as initializeAccCache } from "@apps/acc/config/redisClient.js";
 
 const app = express();
 

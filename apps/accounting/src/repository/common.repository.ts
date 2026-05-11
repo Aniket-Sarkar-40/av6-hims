@@ -7,10 +7,10 @@ import {
   FindFirstResult,
   FindManyResult,
   FullRow,
-  ModelName,
 } from "@/types/common.js";
-import { db } from "@repo/db";
+import { db } from "@repo/db/client";
 import { PrismaClient } from "@repo/db/generated/prisma/client";
+import { ModelName } from "@repo/db/generated/prisma/internal/prismaNamespace.js";
 import { createCache } from "@repo/platform/cache/redis.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
@@ -18,6 +18,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 export const fetchTableData = async (table: string) => {
   // Check if data is already cached in Redis
   logger.info("entering::fetchTableData::repository");
+
   // @ts-expect-error dynamic model
   const model = db[table];
   if (!model) {

@@ -1,4 +1,3 @@
-import { DEFAULT_COMPANY_ID } from "@/config/index.js";
 import { requestStorage } from "@/config/requestContext.js";
 import { getAll } from "@/repository/common.repository.js";
 import {
@@ -40,6 +39,7 @@ import { getNestedValue, renderTemplate } from "av6-core-v2";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/accounting.shortCode.utils.js";
 import { addToCache } from "@repo/platform/cache/redis.utils.js";
 import { applyRound } from "av6-utils";
+import { DEFAULT_COMPANY_ID } from "@repo/shared";
 
 /**Constant for the cash and bank group names */
 const CASH_BANK_GROUP_NAMES = {

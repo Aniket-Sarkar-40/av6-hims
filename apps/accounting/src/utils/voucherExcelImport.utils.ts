@@ -1,5 +1,4 @@
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
-import { DEFAULT_COMPANY_ID } from "@/config/index.js";
 import { getCompanyFinancialYearByCompanyIdAndIsCurrentFromDb } from "@/repository/master/companyFinancialYear.repository.js";
 import { createLedgerInDb } from "@/repository/master/ledger.repository.js";
 import { commonGetService } from "@/services/common.service.js";
@@ -20,6 +19,7 @@ import {
   VoucherEntryExcel,
 } from "@repo/db/generated/prisma/client";
 import { addToCache } from "@repo/platform/cache/redis.utils.js";
+import { DEFAULT_COMPANY_ID } from "@repo/shared";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/accounting.shortCode.utils.js";
