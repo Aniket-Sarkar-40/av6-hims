@@ -18,9 +18,9 @@ model AccDynamicShortCode {
     @@map("accounting_dynamic_short_code")
 }
 
-model UINConfig {
+model AccUINConfig {
     id             Int              @id @default(autoincrement())
-    shortCode      UinShortCode     @map("short_code")
+    shortCode      AccUinShortCode  @map("short_code")
     sequenceNo     BigInt           @default(0) @map("sequence_no")
     seqResetDate   DateTime         @map("seq_reset_date") @db.Date
     seqResetPolicy UIN_RESET_POLICY @default(no) @map("seq_reset_policy")

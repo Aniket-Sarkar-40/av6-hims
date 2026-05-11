@@ -11,6 +11,8 @@ import { createOpdApp } from "@apps/opd";
 import { createInvApp } from "@apps/inv";
 import { createPharmacyApp } from "@apps/pharmacy";
 import cors from "cors";
+import { createAccApp } from "@apps/acc";
+import { initializeAccCache } from "@apps/acc/config/redisClient.js";
 
 const app = express();
 
@@ -40,6 +42,7 @@ if (enabled.has("core")) app.use("/api/v1/core", createCoreApp("GATEWAY"));
 if (enabled.has("opd")) app.use("/api/v1/opd", createOpdApp("GATEWAY"));
 if (enabled.has("pms")) app.use("/api/v1/pms", createPharmacyApp("GATEWAY"));
 if (enabled.has("inv")) app.use("/api/v1/inv", createInvApp("GATEWAY"));
+if (enabled.has("acc")) app.use("/api/v1/acc", createAccApp("GATEWAY"));
 
 connectRedis()
   .then(() => {
@@ -50,6 +53,7 @@ connectRedis()
       if (IS_REDIS && enabled.has("opd")) await initializeOpdCache();
       if (IS_REDIS && enabled.has("pharmacy")) await initializePharmacyCache();
       if (IS_REDIS && enabled.has("inv")) await initializeInvCache();
+      if (IS_REDIS && enabled.has("acc")) await initializeAccCache();
     });
   })
   .catch((err) => {

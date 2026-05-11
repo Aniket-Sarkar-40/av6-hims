@@ -15,7 +15,7 @@ export type DataType = {
   shortCode?: string;
 };
 
-export type Prefix = "core" | "inv" | "opd" | "pms";
+export type Prefix = "core" | "inv" | "opd" | "pms" | "acc";
 
 export const cacheKeyForItemSearch = `${REDIS_PREFIX}pms:pmsItem:search`;
 

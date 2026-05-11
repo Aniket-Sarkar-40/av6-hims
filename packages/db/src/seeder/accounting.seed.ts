@@ -71,6 +71,17 @@ export async function runSeed() {
       selectClause: JSON.stringify({ id: "id", value: "shortCode" }),
     },
     {
+      shortCode: "AUDIT_CONFIG",
+      tableName: "accAuditConfig",
+      isDTO: true,
+      isCacheable: true,
+      permission: "acc:audit-config:view",
+      isDropDown: true,
+      isSingleDto: false,
+      whereClause: JSON.stringify({}),
+      selectClause: JSON.stringify({ id: "id", value: "module" }),
+    },
+    {
       shortCode: "UIN_CONFIG",
       tableName: "accUINConfig",
       isDTO: true,

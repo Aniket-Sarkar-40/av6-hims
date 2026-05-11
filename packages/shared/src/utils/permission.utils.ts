@@ -188,6 +188,44 @@ export enum PermissionResource {
   CLIENT_MASTER = "client-master",
   AUTO_ALERT = "auto-alert",
   SELL_DETAILS = "sell-details",
+
+  //ACCOUNTING
+  VOUCHER_ENTRY = "voucher-entry",
+  CANCEL_VOUCHER = "cancel-voucher",
+  VOUCHER_EXCEL_IMPORT = "voucher-excel-import",
+  LEDGER_BALANCE = "ledger-balance",
+  TRIAL_BALANCE = "trial-balance",
+  LEDGER_BOOK = "ledger-book",
+  GROUP_SUMMARY_TREE = "group-summary-tree",
+  PROFIT_LOSS = "profit-loss",
+  BALANCE_SHEET = "balance-sheet",
+  CASH_BANK_SUMMARY = "cash-bank-summary",
+  RECEIVABLE_SUMMARY = "receivable-summary",
+  PAYABLE_SUMMARY = "payable-summary",
+  CASH_FLOW = "cash-flow",
+  FUND_FLOW = "fund-flow",
+
+  EMAIL_CONFIG = "email-config",
+  DYNAMIC_SHORT_CODE = "dynamic-short-code",
+  AUDIT_CONFIG = "audit-config",
+  COMPANY = "company",
+  GROUP = "group",
+  LEDGER = "ledger",
+  VOUCHER_TYPE = "voucher-type",
+  COST_CENTER = "cost-center",
+  NARRATION = "narration",
+  COMPANY_FINANCIAL_YEAR = "company-financial-year",
+  INTEGRATION_CONFIG = "integration-config",
+  BATCH_JOB = "batch-job",
+  BATCH_JOB_DETAILS = "batch-job-details",
+  UNRECONCILED_BANK_VOUCHER_LINES = "unreconciled-bank-voucher-lines",
+  MANUAL_RECONCILE = "manual-reconcile",
+  BANK_STATEMENT = "bank-statement",
+  BANK_STATEMENT_ROW = "bank-statement-row",
+  MANUAL_BANK_RECONCILE = "manual-bank-reconcile",
+  BANK_RECONCILIATION_SUMMARY = "bank-reconciliation-summary",
+  BANK_AUTO_SUGGESTIONS = "bank-auto-suggestions",
+  SETTINGS = "settings",
 }
 
 export enum PermissionModule {
@@ -195,6 +233,7 @@ export enum PermissionModule {
   OPD = "opd",
   CORE = "core",
   INV = "inv",
+  ACC = "acc",
 }
 
 export const getPermission = (

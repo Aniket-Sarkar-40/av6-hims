@@ -209,7 +209,7 @@ enum Status {
     INACTIVE
 }
 
-enum UinShortCode {
+enum AccUinShortCode {
     VOUCHER
     BATCH_JOB
 }

@@ -5,6 +5,7 @@ import path from "path";
 import jwt from "jsonwebtoken";
 import { Decimal } from "@prisma/client/runtime/client";
 import crypto from "crypto";
+import Joi from "joi";
 
 export const toRelativeImagePath = (absolutePath: string): string => {
   if (

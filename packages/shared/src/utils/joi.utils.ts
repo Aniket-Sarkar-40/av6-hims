@@ -35,6 +35,7 @@ export const dateRequired = (label: string) =>
 export const dateOptional = (label: string) =>
   Joi.date()
     .optional()
+    .allow(null)
     .messages({
       "date.base": `${label} must be a valid date`,
     });
@@ -63,22 +64,40 @@ export const strOptional = (label: string, max = 255) =>
       "string.max": `${label} must be at most ${max} characters`,
     });
 
-export const boolOptional = (label: string, defaultValue: boolean = false) =>
-  Joi.boolean()
-    .default(defaultValue)
-    .optional()
-    .messages({
-      "boolean.base": `${label} must be a boolean`,
-    });
+const baseBoolean = (
+  label: string,
+  options?: {
+    required?: boolean;
+    defaultValue?: boolean;
+  }
+) => {
+  let schema = Joi.boolean();
 
-export const boolRequired = (label: string, defaultValue: boolean = false) =>
-  Joi.boolean()
-    .default(defaultValue)
-    .required()
-    .messages({
-      "boolean.base": `${label} must be a boolean`,
-      "any.required": `${label} is required`,
-    });
+  if (options?.required) {
+    schema = schema.required();
+  } else {
+    schema = schema.optional();
+  }
+
+  if (options?.defaultValue !== undefined) {
+    schema = schema.default(options.defaultValue);
+  }
+
+  return schema.messages({
+    "boolean.base": generateValidationErrorMessage("BOOLEAN", label),
+    ...(options?.required && {
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+    }),
+  });
+};
+
+export const boolRequired = (label: string) =>
+  baseBoolean(label, { required: true });
+
+export const boolOptional = (label: string) => baseBoolean(label);
+
+export const boolWithDefault = (label: string, defaultValue = false) =>
+  baseBoolean(label, { defaultValue });
 
 export const enumRequired = <T extends Record<string, string>>(
   label: string,
