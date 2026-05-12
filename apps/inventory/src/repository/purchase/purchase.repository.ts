@@ -360,10 +360,11 @@ export const updatePurchaseOrderStatusFromDb = async (
   logger.info(
     `entering::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`
   );
-
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
   await db.invPurchaseOrder.update({
     where: { id },
-    data: { status },
+    data: { status, lastVerifiedBy: currentUser, lastVerifiedAt: new Date() },
   });
 
   logger.info(

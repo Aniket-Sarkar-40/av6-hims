@@ -49,6 +49,7 @@ enum InvOperation {
     SELL_RETURN_APPROVAL
     CONSUMPTION
     STOCK_ADJUSTMENT
+    BRANCH_REQUISITION
 }
 
 enum DefaultUnit {
@@ -113,6 +114,7 @@ enum InvUinShortCode {
     CN
     STAJ
     ST_TR
+    BRN
 }
 
 enum InvStockAdjustmentStatus {

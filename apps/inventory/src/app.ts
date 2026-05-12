@@ -24,6 +24,7 @@ import { purchaseRouter } from "./routes/purchase/purchase.route.js";
 import { storeRequisitionRouter } from "./routes/purchase/storeRequisition.route.js";
 import { stockAdjustmentRouter } from "./routes/stock/stockAdjustment.route.js";
 import stockTransferRouter from "@/routes/stock/stockTransfer.route.js";
+import { branchRequisitionRouter } from "@/routes/purchase/branchRequisition.route.js";
 
 export const inventoryRouter: ExpressRouter = Router();
 
@@ -67,3 +68,6 @@ inventoryRouter.use("/stock-adjustment", stockAdjustmentRouter);
 inventoryRouter.use("/consumption", consumptionRouter);
 
 inventoryRouter.use("/stock-transfer", stockTransferRouter);
+
+// Branch Requisition
+inventoryRouter.use("/api/v1/branch-requisition", branchRequisitionRouter);

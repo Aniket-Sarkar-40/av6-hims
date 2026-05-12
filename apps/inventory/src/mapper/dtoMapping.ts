@@ -1,7 +1,5 @@
 import { GrnResponse } from "@/types/grn/grn.js";
 import {
-  Expense,
-  Income,
   InvInTransitStock,
   InvItem,
   InvItemStock,
@@ -33,6 +31,8 @@ import { toStockAdjustmentDTO } from "./stock/stockAdjustment.mapper.js";
 import { StockAdjustmentResponse } from "@/types/stock/stockAdjustment.js";
 import { PurchaseOrderWithDetails } from "@/types/purchase/purchase.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import { toBranchRequisitionDTO } from "@/mapper/purchase/branchRequisition.mapper.js";
+import { BranchRequisitionResponse } from "@/types/purchase/branchRequisition.js";
 
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
@@ -63,4 +63,6 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toInTransitStockDTO(data as InvInTransitStock[]),
   [SHORT_CODE.STOCK_ADJUSTMENT]: (data: unknown) =>
     toStockAdjustmentDTO(data as StockAdjustmentResponse[]),
+  [SHORT_CODE.BRANCH_REQ]: (data: unknown) =>
+    toBranchRequisitionDTO(data as BranchRequisitionResponse[]),
 };

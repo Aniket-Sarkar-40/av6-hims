@@ -234,6 +234,7 @@ model CollectionCenter {
     vouchers                   Voucher[]
     company                    Company?                   @relation(fields: [companyId], references: [id])
     companyId                  Int?
+    branchRequisitions         BranchRequisition[]
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")

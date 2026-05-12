@@ -19,7 +19,7 @@ import {
 import { addItemStock } from "../stock/stock.repository.js";
 
 export const createGrnInDb = async (
-  input: CreateGrnInput,
+  input: CreateGrnInput
 ): Promise<InvGoodReceive> => {
   logger.info("entering::createGrnInDb::repository");
 
@@ -78,7 +78,7 @@ export const createGrnInDb = async (
               refId: createdGrn.id,
               refDetailsId: detail.id,
               refNo: createdGrn.grnNumber,
-            },
+            }
           );
         }
 
@@ -99,10 +99,10 @@ export const createGrnInDb = async (
               refId: createdGrn.id,
               refDetailsId: detail.id,
               refNo: createdGrn.grnNumber,
-            },
+            }
           );
         }
-      }),
+      })
     );
 
     await tx.invPurchaseOrder.update({
@@ -119,8 +119,8 @@ export const createGrnInDb = async (
               increment: detail.quantity ?? 0,
             },
           },
-        }),
-      ),
+        })
+      )
     );
 
     const supplier = omittedGrn.omitted.supplier;
@@ -210,7 +210,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
     });
 
     const prevMap = new Map<number, (typeof prevGrn.goodReceiveDetails)[0]>(
-      prevGrn.goodReceiveDetails.map((d) => [d.id, d]),
+      prevGrn.goodReceiveDetails.map((d) => [d.id, d])
     );
     const updatedMap = new Map<
       number,
@@ -236,7 +236,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (prevDetail.focQuantity > 0) {
@@ -256,7 +256,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -290,7 +290,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         } else if (delta < 0) {
           await subItemStock(
@@ -309,7 +309,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: updDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
 
@@ -330,7 +330,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         } else if (deltaFoc < 0) {
           await subItemStock(
@@ -349,7 +349,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: updDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
       } else {
@@ -370,7 +370,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.quantity > 0) {
@@ -390,7 +390,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
         if (prevDetail.focQuantity > 0) {
@@ -410,7 +410,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.focQuantity > 0) {
@@ -430,7 +430,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -455,7 +455,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.focQuantity > 0) {
@@ -475,7 +475,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -487,7 +487,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
 
 export const getCountGRNDetailsFromDb = async (
   detailIds: number[],
-  grnId: number,
+  grnId: number
 ): Promise<number> => {
   logger.info("entering::getCountGRNDetailsFromDb::repository");
 
@@ -521,10 +521,8 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
         select: {
           id: true,
           date: true,
-          verifiedBy1: true,
-          verifiedAt1: true,
-          verifiedBy2: true,
-          verifiedAt2: true,
+          lastVerifiedBy: true,
+          lastVerifiedAt: true,
           createdBy: true,
           status: true,
           currency: true,
@@ -539,7 +537,7 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
 };
 
 export const getGrnByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<GrnResponse | null> => {
   logger.info(`entering::getGrnByIdFromDb::repository id=${id}`);
 
@@ -563,10 +561,8 @@ export const getGrnByIdFromDb = async (
         select: {
           id: true,
           date: true,
-          verifiedBy1: true,
-          verifiedAt1: true,
-          verifiedBy2: true,
-          verifiedAt2: true,
+          lastVerifiedBy: true,
+          lastVerifiedAt: true,
           createdBy: true,
           status: true,
           currency: true,
@@ -581,7 +577,7 @@ export const getGrnByIdFromDb = async (
 };
 
 export const getGrnDetailsByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<InvGoodReceiveDetails | null> => {
   logger.info(`entering::getGrnDetailsByIdFromDb::repository id=${id}`);
 
@@ -622,7 +618,7 @@ export const deleteGrnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteGrnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteGrnFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 

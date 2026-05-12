@@ -68,10 +68,8 @@ export type GrnResponse = Prisma.InvGoodReceiveGetPayload<{
       select: {
         id: true;
         date: true;
-        verifiedBy1: true;
-        verifiedAt1: true;
-        verifiedBy2: true;
-        verifiedAt2: true;
+        lastVerifiedBy: true;
+        lastVerifiedAt: true;
         createdBy: true;
         status: true;
         currency: true;

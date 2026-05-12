@@ -49,6 +49,10 @@ export enum PermissionResource {
   STOCK_ADJUSTMENT = "stock-adjustment",
   COLLECTION_CENTER = "collection-center",
   STOCK_TRANSFER_ACKNOWLEDGE = "stock-transfer-acknowledge",
+  BRANCH_REQUISITION = "branch-requisition",
+  BRANCH_REQUISITION_REJECT = "branch-requisition-reject",
+  BRANCH_REQUISITION_APPROVE = "branch-requisition-approve",
+  BRANCH_REQUISITION_ACK = "branch-requisition-acknowledge",
 
   // CORE
   COUNTRY = "country",

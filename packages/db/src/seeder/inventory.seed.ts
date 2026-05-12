@@ -315,6 +315,28 @@ export async function runSeed() {
       permission: "inv:stock-transfer:view",
       isDropDown: true,
     },
+    {
+      shortCode: "BRANCH_REQ",
+      tableName: "branchRequisition",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:branch-requisition:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "srNumber" }),
+    },
+    {
+      shortCode: "BRANCH_REQ_DETAILS",
+      tableName: "branchRequisitionDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:branch-requisition-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "branchRequisitionId" }),
+    },
   ];
 
   const eventEmails: EventEmailSeeder[] = [

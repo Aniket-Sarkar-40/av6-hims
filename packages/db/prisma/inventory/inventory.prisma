@@ -242,28 +242,26 @@ model BankDetails {
 }
 
 model InvPurchaseOrder {
-    id           Int       @id @default(autoincrement())
-    poNumber     String    @map("po_number")
-    date         DateTime  @db.Date
-    supplierId   Int       @map("supplier_id")
-    storeId      Int?      @map("store_id")
-    ccId         Int       @map("cc_id")
-    grandTotal   Float     @map("grand_total")
-    status       PO_STATUS @default(SENT_FOR_APPROVAL)
-    notes        String?   @db.Text
-    currency     String?
-    paymentTerms String?   @map("payment_terms") @db.Text
-    isActive     Boolean   @default(true) @map("is_active")
-    createdBy    Int?      @map("created_by")
-    updatedBy    Int?      @map("updated_by")
-    deletedBy    Int?      @map("deleted_by")
-    verifiedBy1  Int?      @map("verified_by_1")
-    verifiedBy2  Int?      @map("verified_by_2")
-    createdAt    DateTime  @default(now()) @map("created_at")
-    updatedAt    DateTime  @updatedAt @map("updated_at")
-    verifiedAt1  DateTime? @map("verified_at_1")
-    verifiedAt2  DateTime? @map("verified_at_2")
-    deletedAt    DateTime? @map("deleted_at")
+    id             Int       @id @default(autoincrement())
+    poNumber       String    @map("po_number")
+    date           DateTime  @db.Date
+    supplierId     Int       @map("supplier_id")
+    storeId        Int?      @map("store_id")
+    ccId           Int       @map("cc_id")
+    grandTotal     Float     @map("grand_total")
+    status         PO_STATUS @default(SENT_FOR_APPROVAL)
+    notes          String?   @db.Text
+    currency       String?
+    paymentTerms   String?   @map("payment_terms") @db.Text
+    isActive       Boolean   @default(true) @map("is_active")
+    createdBy      Int?      @map("created_by")
+    updatedBy      Int?      @map("updated_by")
+    deletedBy      Int?      @map("deleted_by")
+    lastVerifiedBy Int?      @map("last_verified_by")
+    lastVerifiedAt DateTime? @map("last_verified_at")
+    createdAt      DateTime  @default(now()) @map("created_at")
+    updatedAt      DateTime  @updatedAt @map("updated_at")
+    deletedAt      DateTime? @map("deleted_at")
 
     supplier             InvItemSupplier           @relation(fields: [supplierId], references: [id])
     store                InvItemStore?             @relation(fields: [storeId], references: [id])
@@ -347,6 +345,8 @@ model InvItem {
     consumptionDetails        ConsumptionDetails[]
     InvStorage                InvStorage?                   @relation(fields: [storageId], references: [id])
     invStockTransferDetails   InvStockTransferDetails[]
+    branchRequisitionDetails  BranchRequisitionDetails[]
+    branchItemDetails         BranchItemDetails[]
 
     @@index([itemCategoryId], name: "idx_item_category_id")
     @@index([unitId], name: "idx_unit_id")
@@ -408,6 +408,8 @@ model InvBranch {
 
     collectionCenter          CollectionCenter            @relation(fields: [id], references: [id])
     requisitionInvItemDetails RequisitionInvItemDetails[]
+    branchItemDetails         BranchItemDetails[]
+    branchRequisitions        BranchRequisition[]
 
     @@index([id], name: "idx_branch_id")
     @@map("inv_branch")
@@ -437,6 +439,7 @@ model InvWarehouse {
     deletedBy                 Int?                        @map("deleted_by")
     collectionCenter          CollectionCenter            @relation(fields: [id], references: [id])
     requisitionInvItemDetails RequisitionInvItemDetails[]
+    branchItemDetails         BranchItemDetails[]
 
     @@index([id], name: "idx_warehouse_id")
     @@map("inv_warehouse")
@@ -773,6 +776,7 @@ model InvItemStock {
     collectionCenter          CollectionCenter?           @relation(fields: [ccId], references: [id])
     InvItemStockAudit         InvItemStockAudit[]
     requisitionInvItemDetails RequisitionInvItemDetails[]
+    branchItemDetails         BranchItemDetails[]
 
     @@index([itemId], name: "item_stock_item_id_idx")
     @@index([ccId], name: "item_stock_cc_id_idx")
@@ -1104,4 +1108,106 @@ model InvStockTransferDetails {
     @@index([stId], name: "stock_transfer_details_st_id_idx")
     @@index([itemId], name: "stock_transfer_details_item_id_idx")
     @@map("inv_stock_transfer_details")
+}
+
+model BranchRequisition {
+    id                 Int                  @id @default(autoincrement())
+    brNumber           String               @map("br_number")
+    requisitionFrom    Int                  @map("req_from")
+    ccId               Int                  @map("cc_id")
+    branchId           Int                  @map("branch_id")
+    branchReqStatus    STORE_REQ_STATUS     @default(Pending) @map("branch_req_status")
+    branchReqAckStatus STORE_REQ_ACK_STATUS @default(ACK_PENDING) @map("branch_req_ack_status")
+    branchReqDetails   String?              @map("branch_req_details") @db.Text
+    date               DateTime             @default(now())
+    isActive           Boolean              @default(true) @map("is_active")
+    createdBy          Int?                 @map("created_by")
+    updatedBy          Int?                 @map("updated_by")
+    deletedBy          Int?                 @map("deleted_by")
+    approvedBy         Int?                 @map("approved_by")
+    rejectBy           Int?                 @map("reject_by")
+    createdAt          DateTime             @default(now()) @map("created_at")
+    updatedAt          DateTime             @updatedAt @map("updated_at")
+    deletedAt          DateTime?            @map("deleted_at")
+    approvedAt         DateTime?            @map("approved_at")
+    rejectAt           DateTime?            @map("reject_at")
+    acknowledgementBy  Int?                 @map("acknowledgement_by")
+    acknowledgementAt  DateTime?            @map("acknowledgement_at")
+
+    branch InvBranch        @relation(fields: [branchId], references: [id])
+    cc     CollectionCenter @relation(fields: [ccId], references: [id])
+
+    branchRequisitionDetails BranchRequisitionDetails[]
+    branchItemDetails        BranchItemDetails[]
+
+    @@index([requisitionFrom], name: "branch_requisition_requisition_from_idx")
+    @@index([branchId], name: "branch_requisition_branch_id_idx")
+    @@index([ccId], name: "branch_requisition_cc_id_idx")
+    @@map("inv_branch_requisition")
+}
+
+model BranchRequisitionDetails {
+    id                   Int     @id @default(autoincrement())
+    branchRequisitionId  Int     @map("branch_requisition_id")
+    itemId               Int     @map("item_id")
+    reqQuantity          Float   @map("req_quantity")
+    assignedQuantity     Float   @default(0) @map("assigned_quantity")
+    acknowledgedQuantity Float   @default(0) @map("acknowledged_quantity")
+    comment              String? @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    branchRequisition BranchRequisition @relation(fields: [branchRequisitionId], references: [id])
+    item              InvItem           @relation(fields: [itemId], references: [id])
+
+    branchItemDetails BranchItemDetails[]
+
+    @@index([branchRequisitionId], name: "branch_requisition_id_idx")
+    @@index([itemId], name: "item_id_idx")
+    @@map("inv_branch_requisition_details")
+}
+
+model BranchItemDetails {
+    id                         Int       @id @default(autoincrement())
+    branchRequisitionId        Int       @map("branch_requisition_id")
+    branchRequisitionDetailsId Int       @map("branch_requisition_details_id")
+    itemStockId                Int       @map("item_stock_id")
+    itemId                     Int       @map("item_id")
+    assignedQty                Int       @map("assign_qty")
+    batchNo                    String?   @map("batch_no")
+    isFoc                      Boolean   @map("is_foc")
+    expiryDate                 DateTime? @map("expiry_date") @db.Date
+    acknowledgedQty            Int       @default(0) @map("acknowledged_qty")
+    isCompleted                Boolean   @default(false) @map("is_completed")
+    ackCCId                    Int?      @map("ack_cc_id")
+    ccId                       Int       @map("cc_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    branchRequisition        BranchRequisition        @relation(fields: [branchRequisitionId], references: [id])
+    branchRequisitionDetails BranchRequisitionDetails @relation(fields: [branchRequisitionDetailsId], references: [id])
+    item                     InvItem                  @relation(fields: [itemId], references: [id])
+    stock                    InvItemStock             @relation(fields: [itemStockId], references: [id])
+    warehouse                InvWarehouse             @relation(fields: [ccId], references: [id])
+    branch                   InvBranch?               @relation(fields: [ackCCId], references: [id])
+
+    @@index([branchRequisitionId], name: "branch_requisition_id_idx")
+    @@index([branchRequisitionDetailsId], name: "branch_requisition_details_id_idx")
+    @@index([itemId], name: "item_id_idx")
+    @@index([itemStockId], name: "item_stock_id_idx")
+    @@index([ccId], name: "warehouse_id_idx")
+    @@index([ackCCId], name: "branch_id_idx")
+    @@map("inv_branch_item_details")
 }

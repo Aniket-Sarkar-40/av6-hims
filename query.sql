@@ -1156,3 +1156,121 @@ ALTER TABLE `pms_stock_transfer` ADD CONSTRAINT `tock_transfer_from_id_idx` FORE
 
 -- AddForeignKey
 ALTER TABLE `pms_stock_transfer` ADD CONSTRAINT `pms_stock_transfer_from_id_fkey` FOREIGN KEY (`from_id`) REFERENCES `sch_collection_center`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AlterTable
+ALTER TABLE `inv_purchase_order` DROP COLUMN `verified_at_1`,
+    DROP COLUMN `verified_at_2`,
+    DROP COLUMN `verified_by_1`,
+    DROP COLUMN `verified_by_2`,
+    ADD COLUMN `last_verified_at` DATETIME(3) NULL,
+    ADD COLUMN `last_verified_by` INTEGER NULL;
+
+-- AlterTable
+ALTER TABLE `inv_in_transit_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'BRANCH_REQUISITION') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_item_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'BRANCH_REQUISITION') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_uin_config` MODIFY `short_code` ENUM('PO', 'GRN', 'POR', 'SRN', 'ITEM', 'BATCH_JOB', 'CN', 'STAJ', 'ST_TR', 'BRN') NOT NULL;
+
+-- CreateTable
+CREATE TABLE `inv_branch_requisition` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sr_number` VARCHAR(191) NOT NULL,
+    `req_from` INTEGER NOT NULL,
+    `cc_id` INTEGER NOT NULL,
+    `branch_req_status` ENUM('Draft', 'Pending', 'Partially_Approved', 'Approved', 'Reject') NOT NULL DEFAULT 'Pending',
+    `branch_req_ack_status` ENUM('ACK_PENDING', 'ACK_PARTIALLY_RECEIVED', 'ACK_RECEIVED') NOT NULL DEFAULT 'ACK_PENDING',
+    `branch_req_details` TEXT NULL,
+    `date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `approved_by` INTEGER NULL,
+    `reject_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `approved_at` DATETIME(3) NULL,
+    `reject_at` DATETIME(3) NULL,
+    `acknowledgement_by` INTEGER NULL,
+    `acknowledgement_at` DATETIME(3) NULL,
+
+    INDEX `branch_requisition_requisition_from_idx`(`req_from`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `inv_branch_requisition_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `branch_requisition_id` INTEGER NOT NULL,
+    `item_id` INTEGER NOT NULL,
+    `req_quantity` DOUBLE NOT NULL,
+    `assigned_quantity` DOUBLE NOT NULL DEFAULT 0,
+    `acknowledged_quantity` DOUBLE NOT NULL DEFAULT 0,
+    `comment` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `branch_requisition_id_idx`(`branch_requisition_id`),
+    INDEX `item_id_idx`(`item_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `inv_branch_item_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `branch_requisition_id` INTEGER NOT NULL,
+    `branch_requisition_details_id` INTEGER NOT NULL,
+    `item_stock_id` INTEGER NOT NULL,
+    `item_id` INTEGER NOT NULL,
+    `assign_qty` INTEGER NOT NULL,
+    `batch_no` VARCHAR(191) NULL,
+    `is_foc` BOOLEAN NOT NULL,
+    `expiry_date` DATE NULL,
+    `acknowledged_qty` INTEGER NOT NULL DEFAULT 0,
+    `is_completed` BOOLEAN NOT NULL DEFAULT false,
+    `ack_cc_id` INTEGER NULL,
+    `cc_id` INTEGER NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `branch_requisition_id_idx`(`branch_requisition_id`),
+    INDEX `branch_requisition_details_id_idx`(`branch_requisition_details_id`),
+    INDEX `item_id_idx`(`item_id`),
+    INDEX `item_stock_id_idx`(`item_stock_id`),
+    INDEX `warehouse_id_idx`(`cc_id`),
+    INDEX `branch_id_idx`(`ack_cc_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+/*
+  Warnings:
+
+  - You are about to drop the column `sr_number` on the `inv_branch_requisition` table. All the data in the column will be lost.
+  - Added the required column `br_number` to the `inv_branch_requisition` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `branch_id` to the `inv_branch_requisition` table without a default value. This is not possible if the table is not empty.
+
+*/
+-- AlterTable
+ALTER TABLE `inv_branch_requisition` DROP COLUMN `sr_number`,
+    ADD COLUMN `br_number` VARCHAR(191) NOT NULL,
+    ADD COLUMN `branch_id` INTEGER NOT NULL;
+
+-- CreateIndex
+CREATE INDEX `branch_requisition_branch_id_idx` ON `inv_branch_requisition`(`branch_id`);
+
+-- CreateIndex
+CREATE INDEX `branch_requisition_cc_id_idx` ON `inv_branch_requisition`(`cc_id`);
