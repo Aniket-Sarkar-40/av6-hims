@@ -36,6 +36,7 @@ import {
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { Router } from "express";
 
 export const commonRouter: Router = Router();
@@ -169,6 +170,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   validateCommonImportExcel,
   commonExcelImport
 );

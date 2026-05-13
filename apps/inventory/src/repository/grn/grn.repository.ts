@@ -1,8 +1,5 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { db } from "@repo/db/client";
 import { subItemStock } from "./../stock/stock.repository.js";
-
-import { eventEmailService } from "@/services/master/emailConfig.service.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   CreateGrnInput,
@@ -15,8 +12,14 @@ import {
   InvGoodReceiveDetails,
   InvUinShortCode,
   InvGoodReceive,
+  GRN_STATUS,
+  ServiceCode,
+  VoucherReferenceType,
 } from "@repo/db/generated/prisma/client";
 import { addItemStock } from "../stock/stock.repository.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { settingsService } from "@/services/master/settings.service.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 
 export const createGrnInDb = async (
   input: CreateGrnInput
@@ -123,31 +126,30 @@ export const createGrnInDb = async (
       )
     );
 
-    const supplier = omittedGrn.omitted.supplier;
-
-    if (supplier.isGrnEmail) {
-      if (supplier.email) {
-        const emailTemplate = await eventEmailService.getEventEmail();
-
-        if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
-          // sendTemplatedEmail({
-          //   template: emailTemplate,
-          //   to: [supplier.email],
-          //   variables: {
-          //     name: store.user.userName || "User",
-          //     companyDetails: "Aerial View-6 Infotech Pvt. Ltd.",
-          //     message: `Good Receive created.`,
-          //     signature: `Aerial View-6 Pvt. Ltd.`,
-          //   },
-          // })
-          //   .then(() => {
-          //     logger.info("Email Sent Successfully.");
-          //   })
-          //   .catch((e: Error) => logger.error(`Email Failed:: ${e.message} `));
-          // TODO: Send notification
-        }
-      }
-    }
+    // voucher entry
+    // const settings = await settingsService.getSettings();
+    // if (settings?.isAccounting && createdGrn.status === GRN_STATUS.COMPLETED) {
+    //   const result = await accountingExternalService.createVoucher({
+    //     ccId: createdGrn.ccId,
+    //     refType: VoucherReferenceType.INVENTORY_GRN,
+    //     refNo: createdGrn.grnNumber,
+    //     refId: createdGrn.id,
+    //     refDate: createdGrn.date,
+    //     currencyId: createdGrn.currencyId ?? undefined,
+    //     currencyConversionRate: createdGrn.conversionRate
+    //       ? Number(createdGrn.conversionRate)
+    //       : undefined,
+    //     totalAmount: Number(createdGrn.totalAmount),
+    //     clientId: createdGrn.supplierId,
+    //     clientPayAmount: 0,
+    //     customerPayAmount: 0,
+    //     customerName: "",
+    //     createdBy: currentUser,
+    //   });
+    //   if (!result.success) {
+    //     throw new ErrorHandler(result.status, result.message);
+    //   }
+    // }
 
     return createdGrn;
   });
@@ -480,6 +482,33 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
         }
       }
     }
+
+    // voucher entry
+    // if (
+    //   store?.settings?.isAccounting &&
+    //   updatedGrn.status === GRN_STATUS.COMPLETED
+    // ) {
+    //   const result = await accountingExternalService.createVoucher({
+    //     ccId: updatedGrn.ccId,
+    //     refType: VoucherReferenceType.INVENTORY_GRN,
+    //     refNo: updatedGrn.grnNumber,
+    //     refId: updatedGrn.id,
+    //     refDate: updatedGrn.date,
+    //     currencyId: updatedGrn.currencyId ?? undefined,
+    //     conversionRate: updatedGrn.conversionRate
+    //       ? Number(updatedGrn.conversionRate)
+    //       : undefined,
+    //     totalAmount: Number(updatedGrn.totalAmount),
+    //     clientId: updatedGrn.supplierId,
+    //     clientPayAmount: 0,
+    //     customerPayAmount: 0,
+    //     customerName: "",
+    //     createdBy: currentUser,
+    //   });
+    //   if (!result.success) {
+    //     throw new ErrorHandler(result.status, result.message);
+    //   }
+    // }
 
     return updatedGrn;
   });

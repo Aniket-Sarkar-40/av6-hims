@@ -13,6 +13,7 @@ import {
   idOptional,
   idRequired,
   intRequired,
+  numberWithMaxDecimalsOptional,
   priceOptional,
   priceRequired,
   strOptional,
@@ -81,6 +82,14 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
   poId: idRequired("PO ID"),
 
   date: dateRequired("Date"),
+
+  currencyId: idOptional("Currency Id"),
+
+  conversionRate: Joi.when("currencyId", {
+    is: Joi.exist().not(null),
+    then: numberWithMaxDecimalsRequired("Conversion Rate"),
+    otherwise: numberWithMaxDecimalsOptional("Conversion Rate"),
+  }),
 
   supplierId: idRequired("Supplier ID"),
 

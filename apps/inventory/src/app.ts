@@ -70,4 +70,4 @@ inventoryRouter.use("/consumption", consumptionRouter);
 inventoryRouter.use("/stock-transfer", stockTransferRouter);
 
 // Branch Requisition
-inventoryRouter.use("/api/v1/branch-requisition", branchRequisitionRouter);
+inventoryRouter.use("/branch-requisition", branchRequisitionRouter);

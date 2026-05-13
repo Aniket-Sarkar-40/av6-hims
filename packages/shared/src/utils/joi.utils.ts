@@ -366,6 +366,9 @@ export const numberWithMaxDecimalsRequired = (fieldName: string) =>
     .required()
     .messages({ "any.required": `${fieldName} is required` });
 
+export const numberWithMaxDecimalsOptional = (fieldName: string) =>
+  numberWithMaxDecimals(fieldName).optional().allow(null);
+
 export const emailRequired = (label: string) =>
   Joi.string()
     .trim()

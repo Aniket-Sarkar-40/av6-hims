@@ -18,6 +18,7 @@ import {
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { Router } from "express";
 
@@ -44,6 +45,7 @@ bankReconciliationRouter.post(
   verifyToken,
   authorize(getPermission("ACC", "BANK_STATEMENT", "CREATE")),
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   validateBankStatementExcelBaseInput,
   uploadBankStatementExcelController
 );

@@ -412,18 +412,20 @@ model Department {
 }
 
 model Currency {
-    id        Int       @id @default(autoincrement())
-    code      String
-    name      String
-    symbol    String
-    isActive  Boolean   @default(true) @map("is_active")
-    createdBy Int?      @map("created_by")
-    updatedBy Int?      @map("updated_by")
-    deletedBy Int?      @map("deleted_by")
-    createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime? @updatedAt @map("updated_at")
-    deletedAt DateTime? @map("deleted_at")
-    vouchers  Voucher[]
+    id                    Int                    @id @default(autoincrement())
+    code                  String
+    name                  String
+    symbol                String
+    isActive              Boolean                @default(true) @map("is_active")
+    createdBy             Int?                   @map("created_by")
+    updatedBy             Int?                   @map("updated_by")
+    deletedBy             Int?                   @map("deleted_by")
+    createdAt             DateTime               @default(now()) @map("created_at")
+    updatedAt             DateTime?              @updatedAt @map("updated_at")
+    deletedAt             DateTime?              @map("deleted_at")
+    vouchers              Voucher[]
+    invGoodReceives       InvGoodReceive[]
+    invGoodReceiveReturns InvGoodReceiveReturn[]
 
     @@map("core_currency")
 }

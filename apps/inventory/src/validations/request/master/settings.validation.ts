@@ -29,6 +29,7 @@ export const createOrUpdateSettingsSchema = Joi.object<CreateOrUpdateSettings>({
   grnRoundedFormat: enumOptional("GRN rounded format", RoundFormat),
 
   grnFinalRoundedFormat: enumOptional("GRN final rounded format", RoundFormat),
+  isAccounting: boolRequired("Is Accounting"),
 });
 
 export const validateSettings = validationHandler({

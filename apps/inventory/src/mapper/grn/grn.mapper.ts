@@ -10,6 +10,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit } from "av6-utils";
 import { omitAudit, toIdValue } from "av6-utils";
 import { itemMasterToDto } from "../master/itemMaster.mapper.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
 
 export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
@@ -19,7 +20,7 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
     data.map(async (grn) => {
       const omittedGrn = customOmit<
         GrnResponse,
-        BaseModelAttrWoCancel | "supplierId" | "poId" | "ccId" | "storeId"
+        BaseModelAttrWoCancel | "currencyId"
       >(grn, [
         "createdBy",
         "updatedBy",
@@ -27,14 +28,11 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
         "createdAt",
         "updatedAt",
         "deletedAt",
-        "supplierId",
-        "poId",
-        "ccId",
-        "storeId",
+        "currencyId",
       ]);
 
       const supplierDTO = suppliers.find(
-        (supplier) => supplier.id === grn.supplierId,
+        (supplier) => supplier.id === grn.supplierId
       );
       const ccSettingsId = settings?.warehouseMode;
       let warehouseDTO, branchDTO;
@@ -47,11 +45,14 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
       const createdBy = grn.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(grn.createdBy, true)
         : null;
+      const currency = grn.currencyId
+        ? await currencyService.getCurrencyById(grn.currencyId)
+        : null;
       const detailDTO: GrnDetailDTO[] = await Promise.all(
         (grn.goodReceiveDetails || []).map(async (detail) => {
           const item = await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true,
+            true
           );
           const inHandQty =
             (await getItemStockQtyByBatchWise({
@@ -66,17 +67,18 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
             item: item ? await itemMasterToDto(item) : null,
             inHandQty: inHandQty ?? 0,
           };
-        }),
+        })
       );
 
       return {
         ...omittedGrn.rest,
+        currency: toIdValue(currency, "name"),
         supplier: toIdValue(supplierDTO, "name"),
         warehouse: ccSettingsId ? toIdValue(warehouseDTO, "name") : null,
         branch: ccSettingsId ? null : toIdValue(branchDTO, "name"),
         createdBy: createdBy,
         goodReceiveDetails: omitAudit(detailDTO),
       };
-    }),
+    })
   );
 };

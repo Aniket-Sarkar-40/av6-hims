@@ -41,7 +41,9 @@ export interface GrnDTO
     | "poId"
     | "ccId"
     | "storeId"
+    | "currencyId"
   > {
+  currency: IdValue | null;
   supplier: IdValue | null;
   warehouse: IdValue | null;
   branch: IdValue | null;

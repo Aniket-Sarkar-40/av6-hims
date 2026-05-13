@@ -28,6 +28,7 @@ import {
 import { authorizeCommonSearch } from "@apps/core/middleware/auth.middleware.js";
 import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { Router } from "express";
 
 const commonRouter: Router = Router();
@@ -57,7 +58,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch,
+  commonSearch
 );
 
 /**
@@ -79,7 +80,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch,
+  commonDropdownSearch
 );
 
 /**
@@ -101,7 +102,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch,
+  fixedSearch
 );
 
 /**
@@ -123,7 +124,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController,
+  fixedSearchWoPaginationController
 );
 
 /**
@@ -145,7 +146,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport,
+  commonFSExcelExport
 );
 
 /**
@@ -167,7 +168,7 @@ commonRouter.post(
   verifyToken,
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch,
+  commonFetch
 );
 
 /**
@@ -187,8 +188,9 @@ commonRouter.post(
 commonRouter.post(
   "/importExcel",
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport,
+  commonExcelImport
 );
 
 /**
@@ -220,7 +222,7 @@ commonRouter.delete(
   verifyToken,
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete,
+  commonDelete
 );
 
 /**
@@ -242,7 +244,7 @@ commonRouter.patch(
   verifyToken,
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus,
+  commonUpdateStatus
 );
 
 // /**

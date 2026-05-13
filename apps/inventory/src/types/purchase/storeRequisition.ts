@@ -54,7 +54,6 @@ export interface StoreRequisitionDTO
     | "requisitionFrom"
   > {
   branch: IdValue | null;
-  warehouse: IdValue | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
   approvedBy: EmployeeCache | null;
@@ -74,7 +73,6 @@ export interface StoreRequisitionBatchWiseDTO
     "requisitionFrom" | "requisitionItemDetails"
   > {
   branch: IdValue | null;
-  warehouse: IdValue | null;
   requisitionFrom: IdValue | null;
   requisitionItemDetails: RequisitionItemDetailDTO[];
 }

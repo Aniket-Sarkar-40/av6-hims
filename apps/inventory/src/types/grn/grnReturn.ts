@@ -44,12 +44,15 @@ export interface GoodReceiveReturnDTO
     | "goodReceiveReturnDetails"
     | "rejectedBy"
     | "approvedBy"
+    | "grnId"
     | "poId"
     | "ccId"
     | "supplierId"
+    | "currencyId"
   > {
   goodReceiveReturnDetails: GoodReceiveReturnDetailDTO[];
   supplier: IdValue | null;
+  currency: IdValue | null;
   branch: IdValue | null;
   warehouse: IdValue | null;
   createdBy: EmployeeCache | null;

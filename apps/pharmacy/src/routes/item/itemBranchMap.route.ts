@@ -23,7 +23,7 @@ import {
   validateItemWiseItemBranchMapUpdate,
   validateUpdateItemBranchMap,
 } from "@/validations/request/item/itemBranch.validation.js";
-
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { Router } from "express";
 
 export const itemBranchRouter: Router = Router();
@@ -55,7 +55,7 @@ itemBranchRouter.post(
   verifyToken,
   authorize(getPermission("PMS", "ITEM_BRANCH", "CREATE")),
   validateCreateItemBranchMap,
-  createItemBranchMap,
+  createItemBranchMap
 );
 
 /**
@@ -78,7 +78,7 @@ itemBranchRouter.post(
   verifyToken,
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
   validateGetItemBranchMap,
-  getItemBranch,
+  getItemBranch
 );
 
 /**
@@ -101,10 +101,10 @@ itemBranchRouter.put(
   verifyToken,
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
   ),
   validateUpdateItemBranchMap,
-  updateItemBranchMap,
+  updateItemBranchMap
 );
 
 /**
@@ -120,7 +120,7 @@ itemBranchRouter.delete(
   "/:id",
   verifyToken,
   authorize(getPermission("PMS", "ITEM_BRANCH", "DELETE")),
-  deleteItemBranch,
+  deleteItemBranch
 );
 
 /**
@@ -143,7 +143,7 @@ itemBranchRouter.post(
   verifyToken,
   authorize(getPermission("PMS", "ITEM_BRANCH_EXCEL", "VIEW")),
   validateInputExcelItemBranchMap,
-  excelBranchItemMap,
+  excelBranchItemMap
 );
 
 /**
@@ -176,8 +176,9 @@ itemBranchRouter.post(
   "/import",
   verifyToken,
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
-  branchItemMapExcelImport,
+  branchItemMapExcelImport
 );
 
 /**
@@ -200,10 +201,10 @@ itemBranchRouter.put(
   verifyToken,
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
   ),
   validateItemWiseItemBranchMapUpdate,
-  updateItemWiseItemBranchMap,
+  updateItemWiseItemBranchMap
 );
 
 /**
@@ -227,10 +228,10 @@ itemBranchRouter.post(
   verifyToken,
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
   ),
   validateItemBranchMapCopy,
-  BranchToBranchCopyItemBranchMap,
+  BranchToBranchCopyItemBranchMap
 );
 
 /**
@@ -253,5 +254,5 @@ itemBranchRouter.get(
   "/mapping",
   verifyToken,
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
-  getItemBranchMapDetailsForUpdate,
+  getItemBranchMapDetailsForUpdate
 );

@@ -30,7 +30,7 @@ export const settingsService = {
     return created;
   },
   async getSettings(
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<InvSettings | null> {
     logger.info("entering::getSettings::service");
 
@@ -48,7 +48,7 @@ export const settingsService = {
     if (!settings && !canNullReturnable) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Settings"),
+        generateErrorMessage("NOT_FOUND", "Settings")
       );
     }
 

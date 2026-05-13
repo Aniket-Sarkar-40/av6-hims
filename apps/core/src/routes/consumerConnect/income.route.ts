@@ -121,6 +121,7 @@ incomeRouter.put(
     getPermission("CORE", "INCOME", "UPDATE")
   ),
   createUploadMiddleware("documents"),
+  uploadToHetzner("documents"),
   validateUpdateIncome,
   updateIncome
 );

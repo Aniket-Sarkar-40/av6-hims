@@ -19,6 +19,7 @@ import {
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 
 import { Router } from "express";
@@ -66,6 +67,7 @@ voucherRouter.post(
   "/excel-import",
   verifyToken,
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   authorize(getPermission("ACC", "VOUCHER_EXCEL_IMPORT", "CREATE")),
   validateCreateVoucherExcel,
   createVoucherExcel

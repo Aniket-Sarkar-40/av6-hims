@@ -8,6 +8,10 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
 import path from "path";
+import { settingsService } from "@/services/master/settings.service.js";
+import { RoundFormat } from "av6-utils";
+import { applyGrnReturnRateReverseConversion } from "@/utils/grnRateConversion.utils.js";
+import { generatePDF } from "@/utils/pdfGenerator.utils.js";
 
 export const createGrnReturn = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createGrnReturn::controller");
@@ -15,7 +19,7 @@ export const createGrnReturn = TryCatch(async (req: Request, res: Response) => {
   const grnReturn = await grnReturnService.createGrnReturn(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: grnReturn },
-    "Good Received",
+    "Good Received Return"
   );
 
   logger.info("exiting::createGrnReturn::controller");
@@ -33,7 +37,7 @@ export const updateGrnReturn = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "UPDATED", data: updated },
-    "Good Received",
+    "Good Received Return"
   );
   return res.status(200).json(response);
 });
@@ -44,7 +48,7 @@ export const getAllGrnReturn = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::getAllGrnReturn::controller");
   const response = BaseResponse.success(
     { type: "CREATED", data: grnReturn },
-    "Good Received",
+    "Good Received return"
   );
   return res.status(200).json(response);
 });
@@ -55,7 +59,7 @@ export const getGrnReturnById = TryCatch(
     const { grnReturnId } = req.query as { grnReturnId: string };
 
     const grnReturn = await grnReturnService.getGrnReturnById(
-      Number(grnReturnId),
+      Number(grnReturnId)
     );
 
     if (!grnReturn) {
@@ -67,10 +71,10 @@ export const getGrnReturnById = TryCatch(
     logger.info("exiting::getGrnReturnById::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: grnReturn },
-      "Good Received",
+      "Good Received return"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const deleteGrnReturn = TryCatch(async (req, res) => {
@@ -82,7 +86,7 @@ export const deleteGrnReturn = TryCatch(async (req, res) => {
   logger.info("exiting::deleteGrnReturn::controller");
   const response = BaseResponse.success(
     { type: "DELETED", data: del },
-    "Good Received",
+    "Good Received return"
   );
   return res.status(200).json(response);
 });
@@ -94,11 +98,11 @@ export const approveGrnReturn = TryCatch(
     const grnReturn = await grnReturnService.approveGrnReturn(input);
     const response = BaseResponse.success(
       { type: "APPROVED", data: grnReturn },
-      "Good Received",
+      "Good Received return"
     );
     logger.info("exiting::approveGrnReturn::controller");
     return res.status(201).json(response);
-  },
+  }
 );
 
 export const rejectedGrnReturn = TryCatch(
@@ -108,11 +112,11 @@ export const rejectedGrnReturn = TryCatch(
     const grnReturn = await grnReturnService.rejectedGrnReturn(input);
     const response = BaseResponse.success(
       { type: "REJECTED", data: grnReturn },
-      "Good Received",
+      "Good Received return"
     );
     logger.info("exiting::rejectedGrnReturn::controller");
     return res.status(200).json(response);
-  },
+  }
 );
 
 // export const excelGrnReturnReport = TryCatch(async (req: Request, res: Response) => {
@@ -127,34 +131,58 @@ export const rejectedGrnReturn = TryCatch(
 //   res.end();
 // });
 
-// export const printGrnReturnById = TryCatch(async (req: Request, res: Response) => {
-//   logger.info("entering::printGrnReturnById::controller");
+export const printGrnReturnById = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::printGrnReturnById::controller");
+    const settings = await settingsService.getSettings();
+    const roundFormat: RoundFormat = settings?.grnRoundedFormat || "TO_FIXED";
+    const precision: number = settings?.defaultPrecision || 2;
+    // 1) Read filters and fetch data
+    const { id } = req.query as { id: string };
 
-//   // 1) Read filters and fetch data
-//   const { id } = req.query as { id: string };
+    const grnReturn = await grnReturnService.getGrnReturnById(Number(id));
 
-//   const grnReturn = await grnReturnService.getGrnReturnById(Number(id));
+    if (!grnReturn) {
+      return res.status(404).json(
+        BaseResponse.error({
+          message: generateErrorMessage("NOT_FOUND", "Good Receive Return"),
+        })
+      );
+    }
 
-//   // 3) Locate template & logo
-//   const tplDir = path.join(process.cwd(), "src", "templates", "pdf", "reports-pdf", "grn");
-//   const bodyTpl = path.join(tplDir, "grnReturn.hbs");
-//   const base64Image = imageToBase64("public/images/logo.png");
+    const convertedGrnReturn = applyGrnReturnRateReverseConversion(grnReturn, {
+      roundFormat,
+      precision,
+    });
 
-//   // 4) Render PDF
-//   const pdfBuffer = await generatePDF(bodyTpl, {
-//     grnReturn,
-//     base64Image,
-//     reportFor: "Good Receive Return",
-//   });
+    // 3) Locate template & logo
+    const tplDir = path.join(
+      process.cwd(),
+      "src",
+      "templates",
+      "pdf",
+      "reports-pdf",
+      "grn"
+    );
+    const bodyTpl = path.join(tplDir, "grnReturn.hbs");
+    const base64Image = imageToBase64("public/images/logo.png");
 
-//   // 5) Stream down
-//   res
-//     .status(200)
-//     .set({
-//       "Content-Type": "application/pdf",
-//       "Content-Disposition": 'attachment; filename="good_receive_return.pdf"',
-//     })
-//     .send(pdfBuffer);
+    // 4) Render PDF
+    const pdfBuffer = await generatePDF(bodyTpl, {
+      grnReturn: convertedGrnReturn,
+      base64Image,
+      reportFor: "Good Receive Return",
+    });
 
-//   logger.info("exiting::printGrnReturnById::controller");
-// });
+    // 5) Stream down
+    res
+      .status(200)
+      .set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": 'attachment; filename="good_receive_return.pdf"',
+      })
+      .send(pdfBuffer);
+
+    logger.info("exiting::printGrnReturnById::controller");
+  }
+);

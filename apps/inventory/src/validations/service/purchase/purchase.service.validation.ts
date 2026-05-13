@@ -60,6 +60,12 @@ export const validatePurchaseOrderCommon = async (
     if (!branch) {
       throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Branch"));
     }
+    if (!branch.isMain) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("ACCESS_FAIL", "Branch is not main")
+      );
+    }
   }
 
   const store = body.storeId

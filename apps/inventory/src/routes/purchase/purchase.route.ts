@@ -160,12 +160,12 @@ purchaseRouter.put(
  *           schema:
  *             $ref: '#/components/purchaseSchema'
  */
-// purchaseRouter.post(
-//   "/:id/approval",
-//   verifyToken,
-//   authorize(getPermission("PURCHASE_APPROVAL", "CREATE")),
-//   purchaseApproval
-// );
+purchaseRouter.post(
+  "/:id/approval",
+  verifyToken,
+  authorize(getPermission("INV", "PURCHASE_APPROVAL", "CREATE")),
+  purchaseApproval
+);
 
 /**
  * @swagger
@@ -185,8 +185,8 @@ purchaseRouter.put(
 // purchaseRouter.post(
 //   "/purchase-excel",
 //   verifyToken,
-//   authorize(getPermission("PURCHASE_EXCEL", "VIEW")),
-//   validateExcelFilterPurchase,
+//   authorize(getPermission("INV", "PURCHASE_EXCEL", "VIEW")),
+//   validateExcelFilterPurchase
 //   // excelPurchaseOrderReport
 // );
 

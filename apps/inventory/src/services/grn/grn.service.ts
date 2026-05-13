@@ -16,12 +16,32 @@ import {
   deleteGrnServiceValidation,
   updateGrnServiceValidation,
 } from "@/validations/service/grn/grn.service.validation.js";
+import { notifier } from "@/config/core.config.js";
+import { validateIdItemSupplier } from "@/validations/service/master/itemSupplier.service.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const grnService = {
   async createGrn(input: CreateGrnInput) {
     logger.info("entering::createGrn::service");
     await createGrnServiceValidation(input);
     const createGrn = await createGrnInDb(input);
+
+    const supplier = await validateIdItemSupplier(createGrn.supplierId);
+
+    if (supplier.isGrnEmail) {
+      this.getGrnById(createGrn.id)
+        .then((grn) => {
+          if (grn) {
+            notifier.emitEvent("GRN_CREATED", {
+              service: ServiceCode.INVENTORY,
+              data: grn,
+            });
+          }
+        })
+        .catch((err) => {
+          logger.error(err);
+        });
+    }
 
     logger.info("exiting::createStore Requisition::service");
     return createGrn;
@@ -45,7 +65,7 @@ export const grnService = {
     if (records.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "grn Order"),
+        generateErrorMessage("NOT_FOUND", "grn Order")
       );
     }
 
@@ -57,7 +77,7 @@ export const grnService = {
             goodReceiveDetails: sr.goodReceiveDetails,
           },
         ]);
-      }),
+      })
     );
 
     logger.info("exiting::getAllGrn::service");
@@ -66,7 +86,7 @@ export const grnService = {
 
   async getGrnById(
     id: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<GrnDTO | null> {
     logger.info("entering::getGrnById::service id=" + id);
 
@@ -78,11 +98,11 @@ export const grnService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Good Receive Note"),
+          generateErrorMessage("NOT_FOUND", "Good Receive Note")
         );
       } else {
         logger.warn(
-          `GRN with id=${id} not found, returning null as requested.`,
+          `GRN with id=${id} not found, returning null as requested.`
         );
         return null;
       }

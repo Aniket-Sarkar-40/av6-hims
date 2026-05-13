@@ -73,6 +73,17 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   poId: idRequired("PO Id"),
 
+  currencyId: idOptional("Currency Id"),
+
+  conversionRate: Joi.when("currencyId", {
+    is: Joi.exist().not(null),
+    then: numberWithMaxDecimalsRequired("Conversion Rate"),
+    otherwise: Joi.allow(null).messages({
+      "any.unknown":
+        "Conversion Rate is not allowed when Currency Id is not provided",
+    }),
+  }),
+
   date: dateRequired("Date"),
 
   supplierId: idRequired("Supplier Id"),

@@ -22,6 +22,7 @@ model InvSettings {
     id Int @id @default(autoincrement())
 
     isEmail               Boolean           @default(true) @map("is_email")
+    isAccounting          Boolean           @default(true) @map("is_accounting")
     isSMS                 Boolean           @default(false) @map("is_sms")
     isWhatsapp            Boolean           @default(false) @map("is_whatsapp")
     expiryInMonth         Int               @map("expiry_in_month")
@@ -579,10 +580,12 @@ model InvItemSupplierMapExcel {
 model InvGoodReceive {
     id Int @id @default(autoincrement())
 
-    poId       Int  @map("po_id")
-    supplierId Int  @map("supplier_id")
-    storeId    Int? @map("store_id")
-    ccId       Int  @map("cc_id")
+    poId           Int      @map("po_id")
+    supplierId     Int      @map("supplier_id")
+    storeId        Int?     @map("store_id")
+    ccId           Int      @map("cc_id")
+    currencyId     Int?     @map("currency_id")
+    conversionRate Decimal? @map("conversion_rate") @db.Decimal(13, 5)
 
     poNumber  String   @map("po_number")
     grnNumber String   @map("grn_number")
@@ -616,6 +619,7 @@ model InvGoodReceive {
     po       InvPurchaseOrder @relation(fields: [poId], references: [id])
     supplier InvItemSupplier  @relation(fields: [supplierId], references: [id])
     store    InvItemStore?    @relation(fields: [storeId], references: [id])
+    currency Currency?        @relation(fields: [currencyId], references: [id])
 
     goodReceiveDetails InvGoodReceiveDetails[]
     goodReceiveReturn  InvGoodReceiveReturn[]
@@ -668,6 +672,8 @@ model InvGoodReceiveDetails {
 model InvGoodReceiveReturn {
     id             Int        @id @default(autoincrement())
     grnId          Int        @map("grn_id")
+    currencyId     Int?       @map("currency_id")
+    conversionRate Decimal?   @map("conversion_rate") @db.Decimal(13, 5)
     poNumber       String     @map("po_number")
     grnNumber      String     @map("grn_number")
     poId           Int        @map("po_id")
@@ -703,12 +709,14 @@ model InvGoodReceiveReturn {
     po                       InvPurchaseOrder              @relation(fields: [poId], references: [id])
     collectionCenter         CollectionCenter              @relation(fields: [ccId], references: [id])
     supplier                 InvItemSupplier               @relation(fields: [supplierId], references: [id])
+    currency                 Currency?                     @relation(fields: [currencyId], references: [id])
     goodReceiveReturnDetails InvGoodReceiveReturnDetails[]
 
     @@index([grnId], name: "good_receive_return_grn_id_idx")
     @@index([poId], name: "good_receive_return_po_id_idx")
     @@index([ccId], name: "good_receive_return_cc_id_idx")
     @@index([supplierId], name: "item_supplier_id_idx")
+    @@index([currencyId], name: "good_receive_return_currency_id_idx")
     @@map("inv_good_receive_return")
 }
 

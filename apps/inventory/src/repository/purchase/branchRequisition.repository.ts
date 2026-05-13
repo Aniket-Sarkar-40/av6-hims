@@ -7,7 +7,6 @@ import {
   addItemStock,
   subItemStock,
 } from "@/repository/stock/stock.repository.js";
-import { eventEmailService } from "@/services/master/emailConfig.service.js";
 import {
   AcknowledgeBranchRequisition,
   ApproveBranchReqInput,
@@ -79,25 +78,6 @@ export const createBranchRequisitionInDb = async (
       },
     });
   });
-
-  // const emailTemplate = await eventEmailService.getEventEmail();
-
-  // if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
-  //   sendTemplatedEmail({
-  //     template: emailTemplate,
-  //     to: [store.user.email],
-  //     variables: {
-  //       name: store.user.userName || "User",
-  //       companyDetails: "Aerial View-6",
-  //       message: "Branch Requisition created.",
-  //       signature: "Aerial View-6 Pvt. Ltd.",
-  //     },
-  //   })
-  //     .then(() => {
-  //       logger.info("Email Sent Successfully.");
-  //     })
-  //     .catch((e) => logger.error(`Email Failed:: ${e.message} `));
-  // }
 
   logger.info("exiting::createBranchRequisitionInDb::repository");
   return createdBranchRequisition;

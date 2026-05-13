@@ -23,12 +23,32 @@ import {
   rejectGrnReturnServiceValidation,
   updateGrnReturnServiceValidation,
 } from "@/validations/service/grn/grnReturn.service.validation.js";
+import { validateIdItemSupplier } from "@/validations/service/master/itemSupplier.service.validation.js";
+import { notifier } from "@/config/core.config.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const grnReturnService = {
   async createGrnReturn(input: CreateGrnReturnInput) {
     logger.info("entering::createGrnReturn::service");
     await createGrnReturnServiceValidation(input);
     const createGrnReturn = await createGrnReturnInDb(input);
+
+    const supplier = await validateIdItemSupplier(createGrnReturn.supplierId);
+
+    if (supplier.isReturnEmail) {
+      this.getGrnReturnById(createGrnReturn.id)
+        .then((grn) => {
+          if (grn) {
+            notifier.emitEvent("GRN_RETURN_CREATED", {
+              service: ServiceCode.INVENTORY,
+              data: grn,
+            });
+          }
+        })
+        .catch((err) => {
+          logger.error(err);
+        });
+    }
 
     logger.info("exiting::createGrnReturn::service");
     return createGrnReturn;
@@ -52,7 +72,7 @@ export const grnReturnService = {
     if (records.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "grnReturn Order"),
+        generateErrorMessage("NOT_FOUND", "grnReturn Order")
       );
     }
 
@@ -64,7 +84,7 @@ export const grnReturnService = {
             goodReceiveReturnDetails: sr.goodReceiveReturnDetails,
           },
         ]);
-      }),
+      })
     );
 
     logger.info("exiting::getAllGrnReturn::service");
@@ -73,7 +93,7 @@ export const grnReturnService = {
 
   async getGrnReturnById(
     id: number,
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<GoodReceiveReturnDTO | null> {
     logger.info("entering::getGrnReturnById::service id=" + id);
 
@@ -85,11 +105,11 @@ export const grnReturnService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Good Receive Note"),
+          generateErrorMessage("NOT_FOUND", "Good Receive Note")
         );
       } else {
         logger.warn(
-          `GRN with id=${id} not found, returning null as requested.`,
+          `GRN with id=${id} not found, returning null as requested.`
         );
         return null;
       }

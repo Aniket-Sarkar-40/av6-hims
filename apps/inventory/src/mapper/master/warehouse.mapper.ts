@@ -5,10 +5,10 @@ import {
   WarehouseResponse,
   WarehouseDTOLocation,
 } from "@/types/master/warehouse.js";
-import { customOmit, toIdValue } from "av6-utils";
+import { customOmit } from "av6-utils";
 
 export const toWarehouseDTO = async (
-  data: WarehouseResponse[],
+  data: WarehouseResponse[]
 ): Promise<WarehouseDTO[]> => {
   const allCollectionCenters =
     await commonService.getAllElements<"CollectionCenter">({
@@ -36,13 +36,13 @@ export const toWarehouseDTO = async (
       allCollectionCenters.find((cc) => cc.id === warehouse.id) ?? null;
     return {
       ...omittedWarehouse.rest,
-      collectionCenter: toIdValue(singleCollectionCenter, "colName"),
+      collectionCenter: singleCollectionCenter,
     };
   });
 };
 
 export const toWarehouseDTOLocation = async (
-  warehouse: WarehouseResponse,
+  warehouse: WarehouseResponse
 ): Promise<WarehouseDTOLocation> => {
   const omittedWarehouse = customOmit<
     WarehouseResponse,

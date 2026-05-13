@@ -8,9 +8,13 @@ import {
 } from "@/types/grn/grnReturn.js";
 import { customOmit } from "av6-utils";
 import { logger } from "@repo/platform/logging/logger.js";
-import { RETURN_STS } from "@repo/db/generated/prisma/client";
+import {
+  RETURN_STS,
+  VoucherReferenceType,
+} from "@repo/db/generated/prisma/client";
 import { subItemStock } from "../stock/stock.repository.js";
 import { eventEmailService } from "@/services/master/emailConfig.service.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 
 export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   logger.info("entering::createGrnReturnInDb::repository");
@@ -47,7 +51,7 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
                   : null,
                 createdBy: currentUser,
               };
-            },
+            }
           ),
         },
       },
@@ -59,30 +63,6 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
         },
       },
     });
-
-    const supplier = omittedGRNReturn.omitted.supplier;
-
-    if (supplier.isReturnEmail && supplier?.email) {
-      const emailTemplate = await eventEmailService.getEventEmail();
-
-      if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
-        // sendTemplatedEmail({
-        //   template: emailTemplate,
-        //   to: [supplier.email],
-        //   variables: {
-        //     name: store.user.userName || "User",
-        //     companyDetails: "Aerial View-6 Infotech Pvt. Ltd.",
-        //     message: `Good Receive Return created.`,
-        //     signature: `Aerial View-6 Pvt. Ltd.`,
-        //   },
-        // })
-        //   .then(() => {
-        //     logger.info("Email Sent Successfully.");
-        //   })
-        //   .catch((e) => logger.error(`Email Failed:: ${e.message} `));
-        // TODO: Send notification
-      }
-    }
 
     return createdGrnReturn;
   });
@@ -117,13 +97,13 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number",
+    (d) => typeof d.id === "number"
   );
   const toCreate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id !== "number",
+    (d) => typeof d.id !== "number"
   );
   const toDelete = grnReturn.goodReceiveReturnDetails.filter(
-    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id),
+    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id)
   );
 
   return await db.$transaction(async (tx) => {
@@ -196,7 +176,7 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
 
 export const getCountGrnReturnDetailsFromDb = async (
   detailIds: number[],
-  grnReturnId: number,
+  grnReturnId: number
 ): Promise<number> => {
   logger.info("entering::getCountGrnReturnDetailsFromDb::repository");
 
@@ -229,7 +209,7 @@ export const getAllGrnReturnFromDb = async (): Promise<GrnReturnResponse[]> => {
 };
 
 export const getGrnReturnByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<GoodReceivedReturnResponse | null> => {
   logger.info(`entering::getGrnReturnByIdFromDb::repository id=${id}`);
 
@@ -274,7 +254,7 @@ export const deleteGrnReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
@@ -287,7 +267,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number",
+    (d) => typeof d.id === "number"
   );
   // const toCreate = goodReceiveReturnDetails.filter(
   //   (d) => typeof d.id !== "number"
@@ -341,7 +321,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           refDetailsId: detail.id!,
           refId: id,
           refNo: grnReturnData.grnNumber,
-        },
+        }
       );
     }
 
@@ -359,7 +339,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
             },
           },
         });
-      }),
+      })
     );
 
     await tx.invGoodReceive.update({
@@ -370,6 +350,35 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
         },
       },
     });
+
+    // Create voucher in accounting
+    // if (
+    //   store?.settings?.isAccounting &&
+    //   (updatedGrnReturn.status === RETURN_STS.APPROVED ||
+    //     RETURN_STS.PARTIALLY_APPROVED)
+    // ) {
+    //   const result = await accountingExternalService.createVoucher({
+    //     ccId: updatedGrnReturn.ccId,
+    //     currencyId: updatedGrnReturn.currencyId ?? undefined,
+    //     conversionRate: updatedGrnReturn.conversionRate
+    //       ? Number(updatedGrnReturn.conversionRate)
+    //       : undefined,
+    //     refType: VoucherReferenceType.INVENTORY_GRN_RETURN,
+    //     refNo: updatedGrnReturn.grnNumber,
+    //     refId: updatedGrnReturn.id,
+    //     refDate: updatedGrnReturn.approveAt ?? new Date(),
+    //     pId: updatedGrnReturn.supplierId.toString(),
+    //     totalAmount: Number(updatedGrnReturn.totalAmount),
+    //     clientId: updatedGrnReturn.supplierId,
+    //     clientPayAmount: 0,
+    //     customerPayAmount: 0,
+    //     customerName: "",
+    //     createdBy: currentUser,
+    //   });
+    //   if (!result.success) {
+    //     throw new ErrorHandler(result.status, result.message);
+    //   }
+    // }
 
     return updatedGrnReturn;
   });

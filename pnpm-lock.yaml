@@ -278,9 +278,15 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.2.1
+      handlebars:
+        specifier: ^4.7.8
+        version: 4.7.8
       joi:
         specifier: ^17.13.3
         version: 17.13.3
+      puppeteer:
+        specifier: ^24.13.0
+        version: 24.43.0(typescript@5.9.2)
       xlsx:
         specifier: ^0.18.5
         version: 0.18.5

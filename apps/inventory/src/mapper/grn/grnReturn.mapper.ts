@@ -15,6 +15,7 @@ import { omitAudit, toIdValue } from "av6-utils";
 import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
 
 export const toGrnReturnDTO = async (
   data: GrnReturnResponse[]
@@ -31,6 +32,7 @@ export const toGrnReturnDTO = async (
         | "rejectedBy"
         | "createdBy"
         | "goodReceiveReturnDetails"
+        | "currencyId"
       >(grnReturn, [
         "createdBy",
         "updatedBy",
@@ -41,11 +43,15 @@ export const toGrnReturnDTO = async (
         "approvedBy",
         "rejectedBy",
         "goodReceiveReturnDetails",
+        "currencyId",
       ]);
 
       const supplierDTO = suppliers.find(
         (supplier) => supplier.id === grnReturn.supplierId
       );
+      const currency = grnReturn.currencyId
+        ? await currencyService.getCurrencyById(grnReturn.currencyId)
+        : null;
       const ccSettingsId = settings?.warehouseMode;
       let warehouseDTO, branchDTO;
       if (ccSettingsId) {
@@ -105,6 +111,7 @@ export const toGrnReturnDTO = async (
       return {
         ...omittedGrnReturn.rest,
         goodReceiveReturnDetails: omitAudit(detailDTO),
+        currency: toIdValue(currency, "name"),
         warehouse: ccSettingsId ? toIdValue(warehouseDTO, "name") : null,
         branch: ccSettingsId ? null : toIdValue(branchDTO, "name"),
         supplier: toIdValue(supplierDTO, "name"),

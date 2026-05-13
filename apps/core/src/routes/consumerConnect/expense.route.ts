@@ -122,6 +122,7 @@ expenseRouter.put(
     getPermission("CORE", "EXPENSE", "UPDATE")
   ),
   createUploadMiddleware("documents"),
+  uploadToHetzner("documents"),
   validateUpdateExpenseSchema,
   updateExpense
 );

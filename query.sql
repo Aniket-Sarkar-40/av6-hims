@@ -1274,3 +1274,9 @@ CREATE INDEX `branch_requisition_branch_id_idx` ON `inv_branch_requisition`(`bra
 
 -- CreateIndex
 CREATE INDEX `branch_requisition_cc_id_idx` ON `inv_branch_requisition`(`cc_id`);
+
+-- AlterTable
+ALTER TABLE `inv_settings` ADD COLUMN `is_accounting` BOOLEAN NOT NULL DEFAULT true;
+
+
+

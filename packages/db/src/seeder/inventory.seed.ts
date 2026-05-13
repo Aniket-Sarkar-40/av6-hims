@@ -324,7 +324,7 @@ export async function runSeed() {
       permission: "inv:branch-requisition:view",
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true }),
-      selectClause: JSON.stringify({ id: "id", value: "srNumber" }),
+      selectClause: JSON.stringify({ id: "id", value: "brNumber" }),
     },
     {
       shortCode: "BRANCH_REQ_DETAILS",
