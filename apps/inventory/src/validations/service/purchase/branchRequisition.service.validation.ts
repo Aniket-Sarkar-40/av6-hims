@@ -13,6 +13,8 @@ import {
   RejectBranchRequisitionInput,
 } from "@/types/purchase/branchRequisition.js";
 import { validateBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
+import { validateIdBranch } from "@/validations/service/master/branch.service.validation.js";
+import { validateWarehouseId } from "@/validations/service/master/warehouse.service.validation.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { STORE_REQ_STATUS } from "@repo/db/generated/prisma/enums.js";
 import { logger } from "@repo/platform/logging/logger.js";
@@ -62,10 +64,9 @@ export const validateBranchRequisitionCommon = async (
   logger.info("entering::validateBranchRequisitionCommon::service::validation");
 
   validateWarehouseModeEnabled();
-  await validateBranchOrWarehouse(body.ccId);
-  await validateBranchOrWarehouse(body.branchId);
-
-  const location = await validateBranchOrWarehouse(body.locationId);
+  await validateWarehouseId(body.ccId);
+  await validateIdBranch(body.branchId);
+  const location = await validateIdBranch(body.locationId);
 
   if (!location.isMain) {
     if (body.locationId !== body.branchId) {
@@ -207,7 +208,7 @@ export const rejectBranchRequisitionServiceValidation = async (
 
   const currBranchReq = await validateIdBranchRequisition(body.id);
 
-  await validateBranchOrWarehouse(body.ccId);
+  await validateWarehouseId(body.ccId);
 
   ensureMatch(
     body.ccId,
@@ -243,7 +244,7 @@ export const approveBranchRequisitionServiceValidation = async (
   const currBranchReq = await validateIdBranchRequisition(body.branchReqId);
   body.branchReq = currBranchReq;
 
-  await validateBranchOrWarehouse(body.ccId);
+  await validateWarehouseId(body.ccId);
 
   ensureMatch(
     body.ccId,
@@ -429,7 +430,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
   const currBranchReq = await validateIdBranchRequisition(body.branchReqId);
   body.branchReq = currBranchReq;
 
-  await validateBranchOrWarehouse(body.branchId);
+  await validateIdBranch(body.branchId);
 
   ensureMatch(
     body.branchId,

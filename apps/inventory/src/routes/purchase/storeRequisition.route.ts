@@ -4,6 +4,7 @@ import {
   createStoreRequisition,
   deleteStoreRequisition,
   getAllStoreRequisition,
+  getAllStoreRequisitionBatchWiseById,
   getstoreRequisitionBatchWiseById,
   getstoreRequisitionById,
   rejectStoreRequisition,
@@ -52,7 +53,7 @@ storeRequisitionRouter.post(
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION", "CREATE")),
   validateStoreRequisition,
-  createStoreRequisition,
+  createStoreRequisition
 );
 
 /**
@@ -68,7 +69,7 @@ storeRequisitionRouter.get(
   "/",
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisition,
+  getAllStoreRequisition
 );
 
 /**
@@ -89,7 +90,7 @@ storeRequisitionRouter.get(
   "/id",
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionById,
+  getstoreRequisitionById
 );
 
 /**
@@ -119,10 +120,10 @@ storeRequisitionRouter.put(
   verifyToken,
   authorize(
     getPermission("INV", "STORE_REQUISITION", "VIEW"),
-    getPermission("INV", "STORE_REQUISITION", "UPDATE"),
+    getPermission("INV", "STORE_REQUISITION", "UPDATE")
   ),
   validateStoreRequisitionUpdate,
-  updateStoreRequisition,
+  updateStoreRequisition
 );
 
 /**
@@ -149,7 +150,7 @@ storeRequisitionRouter.delete(
   "/",
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION", "DELETE")),
-  deleteStoreRequisition,
+  deleteStoreRequisition
 );
 
 /**
@@ -172,7 +173,7 @@ storeRequisitionRouter.post(
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION_REJECT", "CREATE")),
   validateStoreRequisitionReject,
-  rejectStoreRequisition,
+  rejectStoreRequisition
 );
 
 /**
@@ -195,7 +196,7 @@ storeRequisitionRouter.post(
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION_SENT", "CREATE")),
   validateSentStoreRequisition,
-  approveStoreRequisition,
+  approveStoreRequisition
 );
 
 /**
@@ -218,7 +219,7 @@ storeRequisitionRouter.post(
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeStoreRequisition,
-  acknowledgeStoreRequisition,
+  acknowledgeStoreRequisition
 );
 
 /**
@@ -239,7 +240,7 @@ storeRequisitionRouter.get(
   "/batch-wise-by-id",
   verifyToken,
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionBatchWiseById,
+  getstoreRequisitionBatchWiseById
 );
 
 /**
@@ -264,3 +265,24 @@ storeRequisitionRouter.get(
 //   validateExcelFilterStoreRequisition,
 //   excelStoreReqReport
 // );
+
+/**
+ * @swagger
+ * /api/v1/storeRequisition/batch-wise:
+ *   get:
+ *     summary: Retrieve a single Store Requisition
+ *     tags: [Store Requisition]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Type found
+ *       '404':
+ *         description: Type not found
+ */
+storeRequisitionRouter.get(
+  "/batch-wise",
+  verifyToken,
+  authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
+  getAllStoreRequisitionBatchWiseById
+);

@@ -53,6 +53,12 @@ export enum PermissionResource {
   BRANCH_REQUISITION_REJECT = "branch-requisition-reject",
   BRANCH_REQUISITION_APPROVE = "branch-requisition-approve",
   BRANCH_REQUISITION_ACK = "branch-requisition-acknowledge",
+  STORE_REQUISITION_RETURN_APPROVE = "store-requisition-return-approve",
+  STORE_REQUISITION_RETURN_ACKNOWLEDGE = "store-requisition-return-acknowledge",
+  BRANCH_REQUISITION_RETURN = "branch-requisition-return",
+  BRANCH_REQUISITION_RETURN_REJECT = "branch-requisition-return-reject",
+  BRANCH_REQUISITION_RETURN_APPROVE = "branch-requisition-return-approve",
+  BRANCH_REQUISITION_RETURN_ACK = "branch-requisition-return-acknowledge",
 
   // CORE
   COUNTRY = "country",

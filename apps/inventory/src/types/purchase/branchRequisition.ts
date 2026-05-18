@@ -58,6 +58,7 @@ export interface BranchRequisitionDTO
     | "requisitionFrom"
     | "branchRequisitionDetails"
   > {
+  isAnyPendingReturn: boolean;
   branch: IdValue | null;
   warehouse: IdValue | null;
   requisitionFrom: EmployeeCache | null;

@@ -9,10 +9,8 @@ import {
   IdValue,
 } from "@repo/shared/types/global.js";
 
-export interface CreateItemStockInput extends Omit<
-  Prisma.InvItemStockUncheckedCreateInput,
-  "id" | BaseModelAttr
-> {
+export interface CreateItemStockInput
+  extends Omit<Prisma.InvItemStockUncheckedCreateInput, "id" | BaseModelAttr> {
   quantity: number;
 }
 export interface UpdateItemStockInput extends CreateItemStockInput {
@@ -29,10 +27,11 @@ export type ItemStockResponse = Prisma.InvItemStockGetPayload<{
     collectionCenter: true;
   };
 }>;
-export interface ItemStockDTO extends Omit<
-  InvItemStock,
-  BaseModelAttrWoCancel | "ccId" | "userId" | "itemId"
-> {
+export interface ItemStockDTO
+  extends Omit<
+    InvItemStock,
+    BaseModelAttrWoCancel | "ccId" | "userId" | "itemId"
+  > {
   item: InvItem | null;
   user: IdValue | null;
 }
@@ -40,7 +39,7 @@ export interface ItemStockDTO extends Omit<
 export interface ItemStockByBatchInput {
   itemId: number;
   batchNo?: string | null;
-  ccId: number | null;
+  ccId?: number | null;
   userId?: number;
   expiryDate?: Date | null;
   isFoc?: boolean;

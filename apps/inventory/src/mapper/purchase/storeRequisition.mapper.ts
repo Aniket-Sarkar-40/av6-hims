@@ -23,6 +23,7 @@ import {
 } from "@/repository/stock/stock.repository.js";
 import { RawItemStock } from "@/types/stock/stock.js";
 import { InvItemStock } from "@repo/db/generated/prisma/client";
+import { getPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
 
 export const toStoreRequisitionDTO = async (
   storeRequisition: StoreRequisitionResponse[]
@@ -42,6 +43,9 @@ export const toStoreRequisitionDTO = async (
         "deletedAt",
         "ccId",
       ]);
+
+      const pendingBRR = await getPendingBRRFromBRId(requisition.id);
+      const isAnyPendingReturn = pendingBRR.length > 0;
 
       const branch = await branchService.getBranchById(requisition.ccId, true);
 
@@ -142,6 +146,7 @@ export const toStoreRequisitionDTO = async (
         rejectBy: rejectBy,
         staff: reqFrom ?? null,
         acknowledgementBy: acknowledgementBy,
+        isAnyPendingReturn,
       };
     })
   );

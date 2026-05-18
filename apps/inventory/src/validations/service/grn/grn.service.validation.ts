@@ -216,16 +216,18 @@ export const validateGrnCommon = async (
     }
 
     // Validate price mismatch
-    if (detail.purchasedPrice !== poDetail.purchasedPrice) {
+    if (Number(detail.purchasedPrice) !== Number(poDetail.purchasedPrice)) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
           `Item ${
             poDetail?.item?.item ?? `ID ${detail.itemId}`
-          }: Purchased Price (${
+          }: Purchased Price (${Number(
             detail.purchasedPrice
-          }) does not match Purchase Order Price (${poDetail.purchasedPrice})`
+          )}) does not match Purchase Order Price (${Number(
+            poDetail.purchasedPrice
+          )})`
         )
       );
     }

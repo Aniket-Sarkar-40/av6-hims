@@ -103,14 +103,14 @@ export const validatePurchaseOrderCommon = async (
       )?.basePrice;
       const purchasedPrice = supplierPrice ?? itemBasePrice ?? 0;
 
-      if (purchasedPrice !== detail.purchasedPrice) {
+      if (Number(purchasedPrice) !== Number(detail.purchasedPrice)) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
             "VALUE_MISMATCH",
-            `Purchased price mismatch: expected ${purchasedPrice.toFixed(
-              2
-            )}, got ${detail.purchasedPrice.toFixed(2)}`
+            `Purchased price mismatch: expected ${Number(
+              purchasedPrice
+            ).toFixed(2)}, got ${Number(detail.purchasedPrice).toFixed(2)}`
           )
         );
       }

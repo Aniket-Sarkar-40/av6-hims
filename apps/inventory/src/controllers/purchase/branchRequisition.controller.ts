@@ -141,3 +141,27 @@ export const getBranchRequisitionBatchWiseById = TryCatch(
       );
   }
 );
+
+export const getAllBranchRequisitionBatchWiseById = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::getAllBranchRequisitionBatchWiseById::controller");
+    const { branchRequisitionId } = req.query as {
+      branchRequisitionId: string;
+    };
+
+    const branchRequisition =
+      await branchRequisitionService.getAllBranchRequisitionBatchWiseById(
+        Number(branchRequisitionId)
+      );
+
+    logger.info("exiting::getAllBranchRequisitionBatchWiseById::controller");
+    return res
+      .status(200)
+      .json(
+        BaseResponse.success(
+          { type: "FETCHED", data: branchRequisition },
+          "Batch Wise"
+        )
+      );
+  }
+);

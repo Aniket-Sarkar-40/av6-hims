@@ -78,6 +78,8 @@ export const toItemMasterDTO = async (
       | "unitId"
       | "taxDetailsId"
       | "storageId"
+      | "basePrice"
+      | "lastPurchasedPrice"
     >(itemMaster, [
       "createdBy",
       "updatedBy",
@@ -89,6 +91,8 @@ export const toItemMasterDTO = async (
       "unitId",
       "taxDetailsId",
       "storageId",
+      "basePrice",
+      "lastPurchasedPrice",
     ]);
 
     const itemCategory =
@@ -100,6 +104,10 @@ export const toItemMasterDTO = async (
     const storage = storages.find((s) => s.id === itemMaster.storageId) ?? null;
     return {
       ...omittedItem.rest,
+      basePrice: itemMaster.basePrice ? Number(itemMaster.basePrice) : null,
+      lastPurchasedPrice: itemMaster.lastPurchasedPrice
+        ? Number(itemMaster.lastPurchasedPrice)
+        : null,
       frontImage: itemMaster.frontImage
         ? toPublicImageUrl(itemMaster.frontImage)
         : null,
@@ -140,27 +148,28 @@ export const toItemMasterDTOForItemSupplierMap = async (
     : null;
 
   const settings = await settingsService.getSettings(true);
-
+  const wareMode = settings?.warehouseMode;
   const supplierMode = settings?.supplierMode;
 
-  let finalBasePrice = model.basePrice;
-  if (itemReq) {
-    if (itemReq.ccId && itemReq.supplierId && supplierMode) {
-      const itemSupplierMap = await itemSupplierMapService.getItemSupplierMap(
-        itemReq
-      );
-      if (itemSupplierMap) {
-        finalBasePrice = Number(itemSupplierMap.purchasePrice);
-      }
+  let finalBasePrice: number | null = model.basePrice
+    ? Number(model.basePrice)
+    : null;
+
+  if (itemReq?.ccId && itemReq.supplierId && supplierMode) {
+    const itemSupplierMap = await itemSupplierMapService.getItemSupplierMap(
+      itemReq
+    );
+
+    if (
+      itemSupplierMap?.purchasePrice !== null &&
+      itemSupplierMap?.purchasePrice !== undefined
+    ) {
+      finalBasePrice = Number(itemSupplierMap.purchasePrice);
     }
   }
 
-  const store = await settingsService.getSettings(true);
-  const wareMode = store?.warehouseMode;
-
   let warehouseStock: number | null = null;
   let branchStock: number | null = null;
-  let ccTotal: number | null = null;
 
   if (itemReq?.ccId) {
     const ccId = itemReq.ccId;
@@ -168,7 +177,7 @@ export const toItemMasterDTOForItemSupplierMap = async (
     const ccInfo = ccMap[ccId];
 
     const stockResult = await getItemStockQtyByCc(model.id, ccId);
-    ccTotal = stockResult.totalQty;
+    const ccTotal = stockResult.totalQty;
 
     if (ccInfo?.branch) {
       branchStock = ccTotal;
@@ -180,11 +189,15 @@ export const toItemMasterDTOForItemSupplierMap = async (
   let userStock: number | null = null;
 
   if (itemReq?.userId) {
-    userStock = await getItemStockQtyByUser(model.id, itemReq?.userId);
+    userStock = await getItemStockQtyByUser(model.id, itemReq.userId);
   }
 
   return {
     ...model,
+    basePrice: finalBasePrice,
+    lastPurchasedPrice: model.lastPurchasedPrice
+      ? Number(model.lastPurchasedPrice)
+      : null,
     frontImage: model.frontImage ? toPublicImageUrl(model.frontImage) : null,
     backImage: model.backImage ? toPublicImageUrl(model.backImage) : null,
     leftSideImage: model.leftSideImage
@@ -193,7 +206,6 @@ export const toItemMasterDTOForItemSupplierMap = async (
     rightSideImage: model.rightSideImage
       ? toPublicImageUrl(model.rightSideImage)
       : null,
-    basePrice: finalBasePrice,
     itemCategory: toIdValue(itemCategoryRow, "name"),
     unitMaster: toIdValue(unitMasterRow, "packagingTypeName"),
     taxDetails: toIdValue(taxDetailsRow, "name"),

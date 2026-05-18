@@ -33,6 +33,10 @@ import { PurchaseOrderWithDetails } from "@/types/purchase/purchase.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import { toBranchRequisitionDTO } from "@/mapper/purchase/branchRequisition.mapper.js";
 import { BranchRequisitionResponse } from "@/types/purchase/branchRequisition.js";
+import { toStoreRequisitionReturnDTO } from "@/mapper/purchase/storeRequisitionReturn.mapper.js";
+import { GetStoreRequisitionReturnResponse } from "@/types/purchase/storeRequisitionReturn.js";
+import { toBranchRequisitionReturnDTO } from "@/mapper/purchase/branchRequisitionReturn.mapper.js";
+import { GetBranchRequisitionReturnResponse } from "@/types/purchase/branchRequisitionReturn.js";
 
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
@@ -65,4 +69,8 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toStockAdjustmentDTO(data as StockAdjustmentResponse[]),
   [SHORT_CODE.BRANCH_REQ]: (data: unknown) =>
     toBranchRequisitionDTO(data as BranchRequisitionResponse[]),
+  [SHORT_CODE.ST_REQ_RET]: (data: unknown) =>
+    toStoreRequisitionReturnDTO(data as GetStoreRequisitionReturnResponse),
+  [SHORT_CODE.BRANCH_REQ_RETURN]: (data: unknown) =>
+    toBranchRequisitionReturnDTO(data as GetBranchRequisitionReturnResponse),
 };

@@ -11,6 +11,7 @@ import {
   getBranchRequisitionBatchWiseFromDb,
   rejectBranchRequisition,
   updateBranchRequisitionInDb,
+  valBranchRequisitionBatchWiseFromDb,
 } from "@/repository/purchase/branchRequisition.repository.js";
 import {
   AcknowledgeBranchRequisition,
@@ -134,6 +135,28 @@ export const branchRequisitionService = {
     const dto = await toBranchRequisitionBatchWiseDTO(branchReq);
 
     logger.info("exiting::getBranchRequisitionBatchWiseById::service id=" + id);
+    return dto;
+  },
+
+  async getAllBranchRequisitionBatchWiseById(id: number) {
+    logger.info(
+      "entering::getAllBranchRequisitionBatchWiseById::service id=" + id
+    );
+
+    validIdCheck(id);
+    const branchReq = await valBranchRequisitionBatchWiseFromDb(id);
+    if (!branchReq) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Branch Requisition")
+      );
+    }
+
+    const dto = await toBranchRequisitionBatchWiseDTO(branchReq);
+
+    logger.info(
+      "exiting::getAllBranchRequisitionBatchWiseById::service id=" + id
+    );
     return dto;
   },
 };

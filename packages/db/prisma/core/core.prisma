@@ -235,6 +235,8 @@ model CollectionCenter {
     company                    Company?                   @relation(fields: [companyId], references: [id])
     companyId                  Int?
     branchRequisitions         BranchRequisition[]
+    branchRequisitionReturns   BranchRequisitionReturn[]
+    branchReturnItemDetails    BranchReturnItemDetails[]
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")
@@ -336,26 +338,28 @@ model Staff {
     // incentiveCalculationType     IncentiveCalculationType @default(STANDARD) @map("incentive_calculation_type")
     // isOpdConsultant              BinaryFlag               @default(false) @map("is_opd_consultant")
 
-    employee                   StaffMapping?
-    staffCollectionCenter      StaffCollectionCenter[]
-    notifications              Notification[]
-    doctorSchedule             DoctorSchedule[]
-    timeSlots                  TimeSlot[]
-    appointments               Appointment[]
-    patientReferToDoctors      PatientReferToDoctor[]
-    patientFollowUps           PatientFollowUp[]
-    chipsButtonMappings        ChipsButtonMapping[]
-    consultationNotesMappings  ConsultationNotesMapping[]
-    testCategories             TestCategories[]
-    medicineTabs               MedicineTab[]
-    patientMedicines           PatientMedicine[]
-    paymentTransactions        PaymentTransaction[]
-    pmsStoreRequisitions       PmsStoreRequisition[]
-    pmsStoreRequisitionReturns PmsStoreRequisitionReturn[]
-    pmsSells                   PmsSell[]
-    pmsSellReturns             PmsSellReturn[]
-    approverMappings           ApproverMapping[]
-    approvalActions            ApprovalAction[]
+    employee                     StaffMapping?
+    staffCollectionCenter        StaffCollectionCenter[]
+    notifications                Notification[]
+    doctorSchedule               DoctorSchedule[]
+    timeSlots                    TimeSlot[]
+    appointments                 Appointment[]
+    patientReferToDoctors        PatientReferToDoctor[]
+    patientFollowUps             PatientFollowUp[]
+    chipsButtonMappings          ChipsButtonMapping[]
+    consultationNotesMappings    ConsultationNotesMapping[]
+    testCategories               TestCategories[]
+    medicineTabs                 MedicineTab[]
+    patientMedicines             PatientMedicine[]
+    paymentTransactions          PaymentTransaction[]
+    pmsStoreRequisitions         PmsStoreRequisition[]
+    pmsStoreRequisitionReturns   PmsStoreRequisitionReturn[]
+    pmsSells                     PmsSell[]
+    pmsSellReturns               PmsSellReturn[]
+    approverMappings             ApproverMapping[]
+    approvalActions              ApprovalAction[]
+    storeRequisitionReturns      StoreRequisitionReturn[]
+    requisitionReturnItemDetails RequisitionReturnItemDetails[]
 
     @@map("staff")
 }

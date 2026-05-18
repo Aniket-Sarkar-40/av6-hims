@@ -1280,3 +1280,204 @@ ALTER TABLE `inv_settings` ADD COLUMN `is_accounting` BOOLEAN NOT NULL DEFAULT t
 
 
 
+-- AlterTable
+ALTER TABLE `inv_in_transit_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'BRANCH_REQUISITION', 'STORE_REQUISITION_RETURN') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_item_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'BRANCH_REQUISITION', 'STORE_REQUISITION_RETURN') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_uin_config` MODIFY `short_code` ENUM('PO', 'GRN', 'POR', 'SRN', 'ITEM', 'BATCH_JOB', 'CN', 'STAJ', 'ST_TR', 'BRN', 'SRR') NOT NULL;
+
+-- CreateTable
+CREATE TABLE `inv_store_requisition_return` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `srr_number` VARCHAR(191) NOT NULL,
+    `store_requisition_id` INTEGER NOT NULL,
+    `req_from` INTEGER NOT NULL,
+    `cc_id` INTEGER NOT NULL,
+    `return_status` ENUM('Draft', 'Pending', 'Partially_Approved', 'Approved', 'Reject') NOT NULL DEFAULT 'Pending',
+    `ack_status` ENUM('ACK_PENDING', 'ACK_PARTIALLY_RECEIVED', 'ACK_RECEIVED') NOT NULL DEFAULT 'ACK_PENDING',
+    `return_reason` TEXT NULL,
+    `return_details` TEXT NULL,
+    `date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `approved_by` INTEGER NULL,
+    `reject_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `approved_at` DATETIME(3) NULL,
+    `reject_at` DATETIME(3) NULL,
+    `acknowledgement_by` INTEGER NULL,
+    `acknowledgement_at` DATETIME(3) NULL,
+
+    INDEX `inv_srr_store_requisition_id_idx`(`store_requisition_id`),
+    INDEX `inv_srr_requisition_from_idx`(`req_from`),
+    INDEX `inv_srr_cc_id_idx`(`cc_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `inv_store_requisition_return_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `store_requisition_return_id` INTEGER NOT NULL,
+    `store_requisition_details_id` INTEGER NOT NULL,
+    `item_id` INTEGER NOT NULL,
+    `requested_return_qty` DOUBLE NOT NULL,
+    `acknowledged_return_qty` DOUBLE NOT NULL DEFAULT 0,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `inv_srrd_store_requisition_return_id_idx`(`store_requisition_return_id`),
+    INDEX `inv_srrd_store_requisition_details_id_idx`(`store_requisition_details_id`),
+    INDEX `inv_srrd_item_id_idx`(`item_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `inv_requisition_return_item_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `store_requisition_return_details_id` INTEGER NOT NULL,
+    `requisition_item_details_id` INTEGER NOT NULL,
+    `item_id` INTEGER NOT NULL,
+    `return_qty` INTEGER NOT NULL,
+    `acknowledged_qty` INTEGER NOT NULL DEFAULT 0,
+    `batch_no` VARCHAR(191) NULL,
+    `is_foc` BOOLEAN NOT NULL,
+    `expiry_date` DATE NULL,
+    `comment` TEXT NULL,
+    `is_completed` BOOLEAN NOT NULL DEFAULT false,
+    `req_from` INTEGER NOT NULL,
+    `cc_id` INTEGER NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `inv_rrid_store_requisition_return_details_id_idx`(`store_requisition_return_details_id`),
+    INDEX `inv_rrid_requisition_item_details_id_idx`(`requisition_item_details_id`),
+    INDEX `inv_rrid_item_id_idx`(`item_id`),
+    INDEX `inv_rrid_req_from_idx`(`req_from`),
+    INDEX `inv_rrid_cc_id_idx`(`cc_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AlterTable
+ALTER TABLE `inv_requisition_item_details` ADD COLUMN `returned_qty` INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE `inv_branch_requisition_details` ADD COLUMN `returned_quantity` DOUBLE NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE `inv_in_transit_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'BRANCH_REQUISITION', 'STORE_REQUISITION_RETURN', 'BRANCH_REQUISITION_RETURN') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_item_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'BRANCH_REQUISITION', 'STORE_REQUISITION_RETURN', 'BRANCH_REQUISITION_RETURN') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_uin_config` MODIFY `short_code` ENUM('PO', 'GRN', 'POR', 'SRN', 'ITEM', 'BATCH_JOB', 'CN', 'STAJ', 'ST_TR', 'BRN', 'SRR', 'BRR') NOT NULL;
+
+-- CreateTable
+CREATE TABLE `inv_branch_requisition_return` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `brr_number` VARCHAR(191) NOT NULL,
+    `branch_requisition_id` INTEGER NOT NULL,
+    `req_from` INTEGER NOT NULL,
+    `cc_id` INTEGER NOT NULL,
+    `branch_id` INTEGER NOT NULL,
+    `return_status` ENUM('Draft', 'Pending', 'Partially_Approved', 'Approved', 'Reject') NOT NULL DEFAULT 'Pending',
+    `ack_status` ENUM('ACK_PENDING', 'ACK_PARTIALLY_RECEIVED', 'ACK_RECEIVED') NOT NULL DEFAULT 'ACK_PENDING',
+    `return_reason` TEXT NULL,
+    `return_details` TEXT NULL,
+    `date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `approved_by` INTEGER NULL,
+    `reject_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `approved_at` DATETIME(3) NULL,
+    `reject_at` DATETIME(3) NULL,
+    `acknowledgement_by` INTEGER NULL,
+    `acknowledgement_at` DATETIME(3) NULL,
+
+    INDEX `brr_branch_requisition_id_idx`(`branch_requisition_id`),
+    INDEX `brr_requisition_from_idx`(`req_from`),
+    INDEX `brr_cc_id_idx`(`cc_id`),
+    INDEX `brr_branch_id_idx`(`branch_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `inv_branch_requisition_return_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `branch_requisition_return_id` INTEGER NOT NULL,
+    `branch_requisition_details_id` INTEGER NOT NULL,
+    `item_id` INTEGER NOT NULL,
+    `requested_return_qty` DOUBLE NOT NULL,
+    `acknowledged_return_qty` DOUBLE NOT NULL DEFAULT 0,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `brrd_branch_requisition_return_id_idx`(`branch_requisition_return_id`),
+    INDEX `brrd_branch_requisition_details_id_idx`(`branch_requisition_details_id`),
+    INDEX `brrd_item_id_idx`(`item_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `inv_branch_return_item_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `branch_requisition_return_details_id` INTEGER NOT NULL,
+    `branch_item_details_id` INTEGER NOT NULL,
+    `item_id` INTEGER NOT NULL,
+    `return_qty` INTEGER NOT NULL,
+    `acknowledged_qty` INTEGER NOT NULL DEFAULT 0,
+    `batch_no` VARCHAR(191) NULL,
+    `is_foc` BOOLEAN NOT NULL,
+    `expiry_date` DATE NULL,
+    `comment` TEXT NULL,
+    `is_completed` BOOLEAN NOT NULL DEFAULT false,
+    `branch_id` INTEGER NOT NULL,
+    `cc_id` INTEGER NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `brid_branch_requisition_return_details_id_idx`(`branch_requisition_return_details_id`),
+    INDEX `brid_branch_item_details_id_idx`(`branch_item_details_id`),
+    INDEX `brid_item_id_idx`(`item_id`),
+    INDEX `brid_branch_id_idx`(`branch_id`),
+    INDEX `brid_cc_id_idx`(`cc_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AlterTable
+ALTER TABLE `inv_branch_item_details` ADD COLUMN `returned_qty` INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE `inv_store_requisition_details` ADD COLUMN `returned_quantity` DOUBLE NOT NULL DEFAULT 0;

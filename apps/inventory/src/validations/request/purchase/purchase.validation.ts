@@ -8,6 +8,7 @@ import {
   enumOptional,
   idOptional,
   idRequired,
+  numberWithMaxDecimalsRequired,
   priceRequired,
   strOptional,
 } from "@repo/shared/utils/joi.utils.js";
@@ -40,7 +41,7 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
 
   ccId: idRequired("Cc Id"),
 
-  grandTotal: priceRequired("Grand total"),
+  grandTotal: numberWithMaxDecimalsRequired("Grand total"),
 
   status: enumOptional("Status", PO_STATUS),
 

@@ -70,6 +70,7 @@ export enum ErrorMessageType {
   DATE_RANGE_OVERLAP = "%1 date range overlaps with existing %2 for the %3",
   MUST_GREATER_THEN = "%1 must be greater than %2",
   MUST_BETWEEN = "%1 must be between %2 and %3",
+  INVALID_RETURN = "%1 is not a valid return for %2.",
 }
 
 export enum ValidationErrorMessage {

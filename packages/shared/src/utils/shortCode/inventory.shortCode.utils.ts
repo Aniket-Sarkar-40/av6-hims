@@ -29,6 +29,8 @@ export const SHORT_CODE = {
   STOCK_TRANSFER: "STOCK_TRANSFER",
   BRANCH_REQ: "BRANCH_REQ",
   BRANCH_REQ_DETAILS: "BRANCH_REQ_DETAILS",
+  ST_REQ_RET: "ST_REQ_RET",
+  BRANCH_REQ_RETURN: "BRANCH_REQ_RETURN",
 };
 /*
 short code not  added till now fro the below mentioned tables 

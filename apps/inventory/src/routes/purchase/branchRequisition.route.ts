@@ -3,6 +3,7 @@ import {
   approveBranchRequisition,
   createBranchRequisition,
   deleteBranchRequisition,
+  getAllBranchRequisitionBatchWiseById,
   getBranchRequisitionBatchWiseById,
   rejectBranchRequisition,
   updateBranchRequisition,
@@ -190,4 +191,25 @@ branchRequisitionRouter.get(
   verifyToken,
   authorize(getPermission("INV", "BRANCH_REQUISITION", "VIEW")),
   getBranchRequisitionBatchWiseById
+);
+
+/**
+ * @swagger
+ * /api/v1/storeRequisition/batch-wise:
+ *   get:
+ *     summary: Retrieve a single Store Requisition
+ *     tags: [Store Requisition]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Type found
+ *       '404':
+ *         description: Type not found
+ */
+branchRequisitionRouter.get(
+  "/batch-wise",
+  verifyToken,
+  authorize(getPermission("INV", "BRANCH_REQUISITION", "VIEW")),
+  getAllBranchRequisitionBatchWiseById
 );

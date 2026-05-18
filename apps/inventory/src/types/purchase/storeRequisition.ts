@@ -53,6 +53,7 @@ export interface StoreRequisitionDTO
     | "updatedBy"
     | "requisitionFrom"
   > {
+  isAnyPendingReturn: boolean;
   branch: IdValue | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
@@ -174,13 +175,19 @@ export type StoreReqBatchWiseResponse = Prisma.InvStoreRequisitionGetPayload<{
     };
   };
 }>;
-export interface StoreReqExcelFilter {
-  id?: number;
-  staffId?: number;
-  branchId?: number;
-  warehouseId?: number;
-  startDate?: string;
-  endDate?: string;
-  storeReqStatus?: STORE_REQ_STATUS;
-  storeReqAckStatus?: STORE_REQ_ACK_STATUS;
-}
+
+export type StoreReqValResponse = Prisma.InvStoreRequisitionGetPayload<{
+  include: {
+    requisitionInvItemDetails: {
+      where: {
+        isActive: true;
+        isCompleted: false;
+      };
+    };
+    storeRequisitionDetails: {
+      where: {
+        isActive: true;
+      };
+    };
+  };
+}>;

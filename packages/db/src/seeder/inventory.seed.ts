@@ -337,6 +337,28 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "branchRequisitionId" }),
     },
+    {
+      shortCode: "ST_REQ_RET",
+      tableName: "storeRequisitionReturn",
+      isDTO: true,
+      isSingleDto: true,
+      isCacheable: false,
+      permission: "inv:store-requisition-return:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "srrNumber" }),
+    },
+    {
+      shortCode: "BRANCH_REQ_RETURN",
+      tableName: "branchRequisitionReturn",
+      isDTO: true,
+      isSingleDto: true,
+      isCacheable: false,
+      permission: "inv:branch-requisition-return:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "brrNumber" }),
+    },
   ];
 
   const eventEmails: EventEmailSeeder[] = [

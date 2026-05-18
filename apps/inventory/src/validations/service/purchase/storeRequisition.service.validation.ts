@@ -1,6 +1,7 @@
 import { getCountItemsFromDb } from "@/repository/master/itemMaster.repository.js";
 import {
   getRequisitionItemDetailsFromDb,
+  getStaffCollectionCenterFromDb,
   validateStoreRequisitionByIdFromDb,
 } from "@/repository/purchase/storeRequisition.repository.js";
 import { getStockById } from "@/repository/stock/stock.repository.js";
@@ -19,6 +20,26 @@ import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import { STORE_REQ_STATUS } from "@repo/db/generated/prisma/client";
 import dayjs from "dayjs";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { validateIdBranch } from "@/validations/service/master/branch.service.validation.js";
+
+export const validateStaffCollectionCenter = async (
+  staffId: number,
+  ccId: number
+) => {
+  logger.info("entering::validateStaffCollectionCenter::service::validation");
+  const staffCollectionCenter = await getStaffCollectionCenterFromDb(
+    staffId,
+    ccId
+  );
+  if (!staffCollectionCenter) {
+    throw new ErrorHandler(
+      404,
+      generateErrorMessage("NOT_FOUND", "Staff Collection Center Mapping")
+    );
+  }
+  logger.info("exiting::validateStaffCollectionCenter::service::validation");
+  return staffCollectionCenter;
+};
 
 export const validateIdStoreRequisition = async (id: number) => {
   logger.info("entering::validateIdStoreRequisition service::validation");
@@ -27,7 +48,7 @@ export const validateIdStoreRequisition = async (id: number) => {
   if (!storeReq) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Store Requisition"),
+      generateErrorMessage("NOT_FOUND", "Store Requisition")
     );
   }
   logger.info("exiting::validateIdStoreRequisition::service::validation");
@@ -36,11 +57,13 @@ export const validateIdStoreRequisition = async (id: number) => {
 };
 
 export const validateStoreRequisitionCommon = async (
-  body: CreateStoreRequisitionInput,
+  body: CreateStoreRequisitionInput
 ): Promise<void> => {
   logger.info("entering::validateStoreRequisitionCommon::service::validation");
 
-  await validateBranchOrWarehouse(body.ccId);
+  await validateIdBranch(body.ccId);
+
+  await validateStaffCollectionCenter(body.requisitionFrom, body.ccId);
 
   if (
     body.storeReqStatus &&
@@ -49,19 +72,19 @@ export const validateStoreRequisitionCommon = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store requisition"),
+      generateErrorMessage("INVALID_STATUS", "Store requisition")
     );
   }
 
   const userId = employeeService.getEmployeeByIdFrmCacheOrDb(
-    body.requisitionFrom,
+    body.requisitionFrom
   );
   if (!userId) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Employee"));
   }
 
   const itemIds: number[] = body.storeRequisitionDetails.map(
-    (d: StoreRequisitionDetailInput) => d.itemId,
+    (d: StoreRequisitionDetailInput) => d.itemId
   );
 
   const items = await getCountItemsFromDb(itemIds);
@@ -79,31 +102,31 @@ export const validateStoreRequisitionCommon = async (
 };
 
 export const createStoreRequisitionServiceValidation = async (
-  body: CreateStoreRequisitionInput,
+  body: CreateStoreRequisitionInput
 ) => {
   logger.info(
-    "entering::createStoreRequisitionServiceValidation::service::validation",
+    "entering::createStoreRequisitionServiceValidation::service::validation"
   );
 
   await validateStoreRequisitionCommon(body);
 
   logger.info(
-    "exiting::createStoreRequisitionServiceValidation::service::validation",
+    "exiting::createStoreRequisitionServiceValidation::service::validation"
   );
 };
 
 export const updateStoreRequisitionServiceValidation = async (
-  body: CreateStoreRequisitionInput,
+  body: CreateStoreRequisitionInput
 ) => {
   logger.info(
-    "entering::updateStoreRequisitionServiceValidation::service::validation",
+    "entering::updateStoreRequisitionServiceValidation::service::validation"
   );
 
   if (body.id == null) {
     logger.error("missing storeRequisition id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Store Requisition id"),
+      generateErrorMessage("NOT_FOUND", "Store Requisition id")
     );
   }
   logger.info(`validating existence of storeRequisition id=${body.id}`);
@@ -116,7 +139,7 @@ export const updateStoreRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("INVALID_STATUS", "Store requisition"),
+      generateErrorMessage("INVALID_STATUS", "Store requisition")
     );
   }
 
@@ -128,39 +151,39 @@ export const updateStoreRequisitionServiceValidation = async (
   const existingIds = currReq.storeRequisitionDetails.map((item) => item.id);
   // check if any item is not in stock transfer details
   const notInRequisitionDetails = updatedIds.filter(
-    (id) => !existingIds.includes(id),
+    (id) => !existingIds.includes(id)
   );
   if (notInRequisitionDetails.length > 0) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "INVALID_FIELD",
-        `Id ${notInRequisitionDetails.join(", ")} of Stock Transfer Details`,
-      ),
+        `Id ${notInRequisitionDetails.join(", ")} of Stock Transfer Details`
+      )
     );
   }
 
   await validateStoreRequisitionCommon(body);
 
   logger.info(
-    "exiting::updateStoreRequisitionServiceValidation::service::validation",
+    "exiting::updateStoreRequisitionServiceValidation::service::validation"
   );
 };
 
 export const rejectStoreRequisitionServiceValidation = async (
-  body: RejectStoreRequisitionInput,
+  body: RejectStoreRequisitionInput
 ) => {
   logger.info(
-    "entering::rejectStoreRequisitionServiceValidation::service::validation",
+    "entering::rejectStoreRequisitionServiceValidation::service::validation"
   );
 
   const currStoreReq = await validateIdStoreRequisition(body.id);
-  await validateBranchOrWarehouse(body.ccId);
+  await validateIdBranch(body.ccId);
 
   if (currStoreReq.ccId !== body.ccId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Location"),
+      generateErrorMessage("ACCESS_FAIL", "Correct Location")
     );
   }
   if (
@@ -169,29 +192,29 @@ export const rejectStoreRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store requisition"),
+      generateErrorMessage("INVALID_STATUS", "Store requisition")
     );
   }
   logger.info(
-    "exiting::rejectStoreRequisitionServiceValidation::service::validation",
+    "exiting::rejectStoreRequisitionServiceValidation::service::validation"
   );
 };
 
 export const approveStoreRequisitionServiceValidation = async (
-  body: ApproveStoreReqInput,
+  body: ApproveStoreReqInput
 ) => {
   logger.info(
-    "entering::approveStoreRequisitionServiceValidation::service::validation",
+    "entering::approveStoreRequisitionServiceValidation::service::validation"
   );
 
   const currStoreReq = await validateIdStoreRequisition(body.storeReqId);
   body.storeReq = currStoreReq;
-  await validateBranchOrWarehouse(body.ccId);
+  await validateIdBranch(body.ccId);
 
   if (currStoreReq.ccId !== body.ccId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Current Location"),
+      generateErrorMessage("ACCESS_FAIL", "Current Location")
     );
   }
 
@@ -201,27 +224,27 @@ export const approveStoreRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store requisition"),
+      generateErrorMessage("INVALID_STATUS", "Store requisition")
     );
   }
 
   if (currStoreReq.srNumber !== body.storeReqNo) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", "Store requisition number"),
+      generateErrorMessage("INVALID_FIELD", "Store requisition number")
     );
   }
   let totalAssignQty = 0;
 
   for (const detail of body.assignItems) {
     const srDetails = currStoreReq.storeRequisitionDetails.find(
-      (elem) => elem.id === detail.storeRequisitionDetailsId,
+      (elem) => elem.id === detail.storeRequisitionDetailsId
     );
 
     if (!srDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Store requisition details.`),
+        generateErrorMessage("NOT_FOUND", `Store requisition details.`)
       );
     }
     totalAssignQty += detail.assignedQty;
@@ -229,7 +252,7 @@ export const approveStoreRequisitionServiceValidation = async (
     if (srDetails.itemId !== detail.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item"),
+        generateErrorMessage("INVALID_FIELD", "Item")
       );
     }
 
@@ -242,7 +265,7 @@ export const approveStoreRequisitionServiceValidation = async (
     if (srDetails.reqQuantity < assignQty) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", `Assign Quantity for `),
+        generateErrorMessage("INVALID_FIELD", `Assign Quantity for `)
       );
     }
 
@@ -250,7 +273,7 @@ export const approveStoreRequisitionServiceValidation = async (
     if (!stock) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Item Stock`),
+        generateErrorMessage("NOT_FOUND", `Item Stock`)
       );
     }
 
@@ -263,8 +286,8 @@ export const approveStoreRequisitionServiceValidation = async (
         400,
         generateErrorMessage(
           "INVALID_VALUE",
-          `Item for Batch no : ${detail.batchNo}`,
-        ),
+          `Item for Batch no : ${detail.batchNo}`
+        )
       );
     }
 
@@ -273,30 +296,30 @@ export const approveStoreRequisitionServiceValidation = async (
         400,
         generateErrorMessage(
           "INSUFFICIENT_STOCK",
-          `Batch no : ${detail.batchNo}`,
-        ),
+          `Batch no : ${detail.batchNo}`
+        )
       );
     }
   }
 
   const totalReqQty = currStoreReq.storeRequisitionDetails.reduce(
     (acc, details) => (acc += details.reqQuantity),
-    0,
+    0
   );
 
   const alreadyAssignedQty = currStoreReq.storeRequisitionDetails.reduce(
     (acc, details) => (acc += details.assignedQuantity),
-    0,
+    0
   );
   const alreadyAckQty = currStoreReq.storeRequisitionDetails.reduce(
     (acc, details) => (acc += details.acknowledgedQuantity),
-    0,
+    0
   );
 
   if (totalAssignQty + alreadyAssignedQty > totalReqQty) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_VALUE", `Item Total quantity`),
+      generateErrorMessage("INVALID_VALUE", `Item Total quantity`)
     );
   } else if (totalAssignQty + alreadyAssignedQty < totalReqQty) {
     body.storeReqStatus = "Partially_Approved";
@@ -311,15 +334,15 @@ export const approveStoreRequisitionServiceValidation = async (
     body.storeReqAckStatus = "ACK_PARTIALLY_RECEIVED";
   }
   logger.info(
-    "exiting::approveStoreRequisitionServiceValidation::service::validation",
+    "exiting::approveStoreRequisitionServiceValidation::service::validation"
   );
 };
 
 export const acknowledgeStoreRequisitionServiceValidation = async (
-  body: AcknowledgeRequisition,
+  body: AcknowledgeRequisition
 ) => {
   logger.info(
-    "entering::acknowledgeStoreRequisitionServiceValidation::service::validation",
+    "entering::acknowledgeStoreRequisitionServiceValidation::service::validation"
   );
 
   const currStoreReq = await validateIdStoreRequisition(body.storeReqId);
@@ -328,7 +351,7 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
   if (currStoreReq.requisitionFrom !== body.requisitionFrom) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Current Location"),
+      generateErrorMessage("ACCESS_FAIL", "Current Location")
     );
   }
 
@@ -338,23 +361,23 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "store req status"),
+      generateErrorMessage("INVALID_STATUS", "store req status")
     );
   }
 
   if (currStoreReq.storeReqAckStatus === "ACK_RECEIVED") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "store req acknowledge status"),
+      generateErrorMessage("INVALID_STATUS", "store req acknowledge status")
     );
   }
 
-  await validateBranchOrWarehouse(body.ccId);
+  await validateIdBranch(body.ccId);
 
   if (currStoreReq.srNumber !== body.storeReqNo) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", "Store requisition number"),
+      generateErrorMessage("INVALID_FIELD", "Store requisition number")
     );
   }
   let currTotalAckQty = 0;
@@ -362,20 +385,20 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
   for (const detail of body.acknowledgeItems) {
     currTotalAckQty += detail.totalAcknowledgeQty;
     const srDetails = currStoreReq.storeRequisitionDetails.find(
-      (elem) => elem.id === detail.storeRequisitionDetailsId,
+      (elem) => elem.id === detail.storeRequisitionDetailsId
     );
 
     if (!srDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Store requisition details.`),
+        generateErrorMessage("NOT_FOUND", `Store requisition details.`)
       );
     }
 
     if (srDetails.itemId !== detail.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item"),
+        generateErrorMessage("INVALID_FIELD", "Item")
       );
     }
 
@@ -383,13 +406,13 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
 
     for (const item of detail.itemBatch) {
       const requisitionItem = await getRequisitionItemDetailsFromDb(
-        item.requisitionItemId,
+        item.requisitionItemId
       );
 
       if (!requisitionItem) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", `Store requisition details.`),
+          generateErrorMessage("NOT_FOUND", `Store requisition details.`)
         );
       }
 
@@ -401,8 +424,8 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
           400,
           generateErrorMessage(
             "INVALID_FIELD",
-            `Acknowledge quantity for Batch no : ${item.batchNo}`,
-          ),
+            `Acknowledge quantity for Batch no : ${item.batchNo}`
+          )
         );
       } else if (
         requisitionItem.assignedQty >
@@ -420,30 +443,30 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
     if (detail.totalAcknowledgeQty !== totalAckQty) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", `Total acknowledge quantity`),
+        generateErrorMessage("INVALID_FIELD", `Total acknowledge quantity`)
       );
     }
   }
 
   const totalReqQty = currStoreReq.storeRequisitionDetails.reduce(
     (acc, details) => (acc += details.reqQuantity),
-    0,
+    0
   );
 
   const totalAckQtyTill = currStoreReq.storeRequisitionDetails.reduce(
     (acc, details) => (acc += details.acknowledgedQuantity),
-    0,
+    0
   );
 
   const totalAssignQty = currStoreReq.storeRequisitionDetails.reduce(
     (acc, details) => (acc += details.assignedQuantity),
-    0,
+    0
   );
 
   if (totalReqQty < totalAckQtyTill + currTotalAckQty) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", `Item Total quantity`),
+      generateErrorMessage("INVALID_FIELD", `Item Total quantity`)
     );
   } else if (totalAssignQty === totalAckQtyTill + currTotalAckQty) {
     body.storeReqAckStatus = "ACK_RECEIVED";
@@ -452,13 +475,13 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
   }
 
   logger.info(
-    "exiting::acknowledgeStoreRequisitionServiceValidation::service::validation",
+    "exiting::acknowledgeStoreRequisitionServiceValidation::service::validation"
   );
 };
 
 export const deleteStoreRequisitionServiceValidation = async (id: number) => {
   logger.info(
-    "entering::createStoreRequisitionServiceValidation::service::validation",
+    "entering::createStoreRequisitionServiceValidation::service::validation"
   );
 
   const srn = await validateIdStoreRequisition(id);
@@ -468,10 +491,10 @@ export const deleteStoreRequisitionServiceValidation = async (id: number) => {
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store requisition"),
+      generateErrorMessage("INVALID_STATUS", "Store requisition")
     );
   }
   logger.info(
-    "exiting::createStoreRequisitionServiceValidation::service::validation",
+    "exiting::createStoreRequisitionServiceValidation::service::validation"
   );
 };

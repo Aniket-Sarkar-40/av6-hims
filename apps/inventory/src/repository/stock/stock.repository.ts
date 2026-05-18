@@ -18,7 +18,7 @@ type Tx = Prisma.TransactionClient;
 export const addItemStock = async (
   tx: Tx,
   data: CreateItemStockInput,
-  detail: ItemStockAudit,
+  detail: ItemStockAudit
 ): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
@@ -78,7 +78,7 @@ export const addItemStock = async (
 export const subItemStock = async (
   tx: Tx,
   data: CreateItemStockInput,
-  detail: ItemStockAudit,
+  detail: ItemStockAudit
 ): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
@@ -128,7 +128,7 @@ export const subItemStock = async (
 };
 
 export const getStockById = async (
-  id: number,
+  id: number
 ): Promise<ItemStockResponse | null> => {
   logger.info(`entering::getStockById::repository`);
 
@@ -201,7 +201,7 @@ export const getItemStockByBatchWise = async ({
 
 export const getItemStockQtyByLocation = async (
   itemId: number,
-  ccId: number,
+  ccId: number
 ) => {
   logger.info(`entering::getItemStockQtyByLocation::repository`);
 
@@ -248,7 +248,7 @@ export const getItemStockQtyByCc = async (itemId: number, ccId: number) => {
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 };
 
@@ -257,7 +257,7 @@ export const getItemStocksByLocation = async (
   id: number,
   ccId?: number,
   userId?: number,
-  canTakeZero = false,
+  canTakeZero = false
 ): Promise<InvItemStock[]> => {
   logger.info(`entering::getItemStocksByLocation::repository (raw SQL)`);
   const store = requestStorage.getStore();
@@ -295,7 +295,7 @@ export const getItemStocksByLocationUserId = async (
   tx: Tx,
   itemId?: number,
   userId?: number,
-  canTakeZero = false,
+  canTakeZero = false
 ): Promise<InvItemStock[]> => {
   logger.info(`entering::getItemStocksByLocation::repository (raw SQL)`);
 
@@ -820,7 +820,7 @@ export const getItemStockByItemOnly = async (
   ccId: number,
   batchNo?: string | null,
   expiryDate?: Date | null,
-  isFoc?: boolean,
+  isFoc?: boolean
 ) => {
   logger.info(`entering::getItemStockByItemOnly::repository`);
 
@@ -843,7 +843,7 @@ export const getItemStockByItemOnly = async (
 };
 
 export const getStocksByIds = async (
-  ids: number[],
+  ids: number[]
 ): Promise<InvItemStock[]> => {
   logger.info(`entering::getStocksByIds::repository`);
   return await db.invItemStock.findMany({

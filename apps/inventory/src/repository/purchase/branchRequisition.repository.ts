@@ -566,13 +566,12 @@ export const getBranchRequisitionBatchWiseFromDb = async (
   id: number
 ): Promise<BranchReqBatchWiseResponse | null> => {
   logger.info(`entering::getStoreRequisitionBatchWiseFromDb::repository`);
-  const branchReq = await db.branchRequisition.findUnique({
+  const branchReq = await db.branchRequisition.findFirst({
     where: { id, isActive: true },
     include: {
       branchItemDetails: {
         where: {
           isActive: true,
-          isCompleted: false,
         },
         include: {
           branchRequisitionDetails: true,
@@ -581,5 +580,30 @@ export const getBranchRequisitionBatchWiseFromDb = async (
     },
   });
   logger.info(`exiting::getStoreRequisitionBatchWiseFromDb::repository`);
+  return branchReq;
+};
+
+export const valBranchRequisitionBatchWiseFromDb = async (
+  id: number
+): Promise<BranchReqBatchWiseResponse | null> => {
+  logger.info(
+    `entering::getBranchRequisitionBatchWiseFromDb::repository id=${id}`
+  );
+  const branchReq = await db.branchRequisition.findFirst({
+    where: { id, isActive: true },
+    include: {
+      branchItemDetails: {
+        where: {
+          isActive: true,
+        },
+        include: {
+          branchRequisitionDetails: true,
+        },
+      },
+    },
+  });
+  logger.info(
+    `exiting::getBranchRequisitionBatchWiseFromDb::repository id=${id}`
+  );
   return branchReq;
 };

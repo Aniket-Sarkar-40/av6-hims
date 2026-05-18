@@ -1,4 +1,5 @@
 import { itemMasterToDto } from "@/mapper/master/itemMaster.mapper.js";
+import { getPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
 import { getItemStockQtyByLocation } from "@/repository/stock/stock.repository.js";
 import { branchService } from "@/services/master/branch.service.js";
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
@@ -38,6 +39,9 @@ export const toBranchRequisitionDTO = async (
         "branchId",
         "requisitionFrom",
       ]);
+
+      const pendingBRR = await getPendingBRRFromBRId(requisition.id);
+      const isAnyPendingReturn = pendingBRR.length > 0;
 
       const warehouse = requisition.ccId
         ? await warehouseService.getWarehouseById(requisition.ccId, true)
@@ -123,6 +127,7 @@ export const toBranchRequisitionDTO = async (
         approvedBy,
         rejectBy,
         acknowledgementBy,
+        isAnyPendingReturn,
       };
     })
   );

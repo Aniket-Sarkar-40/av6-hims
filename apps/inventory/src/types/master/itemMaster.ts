@@ -1,5 +1,6 @@
 import { InvItem, Prisma } from "@repo/db/generated/prisma/client";
 import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
+import { DecimalToNumber } from "@repo/shared/utils/helper.utils.js";
 import { FormData } from "@repo/shared/utils/types.utils.js";
 
 export type ItemMasterReq = Omit<Prisma.InvItemUncheckedCreateInput, "id">;
@@ -17,21 +18,22 @@ export interface ItemImageFiles {
   rightSideImage?: Express.Multer.File[];
 }
 
-export interface ItemMasterDto extends Omit<
-  InvItem,
-  | "itemCategoryId"
-  | "unitId"
-  | "taxDetailsId"
-  | "storageId"
-  | BaseModelAttrWoCancel
-> {
+export interface ItemMasterDto
+  extends Omit<
+    DecimalToNumber<InvItem>,
+    | "itemCategoryId"
+    | "unitId"
+    | "taxDetailsId"
+    | "storageId"
+    | BaseModelAttrWoCancel
+  > {
   itemCategory: IdValue | null;
   unitMaster: IdValue | null;
   taxDetails: IdValue | null;
   storage: IdValue | null;
 }
 
-export interface ItemMasterDtoStock extends ItemMasterDto {
+export interface ItemMasterDtoStock extends DecimalToNumber<ItemMasterDto> {
   branchInHandStock: number | null;
   warehouseInHandStock: number | null;
   userInHandStock: number | null;
