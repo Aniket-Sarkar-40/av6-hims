@@ -34,26 +34,24 @@ const corsOptions: cors.CorsOptions = {
 
 app.use(cors(corsOptions));
 
-const enabled = new Set(
-  (process.env.ENABLED_APPS ?? "core,opd,pms").split(",")
-);
-
-if (enabled.has("core")) app.use("/api/v1/core", createCoreApp("GATEWAY"));
-if (enabled.has("opd")) app.use("/api/v1/opd", createOpdApp("GATEWAY"));
-if (enabled.has("pms")) app.use("/api/v1/pms", createPharmacyApp("GATEWAY"));
-if (enabled.has("inv")) app.use("/api/v1/inv", createInvApp("GATEWAY"));
-if (enabled.has("acc")) app.use("/api/v1/acc", createAccApp("GATEWAY"));
+app.use("/api/v1/core", createCoreApp("GATEWAY"));
+app.use("/api/v1/opd", createOpdApp("GATEWAY"));
+app.use("/api/v1/pms", createPharmacyApp("GATEWAY"));
+app.use("/api/v1/inv", createInvApp("GATEWAY"));
+app.use("/api/v1/acc", createAccApp("GATEWAY"));
 
 connectRedis()
   .then(() => {
     logger.info("Starting the Server...");
     app.listen(PORT, async () => {
       console.log(`gateway running on ${PORT}`);
-      if (IS_REDIS && enabled.has("core")) await initializeCoreCache();
-      if (IS_REDIS && enabled.has("opd")) await initializeOpdCache();
-      if (IS_REDIS && enabled.has("pharmacy")) await initializePharmacyCache();
-      if (IS_REDIS && enabled.has("inv")) await initializeInvCache();
-      if (IS_REDIS && enabled.has("acc")) await initializeAccCache();
+      if (IS_REDIS) {
+        await initializeCoreCache();
+        await initializeOpdCache();
+        await initializePharmacyCache();
+        await initializeInvCache();
+        await initializeAccCache();
+      }
     });
   })
   .catch((err) => {

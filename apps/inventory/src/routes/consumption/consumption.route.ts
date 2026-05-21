@@ -20,6 +20,7 @@ import {
   validateUpdateConsumption,
 } from "@/validations/request/consumption/consumption.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const consumptionRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const consumptionRouter: Router = Router();
  */
 consumptionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "CREATE")),
   validateCreateConsumption,
-  createConsumption,
+  createConsumption
 );
 
 /**
@@ -73,7 +74,7 @@ consumptionRouter.put(
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "UPDATE")),
   validateUpdateConsumption,
-  updateConsumption,
+  updateConsumption
 );
 
 /**
@@ -89,7 +90,7 @@ consumptionRouter.get(
   "/",
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getAllConsumption,
+  getAllConsumption
 );
 
 /** * @swagger
@@ -111,7 +112,7 @@ consumptionRouter.get(
   "/id",
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getConsumptionById,
+  getConsumptionById
 );
 
 /**
@@ -135,7 +136,7 @@ consumptionRouter.put(
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "APPROVE")),
   validateApproveConsumption,
-  approveConsumption,
+  approveConsumption
 );
 
 /**
@@ -158,7 +159,7 @@ consumptionRouter.delete(
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "DELETE")),
   validateCommonConsumptionInput,
-  deleteConsumptionById,
+  deleteConsumptionById
 );
 
 /**
@@ -181,7 +182,7 @@ consumptionRouter.put(
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "REJECT")),
   validateCommonConsumptionInput,
-  rejectConsumption,
+  rejectConsumption
 );
 
 /**
@@ -203,5 +204,5 @@ consumptionRouter.get(
   "/by-user",
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getConsumptionByUserId,
+  getConsumptionByUserId
 );
