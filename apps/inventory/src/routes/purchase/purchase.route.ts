@@ -20,6 +20,7 @@ import {
 
 import { Router } from "express";
 import { authorizeExternal } from "@apps/core/middleware/auth.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const purchaseRouter: Router = Router();
 
@@ -47,7 +48,7 @@ export const purchaseRouter: Router = Router();
  */
 purchaseRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "CREATE")),
   validatePurchase,
   createPurchase
@@ -64,7 +65,7 @@ purchaseRouter.post(
  */
 purchaseRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
   getAllPurchase
 );
@@ -85,7 +86,7 @@ purchaseRouter.get(
  */
 purchaseRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
   getPurchaseById
 );
@@ -114,7 +115,7 @@ purchaseRouter.get(
  */
 purchaseRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "PURCHASE_ORDER", "VIEW"),
     getPermission("INV", "PURCHASE_ORDER", "UPDATE")
@@ -162,7 +163,7 @@ purchaseRouter.put(
  */
 purchaseRouter.post(
   "/:id/approval",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_APPROVAL", "CREATE")),
   purchaseApproval
 );
@@ -244,7 +245,7 @@ purchaseRouter.post("/rejection", authorizeExternal(), purchaseRejection);
  */
 purchaseRouter.post(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
   generatePurchaseOrderPdf
 );

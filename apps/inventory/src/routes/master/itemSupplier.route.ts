@@ -16,6 +16,7 @@ import {
 } from "@/validations/request/master/itemSupplier.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemSupplierRouter: Router = Router();
 
@@ -43,10 +44,10 @@ export const itemSupplierRouter: Router = Router();
  */
 itemSupplierRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "CREATE")),
   validateCreateItemSupplier,
-  createItemSupplier,
+  createItemSupplier
 );
 
 /**
@@ -66,10 +67,10 @@ itemSupplierRouter.post(
  */
 itemSupplierRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "UPDATE")),
   validateUpdateItemSupplier,
-  updateItemSupplier,
+  updateItemSupplier
 );
 
 /**
@@ -83,9 +84,9 @@ itemSupplierRouter.put(
  */
 itemSupplierRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
-  getAllItemSupplier,
+  getAllItemSupplier
 );
 
 /**
@@ -107,9 +108,9 @@ itemSupplierRouter.get(
 
 itemSupplierRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
-  getItemSupplierById,
+  getItemSupplierById
 );
 
 /**
@@ -131,7 +132,7 @@ itemSupplierRouter.get(
 
 itemSupplierRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "DELETE")),
-  deleteItemSupplierById,
+  deleteItemSupplierById
 );

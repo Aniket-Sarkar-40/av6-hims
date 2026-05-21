@@ -19,6 +19,7 @@ import {
 } from "@/validations/request/grn/grnReturn.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const grnReturnRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const grnReturnRouter: Router = Router();
  */
 grnReturnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "CREATE")),
   validateGrnReturn,
-  createGrnReturn,
+  createGrnReturn
 );
 
 /**
@@ -63,9 +64,9 @@ grnReturnRouter.post(
  */
 grnReturnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "VIEW")),
-  getAllGrnReturn,
+  getAllGrnReturn
 );
 
 /**
@@ -84,9 +85,9 @@ grnReturnRouter.get(
  */
 grnReturnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "VIEW")),
-  getGrnReturnById,
+  getGrnReturnById
 );
 
 /**
@@ -113,13 +114,13 @@ grnReturnRouter.get(
  */
 grnReturnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "GRN_RETURN", "VIEW"),
-    getPermission("INV", "GRN_RETURN", "UPDATE"),
+    getPermission("INV", "GRN_RETURN", "UPDATE")
   ),
   validateGrnReturnUpdate,
-  updateGrnReturn,
+  updateGrnReturn
 );
 
 /**
@@ -144,9 +145,9 @@ grnReturnRouter.put(
  */
 grnReturnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "DELETE")),
-  deleteGrnReturn,
+  deleteGrnReturn
 );
 
 /**
@@ -166,10 +167,10 @@ grnReturnRouter.delete(
  */
 grnReturnRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN_APPROVE", "CREATE")),
   validateGrnReturnApprove,
-  approveGrnReturn,
+  approveGrnReturn
 );
 
 /**
@@ -189,9 +190,9 @@ grnReturnRouter.post(
  */
 grnReturnRouter.post(
   "/rejected",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN_REJECTED", "CREATE")),
-  rejectedGrnReturn,
+  rejectedGrnReturn
 );
 
 /**

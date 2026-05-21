@@ -24,6 +24,7 @@ import {
   validateItemStock,
 } from "@/validations/request/master/itemMaster.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemMasterRouter: Router = Router();
 
@@ -51,7 +52,7 @@ export const itemMasterRouter: Router = Router();
  */
 itemMasterRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
   createUploadFieldsMiddleware("item", [
     "frontImage",
@@ -60,7 +61,7 @@ itemMasterRouter.post(
     "rightSideImage",
   ]),
   validateItemMasterCreate,
-  createItemMaster,
+  createItemMaster
 );
 
 /**
@@ -74,9 +75,9 @@ itemMasterRouter.post(
  */
 itemMasterRouter.put(
   "/active",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
-  ActiveItem,
+  ActiveItem
 );
 
 /**
@@ -90,9 +91,9 @@ itemMasterRouter.put(
  */
 itemMasterRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
-  getAllItemMaster,
+  getAllItemMaster
 );
 
 /**
@@ -111,10 +112,10 @@ itemMasterRouter.get(
  */
 itemMasterRouter.post(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
   validateGetItem,
-  getItemMasterById,
+  getItemMasterById
 );
 
 /**
@@ -141,10 +142,10 @@ itemMasterRouter.post(
  */
 itemMasterRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "ITEM_MASTER", "VIEW"),
-    getPermission("INV", "ITEM_MASTER", "UPDATE"),
+    getPermission("INV", "ITEM_MASTER", "UPDATE")
   ),
   createUploadFieldsMiddleware("item", [
     "frontImage",
@@ -153,7 +154,7 @@ itemMasterRouter.put(
     "rightSideImage",
   ]),
   validateItemMasterUpdate,
-  updateItemMaster,
+  updateItemMaster
 );
 
 /**
@@ -173,10 +174,10 @@ itemMasterRouter.put(
  */
 itemMasterRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SEARCH", "CREATE")),
   validateItemSearch,
-  itemSearch,
+  itemSearch
 );
 
 /**
@@ -206,10 +207,10 @@ itemMasterRouter.post(
  */
 itemMasterRouter.post(
   "/items",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEMS_SUP", "VIEW")),
   validateBulkItemSupplierPrices,
-  getBulkItemSupplierPrices,
+  getBulkItemSupplierPrices
 );
 
 /**
@@ -229,10 +230,10 @@ itemMasterRouter.post(
  */
 itemMasterRouter.post(
   "/stock",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_BATCHES", "VIEW")),
   validateItemStock,
-  getItemStocksByItemId,
+  getItemStocksByItemId
 );
 
 /**
@@ -245,7 +246,7 @@ itemMasterRouter.post(
 // POST /export
 itemMasterRouter.post(
   "/export",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
-  itemExcelSampleExport,
+  itemExcelSampleExport
 );

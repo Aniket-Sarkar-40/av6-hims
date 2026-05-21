@@ -15,6 +15,7 @@ import {
   validateGrnUpdate,
 } from "@/validations/request/grn/grn.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const grnRouter: Router = Router();
 
@@ -42,10 +43,10 @@ export const grnRouter: Router = Router();
  */
 grnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "CREATE")),
   validateGrn,
-  createGrn,
+  createGrn
 );
 
 /**
@@ -59,9 +60,9 @@ grnRouter.post(
  */
 grnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "VIEW")),
-  getAllGrn,
+  getAllGrn
 );
 
 /**
@@ -80,9 +81,9 @@ grnRouter.get(
  */
 grnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "VIEW")),
-  getGrnById,
+  getGrnById
 );
 
 /**
@@ -109,13 +110,13 @@ grnRouter.get(
  */
 grnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "GRN", "VIEW"),
-    getPermission("INV", "GRN", "UPDATE"),
+    getPermission("INV", "GRN", "UPDATE")
   ),
   validateGrnUpdate,
-  updateGrn,
+  updateGrn
 );
 
 /**
@@ -140,9 +141,9 @@ grnRouter.put(
  */
 grnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "DELETE")),
-  deleteGrn,
+  deleteGrn
 );
 
 /**
@@ -170,7 +171,7 @@ grnRouter.delete(
 
 grnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "DELETE")),
-  deleteGrn,
+  deleteGrn
 );

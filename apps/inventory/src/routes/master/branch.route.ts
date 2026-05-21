@@ -13,6 +13,7 @@ import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateToggleActive } from "@/validations/request/common.validation.js";
 import { validateBranch } from "@/validations/request/master/branch.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const branchRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const branchRouter: Router = Router();
  */
 branchRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH", "CREATE")),
   validateBranch,
-  createBranch,
+  createBranch
 );
 
 /**
@@ -57,9 +58,9 @@ branchRouter.post(
  */
 branchRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH", "VIEW")),
-  getAllBranch,
+  getAllBranch
 );
 
 /**
@@ -78,9 +79,9 @@ branchRouter.get(
  */
 branchRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH", "VIEW")),
-  getBranchById,
+  getBranchById
 );
 
 /**
@@ -100,13 +101,13 @@ branchRouter.get(
  */
 branchRouter.post(
   "/toggle-active",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH", "VIEW"),
-    getPermission("INV", "BRANCH", "UPDATE"),
+    getPermission("INV", "BRANCH", "UPDATE")
   ),
   validateToggleActive,
-  toggleActiveBranch,
+  toggleActiveBranch
 );
 
 /**
@@ -133,11 +134,11 @@ branchRouter.post(
  */
 branchRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH", "VIEW"),
-    getPermission("INV", "BRANCH", "UPDATE"),
+    getPermission("INV", "BRANCH", "UPDATE")
   ),
   validateBranch,
-  updateBranch,
+  updateBranch
 );

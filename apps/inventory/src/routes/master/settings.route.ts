@@ -9,6 +9,7 @@ import {
   upsertSettings,
 } from "@/controllers/master/settings.controller.js";
 import { validateSettings } from "@/validations/request/master/settings.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const settingsRouter: Router = Router();
 
@@ -36,10 +37,10 @@ export const settingsRouter: Router = Router();
  */
 settingsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "SETTING", "CREATE")),
   validateSettings,
-  upsertSettings,
+  upsertSettings
 );
 
 /**
@@ -53,9 +54,9 @@ settingsRouter.post(
  */
 settingsRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "SETTING", "VIEW")),
-  getSettings,
+  getSettings
 );
 
 export default settingsRouter;

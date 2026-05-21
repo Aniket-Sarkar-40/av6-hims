@@ -14,6 +14,7 @@ import {
   validateItemStoreUpdate,
 } from "@/validations/request/master/itemStore.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemStoreRouter: Router = Router();
 
@@ -41,10 +42,10 @@ export const itemStoreRouter: Router = Router();
  */
 itemStoreRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STORE", "CREATE")),
   validateItemStoreCreate,
-  createItemStore,
+  createItemStore
 );
 
 /**
@@ -58,9 +59,9 @@ itemStoreRouter.post(
  */
 itemStoreRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STORE", "VIEW")),
-  getAllItemStore,
+  getAllItemStore
 );
 
 /**
@@ -79,9 +80,9 @@ itemStoreRouter.get(
  */
 itemStoreRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STORE", "VIEW")),
-  getItemStoreById,
+  getItemStoreById
 );
 
 /**
@@ -108,11 +109,11 @@ itemStoreRouter.get(
  */
 itemStoreRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "ITEM_STORE", "VIEW"),
-    getPermission("INV", "ITEM_STORE", "UPDATE"),
+    getPermission("INV", "ITEM_STORE", "UPDATE")
   ),
   validateItemStoreUpdate,
-  updateItemStore,
+  updateItemStore
 );

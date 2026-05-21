@@ -18,6 +18,7 @@ import {
   validateSearchStockTransfer,
   validateUpdateStockTransfer,
 } from "@/validations/request/stock/stockTransfer.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -51,7 +52,7 @@ const stockTransferRouter: Router = Router();
 
 stockTransferRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "CREATE")),
   validateCreateStockTransfer,
   createStockTransfer
@@ -75,7 +76,7 @@ stockTransferRouter.post(
 
 stockTransferRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STOCK_TRANSFER", "VIEW"),
     getPermission("INV", "STOCK_TRANSFER", "UPDATE")
@@ -102,7 +103,7 @@ stockTransferRouter.put(
 
 stockTransferRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "DELETE")),
   validateDeleteStockTransfer,
   deleteStockTransfer
@@ -126,7 +127,7 @@ stockTransferRouter.delete(
 
 stockTransferRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER_APPROVE", "CREATE")),
   validateApproveStockTransfer,
   approveStockTransfer
@@ -149,7 +150,7 @@ stockTransferRouter.post(
 
 stockTransferRouter.post(
   "/approve-return",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH_STOCK_TRANSFER_APPROVE_RETURN", "CREATE")
   ),
@@ -174,7 +175,7 @@ stockTransferRouter.post(
  */
 stockTransferRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER_ACKNOWLEDGE", "CREATE")),
   validateAcknowledgeStockTransfer,
   acknowledgeStockTransfer
@@ -199,7 +200,7 @@ stockTransferRouter.post(
 
 stockTransferRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "VIEW")),
   getStockTransferById
 );
@@ -215,7 +216,7 @@ stockTransferRouter.get(
  */
 stockTransferRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "VIEW")),
   getAllStockTransfer
 );
@@ -237,7 +238,7 @@ stockTransferRouter.get(
  */
 stockTransferRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER_SEARCH", "VIEW")),
   validateSearchStockTransfer,
   searchStockTransfer

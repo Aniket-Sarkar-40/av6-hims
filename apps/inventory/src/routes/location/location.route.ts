@@ -1,4 +1,5 @@
 import { collectionCenterGet } from "@/controllers/location/location.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -32,7 +33,7 @@ export const locationRouter: Router = Router();
  */
 locationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "LOCATION", "VIEW")),
-  collectionCenterGet,
+  collectionCenterGet
 );

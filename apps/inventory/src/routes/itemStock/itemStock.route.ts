@@ -3,6 +3,7 @@ import {
   getItemStock,
   getItemStockSummary,
 } from "@/controllers/stock/itemStock.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -36,9 +37,9 @@ export const itemStockRouter: Router = Router();
  */
 itemStockRouter.post(
   "/summary",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK_SUMMARY", "VIEW")),
-  getItemStockSummary,
+  getItemStockSummary
 );
 /**
  * @swagger
@@ -57,9 +58,9 @@ itemStockRouter.post(
  */
 itemStockRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
-  getItemStock,
+  getItemStock
 );
 
 /**
@@ -80,7 +81,7 @@ itemStockRouter.post(
  */
 itemStockRouter.post(
   "/export-excel",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
-  exportItemStockExcel,
+  exportItemStockExcel
 );

@@ -15,6 +15,7 @@ import {
   validateBranchRequisitionReject,
   validateBranchRequisitionUpdate,
 } from "@/validations/request/purchase/branchRequisition.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -48,7 +49,7 @@ export const branchRequisitionRouter: Router = Router();
  */
 branchRequisitionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "CREATE")),
   validateBranchRequisition,
   createBranchRequisition
@@ -71,7 +72,7 @@ branchRequisitionRouter.post(
  */
 branchRequisitionRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH_REQUISITION", "VIEW"),
     getPermission("INV", "BRANCH_REQUISITION", "UPDATE")
@@ -98,7 +99,7 @@ branchRequisitionRouter.put(
  */
 branchRequisitionRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "DELETE")),
   deleteBranchRequisition
 );
@@ -120,7 +121,7 @@ branchRequisitionRouter.delete(
  */
 branchRequisitionRouter.post(
   "/reject",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_REJECT", "CREATE")),
   validateBranchRequisitionReject,
   rejectBranchRequisition
@@ -143,7 +144,7 @@ branchRequisitionRouter.post(
  */
 branchRequisitionRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_APPROVE", "CREATE")),
   validateApproveBranchRequisition,
   approveBranchRequisition
@@ -166,7 +167,7 @@ branchRequisitionRouter.post(
  */
 branchRequisitionRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeBranchRequisition,
   acknowledgeBranchRequisition
@@ -188,7 +189,7 @@ branchRequisitionRouter.post(
  */
 branchRequisitionRouter.get(
   "/batch-wise-by-id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "VIEW")),
   getBranchRequisitionBatchWiseById
 );
@@ -209,7 +210,7 @@ branchRequisitionRouter.get(
  */
 branchRequisitionRouter.get(
   "/batch-wise",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "VIEW")),
   getAllBranchRequisitionBatchWiseById
 );

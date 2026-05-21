@@ -71,7 +71,7 @@ consumptionRouter.post(
 
 consumptionRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "UPDATE")),
   validateUpdateConsumption,
   updateConsumption
@@ -88,7 +88,7 @@ consumptionRouter.put(
  */
 consumptionRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
   getAllConsumption
 );
@@ -110,7 +110,7 @@ consumptionRouter.get(
  */
 consumptionRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
   getConsumptionById
 );
@@ -133,7 +133,7 @@ consumptionRouter.get(
 
 consumptionRouter.put(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "APPROVE")),
   validateApproveConsumption,
   approveConsumption
@@ -156,7 +156,7 @@ consumptionRouter.put(
  */
 consumptionRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "DELETE")),
   validateCommonConsumptionInput,
   deleteConsumptionById
@@ -179,7 +179,7 @@ consumptionRouter.delete(
  */
 consumptionRouter.put(
   "/reject",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "REJECT")),
   validateCommonConsumptionInput,
   rejectConsumption
@@ -202,7 +202,7 @@ consumptionRouter.put(
 
 consumptionRouter.get(
   "/by-user",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
   getConsumptionByUserId
 );

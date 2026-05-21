@@ -15,6 +15,7 @@ import {
   validateBranchRequisitionReturnReject,
   validateBranchRequisitionReturnUpdate,
 } from "@/validations/request/purchase/branchRequisitionReturn.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -42,7 +43,7 @@ export const branchRequisitionReturnRouter: Router = Router();
  */
 branchRequisitionReturnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "CREATE")),
   validateBranchRequisitionReturn,
   createBranchRequisitionReturn
@@ -59,7 +60,7 @@ branchRequisitionReturnRouter.post(
  */
 branchRequisitionReturnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "VIEW")),
   getAllBranchRequisitionReturn
 );
@@ -82,7 +83,7 @@ branchRequisitionReturnRouter.get(
  */
 branchRequisitionReturnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "VIEW")),
   getBranchRequisitionReturnById
 );
@@ -98,7 +99,7 @@ branchRequisitionReturnRouter.get(
  */
 branchRequisitionReturnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH_REQUISITION_RETURN", "VIEW"),
     getPermission("INV", "BRANCH_REQUISITION_RETURN", "UPDATE")
@@ -124,7 +125,7 @@ branchRequisitionReturnRouter.put(
  */
 branchRequisitionReturnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "DELETE")),
   deleteBranchRequisitionReturn
 );
@@ -140,7 +141,7 @@ branchRequisitionReturnRouter.delete(
  */
 branchRequisitionReturnRouter.post(
   "/reject",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN_REJECT", "CREATE")),
   validateBranchRequisitionReturnReject,
   rejectBranchRequisitionReturn
@@ -157,7 +158,7 @@ branchRequisitionReturnRouter.post(
  */
 branchRequisitionReturnRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH_REQUISITION_RETURN_APPROVE", "CREATE")
   ),
@@ -176,7 +177,7 @@ branchRequisitionReturnRouter.post(
  */
 branchRequisitionReturnRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN_ACK", "CREATE")),
   validateAcknowledgeBranchRequisitionReturn,
   acknowledgeBranchRequisitionReturn

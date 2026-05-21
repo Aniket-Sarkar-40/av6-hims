@@ -13,6 +13,7 @@ import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateToggleActive } from "@/validations/request/common.validation.js";
 import { validateWarehouse } from "@/validations/request/master/warehouse.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const warehouseRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const warehouseRouter: Router = Router();
  */
 warehouseRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "WAREHOUSE", "CREATE")),
   validateWarehouse,
-  createWarehouse,
+  createWarehouse
 );
 
 /**
@@ -57,9 +58,9 @@ warehouseRouter.post(
  */
 warehouseRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "WAREHOUSE", "VIEW")),
-  getAllWarehouse,
+  getAllWarehouse
 );
 
 /**
@@ -78,9 +79,9 @@ warehouseRouter.get(
  */
 warehouseRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "WAREHOUSE", "VIEW")),
-  getWarehouseById,
+  getWarehouseById
 );
 
 /**
@@ -107,13 +108,13 @@ warehouseRouter.get(
  */
 warehouseRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "WAREHOUSE", "VIEW"),
-    getPermission("INV", "WAREHOUSE", "UPDATE"),
+    getPermission("INV", "WAREHOUSE", "UPDATE")
   ),
   validateWarehouse,
-  updateWarehouse,
+  updateWarehouse
 );
 
 /**
@@ -133,13 +134,13 @@ warehouseRouter.put(
  */
 warehouseRouter.post(
   "/toggle-active",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "WAREHOUSE", "VIEW"),
-    getPermission("INV", "WAREHOUSE", "UPDATE"),
+    getPermission("INV", "WAREHOUSE", "UPDATE")
   ),
   validateToggleActive,
-  toggleActiveWarehouse,
+  toggleActiveWarehouse
 );
 
 export default warehouseRouter;

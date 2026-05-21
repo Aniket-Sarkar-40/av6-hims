@@ -23,6 +23,7 @@ import {
   validateStoreRequisitionUpdate,
 } from "@/validations/request/purchase/storeRequisition.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const storeRequisitionRouter: Router = Router();
 
@@ -50,7 +51,7 @@ export const storeRequisitionRouter: Router = Router();
  */
 storeRequisitionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "CREATE")),
   validateStoreRequisition,
   createStoreRequisition
@@ -67,7 +68,7 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
   getAllStoreRequisition
 );
@@ -88,7 +89,7 @@ storeRequisitionRouter.get(
  */
 storeRequisitionRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
   getstoreRequisitionById
 );
@@ -117,7 +118,7 @@ storeRequisitionRouter.get(
  */
 storeRequisitionRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STORE_REQUISITION", "VIEW"),
     getPermission("INV", "STORE_REQUISITION", "UPDATE")
@@ -148,7 +149,7 @@ storeRequisitionRouter.put(
  */
 storeRequisitionRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "DELETE")),
   deleteStoreRequisition
 );
@@ -170,7 +171,7 @@ storeRequisitionRouter.delete(
  */
 storeRequisitionRouter.post(
   "/reject",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_REJECT", "CREATE")),
   validateStoreRequisitionReject,
   rejectStoreRequisition
@@ -193,7 +194,7 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_SENT", "CREATE")),
   validateSentStoreRequisition,
   approveStoreRequisition
@@ -216,7 +217,7 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeStoreRequisition,
   acknowledgeStoreRequisition
@@ -238,7 +239,7 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.get(
   "/batch-wise-by-id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
   getstoreRequisitionBatchWiseById
 );
@@ -282,7 +283,7 @@ storeRequisitionRouter.get(
  */
 storeRequisitionRouter.get(
   "/batch-wise",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
   getAllStoreRequisitionBatchWiseById
 );

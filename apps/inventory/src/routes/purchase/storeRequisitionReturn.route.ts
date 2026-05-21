@@ -15,6 +15,7 @@ import {
   validateStoreRequisitionReturnReject,
   validateStoreRequisitionReturnUpdate,
 } from "@/validations/request/purchase/storeRequisitionReturn.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -42,7 +43,7 @@ export const storeRequisitionReturnRouter: Router = Router();
  */
 storeRequisitionReturnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "CREATE")),
   validateStoreRequisitionReturn,
   createStoreRequisitionReturn
@@ -59,7 +60,7 @@ storeRequisitionReturnRouter.post(
  */
 storeRequisitionReturnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "VIEW")),
   getAllStoreRequisitionReturn
 );
@@ -75,7 +76,7 @@ storeRequisitionReturnRouter.get(
  */
 storeRequisitionReturnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "VIEW")),
   getStoreRequisitionReturnById
 );
@@ -91,7 +92,7 @@ storeRequisitionReturnRouter.get(
  */
 storeRequisitionReturnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STORE_REQUISITION_RETURN", "VIEW"),
     getPermission("INV", "STORE_REQUISITION_RETURN", "UPDATE")
@@ -111,7 +112,7 @@ storeRequisitionReturnRouter.put(
  */
 storeRequisitionReturnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "DELETE")),
   deleteStoreRequisitionReturn
 );
@@ -127,7 +128,7 @@ storeRequisitionReturnRouter.delete(
  */
 storeRequisitionReturnRouter.post(
   "/reject",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN_REJECT", "CREATE")),
   validateStoreRequisitionReturnReject,
   rejectStoreRequisitionReturn
@@ -144,7 +145,7 @@ storeRequisitionReturnRouter.post(
  */
 storeRequisitionReturnRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN_APPROVE", "CREATE")),
   validateApproveStoreRequisitionReturn,
   approveStoreRequisitionReturn
@@ -163,7 +164,7 @@ storeRequisitionReturnRouter.post(
 // using the existing `STORE_REQUISITION_RETURN_ACKNOWLEDGE` to stay consistent with permissions.utils.ts.
 storeRequisitionReturnRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STORE_REQUISITION_RETURN_ACKNOWLEDGE", "CREATE")
   ),
