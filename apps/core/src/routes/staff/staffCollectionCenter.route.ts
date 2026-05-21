@@ -40,7 +40,7 @@ export const staffCollectionCenterRouter: Router = Router();
 // POST /staffCollectionCenters
 staffCollectionCenterRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "CREATE")),
   validateStaffCollectionCenter,
   createStaffCollectionCenter
@@ -65,7 +65,7 @@ staffCollectionCenterRouter.post(
 // GET /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.get(
   "/:staffCollectionCenterId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "VIEW")),
   getStaffCollectionCenterById
 );
@@ -89,7 +89,7 @@ staffCollectionCenterRouter.get(
 // GET /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.get(
   "/id/:staffId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "VIEW")),
   getStaffCollectionCenterMapById
 );
@@ -119,7 +119,7 @@ staffCollectionCenterRouter.get(
 // PUT /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.put(
   "/:staffCollectionCenterId",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "STAFF_COLLECTION_CENTER", "VIEW"),
     getPermission("CORE", "STAFF_COLLECTION_CENTER", "UPDATE")
@@ -147,7 +147,7 @@ staffCollectionCenterRouter.put(
 // DELETE /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.delete(
   "/:staffCollectionCenterId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "DELETE")),
   deleteStaffCollectionCenter
 );

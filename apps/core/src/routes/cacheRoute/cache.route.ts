@@ -31,7 +31,7 @@ const cacheRouter: Router = Router();
  */
 cacheRouter.post(
   "/load",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CACHE", "VIEW")),
   getAllCacheController
 );
@@ -53,13 +53,13 @@ cacheRouter.post(
  */
 cacheRouter.delete(
   "/delete",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CACHE", "DELETE")),
   clearCacheController
 );
 cacheRouter.delete(
   "/all",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CACHE", "DELETE")),
   clearAllCacheController
 );

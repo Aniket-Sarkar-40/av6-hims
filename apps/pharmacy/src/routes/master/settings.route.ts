@@ -9,6 +9,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateSettings } from "@/validations/request/master/settings.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const settingsRouter: Router = Router();
 
@@ -36,10 +37,10 @@ const settingsRouter: Router = Router();
  */
 settingsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SETTING", "CREATE")),
   validateSettings,
-  upsertSettings,
+  upsertSettings
 );
 
 /**
@@ -53,9 +54,9 @@ settingsRouter.post(
  */
 settingsRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SETTING", "VIEW")),
-  getSettings,
+  getSettings
 );
 
 export default settingsRouter;

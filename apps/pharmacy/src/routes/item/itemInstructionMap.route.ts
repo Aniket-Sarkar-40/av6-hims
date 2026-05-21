@@ -14,6 +14,7 @@ import {
 } from "@/validations/request/item/item.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemInstructionRouter: Router = Router();
 
@@ -41,10 +42,10 @@ export const itemInstructionRouter: Router = Router();
  */
 itemInstructionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_INST_MAP", "CREATE")),
   validateCreateItemInstructionMap,
-  createItemInstructionMap,
+  createItemInstructionMap
 );
 
 /**
@@ -64,13 +65,13 @@ itemInstructionRouter.post(
  */
 itemInstructionRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_INST_MAP", "VIEW"),
-    getPermission("PMS", "ITEM_INST_MAP", "UPDATE"),
+    getPermission("PMS", "ITEM_INST_MAP", "UPDATE")
   ),
   validateUpdateItemInstructionMap,
-  updateItemInstructionMap,
+  updateItemInstructionMap
 );
 
 /**
@@ -84,7 +85,7 @@ itemInstructionRouter.put(
  */
 itemInstructionRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_INST_MAP", "DELETE")),
-  deleteItemInstruction,
+  deleteItemInstruction
 );

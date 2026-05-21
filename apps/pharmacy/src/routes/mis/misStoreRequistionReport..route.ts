@@ -2,6 +2,7 @@ import {
   excelMisStoreRequisition,
   misStoreRequisitionList,
 } from "@/controllers/mis/misStoreRequisition.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -35,13 +36,13 @@ export const misStoreRequisitionRouter: Router = Router();
  */
 misStoreRequisitionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_STORE_REQUISITION", "VIEW")),
-  misStoreRequisitionList,
+  misStoreRequisitionList
 );
 misStoreRequisitionRouter.post(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_STORE_REQUISITION", "VIEW")),
-  excelMisStoreRequisition,
+  excelMisStoreRequisition
 );

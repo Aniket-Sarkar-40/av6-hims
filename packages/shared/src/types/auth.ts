@@ -10,6 +10,7 @@ export interface JwtPayload {
   [key: string]: unknown;
   id: string;
   uuid: string; // unique identifier for the user session
+  modules: string[];
 }
 export interface CurrentMapping {
   mappingId: number;
@@ -38,6 +39,7 @@ export interface JwtAccessPayload {
   levelTwo: CurrentMapping[];
   sessionId: string;
   expireAt: number;
+  modules: string[];
 }
 
 export interface JwtRefreshPayload {
@@ -45,6 +47,7 @@ export interface JwtRefreshPayload {
   userId: number;
   role: CurrentMapping | null;
   expireAt: number;
+  modules: string[];
 }
 
 export interface DecodedToken {

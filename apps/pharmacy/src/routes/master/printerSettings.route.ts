@@ -14,6 +14,7 @@ import {
   validateUpdatePrinterSettings,
 } from "@/validations/request/master/printerSettings.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const printerSettingsRouter: Router = Router();
 
@@ -41,10 +42,10 @@ const printerSettingsRouter: Router = Router();
  */
 printerSettingsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PRINTER_SETTINGS", "CREATE")),
   validatePrinterSettings,
-  createPrinterSettings,
+  createPrinterSettings
 );
 /**
  * @swagger
@@ -63,13 +64,13 @@ printerSettingsRouter.post(
  */
 printerSettingsRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "PRINTER_SETTINGS", "UPDATE"),
-    getPermission("PMS", "PRINTER_SETTINGS", "VIEW"),
+    getPermission("PMS", "PRINTER_SETTINGS", "VIEW")
   ),
   validateUpdatePrinterSettings,
-  updatePrinterSettings,
+  updatePrinterSettings
 );
 
 /**
@@ -83,9 +84,9 @@ printerSettingsRouter.put(
  */
 printerSettingsRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PRINTER_SETTINGS", "VIEW")),
-  getPrinterSettings,
+  getPrinterSettings
 );
 
 /**
@@ -99,9 +100,9 @@ printerSettingsRouter.get(
  */
 printerSettingsRouter.get(
   "/cc-type",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PRINTER_SETTINGS", "VIEW")),
-  getPrinterSettingsByCCAndType,
+  getPrinterSettingsByCCAndType
 );
 
 export default printerSettingsRouter;

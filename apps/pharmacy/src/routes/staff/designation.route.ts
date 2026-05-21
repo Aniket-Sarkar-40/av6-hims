@@ -12,6 +12,7 @@ import {
 } from "@/controllers/staff/designation.controller.js";
 import { validateStaffDesignation } from "@/validations/request/staff/designation.validation.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const staffDesignationRouter: Router = Router();
 
@@ -39,10 +40,10 @@ const staffDesignationRouter: Router = Router();
  */
 staffDesignationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "CREATE")),
   validateStaffDesignation,
-  createStaffDesignation,
+  createStaffDesignation
 );
 
 /**
@@ -56,9 +57,9 @@ staffDesignationRouter.post(
  */
 staffDesignationRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "VIEW")),
-  getAllStaffDesignations,
+  getAllStaffDesignations
 );
 
 /**
@@ -79,9 +80,9 @@ staffDesignationRouter.get(
  */
 staffDesignationRouter.get(
   "/:staffDesignationId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "VIEW")),
-  getStaffDesignationById,
+  getStaffDesignationById
 );
 
 /**
@@ -108,13 +109,13 @@ staffDesignationRouter.get(
  */
 staffDesignationRouter.put(
   "/:staffDesignationId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STAFF_DESIGNATION", "VIEW"),
-    getPermission("PMS", "STAFF_DESIGNATION", "UPDATE"),
+    getPermission("PMS", "STAFF_DESIGNATION", "UPDATE")
   ),
   validateStaffDesignation,
-  updateStaffDesignation,
+  updateStaffDesignation
 );
 
 /**
@@ -135,9 +136,9 @@ staffDesignationRouter.put(
  */
 staffDesignationRouter.delete(
   "/:staffDesignationId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "DELETE")),
-  deleteStaffDesignation,
+  deleteStaffDesignation
 );
 
 export default staffDesignationRouter;

@@ -39,7 +39,7 @@ export const departmentRouter: Router = Router();
  */
 departmentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "CREATE")),
   validateDepartment,
   createDepartment
@@ -56,7 +56,7 @@ departmentRouter.post(
  */
 departmentRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "VIEW")),
   getAllDepartments
 );
@@ -79,7 +79,7 @@ departmentRouter.get(
  */
 departmentRouter.get(
   "/:departmentId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "VIEW")),
   getDepartmentById
 );
@@ -108,7 +108,7 @@ departmentRouter.get(
  */
 departmentRouter.put(
   "/:departmentId",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "DEPARTMENT", "VIEW"),
     getPermission("CORE", "DEPARTMENT", "UPDATE")
@@ -135,7 +135,7 @@ departmentRouter.put(
  */
 departmentRouter.delete(
   "/:departmentId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "DELETE")),
   deleteDepartment
 );

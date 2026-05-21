@@ -12,6 +12,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateDoctor } from "@/validations/request/staff/doctor.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const doctorRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const doctorRouter: Router = Router();
 // POST /doctors
 doctorRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "CREATE")),
   validateDoctor,
-  createDoctor,
+  createDoctor
 );
 
 /**
@@ -58,9 +59,9 @@ doctorRouter.post(
 // GET /doctors
 doctorRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "VIEW")),
-  getAllDoctors,
+  getAllDoctors
 );
 
 /**
@@ -82,9 +83,9 @@ doctorRouter.get(
 // GET /doctors/:doctorId
 doctorRouter.get(
   "/:doctorId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "VIEW")),
-  getDoctorById,
+  getDoctorById
 );
 
 /**
@@ -112,13 +113,13 @@ doctorRouter.get(
 // PUT /doctors/:doctorId
 doctorRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "DOCTOR", "VIEW"),
-    getPermission("PMS", "DOCTOR", "UPDATE"),
+    getPermission("PMS", "DOCTOR", "UPDATE")
   ),
   validateDoctor,
-  updateDoctor,
+  updateDoctor
 );
 
 /**
@@ -140,7 +141,7 @@ doctorRouter.put(
 // DELETE /doctors/:doctorId
 doctorRouter.delete(
   "/:doctorId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "DELETE")),
-  deleteDoctor,
+  deleteDoctor
 );

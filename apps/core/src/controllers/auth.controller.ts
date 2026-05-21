@@ -14,8 +14,10 @@ import { Request, Response } from "express";
 import { authService } from "@/services/auth.service.js";
 import { processAndRecreateJWT } from "@repo/shared/utils/helper.utils.js";
 import { AuthRequest } from "@repo/shared/types/request.type.js";
+import { decodeToken } from "@repo/shared/utils/auth.utils.js";
 
-const SEVENTEEN_HOURS = 1000 /*ms*/ * 60 /*sec*/ * 60 /*min*/ * 17; /*hrs*/
+export const SEVENTEEN_HOURS =
+  1000 /*ms*/ * 60 /*sec*/ * 60 /*min*/ * 17; /*hrs*/
 
 export const LOGIN_KEY = `av6:login`;
 
@@ -79,7 +81,7 @@ export const login = TryCatch(async (req: Request, res: Response) => {
 export const logout = TryCatch(async (req: AuthRequest, res: Response) => {
   logger.info("entering::logout::controller");
 
-  const decodedToken = authService.decodeToken(req.token as string);
+  const decodedToken = decodeToken(req.token as string);
 
   if (!decodedToken || !decodedToken.uuid) {
     throw new ErrorHandler(401, "Invalid token");
@@ -126,7 +128,7 @@ export const changeRole = TryCatch(async (req: AuthRequest, res: Response) => {
   const { roleId, ccId } = req.body;
   if (!req.token) throw new ErrorHandler(401, "Missing Token");
 
-  const decodedToken = authService.decodeToken(req.token as string);
+  const decodedToken = decodeToken(req.token as string);
 
   if (!decodedToken || !decodedToken.uuid) {
     throw new ErrorHandler(401, "Invalid token");

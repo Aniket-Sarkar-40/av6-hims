@@ -1341,3 +1341,19 @@ model CompanySettings {
     @@index([sessionId], name: "session_id")
     @@map("sch_settings")
 }
+
+model MonoRepoModule {
+    id        Int         @id @default(autoincrement())
+    module    ServiceCode @map("module")
+    isEnabled Boolean     @default(true) @map("is_enabled")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+
+    @@map("core_mono_repo_modules")
+}

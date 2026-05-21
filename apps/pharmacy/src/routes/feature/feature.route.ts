@@ -16,6 +16,7 @@ import {
   validateUpdateFeatureFlag,
 } from "@/validations/request/feature/feature.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const featureRouter: Router = Router();
 
@@ -43,10 +44,10 @@ const featureRouter: Router = Router();
  */
 featureRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "CREATE")),
   validateCreateFeatureFlag,
-  createFeatureFlag,
+  createFeatureFlag
 );
 
 /**
@@ -66,13 +67,13 @@ featureRouter.post(
  */
 featureRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "FEATURE_FLAG", "VIEW"),
-    getPermission("PMS", "FEATURE_FLAG", "UPDATE"),
+    getPermission("PMS", "FEATURE_FLAG", "UPDATE")
   ),
   validateUpdateFeatureFlag,
-  updateFeatureFlag,
+  updateFeatureFlag
 );
 
 /**
@@ -86,9 +87,9 @@ featureRouter.put(
  */
 featureRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "VIEW")),
-  getAllFeatureFlags,
+  getAllFeatureFlags
 );
 
 /**
@@ -108,9 +109,9 @@ featureRouter.get(
  */
 featureRouter.get(
   "/shortCode",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "VIEW")),
-  getFeatureFlagByShortCode,
+  getFeatureFlagByShortCode
 );
 
 /**
@@ -130,12 +131,12 @@ featureRouter.get(
  */
 featureRouter.put(
   "/toggle-enabled",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "FEATURE_FLAG", "VIEW"),
-    getPermission("PMS", "FEATURE_FLAG", "UPDATE"),
+    getPermission("PMS", "FEATURE_FLAG", "UPDATE")
   ),
-  toggleFeatureFlag,
+  toggleFeatureFlag
 );
 
 /**
@@ -155,9 +156,9 @@ featureRouter.put(
  */
 featureRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "DELETE")),
-  deleteFeatureFlag,
+  deleteFeatureFlag
 );
 
 export default featureRouter;

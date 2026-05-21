@@ -19,6 +19,7 @@ import {
 } from "@/validations/request/gatePass/gatePass.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const gatePassRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const gatePassRouter: Router = Router();
  */
 gatePassRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "CREATE")),
   validateGatePass,
-  createGatePass,
+  createGatePass
 );
 
 /**
@@ -63,9 +64,9 @@ gatePassRouter.post(
  */
 gatePassRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "VIEW")),
-  getAllGatePass,
+  getAllGatePass
 );
 
 /**
@@ -91,9 +92,9 @@ gatePassRouter.get(
  */
 gatePassRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "VIEW")),
-  getGatePassById,
+  getGatePassById
 );
 
 /**
@@ -113,13 +114,13 @@ gatePassRouter.get(
  */
 gatePassRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "GATE_PASS", "VIEW"),
-    getPermission("PMS", "GATE_PASS", "UPDATE"),
+    getPermission("PMS", "GATE_PASS", "UPDATE")
   ),
   validateGatePassUpdate,
-  updateGatePass,
+  updateGatePass
 );
 
 /**
@@ -138,9 +139,9 @@ gatePassRouter.put(
  */
 gatePassRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "DELETE")),
-  deleteGatePass,
+  deleteGatePass
 );
 
 /**
@@ -161,15 +162,15 @@ gatePassRouter.delete(
  */
 gatePassRouter.post(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS_PDF", "VIEW")),
-  getGatePassPdfById,
+  getGatePassPdfById
 );
 
 gatePassRouter.post(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS_EXCEL", "VIEW")),
   validateGatePassFilter,
-  excelGatePassReport,
+  excelGatePassReport
 );

@@ -12,6 +12,7 @@ import {
   updateDepartment,
 } from "@/controllers/staff/department.controller.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const departmentRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const departmentRouter: Router = Router();
  */
 departmentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "CREATE")),
   validateDepartment,
-  createDepartment,
+  createDepartment
 );
 
 /**
@@ -56,9 +57,9 @@ departmentRouter.post(
  */
 departmentRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "VIEW")),
-  getAllDepartments,
+  getAllDepartments
 );
 
 /**
@@ -79,9 +80,9 @@ departmentRouter.get(
  */
 departmentRouter.get(
   "/:departmentId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "VIEW")),
-  getDepartmentById,
+  getDepartmentById
 );
 
 /**
@@ -108,13 +109,13 @@ departmentRouter.get(
  */
 departmentRouter.put(
   "/:departmentId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "DEPARTMENT", "VIEW"),
-    getPermission("PMS", "DEPARTMENT", "UPDATE"),
+    getPermission("PMS", "DEPARTMENT", "UPDATE")
   ),
   validateDepartment,
-  updateDepartment,
+  updateDepartment
 );
 
 /**
@@ -135,7 +136,7 @@ departmentRouter.put(
  */
 departmentRouter.delete(
   "/:departmentId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "DELETE")),
-  deleteDepartment,
+  deleteDepartment
 );

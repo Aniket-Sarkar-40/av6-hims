@@ -14,6 +14,7 @@ import {
   validateUpdateSchema,
 } from "@/validations/request/customer/customer.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const customerRouter: Router = Router();
 /**
@@ -40,10 +41,10 @@ export const customerRouter: Router = Router();
 // POST /customer
 customerRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CUSTOMER", "CREATE")),
   validateCustomer,
-  createCustomer,
+  createCustomer
 );
 /**
  * @swagger
@@ -57,9 +58,9 @@ customerRouter.post(
 // GET /customer
 customerRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CUSTOMER", "VIEW")),
-  getAllCustomers,
+  getAllCustomers
 );
 
 /**
@@ -81,9 +82,9 @@ customerRouter.get(
 // GET /customer/id?customerId=1
 customerRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CUSTOMER", "VIEW")),
-  getCustomerById,
+  getCustomerById
 );
 
 /**
@@ -104,11 +105,11 @@ customerRouter.get(
 // PUT /customer
 customerRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "CUSTOMER", "VIEW"),
-    getPermission("PMS", "CUSTOMER", "UPDATE"),
+    getPermission("PMS", "CUSTOMER", "UPDATE")
   ),
   validateUpdateSchema,
-  updateCustomer,
+  updateCustomer
 );

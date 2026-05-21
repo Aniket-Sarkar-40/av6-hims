@@ -42,7 +42,7 @@ export const expenseHeadRouter: Router = Router();
 
 expenseHeadRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("PMS", "EXPENSE_HEAD", "CREATE")),
   validateExpenseHeadCreate,
   createExpenseHead
@@ -58,7 +58,7 @@ expenseHeadRouter.post(
  */
 expenseHeadRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("PMS", "EXPENSE_HEAD", "VIEW")),
   getAllExpenseHeads
 );
@@ -85,7 +85,7 @@ expenseHeadRouter.get(
 
 expenseHeadRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("PMS", "EXPENSE_HEAD", "VIEW")),
   getExpenseHeadById
 );
@@ -113,7 +113,7 @@ expenseHeadRouter.get(
  */
 expenseHeadRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("PMS", "EXPENSE_HEAD", "VIEW"),
     getPermission("PMS", "EXPENSE_HEAD", "UPDATE")
@@ -139,7 +139,7 @@ expenseHeadRouter.put(
  */
 expenseHeadRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("PMS", "EXPENSE_HEAD", "DELETE")),
   deleteExpenseHead
 );

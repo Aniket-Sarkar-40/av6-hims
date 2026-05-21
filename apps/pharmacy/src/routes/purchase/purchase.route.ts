@@ -20,6 +20,7 @@ import {
 } from "@/validations/request/purchase/purchase.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const purchaseRouter: Router = Router();
 
@@ -47,10 +48,10 @@ export const purchaseRouter: Router = Router();
  */
 purchaseRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER", "CREATE")),
   validatePurchase,
-  createPurchase,
+  createPurchase
 );
 
 /**
@@ -66,7 +67,7 @@ purchaseRouter.get(
   "/",
   verifyToken,
   authorize(getPermission("PMS", "PURCHASE_ORDER", "VIEW")),
-  getAllPurchase,
+  getAllPurchase
 );
 
 /**
@@ -85,9 +86,9 @@ purchaseRouter.get(
  */
 purchaseRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER", "VIEW")),
-  getPurchaseById,
+  getPurchaseById
 );
 
 /**
@@ -114,13 +115,13 @@ purchaseRouter.get(
  */
 purchaseRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "PURCHASE_ORDER", "VIEW"),
-    getPermission("PMS", "PURCHASE_ORDER", "UPDATE"),
+    getPermission("PMS", "PURCHASE_ORDER", "UPDATE")
   ),
   validatePurchaseUpdate,
-  updatePurchase,
+  updatePurchase
 );
 
 /**
@@ -145,9 +146,9 @@ purchaseRouter.put(
  */
 purchaseRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER", "DELETE")),
-  deletePurchase,
+  deletePurchase
 );
 
 /**
@@ -167,9 +168,9 @@ purchaseRouter.delete(
  */
 purchaseRouter.post(
   "/:id/approval",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_APPROVAL", "CREATE")),
-  purchaseApproval,
+  purchaseApproval
 );
 
 /**
@@ -189,10 +190,10 @@ purchaseRouter.post(
  */
 purchaseRouter.post(
   "/purchase-excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_EXCEL", "VIEW")),
   validateExcelFilterPurchase,
-  excelPurchaseOrderReport,
+  excelPurchaseOrderReport
 );
 
 /**
@@ -213,7 +214,7 @@ purchaseRouter.post(
  */
 purchaseRouter.post(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER_PDF", "VIEW")),
-  printPOById,
+  printPOById
 );

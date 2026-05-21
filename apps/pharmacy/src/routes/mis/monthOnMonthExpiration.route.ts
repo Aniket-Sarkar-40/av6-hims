@@ -2,6 +2,7 @@ import {
   excelMonthOnMonthExpirationReport,
   getMisMonthOnMonthExpirationController,
 } from "@/controllers/mis/monthOnMonthExpiration.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -35,17 +36,17 @@ const monthOnMonthExpirationRouter: Router = Router();
 
 monthOnMonthExpirationRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_MONTH_ON_MONTH", "VIEW")),
-  getMisMonthOnMonthExpirationController,
+  getMisMonthOnMonthExpirationController
 );
 
 monthOnMonthExpirationRouter.get(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_MONTH_ON_MONTH", "VIEW")),
   //   validateGatePassFilter,
-  excelMonthOnMonthExpirationReport,
+  excelMonthOnMonthExpirationReport
 );
 
 export default monthOnMonthExpirationRouter;

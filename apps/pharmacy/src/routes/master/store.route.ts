@@ -13,6 +13,7 @@ import {
   validateUpdateStore,
 } from "@/validations/request/master/store.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const storeRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const storeRouter: Router = Router();
  */
 storeRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE", "CREATE")),
   validateCreateStore,
-  createStore,
+  createStore
 );
 
 /**
@@ -57,9 +58,9 @@ storeRouter.post(
  */
 storeRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE", "VIEW")),
-  getAllStore,
+  getAllStore
 );
 
 /**
@@ -86,11 +87,11 @@ storeRouter.get(
  */
 storeRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORE", "VIEW"),
-    getPermission("PMS", "STORE", "UPDATE"),
+    getPermission("PMS", "STORE", "UPDATE")
   ),
   validateUpdateStore,
-  updateStore,
+  updateStore
 );

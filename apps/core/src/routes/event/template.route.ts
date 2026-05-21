@@ -39,7 +39,7 @@ const templateRouter: Router = Router();
  */
 templateRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "TEMPLATE", "CREATE")),
   validateTemplateCreate,
   createTemplate
@@ -69,7 +69,7 @@ templateRouter.post(
  */
 templateRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "TEMPLATE", "UPDATE")),
   validateTemplateUpdate,
   updateTemplate

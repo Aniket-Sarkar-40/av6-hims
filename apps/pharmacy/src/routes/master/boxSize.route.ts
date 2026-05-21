@@ -14,6 +14,7 @@ import {
   validateDropDownNameUpdate,
 } from "@/validations/request/master/dropDown.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const boxSizeRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const boxSizeRouter: Router = Router();
  */
 boxSizeRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BOX_SIZE", "CREATE")),
   validateDropDownName,
-  boxSizeCreate,
+  boxSizeCreate
 );
 
 /**
@@ -66,9 +67,9 @@ boxSizeRouter.post(
  */
 boxSizeRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BOX_SIZE", "VIEW")),
-  boxSizeGet,
+  boxSizeGet
 );
 
 /**
@@ -87,9 +88,9 @@ boxSizeRouter.get(
  */
 boxSizeRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BOX_SIZE", "VIEW")),
-  getBoxSizeById,
+  getBoxSizeById
 );
 
 /**
@@ -116,11 +117,11 @@ boxSizeRouter.get(
  */
 boxSizeRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "BOX_SIZE", "VIEW"),
-    getPermission("PMS", "BOX_SIZE", "UPDATE"),
+    getPermission("PMS", "BOX_SIZE", "UPDATE")
   ),
   validateDropDownNameUpdate,
-  updateBoxSize,
+  updateBoxSize
 );

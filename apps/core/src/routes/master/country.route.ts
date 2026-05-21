@@ -42,7 +42,7 @@ const countryRouter: Router = Router();
  */
 countryRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "CREATE")),
   validateCountry,
   createCountry
@@ -59,7 +59,7 @@ countryRouter.post(
  */
 countryRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "VIEW")),
   getAllCountries
 );
@@ -82,7 +82,7 @@ countryRouter.get(
  */
 countryRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "VIEW")),
   getCountryById
 );
@@ -104,7 +104,7 @@ countryRouter.get(
  */
 countryRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "COUNTRY", "VIEW"),
     getPermission("CORE", "COUNTRY", "UPDATE")
@@ -131,7 +131,7 @@ countryRouter.put(
  */
 countryRouter.delete(
   "/:countryId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "DELETE")),
   deleteCountry
 );

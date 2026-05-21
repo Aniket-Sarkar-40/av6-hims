@@ -12,16 +12,16 @@ import { Router } from "express";
 export const authRouter: Router = Router();
 
 authRouter.post("/login", login);
-authRouter.post("/change-role", verifyToken, changeRole);
-authRouter.post("/logout", verifyToken, logout);
-authRouter.post("/role-by-cc", verifyToken, getRoleByCcId);
+authRouter.post("/change-role", verifyToken(), changeRole);
+authRouter.post("/logout", verifyToken(), logout);
+authRouter.post("/role-by-cc", verifyToken(), getRoleByCcId);
 authRouter.post(
   "/get-user-details",
-  verifyToken,
+  verifyToken(),
   // authorize("pms:user:view"),
   getUserDetails
 );
 
-authRouter.post("/permission", verifyToken, verifyPermission);
+authRouter.post("/permission", verifyToken(), verifyPermission);
 
 export default authRouter;

@@ -6,6 +6,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateCreateMigration } from "@/validations/request/migration/migration.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const migrationRouter: Router = Router();
 
@@ -34,8 +35,8 @@ export const migrationRouter: Router = Router();
 
 migrationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIGRATION", "CREATE")),
   validateCreateMigration,
-  createMigration,
+  createMigration
 );

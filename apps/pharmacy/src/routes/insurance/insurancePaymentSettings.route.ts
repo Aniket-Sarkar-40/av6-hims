@@ -1,4 +1,5 @@
 import { getAllInsurancePaymentSettings } from "@/controllers/insurance/insurancePaymentSettings.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -81,9 +82,9 @@ export const insurancePaymentSettingsRouter: Router = Router();
  */
 insurancePaymentSettingsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "INSURANCE_PAYMENT_SETINGS", "VIEW")),
-  getAllInsurancePaymentSettings,
+  getAllInsurancePaymentSettings
 );
 
 /**

@@ -41,6 +41,7 @@ export const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || ".fixuji.com";
 export const JWT_TOKEN = process.env.JWT_TOKEN || "access-token-av6";
 export const SUPER_ADMIN_ID = Number(process.env.SUPER_ADMIN_ID) || 1;
 export const PERMISSION_PREFIX = process.env.PERMISSION_PREFIX || "";
+export const JWT_SECRET = process.env.JWT_SECRET || "AV6";
 
 export const CRON_RETRY_DELAY_MS = 5 * 60 * 1000;
 export const CRON_MAX_RETRIES = 3;

@@ -15,6 +15,7 @@ import {
   validateUpdateStockAdjustment,
 } from "@/validations/request/stock/stockAdjustment.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const stockAdjustmentRouter: Router = Router();
 
@@ -42,21 +43,21 @@ export const stockAdjustmentRouter: Router = Router();
  */
 stockAdjustmentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_ADJUSTMENT", "CREATE")),
   validateStockAdjustment,
-  createStockAdjustment,
+  createStockAdjustment
 );
 
 stockAdjustmentRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STOCK_ADJUSTMENT", "UPDATE"),
-    getPermission("PMS", "STOCK_ADJUSTMENT", "VIEW"),
+    getPermission("PMS", "STOCK_ADJUSTMENT", "VIEW")
   ),
   validateUpdateStockAdjustment,
-  updateStockAdjustment,
+  updateStockAdjustment
 );
 /**
  * @swagger
@@ -76,9 +77,9 @@ stockAdjustmentRouter.put(
  */
 stockAdjustmentRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_ADJUSTMENT", "VIEW")),
-  getStockAdjustmentById,
+  getStockAdjustmentById
 );
 
 /**
@@ -98,10 +99,10 @@ stockAdjustmentRouter.get(
  */
 stockAdjustmentRouter.put(
   "/batch-expiry",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_BATCH_WISE", "UPDATE")),
   validateUpdateBatchExpiry,
-  updateBatchExpiry,
+  updateBatchExpiry
 );
 
 export default stockAdjustmentRouter;

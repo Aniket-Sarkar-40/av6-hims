@@ -22,6 +22,7 @@ import {
 } from "@/validations/request/grn/grnReturn.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const grnReturnRouter: Router = Router();
 
@@ -49,10 +50,10 @@ export const grnReturnRouter: Router = Router();
  */
 grnReturnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "CREATE")),
   validateGrnReturn,
-  createGrnReturn,
+  createGrnReturn
 );
 
 /**
@@ -66,9 +67,9 @@ grnReturnRouter.post(
  */
 grnReturnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "VIEW")),
-  getAllGrnReturn,
+  getAllGrnReturn
 );
 
 /**
@@ -87,9 +88,9 @@ grnReturnRouter.get(
  */
 grnReturnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "VIEW")),
-  getGrnReturnById,
+  getGrnReturnById
 );
 
 /**
@@ -116,13 +117,13 @@ grnReturnRouter.get(
  */
 grnReturnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "GRN_RETURN", "VIEW"),
-    getPermission("PMS", "GRN_RETURN", "UPDATE"),
+    getPermission("PMS", "GRN_RETURN", "UPDATE")
   ),
   validateGrnReturnUpdate,
-  updateGrnReturn,
+  updateGrnReturn
 );
 
 /**
@@ -147,9 +148,9 @@ grnReturnRouter.put(
  */
 grnReturnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "DELETE")),
-  deleteGrnReturn,
+  deleteGrnReturn
 );
 
 /**
@@ -169,10 +170,10 @@ grnReturnRouter.delete(
  */
 grnReturnRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_APPROVE", "CREATE")),
   validateGrnReturnApprove,
-  approveGrnReturn,
+  approveGrnReturn
 );
 
 /**
@@ -192,9 +193,9 @@ grnReturnRouter.post(
  */
 grnReturnRouter.post(
   "/rejected",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_REJECTED", "CREATE")),
-  rejectedGrnReturn,
+  rejectedGrnReturn
 );
 
 /**
@@ -214,10 +215,10 @@ grnReturnRouter.post(
  */
 grnReturnRouter.post(
   "/excel-report",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_EXCEL", "VIEW")),
   validateGrnReturnExcel,
-  excelGrnReturnReport,
+  excelGrnReturnReport
 );
 
 /**
@@ -231,7 +232,7 @@ grnReturnRouter.post(
  */
 grnReturnRouter.post(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_PDF", "VIEW")),
-  printGrnReturnById,
+  printGrnReturnById
 );

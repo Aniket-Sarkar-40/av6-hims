@@ -12,6 +12,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateStaffCollectionCenter } from "@/validations/request/staff/staffCollectionCenter.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const staffCollectionCenterRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const staffCollectionCenterRouter: Router = Router();
 // POST /staffCollectionCenters
 staffCollectionCenterRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "CREATE")),
   validateStaffCollectionCenter,
-  createStaffCollectionCenter,
+  createStaffCollectionCenter
 );
 
 /**
@@ -65,9 +66,9 @@ staffCollectionCenterRouter.post(
 // GET /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.get(
   "/:staffCollectionCenterId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "VIEW")),
-  getStaffCollectionCenterById,
+  getStaffCollectionCenterById
 );
 
 /**
@@ -89,9 +90,9 @@ staffCollectionCenterRouter.get(
 // GET /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.get(
   "/id/:staffId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "VIEW")),
-  getStaffCollectionCenterMapById,
+  getStaffCollectionCenterMapById
 );
 
 /**
@@ -119,13 +120,13 @@ staffCollectionCenterRouter.get(
 // PUT /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.put(
   "/:staffCollectionCenterId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STAFF_COLLECTION_CENTER", "VIEW"),
-    getPermission("PMS", "STAFF_COLLECTION_CENTER", "UPDATE"),
+    getPermission("PMS", "STAFF_COLLECTION_CENTER", "UPDATE")
   ),
   validateStaffCollectionCenter,
-  updateStaffCollectionCenter,
+  updateStaffCollectionCenter
 );
 
 /**
@@ -147,7 +148,7 @@ staffCollectionCenterRouter.put(
 // DELETE /staffCollectionCenters/:staffCollectionCenterId
 staffCollectionCenterRouter.delete(
   "/:staffCollectionCenterId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "DELETE")),
-  deleteStaffCollectionCenter,
+  deleteStaffCollectionCenter
 );

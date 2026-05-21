@@ -21,6 +21,7 @@ import {
 } from "@/validations/request/sell/sellReturn.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 export const sellReturnRouter: Router = Router();
 
 /**
@@ -47,10 +48,10 @@ export const sellReturnRouter: Router = Router();
 
 sellReturnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "CREATE")),
   validateSellReturnInput,
-  createSellReturn,
+  createSellReturn
 );
 
 /**
@@ -77,13 +78,13 @@ sellReturnRouter.post(
  */
 sellReturnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "SELL_RETURN", "VIEW"),
-    getPermission("PMS", "SELL_RETURN", "UPDATE"),
+    getPermission("PMS", "SELL_RETURN", "UPDATE")
   ),
   validateSellReturnUpdate,
-  updateSellReturn,
+  updateSellReturn
 );
 
 /**
@@ -100,9 +101,9 @@ sellReturnRouter.put(
  */
 sellReturnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "VIEW")),
-  getSellReturnById,
+  getSellReturnById
 );
 
 /**
@@ -117,9 +118,9 @@ sellReturnRouter.get(
 
 sellReturnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "VIEW")),
-  getAllSellReturn,
+  getAllSellReturn
 );
 
 /**
@@ -131,9 +132,9 @@ sellReturnRouter.get(
  */
 sellReturnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "DELETE")),
-  deleteSellReturn,
+  deleteSellReturn
 );
 
 /**
@@ -154,10 +155,10 @@ sellReturnRouter.delete(
 
 sellReturnRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_APPROVE", "CREATE")),
   validateSellReturnUpdate,
-  approveSellReturn,
+  approveSellReturn
 );
 /**
  * @swagger
@@ -177,9 +178,9 @@ sellReturnRouter.post(
 
 sellReturnRouter.post(
   "/rejected",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_REJECTED", "CREATE")),
-  rejectedSellReturn,
+  rejectedSellReturn
 );
 
 /**
@@ -199,10 +200,10 @@ sellReturnRouter.post(
  */
 sellReturnRouter.post(
   "/excel-report",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_EXCEL", "VIEW")),
   validateSellReturnExcelFilter,
-  excelSellReturnReport,
+  excelSellReturnReport
 );
 /**
  * @swagger
@@ -222,8 +223,8 @@ sellReturnRouter.post(
  */
 sellReturnRouter.post(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_PDF", "VIEW")),
-  getSellReturnPdfById,
+  getSellReturnPdfById
 );
 export default sellReturnRouter;

@@ -14,6 +14,7 @@ import {
   validateMedCategoryInputUpdate,
 } from "@/validations/request/master/medCategory.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const medCategoryRouter: Router = Router();
 
@@ -41,10 +42,10 @@ export const medCategoryRouter: Router = Router();
  */
 medCategoryRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_CATEGORY", "CREATE")),
   validateMedCategoryInput,
-  createMedCategory,
+  createMedCategory
 );
 
 /**
@@ -58,9 +59,9 @@ medCategoryRouter.post(
  */
 medCategoryRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_CATEGORY", "VIEW")),
-  getAllMedCategory,
+  getAllMedCategory
 );
 
 /**
@@ -81,9 +82,9 @@ medCategoryRouter.get(
  */
 medCategoryRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_CATEGORY", "VIEW")),
-  getMedCategoryById,
+  getMedCategoryById
 );
 
 /**
@@ -110,13 +111,13 @@ medCategoryRouter.get(
  */
 medCategoryRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_CATEGORY", "VIEW"),
-    getPermission("PMS", "MEDICINE_CATEGORY", "UPDATE"),
+    getPermission("PMS", "MEDICINE_CATEGORY", "UPDATE")
   ),
   validateMedCategoryInputUpdate,
-  updateMedCategory,
+  updateMedCategory
 );
 
 export default medCategoryRouter;

@@ -22,6 +22,7 @@ import {
 } from "@/validations/request/purchase/storeRequisitionReturn.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const storeRequisitionReturnRouter: Router = Router();
 
@@ -49,10 +50,10 @@ export const storeRequisitionReturnRouter: Router = Router();
  */
 storeRequisitionReturnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "CREATE")),
   validateStoreRequisitionReturn,
-  createStoreRequisitionReturn,
+  createStoreRequisitionReturn
 );
 
 /**
@@ -66,9 +67,9 @@ storeRequisitionReturnRouter.post(
  */
 storeRequisitionReturnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "VIEW")),
-  getAllStoreRequisitionReturn,
+  getAllStoreRequisitionReturn
 );
 
 /**
@@ -87,9 +88,9 @@ storeRequisitionReturnRouter.get(
  */
 storeRequisitionReturnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "VIEW")),
-  getStoreRequisitionReturnById,
+  getStoreRequisitionReturnById
 );
 
 /**
@@ -116,13 +117,13 @@ storeRequisitionReturnRouter.get(
  */
 storeRequisitionReturnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORE_REQUISITION_RETURN", "VIEW"),
-    getPermission("PMS", "STORE_REQUISITION_RETURN", "UPDATE"),
+    getPermission("PMS", "STORE_REQUISITION_RETURN", "UPDATE")
   ),
   validateStoreRequisitionReturnUpdate,
-  updateStoreRequisitionReturn,
+  updateStoreRequisitionReturn
 );
 
 /**
@@ -134,9 +135,9 @@ storeRequisitionReturnRouter.put(
  */
 storeRequisitionReturnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "DELETE")),
-  deleteStoreRequisitionReturn,
+  deleteStoreRequisitionReturn
 );
 
 /**
@@ -156,10 +157,10 @@ storeRequisitionReturnRouter.delete(
  */
 storeRequisitionReturnRouter.post(
   "/reject",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN_REJECT", "CREATE")),
   validateStoreRequisitionReturnReject,
-  rejectStoreRequisitionReturn,
+  rejectStoreRequisitionReturn
 );
 
 /**
@@ -179,10 +180,10 @@ storeRequisitionReturnRouter.post(
  */
 storeRequisitionReturnRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN_SENT", "CREATE")),
   validateApproveStoreRequisitionReturn,
-  approveStoreRequisitionReturn,
+  approveStoreRequisitionReturn
 );
 
 /**
@@ -202,10 +203,10 @@ storeRequisitionReturnRouter.post(
  */
 storeRequisitionReturnRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN_ACK", "CREATE")),
   validateAcknowledgeStoreRequisitionReturn,
-  acknowledgeStoreRequisitionReturn,
+  acknowledgeStoreRequisitionReturn
 );
 
 // /**

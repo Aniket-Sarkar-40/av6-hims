@@ -1481,3 +1481,59 @@ ALTER TABLE `inv_branch_item_details` ADD COLUMN `returned_qty` INTEGER NOT NULL
 
 -- AlterTable
 ALTER TABLE `inv_store_requisition_details` ADD COLUMN `returned_quantity` DOUBLE NOT NULL DEFAULT 0;
+
+-- CreateTable
+CREATE TABLE `core_mono_repo_modules` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS') NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+INSERT INTO core_mono_repo_modules
+(module, is_active, created_at, updated_at, created_by, updated_by)
+VALUES('CORE', 1, '2026-05-19 11:29:05.914', '2026-05-19 11:29:47.088', NULL, NULL);
+
+-- AlterTable
+ALTER TABLE `accounting_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_event_delivery` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_mono_repo_modules` ADD COLUMN `is_enabled` BOOLEAN NOT NULL DEFAULT true,
+    MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_pdf_template` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_service_event` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL DEFAULT 'OPD';
+
+-- AlterTable
+ALTER TABLE `nopd_payment_transactions` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `notifications` MODIFY `source` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `pathology_b2b_invoice_amount_summary` MODIFY `service_type` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL DEFAULT 'PATHOLOGY';
+
+
+-- AlterTable
+ALTER TABLE `core_mono_repo_modules` ADD COLUMN `deleted_at` DATETIME(3) NOT NULL,
+    ADD COLUMN `deleted_by` INTEGER NULL;

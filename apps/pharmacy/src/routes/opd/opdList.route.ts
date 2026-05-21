@@ -14,6 +14,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateOPD } from "@/validations/request/opd/opd.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const opdListRouter: Router = Router();
 
@@ -41,49 +42,49 @@ export const opdListRouter: Router = Router();
  */
 opdListRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getPendingMedicineAppointments,
+  getPendingMedicineAppointments
 );
 opdListRouter.post(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getPendingMedicineAppointmentsExcel,
+  getPendingMedicineAppointmentsExcel
 );
 
 opdListRouter.post(
   "/appointment",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
   validateOPD,
-  getOpdByAppointment,
+  getOpdByAppointment
 );
 
 opdListRouter.post(
   "/med-dosage",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  printInstructionByAppointmentId,
+  printInstructionByAppointmentId
 );
 
 opdListRouter.get(
   "/med-dosage",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getMedicineInstByAppointment,
+  getMedicineInstByAppointment
 );
 
 opdListRouter.get(
   "/corporate-client",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CLIENT_MASTER", "VIEW")),
-  getCorporateClientByCcId,
+  getCorporateClientByCcId
 );
 
 opdListRouter.get(
   "/last-appointments",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getLastAppointments,
+  getLastAppointments
 );

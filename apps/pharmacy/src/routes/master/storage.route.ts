@@ -14,6 +14,7 @@ import {
   validateDropDownNameUpdate,
 } from "@/validations/request/master/dropDown.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const storage: Router = Router();
 
@@ -42,10 +43,10 @@ const storage: Router = Router();
 
 storage.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORAGE", "CREATE")),
   validateDropDownName,
-  createStorage,
+  createStorage
 );
 
 /**
@@ -66,13 +67,13 @@ storage.post(
 
 storage.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORAGE", "VIEW"),
-    getPermission("PMS", "STORAGE", "UPDATE"),
+    getPermission("PMS", "STORAGE", "UPDATE")
   ),
   validateDropDownNameUpdate,
-  updateStorage,
+  updateStorage
 );
 
 /**
@@ -87,9 +88,9 @@ storage.put(
 
 storage.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORAGE", "VIEW")),
-  getAllStorage,
+  getAllStorage
 );
 
 /**
@@ -111,8 +112,8 @@ storage.get(
 
 storage.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORAGE", "VIEW")),
-  getStorageById,
+  getStorageById
 );
 export default storage;

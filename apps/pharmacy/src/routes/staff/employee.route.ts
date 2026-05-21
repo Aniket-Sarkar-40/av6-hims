@@ -12,6 +12,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateEmployee } from "@/validations/request/staff/employee.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const employeeRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const employeeRouter: Router = Router();
 // POST /Employees
 employeeRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "CREATE")),
   validateEmployee,
-  createEmployee,
+  createEmployee
 );
 
 /**
@@ -58,9 +59,9 @@ employeeRouter.post(
 // GET /Employees
 employeeRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "VIEW")),
-  getAllEmployees,
+  getAllEmployees
 );
 
 /**
@@ -82,9 +83,9 @@ employeeRouter.get(
 // GET /Employees/:EmployeeId
 employeeRouter.get(
   "/:employeeId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "VIEW")),
-  getEmployeeById,
+  getEmployeeById
 );
 
 /**
@@ -112,13 +113,13 @@ employeeRouter.get(
 // PUT /Employees/:EmployeeId
 employeeRouter.put(
   "/:employeeId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "EMPLOYEE", "VIEW"),
-    getPermission("PMS", "EMPLOYEE", "UPDATE"),
+    getPermission("PMS", "EMPLOYEE", "UPDATE")
   ),
   validateEmployee,
-  updateEmployee,
+  updateEmployee
 );
 
 /**
@@ -140,7 +141,7 @@ employeeRouter.put(
 // DELETE /Employees/:EmployeeId
 employeeRouter.delete(
   "/:employeeId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "DELETE")),
-  deleteEmployee,
+  deleteEmployee
 );

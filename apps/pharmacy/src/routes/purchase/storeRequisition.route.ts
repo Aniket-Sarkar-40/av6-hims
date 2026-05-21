@@ -26,6 +26,7 @@ import {
   validateStoreRequisitionUpdate,
 } from "@/validations/request/purchase/storeRequisition.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const storeRequisitionRouter: Router = Router();
 
@@ -53,10 +54,10 @@ export const storeRequisitionRouter: Router = Router();
  */
 storeRequisitionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "CREATE")),
   validateStoreRequisition,
-  createStoreRequisition,
+  createStoreRequisition
 );
 
 /**
@@ -70,9 +71,9 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisition,
+  getAllStoreRequisition
 );
 
 /**
@@ -91,9 +92,9 @@ storeRequisitionRouter.get(
  */
 storeRequisitionRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionById,
+  getstoreRequisitionById
 );
 
 /**
@@ -120,13 +121,13 @@ storeRequisitionRouter.get(
  */
 storeRequisitionRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORE_REQUISITION", "VIEW"),
-    getPermission("PMS", "STORE_REQUISITION", "UPDATE"),
+    getPermission("PMS", "STORE_REQUISITION", "UPDATE")
   ),
   validateStoreRequisitionUpdate,
-  updateStoreRequisition,
+  updateStoreRequisition
 );
 
 /**
@@ -151,9 +152,9 @@ storeRequisitionRouter.put(
  */
 storeRequisitionRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "DELETE")),
-  deleteStoreRequisition,
+  deleteStoreRequisition
 );
 
 /**
@@ -173,10 +174,10 @@ storeRequisitionRouter.delete(
  */
 storeRequisitionRouter.post(
   "/reject",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_REJECT", "CREATE")),
   validateStoreRequisitionReject,
-  rejectStoreRequisition,
+  rejectStoreRequisition
 );
 
 /**
@@ -196,10 +197,10 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_SENT", "CREATE")),
   validateSentStoreRequisition,
-  approveStoreRequisition,
+  approveStoreRequisition
 );
 
 /**
@@ -219,10 +220,10 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeStoreRequisition,
-  acknowledgeStoreRequisition,
+  acknowledgeStoreRequisition
 );
 
 /**
@@ -241,9 +242,9 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.get(
   "/batch-wise-by-id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionBatchWiseById,
+  getstoreRequisitionBatchWiseById
 );
 
 /**
@@ -262,9 +263,9 @@ storeRequisitionRouter.get(
  */
 storeRequisitionRouter.get(
   "/batch-wise",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisitionBatchWiseById,
+  getAllStoreRequisitionBatchWiseById
 );
 
 /**
@@ -284,10 +285,10 @@ storeRequisitionRouter.get(
  */
 storeRequisitionRouter.post(
   "/excel-report",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_EXCEL", "VIEW")),
   validateExcelFilterStoreRequisition,
-  excelStoreReqReport,
+  excelStoreReqReport
 );
 
 /**
@@ -308,7 +309,7 @@ storeRequisitionRouter.post(
  */
 storeRequisitionRouter.get(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_PDF", "VIEW")),
-  storeRequisitionPdfById,
+  storeRequisitionPdfById
 );

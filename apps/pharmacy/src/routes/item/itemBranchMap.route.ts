@@ -25,6 +25,7 @@ import {
 } from "@/validations/request/item/itemBranch.validation.js";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemBranchRouter: Router = Router();
 
@@ -52,7 +53,7 @@ export const itemBranchRouter: Router = Router();
  */
 itemBranchRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "CREATE")),
   validateCreateItemBranchMap,
   createItemBranchMap
@@ -75,7 +76,7 @@ itemBranchRouter.post(
  */
 itemBranchRouter.post(
   "/get",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
   validateGetItemBranchMap,
   getItemBranch
@@ -98,7 +99,7 @@ itemBranchRouter.post(
  */
 itemBranchRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
     getPermission("PMS", "ITEM_BRANCH", "UPDATE")
@@ -118,7 +119,7 @@ itemBranchRouter.put(
  */
 itemBranchRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "DELETE")),
   deleteItemBranch
 );
@@ -140,7 +141,7 @@ itemBranchRouter.delete(
  */
 itemBranchRouter.post(
   "/get-excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH_EXCEL", "VIEW")),
   validateInputExcelItemBranchMap,
   excelBranchItemMap
@@ -174,7 +175,7 @@ itemBranchRouter.post(
 
 itemBranchRouter.post(
   "/import",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
@@ -198,7 +199,7 @@ itemBranchRouter.post(
  */
 itemBranchRouter.put(
   "/update",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
     getPermission("PMS", "ITEM_BRANCH", "UPDATE")
@@ -225,7 +226,7 @@ itemBranchRouter.put(
 
 itemBranchRouter.post(
   "/copy",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
     getPermission("PMS", "ITEM_BRANCH", "UPDATE")
@@ -252,7 +253,7 @@ itemBranchRouter.post(
  */
 itemBranchRouter.get(
   "/mapping",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
   getItemBranchMapDetailsForUpdate
 );

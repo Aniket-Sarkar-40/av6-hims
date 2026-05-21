@@ -43,7 +43,7 @@ const cityRouter: Router = Router();
  */
 cityRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CITY", "CREATE")),
   validateCity,
   createCity
@@ -60,7 +60,7 @@ cityRouter.post(
  */
 cityRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CITY", "VIEW")),
   getAllCities
 );
@@ -83,7 +83,7 @@ cityRouter.get(
  */
 cityRouter.get(
   "/:cityId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CITY", "VIEW")),
   getCityById
 );
@@ -105,7 +105,7 @@ cityRouter.get(
  */
 cityRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "CITY", "VIEW"),
     getPermission("CORE", "CITY", "UPDATE")
@@ -132,7 +132,7 @@ cityRouter.put(
  */
 cityRouter.delete(
   "/:cityId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CITY", "DELETE")),
   deleteCity
 );

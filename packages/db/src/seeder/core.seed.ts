@@ -185,7 +185,7 @@ export async function runSeed() {
 
     {
       shortCode: "SETTINGS",
-      tableName: "settings",
+      tableName: "coreSettings",
       isDTO: false,
       isCacheable: true,
       permission: "core:settings:view",
@@ -308,6 +308,16 @@ export async function runSeed() {
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: "yes" }),
       selectClause: JSON.stringify({ id: "id", value: "name" }),
+    },
+    {
+      shortCode: "MODULE_CONFIG",
+      tableName: "monoRepoModule",
+      isDTO: true,
+      isCacheable: false,
+      permission: "core:module-config:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "module" }),
     },
   ];
   const pdfTemplates: PdfTemplateSeeder[] = [
@@ -992,6 +1002,24 @@ export async function runSeed() {
   });
 
   await updateDynamicShortCodeConfigsByShortCode(map);
+
+  const existingCoreModule = await db.monoRepoModule.findFirst({
+    where: {
+      module: ServiceCode.CORE,
+      isActive: true,
+      isEnabled: true,
+    },
+  });
+
+  if (!existingCoreModule) {
+    await db.monoRepoModule.create({
+      data: {
+        module: ServiceCode.CORE,
+        isEnabled: true,
+        isActive: true,
+      },
+    });
+  }
 
   await redis.disconnect();
   await db.$disconnect();

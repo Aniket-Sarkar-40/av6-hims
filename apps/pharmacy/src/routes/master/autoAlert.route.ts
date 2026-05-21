@@ -13,6 +13,7 @@ import {
   validateUpdateAutoAlertEmail,
 } from "@/validations/request/master/autoAlert.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 export const autoAlertRouter: Router = Router();
 
 /**
@@ -39,10 +40,10 @@ export const autoAlertRouter: Router = Router();
  */
 autoAlertRouter.post(
   "/email",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "AUTO_ALERT", "CREATE")),
   validateCreateAutoAlertEmail,
-  createAutoAlertEmail,
+  createAutoAlertEmail
 );
 
 /**
@@ -62,13 +63,13 @@ autoAlertRouter.post(
  */
 autoAlertRouter.put(
   "/email",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "AUTO_ALERT", "UPDATE"),
-    getPermission("PMS", "AUTO_ALERT", "VIEW"),
+    getPermission("PMS", "AUTO_ALERT", "VIEW")
   ),
   validateUpdateAutoAlertEmail,
-  updateAutoAlertEmail,
+  updateAutoAlertEmail
 );
 
 /**
@@ -89,10 +90,10 @@ autoAlertRouter.put(
  */
 autoAlertRouter.put(
   "/email-resend",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "AUTO_ALERT", "UPDATE"),
-    getPermission("PMS", "AUTO_ALERT", "VIEW"),
+    getPermission("PMS", "AUTO_ALERT", "VIEW")
   ),
-  resendAutoAlertEmail,
+  resendAutoAlertEmail
 );

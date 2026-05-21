@@ -40,7 +40,7 @@ export const doctorRouter: Router = Router();
 // POST /doctors
 doctorRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "CREATE")),
   validateDoctor,
   createDoctor
@@ -58,7 +58,7 @@ doctorRouter.post(
 // GET /doctors
 doctorRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "VIEW")),
   getAllDoctors
 );
@@ -82,7 +82,7 @@ doctorRouter.get(
 // GET /doctors/:doctorId
 doctorRouter.get(
   "/:doctorId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "VIEW")),
   getDoctorById
 );
@@ -112,7 +112,7 @@ doctorRouter.get(
 // PUT /doctors/:doctorId
 doctorRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "DOCTOR", "VIEW"),
     getPermission("CORE", "DOCTOR", "UPDATE")
@@ -140,7 +140,7 @@ doctorRouter.put(
 // DELETE /doctors/:doctorId
 doctorRouter.delete(
   "/:doctorId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "DELETE")),
   deleteDoctor
 );

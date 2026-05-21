@@ -80,6 +80,7 @@ export enum PermissionResource {
   NOTIFICATION = "notification",
   EVENT_RECIPIENT_RULE = "event-recipient-rule",
   CORE_APPROVAL = "core-approval",
+  MODULE_CONFIG = "module-config",
 
   // OPD
   PATIENT = "patients",

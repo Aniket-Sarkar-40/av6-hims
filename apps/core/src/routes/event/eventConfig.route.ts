@@ -39,7 +39,7 @@ const eventConfigRouter: Router = Router();
  */
 eventConfigRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EVENT_CONFIG", "CREATE")),
   validateUpsertEventConfigWithKeys,
   createEventConfig
@@ -62,7 +62,7 @@ eventConfigRouter.post(
  */
 eventConfigRouter.post(
   "/notification",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "NOTIFICATION", "VIEW")),
   validateMarkReadNotifications,
   markReadNotifications

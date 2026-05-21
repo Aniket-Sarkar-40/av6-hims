@@ -27,6 +27,7 @@ import {
   validateSetSellCoPayInput,
 } from "@/validations/request/sell/sell.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 export const sellRouter: Router = Router();
 
 /**
@@ -53,10 +54,10 @@ export const sellRouter: Router = Router();
 
 sellRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "CREATE")),
   validateSellInput,
-  createSell,
+  createSell
 );
 
 /**
@@ -74,9 +75,9 @@ sellRouter.post(
  */
 sellRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "VIEW")),
-  getSellById,
+  getSellById
 );
 
 /**
@@ -91,9 +92,9 @@ sellRouter.get(
 
 sellRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "VIEW")),
-  getAllSell,
+  getAllSell
 );
 
 /**
@@ -108,13 +109,13 @@ sellRouter.get(
  */
 sellRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "SELL", "VIEW"),
-    getPermission("PMS", "SELL", "UPDATE"),
+    getPermission("PMS", "SELL", "UPDATE")
   ),
   validateSellUpdate,
-  updateSellStatus,
+  updateSellStatus
 );
 
 /**
@@ -126,9 +127,9 @@ sellRouter.put(
  */
 sellRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "DELETE")),
-  deleteSell,
+  deleteSell
 );
 
 /**
@@ -148,10 +149,10 @@ sellRouter.delete(
  */
 sellRouter.post(
   "/excel-report",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_EXCEL", "VIEW")),
   validateExcelFilterSell,
-  excelSellReport,
+  excelSellReport
 );
 /**
  * @swagger
@@ -172,9 +173,9 @@ sellRouter.post(
 
 sellRouter.post(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_PDF", "VIEW")),
-  getSellPdfById,
+  getSellPdfById
 );
 
 /**
@@ -233,7 +234,7 @@ sellRouter.post(
   "/stock-adjust",
   // authorizeCommonApproval(),
   validateSellStockAdjustmentInput,
-  adjustSellStock,
+  adjustSellStock
 );
 
 /**
@@ -253,10 +254,10 @@ sellRouter.post(
  */
 sellRouter.post(
   "/take-payment",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_PAYMENT", "CREATE")),
   validateSellPaymentInput,
-  takeSellPayment,
+  takeSellPayment
 );
 /**
  * @swagger
@@ -275,10 +276,10 @@ sellRouter.post(
  */
 sellRouter.post(
   "/set-coPay",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_COPAY", "UPDATE")),
   validateSetSellCoPayInput,
-  setSellCoPay,
+  setSellCoPay
 );
 export default sellRouter;
 
@@ -294,9 +295,9 @@ export default sellRouter;
 
 sellRouter.get(
   "/payment-transactions",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_PAYMENT", "VIEW")),
-  getPaymentTransactions,
+  getPaymentTransactions
 );
 
 sellRouter.get("/sell-receipt/medicine", printNotCompletedMedReceiptByAptId);

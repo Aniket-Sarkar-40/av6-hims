@@ -43,7 +43,7 @@ export const expenseRouter: Router = Router();
  * */
 expenseRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EXPENSE", "CREATE")),
   createUploadMiddleware("documents"),
   uploadToHetzner("Documents"),
@@ -61,7 +61,7 @@ expenseRouter.post(
  */
 expenseRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EXPENSE", "VIEW")),
   getAllExpense
 );
@@ -88,7 +88,7 @@ expenseRouter.get(
 
 expenseRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EXPENSE", "VIEW")),
   getExpenseById
 );
@@ -116,7 +116,7 @@ expenseRouter.get(
  */
 expenseRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "EXPENSE", "VIEW"),
     getPermission("CORE", "EXPENSE", "UPDATE")
@@ -144,7 +144,7 @@ expenseRouter.put(
  */
 expenseRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "EXPENSE", "VIEW"),
     getPermission("CORE", "EXPENSE", "DELETE")

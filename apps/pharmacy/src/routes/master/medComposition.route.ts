@@ -14,6 +14,7 @@ import {
   validateDropDownNameUpdate,
 } from "@/validations/request/master/dropDown.validation.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const medCompoRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const medCompoRouter: Router = Router();
  */
 medCompoRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_COMPOSITION", "CREATE")),
   validateDropDownName,
-  compositionNameCreate,
+  compositionNameCreate
 );
 
 /**
@@ -66,9 +67,9 @@ medCompoRouter.post(
  */
 medCompoRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_COMPOSITION", "VIEW")),
-  compositionMedGet,
+  compositionMedGet
 );
 
 /**
@@ -87,9 +88,9 @@ medCompoRouter.get(
  */
 medCompoRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_COMPOSITION", "VIEW")),
-  getMedCompoById,
+  getMedCompoById
 );
 
 /**
@@ -116,13 +117,13 @@ medCompoRouter.get(
  */
 medCompoRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_COMPOSITION", "VIEW"),
-    getPermission("PMS", "MEDICINE_COMPOSITION", "UPDATE"),
+    getPermission("PMS", "MEDICINE_COMPOSITION", "UPDATE")
   ),
   validateDropDownNameUpdate,
-  updateMedCompo,
+  updateMedCompo
 );
 
 export default medCompoRouter;

@@ -26,6 +26,7 @@ import { expenseRouter } from "@/routes/consumerConnect/expense.route.js";
 import { approvalRouter } from "@/routes/approval/approval.routes.js";
 import { registerPharmacyApprovalCallbacks } from "@/modules/callbacks/approvalCallback.js";
 import { companySettingsRouter } from "@/routes/companySettings.route.js";
+import { moduleConfigRouter } from "@/routes/moduleConfig.route.js";
 
 registerPharmacyApprovalCallbacks(); // stock updates
 
@@ -68,3 +69,5 @@ coreRouter.use("/expense", expenseRouter);
 coreRouter.use("/approval", approvalRouter);
 
 coreRouter.use("/company-settings", companySettingsRouter);
+
+coreRouter.use("/module-config", moduleConfigRouter);
