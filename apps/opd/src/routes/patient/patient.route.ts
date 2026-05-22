@@ -16,6 +16,7 @@ import {
   validatePatientsUpdate,
 } from "@/validations/request/patient/patient.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const patientsRouter: Router = Router();
 
@@ -43,7 +44,7 @@ export const patientsRouter: Router = Router();
  */
 patientsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT", "CREATE")),
   createUploadFieldsMiddleware("patient_images/patient_captured_images", [
     "image",
@@ -51,7 +52,7 @@ patientsRouter.post(
     "patientSignature",
   ]),
   validatePatients,
-  createPatients,
+  createPatients
 );
 
 /**
@@ -71,10 +72,10 @@ patientsRouter.post(
  */
 patientsRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT", "VIEW"),
-    getPermission("OPD", "PATIENT", "UPDATE"),
+    getPermission("OPD", "PATIENT", "UPDATE")
   ),
   createUploadFieldsMiddleware("patient_images/patient_captured_images", [
     "image",
@@ -82,7 +83,7 @@ patientsRouter.put(
     "patientSignature",
   ]),
   validatePatientsUpdate,
-  updatePatients,
+  updatePatients
 );
 
 /**
@@ -96,9 +97,9 @@ patientsRouter.put(
  */
 patientsRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT", "VIEW")),
-  getAllPatients,
+  getAllPatients
 );
 
 /**
@@ -118,9 +119,9 @@ patientsRouter.get(
  */
 patientsRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT", "VIEW")),
-  getPatientsById,
+  getPatientsById
 );
 
 /**
@@ -134,7 +135,7 @@ patientsRouter.get(
  */
 patientsRouter.delete(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT", "DELETE")),
-  deletePatients,
+  deletePatients
 );

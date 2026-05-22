@@ -1,4 +1,5 @@
 import { getPathologyMasterById } from "@/controllers/pathology/pathologyMaster.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -34,7 +35,7 @@ export const pathologyMasterRouter: Router = Router();
 
 pathologyMasterRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATHOLOGY_MASTER", "VIEW")),
-  getPathologyMasterById,
+  getPathologyMasterById
 );

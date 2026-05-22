@@ -12,6 +12,7 @@ import {
   validateOpdDepartmentUpdate,
 } from "@/validations/request/master/opdDepartment.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const opdDepartmentRouter: Router = Router();
 
@@ -45,10 +46,10 @@ export const opdDepartmentRouter: Router = Router();
  */
 opdDepartmentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "OPD_DEPARTMENT", "CREATE")),
   validateOpdDepartmentCreate,
-  createOpdDepartment,
+  createOpdDepartment
 );
 
 /**
@@ -76,8 +77,8 @@ opdDepartmentRouter.post(
  */
 opdDepartmentRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "OPD_DEPARTMENT", "UPDATE")),
   validateOpdDepartmentUpdate,
-  updateOpdDepartment,
+  updateOpdDepartment
 );

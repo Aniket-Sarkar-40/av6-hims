@@ -9,6 +9,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validatePatientAdviceDetailsCreate } from "@/validations/request/appointment/patientAdviceDetails.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const patientAdviceDetailsRouter: Router = Router();
 
@@ -36,10 +37,10 @@ export const patientAdviceDetailsRouter: Router = Router();
  */
 patientAdviceDetailsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_ADVICE_DETAILS", "CREATE")),
   validatePatientAdviceDetailsCreate,
-  createPatientAdviceDetails,
+  createPatientAdviceDetails
 );
 
 /**
@@ -67,7 +68,7 @@ patientAdviceDetailsRouter.post(
  */
 patientAdviceDetailsRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_ADVICE_DETAILS", "VIEW")),
-  getPatientAdviceDetailsByAppointmentId,
+  getPatientAdviceDetailsByAppointmentId
 );

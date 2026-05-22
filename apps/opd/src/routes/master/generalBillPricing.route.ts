@@ -20,6 +20,7 @@ import {
 
 import { Router } from "express";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const generalBillPricingRouter: Router = Router();
 
@@ -47,10 +48,10 @@ export const generalBillPricingRouter: Router = Router();
  */
 generalBillPricingRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "CREATE")),
   validateCreateGeneralBillPricingSchema,
-  createGeneralBillPricing,
+  createGeneralBillPricing
 );
 
 /**
@@ -70,13 +71,13 @@ generalBillPricingRouter.post(
  */
 generalBillPricingRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW"),
-    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE"),
+    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE")
   ),
   validateUpdateGeneralBillPricingSchema,
-  updateGeneralBillPricing,
+  updateGeneralBillPricing
 );
 
 /**
@@ -96,9 +97,9 @@ generalBillPricingRouter.put(
  */
 generalBillPricingRouter.post(
   "/get-excel",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW")),
-  generalBillPricingMapExcelExport,
+  generalBillPricingMapExcelExport
 );
 
 /**
@@ -118,14 +119,14 @@ generalBillPricingRouter.post(
  */
 generalBillPricingRouter.post(
   "/import-excel",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW"),
-    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE"),
+    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE")
   ),
   createUploadMiddleware("filePath"),
   uploadToHetzner("generalBillPricing"),
-  generalBillPricingMapExcelImport,
+  generalBillPricingMapExcelImport
 );
 
 /**
@@ -145,15 +146,15 @@ generalBillPricingRouter.post(
  */
 generalBillPricingRouter.post(
   "/copy-pricing",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW")),
-  copyGeneralBillPricing,
+  copyGeneralBillPricing
 );
 
 generalBillPricingRouter.post(
   "/item-search",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW")),
   validateUpdateGeneralBillPricingSearchSchema,
-  getGeneralBillPricingWithItemByCcId,
+  getGeneralBillPricingWithItemByCcId
 );

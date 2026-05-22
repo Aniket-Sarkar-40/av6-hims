@@ -12,6 +12,7 @@ import {
   validateUpdateGeneralBillItemSchema,
 } from "@/validations/request/master/generalBillItem.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const generalBillItemRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const generalBillItemRouter: Router = Router();
  */
 generalBillItemRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_ITEM", "CREATE")),
   validateCreateGeneralBillItemSchema,
-  createGeneralBillItem,
+  createGeneralBillItem
 );
 
 /**
@@ -62,11 +63,11 @@ generalBillItemRouter.post(
  */
 generalBillItemRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "GENERAL_BILL_ITEM", "VIEW"),
-    getPermission("OPD", "GENERAL_BILL_ITEM", "UPDATE"),
+    getPermission("OPD", "GENERAL_BILL_ITEM", "UPDATE")
   ),
   validateUpdateGeneralBillItemSchema,
-  updateGeneralBillItem,
+  updateGeneralBillItem
 );

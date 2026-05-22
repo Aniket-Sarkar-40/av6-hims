@@ -27,6 +27,7 @@ import {
   validateUpdateTests,
 } from "@/validations/request/appointment/investigation.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const investigationRouter: Router = Router();
 
@@ -54,10 +55,10 @@ export const investigationRouter: Router = Router();
  */
 investigationRouter.post(
   "/search-tests",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATHOLOGY_MASTER", "VIEW")),
   validateSearchTest,
-  getTests,
+  getTests
 );
 
 /**
@@ -77,10 +78,10 @@ investigationRouter.post(
  */
 investigationRouter.post(
   "/test-categories",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TEST_CATEGORIES", "CREATE")),
   validateCreateTestCategories,
-  createTestCategories,
+  createTestCategories
 );
 
 /**
@@ -100,13 +101,13 @@ investigationRouter.post(
  */
 investigationRouter.put(
   "/test-categories",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "TEST_CATEGORIES", "VIEW"),
-    getPermission("OPD", "TEST_CATEGORIES", "UPDATE"),
+    getPermission("OPD", "TEST_CATEGORIES", "UPDATE")
   ),
   validateUpdateTestCategories,
-  updateTestCategories,
+  updateTestCategories
 );
 
 /**
@@ -127,9 +128,9 @@ investigationRouter.put(
  */
 investigationRouter.get(
   "/test-categories/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TEST_CATEGORIES", "VIEW")),
-  getTestCategoriesById,
+  getTestCategoriesById
 );
 
 /**
@@ -150,9 +151,9 @@ investigationRouter.get(
  */
 investigationRouter.delete(
   "/test-categories",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TEST_CATEGORIES", "DELETE")),
-  deleteTestCategoriesById,
+  deleteTestCategoriesById
 );
 /**
  * @swagger
@@ -171,10 +172,10 @@ investigationRouter.delete(
  */
 investigationRouter.post(
   "/tests",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TESTS", "CREATE")),
   validateCreateTests,
-  createTests,
+  createTests
 );
 
 /**
@@ -194,13 +195,13 @@ investigationRouter.post(
  */
 investigationRouter.put(
   "/tests",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "TESTS", "VIEW"),
-    getPermission("OPD", "TESTS", "UPDATE"),
+    getPermission("OPD", "TESTS", "UPDATE")
   ),
   validateUpdateTests,
-  updateTests,
+  updateTests
 );
 
 /**
@@ -221,9 +222,9 @@ investigationRouter.put(
  */
 investigationRouter.get(
   "/tests/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TESTS", "VIEW")),
-  getTestsById,
+  getTestsById
 );
 
 /**
@@ -244,9 +245,9 @@ investigationRouter.get(
  */
 investigationRouter.get(
   "/tests/test-category",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TESTS", "VIEW")),
-  getTestsByTestCategoryId,
+  getTestsByTestCategoryId
 );
 
 /**
@@ -266,10 +267,10 @@ investigationRouter.get(
  */
 investigationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_TEST", "CREATE")),
   validateCreatePatientTest,
-  createPatientTest,
+  createPatientTest
 );
 /**
  * @swagger
@@ -288,13 +289,13 @@ investigationRouter.post(
  */
 investigationRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_TEST", "VIEW"),
-    getPermission("OPD", "PATIENT_TEST", "UPDATE"),
+    getPermission("OPD", "PATIENT_TEST", "UPDATE")
   ),
   validateUpdatePatientTest,
-  updatePatientTest,
+  updatePatientTest
 );
 
 /**
@@ -316,7 +317,7 @@ investigationRouter.put(
 
 investigationRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_TEST", "VIEW")),
-  getPatientTestById,
+  getPatientTestById
 );

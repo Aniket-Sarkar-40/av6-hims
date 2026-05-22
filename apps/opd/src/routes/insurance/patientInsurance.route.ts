@@ -16,6 +16,7 @@ import {
   validatePatientsInsuranceUpdate,
 } from "@/validations/request/insurance/patientsInsurance.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const patientsInsuranceRouter: Router = Router();
 
@@ -43,14 +44,14 @@ export const patientsInsuranceRouter: Router = Router();
  */
 patientsInsuranceRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_INSURANCE", "CREATE")),
   createUploadFieldsMiddleware("patient_images/card_image", [
     "cardFrontImage",
     "cardBackImage",
   ]),
   validatePatientsInsurance,
-  createPatientsInsurance,
+  createPatientsInsurance
 );
 
 /**
@@ -70,17 +71,17 @@ patientsInsuranceRouter.post(
  */
 patientsInsuranceRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_INSURANCE", "VIEW"),
-    getPermission("OPD", "PATIENT_INSURANCE", "UPDATE"),
+    getPermission("OPD", "PATIENT_INSURANCE", "UPDATE")
   ),
   createUploadFieldsMiddleware("patient_images/card_image", [
     "cardFrontImage",
     "cardBackImage",
   ]),
   validatePatientsInsuranceUpdate,
-  updatePatientsInsurance,
+  updatePatientsInsurance
 );
 
 /**
@@ -94,9 +95,9 @@ patientsInsuranceRouter.put(
  */
 patientsInsuranceRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_INSURANCE", "VIEW")),
-  getAllPatientsInsurance,
+  getAllPatientsInsurance
 );
 
 /**
@@ -116,9 +117,9 @@ patientsInsuranceRouter.get(
  */
 patientsInsuranceRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_INSURANCE", "VIEW")),
-  getPatientsInsuranceById,
+  getPatientsInsuranceById
 );
 
 /**
@@ -132,9 +133,9 @@ patientsInsuranceRouter.get(
  */
 patientsInsuranceRouter.delete(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_INSURANCE", "DELETE")),
-  deletePatientsInsurance,
+  deletePatientsInsurance
 );
 
 // /**

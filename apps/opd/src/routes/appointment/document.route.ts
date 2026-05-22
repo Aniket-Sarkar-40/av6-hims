@@ -8,6 +8,7 @@ import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateDocumentCreate } from "@/validations/request/appointment/document.validation.js";
 import { Router } from "express";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const documentRouter: Router = Router();
 
@@ -35,7 +36,7 @@ export const documentRouter: Router = Router();
  */
 documentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "DOCUMENT", "CREATE")),
   createUploadMiddleware("filePath"),
   uploadToHetzner("Document"),

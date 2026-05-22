@@ -6,6 +6,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateCreateFollowUp } from "@/validations/request/appointment/followUp.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 export const followUpRouter: Router = Router();
 
 /**
@@ -33,8 +34,8 @@ export const followUpRouter: Router = Router();
 
 followUpRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "FOLLOW_UP", "CREATE")),
   validateCreateFollowUp,
-  createFollowUp,
+  createFollowUp
 );

@@ -16,6 +16,7 @@ import {
   validateInsuranceUpdate,
 } from "@/validations/request/insurance/insurance.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const insuranceRouter: Router = Router();
 
@@ -43,11 +44,11 @@ export const insuranceRouter: Router = Router();
  */
 insuranceRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "INSURANCE", "CREATE")),
   createUploadFieldsMiddleware("insurance", ["logoImage", "attachments"]),
   validateInsurance,
-  createInsurance,
+  createInsurance
 );
 
 /**
@@ -67,14 +68,14 @@ insuranceRouter.post(
  */
 insuranceRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "INSURANCE", "VIEW"),
-    getPermission("OPD", "INSURANCE", "UPDATE"),
+    getPermission("OPD", "INSURANCE", "UPDATE")
   ),
   createUploadFieldsMiddleware("insurance", ["logoImage", "attachments"]),
   validateInsuranceUpdate,
-  updateInsurance,
+  updateInsurance
 );
 
 /**
@@ -89,7 +90,7 @@ insuranceRouter.put(
 insuranceRouter.get(
   "/",
   // verifyToken, authorize(getPermission("INSURANCE", "VIEW")),
-  getAllInsurance,
+  getAllInsurance
 );
 
 /**
@@ -109,9 +110,9 @@ insuranceRouter.get(
  */
 insuranceRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "INSURANCE", "VIEW")),
-  getInsuranceById,
+  getInsuranceById
 );
 
 /**
@@ -125,9 +126,9 @@ insuranceRouter.get(
  */
 insuranceRouter.delete(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "INSURANCE", "DELETE")),
-  deleteInsurance,
+  deleteInsurance
 );
 
 // /**

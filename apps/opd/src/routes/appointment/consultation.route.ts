@@ -6,6 +6,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateCreateConsultation } from "@/validations/request/appointment/consultation.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const consultationRouter: Router = Router();
 
@@ -33,8 +34,8 @@ export const consultationRouter: Router = Router();
  */
 consultationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION", "CREATE")),
   validateCreateConsultation,
-  createConsultation,
+  createConsultation
 );

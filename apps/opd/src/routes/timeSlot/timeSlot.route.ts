@@ -12,6 +12,7 @@ import {
   validateWeekId,
 } from "@/validations/request/timeSlot/timeSlot.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const timeSlotRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const timeSlotRouter: Router = Router();
  */
 timeSlotRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TIME_SLOT", "VIEW")),
   validateTimeSlot,
-  getAllTimeSlots,
+  getAllTimeSlots
 );
 /**
  * @swagger
@@ -61,8 +62,8 @@ timeSlotRouter.post(
  */
 timeSlotRouter.post(
   "/weeks",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TIME_SLOT", "VIEW")),
   validateWeekId,
-  getAllWeekIds,
+  getAllWeekIds
 );

@@ -15,6 +15,7 @@ import {
   validateUpdateGeneralBilling,
 } from "@/validations/request/appointment/generalBilling.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const generalBillingRouter: Router = Router();
 
@@ -43,10 +44,10 @@ export const generalBillingRouter: Router = Router();
 
 generalBillingRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "CREATE")),
   validateCreateGeneralBilling,
-  createGeneralBilling,
+  createGeneralBilling
 );
 /**
  * @swagger
@@ -66,10 +67,10 @@ generalBillingRouter.post(
 
 generalBillingRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "UPDATE")),
   validateUpdateGeneralBilling,
-  updateGeneralBilling,
+  updateGeneralBilling
 );
 
 /**
@@ -91,15 +92,15 @@ generalBillingRouter.put(
 
 generalBillingRouter.delete(
   "/delete",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "DELETE")),
-  deleteGeneralBilling,
+  deleteGeneralBilling
 );
 
 generalBillingRouter.put(
   "/return",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "UPDATE")),
   validateReturnGeneralBilling,
-  returnGeneralBilling,
+  returnGeneralBilling
 );

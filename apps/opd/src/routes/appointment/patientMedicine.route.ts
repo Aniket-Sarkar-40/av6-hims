@@ -17,6 +17,7 @@ import {
 } from "@/validations/request/appointment/patientMedicine.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const patientMedicineRouter: Router = Router();
 
@@ -44,10 +45,10 @@ export const patientMedicineRouter: Router = Router();
  */
 patientMedicineRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "CREATE")),
   validateCreatePatientMedicine,
-  createPatientMedicine,
+  createPatientMedicine
 );
 
 /**
@@ -67,13 +68,13 @@ patientMedicineRouter.post(
  */
 patientMedicineRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_MEDICINE", "VIEW"),
-    getPermission("OPD", "PATIENT_MEDICINE", "UPDATE"),
+    getPermission("OPD", "PATIENT_MEDICINE", "UPDATE")
   ),
   validateUpdatePatientMedicine,
-  updatePatientMedicine,
+  updatePatientMedicine
 );
 
 /**
@@ -93,9 +94,9 @@ patientMedicineRouter.put(
  */
 patientMedicineRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "VIEW")),
-  getPatientMedicineById,
+  getPatientMedicineById
 );
 
 /**
@@ -115,10 +116,10 @@ patientMedicineRouter.get(
  */
 patientMedicineRouter.post(
   "/search-medicine",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "CREATE")),
   validateSearchMedicine,
-  getMedicines,
+  getMedicines
 );
 
 /**
@@ -140,7 +141,7 @@ patientMedicineRouter.post(
 
 patientMedicineRouter.delete(
   "/delete",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "DELETE")),
-  deletePatientMedicine,
+  deletePatientMedicine
 );

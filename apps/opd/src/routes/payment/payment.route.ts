@@ -14,6 +14,7 @@ import {
   validateGetPaymentDetailsWithModule,
 } from "@/validations/request/payment/payment.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const paymentRouter: Router = Router();
 
@@ -42,10 +43,10 @@ export const paymentRouter: Router = Router();
  */
 paymentRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PAYMENT", "VIEW")),
   validateGetPayment,
-  getPayment,
+  getPayment
 );
 
 /**
@@ -65,10 +66,10 @@ paymentRouter.post(
  */
 paymentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PAYMENT", "CREATE")),
   validateCreatePayment,
-  createPayment,
+  createPayment
 );
 
 /**
@@ -88,8 +89,8 @@ paymentRouter.post(
  */
 paymentRouter.post(
   "/fetch-module-wise",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PAYMENT", "VIEW")),
   validateGetPaymentDetailsWithModule,
-  getPaymentDetailsWithModule,
+  getPaymentDetailsWithModule
 );

@@ -12,6 +12,7 @@ import {
   validatePatientConsultationUpdate,
 } from "@/validations/request/appointment/patientConsultation.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const patientConsultationRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const patientConsultationRouter: Router = Router();
  */
 patientConsultationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_CONSULTATION", "CREATE")),
   validatePatientConsultationCreate,
-  createPatientConsultation,
+  createPatientConsultation
 );
 
 /**
@@ -62,8 +63,8 @@ patientConsultationRouter.post(
  */
 patientConsultationRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_CONSULTATION", "UPDATE")),
   validatePatientConsultationUpdate,
-  updatePatientConsultation,
+  updatePatientConsultation
 );
