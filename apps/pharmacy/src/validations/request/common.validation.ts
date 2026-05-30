@@ -4,6 +4,180 @@ import Joi from "joi";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 
+export const fixedFieldSchema = Joi.alternatives()
+  .try(
+    Joi.object({
+      type: Joi.string().valid("number").required().messages({
+        "any.only": "Fixed field type must be 'number'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array()
+        .items(
+          Joi.number().messages({
+            "number.base": "Each value in the fixed field must be a number.",
+          })
+        )
+        .required()
+        .messages({
+          "array.base": "Fixed field value must be an array of numbers.",
+          "any.required": "Fixed field value is required.",
+        }),
+    }),
+    Joi.object({
+      type: Joi.string().valid("string").required().messages({
+        "any.only": "Fixed field type must be 'string'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array()
+        .items(
+          Joi.string().messages({
+            "string.base": "Each value in the fixed field must be a string.",
+          })
+        )
+        .required()
+        .messages({
+          "array.base": "Fixed field value must be an array of strings.",
+          "any.required": "Fixed field value is required.",
+        }),
+    }),
+    Joi.object({
+      type: Joi.string().valid("boolean").required().messages({
+        "any.only": "Fixed field type must be 'boolean'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array()
+        .items(
+          Joi.boolean().messages({
+            "boolean.base": "Each value in the fixed field must be a boolean.",
+          })
+        )
+        .required()
+        .messages({
+          "array.base": "Fixed field value must be an array of booleans.",
+          "any.required": "Fixed field value is required.",
+        }),
+    }),
+    Joi.object({
+      type: Joi.string().valid("date").required().messages({
+        "any.only": "Fixed field type must be 'date'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array()
+        .items(
+          Joi.string().messages({
+            "string.base": "Each value in the fixed field must be a string.",
+          })
+        )
+        .required()
+        .messages({
+          "array.base": "Fixed field value must be an array of strings.",
+          "any.required": "Fixed field value is required.",
+        }),
+    }),
+    Joi.object({
+      type: Joi.string().valid("range").required().messages({
+        "any.only": "Fixed field type must be 'range'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array()
+        .items(
+          Joi.string().messages({
+            "string.base": "Each value in the fixed field must be a string.",
+          })
+        )
+        .length(2)
+        .required()
+        .messages({
+          "array.base": "Fixed field value must be an array of strings.",
+          "any.required": "Fixed field value is required.",
+          "array.length": "Fixed field value must contain exactly 2 elements.",
+        }),
+    }),
+    Joi.object({
+      type: Joi.string().valid("gt", "lt").required().messages({
+        "any.only": "Fixed field type must be 'gt' or 'lt'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array()
+        .items(
+          Joi.alternatives().try(
+            Joi.string().messages({
+              "string.base": "Each value in the fixed field must be a string.",
+            }),
+            Joi.number().messages({
+              "number.base": "Each value in the fixed field must be a number.",
+            })
+          )
+        )
+        .length(1)
+        .required()
+        .messages({
+          "array.base": "Fixed field value must be an array of strings.",
+          "any.required": "Fixed field value is required.",
+          "array.length": "Fixed field value must contain exactly 1 element.",
+        }),
+    }),
+    Joi.object({
+      type: Joi.string().valid("null").required().messages({
+        "any.only": "Fixed field type must be 'null'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array().items(Joi.valid(null)).length(1).required().messages({
+        "array.base": "Fixed field value must be an array.",
+        "any.required": "Fixed field value is required.",
+        "array.length": "Fixed field value must contain exactly 1 element.",
+        "any.only": "Fixed field value must contain only null.",
+      }),
+    })
+  )
+  .messages({
+    "alternatives.match": "Fixed field does not match any allowed schema.",
+  });
+
+export const logicSchema = Joi.object({
+  fixedSearch: Joi.object()
+    .pattern(Joi.string(), fixedFieldSchema)
+    .optional()
+    .messages({
+      "object.base":
+        "logic.fixedSearch must be an object with valid fixed field entries.",
+    }),
+
+  fixedNotSearch: Joi.object()
+    .pattern(Joi.string(), fixedFieldSchema)
+    .optional()
+    .messages({
+      "object.base":
+        "logic.fixedNotSearch must be an object with valid fixed field entries.",
+    }),
+
+  AND: Joi.array().items(Joi.link("#logicNode")).min(1).optional().messages({
+    "array.base": "logic.AND must be an array.",
+    "array.min": "logic.AND must have at least 1 condition.",
+  }),
+
+  OR: Joi.array().items(Joi.link("#logicNode")).min(1).optional().messages({
+    "array.base": "logic.OR must be an array.",
+    "array.min": "logic.OR must have at least 1 condition.",
+  }),
+})
+  // IMPORTANT: id must exist for Joi.link("#logicNode") to resolve
+  .id("logicNode")
+  // require at least one key in each node
+  .or("fixedSearch", "fixedNotSearch", "AND", "OR")
+  .messages({
+    "object.base": "logic must be an object.",
+    "object.missing":
+      "logic node must contain at least one of fixedSearch, fixedNotSearch, AND, OR.",
+  });
+
 export const commonFilterRequestSchema = Joi.object({
   pageNo: Joi.number().integer().min(1).messages({
     "number.base": "pageNo must be a number",
@@ -135,130 +309,6 @@ export const commonApproveSchema = Joi.object({
   }),
 });
 
-export const fixedFieldSchema = Joi.alternatives()
-  .try(
-    Joi.object({
-      type: Joi.string().valid("number").required().messages({
-        "any.only": "Fixed field type must be 'number'.",
-        "string.base": "Fixed field type must be a string.",
-        "any.required": "Fixed field type is required.",
-      }),
-      value: Joi.array()
-        .items(
-          Joi.number().messages({
-            "number.base": "Each value in the fixed field must be a number.",
-          })
-        )
-        .required()
-        .messages({
-          "array.base": "Fixed field value must be an array of numbers.",
-          "any.required": "Fixed field value is required.",
-        }),
-    }),
-    Joi.object({
-      type: Joi.string().valid("string").required().messages({
-        "any.only": "Fixed field type must be 'string'.",
-        "string.base": "Fixed field type must be a string.",
-        "any.required": "Fixed field type is required.",
-      }),
-      value: Joi.array()
-        .items(
-          Joi.string().messages({
-            "string.base": "Each value in the fixed field must be a string.",
-          })
-        )
-        .required()
-        .messages({
-          "array.base": "Fixed field value must be an array of strings.",
-          "any.required": "Fixed field value is required.",
-        }),
-    }),
-    Joi.object({
-      type: Joi.string().valid("boolean").required().messages({
-        "any.only": "Fixed field type must be 'boolean'.",
-        "string.base": "Fixed field type must be a string.",
-        "any.required": "Fixed field type is required.",
-      }),
-      value: Joi.array()
-        .items(
-          Joi.boolean().messages({
-            "boolean.base": "Each value in the fixed field must be a boolean.",
-          })
-        )
-        .required()
-        .messages({
-          "array.base": "Fixed field value must be an array of booleans.",
-          "any.required": "Fixed field value is required.",
-        }),
-    }),
-    Joi.object({
-      type: Joi.string().valid("date").required().messages({
-        "any.only": "Fixed field type must be 'date'.",
-        "string.base": "Fixed field type must be a string.",
-        "any.required": "Fixed field type is required.",
-      }),
-      value: Joi.array()
-        .items(
-          Joi.string().messages({
-            "string.base": "Each value in the fixed field must be a string.",
-          })
-        )
-        .required()
-        .messages({
-          "array.base": "Fixed field value must be an array of strings.",
-          "any.required": "Fixed field value is required.",
-        }),
-    }),
-    Joi.object({
-      type: Joi.string().valid("range").required().messages({
-        "any.only": "Fixed field type must be 'range'.",
-        "string.base": "Fixed field type must be a string.",
-        "any.required": "Fixed field type is required.",
-      }),
-      value: Joi.array()
-        .items(
-          Joi.string().messages({
-            "string.base": "Each value in the fixed field must be a string.",
-          })
-        )
-        .length(2)
-        .required()
-        .messages({
-          "array.base": "Fixed field value must be an array of strings.",
-          "any.required": "Fixed field value is required.",
-          "array.length": "Fixed field value must contain exactly 2 elements.",
-        }),
-    }),
-    Joi.object({
-      type: Joi.string().valid("gt", "lt").required().messages({
-        "any.only": "Fixed field type must be 'gt' or 'lt'.",
-        "string.base": "Fixed field type must be a string.",
-        "any.required": "Fixed field type is required.",
-      }),
-      value: Joi.array()
-        .items(
-          Joi.alternatives().try(
-            Joi.string().messages({
-              "string.base": "Each value in the fixed field must be a string.",
-            }),
-            Joi.number().messages({
-              "number.base": "Each value in the fixed field must be a number.",
-            })
-          )
-        )
-        .length(1)
-        .required()
-        .messages({
-          "array.base": "Fixed field value must be an array of strings.",
-          "any.required": "Fixed field value is required.",
-          "array.length": "Fixed field value must contain exactly 1 element.",
-        }),
-    })
-  )
-  .messages({
-    "alternatives.match": "Fixed field does not match any allowed schema.",
-  });
-
 export const fixedSearchSchema = Joi.object({
   pageNo: Joi.number().integer().min(1).optional().messages({
     "number.base": "Page number must be a number.",
@@ -327,10 +377,12 @@ export const fixedSearchSchema = Joi.object({
       "object.base":
         "Fixed not search must be an object with valid fixed field entries.",
     }),
+  logic: logicSchema.optional(),
   includes: Joi.object().optional().messages({
     "object.base": "Includes must be an object.",
   }),
 });
+
 export const fixedSearchWoPaginationSchema = Joi.object({
   shortCode: Joi.string()
     .required()
@@ -389,6 +441,7 @@ export const fixedSearchWoPaginationSchema = Joi.object({
       "object.base":
         "Fixed not search must be an object with valid fixed field entries.",
     }),
+  logic: logicSchema.optional(),
   includes: Joi.object().optional().messages({
     "object.base": "Includes must be an object.",
   }),
@@ -553,6 +606,8 @@ export const dropdownSchema = Joi.object({
       "object.base":
         "Fixed not search must be an object with valid fixed field entries.",
     }),
+
+  logic: logicSchema.optional(),
 
   sortBy: Joi.string().optional().messages({
     "string.base": "Sort by must be a string.",

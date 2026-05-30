@@ -541,7 +541,6 @@ export const dropdownSchema = Joi.object({
     "object.base": "Select must be an object.",
   }),
 });
-
 //
 // Joi schema for validating SearchRequest
 //
