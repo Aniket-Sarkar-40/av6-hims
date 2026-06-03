@@ -93,53 +93,68 @@ export const subItemStock = async (
 ): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
+
   const ccId = data.ccId ?? null;
   const userId = data.userId ?? null;
   const batchNo = data.batchNo ?? null;
   const expiryDate = data.expiryDate ? new Date(data.expiryDate) : null;
-  const isStockExists = await tx.invItemStock.findFirst({
+
+  const itemStocks = await tx.invItemStock.findMany({
     where: {
       itemId: data.itemId,
       ccId,
       userId,
       batchNo,
       expiryDate,
-      isFoc: data.isFoc,
       isActive: true,
     },
   });
 
-  if (!isStockExists || isStockExists.quantity < data.quantity) {
+  const totalAvailableQty = itemStocks.reduce((sum, stock) => {
+    return sum + stock.quantity;
+  }, 0);
+
+  if (totalAvailableQty < data.quantity) {
     throw new ErrorHandler(400, "Insufficient stock to consume");
   }
 
-  await tx.invItemStock.update({
-    where: {
-      id: isStockExists.id,
-    },
-    data: {
-      quantity: isStockExists.quantity - data.quantity,
-      updatedBy: currentUser,
-    },
-  });
+  let remainingQty = data.quantity;
 
-  await tx.invItemStockAudit.create({
-    data: {
-      itemStockId: isStockExists.id,
-      quantity: data.quantity,
-      action: Action.SUBTRACTION,
-      operation: detail.operation,
-      refApprovedAt: detail.refApprovedAt
-        ? new Date(detail.refApprovedAt)
-        : null,
-      refApprovedBy: detail.refApprovedBy ?? null,
-      refId: detail.refId ?? null,
-      refDetailsId: detail.refDetailsId ?? null,
-      refDate: detail.refDate ? new Date(detail.refDate) : null,
-      refNo: detail.refNo ?? null,
-      createdBy: currentUser,
-    },
-  });
+  for (const stock of itemStocks) {
+    if (remainingQty <= 0) break;
+
+    const consumeQty = Math.min(stock.quantity, remainingQty);
+
+    await tx.invItemStock.update({
+      where: {
+        id: stock.id,
+      },
+      data: {
+        quantity: stock.quantity - consumeQty,
+        updatedBy: currentUser,
+      },
+    });
+
+    await tx.invItemStockAudit.create({
+      data: {
+        itemStockId: stock.id,
+        quantity: consumeQty,
+        action: Action.SUBTRACTION,
+        operation: detail.operation,
+        refApprovedAt: detail.refApprovedAt
+          ? new Date(detail.refApprovedAt)
+          : null,
+        refApprovedBy: detail.refApprovedBy ?? null,
+        refId: detail.refId ?? null,
+        refDetailsId: detail.refDetailsId ?? null,
+        refDate: detail.refDate ? new Date(detail.refDate) : null,
+        refNo: detail.refNo ?? null,
+        createdBy: currentUser,
+      },
+    });
+
+    remainingQty -= consumeQty;
+  }
 };
 
 export const getStockById = async (
