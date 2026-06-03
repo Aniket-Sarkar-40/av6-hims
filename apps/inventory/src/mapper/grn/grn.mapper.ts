@@ -62,10 +62,13 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
               expiryDate: detail.expiryDate ?? null,
             })) || null;
 
+          const totalGrnQty =
+            (detail.quantity ?? 0) + (detail.focQuantity ?? 0);
           return {
             ...detail,
             item: item ? await itemMasterToDto(item) : null,
             inHandQty: inHandQty ?? 0,
+            totalGrnQty: totalGrnQty,
           };
         })
       );

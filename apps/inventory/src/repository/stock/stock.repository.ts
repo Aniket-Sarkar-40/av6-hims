@@ -93,19 +93,66 @@ export const subItemStock = async (
 ): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
+  const isStockExists = await tx.invItemStock.findFirst({
+    where: {
+      itemId: data.itemId,
+      ccId: data.ccId,
+      batchNo: data.batchNo ?? null,
+      userId: data.userId,
+      expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+      isFoc: data.isFoc,
+      isActive: true,
+    },
+  });
 
-  const ccId = data.ccId ?? null;
-  const userId = data.userId ?? null;
-  const batchNo = data.batchNo ?? null;
-  const expiryDate = data.expiryDate ? new Date(data.expiryDate) : null;
+  if (!isStockExists || isStockExists.quantity < data.quantity) {
+    throw new ErrorHandler(400, "Insufficient stock to consume");
+  }
+
+  await tx.invItemStock.update({
+    where: {
+      id: isStockExists.id,
+    },
+    data: {
+      quantity: isStockExists.quantity - data.quantity,
+      updatedBy: currentUser,
+    },
+  });
+
+  await tx.invItemStockAudit.create({
+    data: {
+      itemStockId: isStockExists.id,
+      quantity: data.quantity,
+      action: Action.SUBTRACTION,
+      operation: detail.operation,
+      refApprovedAt: detail.refApprovedAt
+        ? new Date(detail.refApprovedAt)
+        : null,
+      refApprovedBy: detail.refApprovedBy ?? null,
+      refId: detail.refId ?? null,
+      refDetailsId: detail.refDetailsId ?? null,
+      refDate: detail.refDate ? new Date(detail.refDate) : null,
+      refNo: detail.refNo ?? null,
+      createdBy: currentUser,
+    },
+  });
+};
+
+export const subItemStockForGrnReturn = async (
+  tx: Tx,
+  data: CreateItemStockInput,
+  detail: ItemStockAudit
+): Promise<void> => {
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
 
   const itemStocks = await tx.invItemStock.findMany({
     where: {
       itemId: data.itemId,
-      ccId,
-      userId,
-      batchNo,
-      expiryDate,
+      ccId: data.ccId ?? null,
+      batchNo: data.batchNo ?? null,
+      userId: data.userId ?? null,
+      expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
       isActive: true,
     },
   });
@@ -128,6 +175,7 @@ export const subItemStock = async (
     await tx.invItemStock.update({
       where: {
         id: stock.id,
+        isActive: true,
       },
       data: {
         quantity: stock.quantity - consumeQty,

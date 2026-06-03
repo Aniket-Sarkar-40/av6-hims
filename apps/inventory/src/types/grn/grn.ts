@@ -54,6 +54,7 @@ export interface GrnDTO
 export interface GrnDetailDTO extends InvGoodReceiveDetails {
   item: ItemMasterToDto | null;
   inHandQty: number | null;
+  totalGrnQty: number | null;
 }
 
 export interface ItemMasterToDto extends InvItem {
