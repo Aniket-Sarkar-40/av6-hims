@@ -5,7 +5,9 @@ import { toStockEntity } from "@/mapper/purchase/storeRequisition.mapper.js";
 import {
   CreateItemStockInput,
   ItemStockAudit,
+  ItemStockReportRow,
   ItemStockResponse,
+  ItemStockSummaryRow,
   RawItemStock,
 } from "@/types/stock/stock.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
@@ -341,58 +343,58 @@ export const getItemStocksByLocationUserId = async (
 };
 
 export const itemStockSummary = async (ccId: number) => {
-  const rows = await db.$queryRaw<RawItemStock[]>`
+  const rows = await db.$queryRaw<ItemStockSummaryRow[]>`
     SELECT
-      im.id                                   AS item_id,
-      im.item                                 AS item_name,
-      im.item_code,
-    im.item_description,
-    im.base_price,
-    im.is_batch_number,
-    im.is_expire_date,
-    im.is_returnable,
-    im.is_lock,
-    im.is_active                            AS item_is_active,
+      im.id AS itemId,
+      im.item AS itemName,
+      im.item_code AS itemCode,
+      im.item_description AS itemDescription,
+      im.base_price AS basePrice,
+      im.is_batch_number AS isBatchNumber,
+      im.is_expire_date AS isExpireDate,
+      im.is_returnable AS isReturnable,
+      im.is_lock AS itemIsLock,
+      im.is_active AS itemIsActive,
 
-    ic.id                                   AS category_id,
-    ic.name                                 AS category_name,
+      ic.id AS categoryId,
+      ic.name AS categoryName,
 
-    u.id                                    AS unit_id,
-    u.packaging_type_name                   AS unit_name,
-    u.packaging_size                        AS unit_size,
+      u.id AS unitId,
+      u.packaging_type_name AS unitName,
+      u.packaging_size AS unitSize,
 
-    k.cc_id,
-    CASE WHEN b.id IS NOT NULL THEN 'BRANCH'
+      k.cc_id AS ccId,
+      CASE WHEN b.id IS NOT NULL THEN 'BRANCH'
          WHEN w.id IS NOT NULL THEN 'WAREHOUSE'
-         ELSE 'UNKNOWN' END                 AS location_type,
-    COALESCE(b.name, w.name)                AS location_name,
+         ELSE 'UNKNOWN' END AS locationType,
+      COALESCE(b.name, w.name) AS locationName,
 
-    k.batch_no,
-    COALESCE(sa.expiry_date, grd.grn_expiry_date, cd.cons_expiry_date) AS expiry_date,
+      k.batch_no AS batchNo,
+      COALESCE(sa.expiry_date, grd.grn_expiry_date, cd.cons_expiry_date) AS expiryDate,
 
-    sa.stock_id_list,
-    COALESCE(sa.in_hand_qty, 0)             AS in_hand_qty,
-    CASE WHEN b.id IS NOT NULL THEN COALESCE(sa.in_hand_qty, 0) ELSE 0 END AS branch_in_hand_qty,
-    CASE WHEN w.id IS NOT NULL THEN COALESCE(sa.in_hand_qty, 0) ELSE 0 END AS warehouse_in_hand_qty,
+      sa.stock_id_list AS stockIdList,
+      COALESCE(sa.in_hand_qty, 0) AS inHandQty,
+      CASE WHEN b.id IS NOT NULL THEN COALESCE(sa.in_hand_qty, 0) ELSE 0 END AS branchInHandQty,
+      CASE WHEN w.id IS NOT NULL THEN COALESCE(sa.in_hand_qty, 0) ELSE 0 END AS warehouseInHandQty,
 
-    COALESCE(srd.req_qty,          0)       AS req_qty,
-    COALESCE(srd.assigned_qty,     0)       AS assigned_qty,
-    COALESCE(srd.acknowledged_qty, 0)       AS acknowledged_qty,
-    (COALESCE(srd.req_qty, 0) - COALESCE(srd.assigned_qty, 0))          AS pending_qty,
-    (COALESCE(srd.req_qty, 0) - COALESCE(srd.acknowledged_qty, 0))      AS ack_pending_qty,
+      COALESCE(srd.req_qty, 0) AS reqQty,
+      COALESCE(srd.assigned_qty, 0) AS assignedQty,
+      COALESCE(srd.acknowledged_qty, 0) AS acknowledgedQty,
+      (COALESCE(srd.req_qty, 0) - COALESCE(srd.assigned_qty, 0)) AS pendingQty,
+      (COALESCE(srd.req_qty, 0) - COALESCE(srd.acknowledged_qty, 0)) AS ackPendingQty,
 
-    COALESCE(grd.ordered_qty,  0)           AS ordered_qty,
-    COALESCE(grd.received_qty, 0)           AS received_qty,
-    COALESCE(grd.returned_qty, 0)           AS returned_qty,
+      COALESCE(grd.ordered_qty, 0) AS orderedQty,
+      COALESCE(grd.received_qty, 0) AS receivedQty,
+      COALESCE(grd.returned_qty, 0) AS returnedQty,
 
-    COALESCE(cd.consumption_requested_qty, 0) AS consumption_requested_qty,
-    COALESCE(cd.consumed_qty, 0)              AS consumed_qty,
+      COALESCE(cd.consumption_requested_qty, 0) AS consumptionRequestedQty,
+      COALESCE(cd.consumed_qty, 0) AS consumedQty,
 
-    (COALESCE(grd.received_qty, 0) - COALESCE(grd.returned_qty, 0) - COALESCE(cd.consumed_qty, 0)) AS movement_balance,
-    (COALESCE(sa.in_hand_qty, 0)
-     - (COALESCE(grd.received_qty, 0) - COALESCE(grd.returned_qty, 0) - COALESCE(cd.consumed_qty, 0))) AS variance_vs_stock,
+      (COALESCE(grd.received_qty, 0) - COALESCE(grd.returned_qty, 0) - COALESCE(cd.consumed_qty, 0)) AS movementBalance,
+      (COALESCE(sa.in_hand_qty, 0)
+       - (COALESCE(grd.received_qty, 0) - COALESCE(grd.returned_qty, 0) - COALESCE(cd.consumed_qty, 0))) AS varianceVsStock,
 
-    COALESCE(ism.purchase_price, 0.00)      AS purchase_price
+      COALESCE(ism.purchase_price, 0.00) AS purchasePrice
 
   FROM
     (
@@ -553,8 +555,6 @@ export const itemStockSummary = async (ccId: number) => {
 };
 
 export const itemStock = async (ccId: number) => {
-  const store = requestStorage.getStore();
-
   const warehouse = await db.invWarehouse.findFirst({
     where: {
       id: ccId,
@@ -589,127 +589,126 @@ export const itemStock = async (ccId: number) => {
     ? "BRANCH"
     : "BRANCH";
 
-  const rows = await db.$queryRaw<RawItemStock[]>`
+  const rows = await db.$queryRaw<ItemStockReportRow[]>`
     SELECT
       /* ---------------- Item ---------------- */
-      im.id                                   AS item_id,
-      im.item                                 AS item_name,
-      im.item_code                            AS item_code,
-      im.item_description                     AS item_description,
-      im.base_price                           AS base_price,
-      im.last_purchased_price                 AS last_purchased_price,
-      im.re_order_level                       AS re_order_level,
-      im.is_batch_number                      AS is_batch_number,
-      im.is_expire_date                       AS is_expire_date,
-      im.is_returnable                        AS is_returnable,
-      im.is_lock                              AS item_is_lock,
-      im.is_active                            AS item_is_active,
+      im.id AS itemId,
+      im.item AS itemName,
+      im.item_code AS itemCode,
+      im.item_description AS itemDescription,
+      im.base_price AS basePrice,
+      im.last_purchased_price AS lastPurchasedPrice,
+      im.re_order_level AS reOrderLevel,
+      im.is_batch_number AS isBatchNumber,
+      im.is_expire_date AS isExpireDate,
+      im.is_returnable AS isReturnable,
+      im.is_lock AS itemIsLock,
+      im.is_active AS itemIsActive,
 
       /* ---------------- Category ---------------- */
-      ic.id                                   AS category_id,
-      ic.name                                 AS category_name,
+      ic.id AS categoryId,
+      ic.name AS categoryName,
 
       /* ---------------- Unit ---------------- */
-      u.id                                    AS unit_id,
-      u.packaging_type_name                   AS unit_name,
-      u.packaging_size                        AS unit_size,
+      u.id AS unitId,
+      u.packaging_type_name AS unitName,
+      u.packaging_size AS unitSize,
 
       /* ---------------- Location ---------------- */
-      k.location_cc_id                        AS cc_id,
-      ${locationType}                         AS location_type,
+      k.location_cc_id AS ccId,
+      ${locationType} AS locationType,
       CASE
         WHEN ${isWarehouseLocation} = true THEN w.name
         ELSE b.name
-      END                                     AS location_name,
+      END AS locationName,
 
       /* ---------------- Batch ---------------- */
-      COALESCE(stock.batch_no_list, '')       AS batch_no_list,
-      COALESCE(stock.expiry_date_list, '')    AS expiry_date_list,
-      stock.nearest_expiry_date               AS nearest_expiry_date,
+      COALESCE(stock.batch_no_list, '') AS batchNoList,
+      COALESCE(stock.expiry_date_list, '') AS expiryDateList,
+      stock.nearest_expiry_date AS nearestExpiryDate,
 
       /* ---------------- Current Stock ---------------- */
-      COALESCE(stock.stock_id_list, '')       AS stock_id_list,
-      COALESCE(stock.stock_row_count, 0)      AS stock_row_count,
-      COALESCE(stock.stock_in_hand_qty, 0)    AS stock_in_hand_qty,
-      COALESCE(stock.stock_normal_qty, 0)     AS stock_normal_qty,
-      COALESCE(stock.stock_foc_qty, 0)        AS stock_foc_qty,
-
+      COALESCE(stock.stock_id_list, '') AS stockIdList,
+      COALESCE(stock.stock_row_count, 0) AS stockRowCount,
+      COALESCE(stock.stock_in_hand_qty, 0) AS stockInHandQty,
+      COALESCE(stock.stock_normal_qty, 0) AS stockNormalQty,
+      COALESCE(stock.stock_foc_qty, 0) AS stockFocQty,
 
       /* ---------------- Purchase Order ---------------- */
-      COALESCE(po.po_ordered_qty, 0)          AS po_ordered_qty,
-      COALESCE(po.po_received_qty, 0)         AS po_received_qty,
-      COALESCE(po.po_pending_qty, 0)          AS po_pending_qty,
+      COALESCE(po.po_ordered_qty, 0) AS poOrderedQty,
+      COALESCE(po.po_received_qty, 0) AS poReceivedQty,
+      COALESCE(po.po_pending_qty, 0) AS poPendingQty,
 
       /* ---------------- GRN ---------------- */
-      COALESCE(grn.grn_ordered_qty, 0)        AS grn_ordered_qty,
-      COALESCE(grn.grn_received_qty, 0)       AS grn_received_qty,
-      COALESCE(grn.grn_detail_return_qty, 0)  AS grn_detail_return_qty,
+      COALESCE(grn.grn_ordered_qty, 0) AS grnOrderedQty,
+      COALESCE(grn.grn_received_qty, 0) AS grnReceivedQty,
+      COALESCE(grn.grn_detail_return_qty, 0) AS grnDetailReturnQty,
 
       /* ---------------- GRN Return ---------------- */
-      COALESCE(grn_return.grn_return_requested_qty, 0) AS grn_return_requested_qty,
-      COALESCE(grn_return.grn_return_pending_qty, 0)   AS grn_return_pending_qty,
-      COALESCE(grn_return.grn_return_approved_qty, 0)  AS grn_return_approved_qty,
-      COALESCE(grn_return.grn_return_rejected_qty, 0)  AS grn_return_rejected_qty,
+      COALESCE(grn_return.grn_return_requested_qty, 0) AS grnReturnRequestedQty,
+      COALESCE(grn_return.grn_return_pending_qty, 0) AS grnReturnPendingQty,
+      COALESCE(grn_return.grn_return_approved_qty, 0) AS grnReturnApprovedQty,
+      COALESCE(grn_return.grn_return_rejected_qty, 0) AS grnReturnRejectedQty,
 
       /* ---------------- Store Requisition ---------------- */
-      COALESCE(store_req.store_req_qty, 0) AS store_req_qty,
-      COALESCE(store_req.store_req_pending_qty, 0) AS store_req_pending_qty,
-      COALESCE(store_req.store_req_approved_qty, 0) AS store_req_approved_qty,
-      COALESCE(store_req.store_req_rejected_qty, 0) AS store_req_rejected_qty,
-      COALESCE(store_req.store_assigned_qty, 0) AS store_assigned_qty,
-      COALESCE(store_req.store_acknowledged_qty, 0) AS store_acknowledged_qty,
-      COALESCE(store_req.store_returned_qty, 0) AS store_returned_qty,
+      COALESCE(store_req.store_req_qty, 0) AS storeReqQty,
+      COALESCE(store_req.store_req_pending_qty, 0) AS storeReqPendingQty,
+      COALESCE(store_req.store_req_approved_qty, 0) AS storeReqApprovedQty,
+      COALESCE(store_req.store_req_rejected_qty, 0) AS storeReqRejectedQty,
+      COALESCE(store_req.store_assigned_qty, 0) AS storeAssignedQty,
+      COALESCE(store_req.store_acknowledged_qty, 0) AS storeAcknowledgedQty,
+      COALESCE(store_req.store_returned_qty, 0) AS storeReturnedQty,
       (
         COALESCE(store_req.store_req_qty, 0)
         - COALESCE(store_req.store_assigned_qty, 0)
-      ) AS store_pending_assign_qty,
+      ) AS storePendingAssignQty,
       (
         COALESCE(store_req.store_assigned_qty, 0)
         - COALESCE(store_req.store_acknowledged_qty, 0)
-      ) AS store_pending_ack_qty,
+      ) AS storePendingAckQty,
 
       /* ---------------- Store Requisition Return ---------------- */
-      COALESCE(store_req_return.store_return_requested_qty, 0) AS store_return_requested_qty,
-      COALESCE(store_req_return.store_return_pending_qty, 0) AS store_return_pending_qty,
-      COALESCE(store_req_return.store_return_approved_qty, 0) AS store_return_approved_qty,
-      COALESCE(store_req_return.store_return_rejected_qty, 0) AS store_return_rejected_qty,
-      COALESCE(store_req_return.store_return_acknowledged_qty, 0) AS store_return_acknowledged_qty,
-      COALESCE(store_req_return.store_return_ack_pending_qty, 0) AS store_return_ack_pending_qty,
+      COALESCE(store_req_return.store_return_requested_qty, 0) AS storeReturnRequestedQty,
+      COALESCE(store_req_return.store_return_pending_qty, 0) AS storeReturnPendingQty,
+      COALESCE(store_req_return.store_return_approved_qty, 0) AS storeReturnApprovedQty,
+      COALESCE(store_req_return.store_return_rejected_qty, 0) AS storeReturnRejectedQty,
+      COALESCE(store_req_return.store_return_acknowledged_qty, 0) AS storeReturnAcknowledgedQty,
+      COALESCE(store_req_return.store_return_ack_pending_qty, 0) AS storeReturnAckPendingQty,
 
       /* ---------------- Branch Requisition ---------------- */
-      COALESCE(branch_req.branch_req_qty, 0) AS branch_req_qty,
-      COALESCE(branch_req.branch_req_pending_qty, 0) AS branch_req_pending_qty,
-      COALESCE(branch_req.branch_req_approved_qty, 0) AS branch_req_approved_qty,
-      COALESCE(branch_req.branch_req_rejected_qty, 0) AS branch_req_rejected_qty,
-      COALESCE(branch_req.branch_assigned_qty, 0) AS branch_assigned_qty,
-      COALESCE(branch_req.branch_acknowledged_qty, 0) AS branch_acknowledged_qty,
-      COALESCE(branch_req.branch_returned_qty, 0) AS branch_returned_qty,
+      COALESCE(branch_req.branch_req_qty, 0) AS branchReqQty,
+      COALESCE(branch_req.branch_req_pending_qty, 0) AS branchReqPendingQty,
+      COALESCE(branch_req.branch_req_approved_qty, 0) AS branchReqApprovedQty,
+      COALESCE(branch_req.branch_req_rejected_qty, 0) AS branchReqRejectedQty,
+      COALESCE(branch_req.branch_assigned_qty, 0) AS branchAssignedQty,
+      COALESCE(branch_req.branch_acknowledged_qty, 0) AS branchAcknowledgedQty,
+      COALESCE(branch_req.branch_returned_qty, 0) AS branchReturnedQty,
       (
         COALESCE(branch_req.branch_req_qty, 0)
         - COALESCE(branch_req.branch_assigned_qty, 0)
-      ) AS branch_pending_assign_qty,
+      ) AS branchPendingAssignQty,
       (
         COALESCE(branch_req.branch_assigned_qty, 0)
         - COALESCE(branch_req.branch_acknowledged_qty, 0)
-      ) AS branch_pending_ack_qty,
+      ) AS branchPendingAckQty,
 
       /* ---------------- Branch Requisition Return ---------------- */
-      COALESCE(branch_req_return.branch_return_requested_qty, 0) AS branch_return_requested_qty,
-      COALESCE(branch_req_return.branch_return_pending_qty, 0) AS branch_return_pending_qty,
-      COALESCE(branch_req_return.branch_return_approved_qty, 0) AS branch_return_approved_qty,
-      COALESCE(branch_req_return.branch_return_rejected_qty, 0) AS branch_return_rejected_qty,
-      COALESCE(branch_req_return.branch_return_acknowledged_qty, 0) AS branch_return_acknowledged_qty,
-      COALESCE(branch_req_return.branch_return_ack_pending_qty, 0) AS branch_return_ack_pending_qty,
+      COALESCE(branch_req_return.branch_return_requested_qty, 0) AS branchReturnRequestedQty,
+      COALESCE(branch_req_return.branch_return_pending_qty, 0) AS branchReturnPendingQty,
+      COALESCE(branch_req_return.branch_return_approved_qty, 0) AS branchReturnApprovedQty,
+      COALESCE(branch_req_return.branch_return_rejected_qty, 0) AS branchReturnRejectedQty,
+      COALESCE(branch_req_return.branch_return_acknowledged_qty, 0) AS branchReturnAcknowledgedQty,
+      COALESCE(branch_req_return.branch_return_ack_pending_qty, 0) AS branchReturnAckPendingQty,
 
       /* ---------------- Consumption ---------------- */
-      COALESCE(consumption.consumption_requested_qty, 0) AS consumption_requested_qty,
-      COALESCE(consumption.consumption_pending_qty, 0) AS consumption_pending_qty,
-      COALESCE(consumption.consumption_approved_qty, 0) AS consumption_approved_qty,
-      COALESCE(consumption.consumption_rejected_qty, 0) AS consumption_rejected_qty,
-      COALESCE(consumption.consumed_qty, 0) AS consumed_qty,
+      COALESCE(consumption.consumption_requested_qty, 0) AS consumptionRequestedQty,
+      COALESCE(consumption.consumption_pending_qty, 0) AS consumptionPendingQty,
+      COALESCE(consumption.consumption_approved_qty, 0) AS consumptionApprovedQty,
+      COALESCE(consumption.consumption_rejected_qty, 0) AS consumptionRejectedQty,
+      COALESCE(consumption.consumed_qty, 0) AS consumedQty,
 
       /* ---------------- Supplier Price ---------------- */
-      COALESCE(item_supplier.purchase_price, 0.00)       AS purchase_price
+      COALESCE(item_supplier.purchase_price, 0.00) AS purchasePrice
 
     FROM
       (
@@ -721,26 +720,6 @@ export const itemStock = async (ccId: number) => {
           AND s.deleted_at IS NULL
           AND s.cc_id IS NOT NULL
           AND s.cc_id = ${ccId}
-
-        UNION
-
-        SELECT DISTINCT
-          its.item_id,
-          its.to_cc_id AS location_cc_id
-        FROM inv_in_transit_stock its
-        WHERE its.is_active = 1
-          AND its.deleted_at IS NULL
-          AND its.to_cc_id = ${ccId}
-
-        UNION
-
-        SELECT DISTINCT
-          its.item_id,
-          its.from_cc_id AS location_cc_id
-        FROM inv_in_transit_stock its
-        WHERE its.is_active = 1
-          AND its.deleted_at IS NULL
-          AND its.from_cc_id = ${ccId}
 
         UNION
 
@@ -974,76 +953,6 @@ export const itemStock = async (ccId: number) => {
     ) stock
       ON stock.item_id = k.item_id
      AND stock.cc_id = k.location_cc_id
-
-    /* ---------------- In Transit ---------------- */
-    LEFT JOIN (
-      SELECT
-        its.item_id,
-        CASE
-          WHEN its.to_cc_id = ${ccId} THEN its.to_cc_id
-          WHEN its.from_cc_id = ${ccId} THEN its.from_cc_id
-          ELSE ${ccId}
-        END AS location_cc_id,
-        MIN(its.expiry_date) AS in_transit_expiry_date,
-        SUM(
-          CASE
-            WHEN its.to_cc_id = ${ccId}
-            THEN COALESCE(its.quantity, 0)
-            ELSE 0
-          END
-        ) AS in_transit_in_qty,
-        SUM(
-          CASE
-            WHEN its.from_cc_id = ${ccId}
-            THEN COALESCE(its.quantity, 0)
-            ELSE 0
-          END
-        ) AS in_transit_out_qty,
-        SUM(
-          CASE
-            WHEN its.to_cc_id = ${ccId} AND its.is_foc = 0
-            THEN COALESCE(its.quantity, 0)
-            ELSE 0
-          END
-        ) AS in_transit_in_normal_qty,
-        SUM(
-          CASE
-            WHEN its.to_cc_id = ${ccId} AND its.is_foc = 1
-            THEN COALESCE(its.quantity, 0)
-            ELSE 0
-          END
-        ) AS in_transit_in_foc_qty,
-        SUM(
-          CASE
-            WHEN its.from_cc_id = ${ccId} AND its.is_foc = 0
-            THEN COALESCE(its.quantity, 0)
-            ELSE 0
-          END
-        ) AS in_transit_out_normal_qty,
-        SUM(
-          CASE
-            WHEN its.from_cc_id = ${ccId} AND its.is_foc = 1
-            THEN COALESCE(its.quantity, 0)
-            ELSE 0
-          END
-        ) AS in_transit_out_foc_qty
-      FROM inv_in_transit_stock its
-      WHERE its.is_active = 1
-        AND its.deleted_at IS NULL
-        AND (
-          its.to_cc_id = ${ccId}
-          OR its.from_cc_id = ${ccId}
-        )
-      GROUP BY
-        its.item_id,
-        CASE
-          WHEN its.to_cc_id = ${ccId} THEN its.to_cc_id
-          WHEN its.from_cc_id = ${ccId} THEN its.from_cc_id
-          ELSE ${ccId}
-        END
-    ) in_transit
-      ON in_transit.item_id = k.item_id
-     AND in_transit.location_cc_id = k.location_cc_id
 
     /* ---------------- Purchase Order ---------------- */
     LEFT JOIN (
