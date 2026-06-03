@@ -13,6 +13,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { Action, InvItemStock, Prisma } from "@repo/db/generated/prisma/client";
 import { ItemStockByBatchInput } from "../../types/stock/stock.js";
 import { settingsService } from "@/services/master/settings.service.js";
+import { serializeBigInt } from "@repo/shared/utils/bigInt.utils.js";
 
 type Tx = Prisma.TransactionClient;
 
@@ -552,9 +553,41 @@ export const itemStockSummary = async (ccId: number) => {
 };
 
 export const itemStock = async (ccId: number) => {
+  const store = requestStorage.getStore();
+
+  const warehouse = await db.invWarehouse.findFirst({
+    where: {
+      id: ccId,
+      isActive: true,
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  const branch = await db.invBranch.findFirst({
+    where: {
+      id: ccId,
+      isActive: true,
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
   const settings = await settingsService.getSettings();
   const warehouseMode = Boolean(settings?.warehouseMode);
-  const locationType = warehouseMode ? "WAREHOUSE" : "BRANCH";
+  const isWarehouseLocation = warehouseMode ? Boolean(warehouse) : false;
+  const isBranchLocation = !isWarehouseLocation && Boolean(branch);
+  const locationType = isWarehouseLocation
+    ? "WAREHOUSE"
+    : isBranchLocation
+    ? "BRANCH"
+    : "BRANCH";
 
   const rows = await db.$queryRaw<RawItemStock[]>`
     SELECT
@@ -585,41 +618,33 @@ export const itemStock = async (ccId: number) => {
       k.location_cc_id                        AS cc_id,
       ${locationType}                         AS location_type,
       CASE
-        WHEN ${warehouseMode} = true THEN w.name
+        WHEN ${isWarehouseLocation} = true THEN w.name
         ELSE b.name
       END                                     AS location_name,
 
       /* ---------------- Batch ---------------- */
-      k.batch_no                              AS batch_no,
-      COALESCE(
-        stock.stock_expiry_date,
-        grn.grn_expiry_date,
-        grn_return.grn_return_expiry_date,
-        consumption.consumption_expiry_date,
-        in_transit.in_transit_expiry_date
-      )                                       AS expiry_date,
+      COALESCE(stock.batch_no_list, '')       AS batch_no_list,
+      COALESCE(stock.expiry_date_list, '')    AS expiry_date_list,
+      stock.nearest_expiry_date               AS nearest_expiry_date,
 
       /* ---------------- Current Stock ---------------- */
       COALESCE(stock.stock_id_list, '')       AS stock_id_list,
+      COALESCE(stock.stock_row_count, 0)      AS stock_row_count,
       COALESCE(stock.stock_in_hand_qty, 0)    AS stock_in_hand_qty,
-
-      CASE
-        WHEN ${warehouseMode} = true THEN COALESCE(stock.stock_in_hand_qty, 0)
-        ELSE 0
-      END                                     AS warehouse_stock_in_hand_qty,
-
-      CASE
-        WHEN ${warehouseMode} = false THEN COALESCE(stock.stock_in_hand_qty, 0)
-        ELSE 0
-      END                                     AS branch_stock_in_hand_qty,
+      COALESCE(stock.stock_normal_qty, 0)     AS stock_normal_qty,
+      COALESCE(stock.stock_foc_qty, 0)        AS stock_foc_qty,
 
       /* ---------------- In Transit Stock ---------------- */
-      COALESCE(in_transit.in_transit_in_qty, 0)       AS in_transit_in_qty,
-      COALESCE(in_transit.in_transit_out_qty, 0)      AS in_transit_out_qty,
+      COALESCE(in_transit.in_transit_in_qty, 0) AS in_transit_in_qty,
+      COALESCE(in_transit.in_transit_in_normal_qty, 0) AS in_transit_in_normal_qty,
+      COALESCE(in_transit.in_transit_in_foc_qty, 0) AS in_transit_in_foc_qty,
+      COALESCE(in_transit.in_transit_out_qty, 0) AS in_transit_out_qty,
+      COALESCE(in_transit.in_transit_out_normal_qty, 0) AS in_transit_out_normal_qty,
+      COALESCE(in_transit.in_transit_out_foc_qty, 0) AS in_transit_out_foc_qty,
       (
         COALESCE(in_transit.in_transit_in_qty, 0)
         - COALESCE(in_transit.in_transit_out_qty, 0)
-      )                                               AS in_transit_net_qty,
+      ) AS in_transit_net_qty,
 
       /* ---------------- Purchase Order ---------------- */
       COALESCE(po.po_ordered_qty, 0)          AS po_ordered_qty,
@@ -632,100 +657,86 @@ export const itemStock = async (ccId: number) => {
       COALESCE(grn.grn_detail_return_qty, 0)  AS grn_detail_return_qty,
 
       /* ---------------- GRN Return ---------------- */
-      COALESCE(grn_return.grn_return_qty, 0)  AS grn_return_qty,
+      COALESCE(grn_return.grn_return_requested_qty, 0) AS grn_return_requested_qty,
+      COALESCE(grn_return.grn_return_pending_qty, 0)   AS grn_return_pending_qty,
+      COALESCE(grn_return.grn_return_approved_qty, 0)  AS grn_return_approved_qty,
+      COALESCE(grn_return.grn_return_rejected_qty, 0)  AS grn_return_rejected_qty,
 
       /* ---------------- Store Requisition ---------------- */
-      COALESCE(store_req.store_req_qty, 0)             AS store_req_qty,
-      COALESCE(store_req.store_assigned_qty, 0)        AS store_assigned_qty,
-      COALESCE(store_req.store_acknowledged_qty, 0)    AS store_acknowledged_qty,
-      COALESCE(store_req.store_returned_qty, 0)        AS store_returned_qty,
+      COALESCE(store_req.store_req_qty, 0) AS store_req_qty,
+      COALESCE(store_req.store_req_pending_qty, 0) AS store_req_pending_qty,
+      COALESCE(store_req.store_req_approved_qty, 0) AS store_req_approved_qty,
+      COALESCE(store_req.store_req_rejected_qty, 0) AS store_req_rejected_qty,
+      COALESCE(store_req.store_assigned_qty, 0) AS store_assigned_qty,
+      COALESCE(store_req.store_acknowledged_qty, 0) AS store_acknowledged_qty,
+      COALESCE(store_req.store_returned_qty, 0) AS store_returned_qty,
       (
         COALESCE(store_req.store_req_qty, 0)
         - COALESCE(store_req.store_assigned_qty, 0)
-      )                                               AS store_pending_assign_qty,
+      ) AS store_pending_assign_qty,
       (
         COALESCE(store_req.store_assigned_qty, 0)
         - COALESCE(store_req.store_acknowledged_qty, 0)
-      )                                               AS store_pending_ack_qty,
+      ) AS store_pending_ack_qty,
 
       /* ---------------- Store Requisition Return ---------------- */
-      COALESCE(store_req_return.store_return_requested_qty, 0)      AS store_return_requested_qty,
-      COALESCE(store_req_return.store_return_acknowledged_qty, 0)   AS store_return_acknowledged_qty,
-      (
-        COALESCE(store_req_return.store_return_requested_qty, 0)
-        - COALESCE(store_req_return.store_return_acknowledged_qty, 0)
-      )                                                           AS store_return_pending_ack_qty,
+      COALESCE(store_req_return.store_return_requested_qty, 0) AS store_return_requested_qty,
+      COALESCE(store_req_return.store_return_pending_qty, 0) AS store_return_pending_qty,
+      COALESCE(store_req_return.store_return_approved_qty, 0) AS store_return_approved_qty,
+      COALESCE(store_req_return.store_return_rejected_qty, 0) AS store_return_rejected_qty,
+      COALESCE(store_req_return.store_return_acknowledged_qty, 0) AS store_return_acknowledged_qty,
+      COALESCE(store_req_return.store_return_ack_pending_qty, 0) AS store_return_ack_pending_qty,
 
       /* ---------------- Branch Requisition ---------------- */
-      COALESCE(branch_req.branch_req_qty, 0)             AS branch_req_qty,
-      COALESCE(branch_req.branch_assigned_qty, 0)        AS branch_assigned_qty,
-      COALESCE(branch_req.branch_acknowledged_qty, 0)    AS branch_acknowledged_qty,
-      COALESCE(branch_req.branch_returned_qty, 0)        AS branch_returned_qty,
+      COALESCE(branch_req.branch_req_qty, 0) AS branch_req_qty,
+      COALESCE(branch_req.branch_req_pending_qty, 0) AS branch_req_pending_qty,
+      COALESCE(branch_req.branch_req_approved_qty, 0) AS branch_req_approved_qty,
+      COALESCE(branch_req.branch_req_rejected_qty, 0) AS branch_req_rejected_qty,
+      COALESCE(branch_req.branch_assigned_qty, 0) AS branch_assigned_qty,
+      COALESCE(branch_req.branch_acknowledged_qty, 0) AS branch_acknowledged_qty,
+      COALESCE(branch_req.branch_returned_qty, 0) AS branch_returned_qty,
       (
         COALESCE(branch_req.branch_req_qty, 0)
         - COALESCE(branch_req.branch_assigned_qty, 0)
-      )                                                 AS branch_pending_assign_qty,
+      ) AS branch_pending_assign_qty,
       (
         COALESCE(branch_req.branch_assigned_qty, 0)
         - COALESCE(branch_req.branch_acknowledged_qty, 0)
-      )                                                 AS branch_pending_ack_qty,
+      ) AS branch_pending_ack_qty,
 
       /* ---------------- Branch Requisition Return ---------------- */
-      COALESCE(branch_req_return.branch_return_requested_qty, 0)    AS branch_return_requested_qty,
+      COALESCE(branch_req_return.branch_return_requested_qty, 0) AS branch_return_requested_qty,
+      COALESCE(branch_req_return.branch_return_pending_qty, 0) AS branch_return_pending_qty,
+      COALESCE(branch_req_return.branch_return_approved_qty, 0) AS branch_return_approved_qty,
+      COALESCE(branch_req_return.branch_return_rejected_qty, 0) AS branch_return_rejected_qty,
       COALESCE(branch_req_return.branch_return_acknowledged_qty, 0) AS branch_return_acknowledged_qty,
-      (
-        COALESCE(branch_req_return.branch_return_requested_qty, 0)
-        - COALESCE(branch_req_return.branch_return_acknowledged_qty, 0)
-      )                                                           AS branch_return_pending_ack_qty,
+      COALESCE(branch_req_return.branch_return_ack_pending_qty, 0) AS branch_return_ack_pending_qty,
 
       /* ---------------- Consumption ---------------- */
       COALESCE(consumption.consumption_requested_qty, 0) AS consumption_requested_qty,
-      COALESCE(consumption.consumed_qty, 0)              AS consumed_qty,
+      COALESCE(consumption.consumption_pending_qty, 0) AS consumption_pending_qty,
+      COALESCE(consumption.consumption_approved_qty, 0) AS consumption_approved_qty,
+      COALESCE(consumption.consumption_rejected_qty, 0) AS consumption_rejected_qty,
+      COALESCE(consumption.consumed_qty, 0) AS consumed_qty,
 
       /* ---------------- Supplier Price ---------------- */
-      COALESCE(item_supplier.purchase_price, 0.00)       AS purchase_price,
-
-      /* ---------------- Final Calculated Qty ---------------- */
-      (
-        COALESCE(stock.stock_in_hand_qty, 0)
-        + COALESCE(in_transit.in_transit_in_qty, 0)
-        + COALESCE(po.po_pending_qty, 0)
-        - COALESCE(consumption.consumed_qty, 0)
-      ) AS available_with_po_in_transit_qty,
-
-      (
-        COALESCE(grn.grn_received_qty, 0)
-        - COALESCE(grn_return.grn_return_qty, 0)
-        - COALESCE(consumption.consumed_qty, 0)
-      ) AS movement_balance_qty,
-
-      (
-        COALESCE(stock.stock_in_hand_qty, 0)
-        - (
-          COALESCE(grn.grn_received_qty, 0)
-          - COALESCE(grn_return.grn_return_qty, 0)
-          - COALESCE(consumption.consumed_qty, 0)
-        )
-      ) AS stock_variance_qty
+      COALESCE(item_supplier.purchase_price, 0.00)       AS purchase_price
 
     FROM
       (
-        /* Stock */
-        SELECT
+        SELECT DISTINCT
           s.item_id,
-          s.batch_no,
           s.cc_id AS location_cc_id
         FROM inv_item_stock s
         WHERE s.is_active = 1
           AND s.deleted_at IS NULL
+          AND s.cc_id IS NOT NULL
           AND s.cc_id = ${ccId}
 
         UNION
 
-        /* In transit incoming */
-        SELECT
+        SELECT DISTINCT
           its.item_id,
-          its.batch_no,
           its.to_cc_id AS location_cc_id
         FROM inv_in_transit_stock its
         WHERE its.is_active = 1
@@ -734,10 +745,8 @@ export const itemStock = async (ccId: number) => {
 
         UNION
 
-        /* In transit outgoing */
-        SELECT
+        SELECT DISTINCT
           its.item_id,
-          its.batch_no,
           its.from_cc_id AS location_cc_id
         FROM inv_in_transit_stock its
         WHERE its.is_active = 1
@@ -746,26 +755,8 @@ export const itemStock = async (ccId: number) => {
 
         UNION
 
-        /* Purchase order */
-        SELECT
-          pod.item_id,
-          NULL AS batch_no,
-          po.cc_id AS location_cc_id
-        FROM inv_purchase_order_details pod
-        JOIN inv_purchase_order po
-          ON po.id = pod.purchase_id
-         AND po.is_active = 1
-         AND po.deleted_at IS NULL
-        WHERE pod.is_active = 1
-          AND pod.deleted_at IS NULL
-          AND po.cc_id = ${ccId}
-
-        UNION
-
-        /* GRN */
-        SELECT
+        SELECT DISTINCT
           grd.item_id,
-          grd.batch_no,
           grn.cc_id AS location_cc_id
         FROM inv_good_receive_details grd
         JOIN inv_good_receive grn
@@ -778,10 +769,8 @@ export const itemStock = async (ccId: number) => {
 
         UNION
 
-        /* GRN return */
-        SELECT
+        SELECT DISTINCT
           grrd.item_id,
-          grrd.batch_no,
           grr.cc_id AS location_cc_id
         FROM inv_good_receive_return_details grrd
         JOIN inv_good_receive_return grr
@@ -794,10 +783,8 @@ export const itemStock = async (ccId: number) => {
 
         UNION
 
-        /* Consumption */
-        SELECT
+        SELECT DISTINCT
           cd.item_id,
-          cd.batch_no,
           c.cc_id AS location_cc_id
         FROM inv_consumption_details cd
         JOIN inv_consumption c
@@ -810,31 +797,55 @@ export const itemStock = async (ccId: number) => {
 
         UNION
 
-        /* Store requisition issued from warehouse to branch */
-        SELECT
+        SELECT DISTINCT
+          srd.item_id,
+          sr.cc_id AS location_cc_id
+        FROM inv_store_requisition_details srd
+        JOIN inv_store_requisition sr
+          ON sr.id = srd.store_requisition_id
+         AND sr.is_active = 1
+         AND sr.deleted_at IS NULL
+        WHERE srd.is_active = 1
+          AND srd.deleted_at IS NULL
+          AND sr.cc_id = ${ccId}
+
+        UNION
+
+        SELECT DISTINCT
+          srrd.item_id,
+          srr.cc_id AS location_cc_id
+        FROM inv_store_requisition_return_details srrd
+        JOIN inv_store_requisition_return srr
+          ON srr.id = srrd.store_requisition_return_id
+         AND srr.is_active = 1
+         AND srr.deleted_at IS NULL
+        WHERE srrd.is_active = 1
+          AND srrd.deleted_at IS NULL
+          AND srr.cc_id = ${ccId}
+
+        UNION
+
+        SELECT DISTINCT
           rid.item_id,
-          rid.batch_no,
           CASE
-            WHEN ${warehouseMode} = true THEN rid.cc_id
+            WHEN ${isWarehouseLocation} = true THEN rid.cc_id
             ELSE rid.ack_cc_id
           END AS location_cc_id
         FROM inv_requisition_item_details rid
         WHERE rid.is_active = 1
           AND rid.deleted_at IS NULL
           AND (
-            (${warehouseMode} = true AND rid.cc_id = ${ccId})
+            (${isWarehouseLocation} = true AND rid.cc_id = ${ccId})
             OR
-            (${warehouseMode} = false AND rid.ack_cc_id = ${ccId})
+            (${isWarehouseLocation} = false AND rid.ack_cc_id = ${ccId})
           )
 
         UNION
 
-        /* Store requisition return */
-        SELECT
+        SELECT DISTINCT
           rrid.item_id,
-          rrid.batch_no,
           CASE
-            WHEN ${warehouseMode} = true THEN rid.cc_id
+            WHEN ${isWarehouseLocation} = true THEN rid.cc_id
             ELSE rrid.cc_id
           END AS location_cc_id
         FROM inv_requisition_return_item_details rrid
@@ -845,47 +856,85 @@ export const itemStock = async (ccId: number) => {
         WHERE rrid.is_active = 1
           AND rrid.deleted_at IS NULL
           AND (
-            (${warehouseMode} = true AND rid.cc_id = ${ccId})
+            (${isWarehouseLocation} = true AND rid.cc_id = ${ccId})
             OR
-            (${warehouseMode} = false AND rrid.cc_id = ${ccId})
+            (${isWarehouseLocation} = false AND rrid.cc_id = ${ccId})
           )
 
         UNION
 
-        /* Branch requisition issued from warehouse to branch */
-        SELECT
-          bid.item_id,
-          bid.batch_no,
+        SELECT DISTINCT
+          brd.item_id,
           CASE
-            WHEN ${warehouseMode} = true THEN bid.cc_id
+            WHEN ${isWarehouseLocation} = true THEN br.cc_id
+            ELSE br.branch_id
+          END AS location_cc_id
+        FROM inv_branch_requisition_details brd
+        JOIN inv_branch_requisition br
+          ON br.id = brd.branch_requisition_id
+         AND br.is_active = 1
+         AND br.deleted_at IS NULL
+        WHERE brd.is_active = 1
+          AND brd.deleted_at IS NULL
+          AND (
+            (${isWarehouseLocation} = true AND br.cc_id = ${ccId})
+            OR
+            (${isWarehouseLocation} = false AND br.branch_id = ${ccId})
+          )
+
+        UNION
+
+        SELECT DISTINCT
+          bid.item_id,
+          CASE
+            WHEN ${isWarehouseLocation} = true THEN bid.cc_id
             ELSE bid.ack_cc_id
           END AS location_cc_id
         FROM inv_branch_item_details bid
         WHERE bid.is_active = 1
           AND bid.deleted_at IS NULL
           AND (
-            (${warehouseMode} = true AND bid.cc_id = ${ccId})
+            (${isWarehouseLocation} = true AND bid.cc_id = ${ccId})
             OR
-            (${warehouseMode} = false AND bid.ack_cc_id = ${ccId})
+            (${isWarehouseLocation} = false AND bid.ack_cc_id = ${ccId})
           )
 
         UNION
 
-        /* Branch requisition return */
-        SELECT
-          brid.item_id,
-          brid.batch_no,
+        SELECT DISTINCT
+          brrd.item_id,
           CASE
-            WHEN ${warehouseMode} = true THEN brid.cc_id
+            WHEN ${isWarehouseLocation} = true THEN brr.cc_id
+            ELSE brr.branch_id
+          END AS location_cc_id
+        FROM inv_branch_requisition_return_details brrd
+        JOIN inv_branch_requisition_return brr
+          ON brr.id = brrd.branch_requisition_return_id
+         AND brr.is_active = 1
+         AND brr.deleted_at IS NULL
+        WHERE brrd.is_active = 1
+          AND brrd.deleted_at IS NULL
+          AND (
+            (${isWarehouseLocation} = true AND brr.cc_id = ${ccId})
+            OR
+            (${isWarehouseLocation} = false AND brr.branch_id = ${ccId})
+          )
+
+        UNION
+
+        SELECT DISTINCT
+          brid.item_id,
+          CASE
+            WHEN ${isWarehouseLocation} = true THEN brid.cc_id
             ELSE brid.branch_id
           END AS location_cc_id
         FROM inv_branch_return_item_details brid
         WHERE brid.is_active = 1
           AND brid.deleted_at IS NULL
           AND (
-            (${warehouseMode} = true AND brid.cc_id = ${ccId})
+            (${isWarehouseLocation} = true AND brid.cc_id = ${ccId})
             OR
-            (${warehouseMode} = false AND brid.branch_id = ${ccId})
+            (${isWarehouseLocation} = false AND brid.branch_id = ${ccId})
           )
       ) k
 
@@ -919,22 +968,23 @@ export const itemStock = async (ccId: number) => {
       SELECT
         s.item_id,
         s.cc_id,
-        s.batch_no,
-        MIN(s.expiry_date)               AS stock_expiry_date,
-        SUM(s.quantity)                  AS stock_in_hand_qty,
+        MIN(s.expiry_date) AS nearest_expiry_date,
+        GROUP_CONCAT(DISTINCT s.batch_no ORDER BY s.batch_no SEPARATOR ', ') AS batch_no_list,
+        GROUP_CONCAT(DISTINCT DATE_FORMAT(s.expiry_date, '%Y-%m-%d') ORDER BY s.expiry_date SEPARATOR ', ') AS expiry_date_list,
+        SUM(COALESCE(s.quantity, 0)) AS stock_in_hand_qty,
+        SUM(CASE WHEN s.is_foc = 0 THEN COALESCE(s.quantity, 0) ELSE 0 END) AS stock_normal_qty,
+        SUM(CASE WHEN s.is_foc = 1 THEN COALESCE(s.quantity, 0) ELSE 0 END) AS stock_foc_qty,
+        CAST(COUNT(s.id) AS SIGNED) AS stock_row_count,
         GROUP_CONCAT(s.id ORDER BY s.id) AS stock_id_list
       FROM inv_item_stock s
       WHERE s.is_active = 1
         AND s.deleted_at IS NULL
+        AND s.cc_id IS NOT NULL
         AND s.cc_id = ${ccId}
-      GROUP BY s.item_id, s.cc_id, s.batch_no
+      GROUP BY s.item_id, s.cc_id
     ) stock
       ON stock.item_id = k.item_id
      AND stock.cc_id = k.location_cc_id
-     AND (
-       stock.batch_no = k.batch_no
-       OR (stock.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- In Transit ---------------- */
     LEFT JOIN (
@@ -942,30 +992,69 @@ export const itemStock = async (ccId: number) => {
         its.item_id,
         CASE
           WHEN its.to_cc_id = ${ccId} THEN its.to_cc_id
-          ELSE its.from_cc_id
+          WHEN its.from_cc_id = ${ccId} THEN its.from_cc_id
+          ELSE ${ccId}
         END AS location_cc_id,
-        its.batch_no,
         MIN(its.expiry_date) AS in_transit_expiry_date,
-        SUM(CASE WHEN its.to_cc_id = ${ccId} THEN its.quantity ELSE 0 END)   AS in_transit_in_qty,
-        SUM(CASE WHEN its.from_cc_id = ${ccId} THEN its.quantity ELSE 0 END) AS in_transit_out_qty
+        SUM(
+          CASE
+            WHEN its.to_cc_id = ${ccId}
+            THEN COALESCE(its.quantity, 0)
+            ELSE 0
+          END
+        ) AS in_transit_in_qty,
+        SUM(
+          CASE
+            WHEN its.from_cc_id = ${ccId}
+            THEN COALESCE(its.quantity, 0)
+            ELSE 0
+          END
+        ) AS in_transit_out_qty,
+        SUM(
+          CASE
+            WHEN its.to_cc_id = ${ccId} AND its.is_foc = 0
+            THEN COALESCE(its.quantity, 0)
+            ELSE 0
+          END
+        ) AS in_transit_in_normal_qty,
+        SUM(
+          CASE
+            WHEN its.to_cc_id = ${ccId} AND its.is_foc = 1
+            THEN COALESCE(its.quantity, 0)
+            ELSE 0
+          END
+        ) AS in_transit_in_foc_qty,
+        SUM(
+          CASE
+            WHEN its.from_cc_id = ${ccId} AND its.is_foc = 0
+            THEN COALESCE(its.quantity, 0)
+            ELSE 0
+          END
+        ) AS in_transit_out_normal_qty,
+        SUM(
+          CASE
+            WHEN its.from_cc_id = ${ccId} AND its.is_foc = 1
+            THEN COALESCE(its.quantity, 0)
+            ELSE 0
+          END
+        ) AS in_transit_out_foc_qty
       FROM inv_in_transit_stock its
       WHERE its.is_active = 1
         AND its.deleted_at IS NULL
-        AND (its.to_cc_id = ${ccId} OR its.from_cc_id = ${ccId})
+        AND (
+          its.to_cc_id = ${ccId}
+          OR its.from_cc_id = ${ccId}
+        )
       GROUP BY
         its.item_id,
         CASE
           WHEN its.to_cc_id = ${ccId} THEN its.to_cc_id
-          ELSE its.from_cc_id
-        END,
-        its.batch_no
+          WHEN its.from_cc_id = ${ccId} THEN its.from_cc_id
+          ELSE ${ccId}
+        END
     ) in_transit
       ON in_transit.item_id = k.item_id
      AND in_transit.location_cc_id = k.location_cc_id
-     AND (
-       in_transit.batch_no = k.batch_no
-       OR (in_transit.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- Purchase Order ---------------- */
     LEFT JOIN (
@@ -992,9 +1081,7 @@ export const itemStock = async (ccId: number) => {
     LEFT JOIN (
       SELECT
         grd.item_id,
-        grd.batch_no,
         grn.cc_id,
-        MIN(grd.expiry_date) AS grn_expiry_date,
         SUM(grd.order_quantity) AS grn_ordered_qty,
         SUM(grd.quantity) AS grn_received_qty,
         SUM(grd.return_quantity) AS grn_detail_return_qty
@@ -1006,23 +1093,39 @@ export const itemStock = async (ccId: number) => {
       WHERE grd.is_active = 1
         AND grd.deleted_at IS NULL
         AND grn.cc_id = ${ccId}
-      GROUP BY grd.item_id, grd.batch_no, grn.cc_id
+      GROUP BY grd.item_id, grn.cc_id
     ) grn
       ON grn.item_id = k.item_id
      AND grn.cc_id = k.location_cc_id
-     AND (
-       grn.batch_no = k.batch_no
-       OR (grn.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- GRN Return ---------------- */
     LEFT JOIN (
       SELECT
         grrd.item_id,
-        grrd.batch_no,
         grr.cc_id,
         MIN(grrd.expiry_date) AS grn_return_expiry_date,
-        SUM(grrd.quantity) AS grn_return_qty
+        SUM(COALESCE(grrd.quantity, 0)) AS grn_return_requested_qty,
+        SUM(
+          CASE
+            WHEN grr.status = 'PENDING'
+            THEN COALESCE(grrd.quantity, 0)
+            ELSE 0
+          END
+        ) AS grn_return_pending_qty,
+        SUM(
+          CASE
+            WHEN grr.status IN ('APPROVED', 'PARTIALLY_APPROVED')
+            THEN COALESCE(grrd.quantity, 0)
+            ELSE 0
+          END
+        ) AS grn_return_approved_qty,
+        SUM(
+          CASE
+            WHEN grr.status = 'REJECTED'
+            THEN COALESCE(grrd.quantity, 0)
+            ELSE 0
+          END
+        ) AS grn_return_rejected_qty
       FROM inv_good_receive_return_details grrd
       JOIN inv_good_receive_return grr
         ON grr.id = grrd.good_receive_return_id
@@ -1031,184 +1134,256 @@ export const itemStock = async (ccId: number) => {
       WHERE grrd.is_active = 1
         AND grrd.deleted_at IS NULL
         AND grr.cc_id = ${ccId}
-      GROUP BY grrd.item_id, grrd.batch_no, grr.cc_id
+      GROUP BY grrd.item_id, grr.cc_id
     ) grn_return
       ON grn_return.item_id = k.item_id
      AND grn_return.cc_id = k.location_cc_id
-     AND (
-       grn_return.batch_no = k.batch_no
-       OR (grn_return.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- Store Requisition ---------------- */
     LEFT JOIN (
       SELECT
-        rid.item_id,
-        rid.batch_no,
-        CASE
-          WHEN ${warehouseMode} = true THEN rid.cc_id
-          ELSE rid.ack_cc_id
-        END AS location_cc_id,
-        SUM(srd.req_quantity) AS store_req_qty,
-        SUM(rid.assign_qty) AS store_assigned_qty,
-        SUM(rid.acknowledged_qty) AS store_acknowledged_qty,
-        SUM(rid.returned_qty) AS store_returned_qty
-      FROM inv_requisition_item_details rid
-      JOIN inv_store_requisition_details srd
-        ON srd.id = rid.store_requisition_details_id
-       AND srd.is_active = 1
-       AND srd.deleted_at IS NULL
+        srd.item_id,
+        sr.cc_id AS location_cc_id,
+        SUM(COALESCE(srd.req_quantity, 0)) AS store_req_qty,
+        SUM(
+          CASE
+            WHEN sr.store_req_status = 'Pending'
+            THEN COALESCE(srd.req_quantity, 0)
+            ELSE 0
+          END
+        ) AS store_req_pending_qty,
+        SUM(
+          CASE
+            WHEN sr.store_req_status IN ('Approved', 'APPROVED', 'Partially_Approved', 'Completed', 'COMPLETED')
+            THEN COALESCE(srd.req_quantity, 0)
+            ELSE 0
+          END
+        ) AS store_req_approved_qty,
+        SUM(
+          CASE
+            WHEN sr.store_req_status IN ('Reject', 'Rejected', 'REJECTED')
+            THEN COALESCE(srd.req_quantity, 0)
+            ELSE 0
+          END
+        ) AS store_req_rejected_qty,
+        SUM(COALESCE(srd.assigned_quantity, 0)) AS store_assigned_qty,
+        SUM(COALESCE(srd.acknowledged_quantity, 0)) AS store_acknowledged_qty,
+        SUM(COALESCE(srd.returned_quantity, 0)) AS store_returned_qty
+      FROM inv_store_requisition_details srd
       JOIN inv_store_requisition sr
-        ON sr.id = rid.store_requisition_id
+        ON sr.id = srd.store_requisition_id
        AND sr.is_active = 1
        AND sr.deleted_at IS NULL
-      WHERE rid.is_active = 1
-        AND rid.deleted_at IS NULL
-        AND (
-          (${warehouseMode} = true AND rid.cc_id = ${ccId})
-          OR
-          (${warehouseMode} = false AND rid.ack_cc_id = ${ccId})
-        )
+      WHERE srd.is_active = 1
+        AND srd.deleted_at IS NULL
+        AND sr.cc_id = ${ccId}
       GROUP BY
-        rid.item_id,
-        rid.batch_no,
-        CASE
-          WHEN ${warehouseMode} = true THEN rid.cc_id
-          ELSE rid.ack_cc_id
-        END
+        srd.item_id,
+        sr.cc_id
     ) store_req
       ON store_req.item_id = k.item_id
      AND store_req.location_cc_id = k.location_cc_id
-     AND (
-       store_req.batch_no = k.batch_no
-       OR (store_req.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- Store Requisition Return ---------------- */
     LEFT JOIN (
       SELECT
-        rrid.item_id,
-        rrid.batch_no,
-        CASE
-          WHEN ${warehouseMode} = true THEN rid.cc_id
-          ELSE rrid.cc_id
-        END AS location_cc_id,
-        SUM(rrid.return_qty) AS store_return_requested_qty,
-        SUM(rrid.acknowledged_qty) AS store_return_acknowledged_qty
-      FROM inv_requisition_return_item_details rrid
-      JOIN inv_requisition_item_details rid
-        ON rid.id = rrid.requisition_item_details_id
-       AND rid.is_active = 1
-       AND rid.deleted_at IS NULL
-      WHERE rrid.is_active = 1
-        AND rrid.deleted_at IS NULL
-        AND (
-          (${warehouseMode} = true AND rid.cc_id = ${ccId})
-          OR
-          (${warehouseMode} = false AND rrid.cc_id = ${ccId})
-        )
+        srrd.item_id,
+        srr.cc_id AS location_cc_id,
+        SUM(COALESCE(srrd.requested_return_qty, 0)) AS store_return_requested_qty,
+        SUM(
+          CASE
+            WHEN srr.return_status = 'Pending'
+            THEN COALESCE(srrd.requested_return_qty, 0)
+            ELSE 0
+          END
+        ) AS store_return_pending_qty,
+        SUM(
+          CASE
+            WHEN srr.return_status IN ('Approved', 'APPROVED', 'Partially_Approved', 'Completed', 'COMPLETED')
+            THEN COALESCE(srrd.requested_return_qty, 0)
+            ELSE 0
+          END
+        ) AS store_return_approved_qty,
+        SUM(
+          CASE
+            WHEN srr.return_status IN ('Reject', 'Rejected', 'REJECTED')
+            THEN COALESCE(srrd.requested_return_qty, 0)
+            ELSE 0
+          END
+        ) AS store_return_rejected_qty,
+        SUM(COALESCE(srrd.acknowledged_return_qty, 0)) AS store_return_acknowledged_qty,
+        SUM(
+          CASE
+            WHEN srr.ack_status = 'ACK_PENDING'
+            THEN COALESCE(srrd.requested_return_qty, 0) - COALESCE(srrd.acknowledged_return_qty, 0)
+            ELSE 0
+          END
+        ) AS store_return_ack_pending_qty
+      FROM inv_store_requisition_return_details srrd
+      JOIN inv_store_requisition_return srr
+        ON srr.id = srrd.store_requisition_return_id
+       AND srr.is_active = 1
+       AND srr.deleted_at IS NULL
+      WHERE srrd.is_active = 1
+        AND srrd.deleted_at IS NULL
+        AND srr.cc_id = ${ccId}
       GROUP BY
-        rrid.item_id,
-        rrid.batch_no,
-        CASE
-          WHEN ${warehouseMode} = true THEN rid.cc_id
-          ELSE rrid.cc_id
-        END
+        srrd.item_id,
+        srr.cc_id
     ) store_req_return
       ON store_req_return.item_id = k.item_id
      AND store_req_return.location_cc_id = k.location_cc_id
-     AND (
-       store_req_return.batch_no = k.batch_no
-       OR (store_req_return.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- Branch Requisition ---------------- */
     LEFT JOIN (
       SELECT
-        bid.item_id,
-        bid.batch_no,
+        brd.item_id,
         CASE
-          WHEN ${warehouseMode} = true THEN bid.cc_id
-          ELSE bid.ack_cc_id
+          WHEN ${isWarehouseLocation} = true THEN br.cc_id
+          ELSE br.branch_id
         END AS location_cc_id,
-        SUM(brd.req_quantity) AS branch_req_qty,
-        SUM(bid.assign_qty) AS branch_assigned_qty,
-        SUM(bid.acknowledged_qty) AS branch_acknowledged_qty,
-        SUM(bid.returned_qty) AS branch_returned_qty
-      FROM inv_branch_item_details bid
-      JOIN inv_branch_requisition_details brd
-        ON brd.id = bid.branch_requisition_details_id
-       AND brd.is_active = 1
-       AND brd.deleted_at IS NULL
+        SUM(COALESCE(brd.req_quantity, 0)) AS branch_req_qty,
+        SUM(
+          CASE
+            WHEN br.branch_req_status = 'Pending'
+            THEN COALESCE(brd.req_quantity, 0)
+            ELSE 0
+          END
+        ) AS branch_req_pending_qty,
+        SUM(
+          CASE
+            WHEN br.branch_req_status IN ('Approved', 'APPROVED', 'Completed', 'COMPLETED')
+            THEN COALESCE(brd.req_quantity, 0)
+            ELSE 0
+          END
+        ) AS branch_req_approved_qty,
+        SUM(
+          CASE
+            WHEN br.branch_req_status IN ('Rejected', 'REJECTED')
+            THEN COALESCE(brd.req_quantity, 0)
+            ELSE 0
+          END
+        ) AS branch_req_rejected_qty,
+        SUM(COALESCE(brd.assigned_quantity, 0)) AS branch_assigned_qty,
+        SUM(COALESCE(brd.acknowledged_quantity, 0)) AS branch_acknowledged_qty,
+        SUM(COALESCE(brd.returned_quantity, 0)) AS branch_returned_qty
+      FROM inv_branch_requisition_details brd
       JOIN inv_branch_requisition br
-        ON br.id = bid.branch_requisition_id
+        ON br.id = brd.branch_requisition_id
        AND br.is_active = 1
        AND br.deleted_at IS NULL
-      WHERE bid.is_active = 1
-        AND bid.deleted_at IS NULL
+      WHERE brd.is_active = 1
+        AND brd.deleted_at IS NULL
         AND (
-          (${warehouseMode} = true AND bid.cc_id = ${ccId})
+          (${isWarehouseLocation} = true AND br.cc_id = ${ccId})
           OR
-          (${warehouseMode} = false AND bid.ack_cc_id = ${ccId})
+          (${isWarehouseLocation} = false AND br.branch_id = ${ccId})
         )
       GROUP BY
-        bid.item_id,
-        bid.batch_no,
+        brd.item_id,
         CASE
-          WHEN ${warehouseMode} = true THEN bid.cc_id
-          ELSE bid.ack_cc_id
+          WHEN ${isWarehouseLocation} = true THEN br.cc_id
+          ELSE br.branch_id
         END
     ) branch_req
       ON branch_req.item_id = k.item_id
      AND branch_req.location_cc_id = k.location_cc_id
-     AND (
-       branch_req.batch_no = k.batch_no
-       OR (branch_req.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- Branch Requisition Return ---------------- */
     LEFT JOIN (
       SELECT
-        brid.item_id,
-        brid.batch_no,
+        brrd.item_id,
         CASE
-          WHEN ${warehouseMode} = true THEN brid.cc_id
-          ELSE brid.branch_id
+          WHEN ${isWarehouseLocation} = true THEN brr.cc_id
+          ELSE brr.branch_id
         END AS location_cc_id,
-        SUM(brid.return_qty) AS branch_return_requested_qty,
-        SUM(brid.acknowledged_qty) AS branch_return_acknowledged_qty
-      FROM inv_branch_return_item_details brid
-      WHERE brid.is_active = 1
-        AND brid.deleted_at IS NULL
+        SUM(COALESCE(brrd.requested_return_qty, 0)) AS branch_return_requested_qty,
+        SUM(
+          CASE
+            WHEN brr.return_status = 'Pending'
+            THEN COALESCE(brrd.requested_return_qty, 0)
+            ELSE 0
+          END
+        ) AS branch_return_pending_qty,
+        SUM(
+          CASE
+            WHEN brr.return_status IN ('Approved', 'APPROVED', 'Partially_Approved', 'Completed', 'COMPLETED')
+            THEN COALESCE(brrd.requested_return_qty, 0)
+            ELSE 0
+          END
+        ) AS branch_return_approved_qty,
+        SUM(
+          CASE
+            WHEN brr.return_status IN ('Reject', 'Rejected', 'REJECTED')
+            THEN COALESCE(brrd.requested_return_qty, 0)
+            ELSE 0
+          END
+        ) AS branch_return_rejected_qty,
+        SUM(COALESCE(brrd.acknowledged_return_qty, 0)) AS branch_return_acknowledged_qty,
+        SUM(
+          CASE
+            WHEN brr.ack_status = 'ACK_PENDING'
+            THEN COALESCE(brrd.requested_return_qty, 0) - COALESCE(brrd.acknowledged_return_qty, 0)
+            ELSE 0
+          END
+        ) AS branch_return_ack_pending_qty
+      FROM inv_branch_requisition_return_details brrd
+      JOIN inv_branch_requisition_return brr
+        ON brr.id = brrd.branch_requisition_return_id
+       AND brr.is_active = 1
+       AND brr.deleted_at IS NULL
+      WHERE brrd.is_active = 1
+        AND brrd.deleted_at IS NULL
         AND (
-          (${warehouseMode} = true AND brid.cc_id = ${ccId})
+          (${isWarehouseLocation} = true AND brr.cc_id = ${ccId})
           OR
-          (${warehouseMode} = false AND brid.branch_id = ${ccId})
+          (${isWarehouseLocation} = false AND brr.branch_id = ${ccId})
         )
       GROUP BY
-        brid.item_id,
-        brid.batch_no,
+        brrd.item_id,
         CASE
-          WHEN ${warehouseMode} = true THEN brid.cc_id
-          ELSE brid.branch_id
+          WHEN ${isWarehouseLocation} = true THEN brr.cc_id
+          ELSE brr.branch_id
         END
     ) branch_req_return
       ON branch_req_return.item_id = k.item_id
      AND branch_req_return.location_cc_id = k.location_cc_id
-     AND (
-       branch_req_return.batch_no = k.batch_no
-       OR (branch_req_return.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- Consumption ---------------- */
     LEFT JOIN (
       SELECT
         cd.item_id,
-        cd.batch_no,
         c.cc_id,
         MIN(DATE(cd.expiry_date)) AS consumption_expiry_date,
-        SUM(cd.requested_qty) AS consumption_requested_qty,
-        SUM(COALESCE(cd.consumed_qty, 0)) AS consumed_qty
+        SUM(COALESCE(cd.requested_qty, 0)) AS consumption_requested_qty,
+        SUM(
+          CASE
+            WHEN c.status IN ('SENT_FOR_APPROVAL', 'Pending', 'PENDING')
+            THEN COALESCE(cd.requested_qty, 0)
+            ELSE 0
+          END
+        ) AS consumption_pending_qty,
+        SUM(
+          CASE
+            WHEN c.status IN ('APPROVED', 'Approved', 'COMPLETED', 'Completed')
+            THEN COALESCE(cd.requested_qty, 0)
+            ELSE 0
+          END
+        ) AS consumption_approved_qty,
+        SUM(
+          CASE
+            WHEN c.status IN ('REJECTED', 'Rejected')
+            THEN COALESCE(cd.requested_qty, 0)
+            ELSE 0
+          END
+        ) AS consumption_rejected_qty,
+        SUM(
+          CASE
+            WHEN c.status IN ('APPROVED', 'Approved', 'COMPLETED', 'Completed')
+            THEN COALESCE(cd.consumed_qty, 0)
+            ELSE 0
+          END
+        ) AS consumed_qty
       FROM inv_consumption_details cd
       JOIN inv_consumption c
         ON c.id = cd.consumption_id
@@ -1217,14 +1392,12 @@ export const itemStock = async (ccId: number) => {
       WHERE cd.is_active = 1
         AND cd.deleted_at IS NULL
         AND c.cc_id = ${ccId}
-      GROUP BY cd.item_id, cd.batch_no, c.cc_id
+      GROUP BY
+        cd.item_id,
+        c.cc_id
     ) consumption
       ON consumption.item_id = k.item_id
      AND consumption.cc_id = k.location_cc_id
-     AND (
-       consumption.batch_no = k.batch_no
-       OR (consumption.batch_no IS NULL AND k.batch_no IS NULL)
-     )
 
     /* ---------------- Supplier Mapping ---------------- */
     LEFT JOIN (
@@ -1259,12 +1432,11 @@ export const itemStock = async (ccId: number) => {
 
     ORDER BY
       im.item DESC,
-      k.batch_no DESC,
-      expiry_date IS NULL,
-      expiry_date DESC
+      stock.nearest_expiry_date IS NULL,
+      stock.nearest_expiry_date DESC
   `;
 
-  return rows;
+  return serializeBigInt(rows);
 };
 
 export const getItemStockByItemOnly = async (

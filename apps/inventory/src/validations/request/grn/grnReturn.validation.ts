@@ -57,7 +57,7 @@ export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  discount: intRequired("Discount", 0),
+  discount: numberWithMaxDecimalsOptional("Discount"),
   netDiscount: priceRequired("Net Discount amount"),
 
   orderQty: intRequired("Order quantity"),
