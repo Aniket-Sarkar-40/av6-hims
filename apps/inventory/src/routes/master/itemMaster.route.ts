@@ -250,7 +250,7 @@ itemMasterRouter.post(
  *     tags: [Common]
  */
 // POST /export
-itemMasterRouter.post(
+itemMasterRouter.get(
   "/export",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
@@ -265,7 +265,7 @@ itemMasterRouter.post(
  *     tags: [Common]
  */
 // POST /export
-itemMasterRouter.post(
+itemMasterRouter.get(
   "/item-excel-export",
   verifyToken,
   authorize(getPermission("INV", "ITEM", "CREATE")),
