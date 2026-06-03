@@ -634,17 +634,6 @@ export const itemStock = async (ccId: number) => {
       COALESCE(stock.stock_normal_qty, 0)     AS stock_normal_qty,
       COALESCE(stock.stock_foc_qty, 0)        AS stock_foc_qty,
 
-      /* ---------------- In Transit Stock ---------------- */
-      COALESCE(in_transit.in_transit_in_qty, 0) AS in_transit_in_qty,
-      COALESCE(in_transit.in_transit_in_normal_qty, 0) AS in_transit_in_normal_qty,
-      COALESCE(in_transit.in_transit_in_foc_qty, 0) AS in_transit_in_foc_qty,
-      COALESCE(in_transit.in_transit_out_qty, 0) AS in_transit_out_qty,
-      COALESCE(in_transit.in_transit_out_normal_qty, 0) AS in_transit_out_normal_qty,
-      COALESCE(in_transit.in_transit_out_foc_qty, 0) AS in_transit_out_foc_qty,
-      (
-        COALESCE(in_transit.in_transit_in_qty, 0)
-        - COALESCE(in_transit.in_transit_out_qty, 0)
-      ) AS in_transit_net_qty,
 
       /* ---------------- Purchase Order ---------------- */
       COALESCE(po.po_ordered_qty, 0)          AS po_ordered_qty,
