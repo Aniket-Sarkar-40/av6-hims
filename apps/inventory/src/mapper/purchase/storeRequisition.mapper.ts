@@ -1,7 +1,11 @@
+import { getPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
+import {
+  getItemStockQtyByLocation,
+  getItemStockQtyByUser,
+} from "@/repository/stock/stock.repository.js";
 import { branchService } from "@/services/master/branch.service.js";
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
-import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import {
   RequisitionItemDetailDTO,
   RequisitionItemDetailResponse,
@@ -12,18 +16,16 @@ import {
   StoreRequisitionDTO,
   StoreRequisitionResponse,
 } from "@/types/purchase/storeRequisition.js";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { customOmit, toIdValue } from "av6-utils";
-import { settingsService } from "@/services/master/settings.service.js";
-import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import {
-  getItemStockQtyByLocation,
-  getItemStockQtyByUser,
-} from "@/repository/stock/stock.repository.js";
-import { RawItemStock } from "@/types/stock/stock.js";
+  ItemStockWithQtyBreakdown,
+  RawItemStock,
+} from "@/types/stock/stock.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { InvItemStock } from "@repo/db/generated/prisma/client";
-import { getPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
+import { customOmit, toIdValue } from "av6-utils";
+import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 
 export const toStoreRequisitionDTO = async (
   storeRequisition: StoreRequisitionResponse[]
@@ -211,7 +213,7 @@ export const toStoreRequisitionBatchWiseDTO = async (
   };
 };
 
-export const toStockEntity = (raw: RawItemStock): InvItemStock => {
+export const toStockEntity = (raw: RawItemStock): ItemStockWithQtyBreakdown => {
   return {
     id: raw.id,
     itemId: raw.item_id,
@@ -228,5 +230,18 @@ export const toStockEntity = (raw: RawItemStock): InvItemStock => {
     deletedBy: raw.deleted_by ?? null,
     deletedAt: raw.deleted_at ? new Date(raw.deleted_at) : null,
     isFoc: Boolean(raw.is_foc),
+
+    normalQty:
+      raw.normal_qty !== undefined && raw.normal_qty !== null
+        ? Number(raw.normal_qty)
+        : undefined,
+    focQty:
+      raw.foc_qty !== undefined && raw.foc_qty !== null
+        ? Number(raw.foc_qty)
+        : undefined,
+    totalQty:
+      raw.total_qty !== undefined && raw.total_qty !== null
+        ? Number(raw.total_qty)
+        : undefined,
   };
 };

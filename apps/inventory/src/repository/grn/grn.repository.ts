@@ -610,7 +610,7 @@ export const getGrnDetailsByIdFromDb = async (
 ): Promise<InvGoodReceiveDetails | null> => {
   logger.info(`entering::getGrnDetailsByIdFromDb::repository id=${id}`);
 
-  const grnDetails = await db.invGoodReceiveDetails.findUnique({
+  const grnDetails = await db.invGoodReceiveDetails.findFirst({
     where: { id, isActive: true },
   });
 

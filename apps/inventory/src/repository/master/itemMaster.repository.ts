@@ -1,5 +1,3 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   GetItemStockRequest,
@@ -7,10 +5,14 @@ import {
   ItemMasterReq,
   ItemMasterUpdateReq,
 } from "@/types/master/itemMaster.js";
+import { db } from "@repo/db/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 
-import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { mapExcelRowToItemMasterReq } from "@/mapper/master/itemMaster.mapper.js";
+import { createBatchJobInDb } from "@/repository/batch/batch.repository.js";
+import { getItemStocksByLocationUserId } from "@/repository/stock/stock.repository.js";
+import { createItemMasterServiceValidation } from "@/validations/service/master/itemMaster.service.validation.js";
 import {
   InvItem,
   InvItemStock,
@@ -18,12 +20,10 @@ import {
   Prisma,
   RoundFormat,
 } from "@repo/db/generated/prisma/client";
-import { getItemStocksByLocation } from "@/repository/stock/stock.repository.js";
-import { applyRound } from "av6-utils";
-import { createBatchJobInDb } from "@/repository/batch/batch.repository.js";
+import { logger } from "@repo/platform/logging/logger.js";
 import { API_TIMEOUT } from "@repo/shared";
-import { mapExcelRowToItemMasterReq } from "@/mapper/master/itemMaster.mapper.js";
-import { createItemMasterServiceValidation } from "@/validations/service/master/itemMaster.service.validation.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { applyRound } from "av6-utils";
 
 export const createItemMasterInDb = async (
   itemMaster: ItemMasterReq
@@ -130,14 +130,13 @@ export const getItemStocksByItemId = async (
   logger.info("entering::getItemStocksByItemId::repository");
 
   return await db.$transaction(async (tx) => {
-    const { id, ccId, userId, isZeroQty } = itemReq;
+    const { id, userId, isZeroQty } = itemReq;
 
     // const quantityCondition = isZeroQty ? {} : { quantity: { gt: 0 } };
 
-    const stocks = await getItemStocksByLocation(
+    const stocks = await getItemStocksByLocationUserId(
       tx,
       id,
-      ccId,
       userId,
       isZeroQty
     );

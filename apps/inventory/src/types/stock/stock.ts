@@ -61,7 +61,17 @@ export interface RawItemStock {
   deleted_by: number | null;
   deleted_at: string | null;
   is_foc: 1 | 0;
+
+  normal_qty?: number;
+  foc_qty?: number;
+  total_qty?: number;
 }
+
+export type ItemStockWithQtyBreakdown = InvItemStock & {
+  normalQty?: number;
+  focQty?: number;
+  totalQty?: number;
+};
 
 export interface ItemStockReportRow {
   itemId: number;

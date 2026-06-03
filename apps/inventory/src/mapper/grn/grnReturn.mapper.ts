@@ -100,6 +100,8 @@ export const toGrnReturnDTO = async (
 
           return {
             ...detail,
+            totalGrnQty:
+              (grnDetails?.quantity ?? 0) + (grnDetails?.focQuantity ?? 0),
             inHandQty: inHandQty ? inHandQty : 0,
             returnedQty: grnDetails?.returnQuantity ?? 0,
             purchasePrice: grnDetails?.purchasedPrice ?? 0,

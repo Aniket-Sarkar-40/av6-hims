@@ -31,11 +31,14 @@ import {
   ItemMasterUpdateReq,
   ItemSearchDTO,
 } from "@/types/master/itemMaster.js";
+import { getBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
 import {
   createItemMasterServiceValidation,
   updateIdItemMasterServiceValidation,
   validateBulkItemSupplierPricesService,
+  validateIdItemMaster,
 } from "@/validations/service/master/itemMaster.service.validation.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { InvItem } from "@repo/db/generated/prisma/client";
 import {
   addToCache,
@@ -51,7 +54,6 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import ExcelJs from "exceljs";
 import XLSX from "xlsx";
-
 export const cacheKey = getRedisKey("ITEM", "all");
 export const cacheKeyForItemSearch = getRedisKey("ITEM", "search");
 
@@ -81,9 +83,24 @@ export const itemMasterService = {
 
   async getItemStocks(itemStockReq: GetItemStockRequest) {
     logger.info("entering::getItemStocks::service");
-    if (itemStockReq.userId) validIdCheck(itemStockReq.userId);
-    if (itemStockReq.ccId) validIdCheck(itemStockReq.ccId);
-    // validIdCheck(itemStockReq.itemId);
+    if (itemStockReq.userId) {
+      const user = await employeeService.getEmployeeByIdFrmCacheOrDb(
+        itemStockReq.userId
+      );
+      if (!user) {
+        throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "User"));
+      }
+    }
+    if (itemStockReq.ccId) {
+      const cc = await getBranchOrWarehouse(itemStockReq.ccId);
+      if (!cc) {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Location")
+        );
+      }
+    }
+    await validateIdItemMaster(itemStockReq.id);
 
     const stocks = await getItemStocksByItemId(itemStockReq);
 

@@ -100,7 +100,7 @@ export const subItemStock = async (
       batchNo: data.batchNo ?? null,
       userId: data.userId,
       expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
-      isFoc: data.isFoc,
+      isFoc: data.isFoc ?? false,
       isActive: true,
     },
   });
@@ -375,17 +375,31 @@ export const getItemStocksByLocationUserId = async (
   userId?: number,
   canTakeZero = false
 ): Promise<InvItemStock[]> => {
-  logger.info(`entering::getItemStocksByLocation::repository (raw SQL)`);
+  logger.info(`entering::getItemStocksByLocationUserId::repository (raw SQL)`);
 
   const store = requestStorage.getStore();
   const setting = store?.settings;
   const expiry = setting?.expiryInMonth ?? 6;
 
+  const itemIdParam = itemId ?? null;
+  const userIdParam = userId ?? null;
+
   const stocks = await tx.$queryRaw<RawItemStock[]>`
-    SELECT *
+    SELECT
+      inv_item_stock.*,
+
+      SUM(CASE WHEN is_foc = 0 THEN quantity ELSE 0 END)
+        OVER (PARTITION BY item_id, user_id) AS normal_qty,
+
+      SUM(CASE WHEN is_foc = 1 THEN quantity ELSE 0 END)
+        OVER (PARTITION BY item_id, user_id) AS foc_qty,
+
+      SUM(quantity)
+        OVER (PARTITION BY item_id, user_id) AS total_qty
+
     FROM inv_item_stock
-    WHERE (${itemId} IS NULL OR item_id = ${itemId})
-      AND (${userId} IS NULL OR user_id = ${userId})
+    WHERE (${itemIdParam} IS NULL OR item_id = ${itemIdParam})
+      AND (${userIdParam} IS NULL OR user_id = ${userIdParam})
       AND is_active = 1
       AND (${canTakeZero} OR quantity > 0)
       AND (
