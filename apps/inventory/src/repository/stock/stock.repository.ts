@@ -86,65 +86,68 @@ export const addItemStock = async (
   });
 };
 
+type SubItemStockOptions = {
+  consumeFromAll?: boolean;
+};
+
 export const subItemStock = async (
   tx: Tx,
   data: CreateItemStockInput,
-  detail: ItemStockAudit
+  detail: ItemStockAudit,
+  options: SubItemStockOptions = {}
 ): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
-  const isStockExists = await tx.invItemStock.findFirst({
-    where: {
-      itemId: data.itemId,
-      ccId: data.ccId,
-      batchNo: data.batchNo ?? null,
-      userId: data.userId,
-      expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
-      isFoc: data.isFoc ?? false,
-      isActive: true,
-    },
-  });
 
-  if (!isStockExists || isStockExists.quantity < data.quantity) {
-    throw new ErrorHandler(400, "Insufficient stock to consume");
+  const consumeFromAll = options.consumeFromAll ?? false;
+
+  if (!consumeFromAll) {
+    const isStockExists = await tx.invItemStock.findFirst({
+      where: {
+        itemId: data.itemId,
+        ccId: data.ccId ?? null,
+        batchNo: data.batchNo ?? null,
+        userId: data.userId ?? null,
+        expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+        isFoc: data.isFoc ?? false,
+        isActive: true,
+      },
+    });
+
+    if (!isStockExists || isStockExists.quantity < data.quantity) {
+      throw new ErrorHandler(400, "Insufficient stock to consume");
+    }
+
+    await tx.invItemStock.update({
+      where: {
+        id: isStockExists.id,
+      },
+      data: {
+        quantity: isStockExists.quantity - data.quantity,
+        updatedBy: currentUser,
+      },
+    });
+
+    await tx.invItemStockAudit.create({
+      data: {
+        itemStockId: isStockExists.id,
+        quantity: data.quantity,
+        action: Action.SUBTRACTION,
+        operation: detail.operation,
+        refApprovedAt: detail.refApprovedAt
+          ? new Date(detail.refApprovedAt)
+          : null,
+        refApprovedBy: detail.refApprovedBy ?? null,
+        refId: detail.refId ?? null,
+        refDetailsId: detail.refDetailsId ?? null,
+        refDate: detail.refDate ? new Date(detail.refDate) : null,
+        refNo: detail.refNo ?? null,
+        createdBy: currentUser,
+      },
+    });
+
+    return;
   }
-
-  await tx.invItemStock.update({
-    where: {
-      id: isStockExists.id,
-    },
-    data: {
-      quantity: isStockExists.quantity - data.quantity,
-      updatedBy: currentUser,
-    },
-  });
-
-  await tx.invItemStockAudit.create({
-    data: {
-      itemStockId: isStockExists.id,
-      quantity: data.quantity,
-      action: Action.SUBTRACTION,
-      operation: detail.operation,
-      refApprovedAt: detail.refApprovedAt
-        ? new Date(detail.refApprovedAt)
-        : null,
-      refApprovedBy: detail.refApprovedBy ?? null,
-      refId: detail.refId ?? null,
-      refDetailsId: detail.refDetailsId ?? null,
-      refDate: detail.refDate ? new Date(detail.refDate) : null,
-      refNo: detail.refNo ?? null,
-      createdBy: currentUser,
-    },
-  });
-};
-
-export const subItemStockForGrnReturn = async (
-  tx: Tx,
-  data: CreateItemStockInput,
-  detail: ItemStockAudit
-): Promise<void> => {
-  const store = requestStorage.getStore();
-  const currentUser = store?.user?.id;
 
   const itemStocks = await tx.invItemStock.findMany({
     where: {
@@ -175,7 +178,6 @@ export const subItemStockForGrnReturn = async (
     await tx.invItemStock.update({
       where: {
         id: stock.id,
-        isActive: true,
       },
       data: {
         quantity: stock.quantity - consumeQty,

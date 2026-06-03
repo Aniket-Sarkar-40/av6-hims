@@ -1,3 +1,4 @@
+import { subItemStock } from "@/repository/stock/stock.repository.js";
 import {
   CreateGrnReturnInput,
   GoodReceivedReturnResponse,
@@ -9,10 +10,6 @@ import { RETURN_STS } from "@repo/db/generated/prisma/client";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
-import {
-  subItemStock,
-  subItemStockForGrnReturn,
-} from "../stock/stock.repository.js";
 
 export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   logger.info("entering::createGrnReturnInDb::repository");
@@ -302,7 +299,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
     });
 
     for (const detail of goodReceiveReturnDetails) {
-      await subItemStockForGrnReturn(
+      await subItemStock(
         tx,
         {
           itemId: detail.itemId,
@@ -319,7 +316,8 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           refDetailsId: detail.id!,
           refId: id,
           refNo: grnReturnData.grnNumber,
-        }
+        },
+        { consumeFromAll: true }
       );
     }
 
