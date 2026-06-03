@@ -269,6 +269,32 @@ export const getPendingSRRFromSRId = async (
   return storeReqReturns;
 };
 
+export const getApprovedPendingSRRFromSRId = async (
+  storeRequisitionId: number
+) => {
+  logger.info(
+    `entering::getApprovedPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
+  );
+
+  const storeReqReturns = await db.storeRequisitionReturn.findMany({
+    where: {
+      storeRequisitionId,
+      returnStatus: {
+        in: ["Approved", "Partially_Approved"],
+      },
+      ackStatus: {
+        not: "ACK_RECEIVED",
+      },
+      isActive: true,
+    },
+  });
+
+  logger.info(
+    `exiting::getApprovedPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
+  );
+  return storeReqReturns;
+};
+
 export const deleteStoreRequisitionReturnFromDb = async (id: number) => {
   logger.info(
     `entering::deleteStoreRequisitionReturnFromDb::repository id=${id}`
@@ -430,8 +456,8 @@ export const approveStoreRequisitionReturn = async (
             batchNo: item.batchNo,
             expiryDate: item.expiryDate ? new Date(item.expiryDate) : undefined,
             isFoc: item.isFoc,
-            fromId: inp.storeReqReturn.ccId,
-            toId: inp.storeReqReturn.requisitionFrom,
+            userId: inp.storeReqReturn.requisitionFrom,
+            toCcId: inp.storeReqReturn.ccId,
           },
           {
             operation: "STORE_REQUISITION_RETURN",
@@ -490,9 +516,9 @@ export const acknowledgeStoreRequisitionReturn = async (
           {
             itemId: detail.itemId,
             quantity: item.acknowledgedQty,
-            batchNo: item.batchNo,
-            userId: inp.storeReqReturn.requisitionFrom,
-            expiryDate: item.expiryDate,
+            batchNo: item.batchNo ?? null,
+            ccId: inp.storeReqReturn.ccId,
+            expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
             isFoc: item.isFoc,
           },
           {
@@ -512,8 +538,8 @@ export const acknowledgeStoreRequisitionReturn = async (
             batchNo: item.batchNo,
             expiryDate: item.expiryDate ? new Date(item.expiryDate) : undefined,
             isFoc: item.isFoc,
-            fromId: inp.storeReqReturn.ccId,
-            toId: inp.storeReqReturn.requisitionFrom,
+            userId: inp.storeReqReturn.requisitionFrom,
+            toCcId: inp.storeReqReturn.ccId,
           },
           {
             operation: "STORE_REQUISITION_RETURN",

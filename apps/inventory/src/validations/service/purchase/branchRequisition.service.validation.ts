@@ -3,6 +3,7 @@ import {
   getBranchItemDetailsFromDb,
   validateBranchRequisitionByIdFromDb,
 } from "@/repository/purchase/branchRequisition.repository.js";
+import { getApprovedPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
 import { getStockById } from "@/repository/stock/stock.repository.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import {
@@ -12,7 +13,6 @@ import {
   CreateBranchRequisitionInput,
   RejectBranchRequisitionInput,
 } from "@/types/purchase/branchRequisition.js";
-import { validateBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
 import { validateIdBranch } from "@/validations/service/master/branch.service.validation.js";
 import { validateWarehouseId } from "@/validations/service/master/warehouse.service.validation.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
@@ -430,6 +430,20 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
   const currBranchReq = await validateIdBranchRequisition(body.branchReqId);
   body.branchReq = currBranchReq;
 
+  const approvedPendingReturns = await getApprovedPendingBRRFromBRId(
+    body.branchReqId
+  );
+
+  if (approvedPendingReturns.length > 0) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "INVALID_STATUS",
+        "Branch Requisition Return is pending acknowledgement"
+      )
+    );
+  }
+
   await validateIdBranch(body.branchId);
 
   ensureMatch(
@@ -561,10 +575,11 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
         "Branch Item Detail FOC"
       );
 
-      if (
-        branchItem.assignedQty <
-        branchItem.acknowledgedQty + item.acknowledgeQty
-      ) {
+      const alreadyUsedQty =
+        branchItem.acknowledgedQty + branchItem.returnedQty;
+      const nextUsedQty = alreadyUsedQty + item.acknowledgeQty;
+
+      if (branchItem.assignedQty < nextUsedQty) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
@@ -572,14 +587,9 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
             `Acknowledge quantity for Batch no : ${item.batchNo ?? "-"}`
           )
         );
-      } else if (
-        branchItem.assignedQty >
-        branchItem.acknowledgedQty + item.acknowledgeQty
-      ) {
-        item.isCompleted = false;
-      } else {
-        item.isCompleted = true;
       }
+
+      item.isCompleted = branchItem.assignedQty === nextUsedQty;
 
       totalAckQty += item.acknowledgeQty;
     }

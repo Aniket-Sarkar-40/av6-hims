@@ -36,6 +36,7 @@ export interface PurchaseOrderDTO
     | "storeId"
     | "supplierId"
     | "warehouseId"
+    | "currencyId"
   > {
   supplier: IdValue | null;
   store: IdValue | null;
@@ -43,6 +44,7 @@ export interface PurchaseOrderDTO
   updatedBy: EmployeeCache | null;
   warehouse: IdValue | null;
   branch: IdValue | null;
+  currency: IdValue | null;
   purchaseOrderDetails: PurchaseOrderDetailDTO[];
 }
 

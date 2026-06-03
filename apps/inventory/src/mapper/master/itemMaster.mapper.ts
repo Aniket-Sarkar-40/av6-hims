@@ -17,6 +17,7 @@ import {
   ItemMasterDto,
   ItemMasterDtoStock,
   ItemMasterEntity,
+  ItemMasterExcelRow,
   ItemMasterReq,
   ItemMasterUpdateEntity,
   ItemMasterUpdateReq,
@@ -26,7 +27,11 @@ import {
 import { ItemStockDTO } from "@/types/stock/stock.js";
 import { getBranchAndWarehouseByCcIds } from "@/utils/getCollectionCenter.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
-import { InvItem, InvItemStock } from "@repo/db/generated/prisma/client";
+import {
+  InvItem,
+  InvItemStock,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 import { toPickFields } from "av6-utils";
 import {
   toPublicImageUrl,
@@ -350,4 +355,64 @@ export async function itemMasterToDto(item: ItemMasterDto) {
     "isReturnable",
     "isLock"
   ) as ItemMasterToDto | null;
+}
+
+const toExcelBool = (value: boolean | string | number | undefined): boolean => {
+  if (value === true || value === 1) return true;
+  if (typeof value === "string") {
+    return ["true", "1", "yes"].includes(value.trim().toLowerCase());
+  }
+  return false;
+};
+
+const toOptionalInt = (
+  value: number | string | undefined | null
+): number | undefined => {
+  if (value === undefined || value === null || value === "") return undefined;
+  const num = Number(value);
+  return Number.isNaN(num) ? undefined : num;
+};
+
+const toOptionalString = (value?: string | null): string | undefined => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+};
+
+export function mapRowToItemMasterImportExcelInput(
+  row: ItemMasterExcelRow,
+  rowNo: number
+): Prisma.InvItemMasterExcelCreateInput {
+  return {
+    rowNo,
+    item: String(row["Item Name"] ?? "").trim(),
+    itemCode: toOptionalString(row["Item Code"]),
+    itemCategoryId: Number(row["Item Category ID"]),
+    storageId: toOptionalInt(row["Storage ID"]),
+    unitId: Number(row["Unit ID"]),
+    basePrice:
+      row["Base Price"] != null ? Number(row["Base Price"]) : undefined,
+    reOrderLevel: toOptionalInt(row["Re-order Level"]),
+    itemDescription: toOptionalString(row["Item Description"]),
+    isBatchNumber: toExcelBool(row["Is Batch Number"]),
+    isExpireDate: toExcelBool(row["Is Expire Date"]),
+    isReturnable: toExcelBool(row["Is Returnable"]),
+  };
+}
+
+export function mapExcelRowToItemMasterReq(
+  row: Prisma.InvItemMasterExcelGetPayload<object>
+): ItemMasterReq {
+  return {
+    item: row.item,
+    itemCode: row.itemCode ?? undefined,
+    itemCategoryId: row.itemCategoryId,
+    storageId: row.storageId ?? undefined,
+    unitId: row.unitId,
+    basePrice: row.basePrice ?? undefined,
+    reOrderLevel: row.reOrderLevel ?? undefined,
+    itemDescription: row.itemDescription ?? undefined,
+    isBatchNumber: row.isBatchNumber,
+    isExpireDate: row.isExpireDate,
+    isReturnable: row.isReturnable,
+  };
 }

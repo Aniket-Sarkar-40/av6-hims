@@ -360,6 +360,7 @@ model Staff {
     approvalActions              ApprovalAction[]
     storeRequisitionReturns      StoreRequisitionReturn[]
     requisitionReturnItemDetails RequisitionReturnItemDetails[]
+    invInTransitStocks           InvInTransitStock[]
 
     @@map("staff")
 }
@@ -430,6 +431,7 @@ model Currency {
     vouchers              Voucher[]
     invGoodReceives       InvGoodReceive[]
     invGoodReceiveReturns InvGoodReceiveReturn[]
+    invPurchaseOrders     InvPurchaseOrder[]
 
     @@map("core_currency")
 }

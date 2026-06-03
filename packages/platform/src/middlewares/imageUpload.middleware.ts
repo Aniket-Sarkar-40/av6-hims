@@ -20,9 +20,9 @@ const ALLOWED = [
   "image/jpeg",
   "image/png",
   "image/gif",
+  "image/jpg",
+  "image/webp",
   "application/pdf",
-  "application/vnd.ms-excel",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "audio/mp3",
   "audio/mpeg",
   "audio/mp4",
@@ -35,12 +35,22 @@ const ALLOWED = [
   "video/webm",
   "video/ogg",
   "video/mpeg",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+  "application/vnd.ms-excel.sheet.macroEnabled.12",
+  "text/csv",
+  "application/csv",
+  "text/plain",
+  "application/octet-stream",
+  "application/zip",
+  "application/x-zip-compressed",
 ];
 
 export type AnyHandler = (
   req: AuthRequest,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => any;
 export type AnyHandlerArray = AnyHandler[];
 
@@ -50,7 +60,7 @@ export const createUploadMiddleware = (fieldName: string): AnyHandler => {
   const fileFilter = (
     req: Express.Request,
     file: Express.Multer.File,
-    cb: FileFilterCallback,
+    cb: FileFilterCallback
   ) => {
     if (ALLOWED.includes(file.mimetype)) {
       cb(null, true);
@@ -68,14 +78,14 @@ export const createUploadMiddleware = (fieldName: string): AnyHandler => {
 
 export const createUploadMiddlewareForCommon = (
   folder: string,
-  service: Service,
+  service: Service
 ) => {
   const storage = multer.memoryStorage();
 
   const fileFilter = (
     req: Express.Request,
     file: Express.Multer.File,
-    cb: FileFilterCallback,
+    cb: FileFilterCallback
   ) => {
     if (ALLOWED.includes(file.mimetype)) {
       cb(null, true);
@@ -98,7 +108,7 @@ export const createUploadMiddlewareForCommon = (
     (req: AuthRequest, res: Response, next: NextFunction) => {
       const fieldName = getFileAttrFromShortCode(
         service,
-        req.query.shortCode as string,
+        req.query.shortCode as string
       );
 
       const files = (req.files as Express.Multer.File[]) || [];
@@ -108,8 +118,8 @@ export const createUploadMiddlewareForCommon = (
         if (!matched) {
           return next(
             new Error(
-              `Missing file field "${fieldName}" for shortCode "${req.query.shortCode}"`,
-            ),
+              `Missing file field "${fieldName}" for shortCode "${req.query.shortCode}"`
+            )
           );
         }
 
@@ -127,14 +137,14 @@ export const createUploadMiddlewareForCommon = (
 
 export const createUploadMultiMiddleware = (
   folder: string,
-  fieldName: string,
+  fieldName: string
 ): AnyHandlerArray => {
   const storage = multer.memoryStorage();
 
   const fileFilter = (
     req: Express.Request,
     file: Express.Multer.File,
-    cb: FileFilterCallback,
+    cb: FileFilterCallback
   ) => {
     if (ALLOWED.includes(file.mimetype)) {
       cb(null, true);
@@ -158,11 +168,11 @@ export const createUploadMultiMiddleware = (
 function makeFileFilter(
   req: Express.Request,
   file: Express.Multer.File,
-  cb: FileFilterCallback,
+  cb: FileFilterCallback
 ) {
   if (!ALLOWED.includes(file.mimetype)) {
     return cb(
-      new ErrorHandler(400, "Only image, PDF, or Excel files are allowed!"),
+      new ErrorHandler(400, "Only image, PDF, or Excel files are allowed!")
     );
   }
   cb(null, true);
@@ -170,7 +180,7 @@ function makeFileFilter(
 
 export function createUploadFieldsMiddleware(
   folder: string,
-  fields: string[],
+  fields: string[]
 ): AnyHandlerArray {
   const upload = multer({
     storage: multer.memoryStorage(),
@@ -208,7 +218,7 @@ export function createUploadFieldsMiddleware(
               Key: key,
               Body: file.buffer,
               ContentType: file.mimetype,
-            }),
+            })
           );
 
           req.uploadedFiles.push({

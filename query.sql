@@ -1537,3 +1537,64 @@ ALTER TABLE `pathology_b2b_invoice_amount_summary` MODIFY `service_type` ENUM('P
 -- AlterTable
 ALTER TABLE `core_mono_repo_modules` ADD COLUMN `deleted_at` DATETIME(3) NOT NULL,
     ADD COLUMN `deleted_by` INTEGER NULL;
+
+
+-- DropIndex
+DROP INDEX `in_transit_stock_from_id_idx` ON `inv_in_transit_stock`;
+
+-- DropIndex
+DROP INDEX `in_transit_stock_to_id_idx` ON `inv_in_transit_stock`;
+
+-- AlterTable
+ALTER TABLE `inv_in_transit_stock` DROP COLUMN `from_id`,
+    DROP COLUMN `to_Id`,
+    ADD COLUMN `from_cc_id` INTEGER NULL,
+    ADD COLUMN `to_cc_id` INTEGER NULL,
+    ADD COLUMN `user_id` INTEGER NULL;
+
+-- CreateIndex
+CREATE INDEX `inv_in_transit_stock_from_id_idx` ON `inv_in_transit_stock`(`from_cc_id`);
+
+-- CreateIndex
+CREATE INDEX `inv_in_transit_stock_to_id_idx` ON `inv_in_transit_stock`(`to_cc_id`);
+
+-- CreateIndex
+CREATE INDEX `inv_in_transit_stock_user_id_idx` ON `inv_in_transit_stock`(`user_id`);
+
+-- RedefineIndex
+CREATE INDEX `inv_in_transit_stock_item_id_idx` ON `inv_in_transit_stock`(`item_id`);
+DROP INDEX `in_transit_stock_item_id_idx` ON `inv_in_transit_stock`;
+
+-- CreateTable
+CREATE TABLE `inv_item_master_excel` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `row_no` INTEGER NOT NULL,
+    `item` VARCHAR(191) NOT NULL,
+    `item_code` VARCHAR(191) NULL,
+    `item_category_id` INTEGER NOT NULL,
+    `storage_id` INTEGER NULL,
+    `unit_id` INTEGER NOT NULL,
+    `base_price` DOUBLE NULL,
+    `re_order_level` INTEGER NULL,
+    `item_description` VARCHAR(191) NULL,
+    `is_batch_number` BOOLEAN NOT NULL DEFAULT false,
+    `is_expire_date` BOOLEAN NOT NULL DEFAULT false,
+    `is_returnable` BOOLEAN NOT NULL DEFAULT false,
+    `front_image` VARCHAR(191) NULL,
+    `back_image` VARCHAR(191) NULL,
+    `left_side_image` VARCHAR(191) NULL,
+    `right_side_image` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AlterTable
+ALTER TABLE `inv_tax_identification_details` ADD COLUMN `tax_identification_number` VARCHAR(191) NULL;
+
+-- AlterTable
+ALTER TABLE `inv_purchase_order` DROP COLUMN `currency`,
+    ADD COLUMN `conversion_rate` DECIMAL(18, 5) NULL,
+    ADD COLUMN `currency_id` INTEGER NULL;
+
+-- CreateIndex
+CREATE INDEX `purchase_order_currency_id_idx` ON `inv_purchase_order`(`currency_id`);

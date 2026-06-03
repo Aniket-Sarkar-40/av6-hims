@@ -21,6 +21,7 @@ import { STORE_REQ_STATUS } from "@repo/db/generated/prisma/client";
 import dayjs from "dayjs";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { validateIdBranch } from "@/validations/service/master/branch.service.validation.js";
+import { getApprovedPendingSRRFromSRId } from "@/repository/purchase/storeRequisitionReturn.repository.js";
 
 export const validateStaffCollectionCenter = async (
   staffId: number,
@@ -348,6 +349,20 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
   const currStoreReq = await validateIdStoreRequisition(body.storeReqId);
   body.storeReq = currStoreReq;
 
+  const approvedPendingReturns = await getApprovedPendingSRRFromSRId(
+    body.storeReqId
+  );
+
+  if (approvedPendingReturns.length > 0) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "INVALID_STATUS",
+        "Store Requisition Return is pending acknowledgement"
+      )
+    );
+  }
+
   if (currStoreReq.requisitionFrom !== body.requisitionFrom) {
     throw new ErrorHandler(
       403,
@@ -416,10 +431,11 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
         );
       }
 
-      if (
-        requisitionItem.assignedQty <
-        requisitionItem.acknowledgedQty + item.acknowledgeQty
-      ) {
+      const alreadyUsedQty =
+        requisitionItem.acknowledgedQty + requisitionItem.returnedQty;
+      const nextUsedQty = alreadyUsedQty + item.acknowledgeQty;
+
+      if (requisitionItem.assignedQty < nextUsedQty) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
@@ -427,15 +443,9 @@ export const acknowledgeStoreRequisitionServiceValidation = async (
             `Acknowledge quantity for Batch no : ${item.batchNo}`
           )
         );
-      } else if (
-        requisitionItem.assignedQty >
-        requisitionItem.acknowledgedQty + item.acknowledgeQty
-      ) {
-        // TODO : Send email to warehouse
-        item.isCompleted = false;
-      } else {
-        item.isCompleted = true;
       }
+
+      item.isCompleted = requisitionItem.assignedQty === nextUsedQty;
 
       totalAckQty += item.acknowledgeQty;
     }

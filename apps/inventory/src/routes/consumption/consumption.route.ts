@@ -1,14 +1,4 @@
 import {
-  approveConsumption,
-  createConsumption,
-  deleteConsumptionById,
-  getAllConsumption,
-  getConsumptionById,
-  getConsumptionByUserId,
-  rejectConsumption,
-  updateConsumption,
-} from "@/controllers/consumption/cosumption.controller.js";
-import {
   authorize,
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
@@ -21,6 +11,16 @@ import {
 } from "@/validations/request/consumption/consumption.validation.js";
 import { Router } from "express";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import {
+  approveConsumption,
+  createConsumption,
+  deleteConsumptionById,
+  getAllConsumption,
+  getConsumptionById,
+  getConsumptionByUserId,
+  rejectConsumption,
+  updateConsumption,
+} from "@/controllers/consumption/consumption.controller.js";
 
 export const consumptionRouter: Router = Router();
 

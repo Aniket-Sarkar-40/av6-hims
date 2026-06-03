@@ -115,3 +115,5 @@ export const getItemStockReqSchema = Joi.object<GetItemReqStock>({
 export const validateItemStock = validationHandler({
   schema: getItemStockReqSchema,
 });
+
+export const itemMasterImportExcelSchema = Joi.object({});

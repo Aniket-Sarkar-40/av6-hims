@@ -1,4 +1,3 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
 import {
   getCountGRNDetailsFromDb,
   getGrnByIdFromDb,
@@ -6,22 +5,22 @@ import {
 import { getPurchaseByIdFromDb } from "@/repository/purchase/purchase.repository.js";
 import { branchService } from "@/services/master/branch.service.js";
 import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
+import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import { CreateGrnInput } from "@/types/grn/grn.js";
-import { applyRound } from "av6-utils";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import { calculation } from "@/utils/commonCalculation.utils.js";
+import { validateBatchNoBelongsToSameItem } from "@/utils/uniqueBatch.utils.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
 import {
   CalculationMethod,
   GRN_STATUS,
   PO_STATUS,
 } from "@repo/db/generated/prisma/client";
-import { calculation } from "@/utils/commonCalculation.utils.js";
-import { settingsService } from "@/services/master/settings.service.js";
-import { currencyService } from "@apps/core/services/master/currency.service.js";
-import { applyGrnRateConversion } from "@/utils/grnRateConversion.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { applyRound } from "av6-utils";
 
 export const validateIdGrn = async (id: number) => {
   logger.info("entering::validateIdGrn service::validation");
@@ -185,6 +184,8 @@ export const validateGrnCommon = async (
       )
     );
   }
+
+  await validateBatchNoBelongsToSameItem(body);
 
   let totalDetailAmounts = 0;
 

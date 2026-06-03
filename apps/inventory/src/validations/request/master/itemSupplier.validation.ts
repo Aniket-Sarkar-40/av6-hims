@@ -17,6 +17,7 @@ const taxIdentificationDetailSchema = Joi.object({
   id: idOptional("Tax Identification ID"),
   taxIdentificationName: strRequired("Tax Identification Name"),
   taxIdentificationValue: idRequired("Tax Identification Value"),
+  taxIdentificationNumber: strRequired("Tax Identification Number"),
 });
 
 const bankDetailsSchema = Joi.object({
@@ -61,7 +62,7 @@ export const itemSupplierCreateSchema = Joi.object({
   isLock: boolOptional("Is Lock"),
   taxIdentificationDetails: arrayOptional(
     "Tax Identification Details",
-    taxIdentificationDetailSchema,
+    taxIdentificationDetailSchema
   ),
 
   bankDetails: arrayOptional("Bank Details", bankDetailsSchema),

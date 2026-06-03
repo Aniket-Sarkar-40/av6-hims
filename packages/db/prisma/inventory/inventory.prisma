@@ -200,9 +200,10 @@ model InvItemSupplier {
 }
 
 model TaxIdentificationDetails {
-    id                     Int    @id @default(autoincrement())
-    taxIdentificationName  String @map("tax_identification_name")
-    taxIdentificationValue Int    @map("tax_identification_value")
+    id                      Int     @id @default(autoincrement())
+    taxIdentificationName   String  @map("tax_identification_name")
+    taxIdentificationValue  Int     @map("tax_identification_value")
+    taxIdentificationNumber String? @map("tax_identification_number")
 
     isActive       Boolean   @default(true) @map("is_active")
     createdBy      Int?      @map("created_by")
@@ -252,7 +253,8 @@ model InvPurchaseOrder {
     grandTotal     Float     @map("grand_total")
     status         PO_STATUS @default(SENT_FOR_APPROVAL)
     notes          String?   @db.Text
-    currency       String?
+    currencyId     Int?      @map("currency_id")
+    conversionRate Decimal?  @map("conversion_rate") @db.Decimal(18, 5)
     paymentTerms   String?   @map("payment_terms") @db.Text
     isActive       Boolean   @default(true) @map("is_active")
     createdBy      Int?      @map("created_by")
@@ -267,6 +269,7 @@ model InvPurchaseOrder {
     supplier             InvItemSupplier           @relation(fields: [supplierId], references: [id])
     store                InvItemStore?             @relation(fields: [storeId], references: [id])
     collectionCenter     CollectionCenter          @relation(fields: [ccId], references: [id])
+    currency             Currency?                 @relation(fields: [currencyId], references: [id])
     purchaseOrderDetails InvPurchaseOrderDetails[]
     goodReceive          InvGoodReceive[]
     goodReceiveReturn    InvGoodReceiveReturn[]
@@ -274,6 +277,7 @@ model InvPurchaseOrder {
     @@index([supplierId], name: "purchase_order_supplier_id_idx")
     @@index([storeId], name: "purchase_order_store_id_idx")
     @@index([ccId], name: "purchase_order_cc_id_idx")
+    @@index([currencyId], name: "purchase_order_currency_id_idx")
     @@map("inv_purchase_order")
 }
 
@@ -930,8 +934,9 @@ model RequisitionInvItemDetails {
 
 model InvInTransitStock {
     id         Int       @id @default(autoincrement())
-    fromId     Int       @map("from_id")
-    toId       Int       @map("to_Id")
+    fromCcId   Int?      @map("from_cc_id")
+    toCcId     Int?      @map("to_cc_id")
+    userId     Int?      @map("user_id")
     itemId     Int       @map("item_id")
     quantity   Float     @default(0)
     batchNo    String?   @map("batch_no")
@@ -946,13 +951,15 @@ model InvInTransitStock {
     deletedAt  DateTime? @map("deleted_at")
 
     item                InvItem                  @relation(fields: [itemId], references: [id])
-    from                CollectionCenter         @relation(name: "From", fields: [fromId], references: [id], map: "inv_in_transit_stock_from_id_idx")
-    to                  CollectionCenter         @relation(name: "To", fields: [toId], references: [id], map: "inv_in_transit_stock_to_id_idx")
+    from                CollectionCenter?        @relation(name: "From", fields: [fromCcId], references: [id], map: "inv_in_transit_stock_from_id_idx")
+    to                  CollectionCenter?        @relation(name: "To", fields: [toCcId], references: [id], map: "inv_in_transit_stock_item_id_idx")
+    user                Staff?                   @relation(fields: [userId], references: [id], map: "inv_in_transit_stock_user_id_idx")
     inTransitStockAudit InvInTransitStockAudit[]
 
-    @@index([fromId], name: "in_transit_stock_from_id_idx")
-    @@index([toId], name: "in_transit_stock_to_id_idx")
-    @@index([itemId], name: "in_transit_stock_item_id_idx")
+    @@index([fromCcId], name: "inv_in_transit_stock_from_id_idx")
+    @@index([toCcId], name: "inv_in_transit_stock_to_id_idx")
+    @@index([itemId], name: "inv_in_transit_stock_item_id_idx")
+    @@index([userId], name: "inv_in_transit_stock_user_id_idx")
     @@map("inv_in_transit_stock")
 }
 
@@ -1467,4 +1474,26 @@ model RequisitionReturnItemDetails {
     @@index([reqFrom], name: "inv_rrid_req_from_idx")
     @@index([ccId], name: "inv_rrid_cc_id_idx")
     @@map("inv_requisition_return_item_details")
+}
+
+model InvItemMasterExcel {
+    id              Int     @id @default(autoincrement())
+    rowNo           Int     @map("row_no")
+    item            String  @map("item")
+    itemCode        String? @map("item_code")
+    itemCategoryId  Int     @map("item_category_id")
+    storageId       Int?    @map("storage_id")
+    unitId          Int     @map("unit_id")
+    basePrice       Float?  @map("base_price")
+    reOrderLevel    Int?    @map("re_order_level")
+    itemDescription String? @map("item_description")
+    isBatchNumber   Boolean @default(false) @map("is_batch_number")
+    isExpireDate    Boolean @default(false) @map("is_expire_date")
+    isReturnable    Boolean @default(false) @map("is_returnable")
+    frontImage      String? @map("front_image")
+    backImage       String? @map("back_image")
+    leftSideImage   String? @map("left_side_image")
+    rightSideImage  String? @map("right_side_image")
+
+    @@map("inv_item_master_excel")
 }

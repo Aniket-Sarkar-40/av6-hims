@@ -14,6 +14,7 @@ import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { customOmit, omitAudit, toIdValue } from "av6-utils";
 import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 import dayjs from "dayjs";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
 
 export const toPurchaseOrderDTO = async (
   purchaseOrders: PurchaseOrderWithDetails[]
@@ -49,6 +50,10 @@ export const toPurchaseOrderDTO = async (
         : null;
       const updatedBy = po.updatedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(po.updatedBy, true)
+        : null;
+
+      const currency = po.currencyId
+        ? await currencyService.getCurrencyById(po.currencyId)
         : null;
 
       const detailDTO: PurchaseOrderDetailDTO[] = await Promise.all(
@@ -87,6 +92,7 @@ export const toPurchaseOrderDTO = async (
         supplier: toIdValue(supplierDTO, "name"),
         warehouse: toIdValue(warehouse, "name"),
         branch: toIdValue(branch, "name"),
+        currency: toIdValue(currency, "name"),
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),
         purchaseOrderDetails: omitAudit(detailDTO),

@@ -22,13 +22,17 @@ export const addItemStock = async (
 ): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
+  const ccId = data.ccId ?? null;
+  const userId = data.userId ?? null;
+  const batchNo = data.batchNo ?? null;
+  const expiryDate = data.expiryDate ? new Date(data.expiryDate) : null;
   const isStockExists = await tx.invItemStock.findFirst({
     where: {
       itemId: data.itemId,
-      ccId: data.ccId,
-      userId: data.userId,
-      batchNo: data.batchNo,
-      expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+      ccId,
+      userId,
+      batchNo,
+      expiryDate,
       isFoc: data.isFoc,
       isActive: true,
     },
@@ -49,7 +53,10 @@ export const addItemStock = async (
     const created = await tx.invItemStock.create({
       data: {
         ...data,
-        expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+        ccId,
+        userId,
+        batchNo,
+        expiryDate,
         createdBy: currentUser,
       },
     });
@@ -82,13 +89,17 @@ export const subItemStock = async (
 ): Promise<void> => {
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
+  const ccId = data.ccId ?? null;
+  const userId = data.userId ?? null;
+  const batchNo = data.batchNo ?? null;
+  const expiryDate = data.expiryDate ? new Date(data.expiryDate) : null;
   const isStockExists = await tx.invItemStock.findFirst({
     where: {
       itemId: data.itemId,
-      ccId: data.ccId,
-      batchNo: data.batchNo ?? null,
-      userId: data.userId,
-      expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+      ccId,
+      userId,
+      batchNo,
+      expiryDate,
       isFoc: data.isFoc,
       isActive: true,
     },
@@ -156,10 +167,10 @@ export const getItemStockQtyByBatchWise = async ({
   const sumResult = await db.invItemStock.aggregate({
     where: {
       itemId,
-      ccId,
-      userId,
-      batchNo,
-      expiryDate: expiryDate ? expiryDate : null,
+      ccId: ccId ?? null,
+      userId: userId ?? null,
+      batchNo: batchNo ?? null,
+      expiryDate: expiryDate ? new Date(expiryDate) : null,
       isFoc,
       isActive: true,
     },

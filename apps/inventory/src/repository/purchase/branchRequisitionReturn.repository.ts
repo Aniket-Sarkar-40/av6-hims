@@ -243,6 +243,32 @@ export const getPendingBRRFromBRId = async (
   return brrs;
 };
 
+export const getApprovedPendingBRRFromBRId = async (
+  branchRequisitionId: number
+) => {
+  logger.info(
+    `entering::getApprovedPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`
+  );
+
+  const brrs = await db.branchRequisitionReturn.findMany({
+    where: {
+      branchRequisitionId,
+      returnStatus: {
+        in: ["Approved", "Partially_Approved"],
+      },
+      ackStatus: {
+        not: "ACK_RECEIVED",
+      },
+      isActive: true,
+    },
+  });
+
+  logger.info(
+    `exiting::getApprovedPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`
+  );
+  return brrs;
+};
+
 export const deleteBranchRequisitionReturnFromDb = async (id: number) => {
   logger.info(
     `entering::deleteBranchRequisitionReturnFromDb::repository id=${id}`
@@ -413,8 +439,8 @@ export const approveBranchRequisitionReturn = async (
                 ? new Date(item.expiryDate)
                 : null,
             isFoc: item.isFoc,
-            fromId: inp.branchReqReturn.branchId,
-            toId: inp.branchReqReturn.ccId,
+            fromCcId: inp.branchReqReturn.branchId,
+            toCcId: inp.branchReqReturn.ccId,
           },
           {
             operation: InvOperation.BRANCH_REQUISITION_RETURN,
@@ -501,8 +527,8 @@ export const acknowledgeBranchRequisitionReturn = async (
                 ? new Date(item.expiryDate)
                 : null,
             isFoc: item.isFoc,
-            fromId: inp.branchReqReturn.branchId,
-            toId: inp.branchReqReturn.ccId,
+            fromCcId: inp.branchReqReturn.branchId,
+            toCcId: inp.branchReqReturn.ccId,
           },
           {
             operation: InvOperation.BRANCH_REQUISITION_RETURN,

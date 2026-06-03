@@ -12,18 +12,19 @@ type Tx = Prisma.TransactionClient;
 export const addInTransitStock = async (
   tx: Tx,
   data: CreateInTransitStockInput,
-  detail: inTransitStockAudit,
+  detail: inTransitStockAudit
 ): Promise<void> => {
   logger.info(`entering::addInTransitStock::repository`);
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
   const isStockExists = await tx.invInTransitStock.findFirst({
     where: {
-      fromId: data.fromId,
-      toId: data.toId,
+      fromCcId: data.fromCcId ?? null,
+      toCcId: data.toCcId ?? null,
+      userId: data.userId ?? null,
       itemId: data.itemId,
       batchNo: data.batchNo,
-      expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+      expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
       isFoc: data.isFoc,
       isActive: true,
     },
@@ -33,6 +34,7 @@ export const addInTransitStock = async (
     await tx.invInTransitStock.update({
       where: {
         id: isStockExists.id,
+        isActive: true,
       },
       data: {
         quantity: isStockExists.quantity + (data.quantity ?? 0),
@@ -42,12 +44,13 @@ export const addInTransitStock = async (
   } else {
     const created = await tx.invInTransitStock.create({
       data: {
-        fromId: data.fromId,
-        toId: data.toId,
+        fromCcId: data.fromCcId ?? null,
+        toCcId: data.toCcId ?? null,
+        userId: data.userId ?? null,
         itemId: data.itemId,
         quantity: data.quantity,
-        batchNo: data.batchNo,
-        expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+        batchNo: data.batchNo ?? null,
+        expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
         isFoc: data.isFoc,
         createdBy: currentUser,
       },
@@ -78,18 +81,19 @@ export const addInTransitStock = async (
 export const subInTransitStock = async (
   tx: Tx,
   data: CreateInTransitStockInput,
-  detail: inTransitStockAudit,
+  detail: inTransitStockAudit
 ): Promise<void> => {
   logger.info(`entering::subInTransitStock::repository`);
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
   const isStockExists = await tx.invInTransitStock.findFirst({
     where: {
-      fromId: data.fromId,
-      toId: data.toId,
+      fromCcId: data.fromCcId ?? null,
+      toCcId: data.toCcId ?? null,
+      userId: data.userId ?? null,
       itemId: data.itemId,
-      batchNo: data.batchNo,
-      expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+      batchNo: data.batchNo ?? null,
+      expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
       isFoc: data.isFoc,
       isActive: true,
     },
@@ -102,6 +106,7 @@ export const subInTransitStock = async (
   await tx.invInTransitStock.update({
     where: {
       id: isStockExists.id,
+      isActive: true,
     },
     data: {
       quantity: isStockExists.quantity - (data.quantity ?? 0),

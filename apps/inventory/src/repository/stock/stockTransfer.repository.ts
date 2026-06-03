@@ -222,8 +222,8 @@ export const approveStockTransfer = async (input: StockTransferUpdate) => {
         await addInTransitStock(
           tx,
           {
-            fromId: approvedStockTransfer.fromId,
-            toId: approvedStockTransfer.toId,
+            fromCcId: approvedStockTransfer.fromId,
+            toCcId: approvedStockTransfer.toId,
             itemId: detail.itemId,
             quantity: detail.quantity,
             batchNo: detail.batchNo,
@@ -305,8 +305,8 @@ export const acknowledgeStockTransfer = async (
         await subInTransitStock(
           tx,
           {
-            fromId: acknowledgedStock.fromId,
-            toId: acknowledgedStock.toId,
+            fromCcId: acknowledgedStock.fromId,
+            toCcId: acknowledgedStock.toId,
             itemId: detail.itemId,
             quantity: detail.acknowledgedQuantity,
             batchNo: detail.batchNo,
@@ -482,8 +482,8 @@ export const approveReturnStockTransfer = async (
         await subInTransitStock(
           tx,
           {
-            fromId: approvedReturnStockTransfer.fromId,
-            toId: approvedReturnStockTransfer.toId,
+            fromCcId: approvedReturnStockTransfer.fromId,
+            toCcId: approvedReturnStockTransfer.toId,
             itemId: detail.itemId,
             quantity: detail.returnQuantity,
             batchNo: detail.batchNo,

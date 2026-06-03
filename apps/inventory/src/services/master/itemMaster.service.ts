@@ -1,16 +1,19 @@
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import {
+  mapRowToItemMasterImportExcelInput,
   toItemMasterDTO,
   toItemMasterDTOForItemSupplierMap,
   toItemSearchDTO,
   toItemStockDTO,
 } from "@/mapper/master/itemMaster.mapper.js";
 import {
+  CreateItemMasterExcelInDb,
   createItemMasterInDb,
   getAllItemMasterFromDb,
   getCountItemsFromDb,
   getItemMasterByIdFromDb,
   getItemStocksByItemId,
+  ItemMasterBatchJob,
   toggleItemActiveInDb,
   updateItemMasterInDb,
 } from "@/repository/master/itemMaster.repository.js";
@@ -20,8 +23,10 @@ import {
   getItems,
   GetItemStockRequest,
   ItemForSearch,
+  ItemMasterBatchJobInput,
   ItemMasterDto,
   ItemMasterDtoStock,
+  ItemMasterExcelRow,
   ItemMasterReq,
   ItemMasterUpdateReq,
   ItemSearchDTO,
@@ -45,6 +50,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import ExcelJs from "exceljs";
+import XLSX from "xlsx";
 
 export const cacheKey = getRedisKey("ITEM", "all");
 export const cacheKeyForItemSearch = getRedisKey("ITEM", "search");
@@ -291,39 +297,41 @@ export const itemMasterService = {
 
     ws.properties.defaultRowHeight = 18;
 
-    // 2. Define the columns with headers, keys, and widths.
-    // The 'key' is crucial for mapping data from objects.
     ws.columns = [
       { header: "Item Name", key: "item", width: 30 },
-      { header: "Item Code", key: "itemCode", width: 30 },
-      { header: "Item Description", key: "itemDescription", width: 40 },
-      { header: "Item Category ID", key: "itemCategoryId", width: 15 },
+      { header: "Item Code", key: "itemCode", width: 25 },
+      { header: "Item Category ID", key: "itemCategoryId", width: 18 },
       { header: "Storage ID", key: "storageId", width: 15 },
       { header: "Unit ID", key: "unitId", width: 15 },
       { header: "Base Price", key: "basePrice", width: 15 },
-      { header: "Re-order Level", key: "reOrderLevel", width: 15 },
-      { header: "Tax Details ID", key: "taxDetailsId", width: 15 },
-      { header: "Is Batch Number", key: "isBatchNumber", width: 15 },
-      { header: "Is Expire Date", key: "isExpireDate", width: 15 },
-      { header: "Is Returnable", key: "isReturnable", width: 15 },
-      { header: "Is Lock", key: "isLock", width: 10 },
-      { header: "Is Active", key: "isActive", width: 10 },
-      { header: "Front Image", key: "frontImage", width: 30 },
-      { header: "Back Image", key: "backImage", width: 30 },
-      { header: "Left Side Image", key: "leftSideImage", width: 30 },
-      { header: "Right Side Image", key: "rightSideImage", width: 30 },
+      { header: "Re-order Level", key: "reOrderLevel", width: 18 },
+      { header: "Item Description", key: "itemDescription", width: 40 },
+      { header: "Is Batch Number", key: "isBatchNumber", width: 18 },
+      { header: "Is Expire Date", key: "isExpireDate", width: 18 },
+      { header: "Is Returnable", key: "isReturnable", width: 18 },
     ];
 
-    // 3. Style the header row
     const headerRow = ws.getRow(1);
+
     headerRow.eachCell((cell) => {
-      cell.font = { name: "Calibri", bold: true, color: { argb: "FFFFFFFF" } };
+      cell.font = {
+        name: "Calibri",
+        bold: true,
+        color: { argb: "FFFFFFFF" },
+      };
+
       cell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FF4F81BD" }, // A nice shade of blue
+        fgColor: { argb: "FF4F81BD" },
       };
-      cell.alignment = { vertical: "middle", horizontal: "center" };
+
+      cell.alignment = {
+        vertical: "middle",
+        horizontal: "center",
+        wrapText: true,
+      };
+
       cell.border = {
         top: { style: "thin" },
         left: { style: "thin" },
@@ -331,7 +339,88 @@ export const itemMasterService = {
         right: { style: "thin" },
       };
     });
-    headerRow.height = 20;
+
+    headerRow.height = 22;
+
+    ws.addRow({
+      item: "Paracetamol 500mg",
+      itemCode: "ITEM-0001",
+      itemCategoryId: 1,
+      storageId: 1,
+      unitId: 1,
+      basePrice: 15,
+      reOrderLevel: 10,
+      itemDescription: "Pain relief and fever medicine",
+      isBatchNumber: true,
+      isExpireDate: true,
+      isReturnable: true,
+    });
+
+    ws.getColumn("itemCode").numFmt = "@";
+
+    ws.columns.forEach((col) => {
+      let max = 10;
+
+      col.eachCell?.({ includeEmpty: true }, (cell) => {
+        const len = cell.value ? String(cell.value).length : 0;
+        if (len > max) max = len;
+      });
+
+      col.width = Math.min(max + 2, 45);
+    });
+
+    ws.views = [{ state: "frozen", ySplit: 1 }];
+
+    return wb;
+  },
+
+  async itemExcelExport(): Promise<ExcelJs.Workbook> {
+    logger.info("entering::itemExcelExport::service");
+    const items = await this.getAllItemMaster(true);
+    if (items.length === 0) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Item Master")
+      );
+    }
+
+    const wb = new ExcelJs.Workbook();
+    const ws = wb.addWorksheet("Item", {
+      properties: { defaultRowHeight: 18 },
+    });
+
+    const attribute = [
+      "Item Name",
+      "Item Code",
+      "Item Description",
+      "Item Category",
+      "Storage Name",
+      "Unit Name",
+      "Base Price",
+      "Re-order Level",
+      "Is Batch Number",
+      "Is Expire Date",
+      "Is Returnable",
+    ];
+
+    const attributeRow = ws.addRow(attribute);
+    attributeRow.font = { bold: true };
+
+    items.forEach((i) => {
+      ws.addRow([
+        i.item,
+        i.itemCode ?? "",
+        i.itemDescription ?? "",
+        i.itemCategory?.value,
+        i.storage?.value ?? "",
+        i.unitMaster?.value,
+        i.basePrice != null ? Number(i.basePrice) : "",
+        i.reOrderLevel ?? "",
+        i.isBatchNumber,
+        i.isExpireDate,
+        i.isReturnable,
+      ]);
+    });
 
     ws.columns.forEach((col) => {
       let max = 10;
@@ -342,6 +431,31 @@ export const itemMasterService = {
       col.width = max + 2;
     });
 
+    logger.info("exiting::itemExcelExport::service");
     return wb;
+  },
+
+  async itemMasterImportExcel(filePath: string) {
+    logger.info("entering::itemMasterImportExcel::service");
+    if (!filePath) {
+      throw new Error("No file path provided for Excel import");
+    }
+
+    const workbook = XLSX.readFile(filePath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(sheet) as ItemMasterExcelRow[];
+    const convertedData = data.map((elem, ind) =>
+      mapRowToItemMasterImportExcelInput(elem, ind + 1)
+    );
+    const batch = await CreateItemMasterExcelInDb(convertedData);
+    const batchJobInput: ItemMasterBatchJobInput = {
+      batchJobId: batch.id,
+    };
+
+    ItemMasterBatchJob(batchJobInput)
+      .then(() => logger.info("Batch Procesing Completed."))
+      .catch((e) => logger.error(JSON.stringify(e)));
+
+    logger.info("exiting::itemMasterImportExcel::service");
   },
 };

@@ -421,8 +421,8 @@ export const approveBranchRequisition = async (
           isFoc: detail.isFoc,
           itemId: detail.itemId,
           quantity: detail.assignedQty,
-          fromId: branchReq.ccId,
-          toId: branchReq.branchId,
+          fromCcId: branchReq.ccId,
+          toCcId: branchReq.branchId,
         },
         {
           operation: InvOperation.BRANCH_REQUISITION,
@@ -503,8 +503,8 @@ export const acknowledgeBranchRequisition = async (
             batchNo: item.batchNo ?? "",
             expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
             isFoc: item.isFoc,
-            fromId: branchReq.ccId,
-            toId: branchReq.branchId,
+            fromCcId: branchReq.ccId,
+            toCcId: branchReq.branchId,
           },
           {
             operation: InvOperation.BRANCH_REQUISITION,

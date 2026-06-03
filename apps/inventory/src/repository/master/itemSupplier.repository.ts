@@ -11,7 +11,7 @@ import { API_TIMEOUT } from "@repo/shared/config/index.js";
 import { customOmit } from "av6-utils";
 
 export async function createItemSupplierInDb(
-  data: ItemSupplierCreateInput,
+  data: ItemSupplierCreateInput
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::createItemSupplierInDb::repository");
   const store = requestStorage.getStore();
@@ -26,6 +26,7 @@ export async function createItemSupplierInDb(
                 create: data.taxIdentificationDetails.map((tid) => ({
                   taxIdentificationName: tid.taxIdentificationName,
                   taxIdentificationValue: tid.taxIdentificationValue,
+                  taxIdentificationNumber: tid.taxIdentificationNumber,
                   createdBy: store?.user?.id,
                 })),
               }
@@ -54,12 +55,12 @@ export async function createItemSupplierInDb(
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 }
 
 export async function updateItemSupplierInDb(
-  data: ItemSupplierUpdateInput,
+  data: ItemSupplierUpdateInput
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::updateItemSupplierInDb::repository");
   const store = requestStorage.getStore();
@@ -75,8 +76,8 @@ export async function updateItemSupplierInDb(
       ?.filter(
         (existingDetail) =>
           !taxIdentificationDetails?.some(
-            (updatedDetail) => updatedDetail.id === existingDetail.id,
-          ),
+            (updatedDetail) => updatedDetail.id === existingDetail.id
+          )
       )
       .map((detail) => detail.id) || [];
 
@@ -85,8 +86,8 @@ export async function updateItemSupplierInDb(
       ?.filter(
         (existingDetail) =>
           !bankDetails?.some(
-            (updatedDetail) => updatedDetail.id === existingDetail.id,
-          ),
+            (updatedDetail) => updatedDetail.id === existingDetail.id
+          )
       )
       .map((detail) => detail.id) || [];
 
@@ -106,6 +107,7 @@ export async function updateItemSupplierInDb(
                   .map((d) => ({
                     taxIdentificationName: d.taxIdentificationName,
                     taxIdentificationValue: d.taxIdentificationValue,
+                    taxIdentificationNumber: d.taxIdentificationNumber,
                     createdBy: store?.user?.id,
                   })),
                 update: taxIdentificationDetails
@@ -115,6 +117,7 @@ export async function updateItemSupplierInDb(
                     data: {
                       taxIdentificationName: d.taxIdentificationName,
                       taxIdentificationValue: d.taxIdentificationValue,
+                      taxIdentificationNumber: d.taxIdentificationNumber,
                       updatedBy: store?.user?.id,
                     },
                   })),
@@ -176,7 +179,7 @@ export async function updateItemSupplierInDb(
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 }
 
@@ -208,7 +211,7 @@ export async function getAllItemSupplierFromDb(): Promise<
 }
 
 export async function getItemSupplierByIdFromDb(
-  itemSupplierId: number,
+  itemSupplierId: number
 ): Promise<ItemSupplierResponse | null> {
   logger.info("entering::getItemSupplierByIdFromDb::repository");
 
@@ -235,7 +238,7 @@ export async function getItemSupplierByIdFromDb(
 }
 
 export async function deleteItemSupplierByIdFromDb(
-  itemSupplierId: number,
+  itemSupplierId: number
 ): Promise<void> {
   logger.info("entering::deleteItemSupplierByIdFromDb::repository");
   const store = requestStorage.getStore();
@@ -296,7 +299,7 @@ export async function deleteItemSupplierByIdFromDb(
 }
 
 export async function getItemSupplierBySupplierCodeFromDb(
-  supplierCode: string,
+  supplierCode: string
 ): Promise<InvItemSupplier | null> {
   logger.info("entering::getItemSupplierBySupplierCodeFromDb::repository");
 
@@ -323,7 +326,7 @@ export async function getItemSupplierBySupplierCodeFromDb(
 }
 
 export async function getItemSupplierByNameFromDb(
-  name: string,
+  name: string
 ): Promise<InvItemSupplier | null> {
   logger.info("entering::getItemSupplierByNameFromDb::repository");
 

@@ -695,3 +695,41 @@ export const deleteGrnFromDb = async (id: number) => {
 //   });
 //   return results;
 // };
+
+export const getExistingBatchItemConflictsFromDb = async (
+  batches: { itemId: number; batchNo: string }[],
+  excludeGrnDetailIds: number[] = []
+) => {
+  logger.info("entering::getExistingBatchItemConflictsFromDb::repository");
+
+  const batchNos = Array.from(
+    new Set(batches.map((b) => b.batchNo.trim()).filter(Boolean))
+  );
+
+  if (!batchNos.length) return [];
+
+  const conflicts = await db.invGoodReceiveDetails.findMany({
+    where: {
+      isActive: true,
+      batchNo: {
+        in: batchNos,
+      },
+      ...(excludeGrnDetailIds.length
+        ? {
+            id: {
+              notIn: excludeGrnDetailIds,
+            },
+          }
+        : {}),
+    },
+    select: {
+      id: true,
+      itemId: true,
+      batchNo: true,
+    },
+  });
+
+  logger.info("exiting::getExistingBatchItemConflictsFromDb::repository");
+
+  return conflicts;
+};

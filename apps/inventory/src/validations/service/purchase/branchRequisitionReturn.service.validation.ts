@@ -506,7 +506,7 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
   if (currBRR.ccId !== body.ccId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Branch")
+      generateErrorMessage("ACCESS_FAIL", "Correct Warehouse")
     );
   }
 

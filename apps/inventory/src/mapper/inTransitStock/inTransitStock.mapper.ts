@@ -9,7 +9,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 
 export const toInTransitStockDTO = async (
-  data: InvInTransitStock[],
+  data: InvInTransitStock[]
 ): Promise<inTransitStockDTO[]> => {
   const warehouses = await warehouseService.getAllWarehouse(true);
   const branches = await branchService.getAllBranch(true);
@@ -19,7 +19,7 @@ export const toInTransitStockDTO = async (
     data.map(async (inStock) => {
       const omittedInStock = customOmit<
         InvInTransitStock,
-        BaseModelAttrWoCancel | "fromId" | "toId" | "itemId"
+        BaseModelAttrWoCancel | "fromCcId" | "toCcId" | "itemId"
       >(inStock, [
         "createdBy",
         "updatedBy",
@@ -27,27 +27,38 @@ export const toInTransitStockDTO = async (
         "createdAt",
         "updatedAt",
         "deletedAt",
-        "fromId",
-        "toId",
+        "fromCcId",
+        "toCcId",
         "itemId",
       ]);
 
-      const fromUser = await employeeService.getEmployeeByIdFrmCacheOrDb(
-        inStock.fromId,
-        true,
-      );
-      const toWarehouse = warehouses.find((wh) => wh.id === inStock.toId);
-      const toBranch = branches.find((br) => br.id === inStock.toId);
+      const user = inStock.userId
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(inStock.userId)
+        : null;
+      const fromBranch = inStock.fromCcId
+        ? branches.find((br) => br.id === inStock.fromCcId)
+        : null;
+      const toBranch = inStock.toCcId
+        ? branches.find((br) => br.id === inStock.toCcId)
+        : null;
+      const fromWarehouse = inStock.fromCcId
+        ? warehouses.find((wh) => wh.id === inStock.fromCcId)
+        : null;
+      const toWarehouse = inStock.toCcId
+        ? warehouses.find((wh) => wh.id === inStock.toCcId)
+        : null;
       const item = items.find((it) => it.id === inStock.itemId);
 
-      const toDTO = toWarehouse ? toWarehouse : toBranch;
+      const fromCcDTO = fromWarehouse ? fromWarehouse : fromBranch;
+      const toCcDTO = toWarehouse ? toWarehouse : toBranch;
 
       return {
         ...omittedInStock.rest,
-        from: toIdValue(fromUser, "name"),
-        to: toDTO ? toIdValue(toDTO, "name") : null,
-        item: item ? toIdValue(item, "item") : null,
+        user: toIdValue(user, "name"),
+        fromCc: toIdValue(fromCcDTO, "name"),
+        toCc: toIdValue(toCcDTO, "name"),
+        item: toIdValue(item, "item"),
       };
-    }),
+    })
   );
 };

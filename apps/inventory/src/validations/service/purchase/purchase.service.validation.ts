@@ -18,6 +18,7 @@ import { validateIdItemSupplier } from "../master/itemSupplier.service.validatio
 import { itemStoreService } from "@/services/master/itemStore.service.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { getItemSupplierMapFromDb } from "@/repository/itemSupplierMap/itemSupplierMap.repository.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
 
 export const validateIdPO = async (id: number) => {
   logger.info("entering::validateIdPO service::validation");
@@ -43,6 +44,16 @@ export const validatePurchaseOrderCommon = async (
   const calculationMethod: CalculationMethod =
     settings?.grnCalculationMethod || "STEP_WISE";
   const precision = settings?.defaultPrecision || 2;
+
+  if (body.currencyId) {
+    const currency = await currencyService.getCurrencyById(body.currencyId);
+    if (!currency) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Currency")
+      );
+    }
+  }
 
   const warehouseMode = settings?.warehouseMode === true;
   const supplierMode = settings?.supplierMode;

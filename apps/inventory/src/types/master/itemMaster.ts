@@ -115,3 +115,21 @@ export interface getItems {
   supplierId: number;
   ccId?: number;
 }
+
+export interface ItemMasterBatchJobInput {
+  batchJobId: number;
+}
+
+export type ItemMasterExcelRow = {
+  "Item Name": string;
+  "Item Code"?: string;
+  "Item Category ID": number;
+  "Storage ID"?: number;
+  "Unit ID": number;
+  "Base Price"?: number;
+  "Re-order Level"?: number;
+  "Item Description"?: string;
+  "Is Batch Number"?: boolean | string | number;
+  "Is Expire Date"?: boolean | string | number;
+  "Is Returnable"?: boolean | string | number;
+};

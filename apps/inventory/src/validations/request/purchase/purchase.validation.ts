@@ -8,6 +8,7 @@ import {
   enumOptional,
   idOptional,
   idRequired,
+  numberWithMaxDecimalsOptional,
   numberWithMaxDecimalsRequired,
   priceRequired,
   strOptional,
@@ -47,7 +48,13 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
 
   notes: strOptional("Notes"),
 
-  currency: strOptional("Currency"),
+  currencyId: idOptional("Currency Id"),
+
+  conversionRate: Joi.when("currencyId", {
+    is: Joi.exist().not(null),
+    then: numberWithMaxDecimalsRequired("Conversion Rate"),
+    otherwise: numberWithMaxDecimalsOptional("Conversion Rate"),
+  }),
 
   paymentTerms: strOptional("Payment terms"),
 

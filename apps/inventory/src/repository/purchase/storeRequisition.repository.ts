@@ -442,8 +442,8 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
           isFoc: detail.isFoc,
           itemId: detail.itemId,
           quantity: detail.assignedQty,
-          fromId: appStr.omitted.storeReq.requisitionFrom,
-          toId: appStr.omitted.storeReq.ccId,
+          fromCcId: appStr.omitted.storeReq.ccId,
+          userId: appStr.omitted.storeReq.requisitionFrom,
         },
         {
           operation: "STORE_REQUISITION",
@@ -517,8 +517,8 @@ export const acknowledgeStoreRequisition = async (
               batchNo: item.batchNo ?? "",
               expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
               isFoc: item.isFoc,
-              fromId: ackStore.omitted.requisitionFrom,
-              toId: ackStore.rest.ccId,
+              fromCcId: ackStore.rest.ccId,
+              userId: ackStore.omitted.requisitionFrom,
             },
             {
               operation: "STORE_REQUISITION",

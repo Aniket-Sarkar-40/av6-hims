@@ -5,6 +5,8 @@ import {
   getBulkItemSupplierPrices,
   getItemMasterById,
   getItemStocksByItemId,
+  importItemMasterExcel,
+  itemExcelExport,
   itemExcelSampleExport,
   itemSearch,
   updateItemMaster,
@@ -13,7 +15,10 @@ import {
   authorize,
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
-import { createUploadFieldsMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import {
+  createUploadFieldsMiddleware,
+  createUploadMiddleware,
+} from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateBulkItemSupplierPrices } from "@/validations/request/itemSupplierMap/itemSupplierMap.validation.js";
 import {
@@ -25,6 +30,7 @@ import {
 } from "@/validations/request/master/itemMaster.validation.js";
 import { Router } from "express";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 
 export const itemMasterRouter: Router = Router();
 
@@ -249,4 +255,28 @@ itemMasterRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
   itemExcelSampleExport
+);
+
+/**
+ * @swagger
+ * /api/v1/item/excel-export:
+ *   post:
+ *     summary: Export excel data
+ *     tags: [Common]
+ */
+// POST /export
+itemMasterRouter.post(
+  "/item-excel-export",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM", "CREATE")),
+  itemExcelExport
+);
+
+itemMasterRouter.post(
+  "/import",
+  verifyToken,
+  createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
+  authorize(getPermission("INV", "ITEM", "CREATE")),
+  importItemMasterExcel
 );
