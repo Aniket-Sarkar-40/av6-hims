@@ -42,6 +42,11 @@ import { InvItemSupplier } from "@repo/db/generated/prisma/client";
 import ExcelJs from "exceljs";
 import XLSX from "xlsx";
 import { validateItemSupplierExcelArray } from "@/validations/request/master/itemSupplierExcel.validation.js";
+import { normalizeVendorExcelRowHeaders } from "@repo/shared/utils/excelImport.utils.js";
+import {
+  addVendorHeaderStarAndNotes,
+  addVendorImportInstructionSheet,
+} from "@/utils/vendorExcelSample.utils.js";
 
 const cacheKey = getRedisKey("ITEM_SUPPLIER", "all");
 
@@ -284,7 +289,9 @@ export const itemSupplierService = {
       };
     });
 
-    headerRow.height = 22;
+    addVendorHeaderStarAndNotes(ws);
+
+    headerRow.height = 24;
 
     ws.addRow({
       supplierCode: supplier?.supplierCode ?? "VEN-0001",
@@ -350,6 +357,8 @@ export const itemSupplierService = {
 
     ws.views = [{ state: "frozen", ySplit: 1 }];
 
+    addVendorImportInstructionSheet(wb);
+
     logger.info("exiting::itemSupplierExcelSampleExport::service");
 
     return wb;
@@ -363,7 +372,14 @@ export const itemSupplierService = {
 
     const workbook = XLSX.readFile(input.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = XLSX.utils.sheet_to_json(sheet) as ItemSupplierExcelRow[];
+
+    const rawData = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+      defval: "",
+    });
+
+    const data = rawData.map(
+      normalizeVendorExcelRowHeaders
+    ) as ItemSupplierExcelRow[];
 
     const convertedData = data.map((elem, ind) =>
       mapRowToItemSupplierExcelCreateInput(elem, ind + 1)

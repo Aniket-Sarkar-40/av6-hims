@@ -69,3 +69,26 @@ export const excelDateToJSDate = (value: unknown): Date | null => {
 
   return null;
 };
+
+export const normalizeVendorExcelHeader = (header: string) => {
+  return header
+    .replace(/\s*[＊*]\s*$/u, "")
+    .replace(
+      /\s*\((required|optional|conditional|required if section is used|required if section used)\)\s*$/i,
+      ""
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+export const normalizeVendorExcelRowHeaders = (
+  row: Record<string, unknown>
+) => {
+  return Object.entries(row).reduce<Record<string, unknown>>(
+    (acc, [key, value]) => {
+      acc[normalizeVendorExcelHeader(key)] = value;
+      return acc;
+    },
+    {}
+  );
+};
