@@ -25,3 +25,48 @@ export interface ItemSupplierDTO
   extends Omit<ItemSupplierResponse, BaseModelAttrWoCancel | "taxDetailsId"> {
   taxDetails: IdValue | null;
 }
+
+export interface ItemSupplierExcelImportReq {
+  path: string;
+}
+
+export interface ItemSupplierBatchJobInput {
+  batchJobId: number;
+}
+
+export interface ItemSupplierExcelRow {
+  "Vendor Code"?: unknown;
+  "Vendor Name"?: unknown;
+  Phone?: unknown;
+  Email?: unknown;
+  Address?: unknown;
+  "Bill To"?: unknown;
+  "Ship To"?: unknown;
+  "Vendor Type"?: unknown;
+
+  "Sales Person"?: unknown;
+  "Sales Person Phone"?: unknown;
+  "Sales Person Email"?: unknown;
+
+  "Proprietary Person Name"?: unknown;
+  "Proprietary Person Phone"?: unknown;
+  "Proprietary Person Email"?: unknown;
+
+  "Terms And Conditions"?: unknown;
+  "Stock Shipment Details"?: unknown;
+
+  "Contact Person Name"?: unknown;
+  "Contact Person Phone"?: unknown;
+  "Contact Person Email"?: unknown;
+
+  "Bank Account No"?: unknown;
+  "Bank Account Holder Name"?: unknown;
+  "Type Of Account"?: unknown;
+  "IFSC Code"?: unknown;
+  "Bank Name"?: unknown;
+  "Bank Address"?: unknown;
+
+  "Tax Identification Name"?: unknown;
+  "Tax Identification Value"?: unknown;
+  "Tax Identification Number"?: unknown;
+}

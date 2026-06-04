@@ -3,6 +3,7 @@ import {
   deleteItemSupplierById,
   getAllItemSupplier,
   getItemSupplierById,
+  itemSupplierExcelImport,
   itemSupplierExcelSampleExport,
   updateItemSupplier,
 } from "@/controllers/master/itemSupplier.controller.js";
@@ -18,6 +19,8 @@ import {
 
 import { Router } from "express";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 
 export const itemSupplierRouter: Router = Router();
 
@@ -152,4 +155,13 @@ itemSupplierRouter.get(
   verifyToken,
   authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
   itemSupplierExcelSampleExport
+);
+
+itemSupplierRouter.post(
+  "/import",
+  verifyToken,
+  createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "CREATE")),
+  itemSupplierExcelImport
 );

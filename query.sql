@@ -1614,3 +1614,43 @@ ALTER TABLE `inv_item_master_excel` DROP COLUMN `back_image`,
 
 ALTER TABLE `inv_item_supplier` DROP COLUMN `branch_details_id`,
     MODIFY `supplier_code` VARCHAR(191) NULL;
+
+
+    ALTER TABLE `inv_batch_job` MODIFY `type` ENUM('ITEM', 'ITEM_PRICING', 'ITEM_SUPPLIER') NOT NULL;
+
+CREATE TABLE `inv_item_supplier_excel` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `row_no` INTEGER NOT NULL,
+    `supplier_code` VARCHAR(191) NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `phone` VARCHAR(191) NULL,
+    `email` VARCHAR(191) NULL,
+    `address` TEXT NOT NULL,
+    `bill_to` VARCHAR(191) NULL,
+    `ship_to` VARCHAR(191) NULL,
+    `vendor_type` ENUM('LOCAL', 'EXPORTED') NULL,
+    `sales_person` VARCHAR(191) NULL,
+    `sales_person_phone` VARCHAR(191) NULL,
+    `sales_person_email` VARCHAR(191) NULL,
+    `proprietary_person_name` VARCHAR(191) NULL,
+    `proprietary_person_phone` VARCHAR(191) NULL,
+    `proprietary_person_email` VARCHAR(191) NULL,
+    `terms_and_conditions` VARCHAR(191) NULL,
+    `stock_shipment_details` VARCHAR(191) NULL,
+    `contact_person_name` VARCHAR(191) NULL,
+    `contact_person_phone` VARCHAR(191) NULL,
+    `contact_person_email` VARCHAR(191) NULL,
+    `account_no` INTEGER NULL,
+    `account_holder_name` VARCHAR(191) NULL,
+    `type_of_account` VARCHAR(191) NULL,
+    `ifsc_code` VARCHAR(191) NULL,
+    `bank_name` VARCHAR(191) NULL,
+    `bank_address` VARCHAR(191) NULL,
+    `tax_identification_name` VARCHAR(191) NULL,
+    `tax_identification_value` INTEGER NULL,
+    `tax_identification_number` VARCHAR(191) NULL,
+    `batch_job_id` INTEGER NOT NULL,
+
+    INDEX `item_supplier_excel_batch_job_id_idx`(`batch_job_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

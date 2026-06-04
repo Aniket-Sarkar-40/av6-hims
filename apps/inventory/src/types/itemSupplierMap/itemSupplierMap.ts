@@ -2,11 +2,7 @@ import {
   InvItemSupplierMapping,
   Prisma,
 } from "@repo/db/generated/prisma/client";
-import {
-  BaseModelAttr,
-  BaseModelAttrWoCancel,
-  IdValue,
-} from "@repo/shared/types/global.js";
+import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
 
 export type ItemSupplierMapCreateInput = Omit<
   Prisma.InvItemSupplierMappingUncheckedCreateInput,
@@ -15,7 +11,7 @@ export type ItemSupplierMapCreateInput = Omit<
 
 export interface ItemSupplierMapUpdateInput extends ItemSupplierMapCreateInput {
   id: number;
-  existing: ItemSuppierMapDTO;
+  existing: ItemSupplierMapDTO;
 }
 
 export interface ItemSupplierMapImportExcelReq {
@@ -26,7 +22,8 @@ export interface ItemSupplierMapImportExcelInput {
   ccId: number;
   supplierId: number;
 }
-export interface ItemSupplierMaplBatchJobInput extends ItemSupplierMapImportExcelInput {
+export interface ItemSupplierMapBatchJobInput
+  extends ItemSupplierMapImportExcelInput {
   batchJobId: number;
 }
 export type ItemSupplierMapExcelRow = {
@@ -38,10 +35,11 @@ export type ItemSupplierMapExcelRow = {
   "Supplier Price": number;
 };
 
-export interface ItemSuppierMapDTO extends Omit<
-  InvItemSupplierMapping,
-  BaseModelAttrWoCancel | "ccId" | "itemId" | "supplierId"
-> {
+export interface ItemSupplierMapDTO
+  extends Omit<
+    InvItemSupplierMapping,
+    BaseModelAttrWoCancel | "ccId" | "itemId" | "supplierId"
+  > {
   item: IdValue | null;
   supplier: IdValue | null;
   collectionCenter: IdValue | null;

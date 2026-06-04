@@ -1,8 +1,8 @@
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
-  ItemSuppierMapDTO,
+  ItemSupplierMapBatchJobInput,
   ItemSupplierMapCreateInput,
-  ItemSupplierMaplBatchJobInput,
+  ItemSupplierMapDTO,
   ItemSupplierMapUpdateInput,
 } from "@/types/itemSupplierMap/itemSupplierMap.js";
 import { GetItemReq } from "@/types/master/itemMaster.js";
@@ -100,7 +100,7 @@ export async function updateItemSupplierMapInDb(
       actionBy: store?.user?.id,
     });
 
-    const updatedItemSupplier: ItemSuppierMapDTO = {
+    const updatedItemSupplier: ItemSupplierMapDTO = {
       ...omittedResponse.rest,
       item: existing.item,
       supplier: existing.supplier,
@@ -227,7 +227,7 @@ export const CreateItemSupplierMapExcelInDb = async (
 };
 
 export async function ItemSupplierMapBatchJob(
-  input: ItemSupplierMaplBatchJobInput
+  input: ItemSupplierMapBatchJobInput
 ) {
   const { batchJobId, supplierId, ccId } = input;
 

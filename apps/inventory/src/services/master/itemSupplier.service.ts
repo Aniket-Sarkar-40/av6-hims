@@ -1,15 +1,22 @@
-import { toItemSupplierDTO } from "@/mapper/master/itemSupplier.mapper.js";
 import {
+  mapRowToItemSupplierExcelCreateInput,
+  toItemSupplierDTO,
+} from "@/mapper/master/itemSupplier.mapper.js";
+import {
+  createItemSupplierExcelInDb,
   createItemSupplierInDb,
   deleteItemSupplierByIdFromDb,
   getAllItemSupplierFromDb,
   getFirstItemSupplierForExcelFromDb,
   getItemSupplierByIdFromDb,
+  ItemSupplierBatchJob,
   updateItemSupplierInDb,
 } from "@/repository/master/itemSupplier.repository.js";
 import {
   ItemSupplierCreateInput,
   ItemSupplierDTO,
+  ItemSupplierExcelImportReq,
+  ItemSupplierExcelRow,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
@@ -33,6 +40,8 @@ import {
 import { checkIsCacheable } from "@/config/cache.config.js";
 import { InvItemSupplier } from "@repo/db/generated/prisma/client";
 import ExcelJs from "exceljs";
+import XLSX from "xlsx";
+import { validateItemSupplierExcelArray } from "@/validations/request/master/itemSupplierExcel.validation.js";
 
 const cacheKey = getRedisKey("ITEM_SUPPLIER", "all");
 
@@ -344,5 +353,33 @@ export const itemSupplierService = {
     logger.info("exiting::itemSupplierExcelSampleExport::service");
 
     return wb;
+  },
+  async itemSupplierExcelImport(input: ItemSupplierExcelImportReq) {
+    logger.info("entering::itemSupplierExcelImport::service");
+
+    if (!input.path) {
+      throw new ErrorHandler(400, generateErrorMessage("NOT_FOUND", "File"));
+    }
+
+    const workbook = XLSX.readFile(input.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(sheet) as ItemSupplierExcelRow[];
+
+    const convertedData = data.map((elem, ind) =>
+      mapRowToItemSupplierExcelCreateInput(elem, ind + 1)
+    );
+
+    const { value } = validateItemSupplierExcelArray(convertedData);
+
+    const batch = await createItemSupplierExcelInDb(value);
+
+    ItemSupplierBatchJob({
+      batchJobId: batch.id,
+    })
+      .then(() => logger.info("Item Supplier Batch Processing Completed."))
+      .catch((e) => logger.error(JSON.stringify(e)));
+
+    logger.info("exiting::itemSupplierExcelImport::service");
+    return batch;
   },
 };

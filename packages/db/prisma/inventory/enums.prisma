@@ -12,6 +12,7 @@ enum Action {
 enum Inv_Batch_Type {
     ITEM
     ITEM_PRICING
+    ITEM_SUPPLIER
 }
 
 enum Batch_Status {

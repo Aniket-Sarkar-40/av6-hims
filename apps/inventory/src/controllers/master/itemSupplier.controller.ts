@@ -5,6 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
 import { Workbook } from "exceljs";
+import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
 
 export const createItemSupplier = TryCatch(
   async (req: Request, res: Response) => {
@@ -107,5 +108,35 @@ export const itemSupplierExcelSampleExport = TryCatch(
     res.end();
 
     logger.info("exiting::itemSupplierExcelSampleExport::controller");
+  }
+);
+
+export const itemSupplierExcelImport = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::itemSupplierExcelImport::controller");
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded.",
+      });
+    }
+
+    const batch = await itemSupplierService.itemSupplierExcelImport({
+      path: req.file.path,
+    });
+
+    deleteFileIfExists(req.file.path);
+
+    const response = new BaseResponse(
+      {
+        success: true,
+        message: "Vendor Import started.",
+      },
+      batch
+    );
+
+    logger.info("exiting::itemSupplierExcelImport::controller");
+    return res.status(200).json(response);
   }
 );

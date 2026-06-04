@@ -2,7 +2,7 @@ import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import {
-  ItemSuppierMapDTO,
+  ItemSupplierMapDTO,
   ItemSupplierMapExcelRow,
   ItemSupplierMapImportExcelInput,
   ItemSupplierMapImportExcelReq,
@@ -17,7 +17,7 @@ import {
 
 export function mapRowToItemSupplierMapImportExcelInput(
   row: ItemSupplierMapExcelRow,
-  rowNo: number,
+  rowNo: number
 ): Prisma.InvItemSupplierMapExcelCreateInput {
   const mappedData: Prisma.InvItemSupplierMapExcelCreateInput = {
     rowNo,
@@ -32,7 +32,7 @@ export function mapRowToItemSupplierMapImportExcelInput(
 }
 
 export function toItemSupplierMapImportExcelEntity(
-  req: ItemSupplierMapImportExcelReq,
+  req: ItemSupplierMapImportExcelReq
 ): ItemSupplierMapImportExcelInput {
   return {
     ccId: Number(req.ccId),
@@ -41,8 +41,8 @@ export function toItemSupplierMapImportExcelEntity(
 }
 
 export const toItemSupplierMapDTO = async (
-  data: InvItemSupplierMapping[],
-): Promise<ItemSuppierMapDTO[]> => {
+  data: InvItemSupplierMapping[]
+): Promise<ItemSupplierMapDTO[]> => {
   const items = await itemMasterService.getAllItemMaster(true);
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
   const collectionCenters = await getAllBranchAndWarehouse();
@@ -75,6 +75,6 @@ export const toItemSupplierMapDTO = async (
         supplier: supplier ? toIdValue(supplier, "name") : null,
         collectionCenter: toIdValue(CollectionCenter, "name"),
       };
-    }),
+    })
   );
 };

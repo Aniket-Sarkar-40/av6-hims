@@ -523,8 +523,9 @@ model InvBatchJob {
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
 
-    batchJobDetails     InvBatchJobDetails[]
-    invItemMasterExcels InvItemMasterExcel[]
+    batchJobDetails       InvBatchJobDetails[]
+    invItemMasterExcels   InvItemMasterExcel[]
+    invItemSupplierExcels InvItemSupplierExcel[]
 
     @@map("inv_batch_job")
 }
@@ -1496,4 +1497,51 @@ model InvItemMasterExcel {
 
     @@index([batchJobId], name: "item_master_excel_batch_job_id_idx")
     @@map("inv_item_master_excel")
+}
+
+model InvItemSupplierExcel {
+    id    Int @id @default(autoincrement())
+    rowNo Int @map("row_no")
+
+    supplierCode String?     @map("supplier_code")
+    name         String
+    phone        String?
+    email        String?
+    address      String      @db.Text
+    billTo       String?     @map("bill_to")
+    shipTo       String?     @map("ship_to")
+    vendorType   VendorType? @map("vendor_type")
+
+    salesPerson      String? @map("sales_person")
+    salesPersonPhone String? @map("sales_person_phone")
+    salesPersonEmail String? @map("sales_person_email")
+
+    proprietaryPersonName  String? @map("proprietary_person_name")
+    proprietaryPersonPhone String? @map("proprietary_person_phone")
+    proprietaryPersonEmail String? @map("proprietary_person_email")
+
+    termsAndCondition    String? @map("terms_and_conditions")
+    stockShipmentDetails String? @map("stock_shipment_details")
+
+    contactPersonName  String? @map("contact_person_name")
+    contactPersonPhone String? @map("contact_person_phone")
+    contactPersonEmail String? @map("contact_person_email")
+
+    accountNo         Int?    @map("account_no")
+    accountHolderName String? @map("account_holder_name")
+    typeOfAccount     String? @map("type_of_account")
+    ifscCode          String? @map("ifsc_code")
+    bankName          String? @map("bank_name")
+    bankAddress       String? @map("bank_address")
+
+    taxIdentificationName   String? @map("tax_identification_name")
+    taxIdentificationValue  Int?    @map("tax_identification_value")
+    taxIdentificationNumber String? @map("tax_identification_number")
+
+    batchJobId Int @map("batch_job_id")
+
+    batchJob InvBatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], name: "item_supplier_excel_batch_job_id_idx")
+    @@map("inv_item_supplier_excel")
 }

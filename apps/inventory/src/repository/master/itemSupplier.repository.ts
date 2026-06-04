@@ -1,13 +1,21 @@
 import { uinServiceFactory } from "@/config/core.config.js";
+import { initializeCache } from "@/config/redisClient.js";
+import { mapExcelRowToItemSupplierReq } from "@/mapper/master/itemSupplier.mapper.js";
+import { createBatchJobInDb } from "@/repository/batch/batch.repository.js";
+import { ItemSupplierMapBatchJobInput } from "@/types/itemSupplierMap/itemSupplierMap.js";
 import {
+  ItemSupplierBatchJobInput,
   ItemSupplierCreateInput,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
+import { ItemSupplierExcelStagingRow } from "@/validations/request/master/itemSupplierExcel.validation.js";
+import { createItemSupplierServiceValidation } from "@/validations/service/master/itemSupplier.service.validation.js";
 import { db } from "@repo/db/client";
 import {
   InvItemSupplier,
   InvUinShortCode,
+  Prisma,
 } from "@repo/db/generated/prisma/client";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
@@ -18,47 +26,63 @@ export async function createItemSupplierInDb(
   data: ItemSupplierCreateInput
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::createItemSupplierInDb::repository");
+
   const store = requestStorage.getStore();
-  const supplierCode = await uinServiceFactory.generateUIN(
-    InvUinShortCode.VENDOR
-  );
+
+  const {
+    taxIdentificationDetails,
+    bankDetails,
+    supplierCode: inputSupplierCode,
+    ...supplierData
+  } = data;
+
+  const supplierCode =
+    inputSupplierCode?.trim() ||
+    (await uinServiceFactory.generateUIN(InvUinShortCode.VENDOR));
+
   return await db.$transaction(
     async (tx) => {
       const itemSupplier = await tx.invItemSupplier.create({
         data: {
-          ...data,
-          supplierCode: supplierCode ?? data.supplierCode,
+          ...supplierData,
+          supplierCode,
           createdBy: store?.user?.id,
-          taxIdentificationDetails: data.taxIdentificationDetails
-            ? {
-                create: data.taxIdentificationDetails.map((tid) => ({
-                  taxIdentificationName: tid.taxIdentificationName,
-                  taxIdentificationValue: tid.taxIdentificationValue,
-                  taxIdentificationNumber: tid.taxIdentificationNumber,
-                  createdBy: store?.user?.id,
-                })),
-              }
-            : undefined,
-          bankDetails: data.bankDetails
-            ? {
-                create: data.bankDetails.map((bd) => ({
-                  accountNo: bd.accountNo,
-                  accountHolderName: bd.accountHolderName ?? undefined,
-                  typeOfAccount: bd.typeOfAccount ?? undefined,
-                  ifscCode: bd.ifscCode,
-                  bankName: bd.bankName,
-                  bankAddress: bd.bankAddress ?? undefined,
-                  createdBy: store?.user?.id,
-                })),
-              }
-            : undefined,
+
+          taxIdentificationDetails:
+            taxIdentificationDetails && taxIdentificationDetails.length > 0
+              ? {
+                  create: taxIdentificationDetails.map((tid) => ({
+                    taxIdentificationName: tid.taxIdentificationName,
+                    taxIdentificationValue: tid.taxIdentificationValue,
+                    taxIdentificationNumber: tid.taxIdentificationNumber,
+                    createdBy: store?.user?.id,
+                  })),
+                }
+              : undefined,
+
+          bankDetails:
+            bankDetails && bankDetails.length > 0
+              ? {
+                  create: bankDetails.map((bd) => ({
+                    accountNo: bd.accountNo,
+                    accountHolderName: bd.accountHolderName ?? undefined,
+                    typeOfAccount: bd.typeOfAccount ?? undefined,
+                    ifscCode: bd.ifscCode,
+                    bankName: bd.bankName,
+                    bankAddress: bd.bankAddress ?? undefined,
+                    createdBy: store?.user?.id,
+                  })),
+                }
+              : undefined,
         },
         include: {
           taxIdentificationDetails: true,
           bankDetails: true,
         },
       });
+
       logger.info("exiting::createItemSupplierInDb::repository");
+
       return itemSupplier;
     },
     {
@@ -418,3 +442,183 @@ export const getFirstItemSupplierForExcelFromDb = async () => {
     },
   });
 };
+
+export const createItemSupplierExcelInDb = async (
+  inp: ItemSupplierExcelStagingRow[]
+) => {
+  logger.info("entering::createItemSupplierExcelInDb::repository");
+
+  const batchJobNo = await uinServiceFactory.generateUIN(
+    InvUinShortCode.BATCH_JOB
+  );
+
+  return await db.$transaction(
+    async (tx) => {
+      const batchJob = await createBatchJobInDb(tx, {
+        totalQty: inp.length,
+        type: "ITEM_SUPPLIER",
+        status: "PENDING",
+        batchJobNo,
+      });
+
+      const rows: Prisma.InvItemSupplierExcelUncheckedCreateInput[] = inp.map(
+        (record) => ({
+          rowNo: record.rowNo,
+
+          supplierCode: record.supplierCode?.trim() || null,
+          name: record.name.trim(),
+          phone: record.phone?.trim() || null,
+          email: record.email?.trim() || null,
+          address: record.address.trim(),
+          billTo: record.billTo?.trim() || null,
+          shipTo: record.shipTo?.trim() || null,
+          vendorType: record.vendorType ?? null,
+
+          salesPerson: record.salesPerson?.trim() || null,
+          salesPersonPhone: record.salesPersonPhone?.trim() || null,
+          salesPersonEmail: record.salesPersonEmail?.trim() || null,
+
+          proprietaryPersonName: record.proprietaryPersonName?.trim() || null,
+          proprietaryPersonPhone: record.proprietaryPersonPhone?.trim() || null,
+          proprietaryPersonEmail: record.proprietaryPersonEmail?.trim() || null,
+
+          termsAndCondition: record.termsAndCondition?.trim() || null,
+          stockShipmentDetails: record.stockShipmentDetails?.trim() || null,
+
+          contactPersonName: record.contactPersonName?.trim() || null,
+          contactPersonPhone: record.contactPersonPhone?.trim() || null,
+          contactPersonEmail: record.contactPersonEmail?.trim() || null,
+
+          accountNo: record.accountNo ?? null,
+          accountHolderName: record.accountHolderName?.trim() || null,
+          typeOfAccount: record.typeOfAccount?.trim() || null,
+          ifscCode: record.ifscCode?.trim() || null,
+          bankName: record.bankName?.trim() || null,
+          bankAddress: record.bankAddress?.trim() || null,
+
+          taxIdentificationName: record.taxIdentificationName?.trim() || null,
+          taxIdentificationValue: record.taxIdentificationValue ?? null,
+          taxIdentificationNumber:
+            record.taxIdentificationNumber?.trim() || null,
+
+          batchJobId: batchJob.id,
+        })
+      );
+
+      await tx.invItemSupplierExcel.createMany({
+        data: rows,
+      });
+
+      logger.info("exiting::createItemSupplierExcelInDb::repository");
+
+      return batchJob;
+    },
+    {
+      timeout: API_TIMEOUT,
+    }
+  );
+};
+
+export async function ItemSupplierBatchJob(input: ItemSupplierBatchJobInput) {
+  const { batchJobId } = input;
+
+  let skip = 0;
+  let isDone = false;
+
+  const store = requestStorage.getStore();
+  const BATCH_SIZE = store?.settings?.batchSize || 100;
+
+  await db.batchJob.update({
+    where: { id: batchJobId },
+    data: { status: "IN_PROGRESS" },
+  });
+
+  while (!isDone) {
+    const batch = await db.invItemSupplierExcel.findMany({
+      where: { batchJobId },
+      orderBy: { rowNo: "asc" },
+      skip,
+      take: BATCH_SIZE,
+    });
+
+    if (batch.length === 0) {
+      isDone = true;
+      break;
+    }
+
+    for (const row of batch) {
+      try {
+        const supplierReq = mapExcelRowToItemSupplierReq(row);
+
+        await createItemSupplierServiceValidation(supplierReq);
+
+        const created = await createItemSupplierInDb(supplierReq);
+
+        await db.batchJobDetails.create({
+          data: {
+            batchId: batchJobId,
+            refId: created.id,
+            refNo: created.supplierCode ?? String(created.id),
+            rowTitle: created.name,
+            status: "SUCCESS",
+            rowNo: row.rowNo,
+          },
+        });
+
+        await db.batchJob.update({
+          where: { id: batchJobId },
+          data: {
+            processedQty: { increment: 1 },
+            successCount: { increment: 1 },
+            status: "IN_PROGRESS",
+          },
+        });
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : typeof error === "string"
+            ? error
+            : "Unknown error";
+
+        await db.batchJobDetails.create({
+          data: {
+            batchId: batchJobId,
+            rowTitle: row.name,
+            refNo: row.supplierCode ?? String(row.rowNo),
+            status: "FAILED",
+            rowNo: row.rowNo,
+            errorMsg: `${row.name} ---> ${errorMessage}`,
+          },
+        });
+
+        await db.batchJob.update({
+          where: { id: batchJobId },
+          data: {
+            processedQty: { increment: 1 },
+            failureCount: { increment: 1 },
+          },
+        });
+      }
+    }
+
+    skip += BATCH_SIZE;
+  }
+
+  const batchInfo = await db.batchJob.findUnique({
+    where: { id: batchJobId },
+  });
+
+  await db.invItemSupplierExcel.deleteMany({
+    where: { batchJobId },
+  });
+
+  if (batchInfo && batchInfo.totalQty === batchInfo.processedQty) {
+    await db.batchJob.update({
+      where: { id: batchJobId },
+      data: { status: "COMPLETED" },
+    });
+  }
+
+  await initializeCache();
+}
