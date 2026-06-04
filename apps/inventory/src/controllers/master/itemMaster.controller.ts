@@ -163,26 +163,6 @@ export const itemExcelSampleExport = TryCatch(
   }
 );
 
-export const importItemMasterExcel = TryCatch(
-  async (req: Request, res: Response) => {
-    logger.info("entering::importItemMasterExcel::controller");
-    if (!req.file) {
-      return res
-        .status(400)
-        .json(BaseResponse.error({ message: "No file uploaded" }));
-    }
-    await itemMasterService.itemMasterImportExcel(req.file.path);
-
-    deleteFileIfExists(req.file.path);
-    const response = BaseResponse.success(
-      { type: "STARTED" },
-      "Item Master Import"
-    );
-    logger.info("exiting::importItemMasterExcel::controller");
-    return res.status(200).json(response);
-  }
-);
-
 export const itemExcelExport = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::itemExcelExport::controller");
 
@@ -196,4 +176,32 @@ export const itemExcelExport = TryCatch(async (req: Request, res: Response) => {
 
   await wb.xlsx.write(res); // streams the Excel file
   res.end();
+});
+
+export const itemExcelImport = TryCatch(async (req: Request, res: Response) => {
+  logger.info("entering::itemExcelImport::controller");
+
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "No file uploaded.",
+    });
+  }
+
+  const batch = await itemMasterService.itemExcelImport({
+    path: req.file.path,
+  });
+
+  deleteFileIfExists(req.file.path);
+
+  const response = new BaseResponse(
+    {
+      success: true,
+      message: "Item Import started.",
+    },
+    batch
+  );
+
+  logger.info("exiting::itemExcelImport::controller");
+  return res.status(200).json(response);
 });

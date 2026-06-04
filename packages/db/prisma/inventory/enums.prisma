@@ -119,6 +119,7 @@ enum InvUinShortCode {
     BRN
     SRR
     BRR
+    VENDOR
 }
 
 enum InvStockAdjustmentStatus {

@@ -2,7 +2,10 @@ import { commonServiceFactory } from "@/config/core.config.js";
 import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
 import { commonService } from "@/services/common.service.js";
 import { shortCodeService } from "@/services/shortCode.service.js";
-import { LockUnlockParams } from "@/types/common.js";
+import {
+  CommonActiveInactiveParams,
+  LockUnlockParams,
+} from "@/types/common.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
@@ -683,6 +686,37 @@ export const commonLockUnlock = TryCatch(
     );
 
     logger.info("exiting::commonLockUnlock::controller");
+
+    return res.status(200).json(response);
+  }
+);
+
+export const commonActiveInactive = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::commonActiveInactive::controller");
+
+    const { shortCode, id, field, value } =
+      req.body as CommonActiveInactiveParams;
+
+    await commonService.activeInactive({
+      shortCode,
+      id: Number(id),
+      field,
+      value,
+    });
+
+    const response = BaseResponse.success(
+      {
+        type: "UPDATED",
+        data: {
+          shortCode,
+          id,
+        },
+      },
+      generateSuccessMessage("UPDATED", "Field")
+    );
+
+    logger.info("exiting::commonActiveInactive::controller");
 
     return res.status(200).json(response);
   }

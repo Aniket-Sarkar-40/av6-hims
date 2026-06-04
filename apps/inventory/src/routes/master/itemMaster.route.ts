@@ -5,21 +5,12 @@ import {
   getBulkItemSupplierPrices,
   getItemMasterById,
   getItemStocksByItemId,
-  importItemMasterExcel,
   itemExcelExport,
+  itemExcelImport,
   itemExcelSampleExport,
   itemSearch,
   updateItemMaster,
 } from "@/controllers/master/itemMaster.controller.js";
-import {
-  authorize,
-  verifyToken,
-} from "@repo/platform/middlewares/auth.middleware.js";
-import {
-  createUploadFieldsMiddleware,
-  createUploadMiddleware,
-} from "@repo/platform/middlewares/imageUpload.middleware.js";
-import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateBulkItemSupplierPrices } from "@/validations/request/itemSupplierMap/itemSupplierMap.validation.js";
 import {
   validateGetItem,
@@ -28,9 +19,18 @@ import {
   validateItemSearch,
   validateItemStock,
 } from "@/validations/request/master/itemMaster.validation.js";
-import { Router } from "express";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import {
+  createUploadFieldsMiddleware,
+  createUploadMiddleware,
+} from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { Router } from "express";
 
 export const itemMasterRouter: Router = Router();
 
@@ -278,5 +278,5 @@ itemMasterRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("INV", "ITEM", "CREATE")),
-  importItemMasterExcel
+  itemExcelImport
 );

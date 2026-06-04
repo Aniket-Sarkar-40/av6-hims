@@ -120,16 +120,26 @@ export interface ItemMasterBatchJobInput {
   batchJobId: number;
 }
 
-export type ItemMasterExcelRow = {
-  "Item Name": string;
-  "Item Code"?: string;
-  "Item Category ID": number;
-  "Storage ID"?: number;
-  "Unit ID": number;
-  "Base Price"?: number;
-  "Re-order Level"?: number;
-  "Item Description"?: string;
-  "Is Batch Number"?: boolean | string | number;
-  "Is Expire Date"?: boolean | string | number;
-  "Is Returnable"?: boolean | string | number;
-};
+export interface ItemExcelImportReq {
+  path: string;
+}
+
+export interface ItemMasterResolvedIds {
+  itemCategoryId: number;
+  storageId: number | null;
+  unitId: number;
+}
+
+export interface ItemMasterExcelRow {
+  "Item Name"?: unknown;
+  "Item Code"?: unknown;
+  "Item Category"?: unknown;
+  Storage?: unknown;
+  Unit?: unknown;
+  "Base Price"?: unknown;
+  "Re-order Level"?: unknown;
+  "Item Description"?: unknown;
+  "Is Batch Number"?: unknown;
+  "Is Expire Date"?: unknown;
+  "Is Returnable"?: unknown;
+}

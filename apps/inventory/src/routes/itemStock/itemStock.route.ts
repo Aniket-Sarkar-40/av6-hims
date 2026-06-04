@@ -1,5 +1,6 @@
 import {
   exportItemStockExcel,
+  getAllItemBatchStock,
   getItemStock,
   getItemStockSummary,
 } from "@/controllers/stock/itemStock.controller.js";
@@ -84,4 +85,26 @@ itemStockRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
   exportItemStockExcel
+);
+
+/**
+ * @swagger
+ * /api/v1/master/item-batch-stock:
+ *   post:
+ *     summary: Get all item batch stock
+ *     tags: [Item Stock]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/itemBatchStockLookupInputSchema'
+ */
+itemStockRouter.post(
+  "/batch-stock",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_BATCH_STOCK", "VIEW")),
+  getAllItemBatchStock
 );

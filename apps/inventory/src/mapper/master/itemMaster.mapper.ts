@@ -19,6 +19,7 @@ import {
   ItemMasterEntity,
   ItemMasterExcelRow,
   ItemMasterReq,
+  ItemMasterResolvedIds,
   ItemMasterUpdateEntity,
   ItemMasterUpdateReq,
   ItemSearchDTO,
@@ -29,6 +30,7 @@ import { getBranchAndWarehouseByCcIds } from "@/utils/getCollectionCenter.utils.
 import { customOmit, toIdValue } from "av6-utils";
 import {
   InvItem,
+  InvItemMasterExcel,
   InvItemStock,
   Prisma,
 } from "@repo/db/generated/prisma/client";
@@ -39,6 +41,14 @@ import {
 } from "@repo/shared/utils/helper.utils.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { ItemMasterExcelStagingRow } from "@/validations/request/master/itemMasterExcel.validation.js";
+import {
+  toBoolean,
+  toIntOrNull,
+  toNumberOrNull,
+  toRequiredString,
+  toStringOrNull,
+} from "@repo/shared/utils/excelImport.utils.js";
 
 export const toItemMasterDTO = async (
   data: InvItem[]
@@ -357,62 +367,48 @@ export async function itemMasterToDto(item: ItemMasterDto) {
   ) as ItemMasterToDto | null;
 }
 
-const toExcelBool = (value: boolean | string | number | undefined): boolean => {
-  if (value === true || value === 1) return true;
-  if (typeof value === "string") {
-    return ["true", "1", "yes"].includes(value.trim().toLowerCase());
-  }
-  return false;
-};
-
-const toOptionalInt = (
-  value: number | string | undefined | null
-): number | undefined => {
-  if (value === undefined || value === null || value === "") return undefined;
-  const num = Number(value);
-  return Number.isNaN(num) ? undefined : num;
-};
-
-const toOptionalString = (value?: string | null): string | undefined => {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : undefined;
-};
-
-export function mapRowToItemMasterImportExcelInput(
+export function mapRowToItemMasterExcelCreateInput(
   row: ItemMasterExcelRow,
   rowNo: number
-): Prisma.InvItemMasterExcelCreateInput {
+): ItemMasterExcelStagingRow {
+  const basePrice = toNumberOrNull(row["Base Price"]);
+  const reOrderLevel = toIntOrNull(row["Re-order Level"]);
+
   return {
     rowNo,
-    item: String(row["Item Name"] ?? "").trim(),
-    itemCode: toOptionalString(row["Item Code"]),
-    itemCategoryId: Number(row["Item Category ID"]),
-    storageId: toOptionalInt(row["Storage ID"]),
-    unitId: Number(row["Unit ID"]),
-    basePrice:
-      row["Base Price"] != null ? Number(row["Base Price"]) : undefined,
-    reOrderLevel: toOptionalInt(row["Re-order Level"]),
-    itemDescription: toOptionalString(row["Item Description"]),
-    isBatchNumber: toExcelBool(row["Is Batch Number"]),
-    isExpireDate: toExcelBool(row["Is Expire Date"]),
-    isReturnable: toExcelBool(row["Is Returnable"]),
+    item: toRequiredString(row["Item Name"], "Item Name", rowNo),
+    itemCode: toStringOrNull(row["Item Code"]),
+    itemCategory: toRequiredString(
+      row["Item Category"],
+      "Item Category",
+      rowNo
+    ),
+    storage: toStringOrNull(row.Storage),
+    unit: toRequiredString(row.Unit, "Unit", rowNo),
+    basePrice: basePrice ?? undefined,
+    reOrderLevel: reOrderLevel ?? undefined,
+    itemDescription: toStringOrNull(row["Item Description"]),
+    isBatchNumber: toBoolean(row["Is Batch Number"], false),
+    isExpireDate: toBoolean(row["Is Expire Date"], false),
+    isReturnable: toBoolean(row["Is Returnable"], false),
   };
 }
 
-export function mapExcelRowToItemMasterReq(
-  row: Prisma.InvItemMasterExcelGetPayload<object>
-): ItemMasterReq {
+export const mapExcelRowToItemMasterReq = (
+  row: InvItemMasterExcel,
+  resolved: ItemMasterResolvedIds
+): ItemMasterReq => {
   return {
     item: row.item,
     itemCode: row.itemCode ?? undefined,
-    itemCategoryId: row.itemCategoryId,
-    storageId: row.storageId ?? undefined,
-    unitId: row.unitId,
-    basePrice: row.basePrice ?? undefined,
+    itemCategoryId: resolved.itemCategoryId,
+    storageId: resolved.storageId ?? undefined,
+    unitId: resolved.unitId,
+    basePrice: row.basePrice != null ? Number(row.basePrice) : undefined,
     reOrderLevel: row.reOrderLevel ?? undefined,
     itemDescription: row.itemDescription ?? undefined,
     isBatchNumber: row.isBatchNumber,
     isExpireDate: row.isExpireDate,
     isReturnable: row.isReturnable,
   };
-}
+};

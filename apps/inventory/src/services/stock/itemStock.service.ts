@@ -1,4 +1,5 @@
 import {
+  getItemBatchStockByBatchFromDb,
   itemStock,
   itemStockSummary,
 } from "@/repository/stock/stock.repository.js";
@@ -7,8 +8,59 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import ExcelJs from "exceljs";
+import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
+import { validateIdItemMaster } from "@/validations/service/master/itemMaster.service.validation.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
+import { getAllCache } from "@repo/platform/cache/redis.utils.js";
+import {
+  toAvailableItemBatchStockDTOList,
+  toItemBatchStockCacheDTOList,
+} from "@/mapper/stock/itemBatchStock.mapper.js";
+import {
+  ItemBatchStockCacheDTO,
+  ItemBatchStockDTO,
+  ItemBatchStockLookupInput,
+} from "@/types/stock/stock.js";
+
+export const cacheKeyForItemBatchStock = getRedisKey("ITEM", "Batch");
 
 export const itemStockService = {
+  async getAllItemBatchStock(
+    input: ItemBatchStockLookupInput,
+    canNullReturnable: boolean = false
+  ): Promise<ItemBatchStockDTO[]> {
+    logger.info("entering::getAllItemBatchStock::service");
+    await validateIdItemMaster(input.itemId);
+
+    const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_BATCH_STOCK);
+    let itemBatchStock: ItemBatchStockCacheDTO[];
+    if (isCacheable) {
+      itemBatchStock = (await getAllCache(
+        cacheKeyForItemBatchStock
+      )) as ItemBatchStockCacheDTO[];
+    } else {
+      const stocks = await getItemBatchStockByBatchFromDb(input);
+      itemBatchStock = await toItemBatchStockCacheDTOList(stocks);
+    }
+
+    const itemBatchStockDTO = toAvailableItemBatchStockDTOList(
+      itemBatchStock,
+      input
+    );
+
+    if (itemBatchStockDTO.length === 0) {
+      if (!canNullReturnable)
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Batch Stock")
+        );
+      else return [];
+    }
+
+    logger.info("exiting::getAllItemBatchStock::service");
+    return itemBatchStockDTO;
+  },
+
   async getAllItemStockSummary(ccId: number) {
     logger.info("entering::getAllItemStock::service");
     validIdCheck(ccId);

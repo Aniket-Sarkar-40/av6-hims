@@ -1,18 +1,18 @@
 import {
+  getEmailFromDb,
   getItemSupplierByNameFromDb,
   getItemSupplierBySupplierCodeFromDb,
+  getPhoneNumberFromDb,
 } from "@/repository/master/itemSupplier.repository.js";
 import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
 import {
   ItemSupplierCreateInput,
-  ItemSupplierDTO,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
-import { InvItemSupplier } from "@repo/db/generated/prisma/client";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdItemSupplier = async (itemSupplierId: number) => {
   logger.info("entering::validateIdItemSupplier::service::validation");
@@ -21,12 +21,12 @@ export const validateIdItemSupplier = async (itemSupplierId: number) => {
 
   const itemSupplier = await itemSupplierService.getItemSupplierById(
     itemSupplierId,
-    true,
+    true
   );
   if (!itemSupplier) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Item Supplier"),
+      generateErrorMessage("NOT_FOUND", "Item Supplier")
     );
   }
   logger.info("exiting::validateIdItemSupplier::service::validation");
@@ -35,64 +35,94 @@ export const validateIdItemSupplier = async (itemSupplierId: number) => {
 };
 
 export const createItemSupplierServiceValidation = async (
-  input: ItemSupplierCreateInput,
+  input: ItemSupplierCreateInput
 ): Promise<void> => {
   logger.info("entering::createItemSupplier::service::validation");
 
-  let itemSupplier: InvItemSupplier | null;
-
-  itemSupplier = await getItemSupplierBySupplierCodeFromDb(input.supplierCode);
-  if (itemSupplier) {
-    throw new ErrorHandler(
-      400,
-      generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code"),
-    );
-  } else {
-    itemSupplier = await getItemSupplierByNameFromDb(input.name);
-    if (itemSupplier) {
+  if (input.supplierCode) {
+    const code = await getItemSupplierBySupplierCodeFromDb(input.supplierCode);
+    if (code) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name"),
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code")
       );
     }
   }
+  const name = await getItemSupplierByNameFromDb(input.name);
+  if (name) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name")
+    );
+  }
+
+  if (input.phone) {
+    const phone = await getPhoneNumberFromDb(input.phone);
+    if (phone) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Phone Number")
+      );
+    }
+  }
+  if (input.email) {
+    const email = await getEmailFromDb(input.email);
+    if (email) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Email")
+      );
+    }
+  }
+
   logger.info("exiting::createItemSupplier::service::validation");
 };
 
 export const updateItemSupplierServiceValidation = async (
-  input: ItemSupplierUpdateInput,
-): Promise<ItemSupplierDTO> => {
+  input: ItemSupplierUpdateInput
+) => {
   logger.info("entering::updateItemSupplier::service::validation");
 
-  const itemSupplier = await validateIdItemSupplier(input.id);
-
+  await validateIdItemSupplier(input.id);
   if (input.supplierCode) {
-    const existing = await getItemSupplierBySupplierCodeFromDb(
-      input.supplierCode,
-    );
-    if (existing && existing.id !== Number(input.id)) {
+    const code = await getItemSupplierBySupplierCodeFromDb(input.supplierCode);
+    if (code && code.id !== input.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code"),
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code")
       );
     }
   }
-
-  if (input.name) {
-    const existing = await getItemSupplierByNameFromDb(input.name);
-    if (existing && existing.id !== Number(input.id)) {
+  const name = await getItemSupplierByNameFromDb(input.name);
+  if (name && name.id !== input.id) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name")
+    );
+  }
+  if (input.phone) {
+    const phone = await getPhoneNumberFromDb(input.phone);
+    if (phone && phone.id !== input.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name"),
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Phone Number")
+      );
+    }
+  }
+  if (input.email) {
+    const email = await getEmailFromDb(input.email);
+    if (email && email.id !== input.id) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Email")
       );
     }
   }
   logger.info("exiting::updateItemSupplier::service::validation");
-  return itemSupplier;
 };
 
 export const deleteItemSupplierServiceValidation = async (
-  id: number,
+  id: number
 ): Promise<void> => {
   logger.info("entering::deleteItemSupplier::service::validation");
   await validateIdItemSupplier(id);

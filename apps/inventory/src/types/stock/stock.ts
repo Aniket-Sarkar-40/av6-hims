@@ -189,3 +189,20 @@ export interface ItemStockSummaryRow {
   varianceVsStock: number;
   purchasePrice: number;
 }
+
+export interface ItemBatchStockCacheDTO {
+  id: number;
+  itemId: number;
+  batchNo: string | null;
+  itemName: string;
+}
+
+export interface ItemBatchStockDTO {
+  itemName: string;
+  batchNo: string;
+}
+
+export interface ItemBatchStockLookupInput {
+  itemId: number;
+  batchNo: string;
+}

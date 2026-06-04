@@ -1598,3 +1598,19 @@ ALTER TABLE `inv_purchase_order` DROP COLUMN `currency`,
 
 -- CreateIndex
 CREATE INDEX `purchase_order_currency_id_idx` ON `inv_purchase_order`(`currency_id`);
+
+ALTER TABLE `inv_item_master_excel` DROP COLUMN `back_image`,
+    DROP COLUMN `front_image`,
+    DROP COLUMN `item_category_id`,
+    DROP COLUMN `left_side_image`,
+    DROP COLUMN `right_side_image`,
+    DROP COLUMN `storage_id`,
+    DROP COLUMN `unit_id`,
+    ADD COLUMN `batch_job_id` INTEGER NOT NULL,
+    ADD COLUMN `item_category` VARCHAR(191) NOT NULL,
+    ADD COLUMN `storage` VARCHAR(191) NULL,
+    ADD COLUMN `unit` VARCHAR(191) NOT NULL,
+    MODIFY `base_price` DECIMAL(18, 5) NULL;
+
+ALTER TABLE `inv_item_supplier` DROP COLUMN `branch_details_id`,
+    MODIFY `supplier_code` VARCHAR(191) NULL;

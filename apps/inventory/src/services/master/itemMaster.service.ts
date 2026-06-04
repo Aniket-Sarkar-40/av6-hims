@@ -1,13 +1,13 @@
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import {
-  mapRowToItemMasterImportExcelInput,
+  mapRowToItemMasterExcelCreateInput,
   toItemMasterDTO,
   toItemMasterDTOForItemSupplierMap,
   toItemSearchDTO,
   toItemStockDTO,
 } from "@/mapper/master/itemMaster.mapper.js";
 import {
-  CreateItemMasterExcelInDb,
+  createItemMasterExcelInDb,
   createItemMasterInDb,
   getAllItemMasterFromDb,
   getCountItemsFromDb,
@@ -22,8 +22,8 @@ import {
   GetItemReq,
   getItems,
   GetItemStockRequest,
+  ItemExcelImportReq,
   ItemForSearch,
-  ItemMasterBatchJobInput,
   ItemMasterDto,
   ItemMasterDtoStock,
   ItemMasterExcelRow,
@@ -32,6 +32,7 @@ import {
   ItemSearchDTO,
 } from "@/types/master/itemMaster.js";
 import { getBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
+import { validateItemMasterExcelArray } from "@/validations/request/master/itemMasterExcel.validation.js";
 import {
   createItemMasterServiceValidation,
   updateIdItemMasterServiceValidation,
@@ -317,9 +318,9 @@ export const itemMasterService = {
     ws.columns = [
       { header: "Item Name", key: "item", width: 30 },
       { header: "Item Code", key: "itemCode", width: 25 },
-      { header: "Item Category ID", key: "itemCategoryId", width: 18 },
-      { header: "Storage ID", key: "storageId", width: 15 },
-      { header: "Unit ID", key: "unitId", width: 15 },
+      { header: "Item Category", key: "itemCategory", width: 25 },
+      { header: "Storage", key: "storage", width: 20 },
+      { header: "Unit", key: "unit", width: 15 },
       { header: "Base Price", key: "basePrice", width: 15 },
       { header: "Re-order Level", key: "reOrderLevel", width: 18 },
       { header: "Item Description", key: "itemDescription", width: 40 },
@@ -362,9 +363,9 @@ export const itemMasterService = {
     ws.addRow({
       item: "Paracetamol 500mg",
       itemCode: "ITEM-0001",
-      itemCategoryId: 1,
-      storageId: 1,
-      unitId: 1,
+      itemCategory: "Medicine",
+      storage: "Main Store",
+      unit: "PIECE",
       basePrice: 15,
       reOrderLevel: 10,
       itemDescription: "Pain relief and fever medicine",
@@ -452,27 +453,32 @@ export const itemMasterService = {
     return wb;
   },
 
-  async itemMasterImportExcel(filePath: string) {
-    logger.info("entering::itemMasterImportExcel::service");
-    if (!filePath) {
-      throw new Error("No file path provided for Excel import");
+  async itemExcelImport(input: ItemExcelImportReq) {
+    logger.info("entering::itemExcelImport::service");
+
+    if (!input.path) {
+      throw new ErrorHandler(400, generateErrorMessage("NOT_FOUND", "File"));
     }
 
-    const workbook = XLSX.readFile(filePath);
+    const workbook = XLSX.readFile(input.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = XLSX.utils.sheet_to_json(sheet) as ItemMasterExcelRow[];
-    const convertedData = data.map((elem, ind) =>
-      mapRowToItemMasterImportExcelInput(elem, ind + 1)
-    );
-    const batch = await CreateItemMasterExcelInDb(convertedData);
-    const batchJobInput: ItemMasterBatchJobInput = {
-      batchJobId: batch.id,
-    };
 
-    ItemMasterBatchJob(batchJobInput)
-      .then(() => logger.info("Batch Procesing Completed."))
+    const convertedData = data.map((elem, ind) =>
+      mapRowToItemMasterExcelCreateInput(elem, ind + 1)
+    );
+
+    const { value } = validateItemMasterExcelArray(convertedData);
+
+    const batch = await createItemMasterExcelInDb(value);
+
+    ItemMasterBatchJob({
+      batchJobId: batch.id,
+    })
+      .then(() => logger.info("Item Master Batch Processing Completed."))
       .catch((e) => logger.error(JSON.stringify(e)));
 
-    logger.info("exiting::itemMasterImportExcel::service");
+    logger.info("exiting::itemExcelImport::service");
+    return batch;
   },
 };

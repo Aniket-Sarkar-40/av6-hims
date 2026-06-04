@@ -39,31 +39,44 @@ export const itemSupplierService = {
     input: ItemSupplierCreateInput
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::createItemSupplier::service");
+
     await createItemSupplierServiceValidation(input);
+
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
     const itemSupplier = await createItemSupplierInDb(input);
 
     if (isCacheable && itemSupplier) {
       await addToCache(cacheKey, itemSupplier.id, itemSupplier);
     }
-    logger.info("exiting::createItemSupplier::service");
+
     const itemSupplierDTO = await toItemSupplierDTO([itemSupplier]);
-    return itemSupplierDTO[0];
+    const response = itemSupplierDTO[0];
+
+    logger.info("exiting::createItemSupplier::service");
+
+    return response;
   },
 
   async updateItemSupplier(
     input: ItemSupplierUpdateInput
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::updateItemSupplier::service");
+
     await updateItemSupplierServiceValidation(input);
+
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
     const updatedItemSupplier = await updateItemSupplierInDb(input);
+
     if (isCacheable && updatedItemSupplier) {
       await updateCache(cacheKey, input.id, updatedItemSupplier);
     }
-    logger.info("exiting::updateItemSupplier::service");
+
     const itemSupplierDTO = await toItemSupplierDTO([updatedItemSupplier]);
-    return itemSupplierDTO[0];
+    const response = itemSupplierDTO[0];
+
+    logger.info("exiting::updateItemSupplier::service");
+
+    return response;
   },
   async getAllItemSupplier(
     canNullReturnable: boolean = false

@@ -23,6 +23,36 @@ import {
 } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
+const uniqueBatchNoValidation = (
+  details: GrnDetailInput[],
+  helpers: Joi.CustomHelpers
+) => {
+  const batchNoMap = new Map<string, number>();
+
+  for (let i = 0; i < details.length; i++) {
+    const detail = details[i];
+
+    if (!detail.batchNo) continue;
+
+    const batchNo = detail.batchNo.trim().toLowerCase();
+
+    if (!batchNo) continue;
+
+    if (batchNoMap.has(batchNo)) {
+      const firstRow = batchNoMap.get(batchNo)! + 1;
+      const currentRow = i + 1;
+
+      return helpers.error("any.custom", {
+        message: `Batch number "${detail.batchNo}" already exists in row ${firstRow}. Duplicate found in row ${currentRow}.`,
+      });
+    }
+
+    batchNoMap.set(batchNo, i);
+  }
+
+  return details;
+};
+
 export const grnDetailSchema = Joi.object<GrnDetailInput>({
   id: idOptional("Id"),
 
@@ -115,7 +145,11 @@ export const grnSchema = Joi.object<CreateGrnInput>({
   tax: idOptional("Tax"),
   returnedAmount: priceOptional("Returned amount"),
 
-  goodReceiveDetails: arrayRequired("Good Receive Details", grnDetailSchema, 1),
+  goodReceiveDetails: arrayRequired("Good Receive Details", grnDetailSchema, 1)
+    .custom(uniqueBatchNoValidation)
+    .messages({
+      "any.custom": "{{#message}}",
+    }),
 });
 
 export const grnExcelFilterSchema = Joi.object({

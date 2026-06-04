@@ -1,9 +1,5 @@
-import { InvItemSupplier, Prisma } from "@repo/db/generated/prisma/client";
-import {
-  BaseModelAttr,
-  BaseModelAttrWoCancel,
-  IdValue,
-} from "@repo/shared/types/global.js";
+import { Prisma } from "@repo/db/generated/prisma/client";
+import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
 
 export type ItemSupplierCreateInput = Omit<
   Prisma.InvItemSupplierUncheckedCreateInput,
@@ -24,10 +20,8 @@ export type ItemSupplierResponse = Prisma.InvItemSupplierGetPayload<{
     bankDetails: true;
   };
 }>;
-export interface ItemSupplierDTO extends Omit<
-  ItemSupplierResponse,
-  BaseModelAttrWoCancel | "branchDetailsId" | "taxDetailsId"
-> {
+
+export interface ItemSupplierDTO
+  extends Omit<ItemSupplierResponse, BaseModelAttrWoCancel | "taxDetailsId"> {
   taxDetails: IdValue | null;
-  collectionCenter: IdValue | null;
 }

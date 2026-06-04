@@ -144,14 +144,13 @@ model TaxDetails {
 
 model InvItemSupplier {
     id               Int         @id @default(autoincrement())
-    supplierCode     String      @map("supplier_code")
+    supplierCode     String?     @map("supplier_code")
     name             String
     phone            String?
     email            String?
     address          String      @db.Text
     billTo           String?
     shipTo           String?
-    branchDetailsId  Int         @map("branch_details_id")
     vendorType       VendorType? @map("vendor_type")
     salesPerson      String?     @map("sales_person")
     salesPersonPhone String?     @map("sales_person_phone")
@@ -524,7 +523,8 @@ model InvBatchJob {
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
 
-    batchJobDetails InvBatchJobDetails[]
+    batchJobDetails     InvBatchJobDetails[]
+    invItemMasterExcels InvItemMasterExcel[]
 
     @@map("inv_batch_job")
 }
@@ -1477,23 +1477,23 @@ model RequisitionReturnItemDetails {
 }
 
 model InvItemMasterExcel {
-    id              Int     @id @default(autoincrement())
-    rowNo           Int     @map("row_no")
-    item            String  @map("item")
-    itemCode        String? @map("item_code")
-    itemCategoryId  Int     @map("item_category_id")
-    storageId       Int?    @map("storage_id")
-    unitId          Int     @map("unit_id")
-    basePrice       Float?  @map("base_price")
-    reOrderLevel    Int?    @map("re_order_level")
-    itemDescription String? @map("item_description")
-    isBatchNumber   Boolean @default(false) @map("is_batch_number")
-    isExpireDate    Boolean @default(false) @map("is_expire_date")
-    isReturnable    Boolean @default(false) @map("is_returnable")
-    frontImage      String? @map("front_image")
-    backImage       String? @map("back_image")
-    leftSideImage   String? @map("left_side_image")
-    rightSideImage  String? @map("right_side_image")
+    id              Int      @id @default(autoincrement())
+    rowNo           Int      @map("row_no")
+    item            String   @map("item")
+    itemCode        String?  @map("item_code")
+    itemCategory    String   @map("item_category")
+    storage         String?  @map("storage")
+    unit            String   @map("unit")
+    basePrice       Decimal? @map("base_price") @db.Decimal(18, 5)
+    reOrderLevel    Int?     @map("re_order_level")
+    itemDescription String?  @map("item_description")
+    isBatchNumber   Boolean  @default(false) @map("is_batch_number")
+    isExpireDate    Boolean  @default(false) @map("is_expire_date")
+    isReturnable    Boolean  @default(false) @map("is_returnable")
+    batchJobId      Int      @map("batch_job_id")
 
+    batchJob InvBatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], name: "item_master_excel_batch_job_id_idx")
     @@map("inv_item_master_excel")
 }

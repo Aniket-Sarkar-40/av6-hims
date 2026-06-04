@@ -1,11 +1,10 @@
-import { createClient, RedisClientType } from "redis";
+import { logger } from "@/logging/logger.js";
 import {
   IS_REDIS,
-  REDIS_URL,
   REDIS_PASSWORD,
-  REDIS_PREFIX,
+  REDIS_URL,
 } from "@repo/shared/config/index.js";
-import { logger } from "@/logging/logger.js";
+import { createClient, RedisClientType } from "redis";
 
 let redisClient: RedisClientType | null = null;
 

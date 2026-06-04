@@ -24,6 +24,79 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { API_TIMEOUT } from "@repo/shared";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { applyRound } from "av6-utils";
+import { initializeCache } from "@/config/redisClient.js";
+import { ItemMasterExcelStagingRow } from "@/validations/request/master/itemMasterExcel.validation.js";
+
+const normalizeLookupKey = (value: string) => value.trim().toLowerCase();
+
+const resolveItemCategoryId = async (
+  name: string,
+  rowNo: number,
+  cache: Map<string, number>
+): Promise<number> => {
+  const key = normalizeLookupKey(name);
+  const cached = cache.get(key);
+  if (cached != null) return cached;
+
+  const record = await db.invItemCategory.findFirst({
+    where: { name: name.trim(), isActive: true },
+  });
+
+  if (!record) {
+    throw new Error(`Row ${rowNo}: Item Category "${name}" not found`);
+  }
+
+  cache.set(key, record.id);
+  return record.id;
+};
+
+const resolveStorageId = async (
+  name: string | null | undefined,
+  rowNo: number,
+  cache: Map<string, number>
+): Promise<number | null> => {
+  if (!name?.trim()) return null;
+
+  const key = normalizeLookupKey(name);
+  const cached = cache.get(key);
+  if (cached != null) return cached;
+
+  const record = await db.invStorage.findFirst({
+    where: { name: name.trim(), isActive: true },
+  });
+
+  if (!record) {
+    throw new Error(`Row ${rowNo}: Storage "${name}" not found`);
+  }
+
+  cache.set(key, record.id);
+  return record.id;
+};
+
+const resolveUnitId = async (
+  name: string,
+  rowNo: number,
+  cache: Map<string, number>
+): Promise<number> => {
+  const key = normalizeLookupKey(name);
+  const cached = cache.get(key);
+  if (cached != null) return cached;
+
+  const trimmed = name.trim();
+  const record = await db.invUnitMaster.findFirst({
+    where: {
+      isActive: true,
+      OR: [{ packagingTypeName: trimmed }, { packagingSize: trimmed }],
+    },
+  });
+
+  if (!record) {
+    throw new Error(`Row ${rowNo}: Unit "${name}" not found`);
+  }
+
+  cache.set(key, record.id);
+  return record.id;
+};
 
 export const createItemMasterInDb = async (
   itemMaster: ItemMasterReq
@@ -145,11 +218,11 @@ export const getItemStocksByItemId = async (
   });
 };
 
-export const CreateItemMasterExcelInDb = async (
-  inp: Prisma.InvItemMasterExcelCreateInput[]
+export const createItemMasterExcelInDb = async (
+  inp: ItemMasterExcelStagingRow[]
 ) => {
-  logger.info("entering::CreateItemMasterExcelInDb::repository");
-  const batchUin = await uinServiceFactory.generateUIN(
+  logger.info("entering::createItemMasterExcelInDb::repository");
+  const batchJobNo = await uinServiceFactory.generateUIN(
     InvUinShortCode.BATCH_JOB
   );
   const settings = requestStorage.getStore()?.settings;
@@ -157,30 +230,53 @@ export const CreateItemMasterExcelInDb = async (
 
   return await db.$transaction(
     async (tx) => {
-      const roundedData = inp.map((record) => ({
-        ...record,
-        basePrice:
-          record.basePrice != null
-            ? applyRound(record.basePrice, RoundFormat.TO_FIXED, precision)
-            : undefined,
-      }));
-
-      const total = await tx.invItemMasterExcel.createMany({
-        data: roundedData,
-      });
-
-      return await createBatchJobInDb(tx, {
-        totalQty: total.count,
+      const batchJob = await createBatchJobInDb(tx, {
+        totalQty: inp.length,
         type: "ITEM",
         status: "PENDING",
-        batchJobNo: batchUin,
+        batchJobNo,
       });
+
+      const rows: Prisma.InvItemMasterExcelUncheckedCreateInput[] = [];
+
+      for (const record of inp) {
+        const itemCode =
+          record.itemCode?.trim() ||
+          (await uinServiceFactory.generateUIN(InvUinShortCode.ITEM));
+
+        rows.push({
+          ...record,
+          item: record.item.trim(),
+          itemCode,
+          itemCategory: record.itemCategory.trim(),
+          storage: record.storage?.trim() ?? null,
+          unit: record.unit.trim(),
+          basePrice:
+            record.basePrice != null
+              ? new Prisma.Decimal(
+                  applyRound(
+                    Number(record.basePrice),
+                    RoundFormat.TO_FIXED,
+                    precision
+                  )
+                )
+              : null,
+          batchJobId: batchJob.id,
+        });
+      }
+
+      await tx.invItemMasterExcel.createMany({ data: rows });
+
+      return batchJob;
     },
     {
       timeout: API_TIMEOUT,
     }
   );
 };
+
+/** @deprecated Use createItemMasterExcelInDb */
+export const CreateItemMasterExcelInDb = createItemMasterExcelInDb;
 
 export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
   const { batchJobId } = input;
@@ -190,6 +286,10 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
   const store = requestStorage.getStore();
   const BATCH_SIZE = store?.settings?.batchSize || 100;
 
+  const itemCategoryCache = new Map<string, number>();
+  const storageCache = new Map<string, number>();
+  const unitCache = new Map<string, number>();
+
   await db.batchJob.update({
     where: { id: batchJobId },
     data: { status: "IN_PROGRESS" },
@@ -197,6 +297,8 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
 
   while (!isDone) {
     const batch = await db.invItemMasterExcel.findMany({
+      where: { batchJobId },
+      orderBy: { rowNo: "asc" },
       skip,
       take: BATCH_SIZE,
     });
@@ -208,7 +310,21 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
 
     for (const row of batch) {
       try {
-        const itemReq = mapExcelRowToItemMasterReq(row);
+        const resolved = {
+          itemCategoryId: await resolveItemCategoryId(
+            row.itemCategory,
+            row.rowNo,
+            itemCategoryCache
+          ),
+          storageId: await resolveStorageId(
+            row.storage,
+            row.rowNo,
+            storageCache
+          ),
+          unitId: await resolveUnitId(row.unit, row.rowNo, unitCache),
+        };
+
+        const itemReq = mapExcelRowToItemMasterReq(row, resolved);
         await createItemMasterServiceValidation(itemReq);
         const created = await createItemMasterInDb(itemReq);
 
@@ -267,7 +383,9 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
     where: { id: batchJobId },
   });
 
-  await db.invItemMasterExcel.deleteMany();
+  await db.invItemMasterExcel.deleteMany({
+    where: { batchJobId },
+  });
 
   if (batchInfo && batchInfo.totalQty === batchInfo.processedQty) {
     await db.batchJob.update({
@@ -277,4 +395,6 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
       },
     });
   }
+
+  await initializeCache();
 }

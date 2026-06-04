@@ -1,10 +1,14 @@
+import { uinServiceFactory } from "@/config/core.config.js";
 import {
   ItemSupplierCreateInput,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
 import { db } from "@repo/db/client";
-import { InvItemSupplier } from "@repo/db/generated/prisma/client";
+import {
+  InvItemSupplier,
+  InvUinShortCode,
+} from "@repo/db/generated/prisma/client";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { API_TIMEOUT } from "@repo/shared/config/index.js";
@@ -15,11 +19,15 @@ export async function createItemSupplierInDb(
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::createItemSupplierInDb::repository");
   const store = requestStorage.getStore();
+  const supplierCode = await uinServiceFactory.generateUIN(
+    InvUinShortCode.VENDOR
+  );
   return await db.$transaction(
     async (tx) => {
       const itemSupplier = await tx.invItemSupplier.create({
         data: {
           ...data,
+          supplierCode: supplierCode ?? data.supplierCode,
           createdBy: store?.user?.id,
           taxIdentificationDetails: data.taxIdentificationDetails
             ? {
@@ -66,8 +74,12 @@ export async function updateItemSupplierInDb(
   const store = requestStorage.getStore();
   const omitteditemSupplier = customOmit<
     ItemSupplierUpdateInput,
-    "taxIdentificationDetails" | "bankDetails" | "id" | "existingItemSupplier"
-  >(data, ["taxIdentificationDetails", "bankDetails", "id"]);
+    | "taxIdentificationDetails"
+    | "bankDetails"
+    | "id"
+    | "existingItemSupplier"
+    | "supplierCode"
+  >(data, ["taxIdentificationDetails", "bankDetails", "id", "supplierCode"]);
   const { taxIdentificationDetails, bankDetails, id, existingItemSupplier } =
     omitteditemSupplier.omitted;
 
@@ -351,3 +363,27 @@ export async function getItemSupplierByNameFromDb(
   logger.info("exiting::getItemSupplierByNameFromDb::repository");
   return itemSupplier;
 }
+
+export const getPhoneNumberFromDb = async (phoneNumber: string) => {
+  logger.info("entering::getPhoneNumberFromDb::repository");
+  const itemSupplier = await db.invItemSupplier.findFirst({
+    where: {
+      phone: phoneNumber,
+      isActive: true,
+    },
+  });
+  logger.info("exiting::getPhoneNumberFromDb::repository");
+  return itemSupplier;
+};
+
+export const getEmailFromDb = async (email: string) => {
+  logger.info("entering::getEmailFromDb::repository");
+  const itemSupplier = await db.invItemSupplier.findFirst({
+    where: {
+      email: email,
+      isActive: true,
+    },
+  });
+  logger.info("exiting::getEmailFromDb::repository");
+  return itemSupplier;
+};

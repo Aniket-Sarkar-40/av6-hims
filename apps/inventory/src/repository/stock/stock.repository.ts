@@ -4,6 +4,7 @@ import { db } from "@repo/db/client";
 import { toStockEntity } from "@/mapper/purchase/storeRequisition.mapper.js";
 import {
   CreateItemStockInput,
+  ItemBatchStockLookupInput,
   ItemStockAudit,
   ItemStockReportRow,
   ItemStockResponse,
@@ -1479,6 +1480,24 @@ export const getStockInfo = async (input: {
           }
         : undefined,
       isActive: true,
+    },
+  });
+};
+
+export const getItemBatchStockByBatchFromDb = async (
+  input: ItemBatchStockLookupInput
+) => {
+  logger.info("entering::getItemBatchStockByBatchFromDb::repository");
+  return await db.invItemStock.findMany({
+    where: {
+      isActive: true,
+      batchNo: {
+        not: null,
+        contains: input.batchNo,
+      },
+      itemId: {
+        not: input.itemId,
+      },
     },
   });
 };

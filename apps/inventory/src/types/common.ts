@@ -115,3 +115,29 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   data: T[];
 }
+
+export type CommonFieldScalarValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Date
+  | Record<string, unknown>
+  | unknown[];
+
+export interface CommonActiveInactiveParams {
+  shortCode: string;
+  id: number;
+  field: string;
+  value: CommonFieldScalarValue;
+}
+
+export interface CommonActiveInactiveValidated
+  extends CommonActiveInactiveParams {
+  normalizedValue: CommonFieldScalarValue | Date;
+}
+
+export interface CommonActiveInactiveRequestRepository
+  extends CommonActiveInactiveParams {
+  shortCodeData: InvDynamicShortCode;
+}

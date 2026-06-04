@@ -31,14 +31,13 @@ const bankDetailsSchema = Joi.object({
 });
 
 export const itemSupplierCreateSchema = Joi.object({
-  supplierCode: strRequired("Supplier Code"),
+  supplierCode: strOptional("Supplier Code"),
   name: strRequired("Supplier Name"),
   phone: phoneOptional("Phone number"),
   email: emailOptional("Email"),
   address: strRequired("Address"),
   billTo: strOptional("Bill To"),
   shipTo: strOptional("Ship To"),
-  branchDetailsId: idRequired("Branch Details ID"),
   vendorType: enumOptional("Vendor Type", VendorType),
   salesPerson: strOptional("Sales Person"),
   salesPersonPhone: phoneOptional("Sales Person Phone number"),

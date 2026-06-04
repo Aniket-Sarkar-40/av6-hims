@@ -567,3 +567,25 @@ export const decimalOptional = (label: string, precision = 2) =>
         String(precision)
       ),
     });
+
+export const modelFieldRequired = (label: string) =>
+  Joi.string()
+    .trim()
+    .pattern(/^[a-z][a-zA-Z0-9]*$/)
+    .required()
+    .messages({
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+      "string.base": generateValidationErrorMessage("STRING", label),
+      "string.pattern.base": generateValidationErrorMessage(
+        "INVALID_FORMAT",
+        label
+      ),
+    });
+
+export const scalarValueRequired = (label: string) =>
+  Joi.any()
+    .allow(null)
+    .required()
+    .messages({
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+    });
