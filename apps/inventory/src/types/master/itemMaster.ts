@@ -1,4 +1,8 @@
-import { InvItem, Prisma } from "@repo/db/generated/prisma/client";
+import {
+  InvItem,
+  InvUnitMaster,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
 import { DecimalToNumber } from "@repo/shared/utils/helper.utils.js";
 import { FormData } from "@repo/shared/utils/types.utils.js";
@@ -28,7 +32,7 @@ export interface ItemMasterDto
     | BaseModelAttrWoCancel
   > {
   itemCategory: IdValue | null;
-  unitMaster: IdValue | null;
+  unitMaster: InvUnitMaster | null;
   taxDetails: IdValue | null;
   storage: IdValue | null;
 }

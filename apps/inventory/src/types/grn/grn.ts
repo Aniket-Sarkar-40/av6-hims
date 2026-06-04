@@ -1,6 +1,7 @@
 import {
   InvGoodReceiveDetails,
   InvItem,
+  InvUnitMaster,
   PO_STATUS,
   Prisma,
 } from "@repo/db/generated/prisma/client";
@@ -59,7 +60,7 @@ export interface GrnDetailDTO extends InvGoodReceiveDetails {
 
 export interface ItemMasterToDto extends InvItem {
   itemCategory: IdValue | null;
-  unitMaster: IdValue | null;
+  unitMaster: InvUnitMaster | null;
 }
 
 export type GrnResponse = Prisma.InvGoodReceiveGetPayload<{

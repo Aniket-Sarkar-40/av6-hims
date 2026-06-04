@@ -172,7 +172,7 @@ export const itemMasterService = {
   async getItemMasterById(
     input: GetItemReq,
     canNullReturnable: boolean = false
-  ): Promise<ItemMasterDto | null> {
+  ): Promise<ItemMasterDtoStock | null> {
     logger.info("entering::getItemMasterById::service");
     const { itemId, ccId, supplierId } = input;
     validIdCheck(itemId);
@@ -431,7 +431,7 @@ export const itemMasterService = {
         i.itemDescription ?? "",
         i.itemCategory?.value,
         i.storage?.value ?? "",
-        i.unitMaster?.value,
+        i.unitMaster?.packagingTypeName,
         i.basePrice != null ? Number(i.basePrice) : "",
         i.reOrderLevel ?? "",
         i.isBatchNumber,

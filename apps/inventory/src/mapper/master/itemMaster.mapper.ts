@@ -136,7 +136,7 @@ export const toItemMasterDTO = async (
         ? toPublicImageUrl(itemMaster.rightSideImage)
         : null,
       itemCategory: toIdValue(itemCategory, "name"),
-      unitMaster: toIdValue(unitMaster, "packagingTypeName"),
+      unitMaster,
       taxDetails: toIdValue(taxDetail, "name"),
       storage: toIdValue(storage, "name"),
     };
@@ -222,7 +222,7 @@ export const toItemMasterDTOForItemSupplierMap = async (
       ? toPublicImageUrl(model.rightSideImage)
       : null,
     itemCategory: toIdValue(itemCategoryRow, "name"),
-    unitMaster: toIdValue(unitMasterRow, "packagingTypeName"),
+    unitMaster: unitMasterRow,
     taxDetails: toIdValue(taxDetailsRow, "name"),
     storage: toIdValue(storage, "name"),
     branchInHandStock: branchStock,
@@ -269,8 +269,8 @@ export const toItemSearchDTO = async (
 export const toItemStockDTO = async (
   stock: InvItemStock
 ): Promise<ItemStockDTO> => {
-  const item = await itemMasterService.getItemMasterById(
-    { itemId: stock.itemId },
+  const item = await itemMasterService.getItemMasterByIdWoDto(
+    stock.itemId,
     true
   );
   const user = stock.userId
@@ -279,7 +279,7 @@ export const toItemStockDTO = async (
 
   return {
     ...stock,
-    item: item ? await itemMasterToDto(item) : null,
+    item,
     user: toIdValue(user, "name"),
   };
 };
