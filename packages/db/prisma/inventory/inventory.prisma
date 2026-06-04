@@ -34,6 +34,7 @@ model InvSettings {
     grnFinalRoundedFormat RoundFormat       @default(TO_FIXED) @map("grn_final_round_format")
     warehouseMode         Boolean           @default(false) @map("warehouse_mode")
     supplierMode          Boolean           @default(true) @map("supplier_mode")
+    itemStockType         ItemStockType     @default(PACK_WISE) @map("item_stock_type")
     isActive              Boolean           @default(true) @map("is_active")
 
     createdBy Int?      @map("created_by")
@@ -107,18 +108,18 @@ model InvItemStore {
 }
 
 model InvUnitMaster {
-    id                Int          @id @default(autoincrement())
-    packagingTypeName String       @map("packaging_type_name")
-    packagingSize     String       @map("packaging_size")
-    defaultValue      Int?         @map("default_value")
-    defaultUnit       DefaultUnit? @map("default_unit")
-    isActive          Boolean      @default(true) @map("is_active")
-    createdBy         Int?         @map("created_by")
-    updatedBy         Int?         @map("updated_by")
-    createdAt         DateTime     @default(now()) @map("created_at")
-    updatedAt         DateTime     @updatedAt @map("updated_at")
-    deletedAt         DateTime?    @map("deleted_at")
-    deletedBy         Int?         @map("deleted_by")
+    id                Int         @id @default(autoincrement())
+    packagingTypeName String      @map("packaging_type_name")
+    packagingSize     String      @map("packaging_size")
+    defaultValue      Int         @map("default_value")
+    defaultUnit       DefaultUnit @default(PACK) @map("default_unit")
+    isActive          Boolean     @default(true) @map("is_active")
+    createdBy         Int?        @map("created_by")
+    updatedBy         Int?        @map("updated_by")
+    createdAt         DateTime    @default(now()) @map("created_at")
+    updatedAt         DateTime    @updatedAt @map("updated_at")
+    deletedAt         DateTime?   @map("deleted_at")
+    deletedBy         Int?        @map("deleted_by")
 
     item InvItem[]
 

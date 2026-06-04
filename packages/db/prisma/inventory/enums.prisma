@@ -164,3 +164,8 @@ enum LocationWiseRole {
     enabled
     disabled
 }
+
+enum ItemStockType {
+    PACK_WISE
+    EACH_WISE
+}

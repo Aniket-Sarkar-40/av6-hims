@@ -13,12 +13,46 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import { applyRound } from "av6-utils";
-import { CalculationMethod, PO_STATUS } from "@repo/db/generated/prisma/client";
+import {
+  CalculationMethod,
+  ItemStockType,
+  PO_STATUS,
+} from "@repo/db/generated/prisma/client";
 import { validateIdItemSupplier } from "../master/itemSupplier.service.validation.js";
 import { itemStoreService } from "@/services/master/itemStore.service.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { getItemSupplierMapFromDb } from "@/repository/itemSupplierMap/itemSupplierMap.repository.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
+
+const calculatePurchaseOrderItemTotal = ({
+  itemStockType,
+  unitDefaultValue,
+  purchasedPrice,
+  quantity,
+  calculationMethod,
+  precision,
+}: {
+  itemStockType: ItemStockType;
+  unitDefaultValue: unknown;
+  purchasedPrice: unknown;
+  quantity: unknown;
+  calculationMethod: CalculationMethod;
+  precision: number;
+}) => {
+  const price = Number(purchasedPrice);
+  const qty = Number(quantity);
+  const defaultValue = Number(unitDefaultValue);
+
+  let total = price * qty;
+
+  if (itemStockType === ItemStockType.EACH_WISE) {
+    total = defaultValue * price * qty;
+  }
+
+  return calculationMethod === CalculationMethod.STEP_WISE
+    ? applyRound(total, "TO_FIXED", precision)
+    : total;
+};
 
 export const validateIdPO = async (id: number) => {
   logger.info("entering::validateIdPO service::validation");
@@ -40,10 +74,12 @@ export const validatePurchaseOrderCommon = async (
 ): Promise<void> => {
   logger.info("entering::validatePurchaseOrderCommon::service::validation");
 
-  const settings = await settingsService.getSettings(true);
+  const settings = await settingsService.getSettings();
   const calculationMethod: CalculationMethod =
     settings?.grnCalculationMethod || "STEP_WISE";
   const precision = settings?.defaultPrecision || 2;
+  const itemStockType: ItemStockType =
+    settings?.itemStockType || ItemStockType.PACK_WISE;
 
   if (body.currencyId) {
     const currency = await currencyService.getCurrencyById(body.currencyId);
@@ -55,7 +91,7 @@ export const validatePurchaseOrderCommon = async (
     }
   }
 
-  const warehouseMode = settings?.warehouseMode === true;
+  const warehouseMode = settings?.warehouseMode;
   const supplierMode = settings?.supplierMode;
   if (warehouseMode) {
     const warehouse = await warehouseService.getWarehouseById(body.ccId);
@@ -128,55 +164,78 @@ export const validatePurchaseOrderCommon = async (
     }
 
     const { purchasedPrice, quantity, totalAmount, itemId } = detail;
-    let expectedTotal = purchasedPrice * quantity;
-    expectedTotal =
-      calculationMethod === "STEP_WISE"
-        ? applyRound(expectedTotal, "TO_FIXED", precision)
-        : expectedTotal;
 
-    if (applyRound(expectedTotal, "TO_FIXED", precision) !== totalAmount) {
+    const item = items.find((item) => item.id === itemId);
+
+    const expectedTotal = calculatePurchaseOrderItemTotal({
+      itemStockType,
+      unitDefaultValue: item?.unit?.defaultValue ?? 1,
+      purchasedPrice,
+      quantity,
+      calculationMethod,
+      precision,
+    });
+
+    const roundedExpectedTotal = applyRound(
+      expectedTotal,
+      "TO_FIXED",
+      precision
+    );
+    const roundedProvidedTotal = applyRound(
+      Number(totalAmount),
+      "TO_FIXED",
+      precision
+    );
+
+    if (roundedExpectedTotal !== roundedProvidedTotal) {
       logger.warn(
-        `Item ${itemId} total mismatch: expected ${applyRound(
-          expectedTotal,
-          "TO_FIXED",
-          precision
-        ).toFixed(2)}, got ${totalAmount.toFixed(2)}. Auto-correcting.`
+        `Item ${itemId} total mismatch: expected ${roundedExpectedTotal.toFixed(
+          2
+        )}, got ${roundedProvidedTotal.toFixed(2)}.`
       );
+
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
-          `Item total mismatch for item ${itemId}: expected ${applyRound(
-            expectedTotal,
-            "TO_FIXED",
-            precision
-          ).toFixed(2)}, got ${totalAmount.toFixed(2)}`
+          `Item total mismatch for item ${itemId}: expected ${roundedExpectedTotal.toFixed(
+            2
+          )}, got ${roundedProvidedTotal.toFixed(2)}`
         )
       );
     }
 
-    sumOfProductsTotal += detail.totalAmount;
+    sumOfProductsTotal += roundedExpectedTotal;
   }
 
+  const roundedSumOfProductsTotal = applyRound(
+    sumOfProductsTotal,
+    "TO_FIXED",
+    precision
+  );
+  const roundedGrandTotal = applyRound(
+    Number(body.grandTotal),
+    "TO_FIXED",
+    precision
+  );
+
   logger.info(
-    `calculated sum of item totals: ${sumOfProductsTotal.toFixed(2)}`
+    `calculated sum of item totals: ${roundedSumOfProductsTotal.toFixed(2)}`
   );
   logger.info(
-    `comparing sumOfProductsTotal to provided grandTotal=${body.grandTotal.toFixed(
+    `comparing sumOfProductsTotal to provided grandTotal=${roundedGrandTotal.toFixed(
       2
     )}`
   );
 
-  if (
-    applyRound(sumOfProductsTotal, "TO_FIXED", precision) !== body.grandTotal
-  ) {
+  if (roundedSumOfProductsTotal !== roundedGrandTotal) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "VALUE_MISMATCH",
-        `Grand total mismatch: expected ${sumOfProductsTotal.toFixed(
+        `Grand total mismatch: expected ${roundedSumOfProductsTotal.toFixed(
           2
-        )}, got ${body.grandTotal.toFixed(2)}`
+        )}, got ${roundedGrandTotal.toFixed(2)}`
       )
     );
   }

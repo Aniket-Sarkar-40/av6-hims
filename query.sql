@@ -1704,3 +1704,9 @@ ALTER TABLE `inv_item_supplier` ADD COLUMN `is_sms_send` BOOLEAN NOT NULL DEFAUL
     MODIFY `is_grn_sms` BOOLEAN NOT NULL DEFAULT false,
     MODIFY `is_po_sms` BOOLEAN NOT NULL DEFAULT false,
     MODIFY `is_return_sms` BOOLEAN NOT NULL DEFAULT false;
+
+
+ALTER TABLE `inv_settings` ADD COLUMN `item_stock_type` ENUM('PACK_WISE', 'EACH_WISE') NOT NULL DEFAULT 'PACK_WISE';
+
+ALTER TABLE `inv_unit_master` MODIFY `default_value` INTEGER NOT NULL,
+    MODIFY `default_unit` ENUM('PACK', 'BOX', 'LITER', 'ML') NOT NULL DEFAULT 'PACK';

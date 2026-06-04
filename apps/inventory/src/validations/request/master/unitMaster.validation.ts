@@ -1,13 +1,13 @@
 // validators/unitMaster.validator.ts
 import { UnitMasterReq, UnitMasterUpdate } from "@/types/master/unitMaster.js";
+import { DefaultUnit } from "@repo/db/generated/prisma/client";
 import {
-  enumOptional,
-  idOptional,
+  enumRequired,
   idRequired,
+  intRequired,
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { DefaultUnit } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
 export const unitMasterSchema = Joi.object<UnitMasterReq | UnitMasterUpdate>({
@@ -15,10 +15,10 @@ export const unitMasterSchema = Joi.object<UnitMasterReq | UnitMasterUpdate>({
 
   packagingSize: strRequired("Packaging Size"),
 
-  defaultValue: idOptional("Default Value"),
+  defaultValue: intRequired("Default Value"),
 
-  defaultUnit: enumOptional("Default Unit", DefaultUnit),
-}).unknown(false);
+  defaultUnit: enumRequired("Default Unit", DefaultUnit),
+});
 
 export const validateUnitMasterCreate = validationHandler({
   schema: unitMasterSchema,

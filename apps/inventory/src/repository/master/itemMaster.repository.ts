@@ -180,6 +180,9 @@ export const getCountItemsFromDb = async (itemIds: number[]) => {
       id: { in: itemIds },
       isActive: true,
     },
+    include: {
+      unit: true,
+    },
   });
 };
 
