@@ -143,18 +143,19 @@ model TaxDetails {
 }
 
 model InvItemSupplier {
-    id               Int         @id @default(autoincrement())
-    supplierCode     String?     @map("supplier_code")
-    name             String
-    phone            String?
-    email            String?
-    address          String      @db.Text
-    billTo           String?
-    shipTo           String?
-    vendorType       VendorType? @map("vendor_type")
-    salesPerson      String?     @map("sales_person")
-    salesPersonPhone String?     @map("sales_person_phone")
-    salesPersonEmail String?     @map("sales_person_email")
+    id                Int         @id @default(autoincrement())
+    supplierCode      String?     @map("supplier_code")
+    vendorCompanyName String      @map("vendor_company_name")
+    phone             String?
+    email             String?
+    billTo            String      @map("bill_to")
+    shipTo            String      @map("ship_to")
+    vendorType        VendorType? @map("vendor_type")
+    salesPerson       String?     @map("sales_person")
+    salesPersonPhone  String?     @map("sales_person_phone")
+    salesPersonEmail  String?     @map("sales_person_email")
+
+    isSmsSend Boolean @default(false) @map("is_sms_send")
 
     proprietaryPersonName  String? @map("proprietary_person_name")
     proprietaryPersonPhone String? @map("proprietary_person_phone")
@@ -164,19 +165,17 @@ model InvItemSupplier {
     termsAndCondition    String? @map("terms_and_conditions")
     stockShipmentDetails String? @map("stock_shipment_details")
 
-    contactPersonName  String? @map("contact_person_name")
-    contactPersonPhone String? @map("contact_person_phone")
-    contactPersonEmail String? @map("contact_person_email")
+    isPoWhatsapp     Boolean @default(false) @map("is_po_whatsapp")
+    isPoEmail        Boolean @default(false) @map("is_po_email")
+    isPoSms          Boolean @default(false) @map("is_po_sms")
+    isGrnWhatsapp    Boolean @default(false) @map("is_grn_whatsapp")
+    isGrnEmail       Boolean @default(false) @map("is_grn_email")
+    isGrnSms         Boolean @default(false) @map("is_grn_sms")
+    isReturnWhatsapp Boolean @default(false) @map("is_return_whatsapp")
+    isReturnEmail    Boolean @default(false) @map("is_return_email")
+    isReturnSms      Boolean @default(false) @map("is_return_sms")
 
-    isPoWhatsapp     Boolean? @default(false) @map("is_po_whatsapp")
-    isPoEmail        Boolean? @default(false) @map("is_po_email")
-    isGrnWhatsapp    Boolean? @default(false) @map("is_grn_whatsapp")
-    isGrnEmail       Boolean? @default(false) @map("is_grn_email")
-    isReturnWhatsapp Boolean? @default(false) @map("is_return_whatsapp")
-    isReturnEmail    Boolean? @default(false) @map("is_return_email")
-
-    description String?
-    isLock      Boolean @default(false) @map("is_lock")
+    isLock Boolean @default(false) @map("is_lock")
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -189,7 +188,7 @@ model InvItemSupplier {
     taxIdentificationDetails TaxIdentificationDetails[]
     bankDetails              BankDetails[]
     taxDetails               TaxDetails?                @relation(fields: [taxDetailsId], references: [id])
-    iemSupplierMapping       InvItemSupplierMapping[]
+    itemSupplierMapping      InvItemSupplierMapping[]
     purchaseOrder            InvPurchaseOrder[]
     goodReceive              InvGoodReceive[]
     goodReceiveReturn        InvGoodReceiveReturn[]
@@ -1503,14 +1502,13 @@ model InvItemSupplierExcel {
     id    Int @id @default(autoincrement())
     rowNo Int @map("row_no")
 
-    supplierCode String?     @map("supplier_code")
-    name         String
-    phone        String?
-    email        String?
-    address      String      @db.Text
-    billTo       String?     @map("bill_to")
-    shipTo       String?     @map("ship_to")
-    vendorType   VendorType? @map("vendor_type")
+    supplierCode      String?     @map("supplier_code")
+    vendorCompanyName String      @map("vendor_company_name")
+    phone             String?
+    email             String?
+    billTo            String      @map("bill_to")
+    shipTo            String      @map("ship_to")
+    vendorType        VendorType? @map("vendor_type")
 
     salesPerson      String? @map("sales_person")
     salesPersonPhone String? @map("sales_person_phone")
@@ -1522,10 +1520,6 @@ model InvItemSupplierExcel {
 
     termsAndCondition    String? @map("terms_and_conditions")
     stockShipmentDetails String? @map("stock_shipment_details")
-
-    contactPersonName  String? @map("contact_person_name")
-    contactPersonPhone String? @map("contact_person_phone")
-    contactPersonEmail String? @map("contact_person_email")
 
     accountNo         Int?    @map("account_no")
     accountHolderName String? @map("account_holder_name")

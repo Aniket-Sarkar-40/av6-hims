@@ -89,7 +89,7 @@ export const toPurchaseOrderDTO = async (
       return {
         ...omittedPo.rest,
         store: toIdValue(storeDTO, "itemStoreName"),
-        supplier: toIdValue(supplierDTO, "name"),
+        supplier: toIdValue(supplierDTO, "vendorCompanyName"),
         warehouse: toIdValue(warehouse, "name"),
         branch: toIdValue(branch, "name"),
         currency: toIdValue(currency, "name"),

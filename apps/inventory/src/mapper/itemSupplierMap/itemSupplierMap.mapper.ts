@@ -72,7 +72,7 @@ export const toItemSupplierMapDTO = async (
       return {
         ...omittedItemSupplierMap.rest,
         item: item ? toIdValue(item, "item") : null,
-        supplier: supplier ? toIdValue(supplier, "name") : null,
+        supplier: supplier ? toIdValue(supplier, "vendorCompanyName") : null,
         collectionCenter: toIdValue(CollectionCenter, "name"),
       };
     })

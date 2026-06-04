@@ -368,7 +368,7 @@ export async function getItemSupplierByNameFromDb(
 
   const itemSupplier = await db.invItemSupplier.findFirst({
     where: {
-      name,
+      vendorCompanyName: name,
       isActive: true,
     },
     include: {
@@ -466,12 +466,11 @@ export const createItemSupplierExcelInDb = async (
           rowNo: record.rowNo,
 
           supplierCode: record.supplierCode?.trim() || null,
-          name: record.name.trim(),
+          vendorCompanyName: record.vendorCompanyName.trim(),
           phone: record.phone?.trim() || null,
           email: record.email?.trim() || null,
-          address: record.address.trim(),
-          billTo: record.billTo?.trim() || null,
-          shipTo: record.shipTo?.trim() || null,
+          billTo: record.billTo.trim(),
+          shipTo: record.shipTo.trim(),
           vendorType: record.vendorType ?? null,
 
           salesPerson: record.salesPerson?.trim() || null,
@@ -484,10 +483,6 @@ export const createItemSupplierExcelInDb = async (
 
           termsAndCondition: record.termsAndCondition?.trim() || null,
           stockShipmentDetails: record.stockShipmentDetails?.trim() || null,
-
-          contactPersonName: record.contactPersonName?.trim() || null,
-          contactPersonPhone: record.contactPersonPhone?.trim() || null,
-          contactPersonEmail: record.contactPersonEmail?.trim() || null,
 
           accountNo: record.accountNo ?? null,
           accountHolderName: record.accountHolderName?.trim() || null,
@@ -559,7 +554,7 @@ export async function ItemSupplierBatchJob(input: ItemSupplierBatchJobInput) {
             batchId: batchJobId,
             refId: created.id,
             refNo: created.supplierCode ?? String(created.id),
-            rowTitle: created.name,
+            rowTitle: created.vendorCompanyName,
             status: "SUCCESS",
             rowNo: row.rowNo,
           },
@@ -584,11 +579,11 @@ export async function ItemSupplierBatchJob(input: ItemSupplierBatchJobInput) {
         await db.batchJobDetails.create({
           data: {
             batchId: batchJobId,
-            rowTitle: row.name,
+            rowTitle: row.vendorCompanyName,
             refNo: row.supplierCode ?? String(row.rowNo),
             status: "FAILED",
             rowNo: row.rowNo,
-            errorMsg: `${row.name} ---> ${errorMessage}`,
+            errorMsg: `${row.vendorCompanyName} ---> ${errorMessage}`,
           },
         });
 

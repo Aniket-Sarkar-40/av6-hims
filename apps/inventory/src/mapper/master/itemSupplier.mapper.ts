@@ -79,12 +79,11 @@ export const mapRowToItemSupplierExcelCreateInput = (
     rowNo,
 
     supplierCode: getString(row["Vendor Code"]),
-    name: getRequiredString(row["Vendor Name"]),
+    vendorCompanyName: getRequiredString(row["Vendor Company Name"]),
     phone: getString(row.Phone),
     email: getString(row.Email),
-    address: getRequiredString(row.Address),
-    billTo: getString(row["Bill To"]),
-    shipTo: getString(row["Ship To"]),
+    billTo: getRequiredString(row["Bill To"]),
+    shipTo: getRequiredString(row["Ship To"]),
     vendorType: getOptionalVendorType(row["Vendor Type"]),
 
     salesPerson: getString(row["Sales Person"]),
@@ -97,10 +96,6 @@ export const mapRowToItemSupplierExcelCreateInput = (
 
     termsAndCondition: getString(row["Terms And Conditions"]),
     stockShipmentDetails: getString(row["Stock Shipment Details"]),
-
-    contactPersonName: getString(row["Contact Person Name"]),
-    contactPersonPhone: getString(row["Contact Person Phone"]),
-    contactPersonEmail: getString(row["Contact Person Email"]),
 
     accountNo: getOptionalInt(row["Bank Account No"]),
     accountHolderName: getString(row["Bank Account Holder Name"]),
@@ -139,10 +134,9 @@ export const mapExcelRowToItemSupplierReq = (
 ): ItemSupplierCreateInput => {
   return {
     supplierCode: row.supplierCode,
-    name: row.name,
+    vendorCompanyName: row.vendorCompanyName,
     phone: row.phone,
     email: row.email,
-    address: row.address,
     billTo: row.billTo,
     shipTo: row.shipTo,
     vendorType: row.vendorType,
@@ -157,10 +151,6 @@ export const mapExcelRowToItemSupplierReq = (
 
     termsAndCondition: row.termsAndCondition,
     stockShipmentDetails: row.stockShipmentDetails,
-
-    contactPersonName: row.contactPersonName,
-    contactPersonPhone: row.contactPersonPhone,
-    contactPersonEmail: row.contactPersonEmail,
 
     bankDetails: hasBankDetails(row)
       ? [

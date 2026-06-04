@@ -12,29 +12,25 @@ const VENDOR_HEADER_GUIDE: Record<string, VendorExcelHeaderGuide> = {
     status: "OPTIONAL",
     note: "Optional. If empty, Vendor Code will be generated automatically.",
   },
-  name: {
+  vendorCompanyName: {
     status: "REQUIRED",
-    note: "Required. Vendor Name is mandatory and must be unique.",
+    note: "Required. Vendor Company Name is mandatory and must be unique.",
   },
   phone: {
     status: "OPTIONAL",
-    note: "Optional. If provided, phone number must be unique.",
+    note: "Optional. If provided, must be exactly 9 digits and unique.",
   },
   email: {
     status: "OPTIONAL",
     note: "Optional. If provided, email must be unique.",
   },
-  address: {
-    status: "REQUIRED",
-    note: "Required. Address is mandatory.",
-  },
   billTo: {
-    status: "OPTIONAL",
-    note: "Optional.",
+    status: "REQUIRED",
+    note: "Required. Bill To address is mandatory.",
   },
   shipTo: {
-    status: "OPTIONAL",
-    note: "Optional.",
+    status: "REQUIRED",
+    note: "Required. Ship To address is mandatory.",
   },
   vendorType: {
     status: "OPTIONAL",
@@ -47,7 +43,7 @@ const VENDOR_HEADER_GUIDE: Record<string, VendorExcelHeaderGuide> = {
   },
   salesPersonPhone: {
     status: "OPTIONAL",
-    note: "Optional.",
+    note: "Optional. If provided, must be exactly 9 digits.",
   },
   salesPersonEmail: {
     status: "OPTIONAL",
@@ -60,7 +56,7 @@ const VENDOR_HEADER_GUIDE: Record<string, VendorExcelHeaderGuide> = {
   },
   proprietaryPersonPhone: {
     status: "OPTIONAL",
-    note: "Optional.",
+    note: "Optional. If provided, must be exactly 9 digits.",
   },
   proprietaryPersonEmail: {
     status: "OPTIONAL",
@@ -72,19 +68,6 @@ const VENDOR_HEADER_GUIDE: Record<string, VendorExcelHeaderGuide> = {
     note: "Optional.",
   },
   stockShipmentDetails: {
-    status: "OPTIONAL",
-    note: "Optional.",
-  },
-
-  contactPersonName: {
-    status: "OPTIONAL",
-    note: "Optional.",
-  },
-  contactPersonPhone: {
-    status: "OPTIONAL",
-    note: "Optional.",
-  },
-  contactPersonEmail: {
     status: "OPTIONAL",
     note: "Optional.",
   },
@@ -247,7 +230,8 @@ export const addVendorImportInstructionSheet = (wb: ExcelJs.Workbook) => {
   const instructionRows = [
     {
       type: "Required *",
-      meaning: "Always required. Vendor Name and Address must be provided.",
+      meaning:
+        "Always required. Vendor Company Name, Bill To, and Ship To must be provided.",
     },
     {
       type: "Required if section is used *",
@@ -276,7 +260,7 @@ export const addVendorImportInstructionSheet = (wb: ExcelJs.Workbook) => {
     {
       type: "Duplicate Validation",
       meaning:
-        "Vendor Code, Vendor Name, Phone, and Email are checked during batch import. Duplicate rows will fail in Batch Job Details.",
+        "Vendor Code, Vendor Company Name, Phone, and Email are checked during batch import. Duplicate rows will fail in Batch Job Details.",
     },
     {
       type: "Important",

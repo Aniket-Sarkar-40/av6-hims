@@ -193,10 +193,9 @@ export const itemSupplierService = {
 
     ws.columns = [
       { header: "Vendor Code", key: "supplierCode", width: 20 },
-      { header: "Vendor Name", key: "name", width: 30 },
+      { header: "Vendor Company Name", key: "vendorCompanyName", width: 30 },
       { header: "Phone", key: "phone", width: 18 },
       { header: "Email", key: "email", width: 30 },
-      { header: "Address", key: "address", width: 40 },
       { header: "Bill To", key: "billTo", width: 30 },
       { header: "Ship To", key: "shipTo", width: 30 },
       { header: "Vendor Type", key: "vendorType", width: 20 },
@@ -227,10 +226,6 @@ export const itemSupplierService = {
         key: "stockShipmentDetails",
         width: 40,
       },
-
-      { header: "Contact Person Name", key: "contactPersonName", width: 30 },
-      { header: "Contact Person Phone", key: "contactPersonPhone", width: 25 },
-      { header: "Contact Person Email", key: "contactPersonEmail", width: 32 },
 
       { header: "Bank Account No", key: "accountNo", width: 25 },
       {
@@ -295,20 +290,19 @@ export const itemSupplierService = {
 
     ws.addRow({
       supplierCode: supplier?.supplierCode ?? "VEN-0001",
-      name: supplier?.name ?? "ABC Medical Supplier",
-      phone: supplier?.phone ?? "9876543210",
+      vendorCompanyName: supplier?.vendorCompanyName ?? "ABC Medical Supplier",
+      phone: supplier?.phone ?? "987654321",
       email: supplier?.email ?? "vendor@example.com",
-      address: supplier?.address ?? "Kolkata, West Bengal",
       billTo: supplier?.billTo ?? "ABC Medical Supplier Billing Address",
       shipTo: supplier?.shipTo ?? "ABC Medical Supplier Shipping Address",
       vendorType: supplier?.vendorType ?? "LOCAL",
 
       salesPerson: supplier?.salesPerson ?? "Rahul Das",
-      salesPersonPhone: supplier?.salesPersonPhone ?? "9876543211",
+      salesPersonPhone: supplier?.salesPersonPhone ?? "987654322",
       salesPersonEmail: supplier?.salesPersonEmail ?? "sales@example.com",
 
       proprietaryPersonName: supplier?.proprietaryPersonName ?? "Amit Kumar",
-      proprietaryPersonPhone: supplier?.proprietaryPersonPhone ?? "9876543212",
+      proprietaryPersonPhone: supplier?.proprietaryPersonPhone ?? "987654323",
       proprietaryPersonEmail:
         supplier?.proprietaryPersonEmail ?? "owner@example.com",
 
@@ -316,10 +310,6 @@ export const itemSupplierService = {
         supplier?.termsAndCondition ?? "Payment within 30 days",
       stockShipmentDetails:
         supplier?.stockShipmentDetails ?? "Delivery within 7 days",
-
-      contactPersonName: supplier?.contactPersonName ?? "Suman Roy",
-      contactPersonPhone: supplier?.contactPersonPhone ?? "9876543213",
-      contactPersonEmail: supplier?.contactPersonEmail ?? "contact@example.com",
 
       accountNo:
         bank?.accountNo != null ? String(bank.accountNo) : "1234567890",
@@ -339,7 +329,6 @@ export const itemSupplierService = {
     ws.getColumn("phone").numFmt = "@";
     ws.getColumn("salesPersonPhone").numFmt = "@";
     ws.getColumn("proprietaryPersonPhone").numFmt = "@";
-    ws.getColumn("contactPersonPhone").numFmt = "@";
     ws.getColumn("accountNo").numFmt = "@";
     ws.getColumn("ifscCode").numFmt = "@";
     ws.getColumn("taxIdentificationNumber").numFmt = "@";

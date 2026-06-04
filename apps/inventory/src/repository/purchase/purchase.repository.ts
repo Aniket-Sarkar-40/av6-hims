@@ -88,7 +88,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
       subjectType: "INV_PURCHASE_ORDER",
       subjectId: poCreate.id,
       extra: {
-        supplier: omittedPO.omitted.supplier?.name || null,
+        supplier: omittedPO.omitted.supplier?.vendorCompanyName || null,
         cc: poCreate.collectionCenter.colName || null,
       },
     });
@@ -142,7 +142,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
   const toCreate = incomingDetails.filter(
     (d) => d.id == null || !existingIds.has(d.id)
   );
-  const toDelete = omittedPO.omitted.purchaseOrderDetails.filter(
+  const toDelete = omittedPO.omitted.po.purchaseOrderDetails.filter(
     (d) => !incomingDetails.some((detail) => detail.id === d.id)
   );
 
@@ -162,12 +162,12 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
             packingQty: d.packingQty,
             quantity: d.quantity,
             purchasedPrice: applyRound(
-              d.purchasedPrice,
+              Number(d.purchasedPrice),
               RoundFormat.TO_FIXED,
               precision
             ),
             totalAmount: applyRound(
-              d.totalAmount,
+              Number(d.totalAmount),
               RoundFormat.TO_FIXED,
               precision
             ),
@@ -177,7 +177,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
         create: toCreate.map((d) => ({
           itemId: d.itemId,
           purchasedPrice: applyRound(
-            d.purchasedPrice,
+            Number(d.purchasedPrice),
             RoundFormat.TO_FIXED,
             precision
           ),
@@ -185,7 +185,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           quantity: d.quantity,
           receivedQty: d.receivedQty,
           totalAmount: applyRound(
-            d.totalAmount,
+            Number(d.totalAmount),
             RoundFormat.TO_FIXED,
             precision
           ),
@@ -214,8 +214,24 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           isActive: true,
         },
       },
+      collectionCenter: true,
     },
   });
+
+  if (updated.status === "SENT_FOR_APPROVAL") {
+    await approvalService.startFlow({
+      ccId: updated.ccId,
+      netTotal: Number(updated.grandTotal),
+      refNo: updated.poNumber,
+      service: "INVENTORY",
+      subjectType: "INV_PURCHASE_ORDER",
+      subjectId: updated.id,
+      extra: {
+        supplier: omittedPO.omitted.supplier?.vendorCompanyName || null,
+        cc: updated.collectionCenter.colName || null,
+      },
+    });
+  }
 
   return updated;
 };

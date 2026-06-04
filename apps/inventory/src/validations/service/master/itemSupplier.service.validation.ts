@@ -48,7 +48,7 @@ export const createItemSupplierServiceValidation = async (
       );
     }
   }
-  const name = await getItemSupplierByNameFromDb(input.name);
+  const name = await getItemSupplierByNameFromDb(input.vendorCompanyName);
   if (name) {
     throw new ErrorHandler(
       400,
@@ -93,7 +93,7 @@ export const updateItemSupplierServiceValidation = async (
       );
     }
   }
-  const name = await getItemSupplierByNameFromDb(input.name);
+  const name = await getItemSupplierByNameFromDb(input.vendorCompanyName);
   if (name && name.id !== input.id) {
     throw new ErrorHandler(
       400,

@@ -36,10 +36,9 @@ export interface ItemSupplierBatchJobInput {
 
 export interface ItemSupplierExcelRow {
   "Vendor Code"?: unknown;
-  "Vendor Name"?: unknown;
+  "Vendor Company Name"?: unknown;
   Phone?: unknown;
   Email?: unknown;
-  Address?: unknown;
   "Bill To"?: unknown;
   "Ship To"?: unknown;
   "Vendor Type"?: unknown;
@@ -54,10 +53,6 @@ export interface ItemSupplierExcelRow {
 
   "Terms And Conditions"?: unknown;
   "Stock Shipment Details"?: unknown;
-
-  "Contact Person Name"?: unknown;
-  "Contact Person Phone"?: unknown;
-  "Contact Person Email"?: unknown;
 
   "Bank Account No"?: unknown;
   "Bank Account Holder Name"?: unknown;

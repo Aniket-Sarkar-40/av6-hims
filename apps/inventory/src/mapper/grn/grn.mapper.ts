@@ -76,7 +76,7 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
       return {
         ...omittedGrn.rest,
         currency: toIdValue(currency, "name"),
-        supplier: toIdValue(supplierDTO, "name"),
+        supplier: toIdValue(supplierDTO, "vendorCompanyName"),
         warehouse: ccSettingsId ? toIdValue(warehouseDTO, "name") : null,
         branch: ccSettingsId ? null : toIdValue(branchDTO, "name"),
         createdBy: createdBy,

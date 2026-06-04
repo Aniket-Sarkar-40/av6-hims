@@ -1654,3 +1654,53 @@ CREATE TABLE `inv_item_supplier_excel` (
     INDEX `item_supplier_excel_batch_job_id_idx`(`batch_job_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE `inv_uin_config` MODIFY `short_code` ENUM('PO', 'GRN', 'POR', 'SRN', 'BRN', 'ITEM', 'SRR', 'BRR', 'BATCH_JOB', 'CN', 'STAJ', 'ST_TR', 'VENDOR') NOT NULL;
+
+UPDATE `inv_item_supplier`
+SET
+  `name` = COALESCE(`name`, ''),
+  `billTo` = COALESCE(`billTo`, ''),
+  `shipTo` = COALESCE(`shipTo`, '');
+
+ALTER TABLE `inv_item_supplier`
+    DROP COLUMN `address`,
+    CHANGE `billTo` `bill_to` VARCHAR(191) NOT NULL,
+    DROP COLUMN `contact_person_email`,
+    DROP COLUMN `contact_person_name`,
+    DROP COLUMN `contact_person_phone`,
+    DROP COLUMN `description`,
+    CHANGE `name` `vendor_company_name` VARCHAR(191) NOT NULL,
+    CHANGE `shipTo` `ship_to` VARCHAR(191) NOT NULL;
+
+UPDATE `inv_item_supplier_excel`
+SET
+  `name` = COALESCE(`name`, ''),
+  `bill_to` = COALESCE(`bill_to`, ''),
+  `ship_to` = COALESCE(`ship_to`, '');
+
+ALTER TABLE `inv_item_supplier_excel`
+    DROP COLUMN `address`,
+    DROP COLUMN `contact_person_email`,
+    DROP COLUMN `contact_person_name`,
+    DROP COLUMN `contact_person_phone`,
+    CHANGE `name` `vendor_company_name` VARCHAR(191) NOT NULL,
+    MODIFY `bill_to` VARCHAR(191) NOT NULL,
+    MODIFY `ship_to` VARCHAR(191) NOT NULL;
+
+
+ALTER TABLE `inv_item_supplier` ADD COLUMN `is_grn_sms` BOOLEAN NULL DEFAULT false,
+    ADD COLUMN `is_po_sms` BOOLEAN NULL DEFAULT false,
+    ADD COLUMN `is_return_sms` BOOLEAN NULL DEFAULT false;
+
+
+ALTER TABLE `inv_item_supplier` ADD COLUMN `is_sms_send` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_po_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_po_email` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_grn_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_grn_email` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_return_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_return_email` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_grn_sms` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_po_sms` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_return_sms` BOOLEAN NOT NULL DEFAULT false;

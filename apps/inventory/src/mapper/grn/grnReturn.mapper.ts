@@ -116,7 +116,7 @@ export const toGrnReturnDTO = async (
         currency: toIdValue(currency, "name"),
         warehouse: ccSettingsId ? toIdValue(warehouseDTO, "name") : null,
         branch: ccSettingsId ? null : toIdValue(branchDTO, "name"),
-        supplier: toIdValue(supplierDTO, "name"),
+        supplier: toIdValue(supplierDTO, "vendorCompanyName"),
         createdBy: createdBy,
         approvedBy: approvedBy,
         rejectedBy: rejectedBy,

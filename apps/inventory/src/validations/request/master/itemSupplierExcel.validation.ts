@@ -1,5 +1,6 @@
 import { Prisma, VendorType } from "@repo/db/generated/prisma/client";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { getPattern } from "av6-core-v2";
 
 export type ItemSupplierExcelStagingRow = Omit<
   Prisma.InvItemSupplierExcelUncheckedCreateInput,
@@ -32,21 +33,38 @@ export const validateItemSupplierExcelArray = (
       continue;
     }
 
-    if (!row.name?.trim()) {
-      pushRowError(errors, rowNo, "Vendor Name is required");
+    if (!row.vendorCompanyName?.trim()) {
+      pushRowError(errors, rowNo, "Vendor Company Name is required");
     }
 
-    if (!row.address?.trim()) {
-      pushRowError(errors, rowNo, "Address is required");
+    if (!row.billTo?.trim()) {
+      pushRowError(errors, rowNo, "Bill To is required");
+    }
+
+    if (!row.shipTo?.trim()) {
+      pushRowError(errors, rowNo, "Ship To is required");
     }
 
     if (row.supplierCode != null && typeof row.supplierCode !== "string") {
       pushRowError(errors, rowNo, "Vendor Code must be a string");
     }
 
-    if (row.phone != null && typeof row.phone !== "string") {
-      pushRowError(errors, rowNo, "Phone must be a string");
-    }
+    const validatePhoneField = (
+      value: string | null | undefined,
+      label: string
+    ) => {
+      if (value == null || String(value).trim() === "") return;
+      if (
+        typeof value !== "string" ||
+        !getPattern.phonePattern.test(value.trim())
+      ) {
+        pushRowError(errors, rowNo, `${label} must be exactly 9 digits`);
+      }
+    };
+
+    validatePhoneField(row.phone, "Phone");
+    validatePhoneField(row.salesPersonPhone, "Sales Person Phone");
+    validatePhoneField(row.proprietaryPersonPhone, "Proprietary Person Phone");
 
     if (row.email != null && typeof row.email !== "string") {
       pushRowError(errors, rowNo, "Email must be a string");

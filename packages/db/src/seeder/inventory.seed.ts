@@ -159,7 +159,7 @@ export async function runSeed() {
       permission: "inv:itemSupplier:view",
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true, isLock: false }),
-      selectClause: JSON.stringify({ id: "id", value: "name" }),
+      selectClause: JSON.stringify({ id: "id", value: "vendorCompanyName" }),
     },
     {
       shortCode: "ITEM_SUPPLIER_MAP",
