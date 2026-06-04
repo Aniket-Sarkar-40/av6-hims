@@ -98,12 +98,8 @@ export async function updateItemSupplierInDb(
   const store = requestStorage.getStore();
   const omitteditemSupplier = customOmit<
     ItemSupplierUpdateInput,
-    | "taxIdentificationDetails"
-    | "bankDetails"
-    | "id"
-    | "existingItemSupplier"
-    | "supplierCode"
-  >(data, ["taxIdentificationDetails", "bankDetails", "id", "supplierCode"]);
+    "taxIdentificationDetails" | "bankDetails" | "id" | "existingItemSupplier"
+  >(data, ["taxIdentificationDetails", "bankDetails", "id"]);
   const { taxIdentificationDetails, bankDetails, id, existingItemSupplier } =
     omitteditemSupplier.omitted;
 

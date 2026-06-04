@@ -1,6 +1,7 @@
 import { VendorType } from "@repo/db/generated/prisma/client";
 import {
   arrayOptional,
+  boolOptional,
   boolRequired,
   emailOptional,
   enumOptional,
@@ -47,7 +48,7 @@ export const itemSupplierCreateSchema = Joi.object({
   taxDetailsId: idOptional("Tax Details ID"),
   termsAndCondition: strOptional("Terms And Condition"),
   stockShipmentDetails: strOptional("Stock Shipment Details"),
-  isSmsSend: boolRequired("Is SMS Send"),
+  isSmsSend: boolOptional("Is SMS Send"),
   isPoWhatsapp: boolRequired("Is PO Whatsapp"),
   isPoEmail: boolRequired("Is PO Email"),
   isPoSms: boolRequired("Is PO SMS"),
@@ -57,7 +58,7 @@ export const itemSupplierCreateSchema = Joi.object({
   isReturnWhatsapp: boolRequired("Is Return Whatsapp"),
   isReturnSms: boolRequired("Is Return SMS"),
   isReturnEmail: boolRequired("Is Return Email"),
-  isLock: boolRequired("Is Lock"),
+  isLock: boolOptional("Is Lock"),
   taxIdentificationDetails: arrayOptional(
     "Tax Identification Details",
     taxIdentificationDetailSchema
