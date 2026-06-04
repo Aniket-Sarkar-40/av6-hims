@@ -3,6 +3,7 @@ import {
   deleteItemSupplierById,
   getAllItemSupplier,
   getItemSupplierById,
+  itemSupplierExcelSampleExport,
   updateItemSupplier,
 } from "@/controllers/master/itemSupplier.controller.js";
 import {
@@ -135,4 +136,20 @@ itemSupplierRouter.delete(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "DELETE")),
   deleteItemSupplierById
+);
+
+/**
+ * @swagger
+ * /api/v1/master/item-supplier/excel-sample-export:
+ *   get:
+ *     summary: Export excel sample data
+ *     tags: [Item Supplier]
+ *     security:
+ *       - bearerAuth: []
+ */
+itemSupplierRouter.get(
+  "/excel-sample-export",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
+  itemSupplierExcelSampleExport
 );

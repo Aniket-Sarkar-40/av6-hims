@@ -4,35 +4,38 @@ import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Request, Response } from "express";
+import { Workbook } from "exceljs";
 
 export const createItemSupplier = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::createItemSupplier::controller");
     const body = req.body;
-    const createdItemSupplier =
-      await itemSupplierService.createItemSupplier(body);
+    const createdItemSupplier = await itemSupplierService.createItemSupplier(
+      body
+    );
     logger.info("exiting::createItemSupplier::controller");
     const response = BaseResponse.success(
       { type: "CREATED", data: createdItemSupplier },
-      "Item Supplier",
+      "Item Supplier"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const updateItemSupplier = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::updateItemSupplier::controller");
     const body = req.body;
-    const updatedItemSupplier =
-      await itemSupplierService.updateItemSupplier(body);
+    const updatedItemSupplier = await itemSupplierService.updateItemSupplier(
+      body
+    );
     logger.info("exiting::updateItemSupplier::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedItemSupplier },
-      "Item Supplier",
+      "Item Supplier"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const getAllItemSupplier = TryCatch(
@@ -43,10 +46,10 @@ export const getAllItemSupplier = TryCatch(
     logger.info("exiting::getAllItemSupplier::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: itemSupplier },
-      "Item Supplier",
+      "Item Supplier"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const getItemSupplierById = TryCatch(
@@ -54,7 +57,7 @@ export const getItemSupplierById = TryCatch(
     logger.info("entering::getItemSupplierById::controller");
     const { itemSupplierId } = req.query as { itemSupplierId: string };
     const itemSupplier = await itemSupplierService.getItemSupplierById(
-      Number(itemSupplierId),
+      Number(itemSupplierId)
     );
     logger.info("exiting::getItemSupplierById::controller");
     if (!itemSupplier) {
@@ -66,10 +69,10 @@ export const getItemSupplierById = TryCatch(
     logger.info("exiting::getItemSupplierById::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: itemSupplier },
-      "Item Supplier",
+      "Item Supplier"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const deleteItemSupplierById = TryCatch(
@@ -81,5 +84,28 @@ export const deleteItemSupplierById = TryCatch(
     logger.info("exiting::deleteItemSupplierById::controller");
     const response = BaseResponse.success({ type: "DELETED" }, "Item Supplier");
     return res.status(200).json(response);
-  },
+  }
+);
+
+export const itemSupplierExcelSampleExport = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::itemSupplierExcelSampleExport::controller");
+
+    const wb: Workbook =
+      await itemSupplierService.itemSupplierExcelSampleExport();
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="vendor-sample.xlsx"'
+    );
+
+    await wb.xlsx.write(res);
+    res.end();
+
+    logger.info("exiting::itemSupplierExcelSampleExport::controller");
+  }
 );
