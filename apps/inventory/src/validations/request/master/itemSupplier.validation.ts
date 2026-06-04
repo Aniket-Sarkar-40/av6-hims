@@ -1,6 +1,7 @@
+import { VendorType } from "@repo/db/generated/prisma/client";
 import {
   arrayOptional,
-  boolOptional,
+  boolRequired,
   emailOptional,
   enumOptional,
   idOptional,
@@ -10,7 +11,6 @@ import {
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { VendorType } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
 const taxIdentificationDetailSchema = Joi.object({
@@ -47,13 +47,17 @@ export const itemSupplierCreateSchema = Joi.object({
   taxDetailsId: idOptional("Tax Details ID"),
   termsAndCondition: strOptional("Terms And Condition"),
   stockShipmentDetails: strOptional("Stock Shipment Details"),
-  isPoWhatsapp: boolOptional("Is PO Whatsapp"),
-  isPoEmail: boolOptional("Is PO Email"),
-  isGrnWhatsapp: boolOptional("Is GRN Whatsapp"),
-  isGrnEmail: boolOptional("Is GRN Email"),
-  isReturnWhatsapp: boolOptional("Is Return Whatsapp"),
-  isReturnEmail: boolOptional("Is Return Email"),
-  isLock: boolOptional("Is Lock"),
+  isSmsSend: boolRequired("Is SMS Send"),
+  isPoWhatsapp: boolRequired("Is PO Whatsapp"),
+  isPoEmail: boolRequired("Is PO Email"),
+  isPoSms: boolRequired("Is PO SMS"),
+  isGrnWhatsapp: boolRequired("Is GRN Whatsapp"),
+  isGrnEmail: boolRequired("Is GRN Email"),
+  isGrnSms: boolRequired("Is GRN SMS"),
+  isReturnWhatsapp: boolRequired("Is Return Whatsapp"),
+  isReturnSms: boolRequired("Is Return SMS"),
+  isReturnEmail: boolRequired("Is Return Email"),
+  isLock: boolRequired("Is Lock"),
   taxIdentificationDetails: arrayOptional(
     "Tax Identification Details",
     taxIdentificationDetailSchema
