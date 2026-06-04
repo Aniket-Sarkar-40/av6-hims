@@ -90,6 +90,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
       extra: {
         supplier: omittedPO.omitted.supplier?.vendorCompanyName || null,
         cc: poCreate.collectionCenter.colName || null,
+        supplierCode: omittedPO.omitted.supplier?.supplierCode || null,
       },
     });
   }
