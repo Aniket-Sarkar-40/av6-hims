@@ -8,12 +8,17 @@ import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import { CreateGrnInput } from "@/types/grn/grn.js";
-import { calculation } from "@/utils/commonCalculation.utils.js";
+import {
+  calculateGrnItemNetAmount,
+  calculateGrnStockQty,
+  calculation,
+} from "@/utils/commonCalculation.utils.js";
 import { validateBatchNoBelongsToSameItem } from "@/utils/uniqueBatch.utils.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
 import {
   CalculationMethod,
   GRN_STATUS,
+  ItemStockType,
   PO_STATUS,
 } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
@@ -90,6 +95,8 @@ export const validateGrnCommon = async (
     settings?.grnCalculationMethod || "FINAL";
   const roundFormat = settings?.grnRoundedFormat || "TO_FIXED";
   const precision = settings?.defaultPrecision || 2;
+  const itemStockType: ItemStockType =
+    settings?.itemStockType || ItemStockType.PACK_WISE;
 
   validIdCheck(body.poId);
 
@@ -216,7 +223,20 @@ export const validateGrnCommon = async (
       );
     }
 
-    // Validate price mismatch
+    const unitDefaultValue = poDetail.item?.unit?.defaultValue ?? 1;
+
+    detail.stockQuantity = calculateGrnStockQty({
+      itemStockType,
+      unitDefaultValue,
+      quantity: detail.quantity ?? 0,
+    });
+
+    detail.stockFocQuantity = calculateGrnStockQty({
+      itemStockType,
+      unitDefaultValue,
+      quantity: detail.focQuantity ?? 0,
+    });
+
     if (Number(detail.purchasedPrice) !== Number(poDetail.purchasedPrice)) {
       throw new ErrorHandler(
         400,
@@ -233,26 +253,31 @@ export const validateGrnCommon = async (
       );
     }
 
-    let itemAmount = poDetail.purchasedPrice * (detail.quantity ?? 0);
+    const itemAmount = calculateGrnItemNetAmount({
+      itemStockType,
+      unitDefaultValue,
+      purchasedPrice: Number(poDetail.purchasedPrice),
+      quantity: detail.quantity ?? 0,
+      calculationMethod,
+      roundFormat,
+      precision,
+    });
 
-    // Adjust for calculation method
-    itemAmount =
-      calculationMethod === "STEP_WISE"
-        ? applyRound(itemAmount, roundFormat, precision)
-        : itemAmount;
+    const roundedItemAmount = applyRound(itemAmount, roundFormat, precision);
+    const roundedDetailNetAmount = applyRound(
+      Number(detail.netAmount),
+      roundFormat,
+      precision
+    );
 
-    if (applyRound(itemAmount, roundFormat, precision) !== detail.netAmount) {
+    if (roundedItemAmount !== roundedDetailNetAmount) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
           `Item ${
             poDetail?.item?.item ?? `ID ${detail.itemId}`
-          }: Item Amount (${applyRound(
-            itemAmount,
-            roundFormat,
-            precision
-          )}) does not match net amount (${detail.netAmount})`
+          }: Item Amount (${roundedItemAmount}) does not match net amount (${roundedDetailNetAmount})`
         )
       );
     }
@@ -260,9 +285,9 @@ export const validateGrnCommon = async (
     const { totalAmount, netTax, netDiscount } = calculation({
       // taxMethod: detail.taxMethod,
       discountMethod: detail.discountMethod,
-      discount: detail.discount ?? 0,
+      discount: Number(detail.discount ?? 0),
       tax: detail.tax ?? 0,
-      amount: detail.netAmount,
+      amount: Number(detail.netAmount),
       calculationMethod,
       roundFormat,
       precision: precision || 2,
@@ -496,4 +521,13 @@ export const deleteGrnServiceValidation = async (id: number) => {
     );
   }
   logger.info("exiting::deleteGrnServiceValidation::service::validation");
+};
+
+export const getDetailKey = (detail: {
+  itemId: number;
+  batchNo?: string | null;
+  expiryDate?: Date | string | null;
+}) => {
+  const expiry = detail.expiryDate ? String(detail.expiryDate) : "";
+  return `${detail.itemId}-${detail.batchNo ?? ""}-${expiry}`;
 };

@@ -1,25 +1,27 @@
-import { db } from "@repo/db/client";
-import { subItemStock } from "./../stock/stock.repository.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   CreateGrnInput,
   GrnDetailInput,
   GrnResponse,
 } from "@/types/grn/grn.js";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { db } from "@repo/db/client";
 import {
+  GRN_STATUS,
+  InvGoodReceive,
   InvGoodReceiveDetails,
   InvUinShortCode,
-  InvGoodReceive,
-  GRN_STATUS,
-  ServiceCode,
+  ItemStockType,
   VoucherReferenceType,
 } from "@repo/db/generated/prisma/client";
-import { addItemStock } from "../stock/stock.repository.js";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { customOmit } from "av6-utils";
+import { addItemStock } from "../stock/stock.repository.js";
+import { subItemStock } from "./../stock/stock.repository.js";
 import { settingsService } from "@/services/master/settings.service.js";
+import { calculateGrnStockQty } from "@/utils/commonCalculation.utils.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { getDetailKey } from "@/validations/service/grn/grn.service.validation.js";
 
 export const createGrnInDb = async (
   input: CreateGrnInput
@@ -37,6 +39,8 @@ export const createGrnInDb = async (
   >(input, ["goodReceiveDetails", "poStatus", "supplier"]);
   const grnUin = await uinServiceFactory.generateUIN(InvUinShortCode.GRN);
   return db.$transaction(async (tx) => {
+    const inputDetails = omittedGrn.omitted.goodReceiveDetails;
+
     const createdGrn = await tx.invGoodReceive.create({
       data: {
         ...omittedGrn.rest,
@@ -44,11 +48,23 @@ export const createGrnInDb = async (
         createdBy: currentUser,
         grnNumber: grnUin,
         goodReceiveDetails: {
-          create: omittedGrn.omitted.goodReceiveDetails.map((d) => {
+          create: inputDetails.map((d) => {
             const omittedDetails = customOmit<
               GrnDetailInput,
-              "poDetailsId" | "id" | "isExpiry" | "isBatch"
-            >(d, ["id", "poDetailsId", "isBatch", "isExpiry"]);
+              | "poDetailsId"
+              | "id"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+              | "stockFocQuantity"
+            >(d, [
+              "id",
+              "poDetailsId",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+              "stockFocQuantity",
+            ]);
             return {
               ...omittedDetails.rest,
               expiryDate: d.expiryDate ? new Date(d.expiryDate) : undefined,
@@ -63,7 +79,9 @@ export const createGrnInDb = async (
     });
 
     await Promise.all(
-      createdGrn.goodReceiveDetails.map(async (detail) => {
+      createdGrn.goodReceiveDetails.map(async (detail, index) => {
+        const inputDetail = inputDetails[index];
+
         if ((detail.quantity ?? 0) > 0) {
           await addItemStock(
             tx,
@@ -71,7 +89,7 @@ export const createGrnInDb = async (
               batchNo: detail.batchNo ?? null,
               expiryDate: detail.expiryDate ?? null,
               itemId: detail.itemId,
-              quantity: detail.quantity,
+              quantity: inputDetail.stockQuantity ?? detail.quantity,
               ccId: input.ccId,
               isFoc: false,
             },
@@ -92,7 +110,7 @@ export const createGrnInDb = async (
               batchNo: detail.batchNo ?? null,
               expiryDate: detail.expiryDate ?? null,
               itemId: detail.itemId,
-              quantity: detail.focQuantity,
+              quantity: inputDetail.stockFocQuantity ?? detail.focQuantity,
               ccId: input.ccId,
               isFoc: true,
             },
@@ -163,6 +181,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
 
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
+  const settings = await settingsService.getSettings();
 
   const toUpdate = goodReceiveDetails.filter((d) => typeof d.id === "number");
   const toCreate = goodReceiveDetails.filter((d) => typeof d.id !== "number");
@@ -172,12 +191,54 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
     "goodReceiveDetails" | "poStatus" | "supplier"
   >(input, ["goodReceiveDetails", "poStatus", "supplier"]);
 
+  const newInputDetailByKey = new Map(
+    toCreate.map((detail) => [getDetailKey(detail), detail])
+  );
+
   return await db.$transaction(async (tx) => {
     const prevGrn = await tx.invGoodReceive.findUnique({
       where: { id },
-      include: { goodReceiveDetails: true },
+      include: {
+        goodReceiveDetails: {
+          include: {
+            item: {
+              include: {
+                unit: true,
+              },
+            },
+          },
+        },
+      },
     });
     if (!prevGrn) throw new Error(`GRN ${id} not found`);
+
+    const itemStockType: ItemStockType =
+      settings?.itemStockType || ItemStockType.PACK_WISE;
+
+    const getPrevStockQty = (
+      detail: (typeof prevGrn.goodReceiveDetails)[number],
+      quantity: number
+    ) => {
+      return calculateGrnStockQty({
+        itemStockType,
+        unitDefaultValue: detail.item?.unit?.defaultValue,
+        quantity,
+      });
+    };
+
+    const inputDetailById = new Map(
+      goodReceiveDetails
+        .filter((detail) => typeof detail.id === "number")
+        .map((detail) => [detail.id!, detail])
+    );
+
+    const getInputStockQty = (detailId: number, fallbackQty: number) => {
+      return inputDetailById.get(detailId)?.stockQuantity ?? fallbackQty;
+    };
+
+    const getInputFocStockQty = (detailId: number, fallbackQty: number) => {
+      return inputDetailById.get(detailId)?.stockFocQuantity ?? fallbackQty;
+    };
 
     const updatedGrn = await tx.invGoodReceive.update({
       where: { id },
@@ -189,15 +250,42 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
           update: toUpdate.map((d) => ({
             where: { id: d.id! },
             data: {
-              ...d,
+              ...customOmit<
+                GrnDetailInput,
+                | "poDetailsId"
+                | "id"
+                | "isExpiry"
+                | "isBatch"
+                | "stockQuantity"
+                | "stockFocQuantity"
+              >(d, [
+                "id",
+                "poDetailsId",
+                "isBatch",
+                "isExpiry",
+                "stockQuantity",
+                "stockFocQuantity",
+              ]).rest,
               updatedBy: currentUser,
             },
           })),
           create: toCreate.map((detail) => {
             const omittedDetails = customOmit<
               GrnDetailInput,
-              "poDetailsId" | "id" | "isExpiry" | "isBatch"
-            >(detail, ["id", "poDetailsId", "isBatch", "isExpiry"]);
+              | "poDetailsId"
+              | "id"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+              | "stockFocQuantity"
+            >(detail, [
+              "id",
+              "poDetailsId",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+              "stockFocQuantity",
+            ]);
             return {
               ...omittedDetails.rest,
               createdBy: currentUser,
@@ -228,7 +316,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.quantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.quantity),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -248,7 +336,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.focQuantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.focQuantity),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -282,7 +370,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: delta,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: delta,
+              }),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -301,7 +393,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: -delta,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: -delta,
+              }),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -322,7 +418,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: deltaFoc,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: deltaFoc,
+              }),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -341,7 +441,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: -deltaFoc,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: -deltaFoc,
+              }),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -362,7 +466,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.quantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.quantity),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -382,7 +486,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.quantity,
+              quantity: getInputStockQty(updDetail.id, updDetail.quantity),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -402,7 +506,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.focQuantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.focQuantity),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -422,7 +526,10 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.focQuantity,
+              quantity: getInputFocStockQty(
+                updDetail.id,
+                updDetail.focQuantity
+              ),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -440,6 +547,8 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
 
     for (const updDetail of updatedGrn.goodReceiveDetails) {
       if (!prevMap.has(updDetail.id)) {
+        const inputDetail = newInputDetailByKey.get(getDetailKey(updDetail));
+
         if (updDetail.quantity > 0) {
           await addItemStock(
             tx,
@@ -447,7 +556,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.quantity,
+              quantity: inputDetail?.stockQuantity ?? updDetail.quantity,
               ccId: input.ccId,
               isFoc: false,
             },
@@ -467,7 +576,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.focQuantity,
+              quantity: inputDetail?.stockFocQuantity ?? updDetail.focQuantity,
               ccId: input.ccId,
               isFoc: true,
             },
@@ -482,34 +591,29 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
         }
       }
     }
-
     // voucher entry
-    // if (
-    //   store?.settings?.isAccounting &&
-    //   updatedGrn.status === GRN_STATUS.COMPLETED
-    // ) {
-    //   const result = await accountingExternalService.createVoucher({
-    //     ccId: updatedGrn.ccId,
-    //     refType: VoucherReferenceType.INVENTORY_GRN,
-    //     refNo: updatedGrn.grnNumber,
-    //     refId: updatedGrn.id,
-    //     refDate: updatedGrn.date,
-    //     currencyId: updatedGrn.currencyId ?? undefined,
-    //     conversionRate: updatedGrn.conversionRate
-    //       ? Number(updatedGrn.conversionRate)
-    //       : undefined,
-    //     totalAmount: Number(updatedGrn.totalAmount),
-    //     clientId: updatedGrn.supplierId,
-    //     clientPayAmount: 0,
-    //     customerPayAmount: 0,
-    //     customerName: "",
-    //     createdBy: currentUser,
-    //   });
-    //   if (!result.success) {
-    //     throw new ErrorHandler(result.status, result.message);
-    //   }
-    // }
-
+    if (settings?.isAccounting && updatedGrn.status === GRN_STATUS.COMPLETED) {
+      const result = await accountingExternalService.createVoucher({
+        ccId: updatedGrn.ccId,
+        refType: VoucherReferenceType.INVENTORY_GRN,
+        refNo: updatedGrn.grnNumber,
+        refId: updatedGrn.id,
+        refDate: updatedGrn.date,
+        currencyId: updatedGrn.currencyId ?? undefined,
+        currencyConversionRate: updatedGrn.conversionRate
+          ? Number(updatedGrn.conversionRate)
+          : undefined,
+        totalAmount: Number(updatedGrn.totalAmount),
+        clientId: updatedGrn.supplierId,
+        clientPayAmount: 0,
+        customerPayAmount: 0,
+        customerName: "",
+        createdBy: currentUser,
+      });
+      if (!result.success) {
+        throw new ErrorHandler(result.status, result.message);
+      }
+    }
     return updatedGrn;
   });
 };

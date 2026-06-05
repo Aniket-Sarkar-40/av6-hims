@@ -1,3 +1,4 @@
+import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import {
   mapRowToItemSupplierExcelCreateInput,
   toItemSupplierDTO,
@@ -7,7 +8,6 @@ import {
   createItemSupplierInDb,
   deleteItemSupplierByIdFromDb,
   getAllItemSupplierFromDb,
-  getFirstItemSupplierForExcelFromDb,
   getItemSupplierByIdFromDb,
   ItemSupplierBatchJob,
   updateItemSupplierInDb,
@@ -20,8 +20,17 @@ import {
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
+import {
+  addVendorHeaderStarAndNotes,
+  addVendorImportInstructionSheet,
+} from "@/utils/vendorExcelSample.utils.js";
+import { validateItemSupplierExcelArray } from "@/validations/request/master/itemSupplierExcel.validation.js";
+import {
+  createItemSupplierServiceValidation,
+  deleteItemSupplierServiceValidation,
+  updateItemSupplierServiceValidation,
+} from "@/validations/service/master/itemSupplier.service.validation.js";
+import { InvItemSupplier } from "@repo/db/generated/prisma/client";
 import {
   addToCache,
   deleteCache,
@@ -29,24 +38,13 @@ import {
   getCacheById,
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
-import { getRedisKey } from "@/config/cache.config.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { normalizeVendorExcelRowHeaders } from "@repo/shared/utils/excelImport.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
-import {
-  createItemSupplierServiceValidation,
-  deleteItemSupplierServiceValidation,
-  updateItemSupplierServiceValidation,
-} from "@/validations/service/master/itemSupplier.service.validation.js";
-import { checkIsCacheable } from "@/config/cache.config.js";
-import { InvItemSupplier } from "@repo/db/generated/prisma/client";
 import ExcelJs from "exceljs";
 import XLSX from "xlsx";
-import { validateItemSupplierExcelArray } from "@/validations/request/master/itemSupplierExcel.validation.js";
-import { normalizeVendorExcelRowHeaders } from "@repo/shared/utils/excelImport.utils.js";
-import {
-  addVendorHeaderStarAndNotes,
-  addVendorImportInstructionSheet,
-} from "@/utils/vendorExcelSample.utils.js";
 
 const cacheKey = getRedisKey("ITEM_SUPPLIER", "all");
 
@@ -181,11 +179,6 @@ export const itemSupplierService = {
   async itemSupplierExcelSampleExport(): Promise<ExcelJs.Workbook> {
     logger.info("entering::itemSupplierExcelSampleExport::service");
 
-    const supplier = await getFirstItemSupplierForExcelFromDb();
-
-    const tax = supplier?.taxIdentificationDetails?.[0] ?? null;
-    const bank = supplier?.bankDetails?.[0] ?? null;
-
     const wb = new ExcelJs.Workbook();
     const ws = wb.addWorksheet("Vendor");
 
@@ -289,40 +282,35 @@ export const itemSupplierService = {
     headerRow.height = 24;
 
     ws.addRow({
-      supplierCode: supplier?.supplierCode ?? "VEN-0001",
-      vendorCompanyName: supplier?.vendorCompanyName ?? "ABC Medical Supplier",
-      phone: supplier?.phone ?? "987654321",
-      email: supplier?.email ?? "vendor@example.com",
-      billTo: supplier?.billTo ?? "ABC Medical Supplier Billing Address",
-      shipTo: supplier?.shipTo ?? "ABC Medical Supplier Shipping Address",
-      vendorType: supplier?.vendorType ?? "LOCAL",
+      supplierCode: "VEN-0001",
+      vendorCompanyName: "ABC Medical Supplier",
+      phone: "987654321",
+      email: "vendor@example.com",
+      billTo: "ABC Medical Supplier Billing Address",
+      shipTo: "ABC Medical Supplier Shipping Address",
+      vendorType: "LOCAL",
 
-      salesPerson: supplier?.salesPerson ?? "Rahul Das",
-      salesPersonPhone: supplier?.salesPersonPhone ?? "987654322",
-      salesPersonEmail: supplier?.salesPersonEmail ?? "sales@example.com",
+      salesPerson: "Rahul Das",
+      salesPersonPhone: "987654322",
+      salesPersonEmail: "sales@example.com",
 
-      proprietaryPersonName: supplier?.proprietaryPersonName ?? "Amit Kumar",
-      proprietaryPersonPhone: supplier?.proprietaryPersonPhone ?? "987654323",
-      proprietaryPersonEmail:
-        supplier?.proprietaryPersonEmail ?? "owner@example.com",
+      proprietaryPersonName: "Amit Kumar",
+      proprietaryPersonPhone: "987654323",
+      proprietaryPersonEmail: "owner@example.com",
 
-      termsAndCondition:
-        supplier?.termsAndCondition ?? "Payment within 30 days",
-      stockShipmentDetails:
-        supplier?.stockShipmentDetails ?? "Delivery within 7 days",
+      termsAndCondition: "Payment within 30 days",
+      stockShipmentDetails: "Delivery within 7 days",
 
-      accountNo:
-        bank?.accountNo != null ? String(bank.accountNo) : "1234567890",
-      accountHolderName: bank?.accountHolderName ?? "ABC Medical Supplier",
-      typeOfAccount: bank?.typeOfAccount ?? "CURRENT",
-      ifscCode: bank?.ifscCode ?? "SBIN0001234",
-      bankName: bank?.bankName ?? "State Bank of India",
-      bankAddress: bank?.bankAddress ?? "Kolkata Branch",
+      accountNo: "1234567890",
+      accountHolderName: "ABC Medical Supplier",
+      typeOfAccount: "CURRENT",
+      ifscCode: "SBIN0001234",
+      bankName: "State Bank of India",
+      bankAddress: "Kolkata Branch",
 
-      taxIdentificationName: tax?.taxIdentificationName ?? "GST",
-      taxIdentificationValue: tax?.taxIdentificationValue ?? 1,
-      taxIdentificationNumber:
-        tax?.taxIdentificationNumber ?? "19ABCDE1234F1Z5",
+      taxIdentificationName: "GST",
+      taxIdentificationValue: 1,
+      taxIdentificationNumber: "19ABCDE1234F1Z5",
     });
 
     ws.getColumn("supplierCode").numFmt = "@";

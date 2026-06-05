@@ -1,5 +1,10 @@
 import { CalculationInput, CalculationRes } from "@/types/common.js";
-import { DiscMethod } from "@repo/db/generated/prisma/client";
+import {
+  CalculationMethod,
+  DiscMethod,
+  ItemStockType,
+  RoundFormat,
+} from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { applyRound } from "av6-utils";
 
@@ -61,4 +66,50 @@ export const calculation = (input: CalculationInput): CalculationRes => {
     netTax: calculatedTax,
     totalAmount,
   };
+};
+
+export const calculateGrnItemNetAmount = ({
+  itemStockType,
+  unitDefaultValue,
+  purchasedPrice,
+  quantity,
+  calculationMethod,
+  roundFormat,
+  precision,
+}: {
+  itemStockType: ItemStockType;
+  unitDefaultValue: number;
+  purchasedPrice: number;
+  quantity: number;
+  calculationMethod: CalculationMethod;
+  roundFormat: RoundFormat;
+  precision: number;
+}) => {
+  const price = Number(purchasedPrice);
+  const qty = Number(quantity);
+  const defaultValue = Number(unitDefaultValue);
+
+  const amount =
+    itemStockType === ItemStockType.EACH_WISE
+      ? defaultValue * price * qty
+      : price * qty;
+
+  return calculationMethod === CalculationMethod.STEP_WISE
+    ? applyRound(amount, roundFormat, precision)
+    : amount;
+};
+
+export const calculateGrnStockQty = ({
+  itemStockType,
+  unitDefaultValue,
+  quantity,
+}: {
+  itemStockType: ItemStockType;
+  unitDefaultValue: number;
+  quantity: number;
+}) => {
+  const qty = Number(quantity);
+  const defaultValue = Number(unitDefaultValue);
+
+  return itemStockType === ItemStockType.EACH_WISE ? qty * defaultValue : qty;
 };

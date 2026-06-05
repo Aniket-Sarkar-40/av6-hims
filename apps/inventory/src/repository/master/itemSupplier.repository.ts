@@ -2,7 +2,6 @@ import { uinServiceFactory } from "@/config/core.config.js";
 import { initializeCache } from "@/config/redisClient.js";
 import { mapExcelRowToItemSupplierReq } from "@/mapper/master/itemSupplier.mapper.js";
 import { createBatchJobInDb } from "@/repository/batch/batch.repository.js";
-import { ItemSupplierMapBatchJobInput } from "@/types/itemSupplierMap/itemSupplierMap.js";
 import {
   ItemSupplierBatchJobInput,
   ItemSupplierCreateInput,
@@ -406,37 +405,6 @@ export const getEmailFromDb = async (email: string) => {
   });
   logger.info("exiting::getEmailFromDb::repository");
   return itemSupplier;
-};
-
-export const getFirstItemSupplierForExcelFromDb = async () => {
-  logger.info("entering::getFirstItemSupplierForExcelFromDb::repository");
-  return await db.invItemSupplier.findFirst({
-    include: {
-      taxIdentificationDetails: {
-        where: {
-          isActive: true,
-        },
-        orderBy: {
-          id: "asc",
-        },
-        take: 1,
-      },
-      bankDetails: {
-        where: {
-          deletedAt: null,
-          isActive: true,
-        },
-        orderBy: {
-          id: "asc",
-        },
-        take: 1,
-      },
-      taxDetails: true,
-    },
-    orderBy: {
-      id: "asc",
-    },
-  });
 };
 
 export const createItemSupplierExcelInDb = async (

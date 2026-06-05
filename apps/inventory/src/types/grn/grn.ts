@@ -14,6 +14,8 @@ export interface GrnDetailInput
   poDetailsId: number;
   isBatch: boolean;
   isExpiry: boolean;
+  stockQuantity?: number;
+  stockFocQuantity?: number;
 }
 
 export type CreateGrnInput = Omit<
