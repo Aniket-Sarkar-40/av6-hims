@@ -222,7 +222,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
     ) => {
       return calculateGrnStockQty({
         itemStockType,
-        unitDefaultValue: detail.item?.unit?.defaultValue,
+        unitDefaultValue: Number(detail.item?.unit?.defaultValue ?? 1),
         quantity,
       });
     };

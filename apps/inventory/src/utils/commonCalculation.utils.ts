@@ -87,7 +87,7 @@ export const calculateGrnItemNetAmount = ({
 }) => {
   const price = Number(purchasedPrice);
   const qty = Number(quantity);
-  const defaultValue = Number(unitDefaultValue);
+  const defaultValue = Number(unitDefaultValue ?? 1);
 
   const amount =
     itemStockType === ItemStockType.EACH_WISE
@@ -109,7 +109,7 @@ export const calculateGrnStockQty = ({
   quantity: number;
 }) => {
   const qty = Number(quantity);
-  const defaultValue = Number(unitDefaultValue);
+  const defaultValue = Number(unitDefaultValue ?? 1);
 
   return itemStockType === ItemStockType.EACH_WISE ? qty * defaultValue : qty;
 };
