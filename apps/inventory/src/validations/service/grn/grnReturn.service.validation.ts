@@ -62,8 +62,6 @@ export const validateGrnReturnCommon = async (
     }
   }
 
-  const settings = await settingsService.getSettings(true);
-
   const supplier = await itemSupplierService.getItemSupplierById(
     body.supplierId,
     true
@@ -72,6 +70,8 @@ export const validateGrnReturnCommon = async (
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Supplier"));
   }
   body.supplier = supplier;
+
+  const settings = await settingsService.getSettings();
 
   const ccSettingsId = settings?.warehouseMode;
   let warehouse, branch;
@@ -96,13 +96,17 @@ export const validateGrnReturnCommon = async (
       );
     }
   }
-
   const calculationMethod: CalculationMethod =
     settings?.grnCalculationMethod || "FINAL";
   const roundFormat = settings?.grnRoundedFormat || "TO_FIXED";
   const precision = settings?.defaultPrecision || 2;
   const itemStockType: ItemStockType =
     settings?.itemStockType || ItemStockType.PACK_WISE;
+  //Apply conversion rate to the body
+  applyGrnReturnRateConversion(body, {
+    roundFormat,
+    precision,
+  });
 
   if (ccSettingsId) {
     if (warehouse?.isMain === false) {
@@ -230,24 +234,33 @@ export const validateGrnReturnCommon = async (
     const itemLabel = grnDetail.item?.item ?? `ID ${detail.itemId}`;
     const unitDefaultValue = Number(grnDetail.item?.unit?.defaultValue ?? 1);
 
+    const grnQty = Number(grnDetail.quantity ?? 0);
+    const grnFocQty = Number(grnDetail.focQuantity ?? 0);
+    const totalGrnQty = grnQty + grnFocQty;
+
+    const alreadyReturnedQty = Number(grnDetail.returnQuantity ?? 0);
+    const availableReturnQty = totalGrnQty - alreadyReturnedQty;
+
+    const returnQty = Number(detail.quantity ?? 0);
+
     detail.stockQuantity = calculateGrnStockQty({
       itemStockType,
       unitDefaultValue,
-      quantity: detail.quantity ?? 0,
+      quantity: returnQty,
     });
 
     if (!body.isApproval) {
-      if (grnDetail.quantity !== detail.grnQty) {
+      if (Number(detail.grnQty) !== totalGrnQty) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
             "VALUE_MISMATCH",
-            `Item ${itemLabel}: GRN Quantity (${detail.grnQty}) does not match GRN quantity (${grnDetail.quantity})`
+            `Item ${itemLabel}: GRN Quantity (${detail.grnQty}) does not match total GRN quantity (${totalGrnQty})`
           )
         );
       }
 
-      if (grnDetail.orderQuantity !== detail.orderQty) {
+      if (Number(grnDetail.orderQuantity) !== Number(detail.orderQty)) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
@@ -257,8 +270,6 @@ export const validateGrnReturnCommon = async (
         );
       }
 
-      const finalQuantity = grnDetail.quantity - grnDetail.returnQuantity;
-
       const inHandQty = await getItemStockQtyByBatchWise({
         itemId: detail.itemId,
         ccId: grn.ccId,
@@ -266,7 +277,7 @@ export const validateGrnReturnCommon = async (
         expiryDate: detail.expiryDate ? new Date(detail.expiryDate) : null,
       });
 
-      if (inHandQty !== detail.inHandQty) {
+      if (Number(inHandQty) !== Number(detail.inHandQty)) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
@@ -276,20 +287,19 @@ export const validateGrnReturnCommon = async (
         );
       }
 
-      const returnQty = Number(detail.quantity);
-      const returnStockQty = detail.stockQuantity ?? returnQty;
+      const returnStockQty = Number(detail.stockQuantity ?? returnQty);
 
-      if (returnQty > finalQuantity) {
+      if (returnQty > availableReturnQty) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
             "INVALID_VALUE",
-            `Item ${itemLabel}: Return Quantity (${returnQty}) exceeds available GRN return quantity (${finalQuantity})`
+            `Item ${itemLabel}: Return Quantity (${returnQty}) exceeds available GRN return quantity (${availableReturnQty})`
           )
         );
       }
 
-      if (returnStockQty > inHandQty) {
+      if (returnStockQty > Number(inHandQty)) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
@@ -322,8 +332,8 @@ export const validateGrnReturnCommon = async (
       const itemAmount = calculateGrnItemNetAmount({
         itemStockType,
         unitDefaultValue,
-        purchasedPrice: detail.purchasedPrice,
-        quantity: detail.quantity ?? 0,
+        purchasedPrice: Number(detail.purchasedPrice),
+        quantity: returnQty,
         calculationMethod,
         roundFormat,
         precision,
@@ -495,11 +505,6 @@ export const validateGrnReturnCommon = async (
       )
     );
   }
-
-  applyGrnReturnRateConversion(body, {
-    roundFormat,
-    precision,
-  });
 
   logger.info("exiting::validateGrnReturnCommon::service::validation");
 };
