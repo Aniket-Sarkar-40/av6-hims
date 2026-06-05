@@ -31,13 +31,19 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
             (detail) => {
               const omittedGrnRetDet = customOmit<
                 GrnReturnDetailInput,
-                "id" | "purchasedPrice" | "inHandQty" | "isExpiry" | "isBatch"
+                | "id"
+                | "purchasedPrice"
+                | "inHandQty"
+                | "isExpiry"
+                | "isBatch"
+                | "stockQuantity"
               >(detail, [
                 "id",
                 "inHandQty",
                 "purchasedPrice",
                 "isBatch",
                 "isExpiry",
+                "stockQuantity",
               ]);
               return {
                 ...omittedGrnRetDet.rest,
@@ -114,8 +120,20 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           update: toUpdate.map((d) => {
             const omittedGrnRetDet = customOmit<
               GrnReturnDetailInput,
-              "id" | "purchasedPrice" | "inHandQty" | "isExpiry" | "isBatch"
-            >(d, ["id", "inHandQty", "purchasedPrice", "isBatch", "isExpiry"]);
+              | "id"
+              | "purchasedPrice"
+              | "inHandQty"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+            >(d, [
+              "id",
+              "inHandQty",
+              "purchasedPrice",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+            ]);
 
             return {
               where: { id: omittedGrnRetDet.omitted.id },
@@ -131,8 +149,20 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           create: toCreate.map((d) => {
             const omittedGrnRetDet = customOmit<
               GrnReturnDetailInput,
-              "id" | "purchasedPrice" | "inHandQty" | "isExpiry" | "isBatch"
-            >(d, ["id", "inHandQty", "purchasedPrice", "isBatch", "isExpiry"]);
+              | "id"
+              | "purchasedPrice"
+              | "inHandQty"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+            >(d, [
+              "id",
+              "inHandQty",
+              "purchasedPrice",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+            ]);
             return {
               ...omittedGrnRetDet.rest,
               expiryDate: omittedGrnRetDet.rest.expiryDate
@@ -303,7 +333,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
         tx,
         {
           itemId: detail.itemId,
-          quantity: Number(detail.quantity),
+          quantity: Number(detail.stockQuantity ?? detail.quantity),
           batchNo: detail.batchNo ?? null,
           ccId: grnReturnData.ccId,
           expiryDate: detail.expiryDate ?? null,

@@ -1,4 +1,3 @@
-import { itemMasterToDto } from "@/mapper/master/itemMaster.mapper.js";
 import { getRequisitionItemDetailsFromDb } from "@/repository/purchase/storeRequisition.repository.js";
 import {
   getItemStockQtyByLocation,
@@ -11,6 +10,7 @@ import {
   StoreRequisitionReturnDetailDTO,
   StoreRequisitionReturnDTO,
 } from "@/types/purchase/storeRequisitionReturn.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { StoreRequisitionReturn } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";

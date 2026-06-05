@@ -20,12 +20,11 @@ import {
   ItemStockWithQtyBreakdown,
   RawItemStock,
 } from "@/types/stock/stock.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { InvItemStock } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 
 export const toStoreRequisitionDTO = async (
   storeRequisition: StoreRequisitionResponse[]

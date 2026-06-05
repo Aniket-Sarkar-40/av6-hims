@@ -1,4 +1,3 @@
-import { itemMasterToDto } from "@/mapper/master/itemMaster.mapper.js";
 import { getPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
 import { getItemStockQtyByLocation } from "@/repository/stock/stock.repository.js";
 import { branchService } from "@/services/master/branch.service.js";
@@ -13,6 +12,7 @@ import {
   BranchRequisitionDTO,
   BranchRequisitionResponse,
 } from "@/types/purchase/branchRequisition.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";

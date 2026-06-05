@@ -15,6 +15,7 @@ export interface GrnReturnDetailInput
   purchasedPrice: number;
   isBatch: boolean;
   isExpiry: boolean;
+  stockQuantity?: number;
 }
 
 export interface CreateGrnReturnInput

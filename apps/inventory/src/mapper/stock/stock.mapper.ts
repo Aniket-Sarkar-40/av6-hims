@@ -4,10 +4,10 @@ import { customOmit, toIdValue } from "av6-utils";
 import { InvItemStock } from "@repo/db/generated/prisma/client";
 import { ItemStockDTO } from "@/types/stock/stock.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 
 export const toStockDTO = async (
-  data: InvItemStock[],
+  data: InvItemStock[]
 ): Promise<ItemStockDTO[]> => {
   const items = await itemMasterService.getAllItemMaster(true);
 
@@ -36,6 +36,6 @@ export const toStockDTO = async (
         item: item ? await itemMasterToDto(item) : null,
         user: toIdValue(user, "name"),
       };
-    }),
+    })
   );
 };

@@ -1,4 +1,3 @@
-import { itemMasterToDto } from "@/mapper/master/itemMaster.mapper.js";
 import { getBranchItemDetailsFromDb } from "@/repository/purchase/branchRequisition.repository.js";
 import { getItemStockQtyByLocation } from "@/repository/stock/stock.repository.js";
 import { branchService } from "@/services/master/branch.service.js";
@@ -9,6 +8,7 @@ import {
   BranchRequisitionReturnDTO,
   GetBranchRequisitionReturnResponse,
 } from "@/types/purchase/branchRequisitionReturn.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { BranchRequisitionReturn } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";

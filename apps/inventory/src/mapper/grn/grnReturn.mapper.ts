@@ -12,10 +12,10 @@ import {
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit } from "av6-utils";
 import { omitAudit, toIdValue } from "av6-utils";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 
 export const toGrnReturnDTO = async (
   data: GrnReturnResponse[]

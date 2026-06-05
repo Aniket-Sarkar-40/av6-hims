@@ -9,8 +9,8 @@ import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit } from "av6-utils";
 import { omitAudit, toIdValue } from "av6-utils";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 
 export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplier(true);

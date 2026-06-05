@@ -1,28 +1,24 @@
 import { uinServiceFactory } from "@/config/core.config.js";
+import { settingsService } from "@/services/master/settings.service.js";
 import {
   CreateGrnInput,
   GrnDetailInput,
   GrnResponse,
 } from "@/types/grn/grn.js";
+import { calculateGrnStockQty } from "@/utils/commonCalculation.utils.js";
+import { getDetailKey } from "@/validations/service/grn/grn.service.validation.js";
 import { db } from "@repo/db/client";
 import {
-  GRN_STATUS,
   InvGoodReceive,
   InvGoodReceiveDetails,
   InvUinShortCode,
   ItemStockType,
-  VoucherReferenceType,
 } from "@repo/db/generated/prisma/client";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 import { addItemStock } from "../stock/stock.repository.js";
 import { subItemStock } from "./../stock/stock.repository.js";
-import { settingsService } from "@/services/master/settings.service.js";
-import { calculateGrnStockQty } from "@/utils/commonCalculation.utils.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { getDetailKey } from "@/validations/service/grn/grn.service.validation.js";
-import { voucherService } from "@apps/acc/services/voucher/voucher.service.js";
 
 export const createGrnInDb = async (
   input: CreateGrnInput
@@ -651,6 +647,13 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
             gt: 0,
           },
         },
+        include: {
+          item: {
+            include: {
+              unit: true,
+            },
+          },
+        },
       },
       po: {
         select: {
@@ -688,7 +691,7 @@ export const getGrnByIdFromDb = async (
         },
         include: {
           item: {
-            select: { item: true },
+            select: { item: true, unit: true },
           },
         },
       },

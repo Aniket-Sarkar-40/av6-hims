@@ -69,6 +69,13 @@ export type GrnResponse = Prisma.InvGoodReceiveGetPayload<{
   include: {
     goodReceiveDetails: {
       where: { isActive: true };
+      include: {
+        item: {
+          include: {
+            unit: true;
+          };
+        };
+      };
     };
     po: {
       select: {

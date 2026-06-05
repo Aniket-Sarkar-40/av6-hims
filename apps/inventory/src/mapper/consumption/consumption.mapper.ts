@@ -8,10 +8,10 @@ import { customOmit } from "av6-utils";
 import { toIdValue } from "av6-utils";
 import { ConsumptionDetails } from "@repo/db/generated/prisma/client";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 
 export const toConsumptionDTO = async (
-  consumption: ConsumptionResponse[],
+  consumption: ConsumptionResponse[]
 ): Promise<ConsumptionDTO[]> => {
   const items = await itemMasterService.getAllItemMaster(true);
 
@@ -44,40 +44,40 @@ export const toConsumptionDTO = async (
       const cc = await getBranchOrWarehouse(consumption.ccId);
       const approver = await employeeService.getEmployeeByIdFrmCacheOrDb(
         consumption.approvalFrom,
-        true,
+        true
       );
       const requester = await employeeService.getEmployeeByIdFrmCacheOrDb(
         consumption.requestedBy,
-        true,
+        true
       );
       const createdBy = consumption.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.createdBy,
-            true,
+            true
           )
         : null;
       const updatedBy = consumption.updatedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.updatedBy,
-            true,
+            true
           )
         : null;
       const approvedBy = consumption.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.approvedBy,
-            true,
+            true
           )
         : null;
       const rejectedBy = consumption.rejectedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.rejectedBy,
-            true,
+            true
           )
         : null;
       const deletedBy = consumption.deletedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.deletedBy,
-            true,
+            true
           )
         : null;
       const consumptionDetails = await Promise.all(
@@ -108,7 +108,7 @@ export const toConsumptionDTO = async (
             ...omittedDetail.rest,
             item: item ? await itemMasterToDto(item) : null,
           };
-        }),
+        })
       );
 
       return {
@@ -123,6 +123,6 @@ export const toConsumptionDTO = async (
         consumptionDetails: consumptionDetails,
         collectionCenter: cc ? toIdValue(cc, "name") : null,
       };
-    }),
+    })
   );
 };

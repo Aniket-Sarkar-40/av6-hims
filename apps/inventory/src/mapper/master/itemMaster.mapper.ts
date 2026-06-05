@@ -350,23 +350,6 @@ export const toItemUpdateEntity = (
 //   return out;
 // }
 
-export async function itemMasterToDto(item: ItemMasterDto) {
-  return toPickFields(
-    item,
-    "id",
-    "item",
-    "itemCode",
-    "itemDescription",
-    "reOrderLevel",
-    "unitMaster",
-    "itemCategory",
-    "isBatchNumber",
-    "isExpireDate",
-    "isReturnable",
-    "isLock"
-  ) as ItemMasterToDto | null;
-}
-
 export function mapRowToItemMasterExcelCreateInput(
   row: ItemMasterExcelRow,
   rowNo: number

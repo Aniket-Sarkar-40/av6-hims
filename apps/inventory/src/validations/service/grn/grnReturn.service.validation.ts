@@ -20,9 +20,14 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import {
   CalculationMethod,
+  ItemStockType,
   RETURN_STS,
 } from "@repo/db/generated/prisma/client";
-import { calculation } from "@/utils/commonCalculation.utils.js";
+import {
+  calculateGrnItemNetAmount,
+  calculateGrnStockQty,
+  calculation,
+} from "@/utils/commonCalculation.utils.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { currencyService } from "@/services/master/currency.service.js";
 import { applyGrnReturnRateConversion } from "@/utils/grnRateConversion.utils.js";
@@ -96,6 +101,8 @@ export const validateGrnReturnCommon = async (
     settings?.grnCalculationMethod || "FINAL";
   const roundFormat = settings?.grnRoundedFormat || "TO_FIXED";
   const precision = settings?.defaultPrecision || 2;
+  const itemStockType: ItemStockType =
+    settings?.itemStockType || ItemStockType.PACK_WISE;
 
   if (ccSettingsId) {
     if (warehouse?.isMain === false) {
@@ -209,22 +216,27 @@ export const validateGrnReturnCommon = async (
   let totalDetailAmounts = 0;
 
   for (const detail of body.goodReceiveReturnDetails) {
-    if (!body.isApproval) {
-      const grnDetail = grn.goodReceiveDetails.find(
-        (grnItem) => grnItem.id === detail.grnDetailId
+    const grnDetail = grn.goodReceiveDetails.find(
+      (grnItem) => grnItem.id === detail.grnDetailId
+    );
+
+    if (!grnDetail) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Good Receive Note Details")
       );
+    }
 
-      if (!grnDetail) {
-        throw new ErrorHandler(
-          404,
-          generateErrorMessage("NOT_FOUND", "Good Receive Note Details")
-        );
-      }
+    const itemLabel = grnDetail.item?.item ?? `ID ${detail.itemId}`;
+    const unitDefaultValue = Number(grnDetail.item?.unit?.defaultValue ?? 1);
 
-      const itemLabel =
-        (grnDetail as unknown as { item?: { item?: string } })?.item?.item ??
-        `ID ${detail.itemId}`;
+    detail.stockQuantity = calculateGrnStockQty({
+      itemStockType,
+      unitDefaultValue,
+      quantity: detail.quantity ?? 0,
+    });
 
+    if (!body.isApproval) {
       if (grnDetail.quantity !== detail.grnQty) {
         throw new ErrorHandler(
           400,
@@ -264,25 +276,30 @@ export const validateGrnReturnCommon = async (
         );
       }
 
-      if (
-        detail.quantity !== undefined &&
-        detail.quantity > Math.min(finalQuantity, inHandQty)
-      ) {
+      const returnQty = Number(detail.quantity);
+      const returnStockQty = detail.stockQuantity ?? returnQty;
+
+      if (returnQty > finalQuantity) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
             "INVALID_VALUE",
-            `Item ${itemLabel}: Quantity in GRN (${
-              detail.quantity
-            }) exceeds return quantity (${Math.min(
-              finalQuantity,
-              inHandQty
-            )}) in Good Receive Note Return`
+            `Item ${itemLabel}: Return Quantity (${returnQty}) exceeds available GRN return quantity (${finalQuantity})`
           )
         );
       }
 
-      if (detail.purchasedPrice !== grnDetail.purchasedPrice) {
+      if (returnStockQty > inHandQty) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage(
+            "INVALID_VALUE",
+            `Item ${itemLabel}: Return Stock Quantity (${returnStockQty}) exceeds in-hand stock quantity (${inHandQty})`
+          )
+        );
+      }
+
+      if (Number(detail.purchasedPrice) !== Number(grnDetail.purchasedPrice)) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
@@ -302,24 +319,29 @@ export const validateGrnReturnCommon = async (
         );
       }
 
-      let itemAmount = detail.quantity * detail.purchasedPrice;
-      itemAmount =
-        calculationMethod === "STEP_WISE"
-          ? applyRound(itemAmount, roundFormat, precision)
-          : itemAmount;
+      const itemAmount = calculateGrnItemNetAmount({
+        itemStockType,
+        unitDefaultValue,
+        purchasedPrice: detail.purchasedPrice,
+        quantity: detail.quantity ?? 0,
+        calculationMethod,
+        roundFormat,
+        precision,
+      });
 
-      if (applyRound(itemAmount, roundFormat, precision) !== detail.netAmount) {
+      const roundedItemAmount = applyRound(itemAmount, roundFormat, precision);
+      const roundedDetailNetAmount = applyRound(
+        Number(detail.netAmount),
+        roundFormat,
+        precision
+      );
+
+      if (roundedItemAmount !== roundedDetailNetAmount) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
             "VALUE_MISMATCH",
-            `Item ${itemLabel}: Net Amount (${
-              detail.netAmount
-            }) does not match calculated amount (${applyRound(
-              itemAmount,
-              roundFormat,
-              precision
-            )})`
+            `Item ${itemLabel}: Net Amount (${roundedDetailNetAmount}) does not match calculated amount (${roundedItemAmount})`
           )
         );
       }
@@ -337,9 +359,9 @@ export const validateGrnReturnCommon = async (
 
     const { totalAmount, netTax, netDiscount } = calculation({
       discountMethod: detail.discountMethod,
-      discount: detail.discount ?? 0,
+      discount: Number(detail.discount ?? 0),
       tax: detail.tax ?? 0,
-      amount: detail.netAmount,
+      amount: Number(detail.netAmount),
       // taxMethod: detail.taxMethod,
       calculationMethod,
       precision,
