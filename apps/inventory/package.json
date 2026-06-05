@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@apps/core": "workspace:*",
+    "@apps/acc": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",

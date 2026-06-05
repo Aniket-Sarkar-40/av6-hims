@@ -248,6 +248,9 @@ importers:
 
   apps/inventory:
     dependencies:
+      '@apps/acc':
+        specifier: workspace:*
+        version: link:../accounting
       '@apps/core':
         specifier: workspace:*
         version: link:../core

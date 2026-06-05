@@ -22,6 +22,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { calculateGrnStockQty } from "@/utils/commonCalculation.utils.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { getDetailKey } from "@/validations/service/grn/grn.service.validation.js";
+import { voucherService } from "@apps/acc/services/voucher/voucher.service.js";
 
 export const createGrnInDb = async (
   input: CreateGrnInput
@@ -592,28 +593,29 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
       }
     }
     // voucher entry
-    if (settings?.isAccounting && updatedGrn.status === GRN_STATUS.COMPLETED) {
-      const result = await accountingExternalService.createVoucher({
-        ccId: updatedGrn.ccId,
-        refType: VoucherReferenceType.INVENTORY_GRN,
-        refNo: updatedGrn.grnNumber,
-        refId: updatedGrn.id,
-        refDate: updatedGrn.date,
-        currencyId: updatedGrn.currencyId ?? undefined,
-        currencyConversionRate: updatedGrn.conversionRate
-          ? Number(updatedGrn.conversionRate)
-          : undefined,
-        totalAmount: Number(updatedGrn.totalAmount),
-        clientId: updatedGrn.supplierId,
-        clientPayAmount: 0,
-        customerPayAmount: 0,
-        customerName: "",
-        createdBy: currentUser,
-      });
-      if (!result.success) {
-        throw new ErrorHandler(result.status, result.message);
-      }
-    }
+    // TODO: Add accounting
+    // if (settings?.isAccounting && updatedGrn.status === GRN_STATUS.COMPLETED) {
+    //   const result = await voucherService.createVoucher({
+    //     ccId: updatedGrn.ccId,
+    //     refType: VoucherReferenceType.INVENTORY_GRN,
+    //     refNo: updatedGrn.grnNumber,
+    //     refId: updatedGrn.id,
+    //     refDate: updatedGrn.date,
+    //     currencyId: updatedGrn.currencyId ?? undefined,
+    //     currencyConversionRate: updatedGrn.conversionRate
+    //       ? Number(updatedGrn.conversionRate)
+    //       : undefined,
+    //     totalAmount: Number(updatedGrn.totalAmount),
+    //     clientId: updatedGrn.supplierId,
+    //     clientPayAmount: 0,
+    //     customerPayAmount: 0,
+    //     customerName: "",
+    //     createdBy: currentUser,
+    //   });
+    //   if (!result.success) {
+    //     throw new ErrorHandler(result.status, result.message);
+    //   }
+    // }
     return updatedGrn;
   });
 };
