@@ -188,12 +188,6 @@ export const validatePurchaseOrderCommon = async (
     );
 
     if (roundedExpectedTotal !== roundedProvidedTotal) {
-      logger.warn(
-        `Item ${itemId} total mismatch: expected ${roundedExpectedTotal.toFixed(
-          2
-        )}, got ${roundedProvidedTotal.toFixed(2)}.`
-      );
-
       throw new ErrorHandler(
         400,
         generateErrorMessage(
