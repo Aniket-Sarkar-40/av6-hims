@@ -310,6 +310,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
             where: { id: d.id! },
             data: {
               quantity: d.quantity,
+              focQuantity: d.focQuantity ?? 0,
               netAmount: d.netAmount,
               netTax: d.netTax,
               netDiscount: d.netDiscount,
@@ -333,7 +334,10 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
         tx,
         {
           itemId: detail.itemId,
-          quantity: Number(detail.stockQuantity ?? detail.quantity),
+          quantity: Number(
+            detail.stockQuantity ??
+              Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0)
+          ),
           batchNo: detail.batchNo ?? null,
           ccId: grnReturnData.ccId,
           expiryDate: detail.expiryDate ?? null,
@@ -361,7 +365,8 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           },
           data: {
             returnQuantity: {
-              increment: detail.quantity ?? 0,
+              increment:
+                Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0),
             },
           },
         });

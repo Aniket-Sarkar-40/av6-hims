@@ -752,9 +752,10 @@ model InvGoodReceiveReturnDetails {
     discount       Float?     @map("discount")
     netDiscount    Float      @map("net_Discount")
 
-    quantity Float @default(0)
-    orderQty Float @map("order_quantity")
-    grnQty   Float @map("grn_qty")
+    quantity    Float @default(0)
+    focQuantity Float @default(0) @map("foc_quantity")
+    orderQty    Float @map("order_quantity")
+    grnQty      Float @map("grn_qty")
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")

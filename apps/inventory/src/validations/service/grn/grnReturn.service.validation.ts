@@ -241,12 +241,32 @@ export const validateGrnReturnCommon = async (
     const alreadyReturnedQty = Number(grnDetail.returnQuantity ?? 0);
     const availableReturnQty = totalGrnQty - alreadyReturnedQty;
 
-    const returnQty = Number(detail.quantity ?? 0);
+    const alreadyReturnedPaidQty = Math.min(alreadyReturnedQty, grnQty);
+    const alreadyReturnedFocQty = Math.max(alreadyReturnedQty - grnQty, 0);
+
+    const availablePaidQty = Math.max(grnQty - alreadyReturnedPaidQty, 0);
+    const availableFocQty = Math.max(grnFocQty - alreadyReturnedFocQty, 0);
+
+    const inputPaidQty = Number(detail.quantity ?? 0);
+    const inputFocQty = Number(detail.focQuantity ?? 0);
+
+    let returnQty = inputPaidQty;
+    let returnFocQty = inputFocQty;
+
+    if (inputFocQty <= 0 && inputPaidQty > availablePaidQty) {
+      returnQty = availablePaidQty;
+      returnFocQty = inputPaidQty - availablePaidQty;
+    }
+
+    const totalReturnQty = returnQty + returnFocQty;
+
+    detail.quantity = returnQty;
+    detail.focQuantity = returnFocQty;
 
     detail.stockQuantity = calculateGrnStockQty({
       itemStockType,
       unitDefaultValue,
-      quantity: returnQty,
+      quantity: totalReturnQty,
     });
 
     if (!body.isApproval) {
@@ -287,17 +307,37 @@ export const validateGrnReturnCommon = async (
         );
       }
 
-      const returnStockQty = Number(detail.stockQuantity ?? returnQty);
-
-      if (returnQty > availableReturnQty) {
+      if (returnQty > availablePaidQty) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
             "INVALID_VALUE",
-            `Item ${itemLabel}: Return Quantity (${returnQty}) exceeds available GRN return quantity (${availableReturnQty})`
+            `Item ${itemLabel}: Paid Return Quantity (${returnQty}) exceeds available paid return quantity (${availablePaidQty})`
           )
         );
       }
+
+      if (returnFocQty > availableFocQty) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage(
+            "INVALID_VALUE",
+            `Item ${itemLabel}: FOC Return Quantity (${returnFocQty}) exceeds available FOC return quantity (${availableFocQty})`
+          )
+        );
+      }
+
+      if (totalReturnQty > availableReturnQty) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage(
+            "INVALID_VALUE",
+            `Item ${itemLabel}: Return Quantity (${totalReturnQty}) exceeds available GRN return quantity (${availableReturnQty})`
+          )
+        );
+      }
+
+      const returnStockQty = Number(detail.stockQuantity ?? totalReturnQty);
 
       if (returnStockQty > Number(inHandQty)) {
         throw new ErrorHandler(
@@ -315,16 +355,6 @@ export const validateGrnReturnCommon = async (
           generateErrorMessage(
             "MISMATCH",
             `Item ${itemLabel}: Purchased Price (${detail.purchasedPrice}) does not match Good Receive Note Detail (${grnDetail.purchasedPrice})`
-          )
-        );
-      }
-
-      if (detail.quantity === undefined) {
-        throw new ErrorHandler(
-          400,
-          generateErrorMessage(
-            "INVALID_VALUE",
-            `Item ${itemLabel}: Quantity is required for amount calculation`
           )
         );
       }

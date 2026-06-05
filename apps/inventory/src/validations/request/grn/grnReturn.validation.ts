@@ -4,6 +4,11 @@ import {
   GrnReturnReqExcelFilter,
 } from "@/types/grn/grnReturn.js";
 import {
+  DiscMethod,
+  PAYMENT_STATUS,
+  RETURN_STS,
+} from "@repo/db/generated/prisma/enums.js";
+import {
   arrayRequired,
   boolRequired,
   dateOptional,
@@ -12,20 +17,16 @@ import {
   enumRequired,
   idOptional,
   idRequired,
+  intOptional,
   intRequired,
   numberWithMaxDecimalsOptional,
+  numberWithMaxDecimalsRequired,
   priceOptional,
   priceRequired,
   strOptional,
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { numberWithMaxDecimalsRequired } from "@repo/shared/utils/joi.utils.js";
-import {
-  DiscMethod,
-  PAYMENT_STATUS,
-  RETURN_STS,
-} from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
 export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
@@ -43,17 +44,19 @@ export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
     otherwise: dateOptional("Expiry date"),
   }),
 
-  quantity: idRequired("Quantity"),
+  quantity: intOptional("Quantity").default(0),
+
+  focQuantity: intOptional("FOC Quantity").default(0),
 
   purchasedPrice: numberWithMaxDecimalsRequired("purchasedPrice"),
 
-  totalAmount: numberWithMaxDecimalsRequired("totalAmount"),
+  totalAmount: numberWithMaxDecimalsOptional("totalAmount"),
 
-  tax: priceOptional("Tax"),
+  tax: intOptional("Tax"),
 
-  netTax: priceRequired("Net Tax"),
+  netTax: intRequired("Net Tax"),
 
-  netAmount: numberWithMaxDecimalsRequired("netAmount"),
+  netAmount: numberWithMaxDecimalsOptional("netAmount"),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
@@ -95,15 +98,15 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
 
   ccId: idRequired("CC ID"),
 
-  totalAmount: numberWithMaxDecimalsRequired("totalAmount"),
+  totalAmount: numberWithMaxDecimalsOptional("totalAmount"),
 
-  discount: priceOptional("Discount"),
+  discount: numberWithMaxDecimalsOptional("Discount"),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  netDiscount: priceOptional("Discount amount"),
+  netDiscount: intOptional("Discount amount"),
 
-  netTotal: numberWithMaxDecimalsRequired("netTotal"),
+  netTotal: numberWithMaxDecimalsOptional("netTotal"),
 
   paidAmount: priceOptional("Paid amount"),
 
@@ -111,9 +114,9 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
 
   status: enumOptional("Status", RETURN_STS),
 
-  tax: priceOptional("Tax"),
+  tax: intOptional("Tax"),
 
-  netTax: priceRequired("Net tax"),
+  netTax: intRequired("Net tax"),
 
   goodReceiveReturnDetails: arrayRequired(
     "Good receive return details",

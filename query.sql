@@ -1710,3 +1710,6 @@ ALTER TABLE `inv_settings` ADD COLUMN `item_stock_type` ENUM('PACK_WISE', 'EACH_
 
 ALTER TABLE `inv_unit_master` MODIFY `default_value` INTEGER NOT NULL,
     MODIFY `default_unit` ENUM('PACK', 'BOX', 'LITER', 'ML') NOT NULL DEFAULT 'PACK';
+
+
+ALTER TABLE `inv_good_receive_return_details` ADD COLUMN `foc_quantity` DOUBLE NOT NULL DEFAULT 0;
