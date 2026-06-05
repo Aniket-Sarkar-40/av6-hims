@@ -22,6 +22,7 @@ import {
   PO_STATUS,
 } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
 
 const uniqueBatchNoValidation = (
   details: GrnDetailInput[],
@@ -60,11 +61,13 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
 
   poDetailsId: idRequired("PO details Id"),
 
-  purchasedPrice: priceRequired("purchasedPrice"),
+  purchasedPrice: priceRequired("purchasedPrice", () =>
+    getSchemaPrecision("grn")
+  ),
 
   focQuantity: idRequired("FOC Quantity"),
 
-  netTax: priceRequired("Net Tax"),
+  netTax: priceRequired("Net Tax", () => getSchemaPrecision("grn")),
 
   isBatch: boolRequired("Is Batch"),
 
@@ -74,11 +77,11 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     otherwise: strOptional("Batch number"),
   }),
 
-  totalAmount: priceRequired("Total amount"),
+  totalAmount: priceRequired("Total amount", () => getSchemaPrecision("grn")),
 
-  netAmount: priceRequired("Net amount"),
+  netAmount: priceRequired("Net amount", () => getSchemaPrecision("grn")),
 
-  tax: priceOptional("Tax"),
+  tax: priceOptional("Tax", () => getSchemaPrecision("grn")),
 
   isExpiry: boolRequired("Is Expiry"),
 
@@ -91,7 +94,9 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
   quantity: idRequired("Quantity"),
 
   discount: idRequired("Discount", 0),
-  netDiscount: priceRequired("Net Discount amount"),
+  netDiscount: priceRequired("Net Discount amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 });
@@ -107,7 +112,9 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   conversionRate: Joi.when("currencyId", {
     is: Joi.exist().not(null),
-    then: numberWithMaxDecimalsRequired("Conversion Rate"),
+    then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
+      getSchemaPrecision("grn")
+    ),
     otherwise: Joi.allow(null).messages({
       "any.unknown":
         "Conversion Rate is not allowed when Currency Id is not provided",
@@ -120,21 +127,23 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   ccId: idRequired("CC Id"),
 
-  totalAmount: priceRequired("totalAmount"),
+  totalAmount: priceRequired("totalAmount", () => getSchemaPrecision("grn")),
 
   discount: idRequired("Discount"),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  netDiscount: priceRequired("Net Discount amount"),
+  netDiscount: priceRequired("Net Discount amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  netTotal: priceRequired("netTotal"),
+  netTotal: priceRequired("netTotal", () => getSchemaPrecision("grn")),
 
-  netTax: priceRequired("Net Tax"),
+  netTax: priceRequired("Net Tax", () => getSchemaPrecision("grn")),
 
   storeId: idOptional("Store Id"),
 
-  paidAmount: priceOptional("Paid amount"),
+  paidAmount: priceOptional("Paid amount", () => getSchemaPrecision("grn")),
 
   notes: strOptional("Notes"),
 
@@ -143,7 +152,9 @@ export const grnSchema = Joi.object<CreateGrnInput>({
   status: enumOptional("Status", GRN_STATUS),
 
   tax: idOptional("Tax"),
-  returnedAmount: priceOptional("Returned amount"),
+  returnedAmount: priceOptional("Returned amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   goodReceiveDetails: arrayRequired("Good Receive Details", grnDetailSchema, 1)
     .custom(uniqueBatchNoValidation)

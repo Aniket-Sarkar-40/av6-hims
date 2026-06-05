@@ -16,6 +16,7 @@ import {
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { PO_STATUS } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
 
 export const purchaseOrderDetailSchema = Joi.object<PurchaseOrderDetails>({
   id: idOptional("Id"),
@@ -28,9 +29,11 @@ export const purchaseOrderDetailSchema = Joi.object<PurchaseOrderDetails>({
 
   receivedQty: idOptional("Received quantity").min(1),
 
-  totalAmount: priceRequired("Total amount"),
+  totalAmount: priceRequired("Total amount", () => getSchemaPrecision("po")),
 
-  purchasedPrice: priceRequired("Purchased price"),
+  purchasedPrice: priceRequired("Purchased price", () =>
+    getSchemaPrecision("po")
+  ),
 });
 
 export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
@@ -42,7 +45,9 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
 
   ccId: idRequired("Cc Id"),
 
-  grandTotal: numberWithMaxDecimalsRequired("Grand total"),
+  grandTotal: numberWithMaxDecimalsRequired("Grand total", () =>
+    getSchemaPrecision("po")
+  ),
 
   status: enumOptional("Status", PO_STATUS),
 
@@ -52,8 +57,12 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
 
   conversionRate: Joi.when("currencyId", {
     is: Joi.exist().not(null),
-    then: numberWithMaxDecimalsRequired("Conversion Rate"),
-    otherwise: numberWithMaxDecimalsOptional("Conversion Rate"),
+    then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
+      getSchemaPrecision("po")
+    ),
+    otherwise: numberWithMaxDecimalsOptional("Conversion Rate", () =>
+      getSchemaPrecision("po")
+    ),
   }),
 
   paymentTerms: strOptional("Payment terms"),

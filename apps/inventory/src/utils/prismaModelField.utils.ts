@@ -6,7 +6,12 @@ const runtimeDataModel = (db as any)._runtimeDataModel;
 
 const models = Array.isArray(runtimeDataModel.models)
   ? runtimeDataModel.models
-  : Object.values(runtimeDataModel.models ?? {});
+  : Object.entries(runtimeDataModel.models ?? {}).map(
+      ([name, model]: [string, any]) => ({
+        name,
+        ...model,
+      })
+    );
 
 const enums = Array.isArray(runtimeDataModel.enums)
   ? runtimeDataModel.enums

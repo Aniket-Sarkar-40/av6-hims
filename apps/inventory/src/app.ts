@@ -27,8 +27,11 @@ import stockTransferRouter from "@/routes/stock/stockTransfer.route.js";
 import { branchRequisitionRouter } from "@/routes/purchase/branchRequisition.route.js";
 import { storeRequisitionReturnRouter } from "@/routes/purchase/storeRequisitionReturn.route.js";
 import { branchRequisitionReturnRouter } from "@/routes/purchase/branchRequisitionReturn.route.js";
+import { loadSchemaPrecisionSettings } from "@/middlewares/schemaPrecision.middleware.js";
 
 export const inventoryRouter: ExpressRouter = Router();
+
+inventoryRouter.use(loadSchemaPrecisionSettings);
 
 //master
 inventoryRouter.use("/cache", cacheRouter);

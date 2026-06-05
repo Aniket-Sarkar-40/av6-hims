@@ -5,6 +5,7 @@ import {
   ItemMasterReq,
   ItemMasterUpdateReq,
 } from "@/types/master/itemMaster.js";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
 import {
   boolOptional,
   idOptional,
@@ -28,7 +29,7 @@ export const itemMasterSchema = Joi.object<ItemMasterReq | ItemMasterUpdateReq>(
 
     unitId: idRequired("Unit Id"),
 
-    basePrice: priceRequired("BasePrice"),
+    basePrice: priceRequired("BasePrice", () => getSchemaPrecision("item")),
 
     reOrderLevel: idOptional("Re-Order Level"),
 

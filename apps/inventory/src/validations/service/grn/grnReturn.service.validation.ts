@@ -99,7 +99,7 @@ export const validateGrnReturnCommon = async (
   const calculationMethod: CalculationMethod =
     settings?.grnCalculationMethod || "FINAL";
   const roundFormat = settings?.grnRoundedFormat || "TO_FIXED";
-  const precision = settings?.defaultPrecision || 2;
+  const precision = settings?.grnPrecision ?? settings?.defaultPrecision ?? 2;
   const itemStockType: ItemStockType =
     settings?.itemStockType || ItemStockType.PACK_WISE;
   //Apply conversion rate to the body
@@ -359,7 +359,10 @@ export const validateGrnReturnCommon = async (
         );
       }
 
-      if (Number(detail.purchasedPrice) !== Number(grnDetail.purchasedPrice)) {
+      if (
+        applyRound(Number(detail.purchasedPrice), roundFormat, precision) !==
+        applyRound(Number(grnDetail.purchasedPrice), roundFormat, precision)
+      ) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
@@ -396,13 +399,22 @@ export const validateGrnReturnCommon = async (
         );
       }
     }
+
     const discountAmount = detail.netDiscount ?? 0;
-    if (discountAmount > detail.netAmount) {
+    if (Number(discountAmount) > Number(detail.netAmount)) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "INVALID_VALUE",
-          `Detail discount (${discountAmount}) cannot exceed detail netAmount (${detail.netAmount})`
+          `Detail discount (${applyRound(
+            Number(discountAmount),
+            roundFormat,
+            precision
+          )}) cannot exceed detail netAmount (${applyRound(
+            Number(detail.netAmount),
+            roundFormat,
+            precision
+          )})`
         )
       );
     }
@@ -424,7 +436,10 @@ export const validateGrnReturnCommon = async (
       precision
     );
 
-    if (detail.totalAmount !== formattedTotalAmount) {
+    if (
+      applyRound(Number(detail.totalAmount), roundFormat, precision) !==
+      formattedTotalAmount
+    ) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
@@ -440,7 +455,10 @@ export const validateGrnReturnCommon = async (
       );
     }
 
-    if (detail.netTax !== applyRound(netTax, roundFormat, precision)) {
+    if (
+      applyRound(Number(detail.netTax), roundFormat, precision) !==
+      applyRound(netTax, roundFormat, precision)
+    ) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
@@ -457,7 +475,8 @@ export const validateGrnReturnCommon = async (
     }
 
     if (
-      detail.netDiscount !== applyRound(netDiscount, roundFormat, precision)
+      applyRound(Number(detail.netDiscount), roundFormat, precision) !==
+      applyRound(netDiscount, roundFormat, precision)
     ) {
       throw new ErrorHandler(
         400,
@@ -478,7 +497,8 @@ export const validateGrnReturnCommon = async (
   }
 
   if (
-    body.netTotal !== applyRound(totalDetailAmounts, roundFormat, precision)
+    applyRound(Number(body.netTotal), roundFormat, precision) !==
+    applyRound(totalDetailAmounts, roundFormat, precision)
   ) {
     throw new ErrorHandler(
       400,
@@ -492,7 +512,7 @@ export const validateGrnReturnCommon = async (
   const { netTax, totalAmount, netDiscount } = calculation({
     discountMethod: body.discountMethod,
     discount: body.discount ?? 0,
-    amount: body.netTotal,
+    amount: Number(body.netTotal),
     tax: body.tax ?? 0,
     // taxMethod: "EXCLUSIVE",
     calculationMethod,
@@ -500,7 +520,10 @@ export const validateGrnReturnCommon = async (
     precision,
   });
 
-  if (body.netTax !== applyRound(netTax, roundFormat, precision)) {
+  if (
+    applyRound(Number(body.netTax), roundFormat, precision) !==
+    applyRound(netTax, roundFormat, precision)
+  ) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
@@ -514,7 +537,10 @@ export const validateGrnReturnCommon = async (
     );
   }
 
-  if (body.netDiscount !== applyRound(netDiscount, roundFormat, precision)) {
+  if (
+    applyRound(Number(body.netDiscount), roundFormat, precision) !==
+    applyRound(netDiscount, roundFormat, precision)
+  ) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
@@ -530,7 +556,10 @@ export const validateGrnReturnCommon = async (
     );
   }
 
-  if (body.totalAmount !== applyRound(totalAmount, roundFormat, precision)) {
+  if (
+    applyRound(Number(body.totalAmount), roundFormat, precision) !==
+    applyRound(totalAmount, roundFormat, precision)
+  ) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(

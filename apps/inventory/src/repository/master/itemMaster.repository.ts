@@ -26,6 +26,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { applyRound } from "av6-utils";
 import { initializeCache } from "@/config/redisClient.js";
 import { ItemMasterExcelStagingRow } from "@/validations/request/master/itemMasterExcel.validation.js";
+import { settingsService } from "@/services/master/settings.service.js";
 
 const normalizeLookupKey = (value: string) => value.trim().toLowerCase();
 
@@ -103,10 +104,16 @@ export const createItemMasterInDb = async (
 ): Promise<InvItem> => {
   logger.info("entering::createItemMasterInDb::repository");
   const store = requestStorage.getStore();
-
+  const settings = await settingsService.getSettings();
+  const precision = settings?.itemPrecision || settings?.defaultPrecision || 2;
   const item = await db.invItem.create({
     data: {
       ...itemMaster,
+      basePrice: applyRound(
+        Number(itemMaster.basePrice),
+        RoundFormat.TO_FIXED,
+        precision
+      ),
       itemCode:
         itemMaster.itemCode ??
         (await uinServiceFactory.generateUIN(InvUinShortCode.ITEM)),
@@ -122,10 +129,17 @@ export const updateItemMasterInDb = async (
 ): Promise<InvItem> => {
   logger.info("entering::updateItemMasterInDb::repository");
   const store = requestStorage.getStore();
+  const settings = await settingsService.getSettings();
+  const precision = settings?.itemPrecision || settings?.defaultPrecision || 2;
   return db.invItem.update({
     where: { id: itemMaster.id },
     data: {
       ...itemMaster,
+      basePrice: applyRound(
+        Number(itemMaster.basePrice),
+        RoundFormat.TO_FIXED,
+        precision
+      ),
       itemCode:
         itemMaster.itemCode ??
         (await uinServiceFactory.generateUIN(InvUinShortCode.ITEM)),

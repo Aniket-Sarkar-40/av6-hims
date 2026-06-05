@@ -22,7 +22,7 @@ export const calculation = (input: CalculationInput): CalculationRes => {
   //   actualAmount = input.amount / inclusiveTaxMultiplier;
   // }
   actualAmount =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(actualAmount, roundFormat, input.precision)
       : actualAmount;
 
@@ -33,14 +33,14 @@ export const calculation = (input: CalculationInput): CalculationRes => {
     discountValue = (actualAmount * input.discount) / 100;
   }
   discountValue =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(discountValue, roundFormat, input.precision)
       : discountValue;
 
   // * After discount amount
   let afterDisc = actualAmount - discountValue;
   afterDisc =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(afterDisc, roundFormat, input.precision)
       : afterDisc;
 
@@ -48,14 +48,14 @@ export const calculation = (input: CalculationInput): CalculationRes => {
   let calculatedTax = (input.tax * afterDisc) / 100;
 
   calculatedTax =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(calculatedTax, roundFormat, input.precision)
       : calculatedTax;
 
   //* amount after tax (total amount)
   let totalAmount = afterDisc + calculatedTax;
   totalAmount =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(totalAmount, roundFormat, input.precision)
       : totalAmount;
 

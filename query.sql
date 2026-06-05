@@ -1713,3 +1713,9 @@ ALTER TABLE `inv_unit_master` MODIFY `default_value` INTEGER NOT NULL,
 
 
 ALTER TABLE `inv_good_receive_return_details` ADD COLUMN `foc_quantity` DOUBLE NOT NULL DEFAULT 0;
+
+ALTER TABLE `inv_settings` ADD COLUMN `grn_precision` INTEGER NOT NULL DEFAULT 2,
+    ADD COLUMN `item_precision` INTEGER NOT NULL DEFAULT 2,
+    ADD COLUMN `po_calculation_method` ENUM('STEP_WISE', 'FINAL') NOT NULL DEFAULT 'STEP_WISE',
+    ADD COLUMN `po_precision` INTEGER NOT NULL DEFAULT 2,
+    ADD COLUMN `po_rounded_format` ENUM('ROUND', 'SPECIAL_ROUND', 'TO_FIXED', 'CEIL', 'FLOOR', 'TRUNC', 'NONE') NOT NULL DEFAULT 'TO_FIXED';

@@ -3,6 +3,7 @@ import {
   GrnReturnDetailInput,
   GrnReturnReqExcelFilter,
 } from "@/types/grn/grnReturn.js";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
 import {
   DiscMethod,
   PAYMENT_STATUS,
@@ -48,20 +49,30 @@ export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
 
   focQuantity: intOptional("FOC Quantity").default(0),
 
-  purchasedPrice: numberWithMaxDecimalsRequired("purchasedPrice"),
+  purchasedPrice: numberWithMaxDecimalsRequired("purchasedPrice", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  totalAmount: numberWithMaxDecimalsOptional("totalAmount"),
+  totalAmount: numberWithMaxDecimalsOptional("totalAmount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   tax: intOptional("Tax"),
 
   netTax: intRequired("Net Tax"),
 
-  netAmount: numberWithMaxDecimalsOptional("netAmount"),
+  netAmount: numberWithMaxDecimalsOptional("netAmount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  discount: numberWithMaxDecimalsOptional("Discount"),
-  netDiscount: priceRequired("Net Discount amount"),
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
+  netDiscount: priceRequired("Net Discount amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   orderQty: intRequired("Order quantity"),
 
@@ -90,25 +101,35 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
 
   conversionRate: Joi.when("currencyId", {
     is: Joi.exist().not(null),
-    then: numberWithMaxDecimalsRequired("Conversion Rate"),
-    otherwise: numberWithMaxDecimalsOptional("Conversion Rate"),
+    then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
+      getSchemaPrecision("grn")
+    ),
+    otherwise: numberWithMaxDecimalsOptional("Conversion Rate", () =>
+      getSchemaPrecision("grn")
+    ),
   }),
 
   supplierId: idRequired("Supplier ID"),
 
   ccId: idRequired("CC ID"),
 
-  totalAmount: numberWithMaxDecimalsOptional("totalAmount"),
+  totalAmount: numberWithMaxDecimalsOptional("totalAmount", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  discount: numberWithMaxDecimalsOptional("Discount"),
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
   netDiscount: intOptional("Discount amount"),
 
-  netTotal: numberWithMaxDecimalsOptional("netTotal"),
+  netTotal: numberWithMaxDecimalsOptional("netTotal", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  paidAmount: priceOptional("Paid amount"),
+  paidAmount: priceOptional("Paid amount", () => getSchemaPrecision("grn")),
 
   paymentStatus: enumOptional("Payment Status", PAYMENT_STATUS),
 
