@@ -277,7 +277,7 @@ export const validateGrnCommon = async (
           "VALUE_MISMATCH",
           `Item ${
             poDetail?.item?.item ?? `ID ${detail.itemId}`
-          }: Item Amount (${roundedItemAmount}) does not match net amount (${roundedDetailNetAmount})`
+          }: Net Amount (${roundedDetailNetAmount}) does not match calculated item amount (${roundedItemAmount})`
         )
       );
     }

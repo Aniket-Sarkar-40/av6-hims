@@ -260,6 +260,46 @@ export const validateGrnReturnCommon = async (
 
     const totalReturnQty = returnQty + returnFocQty;
 
+    if (totalReturnQty <= 0) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage(
+          "INVALID_VALUE",
+          `Item ${itemLabel}: Return quantity must be greater than 0`
+        )
+      );
+    }
+
+    if (returnQty > availablePaidQty) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage(
+          "INVALID_VALUE",
+          `Item ${itemLabel}: Paid Return Quantity (${returnQty}) exceeds available paid return quantity (${availablePaidQty})`
+        )
+      );
+    }
+
+    if (returnFocQty > availableFocQty) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage(
+          "INVALID_VALUE",
+          `Item ${itemLabel}: FOC Return Quantity (${returnFocQty}) exceeds available FOC return quantity (${availableFocQty})`
+        )
+      );
+    }
+
+    if (totalReturnQty > availableReturnQty) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage(
+          "INVALID_VALUE",
+          `Item ${itemLabel}: Return Quantity (${totalReturnQty}) exceeds available GRN return quantity (${availableReturnQty})`
+        )
+      );
+    }
+
     detail.quantity = returnQty;
     detail.focQuantity = returnFocQty;
 
@@ -303,36 +343,6 @@ export const validateGrnReturnCommon = async (
           generateErrorMessage(
             "VALUE_MISMATCH",
             `Item ${itemLabel}: In Hand Quantity (${detail.inHandQty}) does not match calculated in hand quantity (${inHandQty})`
-          )
-        );
-      }
-
-      if (returnQty > availablePaidQty) {
-        throw new ErrorHandler(
-          400,
-          generateErrorMessage(
-            "INVALID_VALUE",
-            `Item ${itemLabel}: Paid Return Quantity (${returnQty}) exceeds available paid return quantity (${availablePaidQty})`
-          )
-        );
-      }
-
-      if (returnFocQty > availableFocQty) {
-        throw new ErrorHandler(
-          400,
-          generateErrorMessage(
-            "INVALID_VALUE",
-            `Item ${itemLabel}: FOC Return Quantity (${returnFocQty}) exceeds available FOC return quantity (${availableFocQty})`
-          )
-        );
-      }
-
-      if (totalReturnQty > availableReturnQty) {
-        throw new ErrorHandler(
-          400,
-          generateErrorMessage(
-            "INVALID_VALUE",
-            `Item ${itemLabel}: Return Quantity (${totalReturnQty}) exceeds available GRN return quantity (${availableReturnQty})`
           )
         );
       }
