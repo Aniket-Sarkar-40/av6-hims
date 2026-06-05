@@ -13,6 +13,7 @@ import {
   calculateGrnStockQty,
   calculation,
 } from "@/utils/commonCalculation.utils.js";
+import { applyGrnRateConversion } from "@/utils/rateConversation.utils.js";
 import { validateBatchNoBelongsToSameItem } from "@/utils/uniqueBatch.utils.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
 import {
@@ -374,7 +375,7 @@ export const validateGrnCommon = async (
   // Recalculate based on GRN details
   const { netTax, totalAmount, netDiscount } = calculation({
     discountMethod: body.discountMethod,
-    discount: body.discount ?? 0,
+    discount: Number(body.discount ?? 0),
     amount: body.netTotal,
     tax: body.tax ?? 0,
     // taxMethod: "EXCLUSIVE",
@@ -432,7 +433,7 @@ export const validateGrnCommon = async (
 
   // Validate paid amount
   const paidAmount = body.paidAmount ?? 0;
-  if (paidAmount > body.totalAmount) {
+  if (Number(paidAmount) > Number(body.totalAmount)) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
@@ -462,6 +463,11 @@ export const validateGrnCommon = async (
   } else {
     body.poStatus = PO_STATUS.RECEIVED;
   }
+
+  applyGrnRateConversion(body, {
+    roundFormat,
+    precision,
+  });
 
   logger.info("exiting::validateGrnCommon::service::validation");
 };

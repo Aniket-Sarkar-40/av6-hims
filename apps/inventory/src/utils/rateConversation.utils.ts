@@ -3,18 +3,20 @@ import {
   CreateGrnReturnInput,
   GoodReceiveReturnDTO,
 } from "@/types/grn/grnReturn.js";
-import { DiscMethod } from "@repo/db/generated/prisma/enums.js";
-import { applyRound, RoundFormat } from "av6-utils";
+import { CreatePurchaseOrderInput } from "@/types/purchase/purchase.js";
+import { Prisma } from "@repo/db/generated/prisma/client";
+import { DiscMethod, RoundFormat } from "@repo/db/generated/prisma/enums.js";
+import { applyRound } from "av6-utils";
 
-type GrnRateConversionRoundOptions = {
+type RateConversionRoundOptions = {
   roundFormat: RoundFormat;
   precision: number;
 };
 
-const convertGrnAmountByRate = (
+const convertAmountByRate = (
   amount: number,
   conversionRate: number,
-  roundOptions: GrnRateConversionRoundOptions
+  roundOptions: RateConversionRoundOptions
 ): number => {
   return applyRound(
     amount * conversionRate,
@@ -23,42 +25,48 @@ const convertGrnAmountByRate = (
   );
 };
 
-const reverseConvertGrnAmountByRate = (
+const reverseConvertAmountByRate = (
   amount: number,
   conversionRate: number,
-  roundOptions: GrnRateConversionRoundOptions
-): number => {
-  return applyRound(
-    amount / conversionRate,
-    roundOptions.roundFormat,
-    roundOptions.precision
+  roundOptions: RateConversionRoundOptions
+): Prisma.Decimal => {
+  return new Prisma.Decimal(
+    applyRound(
+      amount / conversionRate,
+      roundOptions.roundFormat,
+      roundOptions.precision
+    )
   );
 };
 
 export const applyGrnRateConversion = (
   body: CreateGrnInput,
-  roundOptions: GrnRateConversionRoundOptions
+  roundOptions: RateConversionRoundOptions
 ): CreateGrnInput => {
   if (!body.conversionRate) return body;
 
   const conversionRate = Number(body.conversionRate);
 
-  body.totalAmount = convertGrnAmountByRate(
-    body.totalAmount,
+  body.totalAmount = convertAmountByRate(
+    Number(body.totalAmount),
     conversionRate,
     roundOptions
   );
 
   body.paidAmount = body.paidAmount
-    ? convertGrnAmountByRate(body.paidAmount, conversionRate, roundOptions)
+    ? convertAmountByRate(Number(body.paidAmount), conversionRate, roundOptions)
     : body.paidAmount;
 
   body.returnedAmount = body.returnedAmount
-    ? convertGrnAmountByRate(body.returnedAmount, conversionRate, roundOptions)
+    ? convertAmountByRate(
+        Number(body.returnedAmount),
+        conversionRate,
+        roundOptions
+      )
     : body.returnedAmount;
 
-  body.netTotal = convertGrnAmountByRate(
-    body.netTotal,
+  body.netTotal = convertAmountByRate(
+    Number(body.netTotal),
     conversionRate,
     roundOptions
   );
@@ -66,39 +74,47 @@ export const applyGrnRateConversion = (
   body.discount =
     body.discountMethod === DiscMethod.FIXED
       ? body.discount
-        ? convertGrnAmountByRate(body.discount, conversionRate, roundOptions)
+        ? convertAmountByRate(
+            Number(body.discount),
+            conversionRate,
+            roundOptions
+          )
         : body.discount
       : body.discount;
 
   body.netDiscount = body.netDiscount
-    ? convertGrnAmountByRate(body.netDiscount, conversionRate, roundOptions)
+    ? convertAmountByRate(
+        Number(body.netDiscount),
+        conversionRate,
+        roundOptions
+      )
     : body.netDiscount;
 
-  body.netTax = convertGrnAmountByRate(
-    body.netTax,
+  body.netTax = convertAmountByRate(
+    Number(body.netTax),
     conversionRate,
     roundOptions
   );
 
   body.goodReceiveDetails = body.goodReceiveDetails?.map((detail) => ({
     ...detail,
-    purchasedPrice: convertGrnAmountByRate(
-      detail.purchasedPrice,
+    purchasedPrice: convertAmountByRate(
+      Number(detail.purchasedPrice),
       conversionRate,
       roundOptions
     ),
-    totalAmount: convertGrnAmountByRate(
-      detail.totalAmount,
+    totalAmount: convertAmountByRate(
+      Number(detail.totalAmount),
       conversionRate,
       roundOptions
     ),
-    netAmount: convertGrnAmountByRate(
-      detail.netAmount,
+    netAmount: convertAmountByRate(
+      Number(detail.netAmount),
       conversionRate,
       roundOptions
     ),
-    netDiscount: convertGrnAmountByRate(
-      detail.netDiscount,
+    netDiscount: convertAmountByRate(
+      Number(detail.netDiscount),
       conversionRate,
       roundOptions
     ),
@@ -106,15 +122,19 @@ export const applyGrnRateConversion = (
     discount:
       detail.discountMethod === DiscMethod.FIXED
         ? detail.discount
-          ? convertGrnAmountByRate(
-              detail.discount,
+          ? convertAmountByRate(
+              Number(detail.discount),
               conversionRate,
               roundOptions
             )
           : detail.discount
         : detail.discount,
 
-    netTax: convertGrnAmountByRate(detail.netTax, conversionRate, roundOptions),
+    netTax: convertAmountByRate(
+      Number(detail.netTax),
+      conversionRate,
+      roundOptions
+    ),
   }));
 
   return body;
@@ -122,36 +142,44 @@ export const applyGrnRateConversion = (
 
 export const applyGrnReturnRateConversion = (
   body: CreateGrnReturnInput,
-  roundOptions: GrnRateConversionRoundOptions
+  roundOptions: RateConversionRoundOptions
 ): CreateGrnReturnInput => {
   if (!body.conversionRate) return body;
 
   const conversionRate = Number(body.conversionRate);
 
-  body.totalAmount = convertGrnAmountByRate(
-    body.totalAmount,
+  body.totalAmount = convertAmountByRate(
+    Number(body.totalAmount),
     conversionRate,
     roundOptions
   );
   body.paidAmount = body.paidAmount
-    ? convertGrnAmountByRate(body.paidAmount, conversionRate, roundOptions)
+    ? convertAmountByRate(Number(body.paidAmount), conversionRate, roundOptions)
     : body.paidAmount;
-  body.netTotal = convertGrnAmountByRate(
-    body.netTotal,
+  body.netTotal = convertAmountByRate(
+    Number(body.netTotal),
     conversionRate,
     roundOptions
   );
   body.discount =
     body.discountMethod === DiscMethod.FIXED
       ? body.discount
-        ? convertGrnAmountByRate(body.discount, conversionRate, roundOptions)
+        ? convertAmountByRate(
+            Number(body.discount),
+            conversionRate,
+            roundOptions
+          )
         : body.discount
       : body.discount;
   body.netDiscount = body.netDiscount
-    ? convertGrnAmountByRate(body.netDiscount, conversionRate, roundOptions)
+    ? convertAmountByRate(
+        Number(body.netDiscount),
+        conversionRate,
+        roundOptions
+      )
     : body.netDiscount;
-  body.netTax = convertGrnAmountByRate(
-    body.netTax,
+  body.netTax = convertAmountByRate(
+    Number(body.netTax),
     conversionRate,
     roundOptions
   );
@@ -159,38 +187,38 @@ export const applyGrnReturnRateConversion = (
   body.goodReceiveReturnDetails = body.goodReceiveReturnDetails?.map(
     (detail) => ({
       ...detail,
-      purchasedPrice: convertGrnAmountByRate(
-        detail.purchasedPrice,
+      purchasedPrice: convertAmountByRate(
+        Number(detail.purchasedPrice),
         conversionRate,
         roundOptions
       ),
-      totalAmount: convertGrnAmountByRate(
-        detail.totalAmount,
+      totalAmount: convertAmountByRate(
+        Number(detail.totalAmount),
         conversionRate,
         roundOptions
       ),
-      netAmount: convertGrnAmountByRate(
-        detail.netAmount,
+      netAmount: convertAmountByRate(
+        Number(detail.netAmount),
         conversionRate,
         roundOptions
       ),
-      netDiscount: convertGrnAmountByRate(
-        detail.netDiscount,
+      netDiscount: convertAmountByRate(
+        Number(detail.netDiscount),
         conversionRate,
         roundOptions
       ),
       discount:
         detail.discountMethod === DiscMethod.FIXED
           ? detail.discount
-            ? convertGrnAmountByRate(
-                detail.discount,
+            ? convertAmountByRate(
+                Number(detail.discount),
                 conversionRate,
                 roundOptions
               )
             : detail.discount
           : detail.discount,
-      netTax: convertGrnAmountByRate(
-        detail.netTax,
+      netTax: convertAmountByRate(
+        Number(detail.netTax),
         conversionRate,
         roundOptions
       ),
@@ -202,36 +230,36 @@ export const applyGrnReturnRateConversion = (
 
 export const applyGrnRateReverseConversion = (
   body: GrnDTO,
-  roundOptions: GrnRateConversionRoundOptions
+  roundOptions: RateConversionRoundOptions
 ): GrnDTO => {
   if (!body.conversionRate) return body;
 
   const conversionRate = Number(body.conversionRate);
 
-  body.totalAmount = reverseConvertGrnAmountByRate(
-    body.totalAmount,
+  body.totalAmount = reverseConvertAmountByRate(
+    Number(body.totalAmount),
     conversionRate,
     roundOptions
   );
 
   body.paidAmount = body.paidAmount
-    ? reverseConvertGrnAmountByRate(
-        body.paidAmount,
+    ? reverseConvertAmountByRate(
+        Number(body.paidAmount),
         conversionRate,
         roundOptions
       )
     : body.paidAmount;
 
   body.returnedAmount = body.returnedAmount
-    ? reverseConvertGrnAmountByRate(
-        body.returnedAmount,
+    ? reverseConvertAmountByRate(
+        Number(body.returnedAmount),
         conversionRate,
         roundOptions
       )
     : body.returnedAmount;
 
-  body.netTotal = reverseConvertGrnAmountByRate(
-    body.netTotal,
+  body.netTotal = reverseConvertAmountByRate(
+    Number(body.netTotal),
     conversionRate,
     roundOptions
   );
@@ -239,8 +267,8 @@ export const applyGrnRateReverseConversion = (
   body.discount =
     body.discountMethod === DiscMethod.FIXED
       ? body.discount
-        ? reverseConvertGrnAmountByRate(
-            body.discount,
+        ? reverseConvertAmountByRate(
+            Number(body.discount),
             conversionRate,
             roundOptions
           )
@@ -248,38 +276,38 @@ export const applyGrnRateReverseConversion = (
       : body.discount;
 
   body.netDiscount = body.netDiscount
-    ? reverseConvertGrnAmountByRate(
-        body.netDiscount,
+    ? reverseConvertAmountByRate(
+        Number(body.netDiscount),
         conversionRate,
         roundOptions
       )
     : body.netDiscount;
 
-  body.netTax = reverseConvertGrnAmountByRate(
-    body.netTax,
+  body.netTax = reverseConvertAmountByRate(
+    Number(body.netTax),
     conversionRate,
     roundOptions
   );
 
   body.goodReceiveDetails = body.goodReceiveDetails?.map((detail) => ({
     ...detail,
-    purchasedPrice: reverseConvertGrnAmountByRate(
-      detail.purchasedPrice,
+    purchasedPrice: reverseConvertAmountByRate(
+      Number(detail.purchasedPrice),
       conversionRate,
       roundOptions
     ),
-    totalAmount: reverseConvertGrnAmountByRate(
-      detail.totalAmount,
+    totalAmount: reverseConvertAmountByRate(
+      Number(detail.totalAmount),
       conversionRate,
       roundOptions
     ),
-    netAmount: reverseConvertGrnAmountByRate(
-      detail.netAmount,
+    netAmount: reverseConvertAmountByRate(
+      Number(detail.netAmount),
       conversionRate,
       roundOptions
     ),
-    netDiscount: reverseConvertGrnAmountByRate(
-      detail.netDiscount,
+    netDiscount: reverseConvertAmountByRate(
+      Number(detail.netDiscount),
       conversionRate,
       roundOptions
     ),
@@ -287,16 +315,16 @@ export const applyGrnRateReverseConversion = (
     discount:
       detail.discountMethod === DiscMethod.FIXED
         ? detail.discount
-          ? reverseConvertGrnAmountByRate(
-              detail.discount,
+          ? reverseConvertAmountByRate(
+              Number(detail.discount),
               conversionRate,
               roundOptions
             )
           : detail.discount
         : detail.discount,
 
-    netTax: reverseConvertGrnAmountByRate(
-      detail.netTax,
+    netTax: reverseConvertAmountByRate(
+      Number(detail.netTax),
       conversionRate,
       roundOptions
     ),
@@ -307,48 +335,50 @@ export const applyGrnRateReverseConversion = (
 
 export const applyGrnReturnRateReverseConversion = (
   body: GoodReceiveReturnDTO,
-  roundOptions: GrnRateConversionRoundOptions
+  roundOptions: RateConversionRoundOptions
 ): GoodReceiveReturnDTO => {
   if (!body.conversionRate) return body;
 
   const conversionRate = Number(body.conversionRate);
 
-  body.totalAmount = reverseConvertGrnAmountByRate(
-    body.totalAmount,
+  body.totalAmount = reverseConvertAmountByRate(
+    Number(body.totalAmount),
     conversionRate,
     roundOptions
   );
   body.paidAmount = body.paidAmount
-    ? reverseConvertGrnAmountByRate(
-        body.paidAmount,
+    ? reverseConvertAmountByRate(
+        Number(body.paidAmount),
         conversionRate,
         roundOptions
       )
     : body.paidAmount;
-  body.netTotal = reverseConvertGrnAmountByRate(
-    body.netTotal,
+  body.netTotal = reverseConvertAmountByRate(
+    Number(body.netTotal),
     conversionRate,
     roundOptions
   );
   body.discount =
     body.discountMethod === DiscMethod.FIXED
       ? body.discount
-        ? reverseConvertGrnAmountByRate(
-            body.discount,
-            conversionRate,
-            roundOptions
+        ? Number(
+            reverseConvertAmountByRate(
+              body.discount,
+              conversionRate,
+              roundOptions
+            )
           )
         : body.discount
       : body.discount;
   body.netDiscount = body.netDiscount
-    ? reverseConvertGrnAmountByRate(
-        body.netDiscount,
+    ? reverseConvertAmountByRate(
+        Number(body.netDiscount),
         conversionRate,
         roundOptions
       )
     : body.netDiscount;
-  body.netTax = reverseConvertGrnAmountByRate(
-    body.netTax,
+  body.netTax = reverseConvertAmountByRate(
+    Number(body.netTax),
     conversionRate,
     roundOptions
   );
@@ -356,38 +386,69 @@ export const applyGrnReturnRateReverseConversion = (
   body.goodReceiveReturnDetails = body.goodReceiveReturnDetails?.map(
     (detail) => ({
       ...detail,
-      totalAmount: reverseConvertGrnAmountByRate(
-        detail.totalAmount,
+      totalAmount: reverseConvertAmountByRate(
+        Number(detail.totalAmount),
         conversionRate,
         roundOptions
       ),
-      netAmount: reverseConvertGrnAmountByRate(
-        detail.netAmount,
+      netAmount: reverseConvertAmountByRate(
+        Number(detail.netAmount),
         conversionRate,
         roundOptions
       ),
-      netDiscount: reverseConvertGrnAmountByRate(
-        detail.netDiscount,
+      netDiscount: reverseConvertAmountByRate(
+        Number(detail.netDiscount),
         conversionRate,
         roundOptions
       ),
       discount:
         detail.discountMethod === DiscMethod.FIXED
           ? detail.discount
-            ? reverseConvertGrnAmountByRate(
-                detail.discount,
+            ? reverseConvertAmountByRate(
+                Number(detail.discount),
                 conversionRate,
                 roundOptions
               )
             : detail.discount
           : detail.discount,
-      netTax: reverseConvertGrnAmountByRate(
-        detail.netTax,
+      netTax: reverseConvertAmountByRate(
+        Number(detail.netTax),
         conversionRate,
         roundOptions
       ),
     })
   );
+
+  return body;
+};
+
+export const applyPurchaseOrderRateConversion = (
+  body: CreatePurchaseOrderInput,
+  roundOptions: RateConversionRoundOptions
+): CreatePurchaseOrderInput => {
+  if (!body.conversionRate) return body;
+
+  const conversionRate = Number(body.conversionRate);
+
+  body.grandTotal = convertAmountByRate(
+    Number(body.grandTotal),
+    conversionRate,
+    roundOptions
+  );
+
+  body.purchaseOrderDetails = body.purchaseOrderDetails?.map((detail) => ({
+    ...detail,
+    purchasedPrice: convertAmountByRate(
+      Number(detail.purchasedPrice),
+      conversionRate,
+      roundOptions
+    ),
+    totalAmount: convertAmountByRate(
+      Number(detail.totalAmount),
+      conversionRate,
+      roundOptions
+    ),
+  }));
 
   return body;
 };

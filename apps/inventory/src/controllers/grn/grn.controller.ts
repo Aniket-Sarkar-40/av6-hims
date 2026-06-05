@@ -10,8 +10,8 @@ import { Request, Response } from "express";
 import path from "path";
 import { settingsService } from "@/services/master/settings.service.js";
 import { RoundFormat } from "av6-utils";
-import { applyGrnRateReverseConversion } from "@/utils/grnRateConversion.utils.js";
 import { generatePDF } from "@/utils/pdfGenerator.utils.js";
+import { applyGrnRateReverseConversion } from "@/utils/rateConversation.utils.js";
 
 export const createGrn = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createGrn::controller");

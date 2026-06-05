@@ -598,28 +598,28 @@ model InvGoodReceive {
     storeId        Int?     @map("store_id")
     ccId           Int      @map("cc_id")
     currencyId     Int?     @map("currency_id")
-    conversionRate Decimal? @map("conversion_rate") @db.Decimal(13, 5)
+    conversionRate Decimal? @map("conversion_rate") @db.Decimal(18, 5)
 
     poNumber  String   @map("po_number")
     grnNumber String   @map("grn_number")
     date      DateTime
 
-    totalAmount    Float @map("total_amount")
-    paidAmount     Float @default(0) @map("paid_amount")
-    returnedAmount Float @default(0) @map("returned_amount")
-    netTotal       Float @map("net_total")
+    totalAmount    Decimal @map("total_amount") @db.Decimal(18, 5)
+    paidAmount     Decimal @default(0) @map("paid_amount") @db.Decimal(18, 5)
+    returnedAmount Decimal @default(0) @map("returned_amount") @db.Decimal(18, 5)
+    netTotal       Decimal @map("net_total") @db.Decimal(18, 5)
 
-    discount       Float      @default(0) @map("discount")
+    discount       Decimal    @default(0) @map("discount") @db.Decimal(18, 5)
     discountMethod DiscMethod @map("discount_method")
-    netDiscount    Float      @map("net_discount")
+    netDiscount    Decimal    @map("net_discount") @db.Decimal(18, 5)
 
     notes String? @db.Text
 
     paymentStatus PAYMENT_STATUS @default(UNPAID) @map("payment_status")
     status        GRN_STATUS     @default(COMPLETED) @map("status")
 
-    tax    Float @default(0)
-    netTax Float @map("net_tax")
+    tax    Float   @default(0)
+    netTax Decimal @map("net_tax") @db.Decimal(18, 5)
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -639,6 +639,7 @@ model InvGoodReceive {
     collectionCenter   CollectionCenter        @relation(fields: [ccId], references: [id])
 
     @@index([poId], name: "good_receive_po_id_idx")
+    @@index([currencyId], name: "good_receive_currency_id_idx")
     @@index([supplierId], name: "good_receive_supplier_id_idx")
     @@index([storeId], name: "good_receive_store_id_idx")
     @@index([ccId], name: "good_receive_cc_id_idx")
@@ -650,20 +651,20 @@ model InvGoodReceiveDetails {
     goodReceiveId Int @map("good_receive_id")
     itemId        Int @map("item_id")
 
-    purchasedPrice Float      @map("purchased_price")
+    purchasedPrice Decimal    @map("purchased_price") @db.Decimal(18, 5)
     focQuantity    Float      @map("foc_quantity")
     tax            Float      @default(0)
-    netTax         Float      @map("net_tax")
+    netTax         Decimal    @map("net_tax") @db.Decimal(18, 5)
     batchNo        String?    @map("batch_no")
     expiryDate     DateTime?  @map("expiry_date") @db.Date
     quantity       Float      @default(0)
     returnQuantity Float      @default(0) @map("return_quantity")
     orderQuantity  Float      @default(0) @map("order_quantity")
-    totalAmount    Float      @map("total_amount")
-    netAmount      Float      @map("net_amount")
-    netDiscount    Float      @map("net_discount")
+    totalAmount    Decimal    @map("total_amount") @db.Decimal(18, 5)
+    netAmount      Decimal    @map("net_amount") @db.Decimal(18, 5)
+    netDiscount    Decimal    @map("net_discount") @db.Decimal(18, 5)
     discountMethod DiscMethod @map("discount_method")
-    discount       Float?     @map("discount_amount")
+    discount       Decimal?   @map("discount_amount") @db.Decimal(18, 5)
     isActive       Boolean    @default(true) @map("is_active")
     createdBy      Int?       @map("created_by")
     updatedBy      Int?       @map("updated_by")
@@ -686,25 +687,25 @@ model InvGoodReceiveReturn {
     id             Int        @id @default(autoincrement())
     grnId          Int        @map("grn_id")
     currencyId     Int?       @map("currency_id")
-    conversionRate Decimal?   @map("conversion_rate") @db.Decimal(13, 5)
+    conversionRate Decimal?   @map("conversion_rate") @db.Decimal(18, 5)
     poNumber       String     @map("po_number")
     grnNumber      String     @map("grn_number")
     poId           Int        @map("po_id")
     date           DateTime   @db.Date
     supplierId     Int
     ccId           Int        @map("cc_id")
-    totalAmount    Float      @map("total_amount")
+    totalAmount    Decimal    @map("total_amount") @db.Decimal(18, 5)
     discount       Float      @default(0) @map("discount")
     discountMethod DiscMethod @map("discount_method")
-    netDiscount    Float?     @map("net_discount")
+    netDiscount    Decimal?   @map("net_discount") @db.Decimal(18, 5)
 
-    netTotal      Float          @map("net_total")
-    paidAmount    Float          @default(0) @map("paid_amount")
+    netTotal      Decimal        @map("net_total") @db.Decimal(18, 5)
+    paidAmount    Decimal        @default(0) @map("paid_amount") @db.Decimal(18, 5)
     paymentStatus PAYMENT_STATUS @default(UNPAID) @map("payment_status")
     status        RETURN_STS     @default(PENDING) @map("status")
 
-    tax    Float @default(0)
-    netTax Float @map("net_tax")
+    tax    Float   @default(0)
+    netTax Decimal @map("net_tax") @db.Decimal(18, 5)
 
     approvedBy Int?      @map("approved_by")
     approveAt  DateTime? @map("approve_at")
@@ -726,10 +727,10 @@ model InvGoodReceiveReturn {
     goodReceiveReturnDetails InvGoodReceiveReturnDetails[]
 
     @@index([grnId], name: "good_receive_return_grn_id_idx")
+    @@index([currencyId], name: "good_receive_return_currency_id_idx")
     @@index([poId], name: "good_receive_return_po_id_idx")
     @@index([ccId], name: "good_receive_return_cc_id_idx")
     @@index([supplierId], name: "item_supplier_id_idx")
-    @@index([currencyId], name: "good_receive_return_currency_id_idx")
     @@map("inv_good_receive_return")
 }
 
@@ -741,16 +742,16 @@ model InvGoodReceiveReturnDetails {
 
     batchNo     String?   @map("batch_no")
     expiryDate  DateTime? @map("expiry_date") @db.Date
-    totalAmount Float     @map("total_amount")
+    totalAmount Decimal   @map("total_amount") @db.Decimal(18, 5)
 
-    tax    Float @default(0)
-    netTax Float @map("net_tax")
+    tax    Float   @default(0)
+    netTax Decimal @map("net_tax") @db.Decimal(18, 5)
     // taxMethod TAX_METHOD @map("tax_method")
 
-    netAmount      Float      @map("net_amount")
+    netAmount      Decimal    @map("net_amount") @db.Decimal(18, 5)
     discountMethod DiscMethod @map("discount_method")
-    discount       Float?     @map("discount")
-    netDiscount    Float      @map("net_Discount")
+    discount       Decimal?   @map("discount") @db.Decimal(18, 5)
+    netDiscount    Decimal    @map("net_Discount") @db.Decimal(18, 5)
 
     quantity    Float @default(0)
     focQuantity Float @default(0) @map("foc_quantity")

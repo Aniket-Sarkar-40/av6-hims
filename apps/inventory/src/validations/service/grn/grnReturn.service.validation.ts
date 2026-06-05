@@ -30,7 +30,7 @@ import {
 } from "@/utils/commonCalculation.utils.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { currencyService } from "@/services/master/currency.service.js";
-import { applyGrnReturnRateConversion } from "@/utils/grnRateConversion.utils.js";
+import { applyGrnReturnRateConversion } from "@/utils/rateConversation.utils.js";
 
 export const validateIdGrnReturn = async (id: number) => {
   logger.info("entering::validateIdGrnReturn service::validation");
