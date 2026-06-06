@@ -376,7 +376,8 @@ export const getItemStocksByLocationUserId = async (
   tx: Tx,
   itemId?: number,
   userId?: number,
-  canTakeZero = false
+  canTakeZero = false,
+  ccId?: number
 ): Promise<InvItemStock[]> => {
   logger.info(`entering::getItemStocksByLocationUserId::repository (raw SQL)`);
 
@@ -386,7 +387,7 @@ export const getItemStocksByLocationUserId = async (
 
   const itemIdParam = itemId ?? null;
   const userIdParam = userId ?? null;
-
+  const ccIdParam = ccId ?? null;
   const stocks = await tx.$queryRaw<RawItemStock[]>`
     SELECT
       inv_item_stock.*,
@@ -403,6 +404,7 @@ export const getItemStocksByLocationUserId = async (
     FROM inv_item_stock
     WHERE (${itemIdParam} IS NULL OR item_id = ${itemIdParam})
       AND (${userIdParam} IS NULL OR user_id = ${userIdParam})
+      AND (${ccIdParam} IS NULL OR cc_id = ${ccIdParam})
       AND is_active = 1
       AND (${canTakeZero} OR quantity > 0)
       AND (

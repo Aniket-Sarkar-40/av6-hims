@@ -220,7 +220,7 @@ export const getItemStocksByItemId = async (
   logger.info("entering::getItemStocksByItemId::repository");
 
   return await db.$transaction(async (tx) => {
-    const { id, userId, isZeroQty } = itemReq;
+    const { id, userId, isZeroQty, ccId } = itemReq;
 
     // const quantityCondition = isZeroQty ? {} : { quantity: { gt: 0 } };
 
@@ -228,7 +228,8 @@ export const getItemStocksByItemId = async (
       tx,
       id,
       userId,
-      isZeroQty
+      isZeroQty,
+      ccId
     );
 
     return stocks;
