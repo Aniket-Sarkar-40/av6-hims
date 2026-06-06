@@ -40,7 +40,7 @@ import {
   validateIdItemMaster,
 } from "@/validations/service/master/itemMaster.service.validation.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { InvItem } from "@repo/db/generated/prisma/client";
+import { ConsumptionType, InvItem } from "@repo/db/generated/prisma/client";
 import {
   addToCache,
   deleteCache,
@@ -313,6 +313,8 @@ export const itemMasterService = {
     const wb = new ExcelJs.Workbook();
     const ws = wb.addWorksheet("Item");
 
+    const consumptionTypes = Object.values(ConsumptionType);
+
     ws.properties.defaultRowHeight = 18;
 
     ws.columns = [
@@ -328,6 +330,8 @@ export const itemMasterService = {
       { header: "Is Expire Date", key: "isExpireDate", width: 18 },
       { header: "Is User Returnable", key: "isUserReturnable", width: 18 },
       { header: "Is Vendor Returnable", key: "isVendorReturnable", width: 18 },
+      { header: "Is Price Variable", key: "isPriceVariable", width: 18 },
+      { header: "Consumption Type", key: "consumptionType", width: 18 },
     ];
 
     const headerRow = ws.getRow(1);
@@ -374,6 +378,8 @@ export const itemMasterService = {
       isExpireDate: true,
       isUserReturnable: true,
       isVendorReturnable: true,
+      isPriceVariable: true,
+      consumptionType: "MANUAL",
     });
 
     ws.getColumn("itemCode").numFmt = "@";
@@ -388,6 +394,17 @@ export const itemMasterService = {
 
       col.width = Math.min(max + 2, 45);
     });
+
+    for (let row = 2; row <= 50; row++) {
+      ws.getCell(`N${row}`).dataValidation = {
+        type: "list",
+        allowBlank: true,
+        formulae: [`"${consumptionTypes.join(",")}"`],
+        showErrorMessage: true,
+        errorTitle: "Invalid Value",
+        error: `Please select one of: ${consumptionTypes.join(", ")}`,
+      };
+    }
 
     ws.views = [{ state: "frozen", ySplit: 1 }];
 
@@ -422,6 +439,8 @@ export const itemMasterService = {
       "Is Expire Date",
       "Is User Returnable",
       "Is Vendor Returnable",
+      "Is Price Variable",
+      "Consumption Type",
     ];
 
     const attributeRow = ws.addRow(attribute);
@@ -441,6 +460,8 @@ export const itemMasterService = {
         i.isExpireDate,
         i.isUserReturnable,
         i.isVendorReturnable,
+        i.isPriceVariable,
+        i.consumptionType,
       ]);
     });
 

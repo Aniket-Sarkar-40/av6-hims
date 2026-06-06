@@ -1737,3 +1737,39 @@ ALTER TABLE `inv_warehouse` DROP COLUMN `is_main`;
 
 -- AlterTable
 ALTER TABLE `inv_dynamic_short_code` ADD COLUMN `delete_config` JSON NULL;
+
+
+-- AlterTable
+ALTER TABLE `inv_item_master` DROP COLUMN `is_returnable`,
+    ADD COLUMN `consumption_type` ENUM('MANUAL', 'AUTO') NOT NULL DEFAULT 'MANUAL',
+    ADD COLUMN `is_price_variable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_user_returnable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_vendor_returnable` BOOLEAN NOT NULL DEFAULT true;
+
+    -- AlterTable
+ALTER TABLE `inv_item_master_excel` DROP COLUMN `is_returnable`,
+    ADD COLUMN `consumption_type` ENUM('MANUAL', 'AUTO') NOT NULL DEFAULT 'MANUAL',
+    ADD COLUMN `is_price_variable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_user_returnable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_vendor_returnable` BOOLEAN NOT NULL DEFAULT true;
+
+-- CreateTable
+CREATE TABLE `inv_cron_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `cron_name` VARCHAR(191) NOT NULL,
+    `run_date` DATE NOT NULL,
+    `run_key` VARCHAR(50) NOT NULL,
+    `attempt` INTEGER NOT NULL DEFAULT 1,
+    `status` ENUM('PENDING', 'IN_PROGRESS', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'PENDING',
+    `started_at` DATETIME(3) NULL,
+    `ended_at` DATETIME(3) NULL,
+    `duration_ms` INTEGER NULL,
+    `message` LONGTEXT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `cron_find_latest_idx`(`cron_name`, `run_date`, `run_key`),
+    UNIQUE INDEX `inv_cron_details_cron_name_run_date_run_key_attempt_key`(`cron_name`, `run_date`, `run_key`, `attempt`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+

@@ -18,7 +18,8 @@ export async function itemMasterToDto(
     "itemCategory",
     "isBatchNumber",
     "isExpireDate",
-    "isReturnable",
+    "isUserReturnable",
+    "isVendorReturnable",
     "isLock",
   ]) as ItemMasterToDto | null;
 }

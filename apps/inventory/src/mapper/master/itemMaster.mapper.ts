@@ -29,6 +29,7 @@ import { ItemStockDTO } from "@/types/stock/stock.js";
 import { getBranchAndWarehouseByCcIds } from "@/utils/getCollectionCenter.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
 import {
+  ConsumptionType,
   InvItem,
   InvItemMasterExcel,
   InvItemStock,
@@ -306,8 +307,13 @@ export const toItemEntity = (
       item.isExpireDate !== undefined && item.isExpireDate === "true"
         ? true
         : false,
-    isReturnable:
-      item.isReturnable !== undefined && item.isReturnable === "true"
+    isUserReturnable:
+      item.isUserReturnable !== undefined && item.isUserReturnable === "true"
+        ? true
+        : false,
+    isVendorReturnable:
+      item.isVendorReturnable !== undefined &&
+      item.isVendorReturnable === "true"
         ? true
         : false,
     isLock: item.isLock !== undefined && item.isLock === "true" ? true : false,
@@ -373,7 +379,12 @@ export function mapRowToItemMasterExcelCreateInput(
     itemDescription: toStringOrNull(row["Item Description"]),
     isBatchNumber: toBoolean(row["Is Batch Number"], false),
     isExpireDate: toBoolean(row["Is Expire Date"], false),
-    isReturnable: toBoolean(row["Is Returnable"], false),
+    isUserReturnable: toBoolean(row["Is User Returnable"], false),
+    isVendorReturnable: toBoolean(row["Is Vendor Returnable"], false),
+    isPriceVariable: toBoolean(row["Is Price Variable"], false),
+    consumptionType: toStringOrNull(row["Consumption Type"]) as
+      | ConsumptionType
+      | undefined,
   };
 }
 
@@ -392,6 +403,9 @@ export const mapExcelRowToItemMasterReq = (
     itemDescription: row.itemDescription ?? undefined,
     isBatchNumber: row.isBatchNumber,
     isExpireDate: row.isExpireDate,
-    isReturnable: row.isReturnable,
+    isUserReturnable: row.isUserReturnable,
+    isVendorReturnable: row.isVendorReturnable,
+    isPriceVariable: row.isPriceVariable,
+    consumptionType: row.consumptionType,
   };
 };

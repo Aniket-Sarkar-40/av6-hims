@@ -140,18 +140,19 @@ export const validateStoreRequisitionReturnCommon = async (
       );
     }
 
-    for (const item of element.itemBatch) {
-      if (item.itemId) {
-        const itemData = items.find((item) => item.id === element.itemId);
-        if (itemData) {
-          if (!itemData.isUserReturnable) {
-            throw new ErrorHandler(
-              400,
-              `Item: ${itemData.item} is set as non-returnable for user`
-            );
-          }
+    if (element.itemId) {
+      const itemData = items.find((item) => item.id === element.itemId);
+      if (itemData) {
+        if (!itemData.isUserReturnable) {
+          throw new ErrorHandler(
+            400,
+            `Item: ${itemData.item} is set as non-returnable for user`
+          );
         }
       }
+    }
+
+    for (const item of element.itemBatch) {
       totalReturnQty += item.returnQty;
 
       const storeReqItem = storeReq.requisitionInvItemDetails.find(

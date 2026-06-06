@@ -145,5 +145,8 @@ export interface ItemMasterExcelRow {
   "Item Description"?: unknown;
   "Is Batch Number"?: unknown;
   "Is Expire Date"?: unknown;
-  "Is Returnable"?: unknown;
+  "Is User Returnable"?: unknown;
+  "Is Vendor Returnable"?: unknown;
+  "Is Price Variable"?: unknown;
+  "Consumption Type"?: unknown;
 }

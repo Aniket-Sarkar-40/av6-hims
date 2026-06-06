@@ -93,8 +93,12 @@ export const validateItemMasterExcelArray = (
       pushRowError(errors, rowNo, "Is Expire Date must be a boolean");
     }
 
-    if (typeof row.isReturnable !== "boolean") {
-      pushRowError(errors, rowNo, "Is Returnable must be a boolean");
+    if (typeof row.isUserReturnable !== "boolean") {
+      pushRowError(errors, rowNo, "Is User Returnable must be a boolean");
+    }
+
+    if (typeof row.isVendorReturnable !== "boolean") {
+      pushRowError(errors, rowNo, "Is Vendor Returnable must be a boolean");
     }
   }
 

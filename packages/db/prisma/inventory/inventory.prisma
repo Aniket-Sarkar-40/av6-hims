@@ -1488,20 +1488,23 @@ model RequisitionReturnItemDetails {
 }
 
 model InvItemMasterExcel {
-    id              Int      @id @default(autoincrement())
-    rowNo           Int      @map("row_no")
-    item            String   @map("item")
-    itemCode        String?  @map("item_code")
-    itemCategory    String   @map("item_category")
-    storage         String?  @map("storage")
-    unit            String   @map("unit")
-    basePrice       Decimal? @map("base_price") @db.Decimal(18, 5)
-    reOrderLevel    Int?     @map("re_order_level")
-    itemDescription String?  @map("item_description")
-    isBatchNumber   Boolean  @default(false) @map("is_batch_number")
-    isExpireDate    Boolean  @default(false) @map("is_expire_date")
-    isReturnable    Boolean  @default(false) @map("is_returnable")
-    batchJobId      Int      @map("batch_job_id")
+    id                 Int             @id @default(autoincrement())
+    rowNo              Int             @map("row_no")
+    item               String          @map("item")
+    itemCode           String?         @map("item_code")
+    itemCategory       String          @map("item_category")
+    storage            String?         @map("storage")
+    unit               String          @map("unit")
+    basePrice          Decimal?        @map("base_price") @db.Decimal(18, 5)
+    reOrderLevel       Int?            @map("re_order_level")
+    itemDescription    String?         @map("item_description")
+    isBatchNumber      Boolean         @default(false) @map("is_batch_number")
+    isExpireDate       Boolean         @default(false) @map("is_expire_date")
+    batchJobId         Int             @map("batch_job_id")
+    consumptionType    ConsumptionType @default(MANUAL) @map("consumption_type")
+    isUserReturnable   Boolean         @default(true) @map("is_user_returnable")
+    isVendorReturnable Boolean         @default(true) @map("is_vendor_returnable")
+    isPriceVariable    Boolean         @default(true) @map("is_price_variable")
 
     batchJob InvBatchJob @relation(fields: [batchJobId], references: [id])
 
@@ -1579,5 +1582,5 @@ model CronDetails {
 
     @@unique([cronName, runDate, runKey, attempt], name: "cron_unique_runkey_attempt")
     @@index([cronName, runDate, runKey], name: "cron_find_latest_idx")
-    @@map("fixuji_cron_details")
+    @@map("inv_cron_details")
 }

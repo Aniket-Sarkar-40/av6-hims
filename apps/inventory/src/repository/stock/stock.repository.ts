@@ -432,7 +432,8 @@ export const itemStockSummary = async (ccId: number) => {
       im.base_price AS basePrice,
       im.is_batch_number AS isBatchNumber,
       im.is_expire_date AS isExpireDate,
-      im.is_returnable AS isReturnable,
+      im.is_user_returnable AS isUserReturnable,
+      im.is_vendor_returnable AS isVendorReturnable,
       im.is_lock AS itemIsLock,
       im.is_active AS itemIsActive,
 
@@ -681,7 +682,8 @@ export const itemStock = async (ccId: number) => {
       im.re_order_level AS reOrderLevel,
       im.is_batch_number AS isBatchNumber,
       im.is_expire_date AS isExpireDate,
-      im.is_returnable AS isReturnable,
+      im.is_user_returnable AS isUserReturnable,
+      im.is_vendor_returnable AS isVendorReturnable,
       im.is_lock AS itemIsLock,
       im.is_active AS itemIsActive,
 
