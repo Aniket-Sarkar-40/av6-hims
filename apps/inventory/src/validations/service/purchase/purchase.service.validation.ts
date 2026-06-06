@@ -176,6 +176,14 @@ export const validatePurchaseOrderCommon = async (
       }
     }
 
+    const itemData = items.find((item) => item.id === detail.itemId);
+    if (!itemData?.isPriceVariable) {
+      throw new ErrorHandler(
+        400,
+        `Cannot change the price of item: ${itemData?.item}`
+      );
+    }
+
     const { purchasedPrice, quantity, totalAmount, itemId } = detail;
 
     const item = items.find((item) => item.id === itemId);

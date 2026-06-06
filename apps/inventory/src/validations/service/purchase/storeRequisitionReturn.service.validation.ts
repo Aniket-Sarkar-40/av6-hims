@@ -15,6 +15,7 @@ import {
   RejectStoreRequisitionReturnInput,
 } from "@/types/purchase/storeRequisitionReturn.js";
 import { validateIdBranch } from "@/validations/service/master/branch.service.validation.js";
+import { validateIdItemMaster } from "@/validations/service/master/itemMaster.service.validation.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { STORE_REQ_STATUS } from "@repo/db/generated/prisma/enums.js";
 import { logger } from "@repo/platform/logging/logger.js";
@@ -140,6 +141,16 @@ export const validateStoreRequisitionReturnCommon = async (
     }
 
     for (const item of element.itemBatch) {
+      if (item.itemId) {
+        const itemData = await validateIdItemMaster(item.itemId);
+
+        if (!itemData.isUserReturnable) {
+          throw new ErrorHandler(
+            400,
+            `Item: ${itemData.item} is set as non-returnable for user`
+          );
+        }
+      }
       totalReturnQty += item.returnQty;
 
       const storeReqItem = storeReq.requisitionInvItemDetails.find(

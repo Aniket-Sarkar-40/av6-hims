@@ -326,7 +326,8 @@ export const itemMasterService = {
       { header: "Item Description", key: "itemDescription", width: 40 },
       { header: "Is Batch Number", key: "isBatchNumber", width: 18 },
       { header: "Is Expire Date", key: "isExpireDate", width: 18 },
-      { header: "Is Returnable", key: "isReturnable", width: 18 },
+      { header: "Is User Returnable", key: "isUserReturnable", width: 18 },
+      { header: "Is Vendor Returnable", key: "isVendorReturnable", width: 18 },
     ];
 
     const headerRow = ws.getRow(1);
@@ -371,7 +372,8 @@ export const itemMasterService = {
       itemDescription: "Pain relief and fever medicine",
       isBatchNumber: true,
       isExpireDate: true,
-      isReturnable: true,
+      isUserReturnable: true,
+      isVendorReturnable: true,
     });
 
     ws.getColumn("itemCode").numFmt = "@";
@@ -418,7 +420,8 @@ export const itemMasterService = {
       "Re-order Level",
       "Is Batch Number",
       "Is Expire Date",
-      "Is Returnable",
+      "Is User Returnable",
+      "Is Vendor Returnable",
     ];
 
     const attributeRow = ws.addRow(attribute);
@@ -436,7 +439,8 @@ export const itemMasterService = {
         i.reOrderLevel ?? "",
         i.isBatchNumber,
         i.isExpireDate,
-        i.isReturnable,
+        i.isUserReturnable,
+        i.isVendorReturnable,
       ]);
     });
 

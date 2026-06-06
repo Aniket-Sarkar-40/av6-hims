@@ -325,12 +325,15 @@ model InvItem {
     itemDescription    String?  @map("item_description")
     isBatchNumber      Boolean  @default(false) @map("is_batch_number")
     isExpireDate       Boolean  @default(false) @map("is_expire_date")
-    isReturnable       Boolean  @default(false) @map("is_returnable")
 
-    frontImage     String? @map("front_image")
-    backImage      String? @map("back_image")
-    leftSideImage  String? @map("left_side_image")
-    rightSideImage String? @map("right_side_image")
+    frontImage         String?         @map("front_image")
+    backImage          String?         @map("back_image")
+    leftSideImage      String?         @map("left_side_image")
+    rightSideImage     String?         @map("right_side_image")
+    consumptionType    ConsumptionType @default(MANUAL) @map("consumption_type")
+    isUserReturnable   Boolean         @default(true) @map("is_user_returnable")
+    isVendorReturnable Boolean         @default(true) @map("is_vendor_returnable")
+    isPriceVariable    Boolean         @default(true) @map("is_price_variable")
 
     isLock    Boolean   @default(false) @map("is_lock")
     isActive  Boolean   @default(true) @map("is_active")
@@ -1555,4 +1558,26 @@ model InvItemSupplierExcel {
 
     @@index([batchJobId], name: "item_supplier_excel_batch_job_id_idx")
     @@map("inv_item_supplier_excel")
+}
+
+model CronDetails {
+    id       Int      @id @default(autoincrement()) @map("id")
+    cronName String   @map("cron_name")
+    runDate  DateTime @map("run_date") @db.Date
+
+    runKey  String @map("run_key") @db.VarChar(50)
+    attempt Int    @default(1) @map("attempt")
+
+    status     CronStatus @default(PENDING) @map("status")
+    startedAt  DateTime?  @map("started_at")
+    endedAt    DateTime?  @map("ended_at")
+    durationMs Int?       @map("duration_ms")
+    message    String?    @map("message") @db.LongText
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@unique([cronName, runDate, runKey, attempt], name: "cron_unique_runkey_attempt")
+    @@index([cronName, runDate, runKey], name: "cron_find_latest_idx")
+    @@map("fixuji_cron_details")
 }

@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { Decimal } from "@prisma/client/runtime/client";
 import crypto from "crypto";
 import Joi from "joi";
+import { toUTCDateOnly } from "@/utils/date.utils.js";
 
 export const toRelativeImagePath = (absolutePath: string): string => {
   if (
@@ -180,4 +181,26 @@ export function generateMd5(text: string) {
 export const generateHashForAuth = (randomNum: string) => {
   const firstHash = generateMd5(CLIENT_ID);
   return generateMd5(firstHash + randomNum);
+};
+
+export const getNormalizedParams = (cornName: string, runDate: Date) => ({
+  name: cornName.trim(),
+  runDate: toUTCDateOnly(runDate),
+});
+
+export const calcDurationMs = (
+  startedAt: Date | null | undefined,
+  endedAt: Date
+) =>
+  Math.max(0, endedAt.getTime() - (startedAt?.getTime() ?? endedAt.getTime()));
+
+export const errToMessage = (err: unknown) => {
+  if (err instanceof Error)
+    return `${err.name}: ${err.message}${err.stack ? `\n${err.stack}` : ""}`;
+  if (typeof err === "string") return err;
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return String(err);
+  }
 };

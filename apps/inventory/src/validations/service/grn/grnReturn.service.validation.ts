@@ -175,13 +175,10 @@ export const validateGrnReturnCommon = async (
         generateErrorMessage("NOT_FOUND", `Item ${itemId}`)
       );
     }
-    if (itm.isReturnable === false) {
+    if (!itm.isVendorReturnable) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage(
-          "INVALID_VALUE",
-          `Item ${itemId} is not returnable`
-        )
+        `Item: ${itm.item} is set as non-returnable for vendor`
       );
     }
   }

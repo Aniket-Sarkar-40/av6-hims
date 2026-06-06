@@ -169,3 +169,15 @@ enum ItemStockType {
     PACK_WISE
     EACH_WISE
 }
+
+enum ConsumptionType {
+    MANUAL
+    AUTO
+}
+
+enum CronStatus {
+    PENDING
+    IN_PROGRESS
+    SUCCESS
+    FAILED
+}
