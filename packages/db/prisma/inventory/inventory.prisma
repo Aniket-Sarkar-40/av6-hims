@@ -7,6 +7,7 @@ model InvDynamicShortCode {
     isDropDown   Boolean  @default(false) @map("is_drop_down")
     permission   String?
     config       Json?    @map("config")
+    deleteConfig Json?    @map("delete_config")
     isSingleDto  Boolean  @default(true) @map("is_single_dto")
     whereClause  Json?    @map("where_clause")
     selectClause Json?    @map("select_clause")

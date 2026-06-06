@@ -1,5 +1,6 @@
 import { db } from "@repo/db";
 import { EMAIL_TYPE, Prisma } from "@repo/db/generated/prisma/client";
+import { SoftDeleteConfig } from "av6-core";
 
 import { createClient } from "redis";
 
@@ -13,6 +14,7 @@ interface DynamicShortCodeSeeder {
   isDropDown?: boolean;
   whereClause?: string;
   selectClause?: string;
+  deleteConfig?: string;
 }
 
 interface EventEmailSeeder {
@@ -44,6 +46,19 @@ async function updateDynamicShortCodeConfigsByShortCode(
     )
   );
 }
+
+const getDeleteConfigByTableName = (shortCode: string): SoftDeleteConfig => {
+  switch (shortCode) {
+    case "PO":
+      return {
+        children: [
+          { tableName: "invPurchaseOrderDetails", foreignKey: "purchaseId" },
+        ],
+      };
+    default:
+      return {};
+  }
+};
 
 export async function runSeed() {
   await redis.connect();
@@ -261,6 +276,7 @@ export async function runSeed() {
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "poNumber" }),
+      deleteConfig: JSON.stringify(getDeleteConfigByTableName("PO")),
     },
     {
       shortCode: "CONSUMPTION",

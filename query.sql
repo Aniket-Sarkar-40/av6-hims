@@ -1733,3 +1733,7 @@ ALTER TABLE `inv_item_supplier_excel` ADD COLUMN `is_grn_email` BOOLEAN NOT NULL
 
 
 ALTER TABLE `inv_warehouse` DROP COLUMN `is_main`;
+
+
+-- AlterTable
+ALTER TABLE `inv_dynamic_short_code` ADD COLUMN `delete_config` JSON NULL;
