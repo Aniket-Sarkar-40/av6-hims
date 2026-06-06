@@ -19,9 +19,9 @@ export const toItemBatchStockCacheDTOList = async (
   if (data.length === 0) return [];
 
   const items = await itemMasterService.getAllItemMaster(true);
-
+  const itemMap = new Map(items.map((item) => [item.id, item]));
   return data.map((stock) => {
-    const item = items.find((i) => i.id === stock.itemId) ?? null;
+    const item = itemMap.get(stock.itemId) ?? null;
     return {
       id: stock.id,
       itemId: stock.itemId,
