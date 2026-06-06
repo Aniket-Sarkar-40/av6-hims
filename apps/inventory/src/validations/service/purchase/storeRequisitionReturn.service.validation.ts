@@ -142,13 +142,14 @@ export const validateStoreRequisitionReturnCommon = async (
 
     for (const item of element.itemBatch) {
       if (item.itemId) {
-        const itemData = await validateIdItemMaster(item.itemId);
-
-        if (!itemData.isUserReturnable) {
-          throw new ErrorHandler(
-            400,
-            `Item: ${itemData.item} is set as non-returnable for user`
-          );
+        const itemData = items.find((item) => item.id === element.itemId);
+        if (itemData) {
+          if (!itemData.isUserReturnable) {
+            throw new ErrorHandler(
+              400,
+              `Item: ${itemData.item} is set as non-returnable for user`
+            );
+          }
         }
       }
       totalReturnQty += item.returnQty;
