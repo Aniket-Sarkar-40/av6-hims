@@ -460,6 +460,16 @@ export const createItemSupplierExcelInDb = async (
           taxIdentificationNumber:
             record.taxIdentificationNumber?.trim() || null,
 
+          isPoWhatsapp: record.isPoWhatsapp ?? false,
+          isPoEmail: record.isPoEmail ?? false,
+          isPoSms: record.isPoSms ?? false,
+          isGrnWhatsapp: record.isGrnWhatsapp ?? false,
+          isGrnEmail: record.isGrnEmail ?? false,
+          isGrnSms: record.isGrnSms ?? false,
+          isReturnWhatsapp: record.isReturnWhatsapp ?? false,
+          isReturnEmail: record.isReturnEmail ?? false,
+          isReturnSms: record.isReturnSms ?? false,
+
           batchJobId: batchJob.id,
         })
       );

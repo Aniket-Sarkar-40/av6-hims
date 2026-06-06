@@ -64,4 +64,14 @@ export interface ItemSupplierExcelRow {
   "Tax Identification Name"?: unknown;
   "Tax Identification Value"?: unknown;
   "Tax Identification Number"?: unknown;
+
+  "Is PO Whatsapp"?: unknown;
+  "Is PO Email"?: unknown;
+  "Is PO SMS"?: unknown;
+  "Is GRN Whatsapp"?: unknown;
+  "Is GRN Email"?: unknown;
+  "Is GRN SMS"?: unknown;
+  "Is Return Whatsapp"?: unknown;
+  "Is Return Email"?: unknown;
+  "Is Return SMS"?: unknown;
 }

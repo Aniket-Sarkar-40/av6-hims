@@ -1540,7 +1540,16 @@ model InvItemSupplierExcel {
     taxIdentificationValue  Int?    @map("tax_identification_value")
     taxIdentificationNumber String? @map("tax_identification_number")
 
-    batchJobId Int @map("batch_job_id")
+    batchJobId       Int     @map("batch_job_id")
+    isPoWhatsapp     Boolean @default(false) @map("is_po_whatsapp")
+    isPoEmail        Boolean @default(false) @map("is_po_email")
+    isPoSms          Boolean @default(false) @map("is_po_sms")
+    isGrnWhatsapp    Boolean @default(false) @map("is_grn_whatsapp")
+    isGrnEmail       Boolean @default(false) @map("is_grn_email")
+    isGrnSms         Boolean @default(false) @map("is_grn_sms")
+    isReturnWhatsapp Boolean @default(false) @map("is_return_whatsapp")
+    isReturnEmail    Boolean @default(false) @map("is_return_email")
+    isReturnSms      Boolean @default(false) @map("is_return_sms")
 
     batchJob InvBatchJob @relation(fields: [batchJobId], references: [id])
 

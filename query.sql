@@ -1719,3 +1719,14 @@ ALTER TABLE `inv_settings` ADD COLUMN `grn_precision` INTEGER NOT NULL DEFAULT 2
     ADD COLUMN `po_calculation_method` ENUM('STEP_WISE', 'FINAL') NOT NULL DEFAULT 'STEP_WISE',
     ADD COLUMN `po_precision` INTEGER NOT NULL DEFAULT 2,
     ADD COLUMN `po_rounded_format` ENUM('ROUND', 'SPECIAL_ROUND', 'TO_FIXED', 'CEIL', 'FLOOR', 'TRUNC', 'NONE') NOT NULL DEFAULT 'TO_FIXED';
+
+
+ALTER TABLE `inv_item_supplier_excel` ADD COLUMN `is_grn_email` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_grn_sms` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_grn_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_po_email` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_po_sms` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_po_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_return_email` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_return_sms` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_return_whatsapp` BOOLEAN NOT NULL DEFAULT false;

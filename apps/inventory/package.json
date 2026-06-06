@@ -2,8 +2,8 @@
   "name": "@apps/inv",
   "version": "0.0.1",
   "dependencies": {
-    "@apps/core": "workspace:*",
     "@apps/acc": "workspace:*",
+    "@apps/core": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",

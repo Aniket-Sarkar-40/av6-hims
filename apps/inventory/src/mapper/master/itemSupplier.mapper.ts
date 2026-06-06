@@ -152,6 +152,16 @@ export const mapExcelRowToItemSupplierReq = (
     termsAndCondition: row.termsAndCondition,
     stockShipmentDetails: row.stockShipmentDetails,
 
+    isPoWhatsapp: row.isPoWhatsapp ?? false,
+    isPoEmail: row.isPoEmail ?? false,
+    isPoSms: row.isPoSms ?? false,
+    isGrnWhatsapp: row.isGrnWhatsapp ?? false,
+    isGrnEmail: row.isGrnEmail ?? false,
+    isGrnSms: row.isGrnSms ?? false,
+    isReturnWhatsapp: row.isReturnWhatsapp ?? false,
+    isReturnEmail: row.isReturnEmail ?? false,
+    isReturnSms: row.isReturnSms ?? false,
+
     bankDetails: hasBankDetails(row)
       ? [
           {

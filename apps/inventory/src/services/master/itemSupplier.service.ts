@@ -246,6 +246,16 @@ export const itemSupplierService = {
         key: "taxIdentificationNumber",
         width: 30,
       },
+
+      { header: "Is PO Whatsapp", key: "isPoWhatsapp", width: 20 },
+      { header: "Is PO Email", key: "isPoEmail", width: 20 },
+      { header: "Is PO SMS", key: "isPoSms", width: 20 },
+      { header: "Is GRN Whatsapp", key: "isGrnWhatsapp", width: 20 },
+      { header: "Is GRN Email", key: "isGrnEmail", width: 20 },
+      { header: "Is GRN SMS", key: "isGrnSms", width: 20 },
+      { header: "Is Return Whatsapp", key: "isReturnWhatsapp", width: 20 },
+      { header: "Is Return Email", key: "isReturnEmail", width: 20 },
+      { header: "Is Return SMS", key: "isReturnSms", width: 20 },
     ];
 
     const headerRow = ws.getRow(1);
@@ -311,6 +321,16 @@ export const itemSupplierService = {
       taxIdentificationName: "GST",
       taxIdentificationValue: 1,
       taxIdentificationNumber: "19ABCDE1234F1Z5",
+
+      isPoWhatsapp: true,
+      isPoEmail: true,
+      isPoSms: true,
+      isGrnWhatsapp: true,
+      isGrnEmail: true,
+      isGrnSms: true,
+      isReturnWhatsapp: true,
+      isReturnEmail: true,
+      isReturnSms: true,
     });
 
     ws.getColumn("supplierCode").numFmt = "@";

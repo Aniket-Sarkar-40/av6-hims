@@ -62,6 +62,14 @@ export const validateItemSupplierExcelArray = (
       }
     };
 
+    const validateBooleanField = (value: unknown, label: string) => {
+      if (value == null || value === "") return;
+
+      if (typeof value !== "boolean") {
+        pushRowError(errors, rowNo, `${label} must be true or false`);
+      }
+    };
+
     validatePhoneField(row.phone, "Phone");
     validatePhoneField(row.salesPersonPhone, "Sales Person Phone");
     validatePhoneField(row.proprietaryPersonPhone, "Proprietary Person Phone");
@@ -71,11 +79,37 @@ export const validateItemSupplierExcelArray = (
     }
 
     if (
+      row.salesPersonEmail != null &&
+      typeof row.salesPersonEmail !== "string"
+    ) {
+      pushRowError(errors, rowNo, "Sales Person Email must be a string");
+    }
+
+    if (
+      row.proprietaryPersonEmail != null &&
+      typeof row.proprietaryPersonEmail !== "string"
+    ) {
+      pushRowError(errors, rowNo, "Proprietary Person Email must be a string");
+    }
+
+    if (
       row.vendorType != null &&
       !Object.values(VendorType).includes(row.vendorType as VendorType)
     ) {
       pushRowError(errors, rowNo, "Vendor Type is invalid");
     }
+
+    validateBooleanField(row.isPoWhatsapp, "PO Whatsapp");
+    validateBooleanField(row.isPoEmail, "PO Email");
+    validateBooleanField(row.isPoSms, "PO SMS");
+
+    validateBooleanField(row.isGrnWhatsapp, "GRN Whatsapp");
+    validateBooleanField(row.isGrnEmail, "GRN Email");
+    validateBooleanField(row.isGrnSms, "GRN SMS");
+
+    validateBooleanField(row.isReturnWhatsapp, "Return Whatsapp");
+    validateBooleanField(row.isReturnEmail, "Return Email");
+    validateBooleanField(row.isReturnSms, "Return SMS");
 
     const bankGiven =
       hasValue(row.accountNo) ||

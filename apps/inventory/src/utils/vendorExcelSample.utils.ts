@@ -109,6 +109,43 @@ const VENDOR_HEADER_GUIDE: Record<string, VendorExcelHeaderGuide> = {
     status: "OPTIONAL",
     note: "Optional tax field.",
   },
+
+  isPoWhatsapp: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isPoEmail: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isPoSms: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isGrnWhatsapp: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isGrnEmail: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isGrnSms: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isReturnWhatsapp: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isReturnEmail: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
+  isReturnSms: {
+    status: "OPTIONAL",
+    note: "Optional. Boolean field. Set to TRUE if vendor is active, FALSE otherwise.",
+  },
 };
 
 const shouldShowVendorHeaderStar = (status: VendorExcelHeaderStatus) => {
