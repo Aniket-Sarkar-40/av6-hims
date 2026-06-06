@@ -108,15 +108,6 @@ export const validateGrnReturnCommon = async (
     precision,
   });
 
-  if (ccSettingsId) {
-    if (warehouse?.isMain === false) {
-      throw new ErrorHandler(
-        404,
-        generateErrorMessage("ACCESS_FAIL", "Warehouse")
-      );
-    }
-  }
-
   const grn = await getGrnByIdFromDb(body.grnId);
 
   if (!grn) {
@@ -653,18 +644,26 @@ export const approveGrnReturnServiceValidation = async (
   const grnReturn = await validateIdGrnReturn(body.id);
 
   const ccSettingsId = settings?.warehouseMode;
-  let warehouse, branch;
 
   if (ccSettingsId) {
-    warehouse = await warehouseService.getWarehouseById(body.ccId, true);
-    if (grnReturn.ccId !== body.ccId && warehouse?.isMain === false) {
+    const warehouse = await warehouseService.getWarehouseById(body.ccId, true);
+    if (!warehouse) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", "Warehouse")
+      );
+    }
+    if (grnReturn.ccId !== body.ccId) {
       throw new ErrorHandler(
         404,
         generateErrorMessage("MISMATCH", "Warehouse Id", "CC Id")
       );
     }
   } else {
-    branch = await branchService.getBranchById(body.ccId, true);
+    const branch = await branchService.getBranchById(body.ccId, true);
+    if (!branch) {
+      throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Branch"));
+    }
     if (grnReturn.ccId !== body.ccId && branch?.isMain === false) {
       throw new ErrorHandler(
         404,
@@ -732,18 +731,32 @@ export const rejectGrnReturnServiceValidation = async (body: {
 
   if (body.ccId) {
     const ccSettingsId = settings?.warehouseMode;
-    let warehouse, branch;
 
     if (ccSettingsId) {
-      warehouse = await warehouseService.getWarehouseById(body.ccId, true);
-      if (grnReturn.ccId !== body.ccId && warehouse?.isMain === false) {
+      const warehouse = await warehouseService.getWarehouseById(
+        body.ccId,
+        true
+      );
+      if (!warehouse) {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Warehouse")
+        );
+      }
+      if (grnReturn.ccId !== body.ccId) {
         throw new ErrorHandler(
           404,
           generateErrorMessage("MISMATCH", "Warehouse Id", "CC Id")
         );
       }
     } else {
-      branch = await branchService.getBranchById(body.ccId, true);
+      const branch = await branchService.getBranchById(body.ccId, true);
+      if (!branch) {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Branch")
+        );
+      }
       if (grnReturn.ccId !== body.ccId && branch?.isMain === false) {
         throw new ErrorHandler(
           404,

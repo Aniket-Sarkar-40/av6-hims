@@ -49,6 +49,7 @@ export const toAvailableItemBatchStockDTOList = (
     seen.add(key);
 
     result.push({
+      itemId: stock.itemId,
       itemName: stock.itemName,
       batchNo: stock.batchNo,
     });

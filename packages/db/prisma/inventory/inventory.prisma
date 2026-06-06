@@ -446,7 +446,6 @@ model InvWarehouse {
     area                      String?                     @map("area")
     pinCode                   Int?                        @map("pin_code")
     latitudeLongitude         String?                     @map("latitude_longitude")
-    isMain                    Boolean                     @default(false) @map("is_main")
     isActive                  Boolean                     @default(true) @map("is_active")
     createdBy                 Int?                        @map("created_by")
     updatedBy                 Int?                        @map("updated_by")

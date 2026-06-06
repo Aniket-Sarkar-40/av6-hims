@@ -101,15 +101,6 @@ export const validateGrnCommon = async (
 
   validIdCheck(body.poId);
 
-  if (ccSettingsId) {
-    if (warehouse?.isMain === false) {
-      throw new ErrorHandler(
-        404,
-        generateErrorMessage("ACCESS_FAIL", "Warehouse")
-      );
-    }
-  }
-
   const existingPO = await getPurchaseByIdFromDb(body.poId);
   if (!existingPO) {
     throw new ErrorHandler(
@@ -137,7 +128,7 @@ export const validateGrnCommon = async (
   }
 
   if (ccSettingsId) {
-    if (existingPO.ccId !== body.ccId && warehouse?.isMain === false) {
+    if (existingPO.ccId !== body.ccId) {
       throw new ErrorHandler(
         400,
         generateErrorMessage("MISMATCH", "Warehouse ID", "Sending Warehouse ID")

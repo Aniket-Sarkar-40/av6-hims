@@ -1730,3 +1730,6 @@ ALTER TABLE `inv_item_supplier_excel` ADD COLUMN `is_grn_email` BOOLEAN NOT NULL
     ADD COLUMN `is_return_email` BOOLEAN NOT NULL DEFAULT false,
     ADD COLUMN `is_return_sms` BOOLEAN NOT NULL DEFAULT false,
     ADD COLUMN `is_return_whatsapp` BOOLEAN NOT NULL DEFAULT false;
+
+
+ALTER TABLE `inv_warehouse` DROP COLUMN `is_main`;

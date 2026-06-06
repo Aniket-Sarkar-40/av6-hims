@@ -198,6 +198,7 @@ export interface ItemBatchStockCacheDTO {
 }
 
 export interface ItemBatchStockDTO {
+  itemId: number;
   itemName: string;
   batchNo: string;
 }
