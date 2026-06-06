@@ -279,6 +279,17 @@ export async function runSeed() {
       deleteConfig: JSON.stringify(getDeleteConfigByTableName("PO")),
     },
     {
+      shortCode: "PO_DETAILS",
+      tableName: "invPurchaseOrderDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:purchase-order-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "quantity" }),
+    },
+    {
       shortCode: "CONSUMPTION",
       tableName: "consumption",
       isDTO: true,

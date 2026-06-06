@@ -79,8 +79,6 @@ export type PurchaseOrderDetailResponse =
   Prisma.InvPurchaseOrderDetailsGetPayload<{
     include: {
       item: true;
-      itemCategory: true;
-      itemMedUnit: true;
     };
   }>;
 

@@ -32,6 +32,7 @@ export const SHORT_CODE = {
   ST_REQ_RET: "ST_REQ_RET",
   BRANCH_REQ_RETURN: "BRANCH_REQ_RETURN",
   ITEM_BATCH_STOCK: "ITEM_BATCH_STOCK",
+  PO_DETAILS: "PO_DETAILS",
 };
 /*
 short code not  added till now fro the below mentioned tables 

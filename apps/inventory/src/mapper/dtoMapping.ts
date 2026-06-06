@@ -25,11 +25,17 @@ import { ConsumptionResponse } from "@/types/consumption/consumption.js";
 import { toStockDTO } from "./stock/stock.mapper.js";
 import { toStoreRequisitionDTO } from "./purchase/storeRequisition.mapper.js";
 import { StoreRequisitionResponse } from "@/types/purchase/storeRequisition.js";
-import { toPurchaseOrderDTO } from "./purchase/purchase.mapper.js";
+import {
+  toPurchaseOrderDetailsDto,
+  toPurchaseOrderDTO,
+} from "./purchase/purchase.mapper.js";
 import { toInTransitStockDTO } from "./inTransitStock/inTransitStock.mapper.js";
 import { toStockAdjustmentDTO } from "./stock/stockAdjustment.mapper.js";
 import { StockAdjustmentResponse } from "@/types/stock/stockAdjustment.js";
-import { PurchaseOrderWithDetails } from "@/types/purchase/purchase.js";
+import {
+  PurchaseOrderDetailResponse,
+  PurchaseOrderWithDetails,
+} from "@/types/purchase/purchase.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import { toBranchRequisitionDTO } from "@/mapper/purchase/branchRequisition.mapper.js";
 import { BranchRequisitionResponse } from "@/types/purchase/branchRequisition.js";
@@ -73,4 +79,6 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toStoreRequisitionReturnDTO(data as GetStoreRequisitionReturnResponse),
   [SHORT_CODE.BRANCH_REQ_RETURN]: (data: unknown) =>
     toBranchRequisitionReturnDTO(data as GetBranchRequisitionReturnResponse),
+  [SHORT_CODE.PO_DETAILS]: (data: unknown) =>
+    toPurchaseOrderDetailsDto(data as PurchaseOrderDetailResponse[]),
 };

@@ -6,6 +6,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   PurchaseOrderDetailDTO,
+  PurchaseOrderDetailResponse,
   PurchaseOrderDTO,
   PurchaseOrderPdfDTO,
   PurchaseOrderWithDetails,
@@ -174,6 +175,34 @@ export const toPurchaseOrderPdfDTO = async (
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),
         purchaseOrderDetails: omitAudit(detailDTO),
+      };
+    })
+  );
+};
+
+export const toPurchaseOrderDetailsDto = async (
+  purchaseOrderDetails: PurchaseOrderDetailResponse[]
+): Promise<PurchaseOrderDetailDTO[]> => {
+  return Promise.all(
+    purchaseOrderDetails.map(async (detail) => {
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...detail,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
       };
     })
   );
