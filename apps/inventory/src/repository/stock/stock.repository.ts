@@ -1426,7 +1426,8 @@ export const getItemStockByItemOnly = async (
   ccId: number,
   batchNo?: string | null,
   expiryDate?: Date | null,
-  isFoc?: boolean
+  isFoc?: boolean,
+  id?: number
 ) => {
   logger.info(`entering::getItemStockByItemOnly::repository`);
 
@@ -1434,6 +1435,7 @@ export const getItemStockByItemOnly = async (
     where: {
       itemId,
       ccId,
+      ...(id !== undefined ? { id } : {}),
       isActive: true,
       ...(batchNo !== undefined ? { batchNo } : {}),
       ...(isFoc !== undefined ? { isFoc } : {}),

@@ -157,7 +157,8 @@ export const commonStockAdjustmentServiceValidation = async (
       input.targetCcId,
       detail.batchNo,
       detail.expiryDate ? new Date(detail.expiryDate) : undefined,
-      !!detail.isFoc
+      !!detail.isFoc,
+      detail.batchId ?? undefined
     );
     if (!stock) {
       throw new ErrorHandler(
