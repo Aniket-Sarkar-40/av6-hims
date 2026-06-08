@@ -167,3 +167,13 @@ export interface AcknowledgeRequisitionReturn {
 
   storeReqReturn: GetStoreRequisitionReturnResponse;
 }
+
+export interface StrReturnDetailDTO
+  extends Omit<
+    RequisitionReturnItemDetails,
+    "itemId" | "createdBy" | "updatedBy"
+  > {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}

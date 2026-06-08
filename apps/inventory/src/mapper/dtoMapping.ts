@@ -1,11 +1,13 @@
 import { GrnResponse } from "@/types/grn/grn.js";
 import {
+  BranchReturnItemDetails,
   InvInTransitStock,
   InvItem,
   InvItemStock,
   InvItemStore,
   InvItemSupplierMapping,
   InvUINConfig,
+  RequisitionReturnItemDetails,
 } from "@repo/db/generated/prisma/client";
 import { toGrnDTO } from "./grn/grn.mapper.js";
 import { toItemMasterDTO } from "./master/itemMaster.mapper.js";
@@ -23,8 +25,15 @@ import { WarehouseResponse } from "@/types/master/warehouse.js";
 import { toConsumptionDTO } from "./consumption/consumption.mapper.js";
 import { ConsumptionResponse } from "@/types/consumption/consumption.js";
 import { toStockDTO } from "./stock/stock.mapper.js";
-import { toStoreRequisitionDTO } from "./purchase/storeRequisition.mapper.js";
-import { StoreRequisitionResponse } from "@/types/purchase/storeRequisition.js";
+import {
+  toStoreRequisitionDetailDTO,
+  toStoreRequisitionDTO,
+  toStoreRequisitionReturnDetailDTO,
+} from "./purchase/storeRequisition.mapper.js";
+import {
+  StoreRequisitionDetails,
+  StoreRequisitionResponse,
+} from "@/types/purchase/storeRequisition.js";
 import {
   toPurchaseOrderDetailsDto,
   toPurchaseOrderDTO,
@@ -37,11 +46,20 @@ import {
   PurchaseOrderWithDetails,
 } from "@/types/purchase/purchase.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
-import { toBranchRequisitionDTO } from "@/mapper/purchase/branchRequisition.mapper.js";
-import { BranchRequisitionResponse } from "@/types/purchase/branchRequisition.js";
+import {
+  toBranchRequisitionDetailDTO,
+  toBranchRequisitionDTO,
+} from "@/mapper/purchase/branchRequisition.mapper.js";
+import {
+  BranchRequisitionDetails,
+  BranchRequisitionResponse,
+} from "@/types/purchase/branchRequisition.js";
 import { toStoreRequisitionReturnDTO } from "@/mapper/purchase/storeRequisitionReturn.mapper.js";
 import { GetStoreRequisitionReturnResponse } from "@/types/purchase/storeRequisitionReturn.js";
-import { toBranchRequisitionReturnDTO } from "@/mapper/purchase/branchRequisitionReturn.mapper.js";
+import {
+  toBranchRequisitionReturnDTO,
+  toBranchReturnDetailDTO,
+} from "@/mapper/purchase/branchRequisitionReturn.mapper.js";
 import { GetBranchRequisitionReturnResponse } from "@/types/purchase/branchRequisitionReturn.js";
 
 // Define a type for DTO mapping functions.
@@ -81,4 +99,12 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toBranchRequisitionReturnDTO(data as GetBranchRequisitionReturnResponse),
   [SHORT_CODE.PO_DETAILS]: (data: unknown) =>
     toPurchaseOrderDetailsDto(data as PurchaseOrderDetailResponse[]),
+  [SHORT_CODE.ST_REQ_DETAILS]: (data: unknown) =>
+    toStoreRequisitionDetailDTO(data as StoreRequisitionDetails[]),
+  [SHORT_CODE.BRANCH_REQ_DETAILS]: (data: unknown) =>
+    toBranchRequisitionDetailDTO(data as BranchRequisitionDetails[]),
+  [SHORT_CODE.ST_REQ_RETURN_DETAILS]: (data: unknown) =>
+    toStoreRequisitionReturnDetailDTO(data as RequisitionReturnItemDetails[]),
+  [SHORT_CODE.BRANCH_REQ_RETURN_DETAILS]: (data: unknown) =>
+    toBranchReturnDetailDTO(data as BranchReturnItemDetails[]),
 };

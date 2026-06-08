@@ -91,3 +91,10 @@ export interface CommonConsumptionInput {
   userId: number;
   description?: string;
 }
+
+export interface ConDetailDTO
+  extends Omit<ConsumptionDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}

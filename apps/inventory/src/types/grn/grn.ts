@@ -156,3 +156,10 @@ export interface ItemCommon {
   unitMaster: number;
   itemCategory: number;
 }
+
+export interface GoodReceiveDetailDTO
+  extends Omit<InvGoodReceiveDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}

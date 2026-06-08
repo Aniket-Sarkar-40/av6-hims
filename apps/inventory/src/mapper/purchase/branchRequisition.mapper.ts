@@ -9,8 +9,10 @@ import {
   BranchReqBatchWiseResponse,
   BranchRequisitionBatchWiseDTO,
   BranchRequisitionDetailDTO,
+  BranchRequisitionDetails,
   BranchRequisitionDTO,
   BranchRequisitionResponse,
+  BrDetailDTO,
 } from "@/types/purchase/branchRequisition.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
@@ -227,4 +229,37 @@ export const toBranchRequisitionBatchWiseDTO = async (
     branch: toIdValue(branch, "name"),
     branchItemDetails: detailDTO,
   };
+};
+
+export const toBranchRequisitionDetailDTO = async (
+  branchRequisitionDetail: BranchRequisitionDetails[]
+): Promise<BrDetailDTO[]> => {
+  return Promise.all(
+    branchRequisitionDetail.map(async (detail) => {
+      const omittedData = customOmit<
+        BranchRequisitionDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
+  );
 };

@@ -4,7 +4,12 @@ import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
-import { GrnDetailDTO, GrnDTO, GrnResponse } from "@/types/grn/grn.js";
+import {
+  GoodReceiveDetailDTO,
+  GrnDetailDTO,
+  GrnDTO,
+  GrnResponse,
+} from "@/types/grn/grn.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit } from "av6-utils";
@@ -135,6 +140,38 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
         location,
         createdBy,
         goodReceiveDetails: detailDTO,
+      };
+    })
+  );
+};
+
+export const toGrnDetailsDto = async (
+  grnDetails: InvGoodReceiveDetails[]
+): Promise<GoodReceiveDetailDTO[]> => {
+  return Promise.all(
+    grnDetails.map(async (detail) => {
+      const omittedData = customOmit<
+        InvGoodReceiveDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
       };
     })
   );

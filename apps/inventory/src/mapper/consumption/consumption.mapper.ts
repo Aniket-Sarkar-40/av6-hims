@@ -1,5 +1,6 @@
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import {
+  ConDetailDTO,
   ConsumptionDTO,
   ConsumptionResponse,
 } from "@/types/consumption/consumption.js";
@@ -122,6 +123,35 @@ export const toConsumptionDTO = async (
         deletedBy: deletedBy,
         consumptionDetails: consumptionDetails,
         collectionCenter: cc ? toIdValue(cc, "name") : null,
+      };
+    })
+  );
+};
+
+export const toConDetailDTO = async (
+  consumptionDetail: ConsumptionDetails[]
+): Promise<ConDetailDTO[]> => {
+  return Promise.all(
+    consumptionDetail.map(async (detail) => {
+      const omittedData = customOmit<
+        ConsumptionDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const item = await itemMasterService.getItemMasterById(
+        { itemId: detail.itemId },
+        true
+      );
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+      return {
+        ...omittedData.rest,
+        item: item ? await itemMasterToDto(item) : null,
+        createdBy,
+        updatedBy,
       };
     })
   );

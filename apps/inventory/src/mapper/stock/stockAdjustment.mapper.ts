@@ -102,3 +102,20 @@ export const toStockAdjustmentDTO = async (
     })
   );
 };
+
+export const toStockAdjustmentDetailDTO = async (
+  data: InvStockAdjustmentDetails[]
+): Promise<StockAdjustmentDetailsDTO[]> => {
+  return Promise.all(
+    data.map(async (detail) => {
+      const item = await itemMasterService.getItemMasterByIdWoDto(
+        detail.itemId,
+        true
+      );
+      return {
+        ...detail,
+        item,
+      };
+    })
+  );
+};

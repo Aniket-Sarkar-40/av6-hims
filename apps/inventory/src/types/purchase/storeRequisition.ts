@@ -191,3 +191,10 @@ export type StoreReqValResponse = Prisma.InvStoreRequisitionGetPayload<{
     };
   };
 }>;
+
+export interface StrDetailDTO
+  extends Omit<StoreRequisitionDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}

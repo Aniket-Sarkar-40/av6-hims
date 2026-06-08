@@ -179,3 +179,10 @@ export interface AcknowledgeBranchRequisitionReturn {
 
   branchReqReturn: ValBranchRequisitionReturnResponse;
 }
+
+export interface BrReturnDetailDTO
+  extends Omit<BranchReturnItemDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}

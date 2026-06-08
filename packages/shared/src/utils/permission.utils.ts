@@ -61,6 +61,12 @@ export enum PermissionResource {
   BRANCH_REQUISITION_RETURN_ACK = "branch-requisition-return-acknowledge",
   ITEM_BATCH_STOCK = "item-batch-stock",
   PURCHASE_ORDER_DETAILS = "purchase-order-details",
+  BRANCH_REQ_RETURN_DETAILS = "branch-requisition-return-details",
+  GRN_DETAILS = "grn-details",
+  STORE_REQUISITION_DETAILS = "store-requisition-details",
+  STORE_REQUISITION_RETURN_DETAILS = "store-requisition-return-details",
+  CONSUMPTION_DETAILS = "consumption-details",
+  STOCK_ADJUSTMENT_DETAILS = "stock-adjustment-details",
 
   // CORE
   COUNTRY = "country",

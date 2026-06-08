@@ -6,7 +6,6 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   PurchaseOrderDetailDTO,
-  PurchaseOrderDetailResponse,
   PurchaseOrderDTO,
   PurchaseOrderPdfDTO,
   PurchaseOrderWithDetails,
@@ -16,6 +15,7 @@ import { customOmit, omitAudit, toIdValue } from "av6-utils";
 import dayjs from "dayjs";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
+import { InvPurchaseOrderDetails } from "@repo/db/generated/prisma/client";
 
 export const toPurchaseOrderDTO = async (
   purchaseOrders: PurchaseOrderWithDetails[]
@@ -181,10 +181,14 @@ export const toPurchaseOrderPdfDTO = async (
 };
 
 export const toPurchaseOrderDetailsDto = async (
-  purchaseOrderDetails: PurchaseOrderDetailResponse[]
+  purchaseOrderDetails: InvPurchaseOrderDetails[]
 ): Promise<PurchaseOrderDetailDTO[]> => {
   return Promise.all(
     purchaseOrderDetails.map(async (detail) => {
+      const omittedData = customOmit<
+        InvPurchaseOrderDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
       const itemDTO = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
@@ -199,7 +203,7 @@ export const toPurchaseOrderDetailsDto = async (
         : null;
 
       return {
-        ...detail,
+        ...omittedData.rest,
         item: itemDTO ? await itemMasterToDto(itemDTO) : null,
         createdBy,
         updatedBy,

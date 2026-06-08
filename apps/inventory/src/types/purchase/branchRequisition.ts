@@ -181,3 +181,10 @@ export interface BranchRequisitionBatchWiseDTO
   requisitionFrom: IdValue | null;
   branchItemDetails: BranchItemDetailDTO[];
 }
+
+export interface BrDetailDTO
+  extends Omit<BranchRequisitionDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}

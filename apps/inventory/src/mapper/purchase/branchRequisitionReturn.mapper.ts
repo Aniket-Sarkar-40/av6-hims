@@ -6,11 +6,15 @@ import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   BranchRequisitionReturnDetailDTO,
   BranchRequisitionReturnDTO,
+  BrReturnDetailDTO,
   GetBranchRequisitionReturnResponse,
 } from "@/types/purchase/branchRequisitionReturn.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { BranchRequisitionReturn } from "@repo/db/generated/prisma/client";
+import {
+  BranchRequisitionReturn,
+  BranchReturnItemDetails,
+} from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit, toIdValue } from "av6-utils";
 
@@ -135,4 +139,36 @@ export const toBranchRequisitionReturnDTO = async (
 
     branchRequisitionReturnDetails: detailDTO,
   };
+};
+
+export const toBranchReturnDetailDTO = async (
+  branchReturnDetail: BranchReturnItemDetails[]
+): Promise<BrReturnDetailDTO[]> => {
+  return Promise.all(
+    branchReturnDetail.map(async (detail) => {
+      const omittedData = customOmit<
+        BranchReturnItemDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
+  );
 };

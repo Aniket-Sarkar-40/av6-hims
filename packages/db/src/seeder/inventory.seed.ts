@@ -245,6 +245,17 @@ export async function runSeed() {
       selectClause: JSON.stringify({ id: "id", value: "grnNumber" }),
     },
     {
+      shortCode: "GRN_DETAILS",
+      tableName: "invGoodReceiveDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:grn-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "quantity" }),
+    },
+    {
       shortCode: "STOCK_ADJUSTMENT",
       tableName: "invStockAdjustment",
       isDTO: true,

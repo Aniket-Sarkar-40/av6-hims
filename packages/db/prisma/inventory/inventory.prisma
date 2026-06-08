@@ -364,6 +364,7 @@ model InvItem {
     requisitionReturnItemDetails   RequisitionReturnItemDetails[]
     branchRequisitionReturnDetails BranchRequisitionReturnDetails[]
     branchReturnItemDetails        BranchReturnItemDetails[]
+    stockAdjustmentDetails         InvStockAdjustmentDetails[]
 
     @@index([itemCategoryId], name: "idx_item_category_id")
     @@index([unitId], name: "idx_unit_id")
@@ -512,6 +513,8 @@ model InvStockAdjustmentDetails {
     deletedBy Int?      @map("deleted_by")
 
     stockAdjustment InvStockAdjustment @relation(fields: [stockAdjustmentId], references: [id])
+    invItem         InvItem?           @relation(fields: [invItemId], references: [id])
+    invItemId       Int?
 
     @@index([stockAdjustmentId], name: "stock_adjustment_details_stock_adjustment_id_idx")
     @@map("inv_stock_adjustment_details")

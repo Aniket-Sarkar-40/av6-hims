@@ -13,15 +13,19 @@ import {
   StoreRequisitionBatchWiseDTO,
   StoreRequisitionDetailDTO,
   StoreRequisitionDetailDTOBranch,
+  StoreRequisitionDetails,
   StoreRequisitionDTO,
   StoreRequisitionResponse,
+  StrDetailDTO,
 } from "@/types/purchase/storeRequisition.js";
+import { StrReturnDetailDTO } from "@/types/purchase/storeRequisitionReturn.js";
 import {
   ItemStockWithQtyBreakdown,
   RawItemStock,
 } from "@/types/stock/stock.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { RequisitionReturnItemDetails } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
@@ -243,4 +247,68 @@ export const toStockEntity = (raw: RawItemStock): ItemStockWithQtyBreakdown => {
         ? Number(raw.total_qty)
         : undefined,
   };
+};
+
+export const toStoreRequisitionDetailDTO = async (
+  storeRequisitionDetail: StoreRequisitionDetails[]
+): Promise<StrDetailDTO[]> => {
+  return Promise.all(
+    storeRequisitionDetail.map(async (detail) => {
+      const omittedData = customOmit<
+        StoreRequisitionDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
+  );
+};
+
+export const toStoreRequisitionReturnDetailDTO = async (
+  storeRequisitionReturnDetail: RequisitionReturnItemDetails[]
+): Promise<StrReturnDetailDTO[]> => {
+  return Promise.all(
+    storeRequisitionReturnDetail.map(async (detail) => {
+      const omittedData = customOmit<
+        RequisitionReturnItemDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
+  );
 };
