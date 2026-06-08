@@ -2,6 +2,7 @@ import { getGrnByIdFromDb } from "@/repository/grn/grn.repository.js";
 import {
   getCountGrnReturnDetailsFromDb,
   getGrnReturnByIdFromDb,
+  getOpenGrnReturnDetailsByGrnDetailIdsFromDb,
 } from "@/repository/grn/grnReturn.repository.js";
 import { getCountItemsFromDb } from "@/repository/master/itemMaster.repository.js";
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
@@ -31,6 +32,63 @@ import {
 import { settingsService } from "@/services/master/settings.service.js";
 import { currencyService } from "@/services/master/currency.service.js";
 import { applyGrnReturnRateConversion } from "@/utils/rateConversation.utils.js";
+
+const validateNoOpenGrnReturnForSameDetails = async (
+  body: CreateGrnReturnInput,
+  excludeGrnReturnId?: number
+): Promise<void> => {
+  logger.info(
+    "entering::validateNoOpenGrnReturnForSameDetails::service::validation"
+  );
+
+  const grnDetailIds = body.goodReceiveReturnDetails.map((d) => d.grnDetailId);
+
+  const seen = new Set<number>();
+  const duplicates = new Set<number>();
+  for (const id of grnDetailIds) {
+    if (seen.has(id)) duplicates.add(id);
+    else seen.add(id);
+  }
+
+  if (duplicates.size > 0) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "INVALID_VALUE",
+        `Duplicate GRN detail entries found in return request: ${[
+          ...duplicates,
+        ].join(", ")}`
+      )
+    );
+  }
+
+  const openReturnDetails = await getOpenGrnReturnDetailsByGrnDetailIdsFromDb({
+    grnId: body.grnId,
+    grnDetailIds,
+    excludeGrnReturnId,
+  });
+
+  if (openReturnDetails.length > 0) {
+    const openItems = openReturnDetails
+      .map(
+        (d) =>
+          `${d.item.item} (Return #${d.grnReturnId}, GRN ${d.goodReceiveReturn.grnNumber})`
+      )
+      .join(", ");
+
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "INVALID_VALUE",
+        `A pending/partially approved GRN return already exists for: ${openItems}. Please approve or reject the existing return before creating a new one.`
+      )
+    );
+  }
+
+  logger.info(
+    "exiting::validateNoOpenGrnReturnForSameDetails::service::validation"
+  );
+};
 
 export const validateIdGrnReturn = async (id: number) => {
   logger.info("entering::validateIdGrnReturn service::validation");
@@ -575,6 +633,8 @@ export const createGrnReturnServiceValidation = async (
 
   await validateGrnReturnCommon(body);
 
+  await validateNoOpenGrnReturnForSameDetails(body);
+
   logger.info("exiting::createGrnReturnServiceValidation::service::validation");
 };
 
@@ -617,6 +677,8 @@ export const updateGrnReturnServiceValidation = async (
   }
 
   await validateGrnReturnCommon(body);
+
+  await validateNoOpenGrnReturnForSameDetails(body, body.id);
 
   logger.info("exiting::updateGrnReturnServiceValidation::service::validation");
 };

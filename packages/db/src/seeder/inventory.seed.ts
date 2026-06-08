@@ -55,6 +55,15 @@ const getDeleteConfigByTableName = (shortCode: string): SoftDeleteConfig => {
           { tableName: "invPurchaseOrderDetails", foreignKey: "purchaseId" },
         ],
       };
+    case "ST_REQ_RET":
+      return {
+        children: [
+          {
+            tableName: "storeRequisitionReturnDetails",
+            foreignKey: "storeRequisitionReturnId",
+          },
+        ],
+      };
     default:
       return {};
   }
@@ -381,10 +390,11 @@ export async function runSeed() {
       isDTO: true,
       isSingleDto: true,
       isCacheable: false,
-      permission: "inv:store-requisition-return:view",
+      permission: "INV:store-requisition-return:view",
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "srrNumber" }),
+      deleteConfig: JSON.stringify(getDeleteConfigByTableName("ST_REQ_RET")),
     },
     {
       shortCode: "BRANCH_REQ_RETURN",

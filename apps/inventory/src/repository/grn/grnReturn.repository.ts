@@ -446,3 +446,51 @@ export const rejectGrnReturnInDb = async (input: {
     },
   });
 };
+
+export const getOpenGrnReturnDetailsByGrnDetailIdsFromDb = async ({
+  grnId,
+  grnDetailIds,
+  excludeGrnReturnId,
+}: {
+  grnId: number;
+  grnDetailIds: number[];
+  excludeGrnReturnId?: number;
+}) => {
+  logger.info(
+    "entering::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+  );
+
+  const uniqueGrnDetailIds = [...new Set(grnDetailIds.filter(Boolean))];
+
+  if (!uniqueGrnDetailIds.length) {
+    logger.info(
+      "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+    );
+    return [];
+  }
+
+  const openDetails = await db.invGoodReceiveReturnDetails.findMany({
+    where: {
+      isActive: true,
+      grnDetailId: { in: uniqueGrnDetailIds },
+      goodReceiveReturn: {
+        isActive: true,
+        grnId,
+        status: { in: [RETURN_STS.PENDING, RETURN_STS.PARTIALLY_APPROVED] },
+        ...(excludeGrnReturnId && { id: { not: excludeGrnReturnId } }),
+      },
+    },
+    select: {
+      grnReturnId: true,
+      grnDetailId: true,
+      item: { select: { item: true } },
+      goodReceiveReturn: { select: { grnNumber: true } },
+    },
+  });
+
+  logger.info(
+    "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+  );
+
+  return openDetails;
+};
