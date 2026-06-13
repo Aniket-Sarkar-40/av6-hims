@@ -276,34 +276,68 @@ export const toBranchRequisitionBatchWiseDTO = async (
 };
 
 export const toBranchRequisitionDetailDTO = async (
-  branchRequisitionDetail: BranchRequisitionDetails[]
-): Promise<BrDetailDTO[]> => {
-  return Promise.all(
-    branchRequisitionDetail.map(async (detail) => {
-      const omittedData = customOmit<
-        BranchRequisitionDetails,
-        "itemId" | "createdBy" | "updatedBy"
-      >(detail, ["itemId", "createdBy", "updatedBy"]);
+  requisitions: BranchRequisitionResponse[]
+): Promise<BranchRequisitionDetailDTO[]> => {
+  return await Promise.all(
+    requisitions.flatMap((requisition) =>
+      requisition.branchRequisitionDetails.map(async (detail) => {
+        const itemDTO = detail.itemId
+          ? await itemMasterService.getItemMasterById(
+              { itemId: detail.itemId },
+              true
+            )
+          : null;
 
-      const itemDTO = detail.itemId
-        ? await itemMasterService.getItemMasterById(
-            { itemId: detail.itemId },
-            true
+        const availableReturnQty = (
+          await Promise.all(
+            requisition.branchItemDetails
+              .filter((item) => item.branchRequisitionDetailsId === detail.id)
+              .map(async (item) => {
+                const stockQty = await getItemStockQtyByBatchWise({
+                  itemId: item.itemId,
+                  batchNo: item.batchNo ?? null,
+                  userId: requisition.requisitionFrom,
+                  expiryDate: item.expiryDate
+                    ? new Date(item.expiryDate)
+                    : undefined,
+                  isFoc: item.isFoc,
+                });
+
+                const returnableQty = Math.max(
+                  item.acknowledgedQty - item.returnedQty,
+                  0
+                );
+
+                return Math.min(returnableQty, stockQty);
+              })
           )
-        : null;
-      const createdBy = detail.createdBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
-        : null;
-      const updatedBy = detail.updatedBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
-        : null;
+        ).reduce((total, qty) => total + qty, 0);
 
-      return {
-        ...omittedData.rest,
-        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-        createdBy,
-        updatedBy,
-      };
-    })
+        const warehouseInHandStock = requisition.ccId
+          ? await getItemStockQtyByLocation(detail.itemId, requisition.ccId)
+          : null;
+
+        const branchInHandStock = requisition.branchId
+          ? await getItemStockQtyByLocation(detail.itemId, requisition.branchId)
+          : null;
+
+        const createdBy = detail.createdBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+          : null;
+        const updatedBy = detail.updatedBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+          : null;
+
+        return {
+          ...detail,
+          warehouseInHandStock,
+          branchInHandStock,
+          availableQtyToReturn: availableReturnQty,
+          item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+          createdBy,
+          updatedBy,
+        };
+      })
+    )
   );
 };

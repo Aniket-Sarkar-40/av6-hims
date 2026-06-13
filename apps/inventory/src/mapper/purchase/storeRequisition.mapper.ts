@@ -14,19 +14,15 @@ import {
   StoreRequisitionBatchWiseDTO,
   StoreRequisitionDetailDTO,
   StoreRequisitionDetailDTOBranch,
-  StoreRequisitionDetails,
   StoreRequisitionDTO,
   StoreRequisitionResponse,
-  StrDetailDTO,
 } from "@/types/purchase/storeRequisition.js";
-import { StrReturnDetailDTO } from "@/types/purchase/storeRequisitionReturn.js";
 import {
   ItemStockWithQtyBreakdown,
   RawItemStock,
 } from "@/types/stock/stock.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { RequisitionReturnItemDetails } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
@@ -290,65 +286,90 @@ export const toStockEntity = (raw: RawItemStock): ItemStockWithQtyBreakdown => {
 };
 
 export const toStoreRequisitionDetailDTO = async (
-  storeRequisitionDetail: StoreRequisitionDetails[]
-): Promise<StrDetailDTO[]> => {
-  return Promise.all(
-    storeRequisitionDetail.map(async (detail) => {
-      const omittedData = customOmit<
-        StoreRequisitionDetails,
-        "itemId" | "createdBy" | "updatedBy"
-      >(detail, ["itemId", "createdBy", "updatedBy"]);
-      const itemDTO = detail.itemId
-        ? await itemMasterService.getItemMasterById(
-            { itemId: detail.itemId },
-            true
+  requisitions: StoreRequisitionResponse[]
+): Promise<StoreRequisitionDetailDTOBranch[]> => {
+  return await Promise.all(
+    requisitions.flatMap((requisition) =>
+      requisition.storeRequisitionDetails.map(async (detail) => {
+        const itemDTO = detail.itemId
+          ? await itemMasterService.getItemMasterById(
+              { itemId: detail.itemId },
+              true
+            )
+          : null;
+
+        const availableReturnQty = (
+          await Promise.all(
+            requisition.requisitionInvItemDetails
+              .filter((item) => item.storeRequisitionDetailsId === detail.id)
+              .map(async (item) => {
+                const stockQty = await getItemStockQtyByBatchWise({
+                  itemId: item.itemId,
+                  batchNo: item.batchNo ?? null,
+                  userId: requisition.requisitionFrom,
+                  expiryDate: item.expiryDate
+                    ? new Date(item.expiryDate)
+                    : undefined,
+                  isFoc: item.isFoc,
+                });
+
+                const returnableQty = Math.max(
+                  item.acknowledgedQty - item.returnedQty,
+                  0
+                );
+
+                return Math.min(returnableQty, stockQty);
+              })
           )
-        : null;
-      const createdBy = detail.createdBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
-        : null;
-      const updatedBy = detail.updatedBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
-        : null;
+        ).reduce((total, qty) => total + qty, 0);
 
-      return {
-        ...omittedData.rest,
-        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-        createdBy,
-        updatedBy,
-      };
-    })
-  );
-};
+        const qtyAtCc = await getItemStockQtyByLocation(
+          detail.itemId,
+          requisition.ccId
+        );
+        let inHandWarehouseQty: number | null = null;
+        let inHandBranchQty: number | null = null;
 
-export const toStoreRequisitionReturnDetailDTO = async (
-  storeRequisitionReturnDetail: RequisitionReturnItemDetails[]
-): Promise<StrReturnDetailDTO[]> => {
-  return Promise.all(
-    storeRequisitionReturnDetail.map(async (detail) => {
-      const omittedData = customOmit<
-        RequisitionReturnItemDetails,
-        "itemId" | "createdBy" | "updatedBy"
-      >(detail, ["itemId", "createdBy", "updatedBy"]);
-      const itemDTO = detail.itemId
-        ? await itemMasterService.getItemMasterById(
-            { itemId: detail.itemId },
+        const warehouseRow = await warehouseService.getWarehouseById(
+          requisition.ccId,
+          true
+        );
+        if (warehouseRow) {
+          inHandWarehouseQty = qtyAtCc;
+        } else {
+          const branchRow = await branchService.getBranchById(
+            requisition.ccId,
             true
-          )
-        : null;
-      const createdBy = detail.createdBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
-        : null;
-      const updatedBy = detail.updatedBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
-        : null;
+          );
+          if (branchRow) inHandBranchQty = qtyAtCc;
+        }
 
-      return {
-        ...omittedData.rest,
-        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-        createdBy,
-        updatedBy,
-      };
-    })
+        let userInHandStock: number | null = null;
+        if (requisition.requisitionFrom) {
+          userInHandStock = await getItemStockQtyByUser(
+            detail.itemId,
+            requisition.requisitionFrom
+          );
+        }
+
+        const createdBy = detail.createdBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+          : null;
+        const updatedBy = detail.updatedBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+          : null;
+
+        return {
+          ...detail,
+          warehouseInHandStock: inHandWarehouseQty,
+          branchInHandStock: inHandBranchQty,
+          userInHandStock,
+          availableQtyToReturn: availableReturnQty,
+          item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+          createdBy,
+          updatedBy,
+        };
+      })
+    )
   );
 };

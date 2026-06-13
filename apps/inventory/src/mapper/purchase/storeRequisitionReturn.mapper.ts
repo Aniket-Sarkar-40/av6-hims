@@ -9,10 +9,14 @@ import {
   GetStoreRequisitionReturnResponse,
   StoreRequisitionReturnDetailDTO,
   StoreRequisitionReturnDTO,
+  StrReturnDetailDTO,
 } from "@/types/purchase/storeRequisitionReturn.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { StoreRequisitionReturn } from "@repo/db/generated/prisma/client";
+import {
+  RequisitionReturnItemDetails,
+  StoreRequisitionReturn,
+} from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit, toIdValue } from "av6-utils";
 
@@ -135,4 +139,36 @@ export const toStoreRequisitionReturnDTO = async (
 
     storeRequisitionReturnDetails: detailDTO,
   };
+};
+
+export const toStoreRequisitionReturnDetailDTO = async (
+  storeRequisitionReturnDetail: RequisitionReturnItemDetails[]
+): Promise<StrReturnDetailDTO[]> => {
+  return Promise.all(
+    storeRequisitionReturnDetail.map(async (detail) => {
+      const omittedData = customOmit<
+        RequisitionReturnItemDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
+  );
 };

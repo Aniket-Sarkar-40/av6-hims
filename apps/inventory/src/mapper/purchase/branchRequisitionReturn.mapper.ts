@@ -156,33 +156,70 @@ export const toBranchRequisitionReturnDTO = async (
 };
 
 export const toBranchReturnDetailDTO = async (
-  branchReturnDetail: BranchReturnItemDetails[]
-): Promise<BrReturnDetailDTO[]> => {
-  return Promise.all(
-    branchReturnDetail.map(async (detail) => {
-      const omittedData = customOmit<
-        BranchReturnItemDetails,
-        "itemId" | "createdBy" | "updatedBy"
-      >(detail, ["itemId", "createdBy", "updatedBy"]);
-      const itemDTO = detail.itemId
-        ? await itemMasterService.getItemMasterById(
-            { itemId: detail.itemId },
-            true
-          )
-        : null;
-      const createdBy = detail.createdBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
-        : null;
-      const updatedBy = detail.updatedBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
-        : null;
+  branchRequisitionReturns: GetBranchRequisitionReturnResponse[]
+): Promise<BranchRequisitionReturnDetailDTO[]> => {
+  return await Promise.all(
+    branchRequisitionReturns.flatMap((branchRequisitionReturn) =>
+      branchRequisitionReturn.branchRequisitionReturnDetails.flatMap((detail) =>
+        detail.branchReturnItemDetails.map(async (itemDetail) => {
+          const itemDTO = detail.itemId
+            ? await itemMasterService.getItemMasterById(
+                { itemId: detail.itemId },
+                true
+              )
+            : null;
 
-      return {
-        ...omittedData.rest,
-        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-        createdBy,
-        updatedBy,
-      };
-    })
+          const branchInHandStock = branchRequisitionReturn.branchId
+            ? await getItemStockQtyByLocation(
+                detail.itemId,
+                branchRequisitionReturn.branchId
+              )
+            : null;
+
+          const warehouseInHandStock = branchRequisitionReturn.ccId
+            ? await getItemStockQtyByLocation(
+                detail.itemId,
+                branchRequisitionReturn.ccId
+              )
+            : null;
+
+          const branchItem = itemDetail.branchItemDetailsId
+            ? await getBranchItemDetailsFromDb(itemDetail.branchItemDetailsId)
+            : null;
+
+          const createdBy = itemDetail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                itemDetail.createdBy
+              )
+            : null;
+          const updatedBy = itemDetail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                itemDetail.updatedBy
+              )
+            : null;
+
+          return {
+            ...itemDetail,
+
+            item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+
+            createdBy,
+            updatedBy,
+
+            branchRequisitionReturnDetailsId: detail.id,
+            branchRequisitionDetailsId: detail.branchRequisitionDetailsId,
+
+            reqAcknowledgedQty: branchItem?.acknowledgedQty ?? null,
+            alreadyReturnedQty: branchItem?.returnedQty ?? null,
+
+            totalRequestedReturnQty: detail.requestedReturnQty,
+            totalAcknowledgedReturnQty: detail.acknowledgedReturnQty,
+
+            branchInHandStock,
+            warehouseInHandStock,
+          };
+        })
+      )
+    )
   );
 };
