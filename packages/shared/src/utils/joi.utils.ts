@@ -2,23 +2,23 @@ import Joi, { SchemaLikeWithoutArray } from "joi";
 import { generateValidationErrorMessage } from "./responseMessage.utils.js";
 import { getPattern } from "av6-utils";
 
-export const priceRequired = (label: string, getPrecision: () => number) =>
+export const priceRequired = (label: string, getPrecision?: () => number) =>
   Joi.number()
     .min(0)
     .required()
-    .precision(getPrecision())
+    .precision(getPrecision?.() ?? 2)
     .messages({
       "number.base": generateValidationErrorMessage("NUMBER", label),
       "number.min": generateValidationErrorMessage("NON_NEGATIVE", label),
       "any.required": generateValidationErrorMessage("REQUIRED", label),
     });
 
-export const priceOptional = (label: string, getPrecision: () => number) =>
+export const priceOptional = (label: string, getPrecision?: () => number) =>
   Joi.number()
     .min(0)
     .optional()
     .allow(null)
-    .precision(getPrecision())
+    .precision(getPrecision?.() ?? 2)
     .messages({
       "number.base": generateValidationErrorMessage("NUMBER", label),
       "number.min": generateValidationErrorMessage("NON_NEGATIVE", label),
@@ -344,8 +344,10 @@ export const numberArrayOptional = (label: string, min?: number) => {
 
 export const numberWithMaxDecimals = (
   fieldName: string,
-  getPrecision: () => number
+  getPrecision?: () => number
 ) => {
+  const precision = getPrecision?.() ?? 2;
+
   return Joi.number()
     .positive()
     .messages({
@@ -355,26 +357,31 @@ export const numberWithMaxDecimals = (
     .custom((value, helpers) => {
       const raw = value.toString();
       const [, decPart = ""] = raw.split(".");
-      if (decPart.length > getPrecision()) {
-        return helpers.error("number.decimals", { getPrecision });
+
+      if (decPart.length > precision) {
+        return helpers.error("number.decimals");
       }
+
       return value;
     })
     .messages({
-      "number.decimals": `${fieldName} must have at most ${getPrecision()} decimal places`,
+      "number.decimals": `${fieldName} must have at most ${precision} decimal places`,
     });
 };
+
 export const numberWithMaxDecimalsRequired = (
   fieldName: string,
-  getPrecision: () => number
+  getPrecision?: () => number
 ) =>
   numberWithMaxDecimals(fieldName, getPrecision)
     .required()
-    .messages({ "any.required": `${fieldName} is required` });
+    .messages({
+      "any.required": `${fieldName} is required`,
+    });
 
 export const numberWithMaxDecimalsOptional = (
   fieldName: string,
-  getPrecision: () => number
+  getPrecision?: () => number
 ) => numberWithMaxDecimals(fieldName, getPrecision).optional().allow(null, 0);
 
 export const emailRequired = (label: string) =>

@@ -307,7 +307,7 @@ export const getFlatLedgerIdByConfig = async (
           return clientLedgerMapping.ledgerId;
         }
 
-        const ledgerName = `${supplier.name}`;
+        const ledgerName = `${supplier.vendorCompanyName}`;
         if (!body.accountingIntegrationConfigDetail.groupId) {
           throw new ErrorHandler(
             400,

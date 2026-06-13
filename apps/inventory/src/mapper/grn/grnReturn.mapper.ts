@@ -7,6 +7,7 @@ import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   GoodReceiveReturnDetailDTO,
   GoodReceiveReturnDTO,
+  GrnReturnDetailDTO,
   GrnReturnResponse,
 } from "@/types/grn/grnReturn.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
@@ -160,6 +161,38 @@ export const toGrnReturnDTO = async (
         createdBy: createdBy,
         approvedBy: approvedBy,
         rejectedBy: rejectedBy,
+      };
+    })
+  );
+};
+
+export const toGrnReturnDetailsDto = async (
+  grnReturnDetails: InvGoodReceiveReturnDetails[]
+): Promise<GrnReturnDetailDTO[]> => {
+  return Promise.all(
+    grnReturnDetails.map(async (detail) => {
+      const omittedData = customOmit<
+        InvGoodReceiveReturnDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
       };
     })
   );

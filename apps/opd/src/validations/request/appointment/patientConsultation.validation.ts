@@ -3,14 +3,11 @@ import {
   enumOptional,
   idRequired,
   intOptional,
-  intRequired,
   numberWithMaxDecimals,
-  numberWithMaxDecimalsRequired,
   strOptional,
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import Joi from "joi";
 
 export const createPatientConsultationSchema =
@@ -21,17 +18,17 @@ export const createPatientConsultationSchema =
 
     notes: strOptional("Notes"),
 
-    temperature: numberWithMaxDecimals("Temperature", 2).required(),
+    temperature: numberWithMaxDecimals("Temperature").required(),
 
-    weight: numberWithMaxDecimals("Weight", 2),
+    weight: numberWithMaxDecimals("Weight"),
 
     spO2: intOptional("SpO2", 0),
 
     pulse: intOptional("Pulse", 0),
 
-    height: numberWithMaxDecimals("Height", 2).required(),
+    height: numberWithMaxDecimals("Height").required(),
 
-    bmi: numberWithMaxDecimals("BMI", 2),
+    bmi: numberWithMaxDecimals("BMI"),
 
     systolicBp: intOptional("Systolic BP", 0),
 
@@ -41,11 +38,11 @@ export const createPatientConsultationSchema =
 
     heartRateBpm: intOptional("Heart Rate BPM", 0),
 
-    urineOutput: numberWithMaxDecimals("Urine Output", 2).optional(),
+    urineOutput: numberWithMaxDecimals("Urine Output").optional(),
 
-    bloodSugarF: numberWithMaxDecimals("Blood Sugar F", 2).optional(),
+    bloodSugarF: numberWithMaxDecimals("Blood Sugar F").optional(),
 
-    bloodSugarR: numberWithMaxDecimals("Blood Sugar R", 2).optional(),
+    bloodSugarR: numberWithMaxDecimals("Blood Sugar R").optional(),
 
     oxygenSupplementation: intOptional("Oxygen Supplementation", 0),
 

@@ -6,6 +6,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   PurchaseOrderDetailDTO,
+  PurchaseOrderDetailResponse,
   PurchaseOrderDTO,
   PurchaseOrderPdfDTO,
   PurchaseOrderWithDetails,
@@ -59,6 +60,10 @@ export const toPurchaseOrderDTO = async (
 
       const detailDTO: PurchaseOrderDetailDTO[] = await Promise.all(
         po.purchaseOrderDetails.map(async (detail) => {
+          const omittedDetail = customOmit<
+            PurchaseOrderDetailResponse,
+            "createdBy" | "updatedBy"
+          >(detail, ["createdBy", "updatedBy"]);
           const itemDTO = detail.itemId
             ? await itemMasterService.getItemMasterById(
                 { itemId: detail.itemId },
@@ -79,20 +84,24 @@ export const toPurchaseOrderDTO = async (
             : null;
 
           return {
-            ...detail,
+            ...omittedDetail.rest,
             item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-            createdBy: createdBy,
-            updatedBy: updatedBy,
+            createdBy: omitAudit(createdBy),
+            updatedBy: omitAudit(updatedBy),
           };
         })
       );
 
+      const location = warehouse
+        ? toIdValue(warehouse, "name")
+        : toIdValue(branch, "name");
       return {
         ...omittedPo.rest,
         store: toIdValue(storeDTO, "itemStoreName"),
         supplier: toIdValue(supplierDTO, "vendorCompanyName"),
         warehouse: toIdValue(warehouse, "name"),
         branch: toIdValue(branch, "name"),
+        location,
         currency: toIdValue(currency, "name"),
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),

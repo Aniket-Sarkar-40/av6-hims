@@ -1,5 +1,6 @@
 import { getPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
 import {
+  getItemStockQtyByBatchWise,
   getItemStockQtyByLocation,
   getItemStockQtyByUser,
 } from "@/repository/stock/stock.repository.js";
@@ -101,6 +102,31 @@ export const toStoreRequisitionDTO = async (
               )
             : null;
 
+          const availableReturnQty = (
+            await Promise.all(
+              requisition.requisitionInvItemDetails
+                .filter((item) => item.storeRequisitionDetailsId === detail.id)
+                .map(async (item) => {
+                  const stockQty = await getItemStockQtyByBatchWise({
+                    itemId: item.itemId,
+                    batchNo: item.batchNo ?? null,
+                    userId: requisition.requisitionFrom,
+                    expiryDate: item.expiryDate
+                      ? new Date(item.expiryDate)
+                      : undefined,
+                    isFoc: item.isFoc,
+                  });
+
+                  const returnableQty = Math.max(
+                    item.acknowledgedQty - item.returnedQty,
+                    0
+                  );
+
+                  return Math.min(returnableQty, stockQty);
+                })
+            )
+          ).reduce((total, qty) => total + qty, 0);
+
           const qtyAtCc = await getItemStockQtyByLocation(
             detail.itemId,
             requisition.ccId
@@ -135,6 +161,7 @@ export const toStoreRequisitionDTO = async (
             warehouseInHandStock: inHandWarehouseQty,
             branchInHandStock: inHandBranchQty,
             userInHandStock: userInHandStock,
+            availableQtyToReturn: availableReturnQty,
             item: itemDTO ? await itemMasterToDto(itemDTO) : null,
           };
         })

@@ -1,5 +1,8 @@
 import { getPendingBRRFromBRId } from "@/repository/purchase/branchRequisitionReturn.repository.js";
-import { getItemStockQtyByLocation } from "@/repository/stock/stock.repository.js";
+import {
+  getItemStockQtyByBatchWise,
+  getItemStockQtyByLocation,
+} from "@/repository/stock/stock.repository.js";
 import { branchService } from "@/services/master/branch.service.js";
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
@@ -98,6 +101,31 @@ export const toBranchRequisitionDTO = async (
               )
             : null;
 
+          const availableReturnQty = (
+            await Promise.all(
+              requisition.branchItemDetails
+                .filter((item) => item.branchRequisitionDetailsId === detail.id)
+                .map(async (item) => {
+                  const stockQty = await getItemStockQtyByBatchWise({
+                    itemId: item.itemId,
+                    batchNo: item.batchNo ?? null,
+                    userId: requisition.requisitionFrom,
+                    expiryDate: item.expiryDate
+                      ? new Date(item.expiryDate)
+                      : undefined,
+                    isFoc: item.isFoc,
+                  });
+
+                  const returnableQty = Math.max(
+                    item.acknowledgedQty - item.returnedQty,
+                    0
+                  );
+
+                  return Math.min(returnableQty, stockQty);
+                })
+            )
+          ).reduce((total, qty) => total + qty, 0);
+
           const warehouseInHandStock = requisition.ccId
             ? await getItemStockQtyByLocation(detail.itemId, requisition.ccId)
             : null;
@@ -113,6 +141,7 @@ export const toBranchRequisitionDTO = async (
             ...detail,
             warehouseInHandStock,
             branchInHandStock,
+            availableQtyToReturn: availableReturnQty,
             item: itemDTO ? await itemMasterToDto(itemDTO) : null,
           };
         })

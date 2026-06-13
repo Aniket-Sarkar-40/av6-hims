@@ -37,7 +37,7 @@ export const commonCustomerSchema = Joi.object<
   lattitudeLongitude: strOptional("Lattitude Longitude"),
   ghanaCardNo: strRequired("Ghana Card Number"),
   tinNo: strOptional("TIN Number"),
-  discount: numberWithMaxDecimals("Discount", 2),
+  discount: numberWithMaxDecimals("Discount"),
 });
 export const updateCustomerSchema = commonCustomerSchema.keys({
   id: idRequired("ID"),

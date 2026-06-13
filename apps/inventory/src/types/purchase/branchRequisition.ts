@@ -31,6 +31,9 @@ export type BranchBaseInclude = {
   branchRequisitionDetails: {
     where: { isActive: true };
   };
+  branchItemDetails: {
+    where: { isActive: true };
+  };
 };
 
 export type ValBranchRequisitionResponse = Prisma.BranchRequisitionGetPayload<{
@@ -75,6 +78,7 @@ export interface BranchRequisitionDetailDTO extends BranchRequisitionDetails {
   item: ItemMasterToDto | null;
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
+  availableQtyToReturn?: number | null;
 }
 
 export interface RejectBranchRequisitionInput {

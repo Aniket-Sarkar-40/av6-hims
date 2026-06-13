@@ -1,5 +1,4 @@
 import {
-  InvStoreRequisition,
   Prisma,
   STORE_REQ_ACK_STATUS,
   STORE_REQ_STATUS,
@@ -28,6 +27,9 @@ export type CreateStoreRequisitionInput = Omit<
 
 export type BaseInclude = {
   storeRequisitionDetails: {
+    where: { isActive: true };
+  };
+  requisitionInvItemDetails: {
     where: { isActive: true };
   };
 };
@@ -89,6 +91,7 @@ export interface StoreRequisitionDetailDTOBranch
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
   userInHandStock: number | null;
+  availableQtyToReturn: number | null;
 }
 
 export interface RequisitionItemDetailDTO

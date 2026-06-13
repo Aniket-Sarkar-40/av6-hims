@@ -1,6 +1,7 @@
 import { GrnResponse } from "@/types/grn/grn.js";
 import {
   BranchReturnItemDetails,
+  InvGoodReceiveReturnDetails,
   InvInTransitStock,
   InvItem,
   InvItemStock,
@@ -15,7 +16,10 @@ import { toUINConfigDTO } from "av6-core-v2";
 import { toItemSupplierDTO } from "./master/itemSupplier.mapper.js";
 import { ItemSupplierResponse } from "@/types/master/itemSupplier.js";
 import { toItemSupplierMapDTO } from "./itemSupplierMap/itemSupplierMap.mapper.js";
-import { toGrnReturnDTO } from "./grn/grnReturn.mapper.js";
+import {
+  toGrnReturnDetailsDto,
+  toGrnReturnDTO,
+} from "./grn/grnReturn.mapper.js";
 import { GrnReturnResponse } from "@/types/grn/grnReturn.js";
 import { toBranchDTO } from "./master/branch.mapper.js";
 import { BranchResponse } from "@/types/master/branch.js";
@@ -107,4 +111,6 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toStoreRequisitionReturnDetailDTO(data as RequisitionReturnItemDetails[]),
   [SHORT_CODE.BRANCH_REQ_RETURN_DETAILS]: (data: unknown) =>
     toBranchReturnDetailDTO(data as BranchReturnItemDetails[]),
+  [SHORT_CODE.GRN_RETURN_DETAILS]: (data: unknown) =>
+    toGrnReturnDetailsDto(data as InvGoodReceiveReturnDetails[]),
 };
