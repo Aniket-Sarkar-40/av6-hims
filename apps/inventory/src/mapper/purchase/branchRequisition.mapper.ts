@@ -182,7 +182,8 @@ export const toBranchRequisitionDTO = async (
 
 export const toBranchItemDetailDTO = async (
   branchRequisition: BranchItemDetailResponse,
-  branchId?: number | null
+  branchId?: number | null,
+  requisitionFrom?: number | null
 ): Promise<BranchItemDetailDTO> => {
   const itemDTO = branchRequisition.itemId
     ? await itemMasterService.getItemMasterById(
@@ -207,6 +208,23 @@ export const toBranchItemDetailDTO = async (
       )
     : null;
 
+  const stockQty = requisitionFrom
+    ? await getItemStockQtyByBatchWise({
+        itemId: branchRequisition.itemId,
+        batchNo: branchRequisition.batchNo ?? null,
+        userId: requisitionFrom,
+        expiryDate: branchRequisition.expiryDate
+          ? new Date(branchRequisition.expiryDate)
+          : undefined,
+        isFoc: branchRequisition.isFoc,
+      })
+    : 0;
+  const returnableQty = Math.max(
+    branchRequisition.acknowledgedQty - branchRequisition.returnedQty,
+    0
+  );
+  const availableQtyToReturn = Math.min(returnableQty, stockQty);
+
   const detailDTO: BranchRequisitionDetailDTO = {
     ...branchRequisition.branchRequisitionDetails,
     item: itemDTO ? await itemMasterToDto(itemDTO) : null,
@@ -219,6 +237,7 @@ export const toBranchItemDetailDTO = async (
   return {
     ...branchRequisition,
     branchRequisitionDetails: detailDTO,
+    availableQtyToReturn,
   };
 };
 
@@ -262,7 +281,11 @@ export const toBranchRequisitionBatchWiseDTO = async (
   const detailDTO: BranchItemDetailDTO[] = await Promise.all(
     branchRequisition.branchItemDetails.map(
       async (detail) =>
-        await toBranchItemDetailDTO(detail, branchRequisition.branchId)
+        await toBranchItemDetailDTO(
+          detail,
+          branchRequisition.branchId,
+          branchRequisition.requisitionFrom
+        )
     )
   );
 

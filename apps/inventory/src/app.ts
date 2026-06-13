@@ -28,6 +28,7 @@ import { branchRequisitionRouter } from "@/routes/purchase/branchRequisition.rou
 import { storeRequisitionReturnRouter } from "@/routes/purchase/storeRequisitionReturn.route.js";
 import { branchRequisitionReturnRouter } from "@/routes/purchase/branchRequisitionReturn.route.js";
 import { loadSchemaPrecisionSettings } from "@/middlewares/schemaPrecision.middleware.js";
+import { defaultUnitMasterRouter } from "@/routes/master/defaultUnitMaster.route.js";
 
 export const inventoryRouter: ExpressRouter = Router();
 
@@ -38,6 +39,10 @@ inventoryRouter.use("/cache", cacheRouter);
 inventoryRouter.use("/master/item-category", itemCategoryRouter);
 inventoryRouter.use("/master/item-store", itemStoreRouter);
 inventoryRouter.use("/master/item-unit", unitMasterRouter);
+inventoryRouter.use(
+  "/api/v1/master/default-unit-master",
+  defaultUnitMasterRouter
+);
 inventoryRouter.use("/common", commonRouter);
 inventoryRouter.use("/master/item-supplier", itemSupplierRouter);
 

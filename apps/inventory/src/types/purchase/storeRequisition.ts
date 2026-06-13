@@ -99,6 +99,7 @@ export interface StoreRequisitionDetailDTOBranch
 export interface RequisitionItemDetailDTO
   extends RequisitionItemDetailResponse {
   storeRequisitionDetails: StoreRequisitionDetailDTO;
+  availableQtyToReturn: number;
 }
 
 export interface RejectStoreRequisitionInput {

@@ -55,13 +55,6 @@ enum InvOperation {
     BRANCH_REQUISITION_RETURN
 }
 
-enum DefaultUnit {
-    PACK
-    BOX
-    LITER
-    ML
-}
-
 enum PO_STATUS {
     SENT_FOR_APPROVAL
     APPROVED

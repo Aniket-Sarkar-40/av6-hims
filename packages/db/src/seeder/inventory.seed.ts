@@ -24,6 +24,11 @@ interface EventEmailSeeder {
   emailBody: string;
 }
 
+interface DefaultUnitMasterSeeder {
+  name: string;
+  description: string;
+}
+
 const redis = createClient({
   url: process.env.REDIS_URL,
   password: process.env.REDIS_PASSWORD,
@@ -72,7 +77,7 @@ const getDeleteConfigByTableName = (shortCode: string): SoftDeleteConfig => {
 export async function runSeed() {
   await redis.connect();
 
-  const rows = await db.coreDynamicShortCode.findMany({
+  const rows = await db.invDynamicShortCode.findMany({
     select: { shortCode: true, config: true },
     where: { config: { not: Prisma.JsonNull } },
   });
@@ -120,8 +125,9 @@ export async function runSeed() {
     {
       shortCode: "UNIT_MASTER",
       tableName: "invUnitMaster",
-      isDTO: false,
+      isDTO: true,
       isCacheable: true,
+      isSingleDto: false,
       isDropDown: true,
       permission: "inv:item-unit:view",
       whereClause: JSON.stringify({ isActive: true }),
@@ -429,6 +435,16 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "batchNo" }),
     },
+    {
+      shortCode: "DEFAULT_UNIT_MASTER",
+      tableName: "invDefaultUnitMaster",
+      isDTO: false,
+      isCacheable: true,
+      isDropDown: true,
+      permission: "inv:default-unit-master:view",
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "name" }),
+    },
   ];
 
   const eventEmails: EventEmailSeeder[] = [
@@ -465,6 +481,89 @@ export async function runSeed() {
     },
   ];
 
+  const defaultUnitMasters: DefaultUnitMasterSeeder[] = [
+    {
+      name: "Piece (PCS)",
+      description: "Individual item",
+    },
+    {
+      name: "Box",
+      description: "Items packed in a box",
+    },
+    {
+      name: "Packet (PKT)",
+      description: "Small packaged items",
+    },
+    {
+      name: "Carton",
+      description: "Large packaging unit",
+    },
+    {
+      name: "Bottle",
+      description: "Liquid products",
+    },
+    {
+      name: "Strip",
+      description: "Medicine strip",
+    },
+    {
+      name: "Tablet",
+      description: "Single medicine unit",
+    },
+    {
+      name: "Capsule",
+      description: "Single capsule unit",
+    },
+    {
+      name: "Kilogram (KG)",
+      description: "Weight measurement",
+    },
+    {
+      name: "Gram (GM)",
+      description: "Small weight measurement",
+    },
+    {
+      name: "Liter (L)",
+      description: "Liquid quantity",
+    },
+    {
+      name: "Milliliter (ML)",
+      description: "Small liquid quantity",
+    },
+    {
+      name: "Meter (MTR)",
+      description: "Length measurement",
+    },
+    {
+      name: "Roll",
+      description: "Rolled material",
+    },
+    {
+      name: "Set",
+      description: "Group of items",
+    },
+    {
+      name: "Pair",
+      description: "Two connected items",
+    },
+    {
+      name: "Dozen",
+      description: "Group of 12 items",
+    },
+    {
+      name: "Pack",
+      description: "Multiple items packed together",
+    },
+    {
+      name: "Tray",
+      description: "Items arranged in tray",
+    },
+    {
+      name: "Bundle",
+      description: "Grouped materials",
+    },
+  ];
+
   await db.invDynamicShortCode.createMany({
     data: dynamicShortCodes,
   });
@@ -475,6 +574,38 @@ export async function runSeed() {
   });
 
   await updateDynamicShortCodeConfigsByShortCode(map);
+
+  for (const unit of defaultUnitMasters) {
+    const existingUnit = await db.invDefaultUnitMaster.findFirst({
+      where: {
+        name: unit.name,
+        isActive: true,
+      },
+    });
+
+    if (existingUnit) {
+      await db.invDefaultUnitMaster.update({
+        where: {
+          id: existingUnit.id,
+        },
+        data: {
+          description: unit.description,
+          isActive: true,
+          deletedAt: null,
+          deletedBy: null,
+        },
+      });
+
+      continue;
+    }
+
+    await db.invDefaultUnitMaster.create({
+      data: {
+        name: unit.name,
+        description: unit.description,
+      },
+    });
+  }
 
   await redis.disconnect();
   await db.$disconnect();

@@ -1773,3 +1773,26 @@ CREATE TABLE `inv_cron_details` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+
+
+ALTER TABLE `inv_unit_master` DROP COLUMN `default_unit`,
+    ADD COLUMN `default_unit_master_id` INTEGER NOT NULL;
+
+CREATE TABLE `inv_default_unit_master` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE INDEX `store_requisition_cc_id_idx` ON `inv_store_requisition`(`cc_id`);
+
+CREATE INDEX `idx_default_unit_master_id` ON `inv_unit_master`(`default_unit_master_id`);

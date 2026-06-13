@@ -159,6 +159,7 @@ export type BranchItemDetailResponse = Prisma.BranchItemDetailsGetPayload<{
 export interface BranchItemDetailDTO
   extends Omit<BranchItemDetailResponse, "branchRequisitionDetails"> {
   branchRequisitionDetails: BranchRequisitionDetailDTO;
+  availableQtyToReturn: number;
 }
 
 export type BranchReqBatchWiseResponse = Prisma.BranchRequisitionGetPayload<{

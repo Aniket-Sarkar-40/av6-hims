@@ -237,6 +237,7 @@ model CollectionCenter {
     branchRequisitions         BranchRequisition[]
     branchRequisitionReturns   BranchRequisitionReturn[]
     branchReturnItemDetails    BranchReturnItemDetails[]
+    invStoreRequisitions       InvStoreRequisition[]
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")
@@ -361,6 +362,7 @@ model Staff {
     storeRequisitionReturns      StoreRequisitionReturn[]
     requisitionReturnItemDetails RequisitionReturnItemDetails[]
     invInTransitStocks           InvInTransitStock[]
+    invStoreRequisitions         InvStoreRequisition[]
 
     @@map("staff")
 }

@@ -24,6 +24,7 @@ export enum RedisResource {
   EVENT_EMAIL = "eventEmail",
   CURRENCY = "currency",
   STORAGE = "invStorage",
+  DEFAULT_UNIT_MASTER = "invDefaultUnitMaster",
 }
 
 export const getRedisKey = (

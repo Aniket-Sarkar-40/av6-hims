@@ -194,7 +194,8 @@ export const toStoreRequisitionDTO = async (
 };
 
 export const toRequisitionItemDetailDTO = async (
-  storeRequisition: RequisitionItemDetailResponse
+  storeRequisition: RequisitionItemDetailResponse,
+  requisitionFrom: number
 ): Promise<RequisitionItemDetailDTO> => {
   const itemDTO = storeRequisition.itemId
     ? await itemMasterService.getItemMasterById(
@@ -214,6 +215,21 @@ export const toRequisitionItemDetailDTO = async (
     storeRequisition.ccId
   );
 
+  const stockQty = await getItemStockQtyByBatchWise({
+    itemId: storeRequisition.itemId,
+    batchNo: storeRequisition.batchNo ?? null,
+    userId: requisitionFrom,
+    expiryDate: storeRequisition.expiryDate
+      ? new Date(storeRequisition.expiryDate)
+      : undefined,
+    isFoc: storeRequisition.isFoc,
+  });
+  const returnableQty = Math.max(
+    storeRequisition.acknowledgedQty - storeRequisition.returnedQty,
+    0
+  );
+  const availableQtyToReturn = Math.min(returnableQty, stockQty);
+
   const detailDTO: StoreRequisitionDetailDTO = {
     ...storeRequisition.storeRequisitionDetails,
     item: itemDTO ? await itemMasterToDto(itemDTO) : null,
@@ -224,6 +240,7 @@ export const toRequisitionItemDetailDTO = async (
   return {
     ...storeRequisition,
     storeRequisitionDetails: detailDTO,
+    availableQtyToReturn,
   };
 };
 
@@ -240,7 +257,11 @@ export const toStoreRequisitionBatchWiseDTO = async (
     : null;
   const detailDTO: RequisitionItemDetailDTO[] = await Promise.all(
     storeRequisition.requisitionInvItemDetails.map(
-      async (detail) => await toRequisitionItemDetailDTO(detail)
+      async (detail) =>
+        await toRequisitionItemDetailDTO(
+          detail,
+          storeRequisition.requisitionFrom
+        )
     )
   );
 

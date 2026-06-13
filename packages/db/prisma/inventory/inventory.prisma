@@ -114,21 +114,23 @@ model InvItemStore {
 }
 
 model InvUnitMaster {
-    id                Int         @id @default(autoincrement())
-    packagingTypeName String      @map("packaging_type_name")
-    packagingSize     String      @map("packaging_size")
-    defaultValue      Int         @map("default_value")
-    defaultUnit       DefaultUnit @default(PACK) @map("default_unit")
-    isActive          Boolean     @default(true) @map("is_active")
-    createdBy         Int?        @map("created_by")
-    updatedBy         Int?        @map("updated_by")
-    createdAt         DateTime    @default(now()) @map("created_at")
-    updatedAt         DateTime    @updatedAt @map("updated_at")
-    deletedAt         DateTime?   @map("deleted_at")
-    deletedBy         Int?        @map("deleted_by")
+    id                  Int       @id @default(autoincrement())
+    packagingTypeName   String    @map("packaging_type_name")
+    packagingSize       String    @map("packaging_size")
+    defaultValue        Int       @map("default_value")
+    defaultUnitMasterId Int       @map("default_unit_master_id")
+    isActive            Boolean   @default(true) @map("is_active")
+    createdBy           Int?      @map("created_by")
+    updatedBy           Int?      @map("updated_by")
+    createdAt           DateTime  @default(now()) @map("created_at")
+    updatedAt           DateTime  @updatedAt @map("updated_at")
+    deletedAt           DateTime? @map("deleted_at")
+    deletedBy           Int?      @map("deleted_by")
 
-    item InvItem[]
+    item              InvItem[]
+    defaultUnitMaster InvDefaultUnitMaster @relation(fields: [defaultUnitMasterId], references: [id])
 
+    @@index([defaultUnitMasterId], name: "idx_default_unit_master_id")
     @@map("inv_unit_master")
 }
 
@@ -868,11 +870,14 @@ model InvStoreRequisition {
     acknowledgementBy Int?                 @map("acknowledgement_by")
     acknowledgementAt DateTime?            @map("acknowledgement_at")
 
+    cc                        CollectionCenter             @relation(fields: [ccId], references: [id])
+    staff                     Staff                        @relation(fields: [requisitionFrom], references: [id])
     storeRequisitionDetails   InvStoreRequisitionDetails[]
     requisitionInvItemDetails RequisitionInvItemDetails[]
     storeRequisitionReturns   StoreRequisitionReturn[]
 
     @@index([requisitionFrom], name: "store_requisition_requisition_from_idx")
+    @@index([ccId], name: "store_requisition_cc_id_idx")
     @@map("inv_store_requisition")
 }
 
@@ -1586,4 +1591,21 @@ model CronDetails {
     @@unique([cronName, runDate, runKey, attempt], name: "cron_unique_runkey_attempt")
     @@index([cronName, runDate, runKey], name: "cron_find_latest_idx")
     @@map("inv_cron_details")
+}
+
+model InvDefaultUnitMaster {
+    id          Int     @id @default(autoincrement())
+    name        String  @map("name")
+    description String?
+
+    isActive    Boolean         @default(true) @map("is_active")
+    createdBy   Int?            @map("created_by")
+    updatedBy   Int?            @map("updated_by")
+    deletedBy   Int?            @map("deleted_by")
+    createdAt   DateTime        @default(now()) @map("created_at")
+    updatedAt   DateTime?       @updatedAt @map("updated_at")
+    deletedAt   DateTime?       @map("deleted_at")
+    unitMasters InvUnitMaster[]
+
+    @@map("inv_default_unit_master")
 }

@@ -68,6 +68,7 @@ export enum PermissionResource {
   CONSUMPTION_DETAILS = "consumption-details",
   STOCK_ADJUSTMENT_DETAILS = "stock-adjustment-details",
   GRN_RETURN_DETAILS = "grn-return-details",
+  DEFAULT_UNIT_MASTER = "default-unit-master",
 
   // CORE
   COUNTRY = "country",

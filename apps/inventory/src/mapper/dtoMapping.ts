@@ -33,6 +33,7 @@ import {
   InvItemStore,
   InvItemSupplierMapping,
   InvUINConfig,
+  InvUnitMaster,
   RequisitionReturnItemDetails,
 } from "@repo/db/generated/prisma/client";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
@@ -60,6 +61,7 @@ import {
 } from "./purchase/storeRequisition.mapper.js";
 import { toStockDTO } from "./stock/stock.mapper.js";
 import { toStockAdjustmentDTO } from "./stock/stockAdjustment.mapper.js";
+import { toUnitMasterDto } from "@/mapper/master/unitMaster.mapper.js";
 
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
@@ -108,4 +110,6 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toBranchReturnDetailDTO(data as GetBranchRequisitionReturnResponse[]),
   [SHORT_CODE.GRN_RETURN_DETAILS]: (data: unknown) =>
     toGrnReturnDetailsDto(data as InvGoodReceiveReturnDetails[]),
+  [SHORT_CODE.UNIT_MASTER]: (data: unknown) =>
+    toUnitMasterDto(data as InvUnitMaster[]),
 };

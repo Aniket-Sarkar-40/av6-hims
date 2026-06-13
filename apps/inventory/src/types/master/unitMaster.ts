@@ -1,4 +1,5 @@
-import { Prisma } from "@repo/db/generated/prisma/client";
+import { InvUnitMaster, Prisma } from "@repo/db/generated/prisma/client";
+import { IdValue } from "@repo/shared/types/common.js";
 import { BaseModelAttr } from "@repo/shared/types/global.js";
 
 export type UnitMasterReq = Omit<
@@ -6,14 +7,12 @@ export type UnitMasterReq = Omit<
   "id"
 >;
 
-export interface UnitMasterUpdate extends Omit<
-  Prisma.InvUnitMasterUncheckedCreateInput,
-  "id"
-> {
+export interface UnitMasterUpdate
+  extends Omit<Prisma.InvUnitMasterUncheckedCreateInput, "id"> {
   id: number;
 }
 
-export type UnitMasterDto = Omit<
-  Prisma.InvUnitMasterUncheckedCreateInput,
-  BaseModelAttr
->;
+export interface UnitMasterDTO
+  extends Omit<InvUnitMaster, BaseModelAttr | "defaultUnitMasterId"> {
+  defaultUnitMaster: IdValue | null;
+}
