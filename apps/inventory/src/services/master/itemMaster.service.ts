@@ -365,22 +365,40 @@ export const itemMasterService = {
 
     headerRow.height = 22;
 
-    ws.addRow({
-      item: "Paracetamol 500mg",
-      itemCode: "ITEM-0001",
-      itemCategory: "Medicine",
-      storage: "Main Store",
-      unit: "PIECE",
-      basePrice: 15,
-      reOrderLevel: 10,
-      itemDescription: "Pain relief and fever medicine",
-      isBatchNumber: true,
-      isExpireDate: true,
-      isUserReturnable: true,
-      isVendorReturnable: true,
-      isPriceVariable: true,
-      consumptionType: "MANUAL",
-    });
+    ws.addRows([
+      {
+        item: "Cotton Roll",
+        itemCode: "ITEM-0001",
+        itemCategory: "Consumables",
+        storage: "Main Store",
+        unit: "PIECE",
+        basePrice: 25,
+        reOrderLevel: 20,
+        itemDescription: "Medical cotton roll for dressing",
+        isBatchNumber: true,
+        isExpireDate: false,
+        isUserReturnable: true,
+        isVendorReturnable: true,
+        isPriceVariable: false,
+        consumptionType: "MANUAL",
+      },
+      {
+        item: "Surgical Gloves",
+        itemCode: "ITEM-0003",
+        itemCategory: "Surgical",
+        storage: "Main Store",
+        unit: "PAIR",
+        basePrice: 15,
+        reOrderLevel: 50,
+        itemDescription: "Disposable surgical gloves",
+        isBatchNumber: true,
+        isExpireDate: true,
+        isUserReturnable: false,
+        isVendorReturnable: true,
+        isPriceVariable: false,
+        consumptionType: "MANUAL",
+      },
+    ]);
 
     ws.getColumn("itemCode").numFmt = "@";
 
