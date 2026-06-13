@@ -1,29 +1,27 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
-import { eventEmailService } from "@/services/master/emailConfig.service.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   CreatePurchaseOrderInput,
   PurchaseOrderWithDetails,
   UpdatePurchaseOrder,
 } from "@/types/purchase/purchase.js";
-import { applyRound } from "av6-utils";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { approvalService } from "@apps/core/services/approval/approval.service.js";
+import { db } from "@repo/db/client";
 import {
   InvPurchaseOrder,
   InvPurchaseOrderDetails,
-  RoundFormat,
   InvUinShortCode,
   PO_STATUS,
+  RoundFormat,
 } from "@repo/db/generated/prisma/client";
-import { approvalService } from "@apps/core/services/approval/approval.service.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { applyRound, customOmit } from "av6-utils";
 
 export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
   logger.info("entering::createPurchaseOrder::repository");
 
   const store = requestStorage.getStore();
-  const currentUser = store?.user?.id ?? 1;
+  const currentUser = store?.user?.id ?? null;
   const setting = store?.settings;
   const precision = setting?.defaultPrecision;
   const omittedPO = customOmit<
@@ -92,6 +90,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
         cc: poCreate.collectionCenter.colName || null,
         supplierCode: omittedPO.omitted.supplier?.supplierCode || null,
       },
+      createdBy: currentUser!,
     });
   }
 
