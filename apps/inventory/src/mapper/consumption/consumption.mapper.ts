@@ -105,9 +105,21 @@ export const toConsumptionDTO = async (
             "updatedAt",
           ]);
           const item = items.find((itm) => itm.id === detail.itemId);
+          const createdBy = detail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.createdBy
+              )
+            : null;
+          const updatedBy = detail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.updatedBy
+              )
+            : null;
           return {
             ...omittedDetail.rest,
             item: item ? await itemMasterToDto(item) : null,
+            createdBy,
+            updatedBy,
           };
         })
       );

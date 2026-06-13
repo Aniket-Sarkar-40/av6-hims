@@ -137,12 +137,25 @@ export const toBranchRequisitionDTO = async (
               )
             : null;
 
+          const detailCreatedBy = detail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.createdBy
+              )
+            : null;
+          const detailUpdatedBy = detail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.updatedBy
+              )
+            : null;
+
           return {
             ...detail,
             warehouseInHandStock,
             branchInHandStock,
             availableQtyToReturn: availableReturnQty,
             item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+            createdBy: detailCreatedBy,
+            updatedBy: detailUpdatedBy,
           };
         })
       );
@@ -199,6 +212,8 @@ export const toBranchItemDetailDTO = async (
     item: itemDTO ? await itemMasterToDto(itemDTO) : null,
     warehouseInHandStock: inHandWarehouseQty,
     branchInHandStock: inHandBranchQty,
+    createdBy: undefined,
+    updatedBy: undefined,
   };
 
   return {

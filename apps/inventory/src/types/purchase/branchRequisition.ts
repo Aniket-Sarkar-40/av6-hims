@@ -74,11 +74,14 @@ export interface BranchRequisitionDTO
   branchRequisitionDetails: BranchRequisitionDetailDTO[];
 }
 
-export interface BranchRequisitionDetailDTO extends BranchRequisitionDetails {
+export interface BranchRequisitionDetailDTO
+  extends Omit<BranchRequisitionDetails, "createdBy" | "updatedBy"> {
   item: ItemMasterToDto | null;
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
   availableQtyToReturn?: number | null;
+  createdBy?: EmployeeCache | null;
+  updatedBy?: EmployeeCache | null;
 }
 
 export interface RejectBranchRequisitionInput {
@@ -153,7 +156,8 @@ export type BranchItemDetailResponse = Prisma.BranchItemDetailsGetPayload<{
   };
 }>;
 
-export interface BranchItemDetailDTO extends BranchItemDetailResponse {
+export interface BranchItemDetailDTO
+  extends Omit<BranchItemDetailResponse, "branchRequisitionDetails"> {
   branchRequisitionDetails: BranchRequisitionDetailDTO;
 }
 

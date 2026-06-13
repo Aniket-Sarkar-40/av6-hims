@@ -31,7 +31,7 @@ import { customOmit } from "av6-core-v2";
 
 export const createBranchRequisitionInDb = async (
   input: CreateBranchRequisitionInput
-): Promise<BranchRequisitionResponse> => {
+) => {
   logger.info("entering::createBranchRequisitionInDb::repository");
 
   const omittedInput = customOmit<
@@ -85,7 +85,7 @@ export const createBranchRequisitionInDb = async (
 
 export const updateBranchRequisitionInDb = async (
   input: CreateBranchRequisitionInput
-): Promise<BranchRequisitionResponse> => {
+) => {
   logger.info("entering::updateBranchRequisitionInDb::repository");
 
   const omittedInput = customOmit<
@@ -224,6 +224,11 @@ export const validateBranchRequisitionByIdFromDb = async (
     },
     include: {
       branchRequisitionDetails: {
+        where: {
+          isActive: true,
+        },
+      },
+      branchItemDetails: {
         where: {
           isActive: true,
         },

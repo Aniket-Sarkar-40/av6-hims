@@ -86,6 +86,17 @@ export const toBranchRequisitionReturnDTO = async (
           ? await getBranchItemDetailsFromDb(itemDetail.branchItemDetailsId)
           : null;
 
+        const detailCreatedBy = itemDetail.createdBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+              itemDetail.createdBy
+            )
+          : null;
+        const detailUpdatedBy = itemDetail.updatedBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+              itemDetail.updatedBy
+            )
+          : null;
+
         return {
           ...itemDetail,
 
@@ -102,6 +113,9 @@ export const toBranchRequisitionReturnDTO = async (
 
           branchInHandStock,
           warehouseInHandStock,
+
+          createdBy: detailCreatedBy,
+          updatedBy: detailUpdatedBy,
         };
       })
     )

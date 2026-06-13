@@ -249,6 +249,11 @@ export const getAllStoreRequisitionFromDb = async (): Promise<
       storeRequisitionDetails: {
         where: { isActive: true },
       },
+      requisitionInvItemDetails: {
+        where: {
+          isActive: true,
+        },
+      },
     },
   });
   logger.info("exiting::getAllStoreRequisitionFromDb::repository");
@@ -265,6 +270,11 @@ export const getStoreRequisitionByIdFromDb = async (
       storeRequisitionDetails: {
         where: { isActive: true },
       },
+      requisitionInvItemDetails: {
+        where: {
+          isActive: true,
+        },
+      },
     },
   });
   logger.info(`exiting::getPurchaseByIdFromDb::repository`);
@@ -280,6 +290,11 @@ export const validateStoreRequisitionByIdFromDb = async (
     include: {
       storeRequisitionDetails: {
         where: { isActive: true },
+      },
+      requisitionInvItemDetails: {
+        where: {
+          isActive: true,
+        },
       },
     },
   });

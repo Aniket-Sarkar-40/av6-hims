@@ -156,6 +156,17 @@ export const toStoreRequisitionDTO = async (
             );
           }
 
+          const detailCreatedBy = detail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.createdBy
+              )
+            : null;
+          const detailUpdatedBy = detail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.updatedBy
+              )
+            : null;
+
           return {
             ...detail,
             warehouseInHandStock: inHandWarehouseQty,
@@ -163,6 +174,8 @@ export const toStoreRequisitionDTO = async (
             userInHandStock: userInHandStock,
             availableQtyToReturn: availableReturnQty,
             item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+            createdBy: detailCreatedBy,
+            updatedBy: detailUpdatedBy,
           };
         })
       );

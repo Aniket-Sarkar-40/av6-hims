@@ -64,7 +64,7 @@ export interface StoreRequisitionDTO
   staff: EmployeeCache | null;
   requisitionFrom: IdValue | null;
   acknowledgementBy: EmployeeCache | null;
-  storeRequisitionDetails: StoreRequisitionDetailDTO[];
+  storeRequisitionDetails: StoreRequisitionDetailDTOBranch[];
 }
 
 export type StoreRequisitionDetails =
@@ -86,12 +86,14 @@ export interface StoreRequisitionDetailDTO extends StoreRequisitionDetails {
   branchInHandStock: number | null;
 }
 export interface StoreRequisitionDetailDTOBranch
-  extends StoreRequisitionDetails {
+  extends Omit<StoreRequisitionDetails, "createdBy" | "updatedBy"> {
   item: ItemMasterToDto | null;
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
   userInHandStock: number | null;
   availableQtyToReturn: number | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }
 
 export interface RequisitionItemDetailDTO

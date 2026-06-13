@@ -83,6 +83,8 @@ export interface ConsumptionDTO
 export interface ConsumptionDetailsDTO
   extends Omit<ConsumptionDetails, "itemId" | BaseModelAttr> {
   item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }
 
 export interface CommonConsumptionInput {

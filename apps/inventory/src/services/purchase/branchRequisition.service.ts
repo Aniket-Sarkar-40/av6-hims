@@ -41,16 +41,16 @@ export const branchRequisitionService = {
 
     const createdBranchRequisition = await createBranchRequisitionInDb(input);
 
-    toBranchRequisitionDTO([createdBranchRequisition])
-      .then((notificationData) => {
-        notifier.emitEvent("BRANCH_REQUISITION_CREATED", {
-          service: ServiceCode.INVENTORY,
-          data: notificationData,
-        });
-      })
-      .catch((err) => {
-        logger.error(err);
-      });
+    // toBranchRequisitionDTO([createdBranchRequisition])
+    //   .then((notificationData) => {
+    //     notifier.emitEvent("BRANCH_REQUISITION_CREATED", {
+    //       service: ServiceCode.INVENTORY,
+    //       data: notificationData,
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     logger.error(err);
+    //   });
 
     logger.info("exiting::createBranchRequisition::service");
     return createdBranchRequisition;
@@ -63,16 +63,16 @@ export const branchRequisitionService = {
 
     const updatedBranchReq = await updateBranchRequisitionInDb(input);
 
-    toBranchRequisitionDTO([updatedBranchReq])
-      .then((notificationData) => {
-        notifier.emitEvent("BRANCH_REQUISITION_UPDATED", {
-          service: ServiceCode.INVENTORY,
-          data: notificationData,
-        });
-      })
-      .catch((err) => {
-        logger.error(err);
-      });
+    // toBranchRequisitionDTO([updatedBranchReq])
+    //   .then((notificationData) => {
+    //     notifier.emitEvent("BRANCH_REQUISITION_UPDATED", {
+    //       service: ServiceCode.INVENTORY,
+    //       data: notificationData,
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     logger.error(err);
+    //   });
 
     logger.info("exiting::updateBranchRequisition::service");
     return updatedBranchReq;

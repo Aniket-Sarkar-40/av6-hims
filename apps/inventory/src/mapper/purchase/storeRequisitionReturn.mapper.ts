@@ -78,6 +78,13 @@ export const toStoreRequisitionReturnDTO = async (
             )
           : null;
 
+        const detailCreatedBy = detail.createdBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+          : null;
+        const detailUpdatedBy = detail.updatedBy
+          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+          : null;
+
         return {
           ...itemDetail,
 
@@ -94,6 +101,9 @@ export const toStoreRequisitionReturnDTO = async (
 
           branchInHandStock,
           userInHandStock,
+
+          createdBy: detailCreatedBy,
+          updatedBy: detailUpdatedBy,
         };
       })
     )

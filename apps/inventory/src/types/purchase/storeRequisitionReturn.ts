@@ -113,8 +113,11 @@ export type GetStoreRequisitionReturnResponse =
   }>;
 
 export interface StoreRequisitionReturnDetailDTO
-  extends RequisitionReturnItemDetails {
+  extends Omit<RequisitionReturnItemDetails, "createdBy" | "updatedBy"> {
   item: ItemMasterToDto | null;
+
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 
   reqAcknowledgedQty: number | null;
   alreadyReturnedQty: number | null;

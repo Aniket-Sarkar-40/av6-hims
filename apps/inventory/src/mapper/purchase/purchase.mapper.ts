@@ -105,7 +105,7 @@ export const toPurchaseOrderDTO = async (
         currency: toIdValue(currency, "name"),
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),
-        purchaseOrderDetails: omitAudit(detailDTO),
+        purchaseOrderDetails: detailDTO,
       };
     })
   );

@@ -120,8 +120,11 @@ export type GetBranchRequisitionReturnResponse =
   }>;
 
 export interface BranchRequisitionReturnDetailDTO
-  extends BranchReturnItemDetails {
+  extends Omit<BranchReturnItemDetails, "createdBy" | "updatedBy"> {
   item: ItemMasterToDto | null;
+
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 
   reqAcknowledgedQty: number | null;
   alreadyReturnedQty: number | null;
