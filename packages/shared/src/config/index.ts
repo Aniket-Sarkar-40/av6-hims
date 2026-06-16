@@ -82,3 +82,6 @@ export const PAYABLE_GROUPS = process.env.PAYABLE_GROUPS
   : [];
 export const DEFAULT_COMPANY_ID = Number(process.env.DEFAULT_COMPANY_ID) || 1;
 export const EXT_CURRENCY_URL = `${MASTER_SERVICE_URL}/api/v1/master/currency`;
+
+export const COMPANY_LOGO_BASE_URL =
+  (process.env.IMAGE_URL || "") + "/hospital_content/logo";

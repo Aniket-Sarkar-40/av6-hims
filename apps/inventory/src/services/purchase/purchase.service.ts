@@ -26,9 +26,9 @@ import {
   updatePurchaseOrderStatusServiceValidation,
 } from "@/validations/service/purchase/purchase.service.validation.js";
 import { CustomDocDefinition, renderCustomPdfToBuffer } from "av6-pdf-engine";
-import { resolvePdfTemplate } from "@repo/shared/utils/applyTemplate.utils.js";
 import { PO_STATUS } from "@repo/db/generated/prisma/enums.js";
 import { pdfTemplateService } from "@apps/core/services/pdf/pdfTemplate.service.js";
+import { resolvePdfTemplate } from "@apps/core/utils/applyTemplate.utils.js";
 
 export const purchaseService = {
   async createPurchaseOrder(input: CreatePurchaseOrderInput) {
@@ -155,10 +155,11 @@ export const purchaseService = {
       );
     }
 
-    const filledDef = resolvePdfTemplate(
+    const filledDef = await resolvePdfTemplate(
       pdfTemplate.bodyJson as unknown as CustomDocDefinition,
       purchaseDto
     );
+
     const pdfBuffer = await renderCustomPdfToBuffer(filledDef);
 
     return pdfBuffer;
