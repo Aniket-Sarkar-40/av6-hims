@@ -12,10 +12,8 @@ import {
   BranchReqBatchWiseResponse,
   BranchRequisitionBatchWiseDTO,
   BranchRequisitionDetailDTO,
-  BranchRequisitionDetails,
   BranchRequisitionDTO,
   BranchRequisitionResponse,
-  BrDetailDTO,
 } from "@/types/purchase/branchRequisition.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
@@ -116,12 +114,7 @@ export const toBranchRequisitionDTO = async (
                     isFoc: item.isFoc,
                   });
 
-                  const returnableQty = Math.max(
-                    item.acknowledgedQty - item.returnedQty,
-                    0
-                  );
-
-                  return Math.min(returnableQty, stockQty);
+                  return stockQty;
                 })
             )
           ).reduce((total, qty) => total + qty, 0);
@@ -219,11 +212,6 @@ export const toBranchItemDetailDTO = async (
         isFoc: branchRequisition.isFoc,
       })
     : 0;
-  const returnableQty = Math.max(
-    branchRequisition.acknowledgedQty - branchRequisition.returnedQty,
-    0
-  );
-  const availableQtyToReturn = Math.min(returnableQty, stockQty);
 
   const detailDTO: BranchRequisitionDetailDTO = {
     ...branchRequisition.branchRequisitionDetails,
@@ -237,7 +225,7 @@ export const toBranchItemDetailDTO = async (
   return {
     ...branchRequisition,
     branchRequisitionDetails: detailDTO,
-    availableQtyToReturn,
+    availableQtyToReturn: stockQty,
   };
 };
 
@@ -326,12 +314,7 @@ export const toBranchRequisitionDetailDTO = async (
                   isFoc: item.isFoc,
                 });
 
-                const returnableQty = Math.max(
-                  item.acknowledgedQty - item.returnedQty,
-                  0
-                );
-
-                return Math.min(returnableQty, stockQty);
+                return stockQty;
               })
           )
         ).reduce((total, qty) => total + qty, 0);

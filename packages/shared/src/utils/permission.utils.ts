@@ -37,7 +37,7 @@ export enum PermissionResource {
   GRN_RETURN_PDF = "grn-return-pdf",
   STORE_REQUISITION = "store-requisition",
   STORE_REQUISITION_REJECT = "store-requisition-reject",
-  STORE_REQUISITION_SENT = "store-requisition-sent",
+  STORE_REQUISITION_APPROVE = "store-requisition-approve",
   STORE_REQUISITION_ACK = "store-requisition-acknowledge",
   LOCATION = "location",
   CONSUMPTION = "consumption",

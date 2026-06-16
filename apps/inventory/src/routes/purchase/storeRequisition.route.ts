@@ -195,7 +195,7 @@ storeRequisitionRouter.post(
 storeRequisitionRouter.post(
   "/approve",
   verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "STORE_REQUISITION_SENT", "CREATE")),
+  authorize(getPermission("INV", "STORE_REQUISITION_APPROVE", "CREATE")),
   validateSentStoreRequisition,
   approveStoreRequisition
 );

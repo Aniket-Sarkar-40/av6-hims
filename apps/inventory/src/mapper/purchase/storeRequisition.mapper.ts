@@ -113,12 +113,7 @@ export const toStoreRequisitionDTO = async (
                     isFoc: item.isFoc,
                   });
 
-                  const returnableQty = Math.max(
-                    item.acknowledgedQty - item.returnedQty,
-                    0
-                  );
-
-                  return Math.min(returnableQty, stockQty);
+                  return stockQty;
                 })
             )
           ).reduce((total, qty) => total + qty, 0);
@@ -224,11 +219,6 @@ export const toRequisitionItemDetailDTO = async (
       : undefined,
     isFoc: storeRequisition.isFoc,
   });
-  const returnableQty = Math.max(
-    storeRequisition.acknowledgedQty - storeRequisition.returnedQty,
-    0
-  );
-  const availableQtyToReturn = Math.min(returnableQty, stockQty);
 
   const detailDTO: StoreRequisitionDetailDTO = {
     ...storeRequisition.storeRequisitionDetails,
@@ -240,7 +230,7 @@ export const toRequisitionItemDetailDTO = async (
   return {
     ...storeRequisition,
     storeRequisitionDetails: detailDTO,
-    availableQtyToReturn,
+    availableQtyToReturn: stockQty,
   };
 };
 
@@ -334,12 +324,7 @@ export const toStoreRequisitionDetailDTO = async (
                   isFoc: item.isFoc,
                 });
 
-                const returnableQty = Math.max(
-                  item.acknowledgedQty - item.returnedQty,
-                  0
-                );
-
-                return Math.min(returnableQty, stockQty);
+                return stockQty;
               })
           )
         ).reduce((total, qty) => total + qty, 0);

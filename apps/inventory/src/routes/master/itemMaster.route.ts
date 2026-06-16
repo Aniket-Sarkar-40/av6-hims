@@ -181,7 +181,7 @@ itemMasterRouter.put(
 itemMasterRouter.post(
   "/search",
   verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "ITEM_SEARCH", "CREATE")),
+  authorize(getPermission("INV", "ITEM_SEARCH", "VIEW")),
   validateItemSearch,
   itemSearch
 );
