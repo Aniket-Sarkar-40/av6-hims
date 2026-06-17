@@ -6,18 +6,21 @@ import {
 } from "@repo/db/generated/prisma/client";
 import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
 import { InvItem } from "@repo/db/generated/prisma/client";
+import { ItemMasterToDto } from "@/types/grn/grn.js";
+import { EmployeeCache } from "@apps/core/types/staff/employee.js";
 
-export interface CreateStockAjustmentInput extends Omit<
-  Prisma.InvStockAdjustmentUncheckedCreateInput,
-  | "isActive"
-  | "createdAt"
-  | "updatedAt"
-  | "deletedAt"
-  | "createdBy"
-  | "updatedBy"
-  | "deletedBy"
-  | "stockAdjustmentDetails"
-> {
+export interface CreateStockAjustmentInput
+  extends Omit<
+    Prisma.InvStockAdjustmentUncheckedCreateInput,
+    | "isActive"
+    | "createdAt"
+    | "updatedAt"
+    | "deletedAt"
+    | "createdBy"
+    | "updatedBy"
+    | "deletedBy"
+    | "stockAdjustmentDetails"
+  > {
   stockAdjustmentDetails: CreateStockAdjustmentDetailsInput[];
   isAvailQtyCheck: boolean;
 }
@@ -27,7 +30,8 @@ export type CreateStockAdjustmentDetailsInput = Omit<
   "id" | BaseModelAttr
 >;
 
-export interface UpdateStockAdjustmentDetailsInput extends CreateStockAdjustmentDetailsInput {
+export interface UpdateStockAdjustmentDetailsInput
+  extends CreateStockAdjustmentDetailsInput {
   id?: number;
 }
 
@@ -45,30 +49,34 @@ export type StockAdjustmentResponse = Prisma.InvStockAdjustmentGetPayload<{
   };
 }>;
 
-export interface StockAdjustmentDetailsDTO extends Omit<
-  InvStockAdjustmentDetails,
-  | "itemId"
-  | "isActive"
-  | "createdBy"
-  | "updatedBy"
-  | "deletedBy"
-  | "createdAt"
-  | "updatedAt"
-  | "deletedAt"
-> {
-  item: InvItem | null;
+export interface StockAdjustmentDetailsDTO
+  extends Omit<
+    InvStockAdjustmentDetails,
+    | "itemId"
+    | "isActive"
+    | "deletedBy"
+    | "createdAt"
+    | "updatedAt"
+    | "deletedAt"
+    | "createdBy"
+    | "updatedBy"
+  > {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }
-export interface StockAdjustmentDTO extends Omit<
-  InvStockAdjustment,
-  | "ccId"
-  | "targetCcId"
-  | "isActive"
-  | "updatedBy"
-  | "updatedAt"
-  | "deletedBy"
-  | "deletedAt"
-  | "stockAdjustmentDetails"
-> {
+export interface StockAdjustmentDTO
+  extends Omit<
+    InvStockAdjustment,
+    | "ccId"
+    | "targetCcId"
+    | "isActive"
+    | "updatedBy"
+    | "updatedAt"
+    | "deletedBy"
+    | "deletedAt"
+    | "stockAdjustmentDetails"
+  > {
   collectionCenter: IdValue | null;
   targetCollectionCenter: IdValue | null;
   stockAdjustmentDetails: StockAdjustmentDetailsDTO[];
@@ -84,4 +92,21 @@ export interface StockAdjustmentMismatchAvailQtyDTO {
   adjustType: Action;
   quantity: number;
   batchId: number;
+}
+
+export interface StockAdjDetailDTO
+  extends Omit<
+    InvStockAdjustmentDetails,
+    | "itemId"
+    | "isActive"
+    | "deletedBy"
+    | "createdAt"
+    | "updatedAt"
+    | "deletedAt"
+    | "createdBy"
+    | "updatedBy"
+  > {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }

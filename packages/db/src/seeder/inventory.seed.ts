@@ -380,6 +380,17 @@ export async function runSeed() {
       isDropDown: true,
     },
     {
+      shortCode: "STOCK_TRANSFER_DETAILS",
+      tableName: "invStockTransferDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:stock-transfer-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "quantity" }),
+    },
+    {
       shortCode: "BRANCH_REQ",
       tableName: "branchRequisition",
       isDTO: true,

@@ -39,6 +39,7 @@ import {
   InvItemStock,
   InvItemStore,
   InvItemSupplierMapping,
+  InvStockTransferDetails,
   InvUINConfig,
   InvUnitMaster,
   RequisitionReturnItemDetails,
@@ -69,6 +70,7 @@ import {
 import { toStockDTO } from "./stock/stock.mapper.js";
 import { toStockAdjustmentDTO } from "./stock/stockAdjustment.mapper.js";
 import { toUnitMasterDto } from "@/mapper/master/unitMaster.mapper.js";
+import { toStockTransferDetailDTO } from "@/mapper/stock/stockTransfer.mapper.js";
 
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
@@ -119,4 +121,6 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toGrnReturnDetailsDto(data as InvGoodReceiveReturnDetails[]),
   [SHORT_CODE.UNIT_MASTER]: (data: unknown) =>
     toUnitMasterDto(data as InvUnitMaster[]),
+  [SHORT_CODE.STOCK_TRANSFER_DETAILS]: (data: unknown) =>
+    toStockTransferDetailDTO(data as InvStockTransferDetails[]),
 };

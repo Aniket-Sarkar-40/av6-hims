@@ -1122,7 +1122,7 @@ model InvStockTransfer {
 
     stockTransferDetails InvStockTransferDetails[]
     from                 CollectionCenter          @relation(name: "From", fields: [fromId], references: [id], map: "stock_transfer_from_id_idx")
-    to                   CollectionCenter          @relation(name: "To", fields: [fromId], references: [id])
+    to                   CollectionCenter          @relation(name: "To", fields: [toId], references: [id])
     cc                   CollectionCenter          @relation(name: "cc", fields: [ccId], references: [id])
 
     @@index([ccId], name: "stock_transfer_cc_id_idx")

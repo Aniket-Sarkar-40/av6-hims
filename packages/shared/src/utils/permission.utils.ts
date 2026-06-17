@@ -69,6 +69,7 @@ export enum PermissionResource {
   STOCK_ADJUSTMENT_DETAILS = "stock-adjustment-details",
   GRN_RETURN_DETAILS = "grn-return-details",
   DEFAULT_UNIT_MASTER = "default-unit-master",
+  STOCK_TRANSFER_DETAILS = "stock-transfer-details",
 
   // CORE
   COUNTRY = "country",

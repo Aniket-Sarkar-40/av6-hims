@@ -1,10 +1,13 @@
 import { commonService } from "@/services/common.service.js";
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import {
+  StockAdjDetailDTO,
   StockAdjustmentDetailsDTO,
   StockAdjustmentDTO,
   StockAdjustmentResponse,
 } from "@/types/stock/stockAdjustment.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { InvStockAdjustmentDetails } from "@repo/db/generated/prisma/client";
 import { customOmit, toIdValue } from "av6-utils";
 
@@ -56,8 +59,6 @@ export const toStockAdjustmentDTO = async (
             InvStockAdjustmentDetails,
             | "itemId"
             | "isActive"
-            | "createdBy"
-            | "updatedBy"
             | "deletedBy"
             | "createdAt"
             | "updatedAt"
@@ -65,21 +66,33 @@ export const toStockAdjustmentDTO = async (
           >(detail, [
             "itemId",
             "isActive",
-            "createdBy",
-            "updatedBy",
             "deletedBy",
             "createdAt",
             "updatedAt",
             "deletedAt",
           ]);
-          const item = await itemMasterService.getItemMasterByIdWoDto(
-            detail.itemId,
-            true
-          );
+          const item = detail.itemId
+            ? await itemMasterService.getItemMasterById(
+                { itemId: detail.itemId },
+                true
+              )
+            : null;
+          const createdBy = detail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.createdBy
+              )
+            : null;
+          const updatedBy = detail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.updatedBy
+              )
+            : null;
 
           return {
             ...omittedDetail.rest,
-            item,
+            item: item ? await itemMasterToDto(item) : null,
+            createdBy,
+            updatedBy,
           };
         })
       );
@@ -105,16 +118,46 @@ export const toStockAdjustmentDTO = async (
 
 export const toStockAdjustmentDetailDTO = async (
   data: InvStockAdjustmentDetails[]
-): Promise<StockAdjustmentDetailsDTO[]> => {
+): Promise<StockAdjDetailDTO[]> => {
   return Promise.all(
     data.map(async (detail) => {
-      const item = await itemMasterService.getItemMasterByIdWoDto(
-        detail.itemId,
-        true
-      );
+      const omittedDetail = customOmit<
+        InvStockAdjustmentDetails,
+        | "itemId"
+        | "isActive"
+        | "deletedBy"
+        | "createdAt"
+        | "updatedAt"
+        | "deletedAt"
+        | "createdBy"
+        | "updatedBy"
+      >(detail, [
+        "itemId",
+        "isActive",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "createdBy",
+        "updatedBy",
+      ]);
+      const item = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
       return {
-        ...detail,
-        item,
+        ...omittedDetail.rest,
+        item: item ? await itemMasterToDto(item) : null,
+        createdBy,
+        updatedBy,
       };
     })
   );
