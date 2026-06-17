@@ -89,11 +89,11 @@ export const toBranchRequisitionReturnDTO = async (
           ? await getBranchItemDetailsFromDb(itemDetail.branchItemDetailsId)
           : null;
 
-        const availableQtyToReturn = branchRequisitionReturn.ccId
+        const availableQtyToReturn = branchRequisitionReturn.branchId
           ? await getItemStockQtyByBatchWise({
               itemId: itemDetail.itemId,
               batchNo: itemDetail.batchNo ?? null,
-              ccId: branchRequisitionReturn.ccId,
+              ccId: branchRequisitionReturn.branchId,
               expiryDate: itemDetail.expiryDate
                 ? new Date(itemDetail.expiryDate)
                 : undefined,

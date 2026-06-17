@@ -75,14 +75,14 @@ export const toStockTransferDTO = async (
 
           const fromStock = await getItemStockQtyByBatchWise({
             itemId: detail.itemId,
-            ccId: stockTransfer.ccId,
+            ccId: stockTransfer.fromId,
             batchNo: detail.batchNo,
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           });
           const toStock = await getItemStockQtyByBatchWise({
             itemId: detail.itemId,
-            ccId: stockTransfer.ccId,
+            ccId: stockTransfer.toId,
             batchNo: detail.batchNo,
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
