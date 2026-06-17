@@ -12,6 +12,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { RoundFormat } from "av6-utils";
 import { generatePDF } from "@/utils/pdfGenerator.utils.js";
 import { applyGrnRateReverseConversion } from "@/utils/rateConversation.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 
 export const createGrn = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createGrn::controller");
@@ -99,54 +100,16 @@ export const deleteGrn = TryCatch(async (req, res) => {
 //   res.end();
 // });
 
-export const printGrnById = TryCatch(async (req: Request, res: Response) => {
-  logger.info("entering::printGrnById::controller");
-
-  const settings = await settingsService.getSettings();
-  const roundFormat: RoundFormat = settings?.grnRoundedFormat || "TO_FIXED";
-  const precision: number = settings?.defaultPrecision || 2;
-  // 1) Read filters and fetch data
-  const { grnId } = req.query as { grnId: string };
-
-  const grn = await grnService.getGrnById(Number(grnId));
-  if (!grn) {
-    return res.status(404).json(
-      BaseResponse.error({
-        message: generateErrorMessage("NOT_FOUND", "Good Receive Note"),
-      })
-    );
-  }
-  const convertedGrn = applyGrnRateReverseConversion(grn, {
-    roundFormat,
-    precision,
-  });
-  // 3) Locate template & logo
-  const tplDir = path.join(
-    process.cwd(),
-    "src",
-    "templates",
-    "pdf",
-    "reports-pdf",
-    "grn"
+export const generateGrnPdf = TryCatch(async (req: Request, res: Response) => {
+  logger.info("entering::generateGrnPdf::controller");
+  const input = req.query.grnId as string;
+  validIdCheck(Number(input));
+  const pdfBuffer = await grnService.generateGrnPdf(Number(input));
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `inline; filename="good-receive-note-${input}.pdf"`
   );
-  const bodyTpl = path.join(tplDir, "grn.hbs");
-  const base64Image = imageToBase64("public/images/logo.png");
-
-  // 4) Render PDF
-  const pdfBuffer = await generatePDF(bodyTpl, {
-    grn: convertedGrn,
-    base64Image,
-    reportFor: "Good Receive Note",
-  });
-
-  // 5) Stream down
-  res
-    .status(200)
-    .set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="good_receive.pdf"',
-    })
-    .send(pdfBuffer);
-
-  logger.info("exiting::printGrnById::controller");
+  res.send(pdfBuffer);
+  logger.info("exiting::generateGrnPdf::controller");
 });

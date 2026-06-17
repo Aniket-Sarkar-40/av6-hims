@@ -122,6 +122,7 @@ enum PdfTemplateType {
     INVOICE
     REPORT
     PURCHASE_ORDER
+    GOOD_RECEIVE_NOTE
 }
 
 enum DiscMethod {

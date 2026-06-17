@@ -395,4 +395,33 @@ export const itemSupplierService = {
     logger.info("exiting::itemSupplierExcelImport::service");
     return batch;
   },
+  async getItemSupplierWoDtoById(
+    id: number,
+    canNullReturnable: boolean = false
+  ): Promise<InvItemSupplier | null> {
+    logger.info("entering::getItemSupplierWoDtoById::service");
+
+    const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
+    let itemSupplier: ItemSupplierResponse | null;
+    if (isCacheable) {
+      itemSupplier = (await getCacheById(
+        cacheKey,
+        id
+      )) as ItemSupplierResponse | null;
+    } else {
+      itemSupplier = await getItemSupplierByIdFromDb(id);
+    }
+
+    if (!itemSupplier) {
+      if (!canNullReturnable) {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Supplier")
+        );
+      } else return null;
+    }
+
+    logger.info("exiting::getItemSupplierWoDtoById::service");
+    return itemSupplier;
+  },
 };

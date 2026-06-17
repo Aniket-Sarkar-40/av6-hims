@@ -6,8 +6,10 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   GoodReceiveDetailDTO,
+  GoodReceiveDetailPdfDTO,
   GrnDetailDTO,
   GrnDTO,
+  GrnPdfDTO,
   GrnResponse,
 } from "@/types/grn/grn.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
@@ -18,6 +20,8 @@ import { currencyService } from "@apps/core/services/master/currency.service.js"
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { ItemStockType } from "@repo/db/generated/prisma/enums.js";
 import { InvGoodReceiveDetails } from "@repo/db/generated/prisma/client";
+import dayjs from "dayjs";
+import { numberToWords } from "@repo/shared/utils/helper.utils.js";
 
 export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
@@ -175,4 +179,64 @@ export const toGrnDetailsDto = async (
       };
     })
   );
+};
+
+export const toGrnPdfDTO = async (grn: GrnResponse): Promise<GrnPdfDTO> => {
+  const omittedGrn = customOmit<
+    GrnResponse,
+    BaseModelAttrWoCancel | "currencyId"
+  >(grn, [
+    "createdBy",
+    "updatedBy",
+    "deletedBy",
+    "createdAt",
+    "updatedAt",
+    "deletedAt",
+    "currencyId",
+  ]);
+
+  const supplier = await itemSupplierService.getItemSupplierWoDtoById(
+    grn.supplierId,
+    true
+  );
+
+  const settings = await settingsService.getSettings(true);
+  const ccSettingsId = settings?.warehouseMode;
+  let warehouseDTO, branchDTO;
+  if (ccSettingsId) {
+    warehouseDTO = await warehouseService.getWarehouseByIdWoDTO(grn.ccId, true);
+  } else {
+    branchDTO = await branchService.getBranchByIdWoDTO(grn.ccId, true);
+  }
+
+  const createdBy = grn.createdBy
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(grn.createdBy)
+    : null;
+  const currency = grn.currencyId
+    ? await currencyService.getCurrencyById(grn.currencyId)
+    : null;
+  const detailDTO: GoodReceiveDetailPdfDTO[] = await Promise.all(
+    (grn.goodReceiveDetails || []).map(async (detail) => {
+      const item = await itemMasterService.getItemMasterByIdWoDto(
+        detail.itemId,
+        true
+      );
+
+      return {
+        ...detail,
+        item: item ?? null,
+      };
+    })
+  );
+
+  return {
+    ...omittedGrn.rest,
+    currency: toIdValue(currency, "name"),
+    supplier,
+    cc: warehouseDTO ?? branchDTO ?? null,
+    createdBy: createdBy,
+    goodReceiveDetails: detailDTO,
+    date: dayjs(grn.date).format("YYYY-MM-DD"),
+    amountInWords: numberToWords.convert(grn.totalAmount.toNumber()),
+  };
 };

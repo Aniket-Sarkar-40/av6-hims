@@ -60,24 +60,6 @@ export interface GrnDTO
   goodReceiveDetails: GrnDetailDTO[];
 }
 
-export interface GrnPdfDTO
-  extends Omit<
-    GrnDTO,
-    | "warehouse"
-    | "branch"
-    | "location"
-    | "supplier"
-    | "date"
-    | "goodReceiveDetails"
-  > {
-  cc: InvBranch | InvWarehouse | null;
-  supplier: InvItemSupplier | null;
-  date: string;
-
-  amountInWords: string;
-  goodReceiveDetails: GoodReceiveDetailPdfDTO[];
-}
-
 export interface GoodReceiveDetailPdfDTO
   extends Omit<InvGoodReceiveDetails, "itemId"> {
   item: InvItem | null;
@@ -162,4 +144,27 @@ export interface GoodReceiveDetailDTO
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
+}
+
+export interface GrnPdfDTO
+  extends Omit<
+    GrnDTO,
+    | "warehouse"
+    | "branch"
+    | "location"
+    | "supplier"
+    | "date"
+    | "goodReceiveDetails"
+  > {
+  cc: InvBranch | InvWarehouse | null;
+  supplier: InvItemSupplier | null;
+  date: string;
+
+  amountInWords: string;
+  goodReceiveDetails: GoodReceiveDetailPdfDTO[];
+}
+
+export interface GoodReceiveDetailPdfDTO
+  extends Omit<InvGoodReceiveDetails, "itemId"> {
+  item: InvItem | null;
 }
