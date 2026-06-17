@@ -1,7 +1,7 @@
 import { defaultUnitMasterService } from "@/services/master/defaultUnitMaster.service.js";
 import { UnitMasterDTO } from "@/types/master/unitMaster.js";
 import { InvUnitMaster } from "@repo/db/generated/prisma/client";
-import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
+import { BaseModelAttrWoCancelWoActive } from "@repo/shared/types/global.js";
 import { customOmit } from "av6-core-v2";
 import { toIdValue } from "av6-utils";
 
@@ -15,9 +15,8 @@ export const toUnitMasterDto = async (
     data.map(async (item) => {
       const omittedItemStore = customOmit<
         InvUnitMaster,
-        BaseModelAttrWoCancel | "defaultUnitMasterId"
+        BaseModelAttrWoCancelWoActive | "defaultUnitMasterId"
       >(item, [
-        "isActive",
         "createdBy",
         "updatedBy",
         "deletedBy",

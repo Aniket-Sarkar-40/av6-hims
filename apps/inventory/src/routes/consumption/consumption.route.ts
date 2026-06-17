@@ -134,7 +134,7 @@ consumptionRouter.get(
 consumptionRouter.put(
   "/approve",
   verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "CONSUMPTION", "APPROVE")),
+  authorize(getPermission("INV", "CONSUMPTION_APPROVE", "CREATE")),
   validateApproveConsumption,
   approveConsumption
 );
@@ -180,7 +180,7 @@ consumptionRouter.delete(
 consumptionRouter.put(
   "/reject",
   verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "CONSUMPTION", "REJECT")),
+  authorize(getPermission("INV", "CONSUMPTION_REJECT", "CREATE")),
   validateCommonConsumptionInput,
   rejectConsumption
 );
