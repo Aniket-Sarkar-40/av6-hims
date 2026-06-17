@@ -643,9 +643,6 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
       goodReceiveDetails: {
         where: {
           isActive: true,
-          quantity: {
-            gt: 0,
-          },
         },
         include: {
           item: {
@@ -685,9 +682,6 @@ export const getGrnByIdFromDb = async (
       goodReceiveDetails: {
         where: {
           isActive: true,
-          quantity: {
-            gt: 0,
-          },
         },
         include: {
           item: {

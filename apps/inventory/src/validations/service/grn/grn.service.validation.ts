@@ -188,6 +188,20 @@ export const validateGrnCommon = async (
 
   let totalDetailAmounts = 0;
 
+  const grnQuantityByPoDetailId = new Map<number, number>();
+
+  for (const detail of body.goodReceiveDetails) {
+    const poDetailsId = Number(detail.poDetailsId);
+    const quantity = Number(detail.quantity ?? 0);
+
+    grnQuantityByPoDetailId.set(
+      poDetailsId,
+      (grnQuantityByPoDetailId.get(poDetailsId) ?? 0) + quantity
+    );
+  }
+
+  const validatedPoDetailIds = new Set<number>();
+
   // Validate each GRN item against PO details
   for (const detail of body.goodReceiveDetails) {
     const poDetail = existingPO.purchaseOrderDetails.find(
@@ -196,18 +210,27 @@ export const validateGrnCommon = async (
 
     if (poDetail) {
       const itemLabel = poDetail?.item?.item ?? `ID ${detail.itemId}`;
-      const finalQuantity = poDetail.quantity - poDetail.receivedQty;
+      const finalQuantity =
+        Number(poDetail.quantity ?? 0) - Number(poDetail.receivedQty ?? 0);
+      const receiveQuantity = Number(detail.quantity ?? 0);
+      const totalReceiveQuantityForPoDetail =
+        grnQuantityByPoDetailId.get(poDetail.id) ?? 0;
 
-      if (detail.quantity !== undefined && detail.quantity > finalQuantity) {
-        throw new ErrorHandler(
-          400,
-          generateErrorMessage(
-            "INVALID_VALUE",
-            `Item ${itemLabel}: Quantity in GRN (${detail.quantity}) exceeds order quantity (${finalQuantity}) in Purchase Order`
-          )
-        );
+      if (!validatedPoDetailIds.has(poDetail.id)) {
+        if (totalReceiveQuantityForPoDetail > finalQuantity) {
+          throw new ErrorHandler(
+            400,
+            generateErrorMessage(
+              "INVALID_VALUE",
+              `Item ${itemLabel}: Total GRN quantity (${totalReceiveQuantityForPoDetail}) exceeds remaining order quantity (${finalQuantity}) in Purchase Order`
+            )
+          );
+        }
+
+        validatedPoDetailIds.add(poDetail.id);
       }
-      detail.orderQuantity = poDetail.quantity;
+
+      detail.orderQuantity = receiveQuantity;
     } else {
       throw new ErrorHandler(
         404,
