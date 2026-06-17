@@ -363,6 +363,7 @@ model Staff {
     requisitionReturnItemDetails RequisitionReturnItemDetails[]
     invInTransitStocks           InvInTransitStock[]
     invStoreRequisitions         InvStoreRequisition[]
+    invPurchaseOrders            InvPurchaseOrder[]
 
     @@map("staff")
 }

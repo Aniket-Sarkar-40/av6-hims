@@ -36,6 +36,7 @@ export interface PurchaseOrderDTO
     | "supplierId"
     | "warehouseId"
     | "currencyId"
+    | "lastVerifiedBy"
   > {
   supplier: IdValue | null;
   store: IdValue | null;
@@ -46,6 +47,7 @@ export interface PurchaseOrderDTO
   location: IdValue | null;
   currency: IdValue | null;
   purchaseOrderDetails: PurchaseOrderDetailDTO[];
+  lastVerifiedBy: EmployeeCache | null;
 }
 
 export interface PurchaseOrderDetailDTO

@@ -231,7 +231,7 @@ export const getItemStockQtyByBatchWise = async ({
   userId,
   expiryDate,
   isFoc,
-}: ItemStockByBatchInput) => {
+}: ItemStockByBatchInput): Promise<number> => {
   logger.info(`entering::getItemStockByLocation::repository`);
 
   const sumResult = await db.invItemStock.aggregate({

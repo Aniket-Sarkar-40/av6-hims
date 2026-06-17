@@ -1796,3 +1796,6 @@ CREATE TABLE `inv_default_unit_master` (
 CREATE INDEX `store_requisition_cc_id_idx` ON `inv_store_requisition`(`cc_id`);
 
 CREATE INDEX `idx_default_unit_master_id` ON `inv_unit_master`(`default_unit_master_id`);
+
+
+CREATE INDEX `purchase_order_last_verified_by_idx` ON `inv_purchase_order`(`last_verified_by`);

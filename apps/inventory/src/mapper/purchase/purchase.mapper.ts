@@ -54,6 +54,10 @@ export const toPurchaseOrderDTO = async (
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(po.updatedBy, true)
         : null;
 
+      const lastVerifiedBy = po.lastVerifiedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(po.lastVerifiedBy)
+        : null;
+
       const currency = po.currencyId
         ? await currencyService.getCurrencyById(po.currencyId)
         : null;
@@ -106,6 +110,7 @@ export const toPurchaseOrderDTO = async (
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),
         purchaseOrderDetails: detailDTO,
+        lastVerifiedBy: omitAudit(lastVerifiedBy),
       };
     })
   );

@@ -277,6 +277,7 @@ model InvPurchaseOrder {
     store                InvItemStore?             @relation(fields: [storeId], references: [id])
     collectionCenter     CollectionCenter          @relation(fields: [ccId], references: [id])
     currency             Currency?                 @relation(fields: [currencyId], references: [id])
+    staff                Staff?                    @relation(fields: [lastVerifiedBy], references: [id])
     purchaseOrderDetails InvPurchaseOrderDetails[]
     goodReceive          InvGoodReceive[]
     goodReceiveReturn    InvGoodReceiveReturn[]
@@ -285,6 +286,7 @@ model InvPurchaseOrder {
     @@index([storeId], name: "purchase_order_store_id_idx")
     @@index([ccId], name: "purchase_order_cc_id_idx")
     @@index([currencyId], name: "purchase_order_currency_id_idx")
+    @@index([lastVerifiedBy], name: "purchase_order_last_verified_by_idx")
     @@map("inv_purchase_order")
 }
 
