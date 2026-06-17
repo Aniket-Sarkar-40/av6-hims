@@ -1,5 +1,6 @@
 import { getRequisitionItemDetailsFromDb } from "@/repository/purchase/storeRequisition.repository.js";
 import {
+  getItemStockQtyByBatchWise,
   getItemStockQtyByLocation,
   getItemStockQtyByUser,
 } from "@/repository/stock/stock.repository.js";
@@ -9,14 +10,10 @@ import {
   GetStoreRequisitionReturnResponse,
   StoreRequisitionReturnDetailDTO,
   StoreRequisitionReturnDTO,
-  StrReturnDetailDTO,
 } from "@/types/purchase/storeRequisitionReturn.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import {
-  RequisitionReturnItemDetails,
-  StoreRequisitionReturn,
-} from "@repo/db/generated/prisma/client";
+import { StoreRequisitionReturn } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit, toIdValue } from "av6-utils";
 
@@ -82,6 +79,18 @@ export const toStoreRequisitionReturnDTO = async (
             )
           : null;
 
+        const availableQtyToReturn = storeRequisitionReturn.requisitionFrom
+          ? await getItemStockQtyByBatchWise({
+              itemId: itemDetail.itemId,
+              batchNo: itemDetail.batchNo ?? null,
+              userId: storeRequisitionReturn.requisitionFrom,
+              expiryDate: itemDetail.expiryDate
+                ? new Date(itemDetail.expiryDate)
+                : undefined,
+              isFoc: itemDetail.isFoc,
+            })
+          : null;
+
         const detailCreatedBy = detail.createdBy
           ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
           : null;
@@ -108,6 +117,7 @@ export const toStoreRequisitionReturnDTO = async (
 
           createdBy: detailCreatedBy,
           updatedBy: detailUpdatedBy,
+          availableQtyToReturn,
         };
       })
     )
@@ -142,33 +152,83 @@ export const toStoreRequisitionReturnDTO = async (
 };
 
 export const toStoreRequisitionReturnDetailDTO = async (
-  storeRequisitionReturnDetail: RequisitionReturnItemDetails[]
-): Promise<StrReturnDetailDTO[]> => {
-  return Promise.all(
-    storeRequisitionReturnDetail.map(async (detail) => {
-      const omittedData = customOmit<
-        RequisitionReturnItemDetails,
-        "itemId" | "createdBy" | "updatedBy"
-      >(detail, ["itemId", "createdBy", "updatedBy"]);
-      const itemDTO = detail.itemId
-        ? await itemMasterService.getItemMasterById(
-            { itemId: detail.itemId },
-            true
-          )
-        : null;
-      const createdBy = detail.createdBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
-        : null;
-      const updatedBy = detail.updatedBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
-        : null;
+  storeRequisitionReturns: GetStoreRequisitionReturnResponse[]
+): Promise<StoreRequisitionReturnDetailDTO[]> => {
+  return await Promise.all(
+    storeRequisitionReturns.flatMap((storeRequisitionReturn) =>
+      storeRequisitionReturn.storeRequisitionReturnDetails.flatMap((detail) =>
+        detail.requisitionReturnItemDetails.map(async (itemDetail) => {
+          const itemDTO = detail.itemId
+            ? await itemMasterService.getItemMasterById(
+                { itemId: detail.itemId },
+                true
+              )
+            : null;
 
-      return {
-        ...omittedData.rest,
-        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-        createdBy,
-        updatedBy,
-      };
-    })
+          const branchInHandStock = await getItemStockQtyByLocation(
+            detail.itemId,
+            storeRequisitionReturn.ccId
+          );
+
+          const userInHandStock = storeRequisitionReturn.requisitionFrom
+            ? await getItemStockQtyByUser(
+                detail.itemId,
+                storeRequisitionReturn.requisitionFrom
+              )
+            : null;
+
+          const reqItem = itemDetail.requisitionItemDetailsId
+            ? await getRequisitionItemDetailsFromDb(
+                itemDetail.requisitionItemDetailsId
+              )
+            : null;
+
+          const availableQtyToReturn = storeRequisitionReturn.requisitionFrom
+            ? await getItemStockQtyByBatchWise({
+                itemId: itemDetail.itemId,
+                batchNo: itemDetail.batchNo ?? null,
+                userId: storeRequisitionReturn.requisitionFrom,
+                expiryDate: itemDetail.expiryDate
+                  ? new Date(itemDetail.expiryDate)
+                  : undefined,
+                isFoc: itemDetail.isFoc,
+              })
+            : null;
+
+          const createdBy = itemDetail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                itemDetail.createdBy
+              )
+            : null;
+          const updatedBy = itemDetail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                itemDetail.updatedBy
+              )
+            : null;
+
+          return {
+            ...itemDetail,
+
+            item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+
+            createdBy,
+            updatedBy,
+
+            storeRequisitionReturnDetailsId: detail.id,
+            storeRequisitionDetailsId: detail.storeRequisitionDetailsId,
+
+            reqAcknowledgedQty: reqItem?.acknowledgedQty ?? null,
+            alreadyReturnedQty: reqItem?.returnedQty ?? null,
+
+            totalRequestedReturnQty: detail.requestedReturnQty,
+            totalAcknowledgedReturnQty: detail.acknowledgedReturnQty,
+
+            branchInHandStock,
+            userInHandStock,
+            availableQtyToReturn,
+          };
+        })
+      )
+    )
   );
 };

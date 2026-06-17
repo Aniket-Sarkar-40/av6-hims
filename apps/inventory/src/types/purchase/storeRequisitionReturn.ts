@@ -127,6 +127,7 @@ export interface StoreRequisitionReturnDetailDTO
 
   branchInHandStock: number | null;
   userInHandStock: number | null;
+  availableQtyToReturn: number | null;
 }
 
 export interface StoreRequisitionReturnDTO

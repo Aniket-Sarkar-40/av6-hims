@@ -1,20 +1,19 @@
 import { getBranchItemDetailsFromDb } from "@/repository/purchase/branchRequisition.repository.js";
-import { getItemStockQtyByLocation } from "@/repository/stock/stock.repository.js";
+import {
+  getItemStockQtyByBatchWise,
+  getItemStockQtyByLocation,
+} from "@/repository/stock/stock.repository.js";
 import { branchService } from "@/services/master/branch.service.js";
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   BranchRequisitionReturnDetailDTO,
   BranchRequisitionReturnDTO,
-  BrReturnDetailDTO,
   GetBranchRequisitionReturnResponse,
 } from "@/types/purchase/branchRequisitionReturn.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import {
-  BranchRequisitionReturn,
-  BranchReturnItemDetails,
-} from "@repo/db/generated/prisma/client";
+import { BranchRequisitionReturn } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit, toIdValue } from "av6-utils";
 
@@ -86,6 +85,18 @@ export const toBranchRequisitionReturnDTO = async (
           ? await getBranchItemDetailsFromDb(itemDetail.branchItemDetailsId)
           : null;
 
+        const availableQtyToReturn = branchRequisitionReturn.ccId
+          ? await getItemStockQtyByBatchWise({
+              itemId: itemDetail.itemId,
+              batchNo: itemDetail.batchNo ?? null,
+              ccId: branchRequisitionReturn.ccId,
+              expiryDate: itemDetail.expiryDate
+                ? new Date(itemDetail.expiryDate)
+                : undefined,
+              isFoc: itemDetail.isFoc,
+            })
+          : null;
+
         const detailCreatedBy = itemDetail.createdBy
           ? await employeeService.getEmployeeByIdFrmCacheOrDb(
               itemDetail.createdBy
@@ -116,6 +127,7 @@ export const toBranchRequisitionReturnDTO = async (
 
           createdBy: detailCreatedBy,
           updatedBy: detailUpdatedBy,
+          availableQtyToReturn,
         };
       })
     )
@@ -187,6 +199,18 @@ export const toBranchReturnDetailDTO = async (
             ? await getBranchItemDetailsFromDb(itemDetail.branchItemDetailsId)
             : null;
 
+          const availableQtyToReturn = branchRequisitionReturn.ccId
+            ? await getItemStockQtyByBatchWise({
+                itemId: itemDetail.itemId,
+                batchNo: itemDetail.batchNo ?? null,
+                ccId: branchRequisitionReturn.ccId,
+                expiryDate: itemDetail.expiryDate
+                  ? new Date(itemDetail.expiryDate)
+                  : undefined,
+                isFoc: itemDetail.isFoc,
+              })
+            : null;
+
           const createdBy = itemDetail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
                 itemDetail.createdBy
@@ -217,6 +241,7 @@ export const toBranchReturnDetailDTO = async (
 
             branchInHandStock,
             warehouseInHandStock,
+            availableQtyToReturn,
           };
         })
       )
