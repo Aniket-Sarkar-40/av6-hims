@@ -1,6 +1,7 @@
 import {
   InvItem,
   InvItemStock,
+  InvOperation,
   Prisma,
 } from "@repo/db/generated/prisma/client";
 import {
@@ -216,4 +217,17 @@ export type InTransitStockByBatchInput = {
   userId?: number | null;
   expiryDate?: Date | string | null;
   isFoc?: boolean;
+};
+
+export type InTransitStockByRefBatchInput = {
+  itemId: number;
+  batchNo?: string | null;
+  fromCcId?: number | null;
+  toCcId?: number | null;
+  userId?: number | null;
+  expiryDate?: Date | string | null;
+  isFoc?: boolean;
+  operation: InvOperation;
+  refId: number;
+  refDetailsId: number;
 };

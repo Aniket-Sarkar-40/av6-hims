@@ -1,3 +1,4 @@
+import { getInTransitStockQtyByRefBatchWise } from "@/repository/inTransitStock/inTransitStock.repository.js";
 import { getRequisitionItemDetailsFromDb } from "@/repository/purchase/storeRequisition.repository.js";
 import {
   getInTransitStockQtyByBatchWise,
@@ -96,8 +97,7 @@ export const toStoreRequisitionReturnDTO = async (
             })
           : null;
 
-        // This is used only for acknowledgement Store Requisition Return, so we need to get the in transit stock quantity for the item in the store to the warehouse
-        const inTransitQtyToAcknowledge =
+        const physicalInTransitQty =
           storeRequisitionReturn.requisitionFrom && storeRequisitionReturn.ccId
             ? await getInTransitStockQtyByBatchWise({
                 itemId: itemDetail.itemId,
@@ -109,6 +109,28 @@ export const toStoreRequisitionReturnDTO = async (
                   : null,
                 isFoc: itemDetail.isFoc,
               })
+            : null;
+
+        const refInTransitQtyToAcknowledge =
+          storeRequisitionReturn.requisitionFrom && storeRequisitionReturn.ccId
+            ? await getInTransitStockQtyByRefBatchWise({
+                itemId: itemDetail.itemId,
+                batchNo: itemDetail.batchNo ?? null,
+                userId: storeRequisitionReturn.requisitionFrom,
+                toCcId: storeRequisitionReturn.ccId,
+                expiryDate: itemDetail.expiryDate
+                  ? new Date(itemDetail.expiryDate)
+                  : null,
+                isFoc: itemDetail.isFoc,
+                operation: "STORE_REQUISITION_RETURN",
+                refId: storeRequisitionReturn.id,
+                refDetailsId: detail.id,
+              })
+            : null;
+
+        const inTransitQtyToAcknowledge =
+          physicalInTransitQty !== null && refInTransitQtyToAcknowledge !== null
+            ? Math.min(physicalInTransitQty, refInTransitQtyToAcknowledge)
             : null;
 
         const detailCreatedBy = detail.createdBy
@@ -138,7 +160,9 @@ export const toStoreRequisitionReturnDTO = async (
           createdBy: detailCreatedBy,
           updatedBy: detailUpdatedBy,
           availableQtyToReturn,
-          inTransitStock: inTransitQtyToAcknowledge,
+          physicalInTransitQty,
+          refInTransitQtyToAcknowledge,
+          inTransitQtyToAcknowledge,
         };
       })
     )

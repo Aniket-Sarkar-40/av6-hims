@@ -7,6 +7,7 @@ import {
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { Action, Prisma } from "@repo/db/generated/prisma/client";
+import { InTransitStockByRefBatchInput } from "@/types/stock/stock.js";
 
 type Tx = Prisma.TransactionClient;
 export const addInTransitStock = async (
@@ -152,4 +153,62 @@ export const getAllInTransitStock = async () => {
       isActive: true,
     },
   });
+};
+
+export const getInTransitStockQtyByRefBatchWise = async ({
+  itemId,
+  batchNo,
+  fromCcId,
+  toCcId,
+  userId,
+  expiryDate,
+  isFoc,
+  operation,
+  refId,
+  refDetailsId,
+}: InTransitStockByRefBatchInput): Promise<number> => {
+  logger.info(`entering::getInTransitStockQtyByRefBatchWise::repository`);
+
+  const commonWhere = {
+    operation,
+    refId,
+    refDetailsId,
+    inTransitStock: {
+      itemId,
+      fromCcId: fromCcId ?? null,
+      toCcId: toCcId ?? null,
+      userId: userId ?? null,
+      batchNo: batchNo ?? null,
+      expiryDate: expiryDate ? new Date(expiryDate) : null,
+      isFoc,
+      isActive: true,
+    },
+  };
+
+  const added = await db.invInTransitStockAudit.aggregate({
+    where: {
+      ...commonWhere,
+      action: Action.ADDITION,
+    },
+    _sum: {
+      quantity: true,
+    },
+  });
+
+  const subtracted = await db.invInTransitStockAudit.aggregate({
+    where: {
+      ...commonWhere,
+      action: Action.SUBTRACTION,
+    },
+    _sum: {
+      quantity: true,
+    },
+  });
+
+  const addedQty = Number(added?._sum?.quantity ?? 0);
+  const subtractedQty = Number(subtracted?._sum?.quantity ?? 0);
+
+  logger.info(`exiting::getInTransitStockQtyByRefBatchWise::repository`);
+
+  return Math.max(addedQty - subtractedQty, 0);
 };

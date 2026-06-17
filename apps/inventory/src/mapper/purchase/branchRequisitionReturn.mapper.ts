@@ -1,3 +1,4 @@
+import { getInTransitStockQtyByRefBatchWise } from "@/repository/inTransitStock/inTransitStock.repository.js";
 import { getBranchItemDetailsFromDb } from "@/repository/purchase/branchRequisition.repository.js";
 import {
   getInTransitStockQtyByBatchWise,
@@ -102,8 +103,7 @@ export const toBranchRequisitionReturnDTO = async (
             })
           : null;
 
-        // This is used only for acknowledgement Branch Requisition Return, so we need to get the in transit stock quantity for the item in the branch to the warehouse
-        const inTransitQtyToAcknowledge =
+        const physicalInTransitQty =
           branchRequisitionReturn.branchId && branchRequisitionReturn.ccId
             ? await getInTransitStockQtyByBatchWise({
                 itemId: itemDetail.itemId,
@@ -115,6 +115,28 @@ export const toBranchRequisitionReturnDTO = async (
                   : null,
                 isFoc: itemDetail.isFoc,
               })
+            : null;
+
+        const refInTransitQtyToAcknowledge =
+          branchRequisitionReturn.branchId && branchRequisitionReturn.ccId
+            ? await getInTransitStockQtyByRefBatchWise({
+                itemId: itemDetail.itemId,
+                batchNo: itemDetail.batchNo ?? null,
+                fromCcId: branchRequisitionReturn.branchId,
+                toCcId: branchRequisitionReturn.ccId,
+                expiryDate: itemDetail.expiryDate
+                  ? new Date(itemDetail.expiryDate)
+                  : null,
+                isFoc: itemDetail.isFoc,
+                operation: "BRANCH_REQUISITION_RETURN",
+                refId: branchRequisitionReturn.id,
+                refDetailsId: detail.id,
+              })
+            : null;
+
+        const inTransitQtyToAcknowledge =
+          physicalInTransitQty !== null && refInTransitQtyToAcknowledge !== null
+            ? Math.min(physicalInTransitQty, refInTransitQtyToAcknowledge)
             : null;
 
         const detailCreatedBy = itemDetail.createdBy
@@ -148,7 +170,9 @@ export const toBranchRequisitionReturnDTO = async (
           createdBy: detailCreatedBy,
           updatedBy: detailUpdatedBy,
           availableQtyToReturn,
-          inTransitStock: inTransitQtyToAcknowledge,
+          physicalInTransitQty,
+          refInTransitQtyToAcknowledge,
+          inTransitQtyToAcknowledge,
         };
       })
     )
