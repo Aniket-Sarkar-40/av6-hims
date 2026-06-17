@@ -3,6 +3,7 @@ import {
   deleteGrn,
   getAllGrn,
   getGrnById,
+  printGrnById,
   updateGrn,
 } from "@/controllers/grn/grn.controller.js";
 import {
@@ -148,30 +149,16 @@ grnRouter.delete(
 
 /**
  * @swagger
- * /api/v1/grn/excel-report:
+ * /api/v1/grn/pdf:
  *   post:
- *     summary: Create a new Good Receive Note
+ *     summary: Print Good Receive Note
  *     tags: [Good Receive Note]
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/grnSchema'
  */
-// grnRouter.post(
-//   "/excel-report",
-//   verifyToken,
-//   authorize(getPermission("GRN_EXCEL", "VIEW")),
-//   validateExcelFilterGrn,
-//   excelGrnReport
-// );
-
-grnRouter.delete(
-  "/",
+grnRouter.post(
+  "/pdf",
   verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "GRN", "DELETE")),
-  deleteGrn
+  authorize(getPermission("INV", "GRN_PDF", "VIEW")),
+  printGrnById
 );

@@ -8,6 +8,7 @@ import {
   enumRequired,
   idOptional,
   idRequired,
+  numberWithMaxDecimalsOptional,
   numberWithMaxDecimalsRequired,
   priceOptional,
   priceRequired,
@@ -93,8 +94,10 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
 
   quantity: idRequired("Quantity"),
 
-  discount: idRequired("Discount", 0),
-  netDiscount: priceRequired("Net Discount amount", () =>
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
+  netDiscount: numberWithMaxDecimalsOptional("Net Discount amount", () =>
     getSchemaPrecision("grn")
   ),
 
@@ -129,11 +132,13 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   totalAmount: priceRequired("totalAmount", () => getSchemaPrecision("grn")),
 
-  discount: idRequired("Discount"),
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  netDiscount: priceRequired("Net Discount amount", () =>
+  netDiscount: numberWithMaxDecimalsOptional("Net Discount amount", () =>
     getSchemaPrecision("grn")
   ),
 
@@ -163,20 +168,6 @@ export const grnSchema = Joi.object<CreateGrnInput>({
     }),
 });
 
-export const grnExcelFilterSchema = Joi.object({
-  id: idOptional("Id"),
-  poNumber: strOptional("PO Number"),
-  startDate: dateOptional("Start date"),
-
-  endDate: dateOptional("End date"),
-  warehouseId: idOptional("Warehouse id"),
-  distributorId: idOptional("Distributor id"),
-  status: enumOptional("Status", GRN_STATUS),
-  paymentStatus: enumOptional("Payment status", PAYMENT_STATUS),
-  poStatus: enumOptional("PO Status", PO_STATUS),
-  gatePassId: idOptional("Gate pass id"),
-});
-
 export const validateGrn = validationHandler({
   schema: grnSchema,
 });
@@ -187,8 +178,4 @@ export const grnSchemaUpdate = grnSchema.keys({
 
 export const validateGrnUpdate = validationHandler({
   schema: grnSchemaUpdate,
-});
-
-export const validateExcelFilterGrn = validationHandler({
-  schema: grnExcelFilterSchema,
 });
