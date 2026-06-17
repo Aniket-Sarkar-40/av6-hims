@@ -107,7 +107,7 @@ export const toBranchRequisitionDTO = async (
                   const stockQty = await getItemStockQtyByBatchWise({
                     itemId: item.itemId,
                     batchNo: item.batchNo ?? null,
-                    userId: requisition.requisitionFrom,
+                    ccId: requisition.ccId,
                     expiryDate: item.expiryDate
                       ? new Date(item.expiryDate)
                       : undefined,
@@ -175,8 +175,7 @@ export const toBranchRequisitionDTO = async (
 
 export const toBranchItemDetailDTO = async (
   branchRequisition: BranchItemDetailResponse,
-  branchId?: number | null,
-  requisitionFrom?: number | null
+  branchId?: number | null
 ): Promise<BranchItemDetailDTO> => {
   const itemDTO = branchRequisition.itemId
     ? await itemMasterService.getItemMasterById(
@@ -201,17 +200,28 @@ export const toBranchItemDetailDTO = async (
       )
     : null;
 
-  const stockQty = requisitionFrom
+  const branchBatchStockQty = branchStockLocationId
     ? await getItemStockQtyByBatchWise({
         itemId: branchRequisition.itemId,
+        ccId: branchStockLocationId,
         batchNo: branchRequisition.batchNo ?? null,
-        userId: requisitionFrom,
         expiryDate: branchRequisition.expiryDate
           ? new Date(branchRequisition.expiryDate)
-          : undefined,
+          : null,
         isFoc: branchRequisition.isFoc,
       })
     : 0;
+
+  const maxReturnableQty = Math.max(
+    Number(branchRequisition.acknowledgedQty ?? 0) -
+      Number(branchRequisition.returnedQty ?? 0),
+    0
+  );
+
+  const availableQtyToReturn = Math.max(
+    Math.min(branchBatchStockQty, maxReturnableQty),
+    0
+  );
 
   const detailDTO: BranchRequisitionDetailDTO = {
     ...branchRequisition.branchRequisitionDetails,
@@ -225,7 +235,7 @@ export const toBranchItemDetailDTO = async (
   return {
     ...branchRequisition,
     branchRequisitionDetails: detailDTO,
-    availableQtyToReturn: stockQty,
+    availableQtyToReturn,
   };
 };
 
@@ -269,11 +279,7 @@ export const toBranchRequisitionBatchWiseDTO = async (
   const detailDTO: BranchItemDetailDTO[] = await Promise.all(
     branchRequisition.branchItemDetails.map(
       async (detail) =>
-        await toBranchItemDetailDTO(
-          detail,
-          branchRequisition.branchId,
-          branchRequisition.requisitionFrom
-        )
+        await toBranchItemDetailDTO(detail, branchRequisition.branchId)
     )
   );
 
@@ -307,7 +313,7 @@ export const toBranchRequisitionDetailDTO = async (
                 const stockQty = await getItemStockQtyByBatchWise({
                   itemId: item.itemId,
                   batchNo: item.batchNo ?? null,
-                  userId: requisition.requisitionFrom,
+                  ccId: requisition.ccId,
                   expiryDate: item.expiryDate
                     ? new Date(item.expiryDate)
                     : undefined,
