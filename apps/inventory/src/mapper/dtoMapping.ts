@@ -43,6 +43,7 @@ import {
   InvUINConfig,
   InvUnitMaster,
   RequisitionReturnItemDetails,
+  StoreRequisitionReturnDetails,
 } from "@repo/db/generated/prisma/client";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import { toUINConfigDTO } from "av6-core-v2";
@@ -114,7 +115,7 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.BRANCH_REQ_DETAILS]: (data: unknown) =>
     toBranchRequisitionDetailDTO(data as BranchRequisitionDetails[]),
   [SHORT_CODE.ST_REQ_RETURN_DETAILS]: (data: unknown) =>
-    toStoreRequisitionReturnDetailDTO(data as RequisitionReturnItemDetails[]),
+    toStoreRequisitionReturnDetailDTO(data as StoreRequisitionReturnDetails[]),
   [SHORT_CODE.BRANCH_REQ_RETURN_DETAILS]: (data: unknown) =>
     toBranchReturnDetailDTO(data as BranchReturnItemDetails[]),
   [SHORT_CODE.GRN_RETURN_DETAILS]: (data: unknown) =>

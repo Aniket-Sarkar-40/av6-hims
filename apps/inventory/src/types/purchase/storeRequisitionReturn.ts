@@ -11,6 +11,7 @@ import {
   Prisma,
   RequisitionReturnItemDetails,
   StoreRequisitionReturn,
+  StoreRequisitionReturnDetails,
 } from "@repo/db/generated/prisma/client";
 import { IdValue } from "@repo/shared/types/global.js";
 import { EmployeeCache } from "@apps/core/types/staff/employee.js";
@@ -174,7 +175,7 @@ export interface AcknowledgeRequisitionReturn {
 
 export interface StrReturnDetailDTO
   extends Omit<
-    RequisitionReturnItemDetails,
+    StoreRequisitionReturnDetails,
     "itemId" | "createdBy" | "updatedBy"
   > {
   item: ItemMasterToDto | null;

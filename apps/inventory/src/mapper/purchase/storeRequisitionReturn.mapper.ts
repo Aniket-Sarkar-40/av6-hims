@@ -17,6 +17,7 @@ import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import {
   RequisitionReturnItemDetails,
   StoreRequisitionReturn,
+  StoreRequisitionReturnDetails,
 } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit, toIdValue } from "av6-utils";
@@ -156,12 +157,12 @@ export const toStoreRequisitionReturnDTO = async (
 };
 
 export const toStoreRequisitionReturnDetailDTO = async (
-  details: RequisitionReturnItemDetails[]
+  details: StoreRequisitionReturnDetails[]
 ): Promise<StrReturnDetailDTO[]> => {
   return await Promise.all(
     details.map(async (detail) => {
       const omittedData = customOmit<
-        RequisitionReturnItemDetails,
+        StoreRequisitionReturnDetails,
         "itemId" | "createdBy" | "updatedBy"
       >(detail, ["itemId", "createdBy", "updatedBy"]);
       const itemDTO = detail.itemId
