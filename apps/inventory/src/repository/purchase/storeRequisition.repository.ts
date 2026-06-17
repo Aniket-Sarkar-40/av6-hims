@@ -82,26 +82,6 @@ export const createStoreRequisitionInDb = async (
         },
       });
 
-      const emailTemplate = await eventEmailService.getEventEmail();
-
-      if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
-        // sendTemplatedEmail({
-        //   template: emailTemplate,
-        //   to: [store?.user?.email],
-        //   variables: {
-        //     name: store?.user?.userName || "User",
-        //     companyDetails: "Aerial View-6",
-        //     message: `Store Requisition created.`,
-        //     signature: `Aerial View-6 Pvt. Ltd.`,
-        //   },
-        // })
-        //   .then(() => {
-        //     logger.info("Email Sent Successfully.");
-        //   })
-        //   .catch((e) => logger.error(`Email Failed:: ${e.message} `));
-        // TODO: Send notification
-      }
-
       return createdStoreRequisition;
     },
     {

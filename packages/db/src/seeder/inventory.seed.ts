@@ -590,7 +590,6 @@ export async function runSeed() {
     const existingUnit = await db.invDefaultUnitMaster.findFirst({
       where: {
         name: unit.name,
-        isActive: true,
       },
     });
 
