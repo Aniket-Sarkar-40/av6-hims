@@ -91,73 +91,121 @@ export const itemStockService = {
     const wb = new ExcelJs.Workbook();
     const ws = wb.addWorksheet("Item Stock");
     ws.properties.defaultRowHeight = 18;
+    ws.views = [{ state: "frozen", ySplit: 1 }];
 
     ws.columns = [
-      { header: "S.No", key: "s_no" },
-      // { header: "Item ID", key: "item_id" },
-      { header: "Item Name", key: "item_name" },
-      { header: "Item Code", key: "item_code" },
-      { header: "Item Description", key: "item_description" },
-      { header: "Base Price", key: "base_price" },
-      { header: "Purchase Price", key: "purchase_price" },
-      // { header: "Is Batch Number", key: "is_batch_number" },
-      // { header: "Is Expire Date", key: "is_expire_date" },
-      // { header: "Is Returnable", key: "is_returnable" },
-      // { header: "Is Lock", key: "is_lock" },
-      // { header: "Item Is Active", key: "item_is_active" },
-      // { header: "Category ID", key: "category_id" },
-      { header: "Category Name", key: "category_name" },
-      // { header: "Unit ID", key: "unit_id" },
-      { header: "Unit Name", key: "unit_name" },
-      { header: "Unit Size", key: "unit_size" },
-      // { header: "CC ID", key: "cc_id" },
-      // { header: "Location Type", key: "location_type" },
-      { header: "Location Name", key: "location_name" },
-      { header: "Batch No", key: "batch_no" },
-      // { header: "Stock ID List", key: "stock_id_list" },
-      { header: "In Hand Qty", key: "in_hand_qty" },
-      // { header: "Branch In Hand Qty", key: "branch_in_hand_qty" },
-      // { header: "Warehouse In Hand Qty", key: "warehouse_in_hand_qty" },
-      { header: "SR Req Qty", key: "sr_req_qty" },
-      { header: "SR Assigned Qty", key: "sr_assigned_qty" },
-      { header: "SR Acknowledged Qty", key: "sr_acknowledged_qty" },
-      { header: "SR Pending Qty", key: "sr_pending_qty_srr_sra" },
-      { header: "Location Stock(RQ-CQ)", key: "location_stock_rq_cq" },
-      { header: "Ack Pending Qty(RQ-AQ)", key: "ack_pending_qty_rq_aq" },
-      { header: "GRN Ordered Qty", key: "grn_ordered_qty" },
-      { header: "GRN Received Qty", key: "grn_received_qty" },
-      { header: "GRN Returned Qty", key: "grn_returned_qty" },
-      { header: "Cons Req Qty", key: "consumption_requested_qty" },
-      { header: "Consumed Qty", key: "consumed_qty" },
-      { header: "PO Ordered Qty", key: "po_ordered_qty" },
-      { header: "PO Received Qty", key: "po_received_qty" },
-      { header: "PO Pend Qty(poq-prq)", key: "po_pending_qty_poq_prq" },
-      { header: "Total Stock", key: "total_stock_ppq_sq_srrq+cq" },
+      { header: "S.No", key: "sNo", width: 8 },
+      { header: "Item Name", key: "itemName", width: 30 },
+      { header: "Item Code", key: "itemCode", width: 18 },
+      { header: "Description", key: "itemDescription", width: 35 },
+      { header: "Base Price", key: "basePrice", width: 14 },
+      { header: "Purchase Price", key: "purchasePrice", width: 16 },
+      { header: "Category", key: "categoryName", width: 22 },
+      { header: "Unit", key: "unitName", width: 16 },
+      { header: "Unit Size", key: "unitSize", width: 12 },
+      { header: "Location", key: "locationName", width: 22 },
+      { header: "Location Type", key: "locationType", width: 14 },
+      { header: "Batch No", key: "batchNoList", width: 25 },
+      { header: "Expiry Date", key: "expiryDateList", width: 22 },
+      { header: "In Hand Qty", key: "stockInHandQty", width: 14 },
+      { header: "Normal Qty", key: "stockNormalQty", width: 14 },
+      { header: "FOC Qty", key: "stockFocQty", width: 12 },
+
+      { header: "SR Req Qty", key: "storeReqQty", width: 14 },
+      { header: "SR Assigned Qty", key: "storeAssignedQty", width: 16 },
+      { header: "SR Ack Qty", key: "storeAcknowledgedQty", width: 14 },
       {
-        header: "GRN(ReqQT-RetrQty-ConsQTY)Stock",
-        key: "grn_recQT_retrQty_consQTY_stock",
+        header: "SR Pending Qty(RQ-AQ)",
+        key: "storePendingAssignQty",
+        width: 22,
       },
-      // { header: "Variance vs Stock", key: "variance_vs_stock" },
+      { header: "SR Ack Pending Qty", key: "storePendingAckQty", width: 20 },
+
+      {
+        header: "SR Return Req Qty",
+        key: "storeReturnRequestedQty",
+        width: 18,
+      },
+      {
+        header: "SR Return Approved Qty",
+        key: "storeReturnApprovedQty",
+        width: 22,
+      },
+      {
+        header: "SR Return Ack Pending Qty",
+        key: "storeReturnAckPendingQty",
+        width: 24,
+      },
+
+      { header: "BR Req Qty", key: "branchReqQty", width: 14 },
+      { header: "BR Assigned Qty", key: "branchAssignedQty", width: 16 },
+      { header: "BR Ack Qty", key: "branchAcknowledgedQty", width: 14 },
+      {
+        header: "BR Pending Qty(RQ-AQ)",
+        key: "branchPendingAssignQty",
+        width: 22,
+      },
+      { header: "BR Ack Pending Qty", key: "branchPendingAckQty", width: 20 },
+
+      {
+        header: "BR Return Req Qty",
+        key: "branchReturnRequestedQty",
+        width: 18,
+      },
+      {
+        header: "BR Return Approved Qty",
+        key: "branchReturnApprovedQty",
+        width: 22,
+      },
+      {
+        header: "BR Return Ack Pending Qty",
+        key: "branchReturnAckPendingQty",
+        width: 24,
+      },
+
+      { header: "GRN Ordered Qty", key: "grnOrderedQty", width: 18 },
+      { header: "GRN Received Qty", key: "grnReceivedQty", width: 18 },
+      { header: "GRN Returned Qty", key: "grnDetailReturnQty", width: 18 },
+      { header: "GRN Return Req Qty", key: "grnReturnRequestedQty", width: 20 },
+      {
+        header: "GRN Return Approved Qty",
+        key: "grnReturnApprovedQty",
+        width: 24,
+      },
+
+      { header: "Cons Req Qty", key: "consumptionRequestedQty", width: 16 },
+      { header: "Consumed Qty", key: "consumedQty", width: 16 },
+
+      { header: "PO Ordered Qty", key: "poOrderedQty", width: 18 },
+      { header: "PO Received Qty", key: "poReceivedQty", width: 18 },
+      { header: "PO Pending Qty", key: "poPendingQty", width: 18 },
     ];
 
-    const headerRow = ws.getRow(1);
-    headerRow.height = 18;
-    headerRow.eachCell((cell) => {
-      cell.font = { bold: true };
-      cell.alignment = { horizontal: "center", vertical: "middle" };
+    stocks.forEach((stock, index) => {
+      ws.addRow({
+        sNo: index + 1,
+        ...stock,
+      });
     });
 
-    stocks.forEach((stock, index) => {
-      ws.addRow({ s_no: index + 1, ...stock });
+    ws.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+        wrapText: true,
+      };
     });
 
     ws.columns.forEach((col) => {
       let max = col.header?.toString().length || 10;
+
       col.eachCell?.({ includeEmpty: true }, (cell) => {
         const len = cell.value ? cell.value.toString().length : 0;
         if (len > max) max = len;
       });
-      col.width = max + 2;
+
+      col.width = Math.min(max + 2, 35);
     });
 
     logger.info("exiting::itemStockExcelExport::service");

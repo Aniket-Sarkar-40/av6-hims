@@ -105,7 +105,9 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.BRANCH_REQ_DETAILS]: (data: unknown) =>
     toBranchRequisitionDetailDTO(data as BranchRequisitionResponse[]),
   [SHORT_CODE.ST_REQ_RETURN_DETAILS]: (data: unknown) =>
-    toStoreRequisitionReturnDetailDTO(data as RequisitionReturnItemDetails[]),
+    toStoreRequisitionReturnDetailDTO(
+      data as GetStoreRequisitionReturnResponse[]
+    ),
   [SHORT_CODE.BRANCH_REQ_RETURN_DETAILS]: (data: unknown) =>
     toBranchReturnDetailDTO(data as GetBranchRequisitionReturnResponse[]),
   [SHORT_CODE.GRN_RETURN_DETAILS]: (data: unknown) =>

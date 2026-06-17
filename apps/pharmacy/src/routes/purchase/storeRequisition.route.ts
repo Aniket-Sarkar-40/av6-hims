@@ -198,7 +198,7 @@ storeRequisitionRouter.post(
 storeRequisitionRouter.post(
   "/approve",
   verifyToken(ServiceCode.PHARMACY),
-  authorize(getPermission("PMS", "STORE_REQUISITION_SENT", "CREATE")),
+  authorize(getPermission("PMS", "STORE_REQUISITION_APPROVE", "CREATE")),
   validateSentStoreRequisition,
   approveStoreRequisition
 );
