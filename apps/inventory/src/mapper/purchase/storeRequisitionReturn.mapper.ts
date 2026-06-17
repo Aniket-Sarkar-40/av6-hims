@@ -1,5 +1,6 @@
 import { getRequisitionItemDetailsFromDb } from "@/repository/purchase/storeRequisition.repository.js";
 import {
+  getInTransitStockQtyByBatchWise,
   getItemStockQtyByBatchWise,
   getItemStockQtyByLocation,
   getItemStockQtyByUser,
@@ -15,7 +16,6 @@ import {
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import {
-  RequisitionReturnItemDetails,
   StoreRequisitionReturn,
   StoreRequisitionReturnDetails,
 } from "@repo/db/generated/prisma/client";
@@ -96,6 +96,21 @@ export const toStoreRequisitionReturnDTO = async (
             })
           : null;
 
+        // This is used only for acknowledgement Store Requisition Return, so we need to get the in transit stock quantity for the item in the store to the warehouse
+        const inTransitQtyToAcknowledge =
+          storeRequisitionReturn.requisitionFrom && storeRequisitionReturn.ccId
+            ? await getInTransitStockQtyByBatchWise({
+                itemId: itemDetail.itemId,
+                batchNo: itemDetail.batchNo ?? null,
+                userId: storeRequisitionReturn.requisitionFrom,
+                toCcId: storeRequisitionReturn.ccId,
+                expiryDate: itemDetail.expiryDate
+                  ? new Date(itemDetail.expiryDate)
+                  : null,
+                isFoc: itemDetail.isFoc,
+              })
+            : null;
+
         const detailCreatedBy = detail.createdBy
           ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
           : null;
@@ -123,6 +138,7 @@ export const toStoreRequisitionReturnDTO = async (
           createdBy: detailCreatedBy,
           updatedBy: detailUpdatedBy,
           availableQtyToReturn,
+          inTransitStock: inTransitQtyToAcknowledge,
         };
       })
     )

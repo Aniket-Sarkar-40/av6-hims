@@ -1,5 +1,6 @@
 import { getBranchItemDetailsFromDb } from "@/repository/purchase/branchRequisition.repository.js";
 import {
+  getInTransitStockQtyByBatchWise,
   getItemStockQtyByBatchWise,
   getItemStockQtyByLocation,
 } from "@/repository/stock/stock.repository.js";
@@ -101,6 +102,21 @@ export const toBranchRequisitionReturnDTO = async (
             })
           : null;
 
+        // This is used only for acknowledgement Branch Requisition Return, so we need to get the in transit stock quantity for the item in the branch to the warehouse
+        const inTransitQtyToAcknowledge =
+          branchRequisitionReturn.branchId && branchRequisitionReturn.ccId
+            ? await getInTransitStockQtyByBatchWise({
+                itemId: itemDetail.itemId,
+                batchNo: itemDetail.batchNo ?? null,
+                fromCcId: branchRequisitionReturn.branchId,
+                toCcId: branchRequisitionReturn.ccId,
+                expiryDate: itemDetail.expiryDate
+                  ? new Date(itemDetail.expiryDate)
+                  : null,
+                isFoc: itemDetail.isFoc,
+              })
+            : null;
+
         const detailCreatedBy = itemDetail.createdBy
           ? await employeeService.getEmployeeByIdFrmCacheOrDb(
               itemDetail.createdBy
@@ -132,6 +148,7 @@ export const toBranchRequisitionReturnDTO = async (
           createdBy: detailCreatedBy,
           updatedBy: detailUpdatedBy,
           availableQtyToReturn,
+          inTransitStock: inTransitQtyToAcknowledge,
         };
       })
     )

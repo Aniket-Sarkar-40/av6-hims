@@ -117,6 +117,8 @@ export interface StoreRequisitionReturnDetailDTO
   extends Omit<RequisitionReturnItemDetails, "createdBy" | "updatedBy"> {
   item: ItemMasterToDto | null;
 
+  inTransitStock: number | null;
+
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
 

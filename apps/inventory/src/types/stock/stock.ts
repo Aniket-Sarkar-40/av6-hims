@@ -207,3 +207,13 @@ export interface ItemBatchStockLookupInput {
   itemId: number;
   batchNo: string;
 }
+
+export type InTransitStockByBatchInput = {
+  itemId: number;
+  batchNo?: string | null;
+  fromCcId?: number | null;
+  toCcId?: number | null;
+  userId?: number | null;
+  expiryDate?: Date | string | null;
+  isFoc?: boolean;
+};

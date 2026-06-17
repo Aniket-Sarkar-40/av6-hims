@@ -135,6 +135,7 @@ export interface BranchRequisitionReturnDetailDTO
   branchInHandStock: number | null;
   warehouseInHandStock: number | null;
   availableQtyToReturn: number | null;
+  inTransitStock: number | null;
 }
 
 export interface BranchRequisitionReturnDTO

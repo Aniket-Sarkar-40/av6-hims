@@ -4,6 +4,7 @@ import { db } from "@repo/db/client";
 import { toStockEntity } from "@/mapper/purchase/storeRequisition.mapper.js";
 import {
   CreateItemStockInput,
+  InTransitStockByBatchInput,
   ItemBatchStockLookupInput,
   ItemStockAudit,
   ItemStockReportRow,
@@ -1506,4 +1507,38 @@ export const getItemBatchStockByBatchFromDb = async (
       },
     },
   });
+};
+
+export const getInTransitStockQtyByBatchWise = async ({
+  itemId,
+  batchNo,
+  fromCcId,
+  toCcId,
+  userId,
+  expiryDate,
+  isFoc,
+}: InTransitStockByBatchInput): Promise<number> => {
+  logger.info(`entering::getInTransitStockQtyByBatchWise::repository`);
+
+  const sumResult = await db.invInTransitStock.aggregate({
+    where: {
+      itemId,
+      fromCcId: fromCcId ?? null,
+      toCcId: toCcId ?? null,
+      userId: userId ?? null,
+      batchNo: batchNo ?? null,
+      expiryDate: expiryDate ? new Date(expiryDate) : null,
+      isFoc,
+      isActive: true,
+    },
+    _sum: {
+      quantity: true,
+    },
+  });
+
+  const totalQuantity = sumResult._sum.quantity ?? 0;
+
+  logger.info(`exiting::getInTransitStockQtyByBatchWise::repository`);
+
+  return totalQuantity;
 };
