@@ -8,6 +8,7 @@ import {
   enumRequired,
   idOptional,
   idRequired,
+  intRequired,
   numberWithMaxDecimalsOptional,
   numberWithMaxDecimalsRequired,
   priceOptional,
@@ -66,7 +67,7 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     getSchemaPrecision("grn")
   ),
 
-  focQuantity: idRequired("FOC Quantity"),
+  focQuantity: intRequired("FOC Quantity"),
 
   netTax: priceRequired("Net Tax", () => getSchemaPrecision("grn")),
 
@@ -92,7 +93,7 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     otherwise: dateOptional("Expiry date"),
   }),
 
-  quantity: idRequired("Quantity"),
+  quantity: intRequired("Quantity"),
 
   discount: numberWithMaxDecimalsOptional("Discount", () =>
     getSchemaPrecision("grn")
