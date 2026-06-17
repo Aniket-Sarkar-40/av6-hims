@@ -9,11 +9,15 @@ import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   BranchRequisitionReturnDetailDTO,
   BranchRequisitionReturnDTO,
+  BrReturnDetailDTO,
   GetBranchRequisitionReturnResponse,
 } from "@/types/purchase/branchRequisitionReturn.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { BranchRequisitionReturn } from "@repo/db/generated/prisma/client";
+import {
+  BranchRequisitionReturn,
+  BranchReturnItemDetails,
+} from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit, toIdValue } from "av6-utils";
 
@@ -168,83 +172,33 @@ export const toBranchRequisitionReturnDTO = async (
 };
 
 export const toBranchReturnDetailDTO = async (
-  branchRequisitionReturns: GetBranchRequisitionReturnResponse[]
-): Promise<BranchRequisitionReturnDetailDTO[]> => {
+  details: BranchReturnItemDetails[]
+): Promise<BrReturnDetailDTO[]> => {
   return await Promise.all(
-    branchRequisitionReturns.flatMap((branchRequisitionReturn) =>
-      branchRequisitionReturn.branchRequisitionReturnDetails.flatMap((detail) =>
-        detail.branchReturnItemDetails.map(async (itemDetail) => {
-          const itemDTO = detail.itemId
-            ? await itemMasterService.getItemMasterById(
-                { itemId: detail.itemId },
-                true
-              )
-            : null;
+    details.map(async (detail) => {
+      const omittedData = customOmit<
+        BranchReturnItemDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
 
-          const branchInHandStock = branchRequisitionReturn.branchId
-            ? await getItemStockQtyByLocation(
-                detail.itemId,
-                branchRequisitionReturn.branchId
-              )
-            : null;
-
-          const warehouseInHandStock = branchRequisitionReturn.ccId
-            ? await getItemStockQtyByLocation(
-                detail.itemId,
-                branchRequisitionReturn.ccId
-              )
-            : null;
-
-          const branchItem = itemDetail.branchItemDetailsId
-            ? await getBranchItemDetailsFromDb(itemDetail.branchItemDetailsId)
-            : null;
-
-          const availableQtyToReturn = branchRequisitionReturn.ccId
-            ? await getItemStockQtyByBatchWise({
-                itemId: itemDetail.itemId,
-                batchNo: itemDetail.batchNo ?? null,
-                ccId: branchRequisitionReturn.ccId,
-                expiryDate: itemDetail.expiryDate
-                  ? new Date(itemDetail.expiryDate)
-                  : undefined,
-                isFoc: itemDetail.isFoc,
-              })
-            : null;
-
-          const createdBy = itemDetail.createdBy
-            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                itemDetail.createdBy
-              )
-            : null;
-          const updatedBy = itemDetail.updatedBy
-            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                itemDetail.updatedBy
-              )
-            : null;
-
-          return {
-            ...itemDetail,
-
-            item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-
-            createdBy,
-            updatedBy,
-
-            branchRequisitionReturnDetailsId: detail.id,
-            branchRequisitionDetailsId: detail.branchRequisitionDetailsId,
-
-            reqAcknowledgedQty: branchItem?.acknowledgedQty ?? null,
-            alreadyReturnedQty: branchItem?.returnedQty ?? null,
-
-            totalRequestedReturnQty: detail.requestedReturnQty,
-            totalAcknowledgedReturnQty: detail.acknowledgedReturnQty,
-
-            branchInHandStock,
-            warehouseInHandStock,
-            availableQtyToReturn,
-          };
-        })
-      )
-    )
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
   );
 };

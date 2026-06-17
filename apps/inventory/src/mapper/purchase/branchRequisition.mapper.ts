@@ -12,8 +12,10 @@ import {
   BranchReqBatchWiseResponse,
   BranchRequisitionBatchWiseDTO,
   BranchRequisitionDetailDTO,
+  BranchRequisitionDetails,
   BranchRequisitionDTO,
   BranchRequisitionResponse,
+  BrDetailDTO,
 } from "@/types/purchase/branchRequisition.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
@@ -293,63 +295,33 @@ export const toBranchRequisitionBatchWiseDTO = async (
 };
 
 export const toBranchRequisitionDetailDTO = async (
-  requisitions: BranchRequisitionResponse[]
-): Promise<BranchRequisitionDetailDTO[]> => {
+  details: BranchRequisitionDetails[]
+): Promise<BrDetailDTO[]> => {
   return await Promise.all(
-    requisitions.flatMap((requisition) =>
-      requisition.branchRequisitionDetails.map(async (detail) => {
-        const itemDTO = detail.itemId
-          ? await itemMasterService.getItemMasterById(
-              { itemId: detail.itemId },
-              true
-            )
-          : null;
-
-        const availableReturnQty = (
-          await Promise.all(
-            requisition.branchItemDetails
-              .filter((item) => item.branchRequisitionDetailsId === detail.id)
-              .map(async (item) => {
-                const stockQty = await getItemStockQtyByBatchWise({
-                  itemId: item.itemId,
-                  batchNo: item.batchNo ?? null,
-                  ccId: requisition.ccId,
-                  expiryDate: item.expiryDate
-                    ? new Date(item.expiryDate)
-                    : undefined,
-                  isFoc: item.isFoc,
-                });
-
-                return stockQty;
-              })
+    details.map(async (detail) => {
+      const omittedData = customOmit<
+        BranchRequisitionDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
           )
-        ).reduce((total, qty) => total + qty, 0);
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
 
-        const warehouseInHandStock = requisition.ccId
-          ? await getItemStockQtyByLocation(detail.itemId, requisition.ccId)
-          : null;
-
-        const branchInHandStock = requisition.branchId
-          ? await getItemStockQtyByLocation(detail.itemId, requisition.branchId)
-          : null;
-
-        const createdBy = detail.createdBy
-          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
-          : null;
-        const updatedBy = detail.updatedBy
-          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
-          : null;
-
-        return {
-          ...detail,
-          warehouseInHandStock,
-          branchInHandStock,
-          availableQtyToReturn: availableReturnQty,
-          item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-          createdBy,
-          updatedBy,
-        };
-      })
-    )
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
   );
 };

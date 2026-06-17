@@ -16,16 +16,23 @@ import { GrnReturnResponse } from "@/types/grn/grnReturn.js";
 import { BranchResponse } from "@/types/master/branch.js";
 import { ItemSupplierResponse } from "@/types/master/itemSupplier.js";
 import { WarehouseResponse } from "@/types/master/warehouse.js";
-import { BranchRequisitionResponse } from "@/types/purchase/branchRequisition.js";
+import {
+  BranchRequisitionDetails,
+  BranchRequisitionResponse,
+} from "@/types/purchase/branchRequisition.js";
 import { GetBranchRequisitionReturnResponse } from "@/types/purchase/branchRequisitionReturn.js";
 import {
   PurchaseOrderDetailResponse,
   PurchaseOrderWithDetails,
 } from "@/types/purchase/purchase.js";
-import { StoreRequisitionResponse } from "@/types/purchase/storeRequisition.js";
+import {
+  StoreRequisitionDetails,
+  StoreRequisitionResponse,
+} from "@/types/purchase/storeRequisition.js";
 import { GetStoreRequisitionReturnResponse } from "@/types/purchase/storeRequisitionReturn.js";
 import { StockAdjustmentResponse } from "@/types/stock/stockAdjustment.js";
 import {
+  BranchReturnItemDetails,
   InvGoodReceiveReturnDetails,
   InvInTransitStock,
   InvItem,
@@ -101,15 +108,13 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.PO_DETAILS]: (data: unknown) =>
     toPurchaseOrderDetailsDto(data as PurchaseOrderDetailResponse[]),
   [SHORT_CODE.ST_REQ_DETAILS]: (data: unknown) =>
-    toStoreRequisitionDetailDTO(data as StoreRequisitionResponse[]),
+    toStoreRequisitionDetailDTO(data as StoreRequisitionDetails[]),
   [SHORT_CODE.BRANCH_REQ_DETAILS]: (data: unknown) =>
-    toBranchRequisitionDetailDTO(data as BranchRequisitionResponse[]),
+    toBranchRequisitionDetailDTO(data as BranchRequisitionDetails[]),
   [SHORT_CODE.ST_REQ_RETURN_DETAILS]: (data: unknown) =>
-    toStoreRequisitionReturnDetailDTO(
-      data as GetStoreRequisitionReturnResponse[]
-    ),
+    toStoreRequisitionReturnDetailDTO(data as RequisitionReturnItemDetails[]),
   [SHORT_CODE.BRANCH_REQ_RETURN_DETAILS]: (data: unknown) =>
-    toBranchReturnDetailDTO(data as GetBranchRequisitionReturnResponse[]),
+    toBranchReturnDetailDTO(data as BranchReturnItemDetails[]),
   [SHORT_CODE.GRN_RETURN_DETAILS]: (data: unknown) =>
     toGrnReturnDetailsDto(data as InvGoodReceiveReturnDetails[]),
   [SHORT_CODE.UNIT_MASTER]: (data: unknown) =>

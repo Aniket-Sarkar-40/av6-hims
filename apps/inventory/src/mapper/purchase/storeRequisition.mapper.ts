@@ -14,8 +14,10 @@ import {
   StoreRequisitionBatchWiseDTO,
   StoreRequisitionDetailDTO,
   StoreRequisitionDetailDTOBranch,
+  StoreRequisitionDetails,
   StoreRequisitionDTO,
   StoreRequisitionResponse,
+  StrDetailDTO,
 } from "@/types/purchase/storeRequisition.js";
 import {
   ItemStockWithQtyBreakdown,
@@ -297,85 +299,32 @@ export const toStockEntity = (raw: RawItemStock): ItemStockWithQtyBreakdown => {
 };
 
 export const toStoreRequisitionDetailDTO = async (
-  requisitions: StoreRequisitionResponse[]
-): Promise<StoreRequisitionDetailDTOBranch[]> => {
+  details: StoreRequisitionDetails[]
+): Promise<StrDetailDTO[]> => {
   return await Promise.all(
-    requisitions.flatMap((requisition) =>
-      requisition.storeRequisitionDetails.map(async (detail) => {
-        const itemDTO = detail.itemId
-          ? await itemMasterService.getItemMasterById(
-              { itemId: detail.itemId },
-              true
-            )
-          : null;
-
-        const availableReturnQty = (
-          await Promise.all(
-            requisition.requisitionInvItemDetails
-              .filter((item) => item.storeRequisitionDetailsId === detail.id)
-              .map(async (item) => {
-                const stockQty = await getItemStockQtyByBatchWise({
-                  itemId: item.itemId,
-                  batchNo: item.batchNo ?? null,
-                  userId: requisition.requisitionFrom,
-                  expiryDate: item.expiryDate
-                    ? new Date(item.expiryDate)
-                    : undefined,
-                  isFoc: item.isFoc,
-                });
-
-                return stockQty;
-              })
-          )
-        ).reduce((total, qty) => total + qty, 0);
-
-        const qtyAtCc = await getItemStockQtyByLocation(
-          detail.itemId,
-          requisition.ccId
-        );
-        let inHandWarehouseQty: number | null = null;
-        let inHandBranchQty: number | null = null;
-
-        const warehouseRow = await warehouseService.getWarehouseById(
-          requisition.ccId,
-          true
-        );
-        if (warehouseRow) {
-          inHandWarehouseQty = qtyAtCc;
-        } else {
-          const branchRow = await branchService.getBranchById(
-            requisition.ccId,
+    details.map(async (detail) => {
+      const omittedData = customOmit<
+        StoreRequisitionDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
             true
-          );
-          if (branchRow) inHandBranchQty = qtyAtCc;
-        }
-
-        let userInHandStock: number | null = null;
-        if (requisition.requisitionFrom) {
-          userInHandStock = await getItemStockQtyByUser(
-            detail.itemId,
-            requisition.requisitionFrom
-          );
-        }
-
-        const createdBy = detail.createdBy
-          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
-          : null;
-        const updatedBy = detail.updatedBy
-          ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
-          : null;
-
-        return {
-          ...detail,
-          warehouseInHandStock: inHandWarehouseQty,
-          branchInHandStock: inHandBranchQty,
-          userInHandStock,
-          availableQtyToReturn: availableReturnQty,
-          item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-          createdBy,
-          updatedBy,
-        };
-      })
-    )
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
   );
 };

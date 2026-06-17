@@ -3,7 +3,11 @@ import {
   STORE_REQ_ACK_STATUS,
   STORE_REQ_STATUS,
 } from "@repo/db/generated/prisma/client";
-import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
+import {
+  BaseModelAttr,
+  BaseModelAttrWoCancel,
+  IdValue,
+} from "@repo/shared/types/global.js";
 import { EmployeeCache } from "av6-core-v2";
 import { ItemMasterToDto } from "../grn/grn.js";
 
@@ -199,7 +203,10 @@ export type StoreReqValResponse = Prisma.InvStoreRequisitionGetPayload<{
 }>;
 
 export interface StrDetailDTO
-  extends Omit<StoreRequisitionDetails, "itemId" | "createdBy" | "updatedBy"> {
+  extends Omit<
+    StoreRequisitionDetails,
+    "item" | BaseModelAttr | "itemId" | "createdBy" | "updatedBy"
+  > {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
