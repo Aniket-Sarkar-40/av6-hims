@@ -18,10 +18,12 @@ import {
 } from "@/validations/service/grn/grn.service.validation.js";
 import { notifier } from "@/config/core.config.js";
 import { validateIdItemSupplier } from "@/validations/service/master/itemSupplier.service.validation.js";
-import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import { RoundFormat, ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import { pdfTemplateService } from "@apps/core/services/pdf/pdfTemplate.service.js";
 import { resolvePdfTemplate } from "@apps/core/utils/applyTemplate.utils.js";
 import { CustomDocDefinition, renderCustomPdfToBuffer } from "av6-pdf-engine";
+import { settingsService } from "@/services/master/settings.service.js";
+import { applyGrnRateReverseConversion } from "@/utils/rateConversation.utils.js";
 
 export const grnService = {
   async createGrn(input: CreateGrnInput) {
@@ -156,9 +158,13 @@ export const grnService = {
       );
     }
 
+    const settings = await settingsService.getSettings(true);
+    const roundFormat: RoundFormat = settings?.grnRoundedFormat || "TO_FIXED";
+    const precision: number = settings?.grnPrecision || 2;
+
     const filledDef = await resolvePdfTemplate(
       pdfTemplate.bodyJson as unknown as CustomDocDefinition,
-      grnDto
+      applyGrnRateReverseConversion(grnDto, { roundFormat, precision })
     );
     const pdfBuffer = await renderCustomPdfToBuffer(filledDef);
 

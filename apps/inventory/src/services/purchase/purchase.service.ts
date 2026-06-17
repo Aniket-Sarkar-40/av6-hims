@@ -26,9 +26,11 @@ import {
   updatePurchaseOrderStatusServiceValidation,
 } from "@/validations/service/purchase/purchase.service.validation.js";
 import { CustomDocDefinition, renderCustomPdfToBuffer } from "av6-pdf-engine";
-import { PO_STATUS } from "@repo/db/generated/prisma/enums.js";
+import { PO_STATUS, RoundFormat } from "@repo/db/generated/prisma/enums.js";
 import { pdfTemplateService } from "@apps/core/services/pdf/pdfTemplate.service.js";
 import { resolvePdfTemplate } from "@apps/core/utils/applyTemplate.utils.js";
+import { settingsService } from "@/services/master/settings.service.js";
+import { applyPurchaseOrderReverseRateConversion } from "@/utils/rateConversation.utils.js";
 
 export const purchaseService = {
   async createPurchaseOrder(input: CreatePurchaseOrderInput) {
@@ -136,13 +138,6 @@ export const purchaseService = {
     }
     const [purchaseDto] = await toPurchaseOrderPdfDTO([purchase]);
 
-    if (!purchase) {
-      throw new ErrorHandler(
-        404,
-        generateErrorMessage("NOT_FOUND", "Purchase Order")
-      );
-    }
-
     const pdfTemplate = await pdfTemplateService.getPdfTemplateByModuleAndType({
       module: "INVENTORY",
       type: "PURCHASE_ORDER",
@@ -155,11 +150,17 @@ export const purchaseService = {
       );
     }
 
+    const settings = await settingsService.getSettings(true);
+    const roundFormat: RoundFormat = settings?.poRoundedFormat || "TO_FIXED";
+    const precision: number = settings?.poPrecision || 2;
+
     const filledDef = await resolvePdfTemplate(
       pdfTemplate.bodyJson as unknown as CustomDocDefinition,
-      purchaseDto
+      applyPurchaseOrderReverseRateConversion(purchaseDto, {
+        roundFormat,
+        precision,
+      })
     );
-
     const pdfBuffer = await renderCustomPdfToBuffer(filledDef);
 
     return pdfBuffer;

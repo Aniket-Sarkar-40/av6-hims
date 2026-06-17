@@ -1,9 +1,12 @@
-import { CreateGrnInput, GrnDTO } from "@/types/grn/grn.js";
+import { CreateGrnInput, GrnPdfDTO } from "@/types/grn/grn.js";
 import {
   CreateGrnReturnInput,
   GoodReceiveReturnDTO,
 } from "@/types/grn/grnReturn.js";
-import { CreatePurchaseOrderInput } from "@/types/purchase/purchase.js";
+import {
+  CreatePurchaseOrderInput,
+  PurchaseOrderPdfDTO,
+} from "@/types/purchase/purchase.js";
 import { Prisma } from "@repo/db/generated/prisma/client";
 import { DiscMethod, RoundFormat } from "@repo/db/generated/prisma/enums.js";
 import { applyRound } from "av6-utils";
@@ -229,9 +232,9 @@ export const applyGrnReturnRateConversion = (
 };
 
 export const applyGrnRateReverseConversion = (
-  body: GrnDTO,
+  body: GrnPdfDTO,
   roundOptions: RateConversionRoundOptions
-): GrnDTO => {
+): GrnPdfDTO => {
   if (!body.conversionRate) return body;
 
   const conversionRate = Number(body.conversionRate);
@@ -444,6 +447,37 @@ export const applyPurchaseOrderRateConversion = (
       roundOptions
     ),
     totalAmount: convertAmountByRate(
+      Number(detail.totalAmount),
+      conversionRate,
+      roundOptions
+    ),
+  }));
+
+  return body;
+};
+
+export const applyPurchaseOrderReverseRateConversion = (
+  body: PurchaseOrderPdfDTO,
+  roundOptions: RateConversionRoundOptions
+): PurchaseOrderPdfDTO => {
+  if (!body.conversionRate) return body;
+
+  const conversionRate = Number(body.conversionRate);
+
+  body.grandTotal = reverseConvertAmountByRate(
+    Number(body.grandTotal),
+    conversionRate,
+    roundOptions
+  );
+
+  body.purchaseOrderDetails = body.purchaseOrderDetails?.map((detail) => ({
+    ...detail,
+    purchasedPrice: reverseConvertAmountByRate(
+      Number(detail.purchasedPrice),
+      conversionRate,
+      roundOptions
+    ),
+    totalAmount: reverseConvertAmountByRate(
       Number(detail.totalAmount),
       conversionRate,
       roundOptions
