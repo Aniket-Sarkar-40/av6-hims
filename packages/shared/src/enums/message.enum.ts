@@ -71,6 +71,7 @@ export enum ErrorMessageType {
   MUST_GREATER_THEN = "%1 must be greater than %2",
   MUST_BETWEEN = "%1 must be between %2 and %3",
   INVALID_RETURN = "%1 is not a valid return for %2.",
+  REQUIRED_FIELD = "%1 is required field",
 }
 
 export enum ValidationErrorMessage {

@@ -9,6 +9,7 @@ import {
   ItemSupplierCreateInput,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
@@ -83,9 +84,46 @@ export const updateItemSupplierServiceValidation = async (
 ) => {
   logger.info("entering::updateItemSupplier::service::validation");
 
+  const store = requestStorage.getStore();
+  //const isAccounting = !!store?.settings?.isAccounting;
+
   await validateIdItemSupplier(input.id);
+
+  input.isLedgerMappingExists = false;
+
+  // if (isAccounting) {
+  //   try {
+  //     const result = await accountingExternalService.getClientLedgerMapping({
+  //       clientType: "INV_ITEM_SUPPLIER",
+  //       clientId: input.id,
+  //     });
+
+  //     input.isLedgerMappingExists = !!result.data;
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   } catch (error) {
+  //     input.isLedgerMappingExists = false;
+  //   }
+
+  //   if (!input.isLedgerMappingExists && !input.ledgerId) {
+  //     throw new ErrorHandler(
+  //       400,
+  //       generateErrorMessage("REQUIRED_FIELD", "Ledger ID")
+  //     );
+  //   }
+  // } else {
+  //   input.isLedgerMappingExists = false;
+
+  //   if (input.ledgerId) {
+  //     throw new ErrorHandler(
+  //       400,
+  //       generateErrorMessage("INVALID_FIELD", "Ledger ID")
+  //     );
+  //   }
+  // }
+
   if (input.supplierCode) {
     const code = await getItemSupplierBySupplierCodeFromDb(input.supplierCode);
+
     if (code && code.id !== input.id) {
       throw new ErrorHandler(
         400,
@@ -93,15 +131,19 @@ export const updateItemSupplierServiceValidation = async (
       );
     }
   }
+
   const name = await getItemSupplierByNameFromDb(input.vendorCompanyName);
+
   if (name && name.id !== input.id) {
     throw new ErrorHandler(
       400,
       generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name")
     );
   }
+
   if (input.phone) {
     const phone = await getPhoneNumberFromDb(input.phone);
+
     if (phone && phone.id !== input.id) {
       throw new ErrorHandler(
         400,
@@ -109,8 +151,10 @@ export const updateItemSupplierServiceValidation = async (
       );
     }
   }
+
   if (input.email) {
     const email = await getEmailFromDb(input.email);
+
     if (email && email.id !== input.id) {
       throw new ErrorHandler(
         400,
@@ -118,6 +162,7 @@ export const updateItemSupplierServiceValidation = async (
       );
     }
   }
+
   logger.info("exiting::updateItemSupplier::service::validation");
 };
 

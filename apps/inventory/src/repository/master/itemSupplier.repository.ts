@@ -127,7 +127,14 @@ export async function updateItemSupplierInDb(
     | "id"
     | "existingItemSupplier"
     | "ledgerId"
-  >(data, ["taxIdentificationDetails", "bankDetails", "id", "ledgerId"]);
+    | "isLedgerMappingExists"
+  >(data, [
+    "taxIdentificationDetails",
+    "bankDetails",
+    "id",
+    "ledgerId",
+    "isLedgerMappingExists",
+  ]);
   const { taxIdentificationDetails, bankDetails, id, existingItemSupplier } =
     omitteditemSupplier.omitted;
 
@@ -182,8 +189,11 @@ export async function updateItemSupplierInDb(
                     },
                   })),
                 updateMany: toDeleteTid?.map((id) => ({
-                  where: { id: id },
-                  data: { isActive: false, deletedBy: currentUser },
+                  where: { id },
+                  data: {
+                    isActive: false,
+                    deletedBy: currentUser,
+                  },
                 })),
               }
             : undefined,
@@ -215,8 +225,11 @@ export async function updateItemSupplierInDb(
                     },
                   })),
                 updateMany: toDeleteBd?.map((id) => ({
-                  where: { id: id },
-                  data: { isActive: false, deletedBy: currentUser },
+                  where: { id },
+                  data: {
+                    isActive: false,
+                    deletedBy: currentUser,
+                  },
                 })),
               }
             : undefined,
@@ -234,7 +247,7 @@ export async function updateItemSupplierInDb(
           },
         },
       });
-      // if (isAccounting && currentUser) {
+      // if (isAccounting && currentUser && !data.isLedgerMappingExists) {
       //   const result =
       //     await accountingExternalService.createItemSupplierVoucher({
       //       clientId: itemSupplier.id,

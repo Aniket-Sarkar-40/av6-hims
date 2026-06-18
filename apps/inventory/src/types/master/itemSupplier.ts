@@ -15,6 +15,7 @@ export interface ItemSupplierUpdateInput extends ItemSupplierCreateInput {
   id: number;
   existingItemSupplier: ItemSupplierDTO;
   ledgerId?: number;
+  isLedgerMappingExists?: boolean;
 }
 
 export type ItemSupplierResponse = Prisma.InvItemSupplierGetPayload<{
