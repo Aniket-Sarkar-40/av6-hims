@@ -1,5 +1,6 @@
 import { ItemSupplierSearchType } from "@/enums/itemSupplier.enums.js";
 import { commonService } from "@/services/common.service.js";
+import { settingsService } from "@/services/master/settings.service.js";
 import {
   ItemSupplierCreateInput,
   ItemSupplierDTO,
@@ -13,12 +14,17 @@ import {
   InvItemSupplierExcel,
   VendorType,
 } from "@repo/db/generated/prisma/client";
+import { logger } from "@repo/platform/logging/logger.js";
+import { IdValue } from "@repo/shared/types/common.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toItemSupplierDTO = async (
   data: ItemSupplierResponse[]
 ): Promise<ItemSupplierDTO[]> => {
+  const settings = await settingsService.getSettings();
+  const isAccounting = settings?.isAccounting;
+
   const allTaxDetails = await commonService.getAllElements<"TaxDetails">({
     cacheCode: "TAX_DETAILS",
     canNullReturnable: true,
@@ -27,27 +33,53 @@ export const toItemSupplierDTO = async (
     useActiveFlag: true,
   });
 
-  return data.map((itemSupplier) => {
-    const omittedItemSupplier = customOmit<
-      ItemSupplierResponse,
-      BaseModelAttrWoCancel | "taxDetailsId"
-    >(itemSupplier, [
-      "createdBy",
-      "updatedBy",
-      "deletedBy",
-      "createdAt",
-      "updatedAt",
-      "deletedAt",
-      "taxDetailsId",
-    ]);
+  return Promise.all(
+    data.map(async (itemSupplier) => {
+      const omittedItemSupplier = customOmit<
+        ItemSupplierResponse,
+        BaseModelAttrWoCancel | "taxDetailsId"
+      >(itemSupplier, [
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "taxDetailsId",
+      ]);
 
-    const taxDetails =
-      allTaxDetails.find((tax) => tax.id === itemSupplier.taxDetailsId) ?? null;
-    return {
-      ...omittedItemSupplier.rest,
-      taxDetails: toIdValue(taxDetails, "name"),
-    };
-  });
+      const taxDetails =
+        allTaxDetails.find((tax) => tax.id === itemSupplier.taxDetailsId) ??
+        null;
+
+      let ledgerValue: IdValue | null = null;
+
+      // if (isAccounting) {
+      //   try {
+      //     const result = await accountingExternalService.getClientLedgerMapping(
+      //       {
+      //         clientType: "INV_ITEM_SUPPLIER",
+      //         clientId: itemSupplier.id,
+      //       }
+      //     );
+
+      //     ledgerValue = result.data?.ledger ?? null;
+      //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      //   } catch (error) {
+      //     logger.info(
+      //       `Client ledger mapping not found for item supplier id: ${itemSupplier.id}`
+      //     );
+      //     ledgerValue = null;
+      //   }
+      // }
+
+      return {
+        ...omittedItemSupplier.rest,
+        taxDetails: toIdValue(taxDetails, "name"),
+        ledger: ledgerValue,
+      };
+    })
+  );
 };
 
 const getString = (value: unknown): string | null => {

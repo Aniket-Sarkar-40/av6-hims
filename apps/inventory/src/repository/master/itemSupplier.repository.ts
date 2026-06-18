@@ -3,6 +3,7 @@ import { initializeCache } from "@/config/redisClient.js";
 import { ItemSupplierSearchType } from "@/enums/itemSupplier.enums.js";
 import { mapExcelRowToItemSupplierReq } from "@/mapper/master/itemSupplier.mapper.js";
 import { createBatchJobInDb } from "@/repository/batch/batch.repository.js";
+import { settingsService } from "@/services/master/settings.service.js";
 import {
   ItemSupplierBatchJobInput,
   ItemSupplierCreateInput,
@@ -27,44 +28,49 @@ export async function createItemSupplierInDb(
   data: ItemSupplierCreateInput
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::createItemSupplierInDb::repository");
-
+  //const settings = await settingsService.getSettings();
+  //const isAccounting = settings?.isAccounting;
   const store = requestStorage.getStore();
 
-  const {
-    taxIdentificationDetails,
-    bankDetails,
-    supplierCode: inputSupplierCode,
-    ...supplierData
-  } = data;
+  const omittedItemSupplier = customOmit<
+    ItemSupplierCreateInput,
+    "taxIdentificationDetails" | "bankDetails" | "ledgerId"
+  >(data, ["taxIdentificationDetails", "bankDetails", "ledgerId"]);
 
   const supplierCode =
-    inputSupplierCode?.trim() ||
+    omittedItemSupplier.rest.supplierCode?.trim() ||
     (await uinServiceFactory.generateUIN(InvUinShortCode.VENDOR));
+  //const currentUser = store?.user?.id;
 
   return await db.$transaction(
     async (tx) => {
       const itemSupplier = await tx.invItemSupplier.create({
         data: {
-          ...supplierData,
+          ...omittedItemSupplier.rest,
           supplierCode,
           createdBy: store?.user?.id,
 
           taxIdentificationDetails:
-            taxIdentificationDetails && taxIdentificationDetails.length > 0
+            omittedItemSupplier.omitted.taxIdentificationDetails &&
+            omittedItemSupplier.omitted.taxIdentificationDetails.length > 0
               ? {
-                  create: taxIdentificationDetails.map((tid) => ({
-                    taxIdentificationName: tid.taxIdentificationName,
-                    taxIdentificationValue: tid.taxIdentificationValue,
-                    taxIdentificationNumber: tid.taxIdentificationNumber,
-                    createdBy: store?.user?.id,
-                  })),
+                  create:
+                    omittedItemSupplier.omitted.taxIdentificationDetails.map(
+                      (tid) => ({
+                        taxIdentificationName: tid.taxIdentificationName,
+                        taxIdentificationValue: tid.taxIdentificationValue,
+                        taxIdentificationNumber: tid.taxIdentificationNumber,
+                        createdBy: store?.user?.id,
+                      })
+                    ),
                 }
               : undefined,
 
           bankDetails:
-            bankDetails && bankDetails.length > 0
+            omittedItemSupplier.omitted.bankDetails &&
+            omittedItemSupplier.omitted.bankDetails.length > 0
               ? {
-                  create: bankDetails.map((bd) => ({
+                  create: omittedItemSupplier.omitted.bankDetails.map((bd) => ({
                     accountNo: bd.accountNo,
                     accountHolderName: bd.accountHolderName ?? undefined,
                     typeOfAccount: bd.typeOfAccount ?? undefined,
@@ -82,6 +88,20 @@ export async function createItemSupplierInDb(
         },
       });
 
+      // if (isAccounting && currentUser) {
+      //   const result =
+      //     await accountingExternalService.createItemSupplierVoucher({
+      //       clientId: itemSupplier.id,
+      //       clientType: "INV_ITEM_SUPPLIER",
+      //       mappingStatus: data.ledgerId ? "CREATED" : "CREATE",
+      //       ledgerId: data.ledgerId ?? null,
+      //       createdBy: currentUser,
+      //     });
+      //   if (!result.success) {
+      //     throw new ErrorHandler(result.status, result.message);
+      //   }
+      // }
+
       logger.info("exiting::createItemSupplierInDb::repository");
 
       return itemSupplier;
@@ -96,11 +116,18 @@ export async function updateItemSupplierInDb(
   data: ItemSupplierUpdateInput
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::updateItemSupplierInDb::repository");
+  //const settings = await settingsService.getSettings();
+  //const isAccounting = settings?.isAccounting;
   const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
   const omitteditemSupplier = customOmit<
     ItemSupplierUpdateInput,
-    "taxIdentificationDetails" | "bankDetails" | "id" | "existingItemSupplier"
-  >(data, ["taxIdentificationDetails", "bankDetails", "id"]);
+    | "taxIdentificationDetails"
+    | "bankDetails"
+    | "id"
+    | "existingItemSupplier"
+    | "ledgerId"
+  >(data, ["taxIdentificationDetails", "bankDetails", "id", "ledgerId"]);
   const { taxIdentificationDetails, bankDetails, id, existingItemSupplier } =
     omitteditemSupplier.omitted;
 
@@ -132,7 +159,7 @@ export async function updateItemSupplierInDb(
         },
         data: {
           ...omitteditemSupplier.rest,
-          updatedBy: store?.user?.id,
+          updatedBy: currentUser,
           taxIdentificationDetails: taxIdentificationDetails
             ? {
                 create: taxIdentificationDetails
@@ -141,7 +168,7 @@ export async function updateItemSupplierInDb(
                     taxIdentificationName: d.taxIdentificationName,
                     taxIdentificationValue: d.taxIdentificationValue,
                     taxIdentificationNumber: d.taxIdentificationNumber,
-                    createdBy: store?.user?.id,
+                    createdBy: currentUser,
                   })),
                 update: taxIdentificationDetails
                   .filter((d) => typeof d.id === "number")
@@ -151,12 +178,12 @@ export async function updateItemSupplierInDb(
                       taxIdentificationName: d.taxIdentificationName,
                       taxIdentificationValue: d.taxIdentificationValue,
                       taxIdentificationNumber: d.taxIdentificationNumber,
-                      updatedBy: store?.user?.id,
+                      updatedBy: currentUser,
                     },
                   })),
                 updateMany: toDeleteTid?.map((id) => ({
                   where: { id: id },
-                  data: { isActive: false, deletedBy: store?.user?.id },
+                  data: { isActive: false, deletedBy: currentUser },
                 })),
               }
             : undefined,
@@ -171,7 +198,7 @@ export async function updateItemSupplierInDb(
                     ifscCode: bd.ifscCode,
                     bankName: bd.bankName,
                     bankAddress: bd.bankAddress ?? undefined,
-                    createdBy: store?.user?.id,
+                    createdBy: currentUser,
                   })),
                 update: bankDetails
                   .filter((d) => typeof d.id === "number")
@@ -184,12 +211,12 @@ export async function updateItemSupplierInDb(
                       ifscCode: bd.ifscCode,
                       bankName: bd.bankName,
                       bankAddress: bd.bankAddress ?? undefined,
-                      updatedBy: store?.user?.id,
+                      updatedBy: currentUser,
                     },
                   })),
                 updateMany: toDeleteBd?.map((id) => ({
                   where: { id: id },
-                  data: { isActive: false, deletedBy: store?.user?.id },
+                  data: { isActive: false, deletedBy: currentUser },
                 })),
               }
             : undefined,
@@ -207,6 +234,19 @@ export async function updateItemSupplierInDb(
           },
         },
       });
+      // if (isAccounting && currentUser) {
+      //   const result =
+      //     await accountingExternalService.createItemSupplierVoucher({
+      //       clientId: itemSupplier.id,
+      //       clientType: "INV_ITEM_SUPPLIER",
+      //       mappingStatus: data.ledgerId ? "CREATED" : "CREATE",
+      //       ledgerId: data.ledgerId ?? null,
+      //       createdBy: currentUser,
+      //     });
+      //   if (!result.success) {
+      //     throw new ErrorHandler(result.status, result.message);
+      //   }
+      // }
       logger.info("exiting::updateItemSupplierInDb::repository");
       return itemSupplier;
     },

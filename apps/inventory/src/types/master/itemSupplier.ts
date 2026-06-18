@@ -8,11 +8,13 @@ export type ItemSupplierCreateInput = Omit<
 > & {
   taxIdentificationDetails?: Prisma.TaxIdentificationDetailsUncheckedCreateInput[];
   bankDetails?: Prisma.BankDetailsUncheckedCreateInput[];
+  ledgerId?: number;
 };
 
 export interface ItemSupplierUpdateInput extends ItemSupplierCreateInput {
   id: number;
   existingItemSupplier: ItemSupplierDTO;
+  ledgerId?: number;
 }
 
 export type ItemSupplierResponse = Prisma.InvItemSupplierGetPayload<{
