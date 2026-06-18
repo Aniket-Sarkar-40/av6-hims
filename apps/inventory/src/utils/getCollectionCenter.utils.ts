@@ -11,7 +11,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { settingsService } from "@/services/master/settings.service.js";
 export const getBranchOrWarehouse = async (
-  ccId: number,
+  ccId: number
 ): Promise<BranchDTO | WarehouseDTO | null> => {
   const branch = await branchService.getBranchById(ccId, true);
   const warehouse = await warehouseService.getWarehouseById(ccId, true);
@@ -30,7 +30,7 @@ export const validateBranchOrWarehouse = async (ccId: number) => {
     if (!cc) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Collection Center"),
+        generateErrorMessage("NOT_FOUND", "Collection Center")
       );
     }
   }
@@ -74,15 +74,53 @@ export async function getBranchAndWarehouseByCcIds(ccIds: number | number[]) {
   return result;
 }
 
-// export const validateBranchOrWarehouse = async (ccId: number) => {
-//   const wareHouseMode = requestStorage.getStore()?.settings?.warehouseMode;
-//   if (wareHouseMode) {
-//     const warehouse = await warehouseService.getWarehouseById(ccId, true);
-//     if (!warehouse) throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Warehouse"));
-//   } else {
-//     const branch = await branchService.getBranchById(ccId, true);
-//     if (!branch) {
-//       throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Branch"));
-//     }
-//   }
-// };
+export type ItemStockLocationType = "BRANCH" | "WAREHOUSE" | "UNKNOWN";
+
+export type ItemStockLocationFlags = {
+  isBranchLocation: boolean;
+  isWarehouseLocation: boolean;
+  locationType: ItemStockLocationType;
+};
+
+/** Warehouse mode: branch id wins if present in branch table, otherwise warehouse. Non-warehouse mode: branch only. */
+export const resolveItemStockLocationFlags = (
+  warehouseMode: boolean,
+  branch: { id: number } | null,
+  warehouse: { id: number } | null
+): ItemStockLocationFlags => {
+  if (warehouseMode) {
+    if (branch) {
+      return {
+        isBranchLocation: true,
+        isWarehouseLocation: false,
+        locationType: "BRANCH",
+      };
+    }
+    if (warehouse) {
+      return {
+        isBranchLocation: false,
+        isWarehouseLocation: true,
+        locationType: "WAREHOUSE",
+      };
+    }
+    return {
+      isBranchLocation: false,
+      isWarehouseLocation: false,
+      locationType: "UNKNOWN",
+    };
+  }
+
+  if (branch) {
+    return {
+      isBranchLocation: true,
+      isWarehouseLocation: false,
+      locationType: "BRANCH",
+    };
+  }
+
+  return {
+    isBranchLocation: false,
+    isWarehouseLocation: false,
+    locationType: "UNKNOWN",
+  };
+};

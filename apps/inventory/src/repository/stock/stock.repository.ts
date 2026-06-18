@@ -22,6 +22,7 @@ import { ItemStockByBatchInput } from "../../types/stock/stock.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { serializeBigInt } from "@repo/shared/utils/bigInt.utils.js";
 import { customOmit } from "av6-core-v2";
+import { resolveItemStockLocationFlags } from "@/utils/getCollectionCenter.utils.js";
 
 type Tx = Prisma.TransactionClient;
 
@@ -728,13 +729,8 @@ export const itemStock = async (
   });
 
   const warehouseMode = Boolean(settings?.warehouseMode);
-  const isWarehouseLocation = warehouseMode ? Boolean(warehouse) : false;
-  const isBranchLocation = !isWarehouseLocation && Boolean(branch);
-  const locationType = isWarehouseLocation
-    ? "WAREHOUSE"
-    : isBranchLocation
-    ? "BRANCH"
-    : "BRANCH";
+  const { isWarehouseLocation, isBranchLocation, locationType } =
+    resolveItemStockLocationFlags(warehouseMode, branch, warehouse);
 
   const rawRows = await db.$queryRaw<ItemStockReportRawRow[]>`
     SELECT
@@ -766,8 +762,9 @@ export const itemStock = async (
       ${userId} AS userId,
       ${locationType} AS locationType,
       CASE
+        WHEN ${isBranchLocation} = true THEN b.name
         WHEN ${isWarehouseLocation} = true THEN w.name
-        ELSE b.name
+        ELSE NULL
       END AS locationName,
 
       /* ---------------- Batch ---------------- */

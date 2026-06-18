@@ -20,6 +20,7 @@ import {
   ItemBatchStockCacheDTO,
   ItemBatchStockDTO,
   ItemBatchStockLookupInput,
+  ItemStockExcelExportFilter,
   ItemStockPaginatedDTO,
   ItemStockSearchFilter,
 } from "@/types/stock/stock.js";
@@ -96,24 +97,28 @@ export const itemStockService = {
   },
 
   async itemStockExcelExport(
-    input: ItemStockSearchFilter
+    input: ItemStockExcelExportFilter
   ): Promise<ExcelJs.Workbook> {
     logger.info("entering::itemStockExcelExport::service");
 
-    const { data: stocks, totalRecords } = await this.getAllItemStock({
+    const firstPage = await this.getAllItemStock({
       ...input,
       pageNo: 1,
-      pageSize: ITEM_STOCK_EXCEL_PAGE_SIZE,
+      pageSize: 1,
+    });
+
+    if (!firstPage.totalRecords) {
+      throw new ErrorHandler(404, generateErrorMessage("EXCEL"));
+    }
+
+    const { data: stocks } = await this.getAllItemStock({
+      ...input,
+      pageNo: 1,
+      pageSize: firstPage.totalRecords,
     });
 
     if (!stocks.length) {
       throw new ErrorHandler(404, generateErrorMessage("EXCEL"));
-    }
-
-    if (totalRecords > stocks.length) {
-      logger.info(
-        `itemStockExcelExport truncated: exported ${stocks.length} of ${totalRecords} item rows (increase page size if needed)`
-      );
     }
 
     const excelRows = toItemStockExcelRows(stocks);

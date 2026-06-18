@@ -5,6 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { Request, Response } from "express";
 import {
   ItemBatchStockLookupInput,
+  ItemStockExcelExportFilter,
   ItemStockSearchFilter,
 } from "@/types/stock/stock.js";
 
@@ -39,7 +40,7 @@ export const getItemStock = TryCatch(async (req: Request, res: Response) => {
 export const exportItemStockExcel = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::exportItemStockExcel::controller");
-    const input = req.body as ItemStockSearchFilter;
+    const input = req.body as ItemStockExcelExportFilter;
     const workbook = await itemStockService.itemStockExcelExport(input);
 
     res.setHeader(

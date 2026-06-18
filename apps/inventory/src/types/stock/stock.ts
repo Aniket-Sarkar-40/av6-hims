@@ -283,3 +283,8 @@ export type ItemStockExcelRow = Omit<
   isFoc: string;
   batchQty: number;
 };
+
+export type ItemStockExcelExportFilter = Omit<
+  ItemStockSearchFilter,
+  "pageNo" | "pageSize"
+>;

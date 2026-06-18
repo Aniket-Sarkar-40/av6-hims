@@ -4,7 +4,10 @@ import {
   getItemStock,
   getItemStockSummary,
 } from "@/controllers/stock/itemStock.controller.js";
-import { validateItemStockSearch } from "@/validations/request/stock/itemStock.validation.js";
+import {
+  validateItemStockExcelExport,
+  validateItemStockSearch,
+} from "@/validations/request/stock/itemStock.validation.js";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
@@ -85,7 +88,7 @@ itemStockRouter.post(
   "/export-excel",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
-  validateItemStockSearch,
+  validateItemStockExcelExport,
   exportItemStockExcel
 );
 
