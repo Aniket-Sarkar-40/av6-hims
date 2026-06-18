@@ -137,7 +137,7 @@ export interface BranchRequisitionReturnDetailDTO
   availableQtyToReturn: number | null;
   physicalInTransitQty: number | null;
   refInTransitQtyToAcknowledge: number | null;
-  inTransitQtyToAcknowledge: number | null;
+  inTransitStock: number | null;
 }
 
 export interface BranchRequisitionReturnDTO

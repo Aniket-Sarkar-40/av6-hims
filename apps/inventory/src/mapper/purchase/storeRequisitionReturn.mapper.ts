@@ -162,7 +162,7 @@ export const toStoreRequisitionReturnDTO = async (
           availableQtyToReturn,
           physicalInTransitQty,
           refInTransitQtyToAcknowledge,
-          inTransitQtyToAcknowledge,
+          inTransitStock: inTransitQtyToAcknowledge,
         };
       })
     )

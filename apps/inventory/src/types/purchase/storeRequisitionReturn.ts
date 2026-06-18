@@ -119,7 +119,7 @@ export interface StoreRequisitionReturnDetailDTO
 
   physicalInTransitQty: number | null;
   refInTransitQtyToAcknowledge: number | null;
-  inTransitQtyToAcknowledge: number | null;
+  inTransitStock: number | null;
 
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;

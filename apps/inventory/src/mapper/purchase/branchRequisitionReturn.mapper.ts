@@ -172,7 +172,7 @@ export const toBranchRequisitionReturnDTO = async (
           availableQtyToReturn,
           physicalInTransitQty,
           refInTransitQtyToAcknowledge,
-          inTransitQtyToAcknowledge,
+          inTransitStock: inTransitQtyToAcknowledge,
         };
       })
     )
