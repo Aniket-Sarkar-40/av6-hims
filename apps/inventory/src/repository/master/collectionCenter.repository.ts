@@ -15,7 +15,7 @@ export const getStaffCollectionCenterFromDb = async (
 ): Promise<StaffCollectionCenter | null> => {
   logger.info(`entering::getStaffCollectionCenterFromDb::repository`);
   const staffCollectionCenter = await db.staffCollectionCenter.findFirst({
-    where: { staffId, collectionCenterId: ccId },
+    where: { staffId, collectionCenterId: ccId, isActive: "true" },
   });
   logger.info(`exiting::getStaffCollectionCenterFromDb::repository`);
   return staffCollectionCenter;

@@ -1,5 +1,3 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
 import {
   AcknowledgeRequisition,
   ApproveStoreReqInput,
@@ -12,25 +10,26 @@ import {
   StoreReqValResponse,
   ValStoreRequisitionResponse,
 } from "@/types/purchase/storeRequisition.js";
+import { db } from "@repo/db/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
 
-import { logger } from "@repo/platform/logging/logger.js";
-import {
-  RequisitionInvItemDetails,
-  InvUinShortCode,
-  StaffCollectionCenter,
-} from "@repo/db/generated/prisma/client";
-import {
-  addItemStock,
-  subItemStock,
-} from "@/repository/stock/stock.repository.js";
-import { customOmit } from "av6-utils";
-import { API_TIMEOUT } from "@repo/shared/config/index.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   addInTransitStock,
   subInTransitStock,
 } from "@/repository/inTransitStock/inTransitStock.repository.js";
+import {
+  addItemStock,
+  subItemStock,
+} from "@/repository/stock/stock.repository.js";
 import { eventEmailService } from "@/services/master/emailConfig.service.js";
+import {
+  InvUinShortCode,
+  RequisitionInvItemDetails,
+} from "@repo/db/generated/prisma/client";
+import { logger } from "@repo/platform/logging/logger.js";
+import { API_TIMEOUT } from "@repo/shared/config/index.js";
+import { customOmit } from "av6-utils";
 
 export const createStoreRequisitionInDb = async (
   input: CreateStoreRequisitionInput
@@ -658,16 +657,4 @@ export const valStoreRequisitionFromDb = async (
     `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
   );
   return storeReq;
-};
-
-export const getStaffCollectionCenterFromDb = async (
-  staffId: number,
-  ccId: number
-): Promise<StaffCollectionCenter | null> => {
-  logger.info(`entering::getStaffCollectionCenterFromDb::repository`);
-  const staffCollectionCenter = await db.staffCollectionCenter.findFirst({
-    where: { staffId, collectionCenterId: ccId },
-  });
-  logger.info(`exiting::getStaffCollectionCenterFromDb::repository`);
-  return staffCollectionCenter;
 };

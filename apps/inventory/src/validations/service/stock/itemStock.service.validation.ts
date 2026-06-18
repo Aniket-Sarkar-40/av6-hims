@@ -1,6 +1,6 @@
 import { ItemStockSearchFilter } from "@/types/stock/stock.js";
 import { validateBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
-import { validateStaffCollectionCenter } from "@/validations/service/purchase/storeRequisition.service.validation.js";
+import { validateStaffCollectionCenter } from "@/validations/service/master/collectionCenter.service.validation.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 

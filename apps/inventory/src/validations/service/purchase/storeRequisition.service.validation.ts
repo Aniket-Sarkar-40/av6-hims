@@ -1,9 +1,9 @@
 import { getCountItemsFromDb } from "@/repository/master/itemMaster.repository.js";
 import {
   getRequisitionItemDetailsFromDb,
-  getStaffCollectionCenterFromDb,
   validateStoreRequisitionByIdFromDb,
 } from "@/repository/purchase/storeRequisition.repository.js";
+import { getApprovedPendingSRRFromSRId } from "@/repository/purchase/storeRequisitionReturn.repository.js";
 import { getStockById } from "@/repository/stock/stock.repository.js";
 import {
   AcknowledgeRequisition,
@@ -12,35 +12,15 @@ import {
   RejectStoreRequisitionInput,
   StoreRequisitionDetailInput,
 } from "@/types/purchase/storeRequisition.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { validateBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { validIdCheck } from "@repo/platform/validation/global.validation.js";
-import { STORE_REQ_STATUS } from "@repo/db/generated/prisma/client";
-import dayjs from "dayjs";
-import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { validateIdBranch } from "@/validations/service/master/branch.service.validation.js";
-import { getApprovedPendingSRRFromSRId } from "@/repository/purchase/storeRequisitionReturn.repository.js";
-
-export const validateStaffCollectionCenter = async (
-  staffId: number,
-  ccId: number
-) => {
-  logger.info("entering::validateStaffCollectionCenter::service::validation");
-  const staffCollectionCenter = await getStaffCollectionCenterFromDb(
-    staffId,
-    ccId
-  );
-  if (!staffCollectionCenter) {
-    throw new ErrorHandler(
-      404,
-      generateErrorMessage("NOT_FOUND", "Staff Collection Center Mapping")
-    );
-  }
-  logger.info("exiting::validateStaffCollectionCenter::service::validation");
-  return staffCollectionCenter;
-};
+import { validateStaffCollectionCenter } from "@/validations/service/master/collectionCenter.service.validation.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { STORE_REQ_STATUS } from "@repo/db/generated/prisma/client";
+import { logger } from "@repo/platform/logging/logger.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import dayjs from "dayjs";
 
 export const validateIdStoreRequisition = async (id: number) => {
   logger.info("entering::validateIdStoreRequisition service::validation");
