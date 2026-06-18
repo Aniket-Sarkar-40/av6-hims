@@ -106,7 +106,7 @@ export const toPurchaseOrderDTO = async (
         warehouse: toIdValue(warehouse, "name"),
         branch: toIdValue(branch, "name"),
         location,
-        currency: toIdValue(currency, "name"),
+        currency: toIdValue(currency, "code"),
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),
         purchaseOrderDetails: detailDTO,
