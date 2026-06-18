@@ -6,6 +6,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { Request, Response } from "express";
 import { Workbook } from "exceljs";
 import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { ItemSupplierLookupInput } from "@/types/master/itemSupplier.js";
 
 export const createItemSupplier = TryCatch(
   async (req: Request, res: Response) => {
@@ -33,6 +34,20 @@ export const updateItemSupplier = TryCatch(
     logger.info("exiting::updateItemSupplier::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedItemSupplier },
+      "Item Supplier"
+    );
+    return res.status(200).json(response);
+  }
+);
+
+export const searchItemSupplier = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::searchItemSupplier::controller");
+    const input = req.body as ItemSupplierLookupInput;
+    const itemSuppliers = await itemSupplierService.searchItemSupplier(input);
+    logger.info("exiting::searchItemSupplier::controller");
+    const response = BaseResponse.success(
+      { type: "FETCHED", data: itemSuppliers },
       "Item Supplier"
     );
     return res.status(200).json(response);

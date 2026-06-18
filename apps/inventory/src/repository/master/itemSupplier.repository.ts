@@ -1,10 +1,12 @@
 import { uinServiceFactory } from "@/config/core.config.js";
 import { initializeCache } from "@/config/redisClient.js";
+import { ItemSupplierSearchType } from "@/enums/itemSupplier.enums.js";
 import { mapExcelRowToItemSupplierReq } from "@/mapper/master/itemSupplier.mapper.js";
 import { createBatchJobInDb } from "@/repository/batch/batch.repository.js";
 import {
   ItemSupplierBatchJobInput,
   ItemSupplierCreateInput,
+  ItemSupplierLookupRow,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
@@ -590,4 +592,64 @@ export async function ItemSupplierBatchJob(input: ItemSupplierBatchJobInput) {
   }
 
   await initializeCache();
+}
+
+export async function searchItemSuppliersFromDb(
+  type: ItemSupplierSearchType,
+  searchText: string
+): Promise<ItemSupplierLookupRow[]> {
+  logger.info("entering::searchItemSuppliersFromDb::repository");
+
+  const search = searchText.trim();
+
+  if (!search) {
+    logger.info("exiting::searchItemSuppliersFromDb::repository");
+    return [];
+  }
+
+  const containsFilter = { contains: search };
+
+  const where: Prisma.InvItemSupplierWhereInput = {
+    isActive: true,
+    deletedAt: null,
+  };
+
+  switch (type) {
+    case ItemSupplierSearchType.CODE:
+      where.supplierCode = containsFilter;
+      break;
+
+    case ItemSupplierSearchType.NAME:
+      where.vendorCompanyName = containsFilter;
+      break;
+
+    case ItemSupplierSearchType.EMAIL:
+      where.email = containsFilter;
+      break;
+
+    case ItemSupplierSearchType.PHONE:
+      where.phone = containsFilter;
+      break;
+
+    default:
+      logger.info("exiting::searchItemSuppliersFromDb::repository");
+      return [];
+  }
+
+  const itemSuppliers = await db.invItemSupplier.findMany({
+    where,
+    select: {
+      id: true,
+      supplierCode: true,
+      vendorCompanyName: true,
+      email: true,
+      phone: true,
+    },
+    orderBy: {
+      vendorCompanyName: "asc",
+    },
+  });
+
+  logger.info("exiting::searchItemSuppliersFromDb::repository");
+  return itemSuppliers;
 }

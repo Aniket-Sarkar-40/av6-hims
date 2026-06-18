@@ -2,6 +2,7 @@ import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import {
   mapRowToItemSupplierExcelCreateInput,
   toItemSupplierDTO,
+  toItemSupplierLookupDTO,
 } from "@/mapper/master/itemSupplier.mapper.js";
 import {
   createItemSupplierExcelInDb,
@@ -10,6 +11,7 @@ import {
   getAllItemSupplierFromDb,
   getItemSupplierByIdFromDb,
   ItemSupplierBatchJob,
+  searchItemSuppliersFromDb,
   updateItemSupplierInDb,
 } from "@/repository/master/itemSupplier.repository.js";
 import {
@@ -17,6 +19,8 @@ import {
   ItemSupplierDTO,
   ItemSupplierExcelImportReq,
   ItemSupplierExcelRow,
+  ItemSupplierLookupDTO,
+  ItemSupplierLookupInput,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
@@ -91,6 +95,34 @@ export const itemSupplierService = {
     logger.info("exiting::updateItemSupplier::service");
 
     return response;
+  },
+
+  async searchItemSupplier(
+    input: ItemSupplierLookupInput
+  ): Promise<ItemSupplierLookupDTO[]> {
+    logger.info("entering::searchItemSupplier::service");
+
+    const searchText = input.searchText.trim();
+
+    if (!searchText) {
+      logger.info("exiting::searchItemSupplier::service");
+      return [];
+    }
+
+    const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
+
+    const itemSuppliers = isCacheable
+      ? ((await getAllCache(cacheKey)) as ItemSupplierResponse[]) ?? []
+      : await searchItemSuppliersFromDb(input.type, searchText);
+
+    const result = toItemSupplierLookupDTO(
+      itemSuppliers,
+      input.type,
+      searchText
+    );
+
+    logger.info("exiting::searchItemSupplier::service");
+    return result;
   },
   async getAllItemSupplier(
     canNullReturnable: boolean = false

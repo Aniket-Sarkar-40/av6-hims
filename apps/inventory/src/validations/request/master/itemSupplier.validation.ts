@@ -1,3 +1,5 @@
+import { ItemSupplierSearchType } from "@/enums/itemSupplier.enums.js";
+import { ItemSupplierLookupInput } from "@/types/master/itemSupplier.js";
 import { VendorType } from "@repo/db/generated/prisma/client";
 import {
   arrayOptional,
@@ -5,6 +7,7 @@ import {
   boolRequired,
   emailOptional,
   enumOptional,
+  enumRequired,
   idOptional,
   idRequired,
   phoneOptional,
@@ -77,4 +80,13 @@ export const itemSupplierUpdateSchema = itemSupplierCreateSchema.keys({
 
 export const validateUpdateItemSupplier = validationHandler({
   schema: itemSupplierUpdateSchema,
+});
+
+export const itemSupplierLookupSchema = Joi.object<ItemSupplierLookupInput>({
+  type: enumRequired("Type", ItemSupplierSearchType),
+  searchText: strRequired("Search text", 1),
+});
+
+export const validateItemSupplierLookup = validationHandler({
+  schema: itemSupplierLookupSchema,
 });

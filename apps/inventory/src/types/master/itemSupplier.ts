@@ -1,3 +1,4 @@
+import { ItemSupplierSearchType } from "@/enums/itemSupplier.enums.js";
 import { Prisma } from "@repo/db/generated/prisma/client";
 import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
 
@@ -74,4 +75,24 @@ export interface ItemSupplierExcelRow {
   "Is Return Whatsapp"?: unknown;
   "Is Return Email"?: unknown;
   "Is Return SMS"?: unknown;
+}
+
+export interface ItemSupplierLookupInput {
+  type: ItemSupplierSearchType;
+  searchText: string;
+}
+
+export interface ItemSupplierLookupRow {
+  id: number;
+  supplierCode?: string | null;
+  vendorCompanyName: string;
+  email?: string | null;
+  phone?: string | null;
+}
+
+export interface ItemSupplierLookupDTO {
+  id: number;
+  vendorName: string;
+  type: ItemSupplierSearchType;
+  result: string;
 }

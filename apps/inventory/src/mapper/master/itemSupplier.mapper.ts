@@ -1,8 +1,11 @@
+import { ItemSupplierSearchType } from "@/enums/itemSupplier.enums.js";
 import { commonService } from "@/services/common.service.js";
 import {
   ItemSupplierCreateInput,
   ItemSupplierDTO,
   ItemSupplierExcelRow,
+  ItemSupplierLookupDTO,
+  ItemSupplierLookupRow,
   ItemSupplierResponse,
 } from "@/types/master/itemSupplier.js";
 import { ItemSupplierExcelStagingRow } from "@/validations/request/master/itemSupplierExcel.validation.js";
@@ -185,4 +188,52 @@ export const mapExcelRowToItemSupplierReq = (
         ]
       : undefined,
   };
+};
+
+export const toItemSupplierLookupDTO = (
+  data: ItemSupplierLookupRow[] | ItemSupplierResponse[],
+  type: ItemSupplierSearchType,
+  searchText: string
+): ItemSupplierLookupDTO[] => {
+  const search = searchText.trim().toLowerCase();
+
+  if (!search) return [];
+
+  return data.reduce<ItemSupplierLookupDTO[]>((result, supplier) => {
+    let value: string | null | undefined;
+
+    switch (type) {
+      case ItemSupplierSearchType.CODE:
+        value = supplier.supplierCode;
+        break;
+
+      case ItemSupplierSearchType.NAME:
+        value = supplier.vendorCompanyName;
+        break;
+
+      case ItemSupplierSearchType.EMAIL:
+        value = supplier.email;
+        break;
+
+      case ItemSupplierSearchType.PHONE:
+        value = supplier.phone;
+        break;
+
+      default:
+        value = null;
+    }
+
+    if (!value || !value.toLowerCase().includes(search)) {
+      return result;
+    }
+
+    result.push({
+      id: supplier.id,
+      vendorName: supplier.vendorCompanyName,
+      type,
+      result: value,
+    });
+
+    return result;
+  }, []);
 };

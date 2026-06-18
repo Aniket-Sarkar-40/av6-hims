@@ -5,6 +5,7 @@ import {
   getItemSupplierById,
   itemSupplierExcelImport,
   itemSupplierExcelSampleExport,
+  searchItemSupplier,
   updateItemSupplier,
 } from "@/controllers/master/itemSupplier.controller.js";
 import {
@@ -14,6 +15,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import {
   validateCreateItemSupplier,
+  validateItemSupplierLookup,
   validateUpdateItemSupplier,
 } from "@/validations/request/master/itemSupplier.validation.js";
 
@@ -164,4 +166,36 @@ itemSupplierRouter.post(
   uploadToHetzner("excel"),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "CREATE")),
   itemSupplierExcelImport
+);
+
+/**
+ * @swagger
+ * /api/v1/master/item-supplier/search:
+ *   post:
+ *     summary: Search item suppliers by code, name, email, or phone
+ *     tags: [Item Supplier]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - type
+ *               - searchText
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 enum: [CODE, NAME, EMAIL, PHONE]
+ *               searchText:
+ *                 type: string
+ */
+itemSupplierRouter.post(
+  "/search",
+  verifyToken(ServiceCode.INVENTORY),
+  authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
+  validateItemSupplierLookup,
+  searchItemSupplier
 );
