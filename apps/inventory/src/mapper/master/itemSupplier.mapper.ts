@@ -191,7 +191,7 @@ export const mapExcelRowToItemSupplierReq = (
 };
 
 export const toItemSupplierLookupDTO = (
-  data: ItemSupplierLookupRow[] | ItemSupplierResponse[],
+  data: ItemSupplierLookupRow[],
   type: ItemSupplierSearchType,
   searchText: string
 ): ItemSupplierLookupDTO[] => {
