@@ -4,6 +4,7 @@ import {
   getItemStock,
   getItemStockSummary,
 } from "@/controllers/stock/itemStock.controller.js";
+import { validateItemStockSearch } from "@/validations/request/stock/itemStock.validation.js";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
@@ -44,9 +45,9 @@ itemStockRouter.post(
 );
 /**
  * @swagger
- * /api/v1/master/item-Stock:
+ * /api/v1/master/item-Stock/search:
  *   post:
- *     summary: Create a new Item Stock
+ *     summary: get Item Stock
  *     tags: [Item Stock]
  *     security:
  *       - bearerAuth: []
@@ -58,12 +59,12 @@ itemStockRouter.post(
  *             $ref: '#/components/itemStockSchema'
  */
 itemStockRouter.post(
-  "/",
+  "/search",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
+  validateItemStockSearch,
   getItemStock
 );
-
 /**
  * @swagger
  * /api/v1/master/item-Stock/export-excel:
@@ -84,6 +85,7 @@ itemStockRouter.post(
   "/export-excel",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
+  validateItemStockSearch,
   exportItemStockExcel
 );
 

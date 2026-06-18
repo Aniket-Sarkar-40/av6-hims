@@ -1,3 +1,4 @@
+import { PaginatedResponse } from "@/types/common.js";
 import {
   InvItem,
   InvItemStock,
@@ -9,6 +10,7 @@ import {
   BaseModelAttrWoCancel,
   IdValue,
 } from "@repo/shared/types/global.js";
+import { NewSearchRequest } from "av6-core-v2";
 
 export interface CreateItemStockInput
   extends Omit<Prisma.InvItemStockUncheckedCreateInput, "id" | BaseModelAttr> {
@@ -93,11 +95,13 @@ export interface ItemStockReportRow {
   unitName: string | null;
   unitSize: string | null;
   ccId: number;
+  userId?: number | null;
   locationType: string;
   locationName: string | null;
   batchNoList: string;
   expiryDateList: string;
   nearestExpiryDate: string | null;
+  batchDetails: ItemStockBatchDetail[];
   stockIdList: string;
   stockRowCount: number;
   stockInHandQty: number;
@@ -230,4 +234,52 @@ export type InTransitStockByRefBatchInput = {
   operation: InvOperation;
   refId: number;
   refDetailsId: number;
+};
+
+export interface ItemStockSearchFilter
+  extends Omit<NewSearchRequest, "searchColumns" | "includes"> {
+  ccId: number;
+  userId?: number | null;
+  itemId?: number | null;
+  categoryId?: number | null;
+}
+
+export type ItemStockPaginatedDTO = PaginatedResponse<ItemStockReportRow>;
+
+export type ItemStockReportRawRow = Omit<ItemStockReportRow, "batchDetails"> & {
+  batchDetailsJson?: unknown;
+  totalRecords?: bigint;
+};
+
+export interface ItemStockPaginatedRes {
+  rows: ItemStockReportRawRow[];
+  totalRecords: number;
+  currentPageNumber: number;
+  lastPageNumber: number;
+  pageSize: number;
+}
+
+export interface ItemStockBatchDetail {
+  stockId: number;
+  batchNo: string | null;
+  expiryDate: string | null;
+  isFoc: boolean;
+  quantity: number;
+}
+
+export type ItemStockExcelRow = Omit<
+  ItemStockReportRow,
+  | "batchDetails"
+  | "batchNoList"
+  | "expiryDateList"
+  | "stockIdList"
+  | "stockRowCount"
+  | "nearestExpiryDate"
+> & {
+  sNo: number;
+  stockId: number | null;
+  batchNo: string;
+  expiryDate: string;
+  isFoc: string;
+  batchQty: number;
 };

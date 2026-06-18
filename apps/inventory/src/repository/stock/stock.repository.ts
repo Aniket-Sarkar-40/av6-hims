@@ -7,8 +7,11 @@ import {
   InTransitStockByBatchInput,
   ItemBatchStockLookupInput,
   ItemStockAudit,
+  ItemStockPaginatedRes,
+  ItemStockReportRawRow,
   ItemStockReportRow,
   ItemStockResponse,
+  ItemStockSearchFilter,
   ItemStockSummaryRow,
   RawItemStock,
 } from "@/types/stock/stock.js";
@@ -18,6 +21,7 @@ import { Action, InvItemStock, Prisma } from "@repo/db/generated/prisma/client";
 import { ItemStockByBatchInput } from "../../types/stock/stock.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { serializeBigInt } from "@repo/shared/utils/bigInt.utils.js";
+import { customOmit } from "av6-core-v2";
 
 type Tx = Prisma.TransactionClient;
 
@@ -638,7 +642,67 @@ export const itemStockSummary = async (ccId: number) => {
   return rows;
 };
 
-export const itemStock = async (ccId: number) => {
+const ITEM_STOCK_ALLOWED_SORT_COLUMNS = {
+  itemName: Prisma.sql`itemName`,
+  itemCode: Prisma.sql`itemCode`,
+  categoryName: Prisma.sql`categoryName`,
+  unitName: Prisma.sql`unitName`,
+  stockInHandQty: Prisma.sql`stockInHandQty`,
+  poPendingQty: Prisma.sql`poPendingQty`,
+  grnReceivedQty: Prisma.sql`grnReceivedQty`,
+  branchReqQty: Prisma.sql`branchReqQty`,
+  storeReqQty: Prisma.sql`storeReqQty`,
+  consumedQty: Prisma.sql`consumedQty`,
+  purchasePrice: Prisma.sql`purchasePrice`,
+} as const;
+
+export const itemStock = async (
+  filters: ItemStockSearchFilter
+): Promise<ItemStockPaginatedRes> => {
+  logger.info("entering::itemStock::repository");
+  const store = requestStorage.getStore();
+  const settings = await settingsService.getSettings();
+
+  const pageNo = filters.pageNo ?? 1;
+  const pageSize = filters.pageSize ?? 10;
+  const offset = (pageNo - 1) * pageSize;
+  const searchText = filters.searchText?.trim() ?? "";
+  const searchPattern = `%${searchText}%`;
+  const { ccId, userId, itemId, categoryId } = filters;
+
+  const sortKey =
+    filters.sortBy && filters.sortBy in ITEM_STOCK_ALLOWED_SORT_COLUMNS
+      ? (filters.sortBy as keyof typeof ITEM_STOCK_ALLOWED_SORT_COLUMNS)
+      : "itemName";
+  const orderByColumn = ITEM_STOCK_ALLOWED_SORT_COLUMNS[sortKey];
+  const orderDirection =
+    filters.sortDir === "DESC" ? Prisma.sql`DESC` : Prisma.sql`ASC`;
+
+  const userIdStockFilter =
+    userId != null ? Prisma.sql`AND s.user_id = ${userId}` : Prisma.empty;
+  const userIdConsumptionFilter =
+    userId != null ? Prisma.sql`AND c.requested_by = ${userId}` : Prisma.empty;
+  const userIdStoreReqFilter =
+    userId != null ? Prisma.sql`AND sr.req_from = ${userId}` : Prisma.empty;
+  const userIdStoreReqReturnFilter =
+    userId != null ? Prisma.sql`AND srr.req_from = ${userId}` : Prisma.empty;
+  const searchFilter =
+    searchText.length > 0
+      ? Prisma.sql`AND (
+          im.item LIKE ${searchPattern}
+          OR im.item_code LIKE ${searchPattern}
+          OR im.item_description LIKE ${searchPattern}
+          OR ic.name LIKE ${searchPattern}
+          OR u.packaging_type_name LIKE ${searchPattern}
+          OR COALESCE(stock.batch_no_list, '') LIKE ${searchPattern}
+          OR COALESCE(stock.expiry_date_list, '') LIKE ${searchPattern}
+        )`
+      : Prisma.empty;
+  const itemIdFilter =
+    itemId != null ? Prisma.sql`AND im.id = ${itemId}` : Prisma.empty;
+  const categoryIdFilter =
+    categoryId != null ? Prisma.sql`AND ic.id = ${categoryId}` : Prisma.empty;
+
   const warehouse = await db.invWarehouse.findFirst({
     where: {
       id: ccId,
@@ -663,7 +727,6 @@ export const itemStock = async (ccId: number) => {
     },
   });
 
-  const settings = await settingsService.getSettings();
   const warehouseMode = Boolean(settings?.warehouseMode);
   const isWarehouseLocation = warehouseMode ? Boolean(warehouse) : false;
   const isBranchLocation = !isWarehouseLocation && Boolean(branch);
@@ -673,7 +736,7 @@ export const itemStock = async (ccId: number) => {
     ? "BRANCH"
     : "BRANCH";
 
-  const rows = await db.$queryRaw<ItemStockReportRow[]>`
+  const rawRows = await db.$queryRaw<ItemStockReportRawRow[]>`
     SELECT
       /* ---------------- Item ---------------- */
       im.id AS itemId,
@@ -685,8 +748,7 @@ export const itemStock = async (ccId: number) => {
       im.re_order_level AS reOrderLevel,
       im.is_batch_number AS isBatchNumber,
       im.is_expire_date AS isExpireDate,
-      im.is_user_returnable AS isUserReturnable,
-      im.is_vendor_returnable AS isVendorReturnable,
+      im.is_user_returnable AS isReturnable,
       im.is_lock AS itemIsLock,
       im.is_active AS itemIsActive,
 
@@ -701,6 +763,7 @@ export const itemStock = async (ccId: number) => {
 
       /* ---------------- Location ---------------- */
       k.location_cc_id AS ccId,
+      ${userId} AS userId,
       ${locationType} AS locationType,
       CASE
         WHEN ${isWarehouseLocation} = true THEN w.name
@@ -711,6 +774,7 @@ export const itemStock = async (ccId: number) => {
       COALESCE(stock.batch_no_list, '') AS batchNoList,
       COALESCE(stock.expiry_date_list, '') AS expiryDateList,
       stock.nearest_expiry_date AS nearestExpiryDate,
+      stock.batch_details_json AS batchDetailsJson,
 
       /* ---------------- Current Stock ---------------- */
       COALESCE(stock.stock_id_list, '') AS stockIdList,
@@ -793,10 +857,16 @@ export const itemStock = async (ccId: number) => {
       COALESCE(consumption.consumed_qty, 0) AS consumedQty,
 
       /* ---------------- Supplier Price ---------------- */
-      COALESCE(item_supplier.purchase_price, 0.00) AS purchasePrice
+      COALESCE(item_supplier.purchase_price, 0.00) AS purchasePrice,
+
+      COUNT(*) OVER() AS totalRecords
 
     FROM
       (
+        SELECT DISTINCT
+          item_keys.item_id,
+          item_keys.location_cc_id
+        FROM (
         SELECT DISTINCT
           s.item_id,
           s.cc_id AS location_cc_id
@@ -805,6 +875,7 @@ export const itemStock = async (ccId: number) => {
           AND s.deleted_at IS NULL
           AND s.cc_id IS NOT NULL
           AND s.cc_id = ${ccId}
+          ${userIdStockFilter}
 
         UNION
 
@@ -847,6 +918,7 @@ export const itemStock = async (ccId: number) => {
         WHERE cd.is_active = 1
           AND cd.deleted_at IS NULL
           AND c.cc_id = ${ccId}
+          ${userIdConsumptionFilter}
 
         UNION
 
@@ -861,6 +933,7 @@ export const itemStock = async (ccId: number) => {
         WHERE srd.is_active = 1
           AND srd.deleted_at IS NULL
           AND sr.cc_id = ${ccId}
+          ${userIdStoreReqFilter}
 
         UNION
 
@@ -875,6 +948,7 @@ export const itemStock = async (ccId: number) => {
         WHERE srrd.is_active = 1
           AND srrd.deleted_at IS NULL
           AND srr.cc_id = ${ccId}
+          ${userIdStoreReqReturnFilter}
 
         UNION
 
@@ -989,6 +1063,7 @@ export const itemStock = async (ccId: number) => {
             OR
             (${isWarehouseLocation} = false AND brid.branch_id = ${ccId})
           )
+        ) item_keys
       ) k
 
     JOIN inv_item_master im
@@ -1028,12 +1103,31 @@ export const itemStock = async (ccId: number) => {
         SUM(CASE WHEN s.is_foc = 0 THEN COALESCE(s.quantity, 0) ELSE 0 END) AS stock_normal_qty,
         SUM(CASE WHEN s.is_foc = 1 THEN COALESCE(s.quantity, 0) ELSE 0 END) AS stock_foc_qty,
         CAST(COUNT(s.id) AS SIGNED) AS stock_row_count,
-        GROUP_CONCAT(s.id ORDER BY s.id) AS stock_id_list
+        GROUP_CONCAT(s.id ORDER BY s.id) AS stock_id_list,
+        CONCAT(
+          '[',
+          IFNULL(
+            GROUP_CONCAT(
+              JSON_OBJECT(
+                'stockId', s.id,
+                'batchNo', s.batch_no,
+                'expiryDate', DATE_FORMAT(s.expiry_date, '%Y-%m-%d'),
+                'isFoc', IF(s.is_foc, 1, 0),
+                'quantity', COALESCE(s.quantity, 0)
+              )
+              ORDER BY s.id
+              SEPARATOR ','
+            ),
+            ''
+          ),
+          ']'
+        ) AS batch_details_json
       FROM inv_item_stock s
       WHERE s.is_active = 1
         AND s.deleted_at IS NULL
         AND s.cc_id IS NOT NULL
         AND s.cc_id = ${ccId}
+        ${userIdStockFilter}
       GROUP BY s.item_id, s.cc_id
     ) stock
       ON stock.item_id = k.item_id
@@ -1160,6 +1254,7 @@ export const itemStock = async (ccId: number) => {
       WHERE srd.is_active = 1
         AND srd.deleted_at IS NULL
         AND sr.cc_id = ${ccId}
+        ${userIdStoreReqFilter}
       GROUP BY
         srd.item_id,
         sr.cc_id
@@ -1210,6 +1305,7 @@ export const itemStock = async (ccId: number) => {
       WHERE srrd.is_active = 1
         AND srrd.deleted_at IS NULL
         AND srr.cc_id = ${ccId}
+        ${userIdStoreReqReturnFilter}
       GROUP BY
         srrd.item_id,
         srr.cc_id
@@ -1375,6 +1471,7 @@ export const itemStock = async (ccId: number) => {
       WHERE cd.is_active = 1
         AND cd.deleted_at IS NULL
         AND c.cc_id = ${ccId}
+        ${userIdConsumptionFilter}
       GROUP BY
         cd.item_id,
         c.cc_id
@@ -1412,14 +1509,27 @@ export const itemStock = async (ccId: number) => {
      AND item_supplier.cc_id = k.location_cc_id
 
     WHERE k.location_cc_id = ${ccId}
+      ${searchFilter}
+      ${itemIdFilter}
+      ${categoryIdFilter}
 
-    ORDER BY
-      im.item DESC,
-      stock.nearest_expiry_date IS NULL,
-      stock.nearest_expiry_date DESC
+    ORDER BY ${orderByColumn} ${orderDirection}
+    LIMIT ${pageSize}
+    OFFSET ${offset}
   `;
 
-  return serializeBigInt(rows);
+  const totalRecords = rawRows.length > 0 ? Number(rawRows[0].totalRecords) : 0;
+  const rows = rawRows.map((row) => customOmit(row, ["totalRecords"]).rest);
+
+  logger.info("exiting::itemStock::repository");
+
+  return {
+    rows: serializeBigInt(rows) as ItemStockReportRawRow[],
+    totalRecords,
+    currentPageNumber: pageNo,
+    lastPageNumber: Math.max(1, Math.ceil(totalRecords / pageSize)),
+    pageSize,
+  };
 };
 
 export const getItemStockByItemOnly = async (

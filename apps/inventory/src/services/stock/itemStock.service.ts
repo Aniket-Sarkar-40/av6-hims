@@ -20,9 +20,17 @@ import {
   ItemBatchStockCacheDTO,
   ItemBatchStockDTO,
   ItemBatchStockLookupInput,
+  ItemStockPaginatedDTO,
+  ItemStockSearchFilter,
 } from "@/types/stock/stock.js";
+import {
+  toItemStockDtoPaginated,
+  toItemStockExcelRows,
+} from "@/mapper/stock/stock.mapper.js";
+import { validateItemStockSearch } from "@/validations/service/stock/itemStock.service.validation.js";
 
 export const cacheKeyForItemBatchStock = getRedisKey("ITEM", "Batch");
+const ITEM_STOCK_EXCEL_PAGE_SIZE = 1_000_000;
 
 export const itemStockService = {
   async getAllItemBatchStock(
@@ -70,31 +78,55 @@ export const itemStockService = {
     logger.info("exiting::getAllItemStock::service");
     return stocks;
   },
-  async getAllItemStock(ccId: number) {
+  async getAllItemStock(
+    input: ItemStockSearchFilter
+  ): Promise<ItemStockPaginatedDTO> {
     logger.info("entering::getAllItemStock::service");
-    validIdCheck(ccId);
 
-    const stocks = await itemStock(ccId);
+    const pageNo = input.pageNo ?? 1;
+    const pageSize = input.pageSize ?? 10;
+
+    await validateItemStockSearch({ ...input, pageNo, pageSize });
+
+    const repoResult = await itemStock({ ...input, pageNo, pageSize });
+    const result = await toItemStockDtoPaginated(repoResult);
 
     logger.info("exiting::getAllItemStock::service");
-    return stocks;
+    return result;
   },
 
-  async itemStockExcelExport(ccId: number): Promise<ExcelJs.Workbook> {
+  async itemStockExcelExport(
+    input: ItemStockSearchFilter
+  ): Promise<ExcelJs.Workbook> {
     logger.info("entering::itemStockExcelExport::service");
-    validIdCheck(ccId);
 
-    const stocks = await itemStock(ccId);
-    if (!Array.isArray(stocks) || stocks.length === 0) {
+    const { data: stocks, totalRecords } = await this.getAllItemStock({
+      ...input,
+      pageNo: 1,
+      pageSize: ITEM_STOCK_EXCEL_PAGE_SIZE,
+    });
+
+    if (!stocks.length) {
       throw new ErrorHandler(404, generateErrorMessage("EXCEL"));
     }
+
+    if (totalRecords > stocks.length) {
+      logger.info(
+        `itemStockExcelExport truncated: exported ${stocks.length} of ${totalRecords} item rows (increase page size if needed)`
+      );
+    }
+
+    const excelRows = toItemStockExcelRows(stocks);
+
     const wb = new ExcelJs.Workbook();
     const ws = wb.addWorksheet("Item Stock");
+
     ws.properties.defaultRowHeight = 18;
     ws.views = [{ state: "frozen", ySplit: 1 }];
 
     ws.columns = [
       { header: "S.No", key: "sNo", width: 8 },
+      { header: "Stock Id", key: "stockId", width: 12 },
       { header: "Item Name", key: "itemName", width: 30 },
       { header: "Item Code", key: "itemCode", width: 18 },
       { header: "Description", key: "itemDescription", width: 35 },
@@ -105,8 +137,11 @@ export const itemStockService = {
       { header: "Unit Size", key: "unitSize", width: 12 },
       { header: "Location", key: "locationName", width: 22 },
       { header: "Location Type", key: "locationType", width: 14 },
-      { header: "Batch No", key: "batchNoList", width: 25 },
-      { header: "Expiry Date", key: "expiryDateList", width: 22 },
+      { header: "User Id", key: "userId", width: 12 },
+      { header: "Batch No", key: "batchNo", width: 18 },
+      { header: "Expiry Date", key: "expiryDate", width: 14 },
+      { header: "FOC", key: "isFoc", width: 8 },
+      { header: "Batch Qty", key: "batchQty", width: 12 },
       { header: "In Hand Qty", key: "stockInHandQty", width: 14 },
       { header: "Normal Qty", key: "stockNormalQty", width: 14 },
       { header: "FOC Qty", key: "stockFocQty", width: 12 },
@@ -181,12 +216,7 @@ export const itemStockService = {
       { header: "PO Pending Qty", key: "poPendingQty", width: 18 },
     ];
 
-    stocks.forEach((stock, index) => {
-      ws.addRow({
-        sNo: index + 1,
-        ...stock,
-      });
-    });
+    excelRows.forEach((row) => ws.addRow(row));
 
     ws.getRow(1).eachCell((cell) => {
       cell.font = { bold: true };
@@ -209,6 +239,7 @@ export const itemStockService = {
     });
 
     logger.info("exiting::itemStockExcelExport::service");
+
     return wb;
   },
 };

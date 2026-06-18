@@ -3,7 +3,10 @@ import { itemStockService } from "@/services/stock/itemStock.service.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { Request, Response } from "express";
-import { ItemBatchStockLookupInput } from "@/types/stock/stock.js";
+import {
+  ItemBatchStockLookupInput,
+  ItemStockSearchFilter,
+} from "@/types/stock/stock.js";
 
 export const getItemStockSummary = TryCatch(
   async (req: Request, res: Response) => {
@@ -20,10 +23,11 @@ export const getItemStockSummary = TryCatch(
     return res.status(200).json(response);
   }
 );
+
 export const getItemStock = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::getItemStock::controller");
-  const { ccId } = req.query as { ccId: string };
-  const itemStock = await itemStockService.getAllItemStock(Number(ccId));
+  const input = req.body as ItemStockSearchFilter;
+  const itemStock = await itemStockService.getAllItemStock(input);
   logger.info("exiting::getItemStock::controller");
   const response = BaseResponse.success(
     { type: "FETCHED", data: itemStock },
@@ -35,8 +39,8 @@ export const getItemStock = TryCatch(async (req: Request, res: Response) => {
 export const exportItemStockExcel = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::exportItemStockExcel::controller");
-    const { ccId } = req.query as { ccId: string };
-    const workbook = await itemStockService.itemStockExcelExport(Number(ccId));
+    const input = req.body as ItemStockSearchFilter;
+    const workbook = await itemStockService.itemStockExcelExport(input);
 
     res.setHeader(
       "Content-Type",
@@ -44,7 +48,7 @@ export const exportItemStockExcel = TryCatch(
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=item-stock-export-${ccId}.xlsx`
+      `attachment; filename=item-stock-export-${input.ccId}.xlsx`
     );
 
     await workbook.xlsx.write(res);
