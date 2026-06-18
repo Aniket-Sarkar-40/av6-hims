@@ -1,4 +1,10 @@
 import { CreateGrnInput, GrnDetailInput } from "@/types/grn/grn.js";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
+import {
+  DiscMethod,
+  GRN_STATUS,
+  PAYMENT_STATUS,
+} from "@repo/db/generated/prisma/client";
 import {
   arrayRequired,
   boolRequired,
@@ -17,20 +23,16 @@ import {
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import {
-  DiscMethod,
-  GRN_STATUS,
-  PAYMENT_STATUS,
-  PO_STATUS,
-} from "@repo/db/generated/prisma/client";
 import Joi from "joi";
-import { getSchemaPrecision } from "@/utils/schema.utils.js";
 
 const uniqueBatchNoValidation = (
   details: GrnDetailInput[],
   helpers: Joi.CustomHelpers
 ) => {
-  const batchNoMap = new Map<string, number>();
+  const batchNoMap = new Map<
+    string,
+    { itemId: number; row: number; originalBatchNo: string }
+  >();
 
   for (let i = 0; i < details.length; i++) {
     const detail = details[i];
@@ -41,16 +43,24 @@ const uniqueBatchNoValidation = (
 
     if (!batchNo) continue;
 
-    if (batchNoMap.has(batchNo)) {
-      const firstRow = batchNoMap.get(batchNo)! + 1;
+    const existingBatch = batchNoMap.get(batchNo);
+
+    if (existingBatch && existingBatch.itemId !== detail.itemId) {
+      const firstRow = existingBatch.row + 1;
       const currentRow = i + 1;
 
       return helpers.error("any.custom", {
-        message: `Batch number "${detail.batchNo}" already exists in row ${firstRow}. Duplicate found in row ${currentRow}.`,
+        message: `Batch number "${detail.batchNo}" is already assigned to item ${existingBatch.itemId} in row ${firstRow}. Same batch number cannot be used for different item ${detail.itemId} in row ${currentRow}.`,
       });
     }
 
-    batchNoMap.set(batchNo, i);
+    if (!existingBatch) {
+      batchNoMap.set(batchNo, {
+        itemId: detail.itemId,
+        row: i,
+        originalBatchNo: detail.batchNo,
+      });
+    }
   }
 
   return details;

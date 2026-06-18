@@ -220,9 +220,9 @@ export const toBranchItemDetailDTO = async (
     0
   );
 
-  const availableQtyToReturn = Math.max(
-    Math.min(branchBatchStockQty, maxReturnableQty),
-    0
+  const availableQtyToReturn = Math.min(
+    Number(branchBatchStockQty ?? 0),
+    maxReturnableQty
   );
 
   const detailDTO: BranchRequisitionDetailDTO = {

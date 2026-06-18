@@ -222,6 +222,17 @@ export const toRequisitionItemDetailDTO = async (
     isFoc: storeRequisition.isFoc,
   });
 
+  const detailReturnableQty = Math.max(
+    Number(storeRequisition.acknowledgedQty ?? 0) -
+      Number(storeRequisition.returnedQty ?? 0),
+    0
+  );
+
+  const availableQtyToReturn = Math.min(
+    Number(stockQty ?? 0),
+    detailReturnableQty
+  );
+
   const detailDTO: StoreRequisitionDetailDTO = {
     ...storeRequisition.storeRequisitionDetails,
     item: itemDTO ? await itemMasterToDto(itemDTO) : null,
@@ -232,7 +243,7 @@ export const toRequisitionItemDetailDTO = async (
   return {
     ...storeRequisition,
     storeRequisitionDetails: detailDTO,
-    availableQtyToReturn: stockQty,
+    availableQtyToReturn,
   };
 };
 
