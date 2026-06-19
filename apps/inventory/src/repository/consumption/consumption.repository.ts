@@ -42,11 +42,11 @@ export async function createConsumptionInDb(
           ...consumptionData,
           consumptionNo,
           createdBy: userId,
+          status: isAutoConsumption ? "APPROVED" : "SENT_FOR_APPROVAL",
           ...(isAutoConsumption
             ? {
                 approvedBy: userId,
                 approvedAt: new Date(),
-                status: "APPROVED",
               }
             : {}),
 
