@@ -364,6 +364,7 @@ model Staff {
     invInTransitStocks           InvInTransitStock[]
     invStoreRequisitions         InvStoreRequisition[]
     invPurchaseOrders            InvPurchaseOrder[]
+    consumptions                 Consumption[]
 
     @@map("staff")
 }

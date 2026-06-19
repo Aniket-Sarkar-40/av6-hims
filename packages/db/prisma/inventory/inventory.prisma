@@ -1015,10 +1015,9 @@ model Consumption {
     ccId          Int                  @map("cc_id")
     consumptionNo String               @map("consumption_no")
     date          DateTime             @default(now())
-    approvalFrom  Int                  @map("approval_from")
-    priority      Consumption_Priority
+    priority      Consumption_Priority @default(MEDIUM)
     description   String?
-    status        Consumption_Status
+    status        Consumption_Status   @default(APPROVED)
     requestedBy   Int                  @map("requested_by")
 
     isActive   Boolean   @default(true) @map("is_active")
@@ -1034,6 +1033,7 @@ model Consumption {
     rejectedAt DateTime? @map("rejected_at")
 
     collectionCenter   CollectionCenter     @relation(fields: [ccId], references: [id])
+    Staff              Staff                @relation(fields: [requestedBy], references: [id])
     consumptionDetails ConsumptionDetails[]
 
     @@index([ccId], name: "consumption_cc_id_idx")
@@ -1047,7 +1047,7 @@ model ConsumptionDetails {
     batchNo       String?   @map("batch_no")
     expiryDate    DateTime? @map("expiry_date")
     requestedQty  Int       @map("requested_qty")
-    consumedQty   Int?      @default(0) @map("consumed_qty")
+    consumedQty   Int?      @map("consumed_qty")
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")

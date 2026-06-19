@@ -1,26 +1,17 @@
 import {
+  createConsumption,
+  getAllConsumption,
+  getConsumptionById,
+  getConsumptionByUserId,
+} from "@/controllers/consumption/consumption.controller.js";
+import { validateCreateConsumption } from "@/validations/request/consumption/consumption.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import {
   authorize,
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
-import {
-  validateApproveConsumption,
-  validateCommonConsumptionInput,
-  validateCreateConsumption,
-  validateUpdateConsumption,
-} from "@/validations/request/consumption/consumption.validation.js";
 import { Router } from "express";
-import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
-import {
-  approveConsumption,
-  createConsumption,
-  deleteConsumptionById,
-  getAllConsumption,
-  getConsumptionById,
-  getConsumptionByUserId,
-  rejectConsumption,
-  updateConsumption,
-} from "@/controllers/consumption/consumption.controller.js";
 
 export const consumptionRouter: Router = Router();
 
@@ -51,30 +42,6 @@ consumptionRouter.post(
   authorize(getPermission("INV", "CONSUMPTION", "CREATE")),
   validateCreateConsumption,
   createConsumption
-);
-
-/**
- * @swagger
- * /api/v1/consumption/:
- *  put:
- *  summary: Update a Consumption
- *  tags: [Consumption]
- *  security:
- *    - bearerAuth: []
- * requestBody:
- *    required: true
- *    content:
- *      application/json:
- *        schema:
- *          $ref: '#/components/approveConsumptionSchema'
- */
-
-consumptionRouter.put(
-  "/",
-  verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "CONSUMPTION", "UPDATE")),
-  validateUpdateConsumption,
-  updateConsumption
 );
 
 /**
@@ -114,77 +81,6 @@ consumptionRouter.get(
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
   getConsumptionById
 );
-
-/**
- * @swagger
- * /api/v1/consumption/approve:
- *  put:
- *  summary: Approve a Consumption
- *  tags: [Consumption]
- *  security:
- *    - bearerAuth: []
- * requestBody:
- *    required: true
- *    content:
- *      application/json:
- *        schema:
- *          $ref: '#/components/approveConsumptionSchema'
- */
-
-consumptionRouter.put(
-  "/approve",
-  verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "CONSUMPTION_APPROVE", "CREATE")),
-  validateApproveConsumption,
-  approveConsumption
-);
-
-/**
- *@swagger
- * /api/v1/consumption/{consumptionId}:
- *   delete:
- *     summary: Delete a resource by short code and ID
- *     tags: [Consumption]
- *     security:
- *       - bearerAuth: []
- * requestBody:
- *    required: true
- *    content:
- *      application/json:
- *        schema:
- *          $ref: '#/components/commonConsumptionInputSchema'
- */
-consumptionRouter.delete(
-  "/",
-  verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "CONSUMPTION", "DELETE")),
-  validateCommonConsumptionInput,
-  deleteConsumptionById
-);
-
-/**
- *@swagger
- * /api/v1/consumption/{consumptionId}:
- *   delete:
- *     summary: Delete a resource by short code and ID
- *     tags: [Consumption]
- *   security:
- *     - bearerAuth: []
- * requestBody:
- *    required: true
- *    content:
- *      application/json:
- *        schema:
- *          $ref: '#/components/commonConsumptionInputSchema'
- */
-consumptionRouter.put(
-  "/reject",
-  verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "CONSUMPTION_REJECT", "CREATE")),
-  validateCommonConsumptionInput,
-  rejectConsumption
-);
-
 /**
  * @swagger
  * /api/v1/consumption/by-user/{userId}:

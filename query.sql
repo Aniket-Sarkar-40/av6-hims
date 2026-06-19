@@ -1799,3 +1799,12 @@ CREATE INDEX `idx_default_unit_master_id` ON `inv_unit_master`(`default_unit_mas
 
 
 CREATE INDEX `purchase_order_last_verified_by_idx` ON `inv_purchase_order`(`last_verified_by`);
+
+ALTER TABLE `inv_consumption` DROP COLUMN `approval_from`;
+
+CREATE INDEX `consumption_requested_by_idx` ON `inv_consumption`(`requested_by`);
+
+ALTER TABLE `inv_consumption` MODIFY `priority` ENUM('HIGH', 'MEDIUM', 'LOW') NOT NULL DEFAULT 'MEDIUM',
+    MODIFY `status` ENUM('DRAFT', 'APPROVED') NOT NULL DEFAULT 'APPROVED';
+
+ALTER TABLE `inv_consumption_details` ALTER COLUMN `consumed_qty` DROP DEFAULT;

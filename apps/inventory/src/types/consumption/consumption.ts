@@ -18,18 +18,6 @@ export interface ConsumptionCreateInput
   consumptionDetails: ConsumptionDetailsCreateInput[];
 }
 
-export interface ConsumptionUpdateInput extends ConsumptionCreateInput {
-  id: number;
-  consumptionDetails: ConsumptionDetailsUpdateInput[];
-  existing: ConsumptionResponse;
-}
-
-export interface ConsumptionApproveInput extends ConsumptionCreateInput {
-  id: number;
-  consumptionDetails: ConsumptionDetailsApproveInput[];
-  existing: ConsumptionResponse;
-}
-
 export interface ConsumptionDetailsCreateInput
   extends Omit<
     Prisma.ConsumptionDetailsUncheckedCreateInput,
@@ -37,19 +25,6 @@ export interface ConsumptionDetailsCreateInput
   > {
   isBatch: boolean;
   isExpiry: boolean;
-}
-
-export interface ConsumptionDetailsUpdateInput
-  extends ConsumptionDetailsCreateInput {
-  id: number;
-}
-export interface ConsumptionDetailsApproveInput
-  extends ConsumptionDetailsCreateInput {
-  id: number;
-  consumedQty: number;
-  isBatch: boolean;
-  isExpiry: boolean;
-  ccId: number | null;
 }
 
 export type ConsumptionResponse = Prisma.ConsumptionGetPayload<{
@@ -63,13 +38,11 @@ export interface ConsumptionDTO
     ConsumptionResponse,
     | "consumptionDetails"
     | "ccId"
-    | "approvalFrom"
     | "requestedBy"
     | "rejectedBy"
     | "approvedBy"
     | BaseModelAttr
   > {
-  approvalFrom: IdValue | null;
   requestedBy: EmployeeCache | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
@@ -85,13 +58,6 @@ export interface ConsumptionDetailsDTO
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
-}
-
-export interface CommonConsumptionInput {
-  id: number;
-  ccId: number;
-  userId: number;
-  description?: string;
 }
 
 export interface ConDetailDTO

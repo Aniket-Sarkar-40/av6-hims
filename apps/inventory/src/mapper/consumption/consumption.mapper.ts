@@ -4,12 +4,11 @@ import {
   ConsumptionDTO,
   ConsumptionResponse,
 } from "@/types/consumption/consumption.js";
-import { getBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
-import { customOmit } from "av6-utils";
-import { toIdValue } from "av6-utils";
-import { ConsumptionDetails } from "@repo/db/generated/prisma/client";
-import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
+import { getBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { ConsumptionDetails } from "@repo/db/generated/prisma/client";
+import { customOmit, toIdValue } from "av6-utils";
 
 export const toConsumptionDTO = async (
   consumption: ConsumptionResponse[]
@@ -22,7 +21,6 @@ export const toConsumptionDTO = async (
         ConsumptionResponse,
         | "consumptionDetails"
         | "ccId"
-        | "approvalFrom"
         | "requestedBy"
         | "createdBy"
         | "updatedBy"
@@ -33,7 +31,6 @@ export const toConsumptionDTO = async (
       >(consumption, [
         "consumptionDetails",
         "ccId",
-        "approvalFrom",
         "requestedBy",
         "createdBy",
         "updatedBy",
@@ -43,10 +40,6 @@ export const toConsumptionDTO = async (
         "deletedBy",
       ]);
       const cc = await getBranchOrWarehouse(consumption.ccId);
-      const approver = await employeeService.getEmployeeByIdFrmCacheOrDb(
-        consumption.approvalFrom,
-        true
-      );
       const requester = await employeeService.getEmployeeByIdFrmCacheOrDb(
         consumption.requestedBy,
         true
@@ -126,7 +119,6 @@ export const toConsumptionDTO = async (
 
       return {
         ...omittedConsumption.rest,
-        approvalFrom: toIdValue(approver, "name"),
         requestedBy: requester,
         createdBy: createdBy,
         updatedBy: updatedBy,

@@ -88,9 +88,7 @@ enum Consumption_Priority {
 
 enum Consumption_Status {
     DRAFT
-    SENT_FOR_APPROVAL
     APPROVED
-    REJECTED
 }
 
 enum EMAIL_TYPE {
