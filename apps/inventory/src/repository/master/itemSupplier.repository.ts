@@ -88,7 +88,7 @@ export async function createItemSupplierInDb(
         },
       });
 
-      // if (isAccounting && currentUser) {
+      // if (isAccounting && currentUser && data.ledgerId !== undefined) {
       //   const result =
       //     await accountingExternalService.createItemSupplierVoucher({
       //       clientId: itemSupplier.id,
