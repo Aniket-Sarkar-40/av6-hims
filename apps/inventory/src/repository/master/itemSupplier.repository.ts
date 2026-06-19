@@ -127,14 +127,7 @@ export async function updateItemSupplierInDb(
     | "id"
     | "existingItemSupplier"
     | "ledgerId"
-    | "isLedgerMappingExists"
-  >(data, [
-    "taxIdentificationDetails",
-    "bankDetails",
-    "id",
-    "ledgerId",
-    "isLedgerMappingExists",
-  ]);
+  >(data, ["taxIdentificationDetails", "bankDetails", "id", "ledgerId"]);
   const { taxIdentificationDetails, bankDetails, id, existingItemSupplier } =
     omitteditemSupplier.omitted;
 
@@ -247,7 +240,7 @@ export async function updateItemSupplierInDb(
           },
         },
       });
-      // if (isAccounting && currentUser && !data.isLedgerMappingExists) {
+      // if (isAccounting && currentUser) {
       //   const result =
       //     await accountingExternalService.createItemSupplierVoucher({
       //       clientId: itemSupplier.id,

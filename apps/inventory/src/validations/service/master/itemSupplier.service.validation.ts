@@ -5,6 +5,7 @@ import {
   getPhoneNumberFromDb,
 } from "@/repository/master/itemSupplier.repository.js";
 import { itemSupplierService } from "@/services/master/itemSupplier.service.js";
+import { settingsService } from "@/services/master/settings.service.js";
 import {
   ItemSupplierCreateInput,
   ItemSupplierUpdateInput,
@@ -39,6 +40,18 @@ export const createItemSupplierServiceValidation = async (
   input: ItemSupplierCreateInput
 ): Promise<void> => {
   logger.info("entering::createItemSupplier::service::validation");
+
+  const settings = await settingsService.getSettings();
+  const isAccounting = settings?.isAccounting;
+
+  if (!isAccounting) {
+    if (input.ledgerId) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("INVALID_FIELD", "Ledger ID")
+      );
+    }
+  }
 
   if (input.supplierCode) {
     const code = await getItemSupplierBySupplierCodeFromDb(input.supplierCode);
@@ -84,35 +97,12 @@ export const updateItemSupplierServiceValidation = async (
 ) => {
   logger.info("entering::updateItemSupplier::service::validation");
 
-  const store = requestStorage.getStore();
+  //const store = requestStorage.getStore();
   //const isAccounting = !!store?.settings?.isAccounting;
 
   await validateIdItemSupplier(input.id);
 
-  input.isLedgerMappingExists = false;
-
-  // if (isAccounting) {
-  //   try {
-  //     const result = await accountingExternalService.getClientLedgerMapping({
-  //       clientType: "INV_ITEM_SUPPLIER",
-  //       clientId: input.id,
-  //     });
-
-  //     input.isLedgerMappingExists = !!result.data;
-  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   } catch (error) {
-  //     input.isLedgerMappingExists = false;
-  //   }
-
-  //   if (!input.isLedgerMappingExists && !input.ledgerId) {
-  //     throw new ErrorHandler(
-  //       400,
-  //       generateErrorMessage("REQUIRED_FIELD", "Ledger ID")
-  //     );
-  //   }
-  // } else {
-  //   input.isLedgerMappingExists = false;
-
+  // if (!isAccounting) {
   //   if (input.ledgerId) {
   //     throw new ErrorHandler(
   //       400,
