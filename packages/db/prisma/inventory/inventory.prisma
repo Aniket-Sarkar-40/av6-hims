@@ -41,6 +41,7 @@ model InvSettings {
     warehouseMode         Boolean           @default(false) @map("warehouse_mode")
     supplierMode          Boolean           @default(true) @map("supplier_mode")
     itemStockType         ItemStockType     @default(PACK_WISE) @map("item_stock_type")
+    isAutoConsumption     Boolean           @default(true) @map("is_auto_consumption")
     isActive              Boolean           @default(true) @map("is_active")
 
     createdBy Int?      @map("created_by")

@@ -73,6 +73,7 @@ export enum ErrorMessageType {
   INVALID_RETURN = "%1 is not a valid return for %2.",
   REQUIRED_FIELD = "%1 is required field",
   NOT_POSSIBLE = "Not possible to update %1 because it has stock",
+  UNAUTHORIZED = "You are not authorized to perform this action",
 }
 
 export enum ValidationErrorMessage {

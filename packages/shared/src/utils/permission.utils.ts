@@ -39,6 +39,8 @@ export enum PermissionResource {
   STORE_REQUISITION_ACK = "store-requisition-acknowledge",
   LOCATION = "location",
   CONSUMPTION = "consumption",
+  CONSUMPTION_APPROVE = "consumption-approve",
+  CONSUMPTION_REJECT = "consumption-reject",
   ITEM_BATCHES = "item-batch",
   ITEMS_SUP = "items-supplier",
   ITEM_STOCK = "item-stock",

@@ -1,3 +1,4 @@
+import { CommonConsumptionInput } from "@/types/consumption/consumption.js";
 import {
   Consumption_Priority,
   Consumption_Status,
@@ -9,6 +10,7 @@ import {
   dateRequired,
   enumRequired,
   idRequired,
+  intRequired,
   strOptional,
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
@@ -52,4 +54,67 @@ export const consumptionCreateSchema = Joi.object({
 
 export const validateCreateConsumption = validationHandler({
   schema: consumptionCreateSchema,
+});
+
+export const ConsumptionDetailsUpdateSchema =
+  ConsumptionDetailsCreateSchema.keys({
+    id: intRequired("Id"),
+  });
+
+export const consumptionUpdateSchema = consumptionCreateSchema.keys({
+  id: intRequired("Id"),
+  consumptionDetails: arrayRequired(
+    "Consumption Details",
+    ConsumptionDetailsUpdateSchema,
+    1
+  ),
+});
+
+export const validateUpdateConsumption = validationHandler({
+  schema: consumptionUpdateSchema,
+});
+
+export const commonConsumptionInputSchema = Joi.object<CommonConsumptionInput>({
+  id: intRequired("Id"),
+  ccId: intRequired("CC Id"),
+  userId: intRequired("User Id"),
+  description: strOptional("Description"),
+});
+
+export const validateCommonConsumptionInput = validationHandler({
+  schema: commonConsumptionInputSchema,
+});
+
+export const ConsumptionDetailsApproveSchema =
+  ConsumptionDetailsCreateSchema.keys({
+    id: idRequired("Id"),
+    consumedQty: intRequired("Consumed Quantity", 0, Joi.ref("requestedQty")),
+
+    batchNo: Joi.when("isBatch", {
+      is: true,
+      then: strRequired("Batch number"),
+      otherwise: strOptional("Batch number"),
+    }),
+    expiryDate: Joi.when("isExpiry", {
+      is: true,
+      then: dateRequired("Expiry date"),
+      otherwise: dateOptional("Expiry date"),
+    }),
+
+    isBatch: boolRequired("Is Batch"),
+
+    isExpiry: boolRequired("Is Expiry"),
+  });
+
+export const consumptionApproveSchema = consumptionCreateSchema.keys({
+  id: idRequired("Id"),
+  consumptionDetails: arrayRequired(
+    "Consumption Details",
+    ConsumptionDetailsApproveSchema,
+    1
+  ),
+});
+
+export const validateApproveConsumption = validationHandler({
+  schema: consumptionApproveSchema,
 });

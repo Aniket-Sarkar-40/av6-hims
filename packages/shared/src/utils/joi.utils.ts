@@ -482,7 +482,11 @@ export const aadharOptional = (label: string) =>
       "string.pattern.base": generateValidationErrorMessage("AADHAR", label),
     });
 
-export const intRequired = (label: string, min?: number, max?: number) => {
+export const intRequired = (
+  label: string,
+  min?: number | Joi.Reference,
+  max?: number | Joi.Reference
+) => {
   let schema = Joi.number().integer().required();
 
   if (min !== undefined) schema = schema.min(min);
@@ -505,7 +509,11 @@ export const intRequired = (label: string, min?: number, max?: number) => {
   });
 };
 
-export const intOptional = (label: string, min?: number, max?: number) => {
+export const intOptional = (
+  label: string,
+  min?: number | Joi.Reference,
+  max?: number | Joi.Reference
+) => {
   let schema = Joi.number().integer().optional().allow(null);
 
   if (min !== undefined) schema = schema.min(min);

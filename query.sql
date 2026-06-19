@@ -1804,9 +1804,10 @@ ALTER TABLE `inv_consumption` DROP COLUMN `approval_from`;
 
 CREATE INDEX `consumption_requested_by_idx` ON `inv_consumption`(`requested_by`);
 
-ALTER TABLE `inv_consumption` MODIFY `priority` ENUM('HIGH', 'MEDIUM', 'LOW') NOT NULL DEFAULT 'MEDIUM',
-    MODIFY `status` ENUM('DRAFT', 'APPROVED') NOT NULL DEFAULT 'APPROVED';
+ALTER TABLE `inv_consumption` MODIFY `priority` ENUM('HIGH', 'MEDIUM', 'LOW') NOT NULL DEFAULT 'MEDIUM';
 
 ALTER TABLE `inv_consumption_details` ALTER COLUMN `consumed_qty` DROP DEFAULT;
 
-ALTER TABLE `inv_consumption` MODIFY `status` ENUM('APPROVED') NOT NULL DEFAULT 'APPROVED';
+ALTER TABLE `inv_consumption` MODIFY `status` ENUM('DRAFT', 'SENT_FOR_APPROVAL', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'APPROVED';
+
+ALTER TABLE `inv_settings` ADD COLUMN `is_auto_consumption` BOOLEAN NOT NULL DEFAULT true;

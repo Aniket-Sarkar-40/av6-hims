@@ -20,6 +20,22 @@ export const createConsumption = TryCatch(
   }
 );
 
+export const updateConsumption = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::updateConsumption::controller");
+    const input = req.body;
+    const updatedConsumption = await consumptionService.updateConsumption(
+      input
+    );
+    logger.info("exiting::updateConsumption::controller");
+    const response = BaseResponse.success(
+      { type: "UPDATED", data: updatedConsumption },
+      "Consumption"
+    );
+    return res.status(200).json(response);
+  }
+);
+
 export const getAllConsumption = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::getAllConsumption::controller");
@@ -29,6 +45,32 @@ export const getAllConsumption = TryCatch(
       { type: "FETCHED", data: consumption },
       "Consumption"
     );
+    return res.status(200).json(response);
+  }
+);
+
+export const approveConsumption = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::updateConsumption::controller");
+    const input = req.body;
+    const approvedConsumption = await consumptionService.approveConsumption(
+      input
+    );
+    logger.info("exiting::updateConsumption::controller");
+    const response = BaseResponse.success(
+      { type: "APPROVED", data: approvedConsumption },
+      "Consumption"
+    );
+    return res.status(200).json(response);
+  }
+);
+export const rejectConsumption = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::rejectConsumption::controller");
+    const input = req.body;
+    await consumptionService.rejectConsumptionById(input);
+    logger.info("exiting::rejectConsumption::controller");
+    const response = BaseResponse.success({ type: "REJECTED" }, "Consumption");
     return res.status(200).json(response);
   }
 );
@@ -50,6 +92,17 @@ export const getConsumptionById = TryCatch(
       { type: "FETCHED", data: consumption },
       "Consumption"
     );
+    return res.status(200).json(response);
+  }
+);
+
+export const deleteConsumptionById = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::deleteConsumptionById::controller");
+    const input = req.body;
+    await consumptionService.deleteConsumptionById(input);
+    logger.info("exiting::deleteConsumptionById::controller");
+    const response = BaseResponse.success({ type: "DELETED" }, "Consumption");
     return res.status(200).json(response);
   }
 );
