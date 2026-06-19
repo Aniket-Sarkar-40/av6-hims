@@ -61,29 +61,27 @@ export async function createConsumptionInDb(
         },
       });
 
-      if (approvedConsumption.status === Consumption_Status.APPROVED) {
-        for (const detail of approvedConsumption.consumptionDetails) {
-          await subItemStock(
-            tx,
-            {
-              itemId: detail.itemId,
-              batchNo: detail.batchNo,
-              userId: approvedConsumption.requestedBy!,
-              expiryDate: detail.expiryDate ?? undefined,
-              quantity: detail.requestedQty,
-            },
-            {
-              operation: InvOperation.CONSUMPTION,
-              refDate: approvedConsumption.date,
-              refNo: approvedConsumption.consumptionNo,
-              refId: approvedConsumption.id,
-              refDetailsId: detail.id,
-              refApprovedBy: approvedConsumption.approvedBy,
-              refApprovedAt: approvedConsumption.approvedAt,
-            },
-            { consumeFromAll: true }
-          );
-        }
+      for (const detail of approvedConsumption.consumptionDetails) {
+        await subItemStock(
+          tx,
+          {
+            itemId: detail.itemId,
+            batchNo: detail.batchNo,
+            userId: approvedConsumption.requestedBy!,
+            expiryDate: detail.expiryDate ?? undefined,
+            quantity: detail.requestedQty,
+          },
+          {
+            operation: InvOperation.CONSUMPTION,
+            refDate: approvedConsumption.date,
+            refNo: approvedConsumption.consumptionNo,
+            refId: approvedConsumption.id,
+            refDetailsId: detail.id,
+            refApprovedBy: approvedConsumption.approvedBy,
+            refApprovedAt: approvedConsumption.approvedAt,
+          },
+          { consumeFromAll: true }
+        );
       }
 
       logger.info("exiting::createConsumptionInDb::repository");

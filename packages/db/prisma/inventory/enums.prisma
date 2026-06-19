@@ -87,7 +87,6 @@ enum Consumption_Priority {
 }
 
 enum Consumption_Status {
-    DRAFT
     APPROVED
 }
 

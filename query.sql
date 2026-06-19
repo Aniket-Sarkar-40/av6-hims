@@ -1808,3 +1808,5 @@ ALTER TABLE `inv_consumption` MODIFY `priority` ENUM('HIGH', 'MEDIUM', 'LOW') NO
     MODIFY `status` ENUM('DRAFT', 'APPROVED') NOT NULL DEFAULT 'APPROVED';
 
 ALTER TABLE `inv_consumption_details` ALTER COLUMN `consumed_qty` DROP DEFAULT;
+
+ALTER TABLE `inv_consumption` MODIFY `status` ENUM('APPROVED') NOT NULL DEFAULT 'APPROVED';
