@@ -27,8 +27,24 @@ import { applyRound } from "av6-utils";
 import { initializeCache } from "@/config/redisClient.js";
 import { ItemMasterExcelStagingRow } from "@/validations/request/master/itemMasterExcel.validation.js";
 import { settingsService } from "@/services/master/settings.service.js";
+import { itemCategoryService } from "@/services/master/itemCategory.service.js";
+import { getItemCategoryByItemCategoryNameFromDb } from "@/repository/master/itemCategory.repository.js";
+import { storageService } from "@/services/master/storage.service.js";
+import { getStorageByStorageNameFromDb } from "@/repository/master/storage.repository.js";
+import { defaultUnitMasterService } from "@/services/master/defaultUnitMaster.service.js";
+import { getDefaultUnitMasterByNameFromDb } from "@/repository/master/defaultUnitMaster.repository.js";
+import { unitMasterService } from "@/services/master/unitMaster.service.js";
+import { getUnitMasterByUnitMasterPackNameFromDb } from "@/repository/master/unitMaster.repository.js";
 
 const normalizeLookupKey = (value: string) => value.trim().toLowerCase();
+
+const findActiveUnitMasterByName = (trimmed: string) =>
+  db.invUnitMaster.findFirst({
+    where: {
+      isActive: true,
+      OR: [{ packagingTypeName: trimmed }, { packagingSize: trimmed }],
+    },
+  });
 
 const resolveItemCategoryId = async (
   name: string,
@@ -39,12 +55,22 @@ const resolveItemCategoryId = async (
   const cached = cache.get(key);
   if (cached != null) return cached;
 
-  const record = await db.invItemCategory.findFirst({
-    where: { name: name.trim(), isActive: true },
+  const trimmed = name.trim();
+  let record = await db.invItemCategory.findFirst({
+    where: { name: trimmed, isActive: true },
   });
 
   if (!record) {
-    throw new Error(`Row ${rowNo}: Item Category "${name}" not found`);
+    try {
+      record = await itemCategoryService.createItemCategory({ name: trimmed });
+    } catch {
+      record = await getItemCategoryByItemCategoryNameFromDb(trimmed);
+      if (!record) {
+        throw new Error(
+          `Row ${rowNo}: Unable to create Item Category "${name}"`
+        );
+      }
+    }
   }
 
   cache.set(key, record.id);
@@ -62,12 +88,59 @@ const resolveStorageId = async (
   const cached = cache.get(key);
   if (cached != null) return cached;
 
-  const record = await db.invStorage.findFirst({
-    where: { name: name.trim(), isActive: true },
+  const trimmed = name.trim();
+  let record = await db.invStorage.findFirst({
+    where: { name: trimmed, isActive: true },
   });
 
   if (!record) {
-    throw new Error(`Row ${rowNo}: Storage "${name}" not found`);
+    try {
+      record = await storageService.createStorage({ name: trimmed });
+    } catch {
+      record = await getStorageByStorageNameFromDb(trimmed);
+      if (!record) {
+        throw new Error(`Row ${rowNo}: Unable to create Storage "${name}"`);
+      }
+    }
+  }
+
+  cache.set(key, record.id);
+  return record.id;
+};
+
+const resolveDefaultUnitMasterId = async (
+  unitName: string,
+  cache: Map<string, number>
+): Promise<number> => {
+  const key = normalizeLookupKey(`default:${unitName}`);
+  const cached = cache.get(key);
+  if (cached != null) return cached;
+
+  const trimmed = unitName.trim();
+  let record = await db.invDefaultUnitMaster.findFirst({
+    where: { name: trimmed, isActive: true },
+  });
+
+  if (!record) {
+    try {
+      record = await defaultUnitMasterService.createDefaultUnitMaster({
+        name: trimmed,
+      });
+    } catch {
+      record = await getDefaultUnitMasterByNameFromDb(trimmed);
+      if (!record) {
+        const fallback = await db.invDefaultUnitMaster.findFirst({
+          where: { isActive: true },
+          orderBy: { id: "asc" },
+        });
+        if (!fallback) {
+          throw new Error(
+            `Unable to create Default Unit Master for "${unitName}"`
+          );
+        }
+        record = fallback;
+      }
+    }
   }
 
   cache.set(key, record.id);
@@ -77,22 +150,36 @@ const resolveStorageId = async (
 const resolveUnitId = async (
   name: string,
   rowNo: number,
-  cache: Map<string, number>
+  cache: Map<string, number>,
+  defaultUnitCache: Map<string, number>
 ): Promise<number> => {
   const key = normalizeLookupKey(name);
   const cached = cache.get(key);
   if (cached != null) return cached;
 
   const trimmed = name.trim();
-  const record = await db.invUnitMaster.findFirst({
-    where: {
-      isActive: true,
-      OR: [{ packagingTypeName: trimmed }, { packagingSize: trimmed }],
-    },
-  });
+  let record = await findActiveUnitMasterByName(trimmed);
 
   if (!record) {
-    throw new Error(`Row ${rowNo}: Unit "${name}" not found`);
+    const defaultUnitMasterId = await resolveDefaultUnitMasterId(
+      trimmed,
+      defaultUnitCache
+    );
+    try {
+      record = await unitMasterService.createUnitMaster({
+        packagingTypeName: trimmed,
+        packagingSize: trimmed,
+        defaultValue: 1,
+        defaultUnitMasterId,
+      });
+    } catch {
+      record =
+        (await findActiveUnitMasterByName(trimmed)) ??
+        (await getUnitMasterByUnitMasterPackNameFromDb(trimmed));
+      if (!record) {
+        throw new Error(`Row ${rowNo}: Unable to create Unit "${name}"`);
+      }
+    }
   }
 
   cache.set(key, record.id);
@@ -308,6 +395,8 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
   const storageCache = new Map<string, number>();
   const unitCache = new Map<string, number>();
 
+  const defaultUnitCache = new Map<string, number>();
+
   await db.batchJob.update({
     where: { id: batchJobId },
     data: { status: "IN_PROGRESS" },
@@ -339,7 +428,12 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
             row.rowNo,
             storageCache
           ),
-          unitId: await resolveUnitId(row.unit, row.rowNo, unitCache),
+          unitId: await resolveUnitId(
+            row.unit,
+            row.rowNo,
+            unitCache,
+            defaultUnitCache
+          ),
         };
 
         const itemReq = mapExcelRowToItemMasterReq(row, resolved);
