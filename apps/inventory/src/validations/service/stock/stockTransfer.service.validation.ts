@@ -82,40 +82,29 @@ export const createStockTransferServiceValidation = async (
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Items"));
   }
 
-  const stockQtyMap = new Map<string, number>();
-
   for (const item of stockTransferDetails) {
-    const expiryDate = item.expiryDate ? new Date(item.expiryDate) : null;
-
-    const key = `${item.itemId}-${item.batchNo ?? ""}-${
-      expiryDate?.toISOString().slice(0, 10) ?? ""
-    }`;
-
-    stockQtyMap.set(key, (stockQtyMap.get(key) ?? 0) + (item.quantity ?? 0));
-  }
-
-  for (const [key, quantity] of stockQtyMap.entries()) {
-    const [itemId, batchNo, expiryDate] = key.split("-");
-
     const fromStock = await getItemStockQtyByBatchWise({
-      itemId: Number(itemId),
-      batchNo: batchNo || null,
-      expiryDate: expiryDate ? new Date(expiryDate) : null,
+      itemId: item.itemId,
+      batchNo: item.batchNo || null,
+      expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
       ccId: input.fromId,
     });
+
+    const itemName =
+      itemsInDb.find((i) => i.id === item.itemId)?.item ??
+      `Item Id:${item.itemId}`;
 
     if (!fromStock) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Item Id:${itemId} Stock`)
+        generateErrorMessage("NOT_FOUND", `${itemName} Stock`)
       );
     }
 
-    // Validate quantity
-    if (fromStock < quantity) {
+    if (fromStock < (item.quantity ?? 0)) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INSUFFICIENT_STOCK", `Item Id:${itemId} `)
+        generateErrorMessage("INSUFFICIENT_STOCK", itemName)
       );
     }
   }
