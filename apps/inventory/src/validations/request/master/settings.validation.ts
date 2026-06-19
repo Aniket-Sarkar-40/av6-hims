@@ -38,6 +38,7 @@ export const createOrUpdateSettingsSchema = Joi.object<CreateOrUpdateSettings>({
   poCalculationMethod: enumOptional("PO calculation method", CalculationMethod),
   itemStockType: enumOptional("Item stock type", ItemStockType),
   poRoundedFormat: enumOptional("PO rounded format", RoundFormat),
+  isAutoApproveConsumption: boolRequired("Is auto approve consumption"),
 });
 
 export const validateSettings = validationHandler({

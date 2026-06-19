@@ -1811,3 +1811,6 @@ ALTER TABLE `inv_consumption_details` ALTER COLUMN `consumed_qty` DROP DEFAULT;
 ALTER TABLE `inv_consumption` MODIFY `status` ENUM('DRAFT', 'SENT_FOR_APPROVAL', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'APPROVED';
 
 ALTER TABLE `inv_settings` ADD COLUMN `is_auto_consumption` BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE `inv_settings` DROP COLUMN `is_auto_consumption`,
+    ADD COLUMN `is_auto_approve_consumption` BOOLEAN NOT NULL DEFAULT true;

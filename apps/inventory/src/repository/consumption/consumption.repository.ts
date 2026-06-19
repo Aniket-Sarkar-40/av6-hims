@@ -30,7 +30,7 @@ export async function createConsumptionInDb(
   const store = requestStorage.getStore();
   const userId = store?.user?.id;
   const settings = await settingsService.getSettings();
-  const isAutoConsumption = settings?.isAutoConsumption;
+  const isAutoApproveConsumption = settings?.isAutoApproveConsumption;
   const consumptionNo = await uinServiceFactory.generateUIN(InvUinShortCode.CN);
 
   const { consumptionDetails, ...consumptionData } = data;
@@ -42,8 +42,8 @@ export async function createConsumptionInDb(
           ...consumptionData,
           consumptionNo,
           createdBy: userId,
-          status: isAutoConsumption ? "APPROVED" : "SENT_FOR_APPROVAL",
-          ...(isAutoConsumption
+          status: isAutoApproveConsumption ? "APPROVED" : "SENT_FOR_APPROVAL",
+          ...(isAutoApproveConsumption
             ? {
                 approvedBy: userId,
                 approvedAt: new Date(),
@@ -52,7 +52,7 @@ export async function createConsumptionInDb(
 
           consumptionDetails: {
             create: consumptionDetails.map((c) => {
-              if (isAutoConsumption) {
+              if (isAutoApproveConsumption) {
                 const omitCons = customOmit<
                   ConsumptionDetailsCreateInput,
                   "isBatch" | "isExpiry"
@@ -90,7 +90,7 @@ export async function createConsumptionInDb(
         },
       });
 
-      if (isAutoConsumption) {
+      if (isAutoApproveConsumption) {
         for (const detail of consumption.consumptionDetails) {
           await subItemStock(
             tx,
