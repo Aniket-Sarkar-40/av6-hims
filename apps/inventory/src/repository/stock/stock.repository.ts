@@ -1649,3 +1649,13 @@ export const getInTransitStockQtyByBatchWise = async ({
 
   return totalQuantity;
 };
+
+export const getItemStockByItemId = async (itemId: number) => {
+  logger.info(`entering::getItemStockByItemId::repository`);
+  return await db.invItemStock.findFirst({
+    where: {
+      itemId,
+      isActive: true,
+    },
+  });
+};

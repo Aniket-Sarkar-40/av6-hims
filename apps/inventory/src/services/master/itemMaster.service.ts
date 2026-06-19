@@ -112,7 +112,10 @@ export const itemMasterService = {
   async updateItemMaster(input: ItemMasterUpdateReq): Promise<ItemMasterDto> {
     logger.info("entering::updateItemMaster::service");
     if (!input.id) {
-      throw new ErrorHandler(400, "Item Master ID is required");
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("FIELD_REQUIRED", "Item Master ID")
+      );
     }
     await updateIdItemMasterServiceValidation(input);
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
