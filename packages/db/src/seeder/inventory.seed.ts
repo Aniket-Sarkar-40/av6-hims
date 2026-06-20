@@ -1,5 +1,6 @@
 import { db } from "@repo/db";
 import { EMAIL_TYPE, Prisma } from "@repo/db/generated/prisma/client";
+import { SoftDeleteConfig } from "av6-core";
 
 import { createClient } from "redis";
 
@@ -13,6 +14,7 @@ interface DynamicShortCodeSeeder {
   isDropDown?: boolean;
   whereClause?: string;
   selectClause?: string;
+  deleteConfig?: string;
 }
 
 interface EventEmailSeeder {
@@ -20,6 +22,11 @@ interface EventEmailSeeder {
   emailType: EMAIL_TYPE;
   isSignature: boolean;
   emailBody: string;
+}
+
+interface DefaultUnitMasterSeeder {
+  name: string;
+  description: string;
 }
 
 const redis = createClient({
@@ -45,10 +52,32 @@ async function updateDynamicShortCodeConfigsByShortCode(
   );
 }
 
+const getDeleteConfigByTableName = (shortCode: string): SoftDeleteConfig => {
+  switch (shortCode) {
+    case "PO":
+      return {
+        children: [
+          { tableName: "invPurchaseOrderDetails", foreignKey: "purchaseId" },
+        ],
+      };
+    case "ST_REQ_RET":
+      return {
+        children: [
+          {
+            tableName: "storeRequisitionReturnDetails",
+            foreignKey: "storeRequisitionReturnId",
+          },
+        ],
+      };
+    default:
+      return {};
+  }
+};
+
 export async function runSeed() {
   await redis.connect();
 
-  const rows = await db.coreDynamicShortCode.findMany({
+  const rows = await db.invDynamicShortCode.findMany({
     select: { shortCode: true, config: true },
     where: { config: { not: Prisma.JsonNull } },
   });
@@ -96,8 +125,9 @@ export async function runSeed() {
     {
       shortCode: "UNIT_MASTER",
       tableName: "invUnitMaster",
-      isDTO: false,
+      isDTO: true,
       isCacheable: true,
+      isSingleDto: false,
       isDropDown: true,
       permission: "inv:item-unit:view",
       whereClause: JSON.stringify({ isActive: true }),
@@ -159,7 +189,7 @@ export async function runSeed() {
       permission: "inv:itemSupplier:view",
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true, isLock: false }),
-      selectClause: JSON.stringify({ id: "id", value: "name" }),
+      selectClause: JSON.stringify({ id: "id", value: "vendorCompanyName" }),
     },
     {
       shortCode: "ITEM_SUPPLIER_MAP",
@@ -230,6 +260,17 @@ export async function runSeed() {
       selectClause: JSON.stringify({ id: "id", value: "grnNumber" }),
     },
     {
+      shortCode: "GRN_DETAILS",
+      tableName: "invGoodReceiveDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:grn-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "quantity" }),
+    },
+    {
       shortCode: "STOCK_ADJUSTMENT",
       tableName: "invStockAdjustment",
       isDTO: true,
@@ -252,6 +293,17 @@ export async function runSeed() {
       selectClause: JSON.stringify({ id: "id", value: "grnNumber" }),
     },
     {
+      shortCode: "GRN_RETURN_DETAILS",
+      tableName: "invGoodReceiveReturnDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "INV:grn-return-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "quantity" }),
+    },
+    {
       shortCode: "PO",
       tableName: "invPurchaseOrder",
       isDTO: true,
@@ -261,6 +313,18 @@ export async function runSeed() {
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "poNumber" }),
+      deleteConfig: JSON.stringify(getDeleteConfigByTableName("PO")),
+    },
+    {
+      shortCode: "PO_DETAILS",
+      tableName: "invPurchaseOrderDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:purchase-order-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "quantity" }),
     },
     {
       shortCode: "CONSUMPTION",
@@ -315,6 +379,83 @@ export async function runSeed() {
       permission: "inv:stock-transfer:view",
       isDropDown: true,
     },
+    {
+      shortCode: "STOCK_TRANSFER_DETAILS",
+      tableName: "invStockTransferDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:stock-transfer-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "quantity" }),
+    },
+    {
+      shortCode: "BRANCH_REQ",
+      tableName: "branchRequisition",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:branch-requisition:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "brNumber" }),
+    },
+    {
+      shortCode: "BRANCH_REQ_DETAILS",
+      tableName: "branchRequisitionDetails",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: false,
+      permission: "inv:branch-requisition-details:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "branchRequisitionId" }),
+    },
+    {
+      shortCode: "ST_REQ_RET",
+      tableName: "storeRequisitionReturn",
+      isDTO: true,
+      isSingleDto: true,
+      isCacheable: false,
+      permission: "INV:store-requisition-return:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "srrNumber" }),
+      deleteConfig: JSON.stringify(getDeleteConfigByTableName("ST_REQ_RET")),
+    },
+    {
+      shortCode: "BRANCH_REQ_RETURN",
+      tableName: "branchRequisitionReturn",
+      isDTO: true,
+      isSingleDto: true,
+      isCacheable: false,
+      permission: "inv:branch-requisition-return:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "brrNumber" }),
+    },
+    {
+      shortCode: "ITEM_BATCH_STOCK",
+      tableName: "invItemStock",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: true,
+      permission: "inv:item-batch-stock:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "batchNo" }),
+    },
+    {
+      shortCode: "DEFAULT_UNIT_MASTER",
+      tableName: "invDefaultUnitMaster",
+      isDTO: false,
+      isCacheable: true,
+      isDropDown: true,
+      permission: "inv:default-unit-master:view",
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "name" }),
+    },
   ];
 
   const eventEmails: EventEmailSeeder[] = [
@@ -351,6 +492,89 @@ export async function runSeed() {
     },
   ];
 
+  const defaultUnitMasters: DefaultUnitMasterSeeder[] = [
+    {
+      name: "Piece (PCS)",
+      description: "Individual item",
+    },
+    {
+      name: "Box",
+      description: "Items packed in a box",
+    },
+    {
+      name: "Packet (PKT)",
+      description: "Small packaged items",
+    },
+    {
+      name: "Carton",
+      description: "Large packaging unit",
+    },
+    {
+      name: "Bottle",
+      description: "Liquid products",
+    },
+    {
+      name: "Strip",
+      description: "Medicine strip",
+    },
+    {
+      name: "Tablet",
+      description: "Single medicine unit",
+    },
+    {
+      name: "Capsule",
+      description: "Single capsule unit",
+    },
+    {
+      name: "Kilogram (KG)",
+      description: "Weight measurement",
+    },
+    {
+      name: "Gram (GM)",
+      description: "Small weight measurement",
+    },
+    {
+      name: "Liter (L)",
+      description: "Liquid quantity",
+    },
+    {
+      name: "Milliliter (ML)",
+      description: "Small liquid quantity",
+    },
+    {
+      name: "Meter (MTR)",
+      description: "Length measurement",
+    },
+    {
+      name: "Roll",
+      description: "Rolled material",
+    },
+    {
+      name: "Set",
+      description: "Group of items",
+    },
+    {
+      name: "Pair",
+      description: "Two connected items",
+    },
+    {
+      name: "Dozen",
+      description: "Group of 12 items",
+    },
+    {
+      name: "Pack",
+      description: "Multiple items packed together",
+    },
+    {
+      name: "Tray",
+      description: "Items arranged in tray",
+    },
+    {
+      name: "Bundle",
+      description: "Grouped materials",
+    },
+  ];
+
   await db.invDynamicShortCode.createMany({
     data: dynamicShortCodes,
   });
@@ -361,6 +585,37 @@ export async function runSeed() {
   });
 
   await updateDynamicShortCodeConfigsByShortCode(map);
+
+  for (const unit of defaultUnitMasters) {
+    const existingUnit = await db.invDefaultUnitMaster.findFirst({
+      where: {
+        name: unit.name,
+      },
+    });
+
+    if (existingUnit) {
+      await db.invDefaultUnitMaster.update({
+        where: {
+          id: existingUnit.id,
+        },
+        data: {
+          description: unit.description,
+          isActive: true,
+          deletedAt: null,
+          deletedBy: null,
+        },
+      });
+
+      continue;
+    }
+
+    await db.invDefaultUnitMaster.create({
+      data: {
+        name: unit.name,
+        description: unit.description,
+      },
+    });
+  }
 
   await redis.disconnect();
   await db.$disconnect();

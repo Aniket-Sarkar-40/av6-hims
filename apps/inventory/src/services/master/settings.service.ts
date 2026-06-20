@@ -11,6 +11,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 import { InvSettings } from "@repo/db/generated/prisma/client";
 import { checkIsCacheable } from "@/config/cache.config.js";
+import { setSchemaPrecisionSettings } from "@/utils/schema.utils.js";
 
 const cacheKey = getRedisKey("SETTINGS", "all");
 
@@ -26,11 +27,13 @@ export const settingsService = {
       await addToCache(cacheKey, created.id, created);
     }
 
+    setSchemaPrecisionSettings(created);
+
     logger.info("exiting::upsertSettings::service");
     return created;
   },
   async getSettings(
-    canNullReturnable: boolean = false,
+    canNullReturnable: boolean = false
   ): Promise<InvSettings | null> {
     logger.info("entering::getSettings::service");
 
@@ -40,7 +43,7 @@ export const settingsService = {
       const cached = (await getAllCache(cacheKey)) as InvSettings[];
       if (cached && cached.length > 0) {
         logger.info("exiting::getSettings::service (cache)");
-        settings = cached[0];
+        return cached[0];
       }
     }
 
@@ -48,7 +51,7 @@ export const settingsService = {
     if (!settings && !canNullReturnable) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Settings"),
+        generateErrorMessage("NOT_FOUND", "Settings")
       );
     }
 

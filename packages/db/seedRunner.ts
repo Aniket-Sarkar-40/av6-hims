@@ -7,6 +7,7 @@ const seedMap: Record<string, () => Promise<any>> = {
   pms: async () => (await import("./src/seeder/pharmacy.seed")).runSeed(),
   opd: async () => (await import("./src/seeder/opd.seed")).runSeed(),
   inv: async () => (await import("./src/seeder/inventory.seed")).runSeed(),
+  acc: async () => (await import("./src/seeder/accounting.seed")).runSeed(),
 };
 
 async function run() {

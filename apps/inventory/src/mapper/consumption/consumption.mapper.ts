@@ -1,17 +1,17 @@
 import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import {
+  ConDetailDTO,
   ConsumptionDTO,
   ConsumptionResponse,
 } from "@/types/consumption/consumption.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { getBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
-import { customOmit } from "av6-utils";
-import { toIdValue } from "av6-utils";
-import { ConsumptionDetails } from "@repo/db/generated/prisma/client";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
+import { ConsumptionDetails } from "@repo/db/generated/prisma/client";
+import { customOmit, toIdValue } from "av6-utils";
 
 export const toConsumptionDTO = async (
-  consumption: ConsumptionResponse[],
+  consumption: ConsumptionResponse[]
 ): Promise<ConsumptionDTO[]> => {
   const items = await itemMasterService.getAllItemMaster(true);
 
@@ -21,7 +21,6 @@ export const toConsumptionDTO = async (
         ConsumptionResponse,
         | "consumptionDetails"
         | "ccId"
-        | "approvalFrom"
         | "requestedBy"
         | "createdBy"
         | "updatedBy"
@@ -32,7 +31,6 @@ export const toConsumptionDTO = async (
       >(consumption, [
         "consumptionDetails",
         "ccId",
-        "approvalFrom",
         "requestedBy",
         "createdBy",
         "updatedBy",
@@ -42,42 +40,38 @@ export const toConsumptionDTO = async (
         "deletedBy",
       ]);
       const cc = await getBranchOrWarehouse(consumption.ccId);
-      const approver = await employeeService.getEmployeeByIdFrmCacheOrDb(
-        consumption.approvalFrom,
-        true,
-      );
       const requester = await employeeService.getEmployeeByIdFrmCacheOrDb(
         consumption.requestedBy,
-        true,
+        true
       );
       const createdBy = consumption.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.createdBy,
-            true,
+            true
           )
         : null;
       const updatedBy = consumption.updatedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.updatedBy,
-            true,
+            true
           )
         : null;
       const approvedBy = consumption.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.approvedBy,
-            true,
+            true
           )
         : null;
       const rejectedBy = consumption.rejectedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.rejectedBy,
-            true,
+            true
           )
         : null;
       const deletedBy = consumption.deletedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.deletedBy,
-            true,
+            true
           )
         : null;
       const consumptionDetails = await Promise.all(
@@ -104,16 +98,27 @@ export const toConsumptionDTO = async (
             "updatedAt",
           ]);
           const item = items.find((itm) => itm.id === detail.itemId);
+          const createdBy = detail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.createdBy
+              )
+            : null;
+          const updatedBy = detail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.updatedBy
+              )
+            : null;
           return {
             ...omittedDetail.rest,
             item: item ? await itemMasterToDto(item) : null,
+            createdBy,
+            updatedBy,
           };
-        }),
+        })
       );
 
       return {
         ...omittedConsumption.rest,
-        approvalFrom: toIdValue(approver, "name"),
         requestedBy: requester,
         createdBy: createdBy,
         updatedBy: updatedBy,
@@ -123,6 +128,35 @@ export const toConsumptionDTO = async (
         consumptionDetails: consumptionDetails,
         collectionCenter: cc ? toIdValue(cc, "name") : null,
       };
-    }),
+    })
+  );
+};
+
+export const toConDetailDTO = async (
+  consumptionDetail: ConsumptionDetails[]
+): Promise<ConDetailDTO[]> => {
+  return Promise.all(
+    consumptionDetail.map(async (detail) => {
+      const omittedData = customOmit<
+        ConsumptionDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const item = await itemMasterService.getItemMasterById(
+        { itemId: detail.itemId },
+        true
+      );
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+      return {
+        ...omittedData.rest,
+        item: item ? await itemMasterToDto(item) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
   );
 };

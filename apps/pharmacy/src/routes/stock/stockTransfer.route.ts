@@ -25,6 +25,7 @@ import {
 } from "@/validations/request/stock/stockTransfer.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 export const stockTransferRouter: Router = Router();
 
 /**
@@ -52,10 +53,10 @@ export const stockTransferRouter: Router = Router();
 
 stockTransferRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "CREATE")),
   validateCreateStockTransfer,
-  createStockTransfer,
+  createStockTransfer
 );
 
 /**
@@ -76,13 +77,13 @@ stockTransferRouter.post(
 
 stockTransferRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STOCK_TRANSFER", "VIEW"),
-    getPermission("PMS", "STOCK_TRANSFER", "UPDATE"),
+    getPermission("PMS", "STOCK_TRANSFER", "UPDATE")
   ),
   validateUpdateStockTransfer,
-  updateStockTransfer,
+  updateStockTransfer
 );
 
 /**
@@ -103,10 +104,10 @@ stockTransferRouter.put(
 
 stockTransferRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "DELETE")),
   validateDeleteStockTransfer,
-  deleteStockTransfer,
+  deleteStockTransfer
 );
 
 /**
@@ -127,10 +128,10 @@ stockTransferRouter.delete(
 
 stockTransferRouter.post(
   "/approve",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER_APPROVE", "CREATE")),
   validateAppAckStockTransfer,
-  approveStockTransfer,
+  approveStockTransfer
 );
 /**
  * @swagger
@@ -150,12 +151,12 @@ stockTransferRouter.post(
 
 stockTransferRouter.post(
   "/approve-return",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
-    getPermission("PMS", "BRANCH_STOCK_TRANSFER_APPROVE_RETURN", "CREATE"),
+    getPermission("PMS", "BRANCH_STOCK_TRANSFER_APPROVE_RETURN", "CREATE")
   ),
   validateAppAckStockTransfer,
-  approveReturnStockTransfer,
+  approveReturnStockTransfer
 );
 
 /**
@@ -175,10 +176,10 @@ stockTransferRouter.post(
  */
 stockTransferRouter.post(
   "/acknowledge",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER_ACK", "CREATE")),
   validateAcknowledgeSearchStockTransfer,
-  acknowledgeStockTransfer,
+  acknowledgeStockTransfer
 );
 
 /**
@@ -200,9 +201,9 @@ stockTransferRouter.post(
 
 stockTransferRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "VIEW")),
-  getStockTransferById,
+  getStockTransferById
 );
 
 /**
@@ -216,9 +217,9 @@ stockTransferRouter.get(
  */
 stockTransferRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "VIEW")),
-  getAllStockTransfer,
+  getAllStockTransfer
 );
 
 /**
@@ -238,10 +239,10 @@ stockTransferRouter.get(
  */
 stockTransferRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER_SEARCH", "VIEW")),
   validateSearchStockTransfer,
-  searchStockTransfer,
+  searchStockTransfer
 );
 
 export default stockTransferRouter;

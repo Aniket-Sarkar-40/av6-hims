@@ -123,10 +123,60 @@ export const fixedFieldSchema = Joi.alternatives()
           "any.required": "Fixed field value is required.",
           "array.length": "Fixed field value must contain exactly 1 element.",
         }),
+    }),
+    Joi.object({
+      type: Joi.string().valid("null").required().messages({
+        "any.only": "Fixed field type must be 'null'.",
+        "string.base": "Fixed field type must be a string.",
+        "any.required": "Fixed field type is required.",
+      }),
+      value: Joi.array().items(Joi.valid(null)).length(1).required().messages({
+        "array.base": "Fixed field value must be an array.",
+        "any.required": "Fixed field value is required.",
+        "array.length": "Fixed field value must contain exactly 1 element.",
+        "any.only": "Fixed field value must contain only null.",
+      }),
     })
   )
   .messages({
     "alternatives.match": "Fixed field does not match any allowed schema.",
+  });
+
+export const logicSchema = Joi.object({
+  fixedSearch: Joi.object()
+    .pattern(Joi.string(), fixedFieldSchema)
+    .optional()
+    .messages({
+      "object.base":
+        "logic.fixedSearch must be an object with valid fixed field entries.",
+    }),
+
+  fixedNotSearch: Joi.object()
+    .pattern(Joi.string(), fixedFieldSchema)
+    .optional()
+    .messages({
+      "object.base":
+        "logic.fixedNotSearch must be an object with valid fixed field entries.",
+    }),
+
+  AND: Joi.array().items(Joi.link("#logicNode")).min(1).optional().messages({
+    "array.base": "logic.AND must be an array.",
+    "array.min": "logic.AND must have at least 1 condition.",
+  }),
+
+  OR: Joi.array().items(Joi.link("#logicNode")).min(1).optional().messages({
+    "array.base": "logic.OR must be an array.",
+    "array.min": "logic.OR must have at least 1 condition.",
+  }),
+})
+  // IMPORTANT: id must exist for Joi.link("#logicNode") to resolve
+  .id("logicNode")
+  // require at least one key in each node
+  .or("fixedSearch", "fixedNotSearch", "AND", "OR")
+  .messages({
+    "object.base": "logic must be an object.",
+    "object.missing":
+      "logic node must contain at least one of fixedSearch, fixedNotSearch, AND, OR.",
   });
 
 export const fixedSearchSchema = Joi.object({
@@ -197,6 +247,7 @@ export const fixedSearchSchema = Joi.object({
       "object.base":
         "Fixed not search must be an object with valid fixed field entries.",
     }),
+  logic: logicSchema.optional(),
   includes: Joi.object().optional().messages({
     "object.base": "Includes must be an object.",
   }),
@@ -311,6 +362,7 @@ export const fixedSearchWoPaginationSchema = Joi.object({
       "object.base":
         "Fixed not search must be an object with valid fixed field entries.",
     }),
+  logic: logicSchema.optional(),
   includes: Joi.object().optional().messages({
     "object.base": "Includes must be an object.",
   }),
@@ -459,6 +511,7 @@ export const dropdownSchema = Joi.object({
     "string.base": "Search text must be a string.",
     "any.required": "Search text is required.",
   }),
+
   fixedSearch: Joi.object()
     .pattern(Joi.string(), fixedFieldSchema)
     .optional()
@@ -466,6 +519,7 @@ export const dropdownSchema = Joi.object({
       "object.base":
         "Fixed search must be an object with valid fixed field entries.",
     }),
+
   fixedNotSearch: Joi.object()
     .pattern(Joi.string(), fixedFieldSchema)
     .optional()
@@ -473,6 +527,21 @@ export const dropdownSchema = Joi.object({
       "object.base":
         "Fixed not search must be an object with valid fixed field entries.",
     }),
+
+  logic: logicSchema.optional(),
+
+  sortBy: Joi.string().optional().messages({
+    "string.base": "Sort by must be a string.",
+  }),
+
+  sortDir: Joi.string().valid("ASC", "DESC").optional().messages({
+    "any.only": "Sort direction must be either ASC or DESC.",
+    "string.base": "Sort direction must be a string.",
+  }),
+
+  selectColumns: Joi.object().optional().messages({
+    "object.base": "Select must be an object.",
+  }),
 });
 
 //

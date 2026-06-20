@@ -19,6 +19,7 @@ import {
   validateUpdateConfig,
 } from "@/validations/request/master/uinConfig.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const uinConfigRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const uinConfigRouter: Router = Router();
  */
 uinConfigRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UIN_CONFIG", "CREATE")),
   validateCreateConfig,
-  createUINConfig,
+  createUINConfig
 );
 
 /**
@@ -69,13 +70,13 @@ uinConfigRouter.post(
  */
 uinConfigRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "UIN_CONFIG", "VIEW"),
-    getPermission("INV", "UIN_CONFIG", "UPDATE"),
+    getPermission("INV", "UIN_CONFIG", "UPDATE")
   ),
   validateUpdateConfig,
-  updateUINConfig,
+  updateUINConfig
 );
 
 /**
@@ -96,10 +97,10 @@ uinConfigRouter.put(
  */
 uinConfigRouter.get(
   "/uin",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UIN_CONFIG", "VIEW")),
   validateGetUINConfig,
-  getUIN,
+  getUIN
 );
 
 /**
@@ -120,10 +121,10 @@ uinConfigRouter.get(
  */
 uinConfigRouter.get(
   "/uin-preview",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UIN_CONFIG", "VIEW")),
   validateGetUINConfig,
-  previewUIN,
+  previewUIN
 );
 
 /**
@@ -143,10 +144,10 @@ uinConfigRouter.get(
  */
 uinConfigRouter.post(
   "/uin-custom-preview",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UIN_CONFIG", "CREATE")),
   validatePreviewCustomConfig,
-  previewCustomUIN,
+  previewCustomUIN
 );
 
 /**
@@ -159,9 +160,9 @@ uinConfigRouter.post(
 // DELETE/:shortCode/:id
 uinConfigRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UIN_CONFIG", "DELETE")),
-  deleteUINConfig,
+  deleteUINConfig
 );
 
 /**
@@ -174,7 +175,7 @@ uinConfigRouter.delete(
 // POST/uin-short-code
 uinConfigRouter.get(
   "/uin-short-code",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UIN_CONFIG", "VIEW")),
-  getAllUinShortCodes,
+  getAllUinShortCodes
 );

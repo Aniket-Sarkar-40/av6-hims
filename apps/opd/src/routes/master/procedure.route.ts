@@ -15,6 +15,7 @@ import {
   validateUpdateProcedureSchema,
 } from "@/validations/request/master/procedure.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const procedureRouter: Router = Router();
 
@@ -42,10 +43,10 @@ export const procedureRouter: Router = Router();
  */
 procedureRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PROCEDURE", "CREATE")),
   validateCreateProcedureSchema,
-  createProcedure,
+  createProcedure
 );
 
 /**
@@ -65,13 +66,13 @@ procedureRouter.post(
  */
 procedureRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PROCEDURE", "VIEW"),
-    getPermission("OPD", "PROCEDURE", "UPDATE"),
+    getPermission("OPD", "PROCEDURE", "UPDATE")
   ),
   validateUpdateProcedureSchema,
-  updateProcedure,
+  updateProcedure
 );
 
 /**
@@ -92,9 +93,9 @@ procedureRouter.put(
  */
 procedureRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PROCEDURE", "VIEW")),
-  getProcedureById,
+  getProcedureById
 );
 
 /**
@@ -114,8 +115,8 @@ procedureRouter.get(
  */
 procedureRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PROCEDURE", "VIEW")),
   validateFetchProcedureSchema,
-  fetchProcedure,
+  fetchProcedure
 );

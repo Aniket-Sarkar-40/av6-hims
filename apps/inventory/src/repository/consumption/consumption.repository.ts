@@ -1,6 +1,3 @@
-import { API_TIMEOUT } from "@repo/shared/config/index.js";
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   CommonConsumptionInput,
@@ -11,58 +8,124 @@ import {
   ConsumptionResponse,
   ConsumptionUpdateInput,
 } from "@/types/consumption/consumption.js";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { db } from "@repo/db/client";
 import {
+  Consumption,
   Consumption_Status,
   InvOperation,
   InvUinShortCode,
 } from "@repo/db/generated/prisma/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { API_TIMEOUT } from "@repo/shared/config/index.js";
+import { customOmit } from "av6-utils";
 import { subItemStock } from "../stock/stock.repository.js";
+import { settingsService } from "@/services/master/settings.service.js";
 
 export async function createConsumptionInDb(
-  data: ConsumptionCreateInput,
+  data: ConsumptionCreateInput
 ): Promise<ConsumptionResponse> {
   logger.info("entering::createConsumptionInDb::repository");
+
   const store = requestStorage.getStore();
+  const userId = store?.user?.id;
+  const settings = await settingsService.getSettings();
+  const isAutoApproveConsumption = settings?.isAutoApproveConsumption;
   const consumptionNo = await uinServiceFactory.generateUIN(InvUinShortCode.CN);
+
+  const { consumptionDetails, ...consumptionData } = data;
+
   return await db.$transaction(
     async (tx) => {
       const consumption = await tx.consumption.create({
         data: {
-          ...data,
+          ...consumptionData,
           consumptionNo,
-          createdBy: store?.user?.id,
+          createdBy: userId,
+          status: isAutoApproveConsumption ? "APPROVED" : "SENT_FOR_APPROVAL",
+          ...(isAutoApproveConsumption
+            ? {
+                approvedBy: userId,
+                approvedAt: new Date(),
+              }
+            : {}),
+
           consumptionDetails: {
-            create: data.consumptionDetails.map((c) => {
+            create: consumptionDetails.map((c) => {
+              if (isAutoApproveConsumption) {
+                const omitCons = customOmit<
+                  ConsumptionDetailsCreateInput,
+                  "isBatch" | "isExpiry"
+                >(c, ["isBatch", "isExpiry"]);
+
+                return {
+                  ...omitCons.rest,
+                  batchNo: c.isBatch ? c.batchNo : null,
+                  expiryDate:
+                    c.isExpiry && c.expiryDate ? new Date(c.expiryDate) : null,
+                  consumedQty: c.consumedQty ? c.consumedQty : c.requestedQty,
+                  createdBy: userId,
+                };
+              }
+
               const omitCons = customOmit<
                 ConsumptionDetailsCreateInput,
                 "consumedQty" | "isBatch" | "isExpiry"
               >(c, ["consumedQty", "isBatch", "isExpiry"]);
+
               return {
                 ...omitCons.rest,
-                expiryDate: c.expiryDate ? new Date(c.expiryDate) : null,
-                createdBy: store?.user?.id,
+                batchNo: c.isBatch ? c.batchNo : null,
+                expiryDate:
+                  c.isExpiry && c.expiryDate ? new Date(c.expiryDate) : null,
+                createdBy: userId,
               };
             }),
           },
         },
         include: {
-          consumptionDetails: true,
+          consumptionDetails: {
+            where: { isActive: true },
+          },
         },
       });
+
+      if (isAutoApproveConsumption) {
+        for (const detail of consumption.consumptionDetails) {
+          await subItemStock(
+            tx,
+            {
+              itemId: detail.itemId,
+              batchNo: detail.batchNo,
+              userId: consumption.requestedBy!,
+              expiryDate: detail.expiryDate ?? undefined,
+              quantity: detail.consumedQty ?? detail.requestedQty ?? 0,
+            },
+            {
+              operation: InvOperation.CONSUMPTION,
+              refDate: consumption.date,
+              refNo: consumption.consumptionNo,
+              refId: consumption.id,
+              refDetailsId: detail.id,
+              refApprovedBy: consumption.approvedBy,
+              refApprovedAt: consumption.approvedAt,
+            },
+            { consumeFromAll: true }
+          );
+        }
+      }
 
       logger.info("exiting::createConsumptionInDb::repository");
       return consumption;
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 }
 
 export async function updateConsumptionInDb(
-  data: ConsumptionUpdateInput,
+  data: ConsumptionUpdateInput
 ): Promise<ConsumptionResponse> {
   logger.info("entering::updateConsumptionInDb::repository");
 
@@ -77,11 +140,11 @@ export async function updateConsumptionInDb(
   const details = consumptionDetails ?? [];
 
   const existingIds = new Set(
-    (existing?.consumptionDetails ?? []).map((d) => d.id),
+    (existing?.consumptionDetails ?? []).map((d) => d.id)
   );
   const toCreate = details.filter((d) => typeof d.id !== "number");
   const toUpdate = details.filter(
-    (d) => typeof d.id === "number" && existingIds.has(d.id as number),
+    (d) => typeof d.id === "number" && existingIds.has(d.id as number)
   );
   const toDelete = (existing?.consumptionDetails ?? [])
     .filter((ed) => !details.some((d) => d.id === ed.id))
@@ -153,7 +216,7 @@ export async function updateConsumptionInDb(
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 
   logger.info("exiting::updateConsumptionInDb::repository");
@@ -161,7 +224,7 @@ export async function updateConsumptionInDb(
 }
 
 export async function getConsumptionByIdFromDb(
-  id: number,
+  id: number
 ): Promise<ConsumptionResponse | null> {
   logger.info("entering::getConsumptionByIdFromDb::repository");
   return await db.consumption.findFirst({
@@ -228,13 +291,13 @@ export async function deleteConsumptionByIdFromDb(id: number): Promise<void> {
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
   logger.info("exiting::deleteConsumptionByIdFromDb::repository");
 }
 
 export async function approveConsumptionInDb(
-  data: ConsumptionApproveInput,
+  data: ConsumptionApproveInput
 ): Promise<ConsumptionResponse> {
   logger.info("entering::approveConsumptionInDb::repository");
   const store = requestStorage.getStore();
@@ -328,6 +391,7 @@ export async function approveConsumptionInDb(
             refApprovedBy: approvedConsumption.approvedBy,
             refApprovedAt: approvedConsumption.approvedAt,
           },
+          { consumeFromAll: true }
         );
       }
       logger.info("exiting::approveConsumptionInDb::repository");
@@ -335,12 +399,12 @@ export async function approveConsumptionInDb(
     },
     {
       timeout: API_TIMEOUT,
-    },
+    }
   );
 }
 
 export async function rejectConsumptionByIdFromDb(
-  data: CommonConsumptionInput,
+  data: CommonConsumptionInput
 ): Promise<void> {
   logger.info("entering::rejectConsumptionByIdFromDb::repository");
   const store = requestStorage.getStore();
@@ -360,7 +424,7 @@ export async function rejectConsumptionByIdFromDb(
 }
 
 export async function getConsumptionByUserIdFromDb(
-  userId: number,
+  userId: number
 ): Promise<ConsumptionResponse[]> {
   logger.info("entering::getConsumptionByUserIdFromDb::repository");
   const consumption = await db.consumption.findMany({

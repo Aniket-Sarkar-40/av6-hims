@@ -12,6 +12,7 @@ import {
   validateClinicalHistoryUpdate,
 } from "@/validations/request/appointment/clinicalHistory.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const clinicalHistoryRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const clinicalHistoryRouter: Router = Router();
  */
 clinicalHistoryRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CLINICAL_HISTORY", "CREATE")),
   validateClinicalHistoryCreate,
-  createClinicalHistory,
+  createClinicalHistory
 );
 
 /**
@@ -62,11 +63,11 @@ clinicalHistoryRouter.post(
  */
 clinicalHistoryRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "CLINICAL_HISTORY", "VIEW"),
-    getPermission("OPD", "CLINICAL_HISTORY", "UPDATE"),
+    getPermission("OPD", "CLINICAL_HISTORY", "UPDATE")
   ),
   validateClinicalHistoryUpdate,
-  updateClinicalHistory,
+  updateClinicalHistory
 );

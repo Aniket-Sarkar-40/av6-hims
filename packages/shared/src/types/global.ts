@@ -72,6 +72,14 @@ export type BaseModelAttrWoCancel =
   | "updatedAt"
   | "deletedAt";
 
+export type BaseModelAttrWoCancelWoActive =
+  | "createdBy"
+  | "updatedBy"
+  | "deletedBy"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt";
+
 export interface FileInfo {
   fileName: string;
   path: string;

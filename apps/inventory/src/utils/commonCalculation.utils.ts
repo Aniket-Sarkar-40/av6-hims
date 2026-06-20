@@ -1,5 +1,10 @@
 import { CalculationInput, CalculationRes } from "@/types/common.js";
-import { DiscMethod } from "@repo/db/generated/prisma/client";
+import {
+  CalculationMethod,
+  DiscMethod,
+  ItemStockType,
+  RoundFormat,
+} from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { applyRound } from "av6-utils";
 
@@ -17,7 +22,7 @@ export const calculation = (input: CalculationInput): CalculationRes => {
   //   actualAmount = input.amount / inclusiveTaxMultiplier;
   // }
   actualAmount =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(actualAmount, roundFormat, input.precision)
       : actualAmount;
 
@@ -28,14 +33,14 @@ export const calculation = (input: CalculationInput): CalculationRes => {
     discountValue = (actualAmount * input.discount) / 100;
   }
   discountValue =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(discountValue, roundFormat, input.precision)
       : discountValue;
 
   // * After discount amount
   let afterDisc = actualAmount - discountValue;
   afterDisc =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(afterDisc, roundFormat, input.precision)
       : afterDisc;
 
@@ -43,14 +48,14 @@ export const calculation = (input: CalculationInput): CalculationRes => {
   let calculatedTax = (input.tax * afterDisc) / 100;
 
   calculatedTax =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(calculatedTax, roundFormat, input.precision)
       : calculatedTax;
 
   //* amount after tax (total amount)
   let totalAmount = afterDisc + calculatedTax;
   totalAmount =
-    calculationMethod === "STEP_WISE"
+    calculationMethod === CalculationMethod.STEP_WISE
       ? applyRound(totalAmount, roundFormat, input.precision)
       : totalAmount;
 
@@ -61,4 +66,50 @@ export const calculation = (input: CalculationInput): CalculationRes => {
     netTax: calculatedTax,
     totalAmount,
   };
+};
+
+export const calculateGrnItemNetAmount = ({
+  itemStockType,
+  unitDefaultValue,
+  purchasedPrice,
+  quantity,
+  calculationMethod,
+  roundFormat,
+  precision,
+}: {
+  itemStockType: ItemStockType;
+  unitDefaultValue: number;
+  purchasedPrice: number;
+  quantity: number;
+  calculationMethod: CalculationMethod;
+  roundFormat: RoundFormat;
+  precision: number;
+}) => {
+  const price = Number(purchasedPrice);
+  const qty = Number(quantity);
+  const defaultValue = Number(unitDefaultValue ?? 1);
+
+  const amount =
+    itemStockType === ItemStockType.EACH_WISE
+      ? defaultValue * price * qty
+      : price * qty;
+
+  return calculationMethod === CalculationMethod.STEP_WISE
+    ? applyRound(amount, roundFormat, precision)
+    : amount;
+};
+
+export const calculateGrnStockQty = ({
+  itemStockType,
+  unitDefaultValue,
+  quantity,
+}: {
+  itemStockType: ItemStockType;
+  unitDefaultValue: number;
+  quantity: number;
+}) => {
+  const qty = Number(quantity);
+  const defaultValue = Number(unitDefaultValue ?? 1);
+
+  return itemStockType === ItemStockType.EACH_WISE ? qty * defaultValue : qty;
 };

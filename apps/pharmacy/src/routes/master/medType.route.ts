@@ -14,6 +14,7 @@ import {
   validateDropDownNameUpdate,
 } from "@/validations/request/master/dropDown.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const medTypeRouter: Router = Router();
 
@@ -41,10 +42,10 @@ const medTypeRouter: Router = Router();
  */
 medTypeRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_TYPE", "CREATE")),
   validateDropDownName,
-  createMedType,
+  createMedType
 );
 
 /**
@@ -58,9 +59,9 @@ medTypeRouter.post(
  */
 medTypeRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_TYPE", "VIEW")),
-  getAllMedType,
+  getAllMedType
 );
 
 /**
@@ -79,9 +80,9 @@ medTypeRouter.get(
  */
 medTypeRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_TYPE", "VIEW")),
-  getMedTypeById,
+  getMedTypeById
 );
 
 /**
@@ -108,13 +109,13 @@ medTypeRouter.get(
  */
 medTypeRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_TYPE", "VIEW"),
-    getPermission("PMS", "MEDICINE_TYPE", "UPDATE"),
+    getPermission("PMS", "MEDICINE_TYPE", "UPDATE")
   ),
   validateDropDownNameUpdate,
-  updateMedType,
+  updateMedType
 );
 
 export default medTypeRouter;

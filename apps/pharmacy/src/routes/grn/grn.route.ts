@@ -18,6 +18,7 @@ import {
   validateGrnUpdate,
 } from "@/validations/request/grn/grn.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const grnRouter: Router = Router();
 
@@ -45,10 +46,10 @@ export const grnRouter: Router = Router();
  */
 grnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "CREATE")),
   validateGrn,
-  createGrn,
+  createGrn
 );
 
 /**
@@ -62,9 +63,9 @@ grnRouter.post(
  */
 grnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "VIEW")),
-  getAllGrn,
+  getAllGrn
 );
 
 /**
@@ -83,9 +84,9 @@ grnRouter.get(
  */
 grnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "VIEW")),
-  getGrnById,
+  getGrnById
 );
 
 /**
@@ -112,13 +113,13 @@ grnRouter.get(
  */
 grnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "GRN", "VIEW"),
-    getPermission("PMS", "GRN", "UPDATE"),
+    getPermission("PMS", "GRN", "UPDATE")
   ),
   validateGrnUpdate,
-  updateGrn,
+  updateGrn
 );
 
 /**
@@ -143,9 +144,9 @@ grnRouter.put(
  */
 grnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "DELETE")),
-  deleteGrn,
+  deleteGrn
 );
 
 /**
@@ -165,10 +166,10 @@ grnRouter.delete(
  */
 grnRouter.post(
   "/excel-report",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_EXCEL", "VIEW")),
   validateExcelFilterGrn,
-  excelGrnReport,
+  excelGrnReport
 );
 
 /**
@@ -182,14 +183,14 @@ grnRouter.post(
  */
 grnRouter.post(
   "/pdf",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_PDF", "VIEW")),
-  printGrnById,
+  printGrnById
 );
 
 grnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "DELETE")),
-  deleteGrn,
+  deleteGrn
 );

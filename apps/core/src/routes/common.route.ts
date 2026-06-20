@@ -56,7 +56,7 @@ const commonRouter: Router = Router();
 // POST /users
 commonRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateSearchRequest,
   commonSearch
@@ -78,7 +78,7 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/dropdownSearch",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateDropdownRequest,
   commonDropdownSearch
@@ -100,7 +100,7 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/fixedSearch",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
   fixedSearch
@@ -122,7 +122,7 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/fixedSearchWOP",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
   fixedSearchWoPaginationController
@@ -144,7 +144,7 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/excel-export-fs",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateCommonExcelExport,
   commonFSExcelExport
@@ -166,7 +166,7 @@ commonRouter.post(
 // POST /fetch
 commonRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateCommonFetch,
   commonFetch
@@ -220,7 +220,7 @@ commonRouter.post("/exportExcel", validateCommonExportExcel, commonExcelExport);
 // DELETE/:shortCode/:id
 commonRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateCommonDelete,
   commonDelete
@@ -242,7 +242,7 @@ commonRouter.delete(
 // DELETE/:shortCode/:id
 commonRouter.patch(
   "/updateStatus",
-  verifyToken,
+  verifyToken(),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
   commonUpdateStatus

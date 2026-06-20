@@ -42,7 +42,7 @@ const stateRouter: Router = Router();
  */
 stateRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STATE", "CREATE")),
   validateState,
   createState
@@ -59,7 +59,7 @@ stateRouter.post(
  */
 stateRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STATE", "VIEW")),
   getAllStates
 );
@@ -82,7 +82,7 @@ stateRouter.get(
  */
 stateRouter.get(
   "/:stateId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STATE", "VIEW")),
   getStateById
 );
@@ -104,7 +104,7 @@ stateRouter.get(
  */
 stateRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "STATE", "VIEW"),
     getPermission("CORE", "STATE", "UPDATE")
@@ -131,7 +131,7 @@ stateRouter.put(
  */
 stateRouter.delete(
   "/:stateId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STATE", "DELETE")),
   deleteState
 );

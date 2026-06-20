@@ -23,8 +23,9 @@ import {
   validateItemWiseItemBranchMapUpdate,
   validateUpdateItemBranchMap,
 } from "@/validations/request/item/itemBranch.validation.js";
-
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemBranchRouter: Router = Router();
 
@@ -52,10 +53,10 @@ export const itemBranchRouter: Router = Router();
  */
 itemBranchRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "CREATE")),
   validateCreateItemBranchMap,
-  createItemBranchMap,
+  createItemBranchMap
 );
 
 /**
@@ -75,10 +76,10 @@ itemBranchRouter.post(
  */
 itemBranchRouter.post(
   "/get",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
   validateGetItemBranchMap,
-  getItemBranch,
+  getItemBranch
 );
 
 /**
@@ -98,13 +99,13 @@ itemBranchRouter.post(
  */
 itemBranchRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
   ),
   validateUpdateItemBranchMap,
-  updateItemBranchMap,
+  updateItemBranchMap
 );
 
 /**
@@ -118,9 +119,9 @@ itemBranchRouter.put(
  */
 itemBranchRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "DELETE")),
-  deleteItemBranch,
+  deleteItemBranch
 );
 
 /**
@@ -140,10 +141,10 @@ itemBranchRouter.delete(
  */
 itemBranchRouter.post(
   "/get-excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH_EXCEL", "VIEW")),
   validateInputExcelItemBranchMap,
-  excelBranchItemMap,
+  excelBranchItemMap
 );
 
 /**
@@ -174,10 +175,11 @@ itemBranchRouter.post(
 
 itemBranchRouter.post(
   "/import",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
-  branchItemMapExcelImport,
+  branchItemMapExcelImport
 );
 
 /**
@@ -197,13 +199,13 @@ itemBranchRouter.post(
  */
 itemBranchRouter.put(
   "/update",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
   ),
   validateItemWiseItemBranchMapUpdate,
-  updateItemWiseItemBranchMap,
+  updateItemWiseItemBranchMap
 );
 
 /**
@@ -224,13 +226,13 @@ itemBranchRouter.put(
 
 itemBranchRouter.post(
   "/copy",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
   ),
   validateItemBranchMapCopy,
-  BranchToBranchCopyItemBranchMap,
+  BranchToBranchCopyItemBranchMap
 );
 
 /**
@@ -251,7 +253,7 @@ itemBranchRouter.post(
  */
 itemBranchRouter.get(
   "/mapping",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
-  getItemBranchMapDetailsForUpdate,
+  getItemBranchMapDetailsForUpdate
 );

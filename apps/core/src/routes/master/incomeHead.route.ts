@@ -42,7 +42,7 @@ export const incomeHeadRouter: Router = Router();
  */
 incomeHeadRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "CREATE")),
   validateIncomeHeadCreate,
   createIncomeHead
@@ -59,7 +59,7 @@ incomeHeadRouter.post(
  */
 incomeHeadRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "VIEW")),
   getAllIncomeHead
 );
@@ -82,7 +82,7 @@ incomeHeadRouter.get(
  */
 incomeHeadRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "VIEW")),
   getIncomeHeadId
 );
@@ -111,7 +111,7 @@ incomeHeadRouter.get(
  */
 incomeHeadRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "INCOME_HEAD", "VIEW"),
     getPermission("CORE", "INCOME_HEAD", "UPDATE")
@@ -138,7 +138,7 @@ incomeHeadRouter.put(
  */
 incomeHeadRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "DELETE")),
   deleteIncomeHead
 );

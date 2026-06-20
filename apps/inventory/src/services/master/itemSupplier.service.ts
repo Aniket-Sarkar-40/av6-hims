@@ -1,19 +1,40 @@
-import { toItemSupplierDTO } from "@/mapper/master/itemSupplier.mapper.js";
+import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import {
+  mapRowToItemSupplierExcelCreateInput,
+  toItemSupplierDTO,
+  toItemSupplierLookupDTO,
+} from "@/mapper/master/itemSupplier.mapper.js";
+import {
+  createItemSupplierExcelInDb,
   createItemSupplierInDb,
   deleteItemSupplierByIdFromDb,
   getAllItemSupplierFromDb,
   getItemSupplierByIdFromDb,
+  ItemSupplierBatchJob,
+  searchItemSuppliersFromDb,
   updateItemSupplierInDb,
 } from "@/repository/master/itemSupplier.repository.js";
 import {
   ItemSupplierCreateInput,
   ItemSupplierDTO,
+  ItemSupplierExcelImportReq,
+  ItemSupplierExcelRow,
+  ItemSupplierLookupDTO,
+  ItemSupplierLookupInput,
   ItemSupplierResponse,
   ItemSupplierUpdateInput,
 } from "@/types/master/itemSupplier.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
+import {
+  addVendorHeaderStarAndNotes,
+  addVendorImportInstructionSheet,
+} from "@/utils/vendorExcelSample.utils.js";
+import { validateItemSupplierExcelArray } from "@/validations/request/master/itemSupplierExcel.validation.js";
+import {
+  createItemSupplierServiceValidation,
+  deleteItemSupplierServiceValidation,
+  updateItemSupplierServiceValidation,
+} from "@/validations/service/master/itemSupplier.service.validation.js";
+import { InvItemSupplier } from "@repo/db/generated/prisma/client";
 import {
   addToCache,
   deleteCache,
@@ -21,16 +42,13 @@ import {
   getCacheById,
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
-import { getRedisKey } from "@/config/cache.config.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { normalizeVendorExcelRowHeaders } from "@repo/shared/utils/excelImport.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
-import {
-  createItemSupplierServiceValidation,
-  deleteItemSupplierServiceValidation,
-  updateItemSupplierServiceValidation,
-} from "@/validations/service/master/itemSupplier.service.validation.js";
-import { checkIsCacheable } from "@/config/cache.config.js";
-import { InvItemSupplier } from "@repo/db/generated/prisma/client";
+import ExcelJs from "exceljs";
+import XLSX from "xlsx";
 
 const cacheKey = getRedisKey("ITEM_SUPPLIER", "all");
 
@@ -39,31 +57,72 @@ export const itemSupplierService = {
     input: ItemSupplierCreateInput
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::createItemSupplier::service");
+
     await createItemSupplierServiceValidation(input);
+
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
     const itemSupplier = await createItemSupplierInDb(input);
 
     if (isCacheable && itemSupplier) {
       await addToCache(cacheKey, itemSupplier.id, itemSupplier);
     }
-    logger.info("exiting::createItemSupplier::service");
+
     const itemSupplierDTO = await toItemSupplierDTO([itemSupplier]);
-    return itemSupplierDTO[0];
+    const response = itemSupplierDTO[0];
+
+    logger.info("exiting::createItemSupplier::service");
+
+    return response;
   },
 
   async updateItemSupplier(
     input: ItemSupplierUpdateInput
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::updateItemSupplier::service");
+
     await updateItemSupplierServiceValidation(input);
+
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
     const updatedItemSupplier = await updateItemSupplierInDb(input);
+
     if (isCacheable && updatedItemSupplier) {
       await updateCache(cacheKey, input.id, updatedItemSupplier);
     }
-    logger.info("exiting::updateItemSupplier::service");
+
     const itemSupplierDTO = await toItemSupplierDTO([updatedItemSupplier]);
-    return itemSupplierDTO[0];
+    const response = itemSupplierDTO[0];
+
+    logger.info("exiting::updateItemSupplier::service");
+
+    return response;
+  },
+
+  async searchItemSupplier(
+    input: ItemSupplierLookupInput
+  ): Promise<ItemSupplierLookupDTO[]> {
+    logger.info("entering::searchItemSupplier::service");
+
+    const searchText = input.searchText.trim();
+
+    if (!searchText) {
+      logger.info("exiting::searchItemSupplier::service");
+      return [];
+    }
+
+    const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
+
+    const itemSuppliers = isCacheable
+      ? ((await getAllCache(cacheKey)) as ItemSupplierResponse[]) ?? []
+      : await searchItemSuppliersFromDb(input.type, searchText);
+
+    const result = toItemSupplierLookupDTO(
+      itemSuppliers,
+      input.type,
+      searchText
+    );
+
+    logger.info("exiting::searchItemSupplier::service");
+    return result;
   },
   async getAllItemSupplier(
     canNullReturnable: boolean = false
@@ -147,6 +206,254 @@ export const itemSupplierService = {
         );
       else return [];
     }
+    return itemSupplier;
+  },
+  async itemSupplierExcelSampleExport(): Promise<ExcelJs.Workbook> {
+    logger.info("entering::itemSupplierExcelSampleExport::service");
+
+    const wb = new ExcelJs.Workbook();
+    const ws = wb.addWorksheet("Vendor");
+
+    ws.properties.defaultRowHeight = 18;
+
+    ws.columns = [
+      { header: "Vendor Code", key: "supplierCode", width: 20 },
+      { header: "Vendor Company Name", key: "vendorCompanyName", width: 30 },
+      { header: "Phone", key: "phone", width: 18 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "Bill To", key: "billTo", width: 30 },
+      { header: "Ship To", key: "shipTo", width: 30 },
+      { header: "Vendor Type", key: "vendorType", width: 20 },
+
+      { header: "Sales Person", key: "salesPerson", width: 25 },
+      { header: "Sales Person Phone", key: "salesPersonPhone", width: 20 },
+      { header: "Sales Person Email", key: "salesPersonEmail", width: 30 },
+
+      {
+        header: "Proprietary Person Name",
+        key: "proprietaryPersonName",
+        width: 30,
+      },
+      {
+        header: "Proprietary Person Phone",
+        key: "proprietaryPersonPhone",
+        width: 25,
+      },
+      {
+        header: "Proprietary Person Email",
+        key: "proprietaryPersonEmail",
+        width: 32,
+      },
+
+      { header: "Terms And Conditions", key: "termsAndCondition", width: 40 },
+      {
+        header: "Stock Shipment Details",
+        key: "stockShipmentDetails",
+        width: 40,
+      },
+
+      { header: "Bank Account No", key: "accountNo", width: 25 },
+      {
+        header: "Bank Account Holder Name",
+        key: "accountHolderName",
+        width: 30,
+      },
+      { header: "Type Of Account", key: "typeOfAccount", width: 22 },
+      { header: "IFSC Code", key: "ifscCode", width: 20 },
+      { header: "Bank Name", key: "bankName", width: 30 },
+      { header: "Bank Address", key: "bankAddress", width: 40 },
+
+      {
+        header: "Tax Identification Name",
+        key: "taxIdentificationName",
+        width: 30,
+      },
+      {
+        header: "Tax Identification Value",
+        key: "taxIdentificationValue",
+        width: 25,
+      },
+      {
+        header: "Tax Identification Number",
+        key: "taxIdentificationNumber",
+        width: 30,
+      },
+
+      { header: "Is PO Whatsapp", key: "isPoWhatsapp", width: 20 },
+      { header: "Is PO Email", key: "isPoEmail", width: 20 },
+      { header: "Is PO SMS", key: "isPoSms", width: 20 },
+      { header: "Is GRN Whatsapp", key: "isGrnWhatsapp", width: 20 },
+      { header: "Is GRN Email", key: "isGrnEmail", width: 20 },
+      { header: "Is GRN SMS", key: "isGrnSms", width: 20 },
+      { header: "Is Return Whatsapp", key: "isReturnWhatsapp", width: 20 },
+      { header: "Is Return Email", key: "isReturnEmail", width: 20 },
+      { header: "Is Return SMS", key: "isReturnSms", width: 20 },
+    ];
+
+    const headerRow = ws.getRow(1);
+
+    headerRow.eachCell((cell) => {
+      cell.font = {
+        name: "Calibri",
+        bold: true,
+        color: { argb: "FFFFFFFF" },
+      };
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF4F81BD" },
+      };
+
+      cell.alignment = {
+        vertical: "middle",
+        horizontal: "center",
+        wrapText: true,
+      };
+
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+
+    addVendorHeaderStarAndNotes(ws);
+
+    headerRow.height = 24;
+
+    ws.addRow({
+      supplierCode: "VEN-0001",
+      vendorCompanyName: "ABC Medical Supplier",
+      phone: "987654321",
+      email: "vendor@example.com",
+      billTo: "ABC Medical Supplier Billing Address",
+      shipTo: "ABC Medical Supplier Shipping Address",
+      vendorType: "LOCAL",
+
+      salesPerson: "Rahul Das",
+      salesPersonPhone: "987654322",
+      salesPersonEmail: "sales@example.com",
+
+      proprietaryPersonName: "Amit Kumar",
+      proprietaryPersonPhone: "987654323",
+      proprietaryPersonEmail: "owner@example.com",
+
+      termsAndCondition: "Payment within 30 days",
+      stockShipmentDetails: "Delivery within 7 days",
+
+      accountNo: "1234567890",
+      accountHolderName: "ABC Medical Supplier",
+      typeOfAccount: "CURRENT",
+      ifscCode: "SBIN0001234",
+      bankName: "State Bank of India",
+      bankAddress: "Kolkata Branch",
+
+      taxIdentificationName: "GST",
+      taxIdentificationValue: 1,
+      taxIdentificationNumber: "19ABCDE1234F1Z5",
+
+      isPoWhatsapp: true,
+      isPoEmail: true,
+      isPoSms: true,
+      isGrnWhatsapp: true,
+      isGrnEmail: true,
+      isGrnSms: true,
+      isReturnWhatsapp: true,
+      isReturnEmail: true,
+      isReturnSms: true,
+    });
+
+    ws.getColumn("supplierCode").numFmt = "@";
+    ws.getColumn("phone").numFmt = "@";
+    ws.getColumn("salesPersonPhone").numFmt = "@";
+    ws.getColumn("proprietaryPersonPhone").numFmt = "@";
+    ws.getColumn("accountNo").numFmt = "@";
+    ws.getColumn("ifscCode").numFmt = "@";
+    ws.getColumn("taxIdentificationNumber").numFmt = "@";
+
+    ws.columns.forEach((col) => {
+      let max = 10;
+
+      col.eachCell?.({ includeEmpty: true }, (cell) => {
+        const len = cell.value ? String(cell.value).length : 0;
+        if (len > max) max = len;
+      });
+
+      col.width = Math.min(max + 2, 45);
+    });
+
+    ws.views = [{ state: "frozen", ySplit: 1 }];
+
+    addVendorImportInstructionSheet(wb);
+
+    logger.info("exiting::itemSupplierExcelSampleExport::service");
+
+    return wb;
+  },
+  async itemSupplierExcelImport(input: ItemSupplierExcelImportReq) {
+    logger.info("entering::itemSupplierExcelImport::service");
+
+    if (!input.path) {
+      throw new ErrorHandler(400, generateErrorMessage("NOT_FOUND", "File"));
+    }
+
+    const workbook = XLSX.readFile(input.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    const rawData = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+      defval: "",
+    });
+
+    const data = rawData.map(
+      normalizeVendorExcelRowHeaders
+    ) as ItemSupplierExcelRow[];
+
+    const convertedData = data.map((elem, ind) =>
+      mapRowToItemSupplierExcelCreateInput(elem, ind + 1)
+    );
+
+    const { value } = validateItemSupplierExcelArray(convertedData);
+
+    const batch = await createItemSupplierExcelInDb(value);
+
+    ItemSupplierBatchJob({
+      batchJobId: batch.id,
+    })
+      .then(() => logger.info("Item Supplier Batch Processing Completed."))
+      .catch((e) => logger.error(JSON.stringify(e)));
+
+    logger.info("exiting::itemSupplierExcelImport::service");
+    return batch;
+  },
+  async getItemSupplierWoDtoById(
+    id: number,
+    canNullReturnable: boolean = false
+  ): Promise<InvItemSupplier | null> {
+    logger.info("entering::getItemSupplierWoDtoById::service");
+
+    const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
+    let itemSupplier: ItemSupplierResponse | null;
+    if (isCacheable) {
+      itemSupplier = (await getCacheById(
+        cacheKey,
+        id
+      )) as ItemSupplierResponse | null;
+    } else {
+      itemSupplier = await getItemSupplierByIdFromDb(id);
+    }
+
+    if (!itemSupplier) {
+      if (!canNullReturnable) {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "Item Supplier")
+        );
+      } else return null;
+    }
+
+    logger.info("exiting::getItemSupplierWoDtoById::service");
     return itemSupplier;
   },
 };

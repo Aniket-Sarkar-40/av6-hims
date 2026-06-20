@@ -1,10 +1,13 @@
 import {
-  InvStoreRequisition,
   Prisma,
   STORE_REQ_ACK_STATUS,
   STORE_REQ_STATUS,
 } from "@repo/db/generated/prisma/client";
-import { BaseModelAttrWoCancel, IdValue } from "@repo/shared/types/global.js";
+import {
+  BaseModelAttr,
+  BaseModelAttrWoCancel,
+  IdValue,
+} from "@repo/shared/types/global.js";
 import { EmployeeCache } from "av6-core-v2";
 import { ItemMasterToDto } from "../grn/grn.js";
 
@@ -30,6 +33,9 @@ export type BaseInclude = {
   storeRequisitionDetails: {
     where: { isActive: true };
   };
+  requisitionInvItemDetails: {
+    where: { isActive: true };
+  };
 };
 
 export type ValStoreRequisitionResponse = Prisma.InvStoreRequisitionGetPayload<{
@@ -53,8 +59,8 @@ export interface StoreRequisitionDTO
     | "updatedBy"
     | "requisitionFrom"
   > {
+  isAnyPendingReturn: boolean;
   branch: IdValue | null;
-  warehouse: IdValue | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
   approvedBy: EmployeeCache | null;
@@ -62,7 +68,7 @@ export interface StoreRequisitionDTO
   staff: EmployeeCache | null;
   requisitionFrom: IdValue | null;
   acknowledgementBy: EmployeeCache | null;
-  storeRequisitionDetails: StoreRequisitionDetailDTO[];
+  storeRequisitionDetails: StoreRequisitionDetailDTOBranch[];
 }
 
 export type StoreRequisitionDetails =
@@ -74,7 +80,6 @@ export interface StoreRequisitionBatchWiseDTO
     "requisitionFrom" | "requisitionItemDetails"
   > {
   branch: IdValue | null;
-  warehouse: IdValue | null;
   requisitionFrom: IdValue | null;
   requisitionItemDetails: RequisitionItemDetailDTO[];
 }
@@ -85,16 +90,20 @@ export interface StoreRequisitionDetailDTO extends StoreRequisitionDetails {
   branchInHandStock: number | null;
 }
 export interface StoreRequisitionDetailDTOBranch
-  extends StoreRequisitionDetails {
+  extends Omit<StoreRequisitionDetails, "createdBy" | "updatedBy"> {
   item: ItemMasterToDto | null;
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
   userInHandStock: number | null;
+  availableQtyToReturn: number | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }
 
 export interface RequisitionItemDetailDTO
   extends RequisitionItemDetailResponse {
   storeRequisitionDetails: StoreRequisitionDetailDTO;
+  availableQtyToReturn: number;
 }
 
 export interface RejectStoreRequisitionInput {
@@ -176,13 +185,29 @@ export type StoreReqBatchWiseResponse = Prisma.InvStoreRequisitionGetPayload<{
     };
   };
 }>;
-export interface StoreReqExcelFilter {
-  id?: number;
-  staffId?: number;
-  branchId?: number;
-  warehouseId?: number;
-  startDate?: string;
-  endDate?: string;
-  storeReqStatus?: STORE_REQ_STATUS;
-  storeReqAckStatus?: STORE_REQ_ACK_STATUS;
+
+export type StoreReqValResponse = Prisma.InvStoreRequisitionGetPayload<{
+  include: {
+    requisitionInvItemDetails: {
+      where: {
+        isActive: true;
+        isCompleted: false;
+      };
+    };
+    storeRequisitionDetails: {
+      where: {
+        isActive: true;
+      };
+    };
+  };
+}>;
+
+export interface StrDetailDTO
+  extends Omit<
+    StoreRequisitionDetails,
+    "item" | BaseModelAttr | "itemId" | "createdBy" | "updatedBy"
+  > {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }

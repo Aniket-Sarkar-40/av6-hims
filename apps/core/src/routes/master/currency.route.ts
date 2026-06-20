@@ -42,7 +42,7 @@ const currencyRouter: Router = Router();
  */
 currencyRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "CREATE")),
   validateCurrency,
   createCurrency
@@ -59,7 +59,7 @@ currencyRouter.post(
  */
 currencyRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "VIEW")),
   getAllCurrency
 );
@@ -82,7 +82,7 @@ currencyRouter.get(
  */
 currencyRouter.get(
   "/:currencyId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "VIEW")),
   getCurrencyById
 );
@@ -111,7 +111,7 @@ currencyRouter.get(
  */
 currencyRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "CURRENCY", "VIEW"),
     getPermission("CORE", "CURRENCY", "UPDATE")
@@ -138,7 +138,7 @@ currencyRouter.put(
  */
 currencyRouter.delete(
   "/:currencyId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "DELETE")),
   deleteCurrency
 );

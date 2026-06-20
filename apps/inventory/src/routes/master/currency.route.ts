@@ -15,6 +15,7 @@ import {
   updateCurrency,
 } from "@/controllers/master/currency.controller.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const currencyRouter: Router = Router();
 
@@ -42,10 +43,10 @@ const currencyRouter: Router = Router();
  */
 currencyRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "CREATE")),
   validateCurrency,
-  createCurrency,
+  createCurrency
 );
 
 /**
@@ -59,9 +60,9 @@ currencyRouter.post(
  */
 currencyRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "VIEW")),
-  getAllCurrency,
+  getAllCurrency
 );
 
 /**
@@ -82,9 +83,9 @@ currencyRouter.get(
  */
 currencyRouter.get(
   "/:currencyId",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "VIEW")),
-  getCurrencyById,
+  getCurrencyById
 );
 
 /**
@@ -111,13 +112,13 @@ currencyRouter.get(
  */
 currencyRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "CURRENCY", "VIEW"),
-    getPermission("INV", "CURRENCY", "UPDATE"),
+    getPermission("INV", "CURRENCY", "UPDATE")
   ),
   validateUpdateCurrency,
-  updateCurrency,
+  updateCurrency
 );
 
 /**
@@ -138,9 +139,9 @@ currencyRouter.put(
  */
 currencyRouter.delete(
   "/:currencyId",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "DELETE")),
-  deleteCurrency,
+  deleteCurrency
 );
 
 export default currencyRouter;

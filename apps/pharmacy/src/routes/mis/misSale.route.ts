@@ -4,6 +4,7 @@ import {
   getSellMisExcelController,
   misSaleList,
 } from "@/controllers/mis/misSale.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -37,9 +38,9 @@ export const misSaleRouter: Router = Router();
  */
 misSaleRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  misSaleList,
+  misSaleList
 );
 
 /**
@@ -59,9 +60,9 @@ misSaleRouter.get(
  */
 misSaleRouter.get(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  excelMisSaleReport,
+  excelMisSaleReport
 );
 
 /**
@@ -81,9 +82,9 @@ misSaleRouter.get(
  */
 misSaleRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  getSellMisController,
+  getSellMisController
 );
 
 /**
@@ -103,7 +104,7 @@ misSaleRouter.post(
  */
 misSaleRouter.post(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  getSellMisExcelController,
+  getSellMisExcelController
 );

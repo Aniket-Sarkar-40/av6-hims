@@ -1,3 +1,6 @@
+import { ItemMasterToDto } from "@/types/grn/grn.js";
+import { ItemSupplierDTO } from "@/types/master/itemSupplier.js";
+import { EmployeeCache } from "@apps/core/types/staff/employee.js";
 import {
   InvGoodReceiveReturnDetails,
   InvItem,
@@ -5,9 +8,8 @@ import {
   Prisma,
   RETURN_STS,
 } from "@repo/db/generated/prisma/client";
-import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
-import { EmployeeCache } from "av6-core-v2";
-import { ItemSupplierDTO } from "../master/itemSupplier.js";
+import { IdValue } from "@repo/shared/types/common.js";
+import { BaseModelAttr } from "@repo/shared/types/global.js";
 
 export interface GrnReturnDetailInput
   extends Prisma.InvGoodReceiveReturnDetailsUncheckedCreateWithoutGoodReceiveReturnInput {
@@ -15,6 +17,8 @@ export interface GrnReturnDetailInput
   purchasedPrice: number;
   isBatch: boolean;
   isExpiry: boolean;
+  focQuantity?: number;
+  stockQuantity?: number;
 }
 
 export interface CreateGrnReturnInput
@@ -44,25 +48,41 @@ export interface GoodReceiveReturnDTO
     | "goodReceiveReturnDetails"
     | "rejectedBy"
     | "approvedBy"
+    | "grnId"
     | "poId"
     | "ccId"
     | "supplierId"
+    | "currencyId"
   > {
   goodReceiveReturnDetails: GoodReceiveReturnDetailDTO[];
   supplier: IdValue | null;
+  currency: IdValue | null;
   branch: IdValue | null;
   warehouse: IdValue | null;
+  location: IdValue | null;
   createdBy: EmployeeCache | null;
   approvedBy: EmployeeCache | null;
   rejectedBy: EmployeeCache | null;
 }
 
+export interface GrnReturnDetailDTO
+  extends Omit<
+    InvGoodReceiveReturnDetails,
+    "itemId" | "createdBy" | "updatedBy"
+  > {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}
 export interface GoodReceiveReturnDetailDTO
-  extends InvGoodReceiveReturnDetails {
+  extends Omit<InvGoodReceiveReturnDetails, "createdBy" | "updatedBy"> {
   inHandQty: number | null;
   returnedQty: number | null;
+  availableTotalQtyToReturn: number | null;
   item: InvItem | null;
   purchasePrice: number | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }
 
 export type GrnReturnResponse = Prisma.InvGoodReceiveReturnGetPayload<{

@@ -12,13 +12,16 @@ import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js
 import { numberWithMaxDecimalsRequired } from "@repo/shared/utils/joi.utils.js";
 import { NextFunction, Request, Response } from "express";
 import Joi, { ValidationErrorItem } from "joi";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
 
 export const itemSupplierMapCreateSchema = Joi.object({
   ccId: idRequired("CC Id"),
 
   itemId: idRequired("Item ID"),
   supplierId: idRequired("Supplier ID"),
-  purchasePrice: numberWithMaxDecimalsRequired("basePrice"),
+  purchasePrice: numberWithMaxDecimalsRequired("basePrice", () =>
+    getSchemaPrecision("item")
+  ),
   isLock: boolOptional("Is Lock"),
   validUpto: dateOptional("Valid Upto"),
 });
@@ -44,7 +47,7 @@ export const itemSupplierMapImportExcelSchema =
 export function validateImportExcelItemSupplierMap(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   req.body = toItemSupplierMapImportExcelEntity(req.body);
   const { error } = itemSupplierMapImportExcelSchema.validate(req.body, {
@@ -62,7 +65,7 @@ export function validateImportExcelItemSupplierMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      }),
+      })
     );
   }
 

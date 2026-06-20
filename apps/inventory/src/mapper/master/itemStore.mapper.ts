@@ -1,11 +1,11 @@
-import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { ItemStoreDTO } from "@/types/master/itemStore.js";
 import { getAllBranchAndWarehouse } from "@/utils/getCollectionCenter.utils.js";
-import { customOmit, toIdValue } from "av6-utils";
 import { InvItemStore } from "@repo/db/generated/prisma/client";
+import { BaseModelAttrWoCancelWoActive } from "@repo/shared/types/global.js";
+import { customOmit, toIdValue } from "av6-utils";
 
 export const toItemStoreDTO = async (
-  data: InvItemStore[],
+  data: InvItemStore[]
 ): Promise<ItemStoreDTO[]> => {
   const CollectionCenters = await getAllBranchAndWarehouse();
 
@@ -13,9 +13,8 @@ export const toItemStoreDTO = async (
     data.map(async (item) => {
       const omittedItemStore = customOmit<
         InvItemStore,
-        BaseModelAttrWoCancel | "ccId"
+        BaseModelAttrWoCancelWoActive | "ccId"
       >(item, [
-        "isActive",
         "createdBy",
         "updatedBy",
         "deletedBy",
@@ -31,7 +30,7 @@ export const toItemStoreDTO = async (
         ...omittedItemStore.rest,
         collectionCenter: cc ? toIdValue(cc, "name") : null,
       };
-    }),
+    })
   );
 
   return itemStoreDTOs;

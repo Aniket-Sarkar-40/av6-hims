@@ -1,4 +1,10 @@
 import { CreateGrnInput, GrnDetailInput } from "@/types/grn/grn.js";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
+import {
+  DiscMethod,
+  GRN_STATUS,
+  PAYMENT_STATUS,
+} from "@repo/db/generated/prisma/client";
 import {
   arrayRequired,
   boolRequired,
@@ -8,6 +14,8 @@ import {
   enumRequired,
   idOptional,
   idRequired,
+  intRequired,
+  numberWithMaxDecimalsOptional,
   numberWithMaxDecimalsRequired,
   priceOptional,
   priceRequired,
@@ -15,13 +23,48 @@ import {
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import {
-  DiscMethod,
-  GRN_STATUS,
-  PAYMENT_STATUS,
-  PO_STATUS,
-} from "@repo/db/generated/prisma/client";
 import Joi from "joi";
+
+const uniqueBatchNoValidation = (
+  details: GrnDetailInput[],
+  helpers: Joi.CustomHelpers
+) => {
+  const batchNoMap = new Map<
+    string,
+    { itemId: number; row: number; originalBatchNo: string }
+  >();
+
+  for (let i = 0; i < details.length; i++) {
+    const detail = details[i];
+
+    if (!detail.batchNo) continue;
+
+    const batchNo = detail.batchNo.trim().toLowerCase();
+
+    if (!batchNo) continue;
+
+    const existingBatch = batchNoMap.get(batchNo);
+
+    if (existingBatch && existingBatch.itemId !== detail.itemId) {
+      const firstRow = existingBatch.row + 1;
+      const currentRow = i + 1;
+
+      return helpers.error("any.custom", {
+        message: `Batch number "${detail.batchNo}" is already assigned to item ${existingBatch.itemId} in row ${firstRow}. Same batch number cannot be used for different item ${detail.itemId} in row ${currentRow}.`,
+      });
+    }
+
+    if (!existingBatch) {
+      batchNoMap.set(batchNo, {
+        itemId: detail.itemId,
+        row: i,
+        originalBatchNo: detail.batchNo,
+      });
+    }
+  }
+
+  return details;
+};
 
 export const grnDetailSchema = Joi.object<GrnDetailInput>({
   id: idOptional("Id"),
@@ -30,11 +73,13 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
 
   poDetailsId: idRequired("PO details Id"),
 
-  purchasedPrice: priceRequired("purchasedPrice"),
+  purchasedPrice: priceRequired("purchasedPrice", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  focQuantity: idRequired("FOC Quantity"),
+  focQuantity: intRequired("FOC Quantity"),
 
-  netTax: priceRequired("Net Tax"),
+  netTax: priceRequired("Net Tax", () => getSchemaPrecision("grn")),
 
   isBatch: boolRequired("Is Batch"),
 
@@ -44,11 +89,11 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     otherwise: strOptional("Batch number"),
   }),
 
-  totalAmount: priceRequired("Total amount"),
+  totalAmount: priceRequired("Total amount", () => getSchemaPrecision("grn")),
 
-  netAmount: priceRequired("Net amount"),
+  netAmount: priceRequired("Net amount", () => getSchemaPrecision("grn")),
 
-  tax: priceOptional("Tax"),
+  tax: priceOptional("Tax", () => getSchemaPrecision("grn")),
 
   isExpiry: boolRequired("Is Expiry"),
 
@@ -58,10 +103,14 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
     otherwise: dateOptional("Expiry date"),
   }),
 
-  quantity: idRequired("Quantity"),
+  quantity: intRequired("Quantity"),
 
-  discount: idRequired("Discount", 0),
-  netDiscount: priceRequired("Net Discount amount"),
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
+  netDiscount: numberWithMaxDecimalsOptional("Net Discount amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 });
@@ -73,27 +122,44 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   poId: idRequired("PO Id"),
 
+  currencyId: idOptional("Currency Id"),
+
+  conversionRate: Joi.when("currencyId", {
+    is: Joi.exist().not(null),
+    then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
+      getSchemaPrecision("grn")
+    ),
+    otherwise: Joi.allow(null).messages({
+      "any.unknown":
+        "Conversion Rate is not allowed when Currency Id is not provided",
+    }),
+  }),
+
   date: dateRequired("Date"),
 
   supplierId: idRequired("Supplier Id"),
 
   ccId: idRequired("CC Id"),
 
-  totalAmount: priceRequired("totalAmount"),
+  totalAmount: priceRequired("totalAmount", () => getSchemaPrecision("grn")),
 
-  discount: idRequired("Discount"),
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  netDiscount: priceRequired("Net Discount amount"),
+  netDiscount: numberWithMaxDecimalsOptional("Net Discount amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  netTotal: priceRequired("netTotal"),
+  netTotal: priceRequired("netTotal", () => getSchemaPrecision("grn")),
 
-  netTax: priceRequired("Net Tax"),
+  netTax: priceRequired("Net Tax", () => getSchemaPrecision("grn")),
 
   storeId: idOptional("Store Id"),
 
-  paidAmount: priceOptional("Paid amount"),
+  paidAmount: priceOptional("Paid amount", () => getSchemaPrecision("grn")),
 
   notes: strOptional("Notes"),
 
@@ -102,23 +168,15 @@ export const grnSchema = Joi.object<CreateGrnInput>({
   status: enumOptional("Status", GRN_STATUS),
 
   tax: idOptional("Tax"),
-  returnedAmount: priceOptional("Returned amount"),
+  returnedAmount: priceOptional("Returned amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  goodReceiveDetails: arrayRequired("Good Receive Details", grnDetailSchema, 1),
-});
-
-export const grnExcelFilterSchema = Joi.object({
-  id: idOptional("Id"),
-  poNumber: strOptional("PO Number"),
-  startDate: dateOptional("Start date"),
-
-  endDate: dateOptional("End date"),
-  warehouseId: idOptional("Warehouse id"),
-  distributorId: idOptional("Distributor id"),
-  status: enumOptional("Status", GRN_STATUS),
-  paymentStatus: enumOptional("Payment status", PAYMENT_STATUS),
-  poStatus: enumOptional("PO Status", PO_STATUS),
-  gatePassId: idOptional("Gate pass id"),
+  goodReceiveDetails: arrayRequired("Good Receive Details", grnDetailSchema, 1)
+    .custom(uniqueBatchNoValidation)
+    .messages({
+      "any.custom": "{{#message}}",
+    }),
 });
 
 export const validateGrn = validationHandler({
@@ -131,8 +189,4 @@ export const grnSchemaUpdate = grnSchema.keys({
 
 export const validateGrnUpdate = validationHandler({
   schema: grnSchemaUpdate,
-});
-
-export const validateExcelFilterGrn = validationHandler({
-  schema: grnExcelFilterSchema,
 });

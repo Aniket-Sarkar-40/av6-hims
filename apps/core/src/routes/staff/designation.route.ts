@@ -39,7 +39,7 @@ const staffDesignationRouter: Router = Router();
  */
 staffDesignationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "CREATE")),
   validateStaffDesignation,
   createStaffDesignation
@@ -56,7 +56,7 @@ staffDesignationRouter.post(
  */
 staffDesignationRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "VIEW")),
   getAllStaffDesignations
 );
@@ -79,7 +79,7 @@ staffDesignationRouter.get(
  */
 staffDesignationRouter.get(
   "/:staffDesignationId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "VIEW")),
   getStaffDesignationById
 );
@@ -108,7 +108,7 @@ staffDesignationRouter.get(
  */
 staffDesignationRouter.put(
   "/:staffDesignationId",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "STAFF_DESIGNATION", "VIEW"),
     getPermission("CORE", "STAFF_DESIGNATION", "UPDATE")
@@ -135,7 +135,7 @@ staffDesignationRouter.put(
  */
 staffDesignationRouter.delete(
   "/:staffDesignationId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "DELETE")),
   deleteStaffDesignation
 );

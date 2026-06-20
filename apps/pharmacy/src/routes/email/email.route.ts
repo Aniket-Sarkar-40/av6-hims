@@ -11,6 +11,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateEmailConfig } from "@/validations/request/email/email.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const emailConfigRouter: Router = Router();
 
@@ -38,10 +39,10 @@ const emailConfigRouter: Router = Router();
  */
 emailConfigRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMAIL", "CREATE")),
   validateEmailConfig,
-  upsertEmailConfig,
+  upsertEmailConfig
 );
 
 /**
@@ -55,9 +56,9 @@ emailConfigRouter.post(
  */
 emailConfigRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMAIL", "VIEW")),
-  getEmailConfig,
+  getEmailConfig
 );
 
 /**
@@ -71,9 +72,9 @@ emailConfigRouter.get(
  */
 emailConfigRouter.get(
   "/event-email",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMAIL", "VIEW")),
-  getEventEmail,
+  getEventEmail
 );
 
 /**
@@ -87,12 +88,12 @@ emailConfigRouter.get(
  */
 emailConfigRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "EMAIL", "VIEW"),
-    getPermission("PMS", "EMAIL", "DELETE"),
+    getPermission("PMS", "EMAIL", "DELETE")
   ),
-  deleteEmailConfig,
+  deleteEmailConfig
 );
 
 export default emailConfigRouter;

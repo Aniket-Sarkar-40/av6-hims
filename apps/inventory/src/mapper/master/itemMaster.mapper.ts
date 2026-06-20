@@ -17,7 +17,9 @@ import {
   ItemMasterDto,
   ItemMasterDtoStock,
   ItemMasterEntity,
+  ItemMasterExcelRow,
   ItemMasterReq,
+  ItemMasterResolvedIds,
   ItemMasterUpdateEntity,
   ItemMasterUpdateReq,
   ItemSearchDTO,
@@ -26,7 +28,13 @@ import {
 import { ItemStockDTO } from "@/types/stock/stock.js";
 import { getBranchAndWarehouseByCcIds } from "@/utils/getCollectionCenter.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
-import { InvItem, InvItemStock } from "@repo/db/generated/prisma/client";
+import {
+  ConsumptionType,
+  InvItem,
+  InvItemMasterExcel,
+  InvItemStock,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 import { toPickFields } from "av6-utils";
 import {
   toPublicImageUrl,
@@ -34,6 +42,14 @@ import {
 } from "@repo/shared/utils/helper.utils.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { ItemMasterExcelStagingRow } from "@/validations/request/master/itemMasterExcel.validation.js";
+import {
+  toBoolean,
+  toIntOrNull,
+  toNumberOrNull,
+  toRequiredString,
+  toStringOrNull,
+} from "@repo/shared/utils/excelImport.utils.js";
 
 export const toItemMasterDTO = async (
   data: InvItem[]
@@ -78,6 +94,8 @@ export const toItemMasterDTO = async (
       | "unitId"
       | "taxDetailsId"
       | "storageId"
+      | "basePrice"
+      | "lastPurchasedPrice"
     >(itemMaster, [
       "createdBy",
       "updatedBy",
@@ -89,6 +107,8 @@ export const toItemMasterDTO = async (
       "unitId",
       "taxDetailsId",
       "storageId",
+      "basePrice",
+      "lastPurchasedPrice",
     ]);
 
     const itemCategory =
@@ -100,6 +120,10 @@ export const toItemMasterDTO = async (
     const storage = storages.find((s) => s.id === itemMaster.storageId) ?? null;
     return {
       ...omittedItem.rest,
+      basePrice: itemMaster.basePrice ? Number(itemMaster.basePrice) : null,
+      lastPurchasedPrice: itemMaster.lastPurchasedPrice
+        ? Number(itemMaster.lastPurchasedPrice)
+        : null,
       frontImage: itemMaster.frontImage
         ? toPublicImageUrl(itemMaster.frontImage)
         : null,
@@ -113,7 +137,7 @@ export const toItemMasterDTO = async (
         ? toPublicImageUrl(itemMaster.rightSideImage)
         : null,
       itemCategory: toIdValue(itemCategory, "name"),
-      unitMaster: toIdValue(unitMaster, "packagingTypeName"),
+      unitMaster,
       taxDetails: toIdValue(taxDetail, "name"),
       storage: toIdValue(storage, "name"),
     };
@@ -140,27 +164,28 @@ export const toItemMasterDTOForItemSupplierMap = async (
     : null;
 
   const settings = await settingsService.getSettings(true);
-
+  const wareMode = settings?.warehouseMode;
   const supplierMode = settings?.supplierMode;
 
-  let finalBasePrice = model.basePrice;
-  if (itemReq) {
-    if (itemReq.ccId && itemReq.supplierId && supplierMode) {
-      const itemSupplierMap = await itemSupplierMapService.getItemSupplierMap(
-        itemReq
-      );
-      if (itemSupplierMap) {
-        finalBasePrice = Number(itemSupplierMap.purchasePrice);
-      }
+  let finalBasePrice: number | null = model.basePrice
+    ? Number(model.basePrice)
+    : null;
+
+  if (itemReq?.ccId && itemReq.supplierId && supplierMode) {
+    const itemSupplierMap = await itemSupplierMapService.getItemSupplierMap(
+      itemReq
+    );
+
+    if (
+      itemSupplierMap?.purchasePrice !== null &&
+      itemSupplierMap?.purchasePrice !== undefined
+    ) {
+      finalBasePrice = Number(itemSupplierMap.purchasePrice);
     }
   }
 
-  const store = await settingsService.getSettings(true);
-  const wareMode = store?.warehouseMode;
-
   let warehouseStock: number | null = null;
   let branchStock: number | null = null;
-  let ccTotal: number | null = null;
 
   if (itemReq?.ccId) {
     const ccId = itemReq.ccId;
@@ -168,7 +193,7 @@ export const toItemMasterDTOForItemSupplierMap = async (
     const ccInfo = ccMap[ccId];
 
     const stockResult = await getItemStockQtyByCc(model.id, ccId);
-    ccTotal = stockResult.totalQty;
+    const ccTotal = stockResult.totalQty;
 
     if (ccInfo?.branch) {
       branchStock = ccTotal;
@@ -180,11 +205,15 @@ export const toItemMasterDTOForItemSupplierMap = async (
   let userStock: number | null = null;
 
   if (itemReq?.userId) {
-    userStock = await getItemStockQtyByUser(model.id, itemReq?.userId);
+    userStock = await getItemStockQtyByUser(model.id, itemReq.userId);
   }
 
   return {
     ...model,
+    basePrice: finalBasePrice,
+    lastPurchasedPrice: model.lastPurchasedPrice
+      ? Number(model.lastPurchasedPrice)
+      : null,
     frontImage: model.frontImage ? toPublicImageUrl(model.frontImage) : null,
     backImage: model.backImage ? toPublicImageUrl(model.backImage) : null,
     leftSideImage: model.leftSideImage
@@ -193,9 +222,8 @@ export const toItemMasterDTOForItemSupplierMap = async (
     rightSideImage: model.rightSideImage
       ? toPublicImageUrl(model.rightSideImage)
       : null,
-    basePrice: finalBasePrice,
     itemCategory: toIdValue(itemCategoryRow, "name"),
-    unitMaster: toIdValue(unitMasterRow, "packagingTypeName"),
+    unitMaster: unitMasterRow,
     taxDetails: toIdValue(taxDetailsRow, "name"),
     storage: toIdValue(storage, "name"),
     branchInHandStock: branchStock,
@@ -242,8 +270,8 @@ export const toItemSearchDTO = async (
 export const toItemStockDTO = async (
   stock: InvItemStock
 ): Promise<ItemStockDTO> => {
-  const item = await itemMasterService.getItemMasterById(
-    { itemId: stock.itemId },
+  const item = await itemMasterService.getItemMasterByIdWoDto(
+    stock.itemId,
     true
   );
   const user = stock.userId
@@ -252,7 +280,7 @@ export const toItemStockDTO = async (
 
   return {
     ...stock,
-    item: item ? await itemMasterToDto(item) : null,
+    item,
     user: toIdValue(user, "name"),
   };
 };
@@ -279,8 +307,13 @@ export const toItemEntity = (
       item.isExpireDate !== undefined && item.isExpireDate === "true"
         ? true
         : false,
-    isReturnable:
-      item.isReturnable !== undefined && item.isReturnable === "true"
+    isUserReturnable:
+      item.isUserReturnable !== undefined && item.isUserReturnable === "true"
+        ? true
+        : false,
+    isVendorReturnable:
+      item.isVendorReturnable !== undefined &&
+      item.isVendorReturnable === "true"
         ? true
         : false,
     isLock: item.isLock !== undefined && item.isLock === "true" ? true : false,
@@ -323,19 +356,56 @@ export const toItemUpdateEntity = (
 //   return out;
 // }
 
-export async function itemMasterToDto(item: ItemMasterDto) {
-  return toPickFields(
-    item,
-    "id",
-    "item",
-    "itemCode",
-    "itemDescription",
-    "reOrderLevel",
-    "unitMaster",
-    "itemCategory",
-    "isBatchNumber",
-    "isExpireDate",
-    "isReturnable",
-    "isLock"
-  ) as ItemMasterToDto | null;
+export function mapRowToItemMasterExcelCreateInput(
+  row: ItemMasterExcelRow,
+  rowNo: number
+): ItemMasterExcelStagingRow {
+  const basePrice = toNumberOrNull(row["Base Price"]);
+  const reOrderLevel = toIntOrNull(row["Re-order Level"]);
+
+  return {
+    rowNo,
+    item: toRequiredString(row["Item Name"], "Item Name", rowNo),
+    itemCode: toStringOrNull(row["Item Code"]),
+    itemCategory: toRequiredString(
+      row["Item Category"],
+      "Item Category",
+      rowNo
+    ),
+    storage: toStringOrNull(row.Storage),
+    unit: toRequiredString(row.Unit, "Unit", rowNo),
+    basePrice: basePrice ?? undefined,
+    reOrderLevel: reOrderLevel ?? undefined,
+    itemDescription: toStringOrNull(row["Item Description"]),
+    isBatchNumber: toBoolean(row["Is Batch Number"], false),
+    isExpireDate: toBoolean(row["Is Expire Date"], false),
+    isUserReturnable: toBoolean(row["Is User Returnable"], false),
+    isVendorReturnable: toBoolean(row["Is Vendor Returnable"], false),
+    isPriceVariable: toBoolean(row["Is Price Variable"], false),
+    consumptionType: toStringOrNull(row["Consumption Type"]) as
+      | ConsumptionType
+      | undefined,
+  };
 }
+
+export const mapExcelRowToItemMasterReq = (
+  row: InvItemMasterExcel,
+  resolved: ItemMasterResolvedIds
+): ItemMasterReq => {
+  return {
+    item: row.item,
+    itemCode: row.itemCode ?? undefined,
+    itemCategoryId: resolved.itemCategoryId,
+    storageId: resolved.storageId ?? undefined,
+    unitId: resolved.unitId,
+    basePrice: row.basePrice != null ? Number(row.basePrice) : undefined,
+    reOrderLevel: row.reOrderLevel ?? undefined,
+    itemDescription: row.itemDescription ?? undefined,
+    isBatchNumber: row.isBatchNumber,
+    isExpireDate: row.isExpireDate,
+    isUserReturnable: row.isUserReturnable,
+    isVendorReturnable: row.isVendorReturnable,
+    isPriceVariable: row.isPriceVariable,
+    consumptionType: row.consumptionType,
+  };
+};

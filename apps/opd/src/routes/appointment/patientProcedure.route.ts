@@ -14,6 +14,7 @@ import {
   validateUpdatePatientProcedure,
 } from "@/validations/request/appointment/patientProcedure.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const patientProcedureRouter: Router = Router();
 
@@ -42,10 +43,10 @@ export const patientProcedureRouter: Router = Router();
 
 patientProcedureRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_PROCEDURE", "CREATE")),
   validateCreatePatientProcedure,
-  createPatientProcedure,
+  createPatientProcedure
 );
 
 /**
@@ -66,13 +67,13 @@ patientProcedureRouter.post(
 
 patientProcedureRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_PROCEDURE", "UPDATE"),
-    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW"),
+    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW")
   ),
   validateUpdatePatientProcedure,
-  updatePatientProcedure,
+  updatePatientProcedure
 );
 
 /**
@@ -92,11 +93,11 @@ patientProcedureRouter.put(
  */
 patientProcedureRouter.put(
   "/return",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_PROCEDURE", "UPDATE"),
-    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW"),
+    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW")
   ),
   validateReturnPatientProcedure,
-  returnPatientProcedure,
+  returnPatientProcedure
 );

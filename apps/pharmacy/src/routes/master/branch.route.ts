@@ -14,6 +14,7 @@ import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateToggleActive } from "@/validations/request/common.validation.js";
 import { validateBranch } from "@/validations/request/master/branch.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const branchRouter: Router = Router();
 
@@ -41,10 +42,10 @@ export const branchRouter: Router = Router();
  */
 branchRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "CREATE")),
   validateBranch,
-  createBranch,
+  createBranch
 );
 
 /**
@@ -58,9 +59,9 @@ branchRouter.post(
  */
 branchRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "VIEW")),
-  getAllBranch,
+  getAllBranch
 );
 
 /**
@@ -79,9 +80,9 @@ branchRouter.get(
  */
 branchRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "VIEW")),
-  getBranchById,
+  getBranchById
 );
 
 /**
@@ -101,13 +102,13 @@ branchRouter.get(
  */
 branchRouter.post(
   "/toggle-active",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "BRANCH", "VIEW"),
-    getPermission("PMS", "BRANCH", "UPDATE"),
+    getPermission("PMS", "BRANCH", "UPDATE")
   ),
   validateToggleActive,
-  toggleActiveBranch,
+  toggleActiveBranch
 );
 
 /**
@@ -134,13 +135,13 @@ branchRouter.post(
  */
 branchRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "BRANCH", "VIEW"),
-    getPermission("PMS", "BRANCH", "UPDATE"),
+    getPermission("PMS", "BRANCH", "UPDATE")
   ),
   validateBranch,
-  updateBranch,
+  updateBranch
 );
 
 /**
@@ -154,7 +155,7 @@ branchRouter.put(
  */
 branchRouter.get(
   "/drop-down",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "VIEW")),
-  getAllBranchFromItemBanchMap,
+  getAllBranchFromItemBanchMap
 );

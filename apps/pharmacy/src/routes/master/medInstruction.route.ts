@@ -14,6 +14,7 @@ import {
   validateInstructionNameUpdate,
 } from "@/validations/request/master/instruction.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const medInstructionRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const medInstructionRouter: Router = Router();
  */
 medInstructionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_INSTRUCTIONS", "CREATE")),
   validateInstructionName,
-  instructionCreate,
+  instructionCreate
 );
 
 /**
@@ -66,9 +67,9 @@ medInstructionRouter.post(
  */
 medInstructionRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_INSTRUCTIONS", "VIEW")),
-  medInstructionGet,
+  medInstructionGet
 );
 
 /**
@@ -87,9 +88,9 @@ medInstructionRouter.get(
  */
 medInstructionRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_INSTRUCTIONS", "VIEW")),
-  getMedInstructionById,
+  getMedInstructionById
 );
 
 /**
@@ -116,13 +117,13 @@ medInstructionRouter.get(
  */
 medInstructionRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_INSTRUCTIONS", "VIEW"),
-    getPermission("PMS", "MEDICINE_INSTRUCTIONS", "UPDATE"),
+    getPermission("PMS", "MEDICINE_INSTRUCTIONS", "UPDATE")
   ),
   validateInstructionNameUpdate,
-  updateMedInstruction,
+  updateMedInstruction
 );
 
 export default medInstructionRouter;

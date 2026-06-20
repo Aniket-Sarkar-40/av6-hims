@@ -5,8 +5,11 @@ import {
   ItemMasterReq,
   ItemMasterUpdateReq,
 } from "@/types/master/itemMaster.js";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
+import { ConsumptionType } from "@repo/db/generated/prisma/enums.js";
 import {
   boolOptional,
+  enumOptional,
   idOptional,
   idRequired,
   priceRequired,
@@ -28,7 +31,7 @@ export const itemMasterSchema = Joi.object<ItemMasterReq | ItemMasterUpdateReq>(
 
     unitId: idRequired("Unit Id"),
 
-    basePrice: priceRequired("BasePrice"),
+    basePrice: priceRequired("BasePrice", () => getSchemaPrecision("item")),
 
     reOrderLevel: idOptional("Re-Order Level"),
 
@@ -40,7 +43,13 @@ export const itemMasterSchema = Joi.object<ItemMasterReq | ItemMasterUpdateReq>(
 
     isExpireDate: boolOptional("Is Expire Date"),
 
-    isReturnable: boolOptional("Is Returnable"),
+    isUserReturnable: boolOptional("Is User Returnable"),
+
+    isVendorReturnable: boolOptional("Is Vendor Returnable"),
+
+    consumptionType: enumOptional("Consumption Type", ConsumptionType),
+
+    isPriceVariable: boolOptional("Is Price Variable"),
 
     isLock: boolOptional("Is Lock"),
 

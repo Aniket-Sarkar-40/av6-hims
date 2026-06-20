@@ -14,6 +14,7 @@ import {
   validateDropDownNameUpdate,
 } from "@/validations/request/master/dropDown.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const manufactureRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const manufactureRouter: Router = Router();
  */
 manufactureRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_MANUFACTURER", "CREATE")),
   validateDropDownName,
-  manufactureCreate,
+  manufactureCreate
 );
 
 /**
@@ -66,9 +67,9 @@ manufactureRouter.post(
  */
 manufactureRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_MANUFACTURER", "VIEW")),
-  manufactureGet,
+  manufactureGet
 );
 
 /**
@@ -87,9 +88,9 @@ manufactureRouter.get(
  */
 manufactureRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_MANUFACTURER", "VIEW")),
-  getManufactureById,
+  getManufactureById
 );
 
 /**
@@ -116,13 +117,13 @@ manufactureRouter.get(
  */
 manufactureRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_MANUFACTURER", "VIEW"),
-    getPermission("PMS", "MEDICINE_MANUFACTURER", "UPDATE"),
+    getPermission("PMS", "MEDICINE_MANUFACTURER", "UPDATE")
   ),
   validateDropDownNameUpdate,
-  updateManufacture,
+  updateManufacture
 );
 
 export default manufactureRouter;

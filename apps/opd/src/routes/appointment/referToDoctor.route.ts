@@ -12,6 +12,7 @@ import {
   validateCreateReferToDoctor,
   validateUpdateReferToDoctor,
 } from "@/validations/request/appointment/referToDoctor.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const referToDoctorRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const referToDoctorRouter: Router = Router();
  */
 referToDoctorRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "REFER_TO_DOCTOR", "CREATE")),
   validateCreateReferToDoctor,
-  createReferToDoctor,
+  createReferToDoctor
 );
 
 /**
@@ -62,11 +63,11 @@ referToDoctorRouter.post(
  */
 referToDoctorRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "REFER_TO_DOCTOR", "UPDATE"),
-    getPermission("OPD", "REFER_TO_DOCTOR", "VIEW"),
+    getPermission("OPD", "REFER_TO_DOCTOR", "VIEW")
   ),
   validateUpdateReferToDoctor,
-  updateReferToDoctor,
+  updateReferToDoctor
 );

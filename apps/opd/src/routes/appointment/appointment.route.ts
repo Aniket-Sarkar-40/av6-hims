@@ -21,6 +21,7 @@ import {
   validateUpgradeAppointment,
 } from "@/validations/request/appointment/appointment.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const appointmentRouter: Router = Router();
 
@@ -48,10 +49,10 @@ export const appointmentRouter: Router = Router();
  */
 appointmentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "CREATE")),
   validateAppointments,
-  createAppointment,
+  createAppointment
 );
 
 /**
@@ -71,13 +72,13 @@ appointmentRouter.post(
  */
 appointmentRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "APPOINTMENT", "VIEW"),
-    getPermission("OPD", "APPOINTMENT", "UPDATE"),
+    getPermission("OPD", "APPOINTMENT", "UPDATE")
   ),
   validateAppointmentUpdate,
-  updateAppointment,
+  updateAppointment
 );
 
 /**
@@ -91,9 +92,9 @@ appointmentRouter.put(
  */
 appointmentRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "VIEW")),
-  getAllAppointment,
+  getAllAppointment
 );
 
 /**
@@ -113,9 +114,9 @@ appointmentRouter.get(
  */
 appointmentRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "VIEW")),
-  getAppointmentById,
+  getAppointmentById
 );
 
 /**
@@ -129,9 +130,9 @@ appointmentRouter.get(
  */
 appointmentRouter.delete(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "DELETE")),
-  cancelAppointment,
+  cancelAppointment
 );
 
 /**
@@ -151,13 +152,13 @@ appointmentRouter.delete(
  */
 appointmentRouter.put(
   "/reschedule",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "APPOINTMENT", "VIEW"),
-    getPermission("OPD", "APPOINTMENT", "UPDATE"),
+    getPermission("OPD", "APPOINTMENT", "UPDATE")
   ),
   validateRescheduledAppointment,
-  rescheduleAppointment,
+  rescheduleAppointment
 );
 
 /**
@@ -177,13 +178,13 @@ appointmentRouter.put(
  */
 appointmentRouter.post(
   "/upgrade",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "APPOINTMENT", "VIEW"),
-    getPermission("OPD", "APPOINTMENT", "UPDATE"),
+    getPermission("OPD", "APPOINTMENT", "UPDATE")
   ),
   validateUpgradeAppointment,
-  upgradeAppointment,
+  upgradeAppointment
 );
 /**
  * @swagger
@@ -203,8 +204,8 @@ appointmentRouter.post(
 
 appointmentRouter.post(
   "/fees",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "DOCTOR_FEES", "VIEW")),
   validategetAppointmentFees,
-  getAppointmentFees,
+  getAppointmentFees
 );

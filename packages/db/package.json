@@ -4,7 +4,8 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.0.0",
     "@prisma/client": "^7.0.0",
-    "dotenv": "^16.4.0",
+    "av6-core": "^2.0.6",
+    "dotenv": "^17.2.3",
     "redis": "^5.11.0"
   },
   "devDependencies": {

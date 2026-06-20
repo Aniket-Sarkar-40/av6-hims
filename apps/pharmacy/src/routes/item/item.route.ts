@@ -31,6 +31,8 @@ import {
   createUploadFieldsMiddleware,
   createUploadMiddleware,
 } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemRouter: Router = Router();
 
@@ -58,7 +60,7 @@ export const itemRouter: Router = Router();
  */
 itemRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
   createUploadFieldsMiddleware("item", [
     "barcode",
@@ -68,7 +70,7 @@ itemRouter.post(
     "rightSideImage",
   ]),
   validateCreateItem,
-  itemCreate,
+  itemCreate
 );
 
 /**
@@ -88,10 +90,10 @@ itemRouter.post(
  */
 itemRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM", "VIEW"),
-    getPermission("PMS", "ITEM", "UPDATE"),
+    getPermission("PMS", "ITEM", "UPDATE")
   ),
   createUploadFieldsMiddleware("item", [
     "barcode",
@@ -101,7 +103,7 @@ itemRouter.put(
     "rightSideImage",
   ]),
   validateUpdateItem,
-  updateItem,
+  updateItem
 );
 
 /**
@@ -115,9 +117,9 @@ itemRouter.put(
  */
 itemRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
-  allItemGet,
+  allItemGet
 );
 
 /**
@@ -131,9 +133,9 @@ itemRouter.get(
  */
 itemRouter.post(
   "/after-pricing",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
-  getItemSellPricing,
+  getItemSellPricing
 );
 
 /**
@@ -153,10 +155,10 @@ itemRouter.post(
  */
 itemRouter.post(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
   validateItemStock,
-  getItemById,
+  getItemById
 );
 
 /**
@@ -170,9 +172,9 @@ itemRouter.post(
  */
 itemRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "DELETE")),
-  deleteItem,
+  deleteItem
 );
 
 /**
@@ -192,10 +194,10 @@ itemRouter.delete(
  */
 itemRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_SEARCH", "CREATE")),
   validateItemSearch,
-  itemSearch,
+  itemSearch
 );
 
 /**
@@ -215,10 +217,10 @@ itemRouter.post(
  */
 itemRouter.post(
   "/stock",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BATCHES", "VIEW")),
   validateItemStock,
-  getItemStocksByItemId,
+  getItemStocksByItemId
 );
 
 /**
@@ -232,9 +234,9 @@ itemRouter.post(
  */
 itemRouter.get(
   "/slowMoving",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_SLOW_MOVING", "VIEW")),
-  getSlowMovingItem,
+  getSlowMovingItem
 );
 
 /**
@@ -247,10 +249,11 @@ itemRouter.get(
 // POST /importExcel
 itemRouter.post(
   "/import",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
-  itemExcelImport,
+  itemExcelImport
 );
 
 /**
@@ -263,9 +266,9 @@ itemRouter.post(
 // POST /export
 itemRouter.post(
   "/export",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
-  itemExcelSampleExport,
+  itemExcelSampleExport
 );
 
 /**
@@ -279,9 +282,9 @@ itemRouter.post(
  */
 itemRouter.put(
   "/active/:id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
-  ActiveItem,
+  ActiveItem
 );
 
 /**
@@ -296,8 +299,8 @@ itemRouter.put(
 // POST /item/excel
 itemRouter.post(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
   validateItemExcelFilter,
-  excelItemReport,
+  excelItemReport
 );

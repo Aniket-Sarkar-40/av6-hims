@@ -1,8 +1,14 @@
 import {
   exportItemStockExcel,
+  getAllItemBatchStock,
   getItemStock,
   getItemStockSummary,
 } from "@/controllers/stock/itemStock.controller.js";
+import {
+  validateItemStockExcelExport,
+  validateItemStockSearch,
+} from "@/validations/request/stock/itemStock.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -36,15 +42,15 @@ export const itemStockRouter: Router = Router();
  */
 itemStockRouter.post(
   "/summary",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK_SUMMARY", "VIEW")),
-  getItemStockSummary,
+  getItemStockSummary
 );
 /**
  * @swagger
- * /api/v1/master/item-Stock:
+ * /api/v1/master/item-Stock/search:
  *   post:
- *     summary: Create a new Item Stock
+ *     summary: get Item Stock
  *     tags: [Item Stock]
  *     security:
  *       - bearerAuth: []
@@ -56,12 +62,12 @@ itemStockRouter.post(
  *             $ref: '#/components/itemStockSchema'
  */
 itemStockRouter.post(
-  "/",
-  verifyToken,
+  "/search",
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
-  getItemStock,
+  validateItemStockSearch,
+  getItemStock
 );
-
 /**
  * @swagger
  * /api/v1/master/item-Stock/export-excel:
@@ -80,7 +86,30 @@ itemStockRouter.post(
  */
 itemStockRouter.post(
   "/export-excel",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
-  exportItemStockExcel,
+  validateItemStockExcelExport,
+  exportItemStockExcel
+);
+
+/**
+ * @swagger
+ * /api/v1/master/item-batch-stock:
+ *   post:
+ *     summary: Get all item batch stock
+ *     tags: [Item Stock]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/itemBatchStockLookupInputSchema'
+ */
+itemStockRouter.post(
+  "/batch-stock",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM_BATCH_STOCK", "VIEW")),
+  getAllItemBatchStock
 );

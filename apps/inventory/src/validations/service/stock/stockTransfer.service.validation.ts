@@ -38,33 +38,35 @@ export const createStockTransferServiceValidation = async (
   input: CreateItemStockTransferInput
 ): Promise<void> => {
   logger.info("entering::createStockTransfer::service::validation");
+
   const { stockTransferDetails } = input;
   const settings = await settingsService.getSettings();
-  if (!settings) {
-    throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Settings"));
-  }
-  const warehouseMode = settings.warehouseMode;
+  const warehouseMode = settings?.warehouseMode;
 
   const staff = await employeeService.getEmployeeByIdFrmCacheOrDb(
     input.staffId
   );
+
   if (!staff) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Staff"));
   }
-  if (warehouseMode) await validateWarehouseId(input.ccId);
-  else {
+
+  if (warehouseMode) {
+    await validateWarehouseId(input.ccId);
+  } else {
     const branch = await validateIdBranch(input.ccId);
-    if (!branch.isMain)
+
+    if (!branch.isMain) {
       throw new ErrorHandler(
         400,
         generateErrorMessage("ACCESS_FAIL", "Switch To Main Branch")
       );
+    }
   }
 
   await validateIdBranch(input.fromId);
   await validateIdBranch(input.toId);
 
-  //if choose same brach for sending and reciving
   if (input.fromId === input.toId) {
     throw new ErrorHandler(
       400,
@@ -72,37 +74,41 @@ export const createStockTransferServiceValidation = async (
     );
   }
 
-  // Validate itemIds
-  const itemIds = stockTransferDetails.map((item) => item.itemId);
+  const itemIds = [...new Set(stockTransferDetails.map((item) => item.itemId))];
+
   const itemsInDb = await getCountItemsFromDb(itemIds);
+
   if (itemIds.length !== itemsInDb.length) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Items"));
   }
 
-  // Validate stock quantity
   for (const item of stockTransferDetails) {
     const fromStock = await getItemStockQtyByBatchWise({
       itemId: item.itemId,
-      batchNo: item.batchNo,
+      batchNo: item.batchNo || null,
       expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
       ccId: input.fromId,
     });
 
+    const itemName =
+      itemsInDb.find((i) => i.id === item.itemId)?.item ??
+      `Item Id:${item.itemId}`;
+
     if (!fromStock) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Item Id:${item.itemId} Stock`)
+        generateErrorMessage("NOT_FOUND", `${itemName} Stock`)
       );
     }
 
-    // Validate quantity
     if (fromStock < (item.quantity ?? 0)) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INSUFFICIENT_STOCK", `Item Id:${item.itemId} `)
+        generateErrorMessage("INSUFFICIENT_STOCK", itemName)
       );
     }
   }
+
   logger.info("exiting::createStockTransfer::service::validation");
 };
 

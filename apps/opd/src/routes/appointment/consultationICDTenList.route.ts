@@ -12,6 +12,7 @@ import {
   validateConsultationICDTenListUpdate,
 } from "@/validations/request/appointment/consultationICDTenList.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const consultationICDTenListRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const consultationICDTenListRouter: Router = Router();
  */
 consultationICDTenListRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_ICD_TEN_LIST", "CREATE")),
   validateConsultationICDTenListCreate,
-  createConsultationICDTenList,
+  createConsultationICDTenList
 );
 
 /**
@@ -62,8 +63,8 @@ consultationICDTenListRouter.post(
  */
 consultationICDTenListRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_ICD_TEN_LIST", "UPDATE")),
   validateConsultationICDTenListUpdate,
-  updateConsultationICDTenList,
+  updateConsultationICDTenList
 );

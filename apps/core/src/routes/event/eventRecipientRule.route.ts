@@ -41,7 +41,7 @@ const eventRecipientRuleRouter: Router = Router();
  */
 eventRecipientRuleRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EVENT_RECIPIENT_RULE", "CREATE")),
   validateRecipientRuleCreate,
   createEventRecipientRule
@@ -64,7 +64,7 @@ eventRecipientRuleRouter.post(
  */
 eventRecipientRuleRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EVENT_RECIPIENT_RULE", "UPDATE")),
   validateRecipientRuleUpdate,
   updateEventRecipientRule
@@ -87,7 +87,7 @@ eventRecipientRuleRouter.put(
  */
 eventRecipientRuleRouter.post(
   "/multi-create-update",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "EVENT_RECIPIENT_RULE", "CREATE"),
     getPermission("CORE", "EVENT_RECIPIENT_RULE", "UPDATE")

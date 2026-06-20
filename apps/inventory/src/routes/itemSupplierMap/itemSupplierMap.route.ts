@@ -20,6 +20,7 @@ import {
 } from "@/validations/request/itemSupplierMap/itemSupplierMap.validation.js";
 import { Router } from "express";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemSupplierMapRouter: Router = Router();
 
@@ -47,10 +48,10 @@ export const itemSupplierMapRouter: Router = Router();
  */
 itemSupplierMapRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "CREATE")),
   validateCreateItemSupplierMap,
-  createItemSupplierMap,
+  createItemSupplierMap
 );
 
 /**
@@ -70,10 +71,10 @@ itemSupplierMapRouter.post(
  */
 itemSupplierMapRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "UPDATE")),
   validateUpdateItemSupplierMap,
-  updateItemSupplierMap,
+  updateItemSupplierMap
 );
 
 /**
@@ -87,9 +88,9 @@ itemSupplierMapRouter.put(
  */
 itemSupplierMapRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
-  getAllItemSupplierMap,
+  getAllItemSupplierMap
 );
 
 /**
@@ -111,9 +112,9 @@ itemSupplierMapRouter.get(
 
 itemSupplierMapRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
-  getItemSupplierMapById,
+  getItemSupplierMapById
 );
 
 /**
@@ -135,9 +136,9 @@ itemSupplierMapRouter.get(
 
 itemSupplierMapRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "DELETE")),
-  deleteItemSupplierMapById,
+  deleteItemSupplierMapById
 );
 
 /**
@@ -152,9 +153,9 @@ itemSupplierMapRouter.delete(
 
 itemSupplierMapRouter.get(
   "/export",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
-  exportItemSupplierMapExcel,
+  exportItemSupplierMapExcel
 );
 
 /**
@@ -182,10 +183,10 @@ itemSupplierMapRouter.get(
  */
 itemSupplierMapRouter.post(
   "/import",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "CREATE")),
   validateImportExcelItemSupplierMap,
-  importItemSupplierMapExcel,
+  importItemSupplierMapExcel
 );

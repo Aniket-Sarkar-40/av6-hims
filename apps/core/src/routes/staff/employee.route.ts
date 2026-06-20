@@ -42,7 +42,7 @@ export const employeeRouter: Router = Router();
 // POST /Employees
 employeeRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "CREATE")),
   validateEmployee,
   createEmployee
@@ -60,7 +60,7 @@ employeeRouter.post(
 // GET /Employees
 employeeRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "VIEW")),
   getAllEmployees
 );
@@ -84,7 +84,7 @@ employeeRouter.get(
 // GET /Employees/:EmployeeId
 employeeRouter.get(
   "/:employeeId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "VIEW")),
   getEmployeeById
 );
@@ -114,7 +114,7 @@ employeeRouter.get(
 // PUT /Employees/:EmployeeId
 employeeRouter.put(
   "/:employeeId",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "EMPLOYEE", "VIEW"),
     getPermission("CORE", "EMPLOYEE", "UPDATE")
@@ -142,14 +142,14 @@ employeeRouter.put(
 // DELETE /Employees/:EmployeeId
 employeeRouter.delete(
   "/:employeeId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "DELETE")),
   deleteEmployee
 );
 
 employeeRouter.get(
   "/cache/:employeeId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "VIEW")),
   getEmployeeByIdWithCache
 );

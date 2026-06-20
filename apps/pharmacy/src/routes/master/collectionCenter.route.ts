@@ -16,6 +16,7 @@ import {
   validateCollectionCenterUpdate,
 } from "@/validations/request/master/collectionCenter.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const collectionCenterRouter: Router = Router();
 
@@ -43,10 +44,10 @@ export const collectionCenterRouter: Router = Router();
  */
 collectionCenterRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "CREATE")),
   validateCollectionCenter,
-  createCollectionCenter,
+  createCollectionCenter
 );
 
 /**
@@ -60,9 +61,9 @@ collectionCenterRouter.post(
  */
 collectionCenterRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "VIEW")),
-  getAllCollectionCenter,
+  getAllCollectionCenter
 );
 
 /**
@@ -76,9 +77,9 @@ collectionCenterRouter.get(
  */
 collectionCenterRouter.get(
   "/avl",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "VIEW")),
-  getAvailableCollectionCenter,
+  getAvailableCollectionCenter
 );
 
 /**
@@ -97,9 +98,9 @@ collectionCenterRouter.get(
  */
 collectionCenterRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "VIEW")),
-  getCollectionCenterById,
+  getCollectionCenterById
 );
 
 /**
@@ -126,13 +127,13 @@ collectionCenterRouter.get(
  */
 collectionCenterRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "COLLECTION_CENTER", "VIEW"),
-    getPermission("PMS", "COLLECTION_CENTER", "UPDATE"),
+    getPermission("PMS", "COLLECTION_CENTER", "UPDATE")
   ),
   validateCollectionCenterUpdate,
-  updateCollectionCenter,
+  updateCollectionCenter
 );
 
 /**
@@ -146,8 +147,8 @@ collectionCenterRouter.put(
  */
 collectionCenterRouter.get(
   "/staffId",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   // authorize(getPermission("COLLECTION_CENTER", "VIEW")),
-  getBranchOrWarehouse,
+  getBranchOrWarehouse
 );
 export default collectionCenterRouter;

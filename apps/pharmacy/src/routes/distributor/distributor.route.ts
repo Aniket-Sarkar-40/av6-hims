@@ -16,6 +16,7 @@ import {
   validateUpdateDistributor,
 } from "@/validations/request/distributor/distributor.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const distributorRouter: Router = Router();
 
@@ -43,7 +44,7 @@ export const distributorRouter: Router = Router();
  */
 distributorRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DISTRIBUTOR", "CREATE")),
   createUploadFieldsMiddleware("distributor", [
     "distLicNumber",
@@ -53,7 +54,7 @@ distributorRouter.post(
     "distDrugDoc",
   ]),
   validateCreateDistributor,
-  distributorCreate,
+  distributorCreate
 );
 
 /**
@@ -73,10 +74,10 @@ distributorRouter.post(
  */
 distributorRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "DISTRIBUTOR", "VIEW"),
-    getPermission("PMS", "DISTRIBUTOR", "UPDATE"),
+    getPermission("PMS", "DISTRIBUTOR", "UPDATE")
   ),
   createUploadFieldsMiddleware("distributor", [
     "distLicNumber",
@@ -86,7 +87,7 @@ distributorRouter.put(
     "distDrugDoc",
   ]),
   validateUpdateDistributor,
-  distributorUpdate,
+  distributorUpdate
 );
 
 /**
@@ -100,9 +101,9 @@ distributorRouter.put(
  */
 distributorRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DISTRIBUTOR", "VIEW")),
-  getAllDistributor,
+  getAllDistributor
 );
 
 /**
@@ -116,9 +117,9 @@ distributorRouter.get(
  */
 distributorRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DISTRIBUTOR", "VIEW")),
-  getDistributorById,
+  getDistributorById
 );
 
 /**
@@ -132,7 +133,7 @@ distributorRouter.get(
  */
 distributorRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DISTRIBUTOR", "DELETE")),
-  distributorDelete,
+  distributorDelete
 );

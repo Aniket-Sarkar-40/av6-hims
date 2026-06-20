@@ -16,6 +16,7 @@ import {
 } from "@repo/shared/utils/responseMessage.utils.js";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
+import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
 
 export const createItemMaster = TryCatch(
   async (req: Request, res: Response) => {
@@ -24,11 +25,11 @@ export const createItemMaster = TryCatch(
     const itemMaster = await itemMasterService.createItemMaster(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: itemMaster },
-      "Item Master",
+      "Item Master"
     );
     logger.info("exiting::createItemMaster::controller");
     return res.status(201).json(response);
-  },
+  }
 );
 
 export const updateItemMaster = TryCatch(
@@ -39,10 +40,10 @@ export const updateItemMaster = TryCatch(
     logger.info("exiting::updateItemMaster::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updateItemMaster },
-      "Item Master",
+      "Item Master"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const getAllItemMaster = TryCatch(
@@ -52,10 +53,10 @@ export const getAllItemMaster = TryCatch(
     logger.info("exiting::getAllItemMaster::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: itemMaster },
-      "Item Master",
+      "Item Master"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const getItemMasterById = TryCatch(
@@ -74,10 +75,10 @@ export const getItemMasterById = TryCatch(
     logger.info("exiting::getItemMasterById::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: itemMaster },
-      "Item Master",
+      "Item Master"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const itemSearch = TryCatch(async (req: Request, res: Response) => {
@@ -91,8 +92,8 @@ export const itemSearch = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Items "),
       },
-      items,
-    ),
+      items
+    )
   );
 });
 
@@ -108,10 +109,10 @@ export const getItemStocksByItemId = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Item stock "),
         },
-        items,
-      ),
+        items
+      )
     );
-  },
+  }
 );
 export const getBulkItemSupplierPrices = TryCatch(
   async (req: Request, res: Response) => {
@@ -121,10 +122,10 @@ export const getBulkItemSupplierPrices = TryCatch(
     logger.info("exiting::getBulkItemSupplierPrices::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data },
-      "Item Supplier Prices",
+      "Item Supplier Prices"
     );
     return res.status(200).json(response);
-  },
+  }
 );
 
 export const ActiveItem = TryCatch(async (req: Request, res: Response) => {
@@ -137,8 +138,8 @@ export const ActiveItem = TryCatch(async (req: Request, res: Response) => {
       {
         type: "UPDATED",
       },
-      "Item Updated",
-    ),
+      "Item Updated"
+    )
   );
 });
 
@@ -150,14 +151,57 @@ export const itemExcelSampleExport = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
     res.setHeader(
       "Content-Disposition",
-      'attachment; filename="sample_item.xlsx"',
+      'attachment; filename="sample_item.xlsx"'
     );
 
     await wb.xlsx.write(res); // streams the Excel file
     res.end();
-  },
+  }
 );
+
+export const itemExcelExport = TryCatch(async (req: Request, res: Response) => {
+  logger.info("entering::itemExcelExport::controller");
+
+  const wb: Workbook = await itemMasterService.itemExcelExport();
+
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader("Content-Disposition", 'attachment; filename="item.xlsx"');
+
+  await wb.xlsx.write(res); // streams the Excel file
+  res.end();
+});
+
+export const itemExcelImport = TryCatch(async (req: Request, res: Response) => {
+  logger.info("entering::itemExcelImport::controller");
+
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "No file uploaded.",
+    });
+  }
+
+  const batch = await itemMasterService.itemExcelImport({
+    path: req.file.path,
+  });
+
+  deleteFileIfExists(req.file.path);
+
+  const response = new BaseResponse(
+    {
+      success: true,
+      message: "Item Import started.",
+    },
+    batch
+  );
+
+  logger.info("exiting::itemExcelImport::controller");
+  return res.status(200).json(response);
+});

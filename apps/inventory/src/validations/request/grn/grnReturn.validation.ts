@@ -3,6 +3,12 @@ import {
   GrnReturnDetailInput,
   GrnReturnReqExcelFilter,
 } from "@/types/grn/grnReturn.js";
+import { getSchemaPrecision } from "@/utils/schema.utils.js";
+import {
+  DiscMethod,
+  PAYMENT_STATUS,
+  RETURN_STS,
+} from "@repo/db/generated/prisma/enums.js";
 import {
   arrayRequired,
   boolRequired,
@@ -12,19 +18,16 @@ import {
   enumRequired,
   idOptional,
   idRequired,
+  intOptional,
   intRequired,
+  numberWithMaxDecimalsOptional,
+  numberWithMaxDecimalsRequired,
   priceOptional,
   priceRequired,
   strOptional,
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { numberWithMaxDecimalsRequired } from "@repo/shared/utils/joi.utils.js";
-import {
-  DiscMethod,
-  PAYMENT_STATUS,
-  RETURN_STS,
-} from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
 export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
@@ -42,22 +45,34 @@ export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
     otherwise: dateOptional("Expiry date"),
   }),
 
-  quantity: idRequired("Quantity"),
+  quantity: intOptional("Quantity").default(0),
 
-  purchasedPrice: numberWithMaxDecimalsRequired("purchasedPrice"),
+  focQuantity: intOptional("FOC Quantity").default(0),
 
-  totalAmount: numberWithMaxDecimalsRequired("totalAmount"),
+  purchasedPrice: numberWithMaxDecimalsRequired("purchasedPrice", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  tax: priceOptional("Tax"),
+  totalAmount: numberWithMaxDecimalsOptional("totalAmount", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  netTax: priceRequired("Net Tax"),
+  tax: intOptional("Tax"),
 
-  netAmount: numberWithMaxDecimalsRequired("netAmount"),
+  netTax: intRequired("Net Tax"),
+
+  netAmount: numberWithMaxDecimalsOptional("netAmount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  discount: intRequired("Discount", 0),
-  netDiscount: priceRequired("Net Discount amount"),
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
+  netDiscount: priceRequired("Net Discount amount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   orderQty: intRequired("Order quantity"),
 
@@ -82,29 +97,47 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
 
   date: dateRequired("Date"),
 
+  currencyId: idOptional("Currency Id"),
+
+  conversionRate: Joi.when("currencyId", {
+    is: Joi.exist().not(null),
+    then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
+      getSchemaPrecision("grn")
+    ),
+    otherwise: numberWithMaxDecimalsOptional("Conversion Rate", () =>
+      getSchemaPrecision("grn")
+    ),
+  }),
+
   supplierId: idRequired("Supplier ID"),
 
   ccId: idRequired("CC ID"),
 
-  totalAmount: numberWithMaxDecimalsRequired("totalAmount"),
+  totalAmount: numberWithMaxDecimalsOptional("totalAmount", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  discount: priceOptional("Discount"),
+  discount: numberWithMaxDecimalsOptional("Discount", () =>
+    getSchemaPrecision("grn")
+  ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
-  netDiscount: priceOptional("Discount amount"),
+  netDiscount: intOptional("Discount amount"),
 
-  netTotal: numberWithMaxDecimalsRequired("netTotal"),
+  netTotal: numberWithMaxDecimalsOptional("netTotal", () =>
+    getSchemaPrecision("grn")
+  ),
 
-  paidAmount: priceOptional("Paid amount"),
+  paidAmount: priceOptional("Paid amount", () => getSchemaPrecision("grn")),
 
   paymentStatus: enumOptional("Payment Status", PAYMENT_STATUS),
 
   status: enumOptional("Status", RETURN_STS),
 
-  tax: priceOptional("Tax"),
+  tax: intOptional("Tax"),
 
-  netTax: priceRequired("Net tax"),
+  netTax: intRequired("Net tax"),
 
   goodReceiveReturnDetails: arrayRequired(
     "Good receive return details",

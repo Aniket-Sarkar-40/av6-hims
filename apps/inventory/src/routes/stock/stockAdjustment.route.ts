@@ -13,6 +13,7 @@ import {
   validateUpdateStockAdjustment,
 } from "@/validations/request/stock/stockAdjustment.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const stockAdjustmentRouter: Router = Router();
 
@@ -40,21 +41,21 @@ export const stockAdjustmentRouter: Router = Router();
  */
 stockAdjustmentRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_ADJUSTMENT", "CREATE")),
   validateStockAdjustment,
-  createStockAdjustment,
+  createStockAdjustment
 );
 
 stockAdjustmentRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STOCK_ADJUSTMENT", "UPDATE"),
-    getPermission("INV", "STOCK_ADJUSTMENT", "VIEW"),
+    getPermission("INV", "STOCK_ADJUSTMENT", "VIEW")
   ),
   validateUpdateStockAdjustment,
-  updateStockAdjustment,
+  updateStockAdjustment
 );
 
 /**
@@ -75,9 +76,9 @@ stockAdjustmentRouter.put(
  */
 stockAdjustmentRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_ADJUSTMENT", "VIEW")),
-  getStockAdjustmentById,
+  getStockAdjustmentById
 );
 
 export default stockAdjustmentRouter;

@@ -14,6 +14,7 @@ import {
   getItemCategoryById,
   updateItemCategory,
 } from "@/controllers/master/itemCategory.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemCategoryRouter: Router = Router();
 
@@ -41,10 +42,10 @@ export const itemCategoryRouter: Router = Router();
  */
 itemCategoryRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_CATEGORY", "CREATE")),
   validateItemCategoryCreate,
-  createItemCategory,
+  createItemCategory
 );
 
 /**
@@ -58,9 +59,9 @@ itemCategoryRouter.post(
  */
 itemCategoryRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_CATEGORY", "VIEW")),
-  getAllItemCategory,
+  getAllItemCategory
 );
 
 /**
@@ -79,9 +80,9 @@ itemCategoryRouter.get(
  */
 itemCategoryRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_CATEGORY", "VIEW")),
-  getItemCategoryById,
+  getItemCategoryById
 );
 
 /**
@@ -108,11 +109,11 @@ itemCategoryRouter.get(
  */
 itemCategoryRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "ITEM_CATEGORY", "VIEW"),
-    getPermission("INV", "ITEM_CATEGORY", "UPDATE"),
+    getPermission("INV", "ITEM_CATEGORY", "UPDATE")
   ),
   validateItemCategoryUpdate,
-  updateItemCategory,
+  updateItemCategory
 );

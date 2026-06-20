@@ -13,6 +13,7 @@ import {
   validateMedicineTabDetailsUpdate,
 } from "@/validations/request/appointment/medicineTabDetails.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const medicineTabDetailsRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const medicineTabDetailsRouter: Router = Router();
  */
 medicineTabDetailsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "MEDICINE_TAB_DETAILS", "CREATE")),
   validateMedicineTabDetailsCreate,
-  createMedicineTabDetails,
+  createMedicineTabDetails
 );
 
 /**
@@ -63,13 +64,13 @@ medicineTabDetailsRouter.post(
  */
 medicineTabDetailsRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "MEDICINE_TAB_DETAILS", "VIEW"),
-    getPermission("OPD", "MEDICINE_TAB_DETAILS", "UPDATE"),
+    getPermission("OPD", "MEDICINE_TAB_DETAILS", "UPDATE")
   ),
   validateMedicineTabDetailsUpdate,
-  updateMedicineTabDetails,
+  updateMedicineTabDetails
 );
 
 /**
@@ -99,7 +100,7 @@ medicineTabDetailsRouter.put(
  */
 medicineTabDetailsRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "MEDICINE_TAB_DETAILS", "VIEW")),
-  getMedicineTabDetailsById,
+  getMedicineTabDetailsById
 );

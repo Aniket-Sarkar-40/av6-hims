@@ -125,6 +125,8 @@ enum PaymentTypePharmacy {
 enum Batch_Type {
     ITEM
     ITEM_PRICING
+    VOUCHER_ENTRY
+    BANK_STATEMENT_UPLOAD
 }
 
 enum INCLUDE_EXCLUDE {

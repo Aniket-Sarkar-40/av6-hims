@@ -25,6 +25,7 @@ import {
 import { Router } from "express";
 import { authorizeCommonSearch } from "@/middleware/auth.middleware.js";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const commonRouter: Router = Router();
 /**
@@ -49,10 +50,10 @@ export const commonRouter: Router = Router();
  */
 commonRouter.post(
   "/fixedSearch",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch,
+  fixedSearch
 );
 
 /**
@@ -70,10 +71,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch,
+  commonSearch
 );
 
 /**
@@ -91,10 +92,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/dropdownSearch",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch,
+  commonDropdownSearch
 );
 
 /**
@@ -112,10 +113,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/fixedSearchWOP",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController,
+  fixedSearchWoPaginationController
 );
 
 /**
@@ -133,10 +134,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch,
+  commonFetch
 );
 
 /**
@@ -157,7 +158,7 @@ commonRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport,
+  commonExcelImport
 );
 
 /**
@@ -184,10 +185,10 @@ commonRouter.post("/exportExcel", validateCommonExportExcel, commonExcelExport);
  */
 commonRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete,
+  commonDelete
 );
 
 /**
@@ -205,8 +206,8 @@ commonRouter.delete(
  */
 commonRouter.patch(
   "/updateStatus",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus,
+  commonUpdateStatus
 );

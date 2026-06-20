@@ -1,19 +1,20 @@
 import { CommonConsumptionInput } from "@/types/consumption/consumption.js";
 import {
+  Consumption_Priority,
+  Consumption_Status,
+} from "@repo/db/generated/prisma/client";
+import {
+  arrayRequired,
   boolRequired,
   dateOptional,
   dateRequired,
   enumRequired,
   idRequired,
+  intRequired,
   strOptional,
   strRequired,
-  arrayRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import {
-  Consumption_Priority,
-  Consumption_Status,
-} from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
 export const ConsumptionDetailsCreateSchema = Joi.object({
@@ -40,7 +41,6 @@ export const ConsumptionDetailsCreateSchema = Joi.object({
 
 export const consumptionCreateSchema = Joi.object({
   ccId: idRequired("CC ID"),
-  approvalFrom: idRequired("Approval From"),
   priority: enumRequired("Priority", Consumption_Priority),
   description: strOptional("Description"),
   status: enumRequired("Status", Consumption_Status),
@@ -48,7 +48,7 @@ export const consumptionCreateSchema = Joi.object({
   consumptionDetails: arrayRequired(
     "Consumption Details",
     ConsumptionDetailsCreateSchema,
-    1,
+    1
   ),
 });
 
@@ -58,15 +58,15 @@ export const validateCreateConsumption = validationHandler({
 
 export const ConsumptionDetailsUpdateSchema =
   ConsumptionDetailsCreateSchema.keys({
-    id: idRequired("Id"),
+    id: intRequired("Id"),
   });
 
 export const consumptionUpdateSchema = consumptionCreateSchema.keys({
-  id: idRequired("Id"),
+  id: intRequired("Id"),
   consumptionDetails: arrayRequired(
     "Consumption Details",
     ConsumptionDetailsUpdateSchema,
-    1,
+    1
   ),
 });
 
@@ -75,9 +75,9 @@ export const validateUpdateConsumption = validationHandler({
 });
 
 export const commonConsumptionInputSchema = Joi.object<CommonConsumptionInput>({
-  id: idRequired("Id"),
-  ccId: idRequired("CC Id"),
-  userId: idRequired("User Id"),
+  id: intRequired("Id"),
+  ccId: intRequired("CC Id"),
+  userId: intRequired("User Id"),
   description: strOptional("Description"),
 });
 
@@ -88,7 +88,7 @@ export const validateCommonConsumptionInput = validationHandler({
 export const ConsumptionDetailsApproveSchema =
   ConsumptionDetailsCreateSchema.keys({
     id: idRequired("Id"),
-    consumedQty: idRequired("Consumed Quantity", 0, Joi.ref("requestedQty")),
+    consumedQty: intRequired("Consumed Quantity", 0, Joi.ref("requestedQty")),
 
     batchNo: Joi.when("isBatch", {
       is: true,
@@ -111,7 +111,7 @@ export const consumptionApproveSchema = consumptionCreateSchema.keys({
   consumptionDetails: arrayRequired(
     "Consumption Details",
     ConsumptionDetailsApproveSchema,
-    1,
+    1
   ),
 });
 

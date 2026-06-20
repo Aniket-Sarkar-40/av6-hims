@@ -2,6 +2,7 @@
   "name": "@apps/gateway",
   "version": "0.0.1",
   "dependencies": {
+    "@apps/acc": "workspace:*",
     "@apps/core": "workspace:*",
     "@apps/inv": "workspace:*",
     "@apps/opd": "workspace:*",

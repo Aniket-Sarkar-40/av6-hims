@@ -16,9 +16,6 @@ import {
   ConsumptionDTO,
   ConsumptionUpdateInput,
 } from "@/types/consumption/consumption.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   approveConsumptionServiceValidation,
   createConsumptionServiceValidation,
@@ -27,10 +24,13 @@ import {
   rejectConsumptionServiceValidation,
   updateConsumptionServiceValidation,
 } from "@/validations/service/consumption/consumption.service.validation.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const consumptionService = {
   async createConsumption(
-    input: ConsumptionCreateInput,
+    input: ConsumptionCreateInput
   ): Promise<ConsumptionDTO> {
     logger.info("entering::createConsumption::service");
     await createConsumptionServiceValidation(input);
@@ -40,7 +40,7 @@ export const consumptionService = {
     return createdConsumption[0];
   },
   async updateConsumption(
-    input: ConsumptionUpdateInput,
+    input: ConsumptionUpdateInput
   ): Promise<ConsumptionDTO> {
     logger.info("entering::updateConsumption::service");
     await updateConsumptionServiceValidation(input);
@@ -49,9 +49,10 @@ export const consumptionService = {
     logger.info("exiting::updateConsumption::service");
     return updatedConsumption[0];
   },
+
   async getConsumptionById(
     id: number,
-    canNullReturnable = false,
+    canNullReturnable = false
   ): Promise<ConsumptionDTO | null> {
     logger.info("entering::getConsumptionById::service");
     const consumption = await getConsumptionByIdFromDb(id);
@@ -60,7 +61,7 @@ export const consumptionService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Consumption"),
+          generateErrorMessage("NOT_FOUND", "Consumption")
         );
       } else return null;
     }
@@ -75,6 +76,7 @@ export const consumptionService = {
     logger.info("exiting::getAllConsumption::service");
     return consumptionDTO;
   },
+
   async deleteConsumptionById(input: CommonConsumptionInput) {
     logger.info("entering::deleteConsumptionById::service");
     await deleteConsumptionServiceValidation(input);
@@ -82,13 +84,13 @@ export const consumptionService = {
     logger.info("exiting::deleteConsumptionById::service");
   },
   async approveConsumption(
-    input: ConsumptionApproveInput,
+    input: ConsumptionApproveInput
   ): Promise<ConsumptionDTO> {
     logger.info("entering::approveConsumption::service");
     await approveConsumptionServiceValidation(input);
     const consumption = await approveConsumptionInDb(input);
-    logger.info("exiting::approveConsumption::service");
     const consumptionDTO = await toConsumptionDTO([consumption]);
+    logger.info("exiting::approveConsumption::service");
     return consumptionDTO[0];
   },
   async rejectConsumptionById(input: CommonConsumptionInput) {
@@ -97,6 +99,7 @@ export const consumptionService = {
     await rejectConsumptionByIdFromDb(input);
     logger.info("exiting::rejectConsumptionById::service");
   },
+
   async getConsumptionByUserId(userId: number): Promise<ConsumptionDTO[]> {
     logger.info("entering::getConsumptionByUserId::service");
     await getConsumptionByUserIdServiceValidation(userId);

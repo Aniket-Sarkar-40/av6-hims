@@ -28,7 +28,7 @@ export const approvalRouter: Router = Router();
  *           schema:
  *             $ref: '#/components/commonUpdateStatusSchema'
  */
-approvalRouter.patch("/", verifyToken, validateCommonApprove, commonApproval);
+approvalRouter.patch("/", verifyToken(), validateCommonApprove, commonApproval);
 approvalRouter.patch(
   "/ext",
   authorizeExternal(),
@@ -51,7 +51,7 @@ approvalRouter.patch(
  */
 approvalRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   validateGetMyApprovalFlow,
   getStaffPendingApproval
 );
@@ -66,7 +66,11 @@ approvalRouter.post(
  * @swagger
  * /api/v1/common/getApprovalActions:
  */
-approvalRouter.post("/getApprovalActions", verifyToken, getApprovalActDetails);
+approvalRouter.post(
+  "/getApprovalActions",
+  verifyToken(),
+  getApprovalActDetails
+);
 approvalRouter.post(
   "/getApprovalActions-ext",
   authorizeExternal(),

@@ -3,8 +3,6 @@ export enum PermissionType {
   VIEW = "view",
   UPDATE = "edit",
   DELETE = "delete",
-  APPROVE = "approve",
-  REJECT = "reject",
 }
 
 export enum PermissionResource {
@@ -37,10 +35,12 @@ export enum PermissionResource {
   GRN_RETURN_PDF = "grn-return-pdf",
   STORE_REQUISITION = "store-requisition",
   STORE_REQUISITION_REJECT = "store-requisition-reject",
-  STORE_REQUISITION_SENT = "store-requisition-sent",
+  STORE_REQUISITION_APPROVE = "store-requisition-approve",
   STORE_REQUISITION_ACK = "store-requisition-acknowledge",
   LOCATION = "location",
   CONSUMPTION = "consumption",
+  CONSUMPTION_APPROVE = "consumption-approve",
+  CONSUMPTION_REJECT = "consumption-reject",
   ITEM_BATCHES = "item-batch",
   ITEMS_SUP = "items-supplier",
   ITEM_STOCK = "item-stock",
@@ -49,6 +49,27 @@ export enum PermissionResource {
   STOCK_ADJUSTMENT = "stock-adjustment",
   COLLECTION_CENTER = "collection-center",
   STOCK_TRANSFER_ACKNOWLEDGE = "stock-transfer-acknowledge",
+  BRANCH_REQUISITION = "branch-requisition",
+  BRANCH_REQUISITION_REJECT = "branch-requisition-reject",
+  BRANCH_REQUISITION_APPROVE = "branch-requisition-approve",
+  BRANCH_REQUISITION_ACK = "branch-requisition-acknowledge",
+  STORE_REQUISITION_RETURN_APPROVE = "store-requisition-return-approve",
+  STORE_REQUISITION_RETURN_ACKNOWLEDGE = "store-requisition-return-acknowledge",
+  BRANCH_REQUISITION_RETURN = "branch-requisition-return",
+  BRANCH_REQUISITION_RETURN_REJECT = "branch-requisition-return-reject",
+  BRANCH_REQUISITION_RETURN_APPROVE = "branch-requisition-return-approve",
+  BRANCH_REQUISITION_RETURN_ACK = "branch-requisition-return-acknowledge",
+  ITEM_BATCH_STOCK = "item-batch-stock",
+  PURCHASE_ORDER_DETAILS = "purchase-order-details",
+  BRANCH_REQ_RETURN_DETAILS = "branch-requisition-return-details",
+  GRN_DETAILS = "grn-details",
+  STORE_REQUISITION_DETAILS = "store-requisition-details",
+  STORE_REQUISITION_RETURN_DETAILS = "store-requisition-return-details",
+  CONSUMPTION_DETAILS = "consumption-details",
+  STOCK_ADJUSTMENT_DETAILS = "stock-adjustment-details",
+  GRN_RETURN_DETAILS = "grn-return-details",
+  DEFAULT_UNIT_MASTER = "default-unit-master",
+  STOCK_TRANSFER_DETAILS = "stock-transfer-details",
 
   // CORE
   COUNTRY = "country",
@@ -70,6 +91,7 @@ export enum PermissionResource {
   NOTIFICATION = "notification",
   EVENT_RECIPIENT_RULE = "event-recipient-rule",
   CORE_APPROVAL = "core-approval",
+  MODULE_CONFIG = "module-config",
 
   // OPD
   PATIENT = "patients",
@@ -188,6 +210,44 @@ export enum PermissionResource {
   CLIENT_MASTER = "client-master",
   AUTO_ALERT = "auto-alert",
   SELL_DETAILS = "sell-details",
+
+  //ACCOUNTING
+  VOUCHER_ENTRY = "voucher-entry",
+  CANCEL_VOUCHER = "cancel-voucher",
+  VOUCHER_EXCEL_IMPORT = "voucher-excel-import",
+  LEDGER_BALANCE = "ledger-balance",
+  TRIAL_BALANCE = "trial-balance",
+  LEDGER_BOOK = "ledger-book",
+  GROUP_SUMMARY_TREE = "group-summary-tree",
+  PROFIT_LOSS = "profit-loss",
+  BALANCE_SHEET = "balance-sheet",
+  CASH_BANK_SUMMARY = "cash-bank-summary",
+  RECEIVABLE_SUMMARY = "receivable-summary",
+  PAYABLE_SUMMARY = "payable-summary",
+  CASH_FLOW = "cash-flow",
+  FUND_FLOW = "fund-flow",
+
+  EMAIL_CONFIG = "email-config",
+  DYNAMIC_SHORT_CODE = "dynamic-short-code",
+  AUDIT_CONFIG = "audit-config",
+  COMPANY = "company",
+  GROUP = "group",
+  LEDGER = "ledger",
+  VOUCHER_TYPE = "voucher-type",
+  COST_CENTER = "cost-center",
+  NARRATION = "narration",
+  COMPANY_FINANCIAL_YEAR = "company-financial-year",
+  INTEGRATION_CONFIG = "integration-config",
+  BATCH_JOB = "batch-job",
+  BATCH_JOB_DETAILS = "batch-job-details",
+  UNRECONCILED_BANK_VOUCHER_LINES = "unreconciled-bank-voucher-lines",
+  MANUAL_RECONCILE = "manual-reconcile",
+  BANK_STATEMENT = "bank-statement",
+  BANK_STATEMENT_ROW = "bank-statement-row",
+  MANUAL_BANK_RECONCILE = "manual-bank-reconcile",
+  BANK_RECONCILIATION_SUMMARY = "bank-reconciliation-summary",
+  BANK_AUTO_SUGGESTIONS = "bank-auto-suggestions",
+  SETTINGS = "settings",
 }
 
 export enum PermissionModule {
@@ -195,6 +255,7 @@ export enum PermissionModule {
   OPD = "opd",
   CORE = "core",
   INV = "inv",
+  ACC = "acc",
 }
 
 export const getPermission = (

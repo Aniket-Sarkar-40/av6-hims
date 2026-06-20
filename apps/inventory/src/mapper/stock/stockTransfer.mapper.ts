@@ -4,12 +4,17 @@ import { itemMasterService } from "@/services/master/itemMaster.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import { RawItemStock } from "@/types/stock/stock.js";
 import {
+  StockTransferDetailRowDTO,
   StockTransferDetailsDTO,
   StockTransferDTO,
   StockTransferResponse,
 } from "@/types/stock/stockTransfer.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { InvItemStock } from "@repo/db/generated/prisma/client";
+import {
+  InvItemStock,
+  InvStockTransferDetails,
+} from "@repo/db/generated/prisma/client";
 import { toIdValue } from "av6-utils";
 
 export const toStockTransferDTO = async (
@@ -70,14 +75,14 @@ export const toStockTransferDTO = async (
 
           const fromStock = await getItemStockQtyByBatchWise({
             itemId: detail.itemId,
-            ccId: stockTransfer.ccId,
+            ccId: stockTransfer.fromId,
             batchNo: detail.batchNo,
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           });
           const toStock = await getItemStockQtyByBatchWise({
             itemId: detail.itemId,
-            ccId: stockTransfer.ccId,
+            ccId: stockTransfer.toId,
             batchNo: detail.batchNo,
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
@@ -126,4 +131,30 @@ export const toStockEntity = (raw: RawItemStock): InvItemStock => {
     deletedAt: raw.deleted_at ? new Date(raw.deleted_at) : null,
     isFoc: Boolean(raw.is_foc),
   };
+};
+
+export const toStockTransferDetailDTO = async (
+  details: InvStockTransferDetails[]
+): Promise<StockTransferDetailRowDTO[]> => {
+  return Promise.all(
+    details.map(async (detail) => {
+      const item = await itemMasterService.getItemMasterById(
+        { itemId: detail.itemId },
+        true
+      );
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...detail,
+        item: item ? await itemMasterToDto(item) : null,
+        createdBy,
+        updatedBy,
+      };
+    })
+  );
 };

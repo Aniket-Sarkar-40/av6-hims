@@ -63,6 +63,17 @@ export enum ErrorMessageType {
   DELETE_RESTRICTED = "Deletion is not allowed because all medicines under this record have been sold.",
   NOT_EXCEED = "%1 cannot exceed %2",
   FAILED = "%1 failed",
+  ARRAY_LENGTH = "%1 must have at least %2 items",
+  INVALID_DATE_RANGE = "%1 date range is invalid, must be between %2 and %3",
+  ASSOCIATED_ITEM_EXIST = "Cannot delete %1 as it has associated %2",
+  RESERVED_ITEM = "Cannot delete %1 as it is reserved",
+  DATE_RANGE_OVERLAP = "%1 date range overlaps with existing %2 for the %3",
+  MUST_GREATER_THEN = "%1 must be greater than %2",
+  MUST_BETWEEN = "%1 must be between %2 and %3",
+  INVALID_RETURN = "%1 is not a valid return for %2.",
+  REQUIRED_FIELD = "%1 is required field",
+  NOT_POSSIBLE = "Not possible to update %1 because it has stock",
+  UNAUTHORIZED = "You are not authorized to perform this action",
 }
 
 export enum ValidationErrorMessage {

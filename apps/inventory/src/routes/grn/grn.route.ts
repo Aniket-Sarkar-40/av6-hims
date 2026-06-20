@@ -1,19 +1,21 @@
 import {
   createGrn,
   deleteGrn,
+  generateGrnPdf,
   getAllGrn,
   getGrnById,
   updateGrn,
 } from "@/controllers/grn/grn.controller.js";
 import {
+  validateGrn,
+  validateGrnUpdate,
+} from "@/validations/request/grn/grn.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import {
   authorize,
   verifyToken,
 } from "@repo/platform/middlewares/auth.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
-import {
-  validateGrn,
-  validateGrnUpdate,
-} from "@/validations/request/grn/grn.validation.js";
 import { Router } from "express";
 
 export const grnRouter: Router = Router();
@@ -42,10 +44,10 @@ export const grnRouter: Router = Router();
  */
 grnRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "CREATE")),
   validateGrn,
-  createGrn,
+  createGrn
 );
 
 /**
@@ -59,9 +61,9 @@ grnRouter.post(
  */
 grnRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "VIEW")),
-  getAllGrn,
+  getAllGrn
 );
 
 /**
@@ -80,9 +82,9 @@ grnRouter.get(
  */
 grnRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "VIEW")),
-  getGrnById,
+  getGrnById
 );
 
 /**
@@ -109,13 +111,13 @@ grnRouter.get(
  */
 grnRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "GRN", "VIEW"),
-    getPermission("INV", "GRN", "UPDATE"),
+    getPermission("INV", "GRN", "UPDATE")
   ),
   validateGrnUpdate,
-  updateGrn,
+  updateGrn
 );
 
 /**
@@ -140,37 +142,23 @@ grnRouter.put(
  */
 grnRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "DELETE")),
-  deleteGrn,
+  deleteGrn
 );
 
 /**
  * @swagger
- * /api/v1/grn/excel-report:
+ * /api/v1/grn/pdf:
  *   post:
- *     summary: Create a new Good Receive Note
+ *     summary: Generate Good Receive PDF
  *     tags: [Good Receive Note]
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/grnSchema'
  */
-// grnRouter.post(
-//   "/excel-report",
-//   verifyToken,
-//   authorize(getPermission("GRN_EXCEL", "VIEW")),
-//   validateExcelFilterGrn,
-//   excelGrnReport
-// );
-
-grnRouter.delete(
-  "/",
-  verifyToken,
-  authorize(getPermission("INV", "GRN", "DELETE")),
-  deleteGrn,
+grnRouter.post(
+  "/pdf",
+  verifyToken(ServiceCode.INVENTORY),
+  authorize(getPermission("INV", "GRN_PDF", "VIEW")),
+  generateGrnPdf
 );

@@ -13,6 +13,7 @@ import {
 } from "@/validations/request/master/medicineDistMapReq.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const medicineDistMapRouter: Router = Router();
 
@@ -40,10 +41,10 @@ const medicineDistMapRouter: Router = Router();
  */
 medicineDistMapRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_DIST_MAP", "CREATE")),
   validateMedicineDistMap,
-  createMedicineDistMap,
+  createMedicineDistMap
 );
 
 /**
@@ -70,13 +71,13 @@ medicineDistMapRouter.post(
  */
 medicineDistMapRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_DIST_MAP", "VIEW"),
-    getPermission("PMS", "MEDICINE_DIST_MAP", "UPDATE"),
+    getPermission("PMS", "MEDICINE_DIST_MAP", "UPDATE")
   ),
   validateMedicineDistMapUpdate,
-  updateMedicineDistMap,
+  updateMedicineDistMap
 );
 
 export default medicineDistMapRouter;

@@ -12,6 +12,7 @@ import {
   validateChipsButtonMappingUpdate,
 } from "@/validations/request/master/chipsButtonMapping.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const chipsButtonMappingRouter: Router = Router();
 
@@ -46,10 +47,10 @@ export const chipsButtonMappingRouter: Router = Router();
  */
 chipsButtonMappingRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CHIPS_BUTTON_MAPPING", "CREATE")),
   validateChipsButtonMappingCreate,
-  createChipsButtonMapping,
+  createChipsButtonMapping
 );
 
 /**
@@ -78,8 +79,8 @@ chipsButtonMappingRouter.post(
  */
 chipsButtonMappingRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CHIPS_BUTTON_MAPPING", "UPDATE")),
   validateChipsButtonMappingUpdate,
-  updateChipsButtonMapping,
+  updateChipsButtonMapping
 );

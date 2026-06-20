@@ -1,14 +1,13 @@
+import { InvWarehouse } from "@repo/db/generated/prisma/client";
 import {
-  boolOptional,
   emailRequired,
-  idRequired,
   idOptional,
+  idRequired,
   phoneRequired,
   strOptional,
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { InvWarehouse } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
 export const warehouseSchema = Joi.object<InvWarehouse>({
@@ -26,7 +25,6 @@ export const warehouseSchema = Joi.object<InvWarehouse>({
   area: strOptional("Area"),
   pinCode: idOptional("Pin code"),
   latitudeLongitude: strOptional("Latitude and longitude"),
-  isMain: boolOptional("Is Main"),
 });
 
 export const validateWarehouse = validationHandler({

@@ -1,14 +1,13 @@
 import {
   InvBranch,
   InvItemSupplier,
-  InvPurchaseOrder,
   InvWarehouse,
   Prisma,
 } from "@repo/db/generated/prisma/client";
 import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
-import { ItemSupplierDTO } from "../master/itemSupplier.js";
 import { EmployeeCache } from "av6-core-v2";
 import { ItemMasterToDto } from "../grn/grn.js";
+import { ItemSupplierDTO } from "../master/itemSupplier.js";
 
 export type PurchaseOrderDetails =
   Prisma.InvPurchaseOrderDetailsUncheckedCreateWithoutPurchaseInput;
@@ -36,6 +35,8 @@ export interface PurchaseOrderDTO
     | "storeId"
     | "supplierId"
     | "warehouseId"
+    | "currencyId"
+    | "lastVerifiedBy"
   > {
   supplier: IdValue | null;
   store: IdValue | null;
@@ -43,7 +44,10 @@ export interface PurchaseOrderDTO
   updatedBy: EmployeeCache | null;
   warehouse: IdValue | null;
   branch: IdValue | null;
+  location: IdValue | null;
+  currency: IdValue | null;
   purchaseOrderDetails: PurchaseOrderDetailDTO[];
+  lastVerifiedBy: EmployeeCache | null;
 }
 
 export interface PurchaseOrderDetailDTO
@@ -56,6 +60,8 @@ export interface PurchaseOrderDetailDTO
     | "itemCategoryId"
     | "medUnitId"
     | "itemMedUnit"
+    | "createdBy"
+    | "updatedBy"
   > {
   id: number;
   item: ItemMasterToDto | null;
@@ -77,8 +83,6 @@ export type PurchaseOrderDetailResponse =
   Prisma.InvPurchaseOrderDetailsGetPayload<{
     include: {
       item: true;
-      itemCategory: true;
-      itemMedUnit: true;
     };
   }>;
 

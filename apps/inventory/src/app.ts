@@ -24,14 +24,25 @@ import { purchaseRouter } from "./routes/purchase/purchase.route.js";
 import { storeRequisitionRouter } from "./routes/purchase/storeRequisition.route.js";
 import { stockAdjustmentRouter } from "./routes/stock/stockAdjustment.route.js";
 import stockTransferRouter from "@/routes/stock/stockTransfer.route.js";
+import { branchRequisitionRouter } from "@/routes/purchase/branchRequisition.route.js";
+import { storeRequisitionReturnRouter } from "@/routes/purchase/storeRequisitionReturn.route.js";
+import { branchRequisitionReturnRouter } from "@/routes/purchase/branchRequisitionReturn.route.js";
+import { loadSchemaPrecisionSettings } from "@/middlewares/schemaPrecision.middleware.js";
+import { defaultUnitMasterRouter } from "@/routes/master/defaultUnitMaster.route.js";
 
 export const inventoryRouter: ExpressRouter = Router();
+
+inventoryRouter.use(loadSchemaPrecisionSettings);
 
 //master
 inventoryRouter.use("/cache", cacheRouter);
 inventoryRouter.use("/master/item-category", itemCategoryRouter);
 inventoryRouter.use("/master/item-store", itemStoreRouter);
 inventoryRouter.use("/master/item-unit", unitMasterRouter);
+inventoryRouter.use(
+  "/api/v1/master/default-unit-master",
+  defaultUnitMasterRouter
+);
 inventoryRouter.use("/common", commonRouter);
 inventoryRouter.use("/master/item-supplier", itemSupplierRouter);
 
@@ -67,3 +78,13 @@ inventoryRouter.use("/stock-adjustment", stockAdjustmentRouter);
 inventoryRouter.use("/consumption", consumptionRouter);
 
 inventoryRouter.use("/stock-transfer", stockTransferRouter);
+
+// Branch Requisition
+inventoryRouter.use("/branch-requisition", branchRequisitionRouter);
+inventoryRouter.use(
+  "/branch-requisition-return",
+  branchRequisitionReturnRouter
+);
+
+//Store requisition return
+inventoryRouter.use("/store-requisition-return", storeRequisitionReturnRouter);

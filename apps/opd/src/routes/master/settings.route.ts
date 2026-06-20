@@ -9,6 +9,7 @@ import {
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateSettings } from "@/validations/request/master/settings.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const settingsRouter: Router = Router();
 
@@ -36,10 +37,10 @@ export const settingsRouter: Router = Router();
  */
 settingsRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "SETTING", "CREATE")),
   validateSettings,
-  upsertSettings,
+  upsertSettings
 );
 
 /**
@@ -53,7 +54,7 @@ settingsRouter.post(
  */
 settingsRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "SETTING", "VIEW")),
-  getSettings,
+  getSettings
 );

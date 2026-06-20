@@ -10,6 +10,7 @@ import {
   getAllCacheController,
 } from "@/controllers/cacheController/cache.controller.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 const cacheRouter: Router = Router();
 
@@ -31,9 +32,9 @@ const cacheRouter: Router = Router();
  */
 cacheRouter.post(
   "/load",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CACHE", "VIEW")),
-  getAllCacheController,
+  getAllCacheController
 );
 /**
  * @swagger
@@ -53,15 +54,15 @@ cacheRouter.post(
  */
 cacheRouter.delete(
   "/delete",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CACHE", "DELETE")),
-  clearCacheController,
+  clearCacheController
 );
 cacheRouter.delete(
   "/all",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CACHE", "DELETE")),
-  clearAllCacheController,
+  clearAllCacheController
 );
 
 export default cacheRouter;

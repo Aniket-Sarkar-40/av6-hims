@@ -1,25 +1,27 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
-import { subItemStock } from "./../stock/stock.repository.js";
-
-import { eventEmailService } from "@/services/master/emailConfig.service.js";
 import { uinServiceFactory } from "@/config/core.config.js";
+import { settingsService } from "@/services/master/settings.service.js";
 import {
   CreateGrnInput,
   GrnDetailInput,
   GrnResponse,
 } from "@/types/grn/grn.js";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { calculateGrnStockQty } from "@/utils/commonCalculation.utils.js";
+import { getDetailKey } from "@/validations/service/grn/grn.service.validation.js";
+import { db } from "@repo/db/client";
 import {
+  InvGoodReceive,
   InvGoodReceiveDetails,
   InvUinShortCode,
-  InvGoodReceive,
+  ItemStockType,
 } from "@repo/db/generated/prisma/client";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { customOmit } from "av6-utils";
 import { addItemStock } from "../stock/stock.repository.js";
+import { subItemStock } from "./../stock/stock.repository.js";
 
 export const createGrnInDb = async (
-  input: CreateGrnInput,
+  input: CreateGrnInput
 ): Promise<InvGoodReceive> => {
   logger.info("entering::createGrnInDb::repository");
 
@@ -34,6 +36,8 @@ export const createGrnInDb = async (
   >(input, ["goodReceiveDetails", "poStatus", "supplier"]);
   const grnUin = await uinServiceFactory.generateUIN(InvUinShortCode.GRN);
   return db.$transaction(async (tx) => {
+    const inputDetails = omittedGrn.omitted.goodReceiveDetails;
+
     const createdGrn = await tx.invGoodReceive.create({
       data: {
         ...omittedGrn.rest,
@@ -41,11 +45,23 @@ export const createGrnInDb = async (
         createdBy: currentUser,
         grnNumber: grnUin,
         goodReceiveDetails: {
-          create: omittedGrn.omitted.goodReceiveDetails.map((d) => {
+          create: inputDetails.map((d) => {
             const omittedDetails = customOmit<
               GrnDetailInput,
-              "poDetailsId" | "id" | "isExpiry" | "isBatch"
-            >(d, ["id", "poDetailsId", "isBatch", "isExpiry"]);
+              | "poDetailsId"
+              | "id"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+              | "stockFocQuantity"
+            >(d, [
+              "id",
+              "poDetailsId",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+              "stockFocQuantity",
+            ]);
             return {
               ...omittedDetails.rest,
               expiryDate: d.expiryDate ? new Date(d.expiryDate) : undefined,
@@ -60,7 +76,9 @@ export const createGrnInDb = async (
     });
 
     await Promise.all(
-      createdGrn.goodReceiveDetails.map(async (detail) => {
+      createdGrn.goodReceiveDetails.map(async (detail, index) => {
+        const inputDetail = inputDetails[index];
+
         if ((detail.quantity ?? 0) > 0) {
           await addItemStock(
             tx,
@@ -68,7 +86,7 @@ export const createGrnInDb = async (
               batchNo: detail.batchNo ?? null,
               expiryDate: detail.expiryDate ?? null,
               itemId: detail.itemId,
-              quantity: detail.quantity,
+              quantity: inputDetail.stockQuantity ?? detail.quantity,
               ccId: input.ccId,
               isFoc: false,
             },
@@ -78,7 +96,7 @@ export const createGrnInDb = async (
               refId: createdGrn.id,
               refDetailsId: detail.id,
               refNo: createdGrn.grnNumber,
-            },
+            }
           );
         }
 
@@ -89,7 +107,7 @@ export const createGrnInDb = async (
               batchNo: detail.batchNo ?? null,
               expiryDate: detail.expiryDate ?? null,
               itemId: detail.itemId,
-              quantity: detail.focQuantity,
+              quantity: inputDetail.stockFocQuantity ?? detail.focQuantity,
               ccId: input.ccId,
               isFoc: true,
             },
@@ -99,10 +117,10 @@ export const createGrnInDb = async (
               refId: createdGrn.id,
               refDetailsId: detail.id,
               refNo: createdGrn.grnNumber,
-            },
+            }
           );
         }
-      }),
+      })
     );
 
     await tx.invPurchaseOrder.update({
@@ -119,35 +137,34 @@ export const createGrnInDb = async (
               increment: detail.quantity ?? 0,
             },
           },
-        }),
-      ),
+        })
+      )
     );
 
-    const supplier = omittedGrn.omitted.supplier;
-
-    if (supplier.isGrnEmail) {
-      if (supplier.email) {
-        const emailTemplate = await eventEmailService.getEventEmail();
-
-        if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
-          // sendTemplatedEmail({
-          //   template: emailTemplate,
-          //   to: [supplier.email],
-          //   variables: {
-          //     name: store.user.userName || "User",
-          //     companyDetails: "Aerial View-6 Infotech Pvt. Ltd.",
-          //     message: `Good Receive created.`,
-          //     signature: `Aerial View-6 Pvt. Ltd.`,
-          //   },
-          // })
-          //   .then(() => {
-          //     logger.info("Email Sent Successfully.");
-          //   })
-          //   .catch((e: Error) => logger.error(`Email Failed:: ${e.message} `));
-          // TODO: Send notification
-        }
-      }
-    }
+    // voucher entry
+    // const settings = await settingsService.getSettings();
+    // if (settings?.isAccounting && createdGrn.status === GRN_STATUS.COMPLETED) {
+    //   const result = await accountingExternalService.createVoucher({
+    //     ccId: createdGrn.ccId,
+    //     refType: VoucherReferenceType.INVENTORY_GRN,
+    //     refNo: createdGrn.grnNumber,
+    //     refId: createdGrn.id,
+    //     refDate: createdGrn.date,
+    //     currencyId: createdGrn.currencyId ?? undefined,
+    //     currencyConversionRate: createdGrn.conversionRate
+    //       ? Number(createdGrn.conversionRate)
+    //       : undefined,
+    //     totalAmount: Number(createdGrn.totalAmount),
+    //     clientId: createdGrn.supplierId,
+    //     clientPayAmount: 0,
+    //     customerPayAmount: 0,
+    //     customerName: "",
+    //     createdBy: currentUser,
+    //   });
+    //   if (!result.success) {
+    //     throw new ErrorHandler(result.status, result.message);
+    //   }
+    // }
 
     return createdGrn;
   });
@@ -161,6 +178,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
 
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
+  const settings = await settingsService.getSettings();
 
   const toUpdate = goodReceiveDetails.filter((d) => typeof d.id === "number");
   const toCreate = goodReceiveDetails.filter((d) => typeof d.id !== "number");
@@ -170,12 +188,54 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
     "goodReceiveDetails" | "poStatus" | "supplier"
   >(input, ["goodReceiveDetails", "poStatus", "supplier"]);
 
+  const newInputDetailByKey = new Map(
+    toCreate.map((detail) => [getDetailKey(detail), detail])
+  );
+
   return await db.$transaction(async (tx) => {
     const prevGrn = await tx.invGoodReceive.findUnique({
       where: { id },
-      include: { goodReceiveDetails: true },
+      include: {
+        goodReceiveDetails: {
+          include: {
+            item: {
+              include: {
+                unit: true,
+              },
+            },
+          },
+        },
+      },
     });
     if (!prevGrn) throw new Error(`GRN ${id} not found`);
+
+    const itemStockType: ItemStockType =
+      settings?.itemStockType || ItemStockType.PACK_WISE;
+
+    const getPrevStockQty = (
+      detail: (typeof prevGrn.goodReceiveDetails)[number],
+      quantity: number
+    ) => {
+      return calculateGrnStockQty({
+        itemStockType,
+        unitDefaultValue: Number(detail.item?.unit?.defaultValue ?? 1),
+        quantity,
+      });
+    };
+
+    const inputDetailById = new Map(
+      goodReceiveDetails
+        .filter((detail) => typeof detail.id === "number")
+        .map((detail) => [detail.id!, detail])
+    );
+
+    const getInputStockQty = (detailId: number, fallbackQty: number) => {
+      return inputDetailById.get(detailId)?.stockQuantity ?? fallbackQty;
+    };
+
+    const getInputFocStockQty = (detailId: number, fallbackQty: number) => {
+      return inputDetailById.get(detailId)?.stockFocQuantity ?? fallbackQty;
+    };
 
     const updatedGrn = await tx.invGoodReceive.update({
       where: { id },
@@ -187,15 +247,42 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
           update: toUpdate.map((d) => ({
             where: { id: d.id! },
             data: {
-              ...d,
+              ...customOmit<
+                GrnDetailInput,
+                | "poDetailsId"
+                | "id"
+                | "isExpiry"
+                | "isBatch"
+                | "stockQuantity"
+                | "stockFocQuantity"
+              >(d, [
+                "id",
+                "poDetailsId",
+                "isBatch",
+                "isExpiry",
+                "stockQuantity",
+                "stockFocQuantity",
+              ]).rest,
               updatedBy: currentUser,
             },
           })),
           create: toCreate.map((detail) => {
             const omittedDetails = customOmit<
               GrnDetailInput,
-              "poDetailsId" | "id" | "isExpiry" | "isBatch"
-            >(detail, ["id", "poDetailsId", "isBatch", "isExpiry"]);
+              | "poDetailsId"
+              | "id"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+              | "stockFocQuantity"
+            >(detail, [
+              "id",
+              "poDetailsId",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+              "stockFocQuantity",
+            ]);
             return {
               ...omittedDetails.rest,
               createdBy: currentUser,
@@ -210,7 +297,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
     });
 
     const prevMap = new Map<number, (typeof prevGrn.goodReceiveDetails)[0]>(
-      prevGrn.goodReceiveDetails.map((d) => [d.id, d]),
+      prevGrn.goodReceiveDetails.map((d) => [d.id, d])
     );
     const updatedMap = new Map<
       number,
@@ -226,7 +313,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.quantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.quantity),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -236,7 +323,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (prevDetail.focQuantity > 0) {
@@ -246,7 +333,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.focQuantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.focQuantity),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -256,7 +343,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -280,7 +367,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: delta,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: delta,
+              }),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -290,7 +381,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         } else if (delta < 0) {
           await subItemStock(
@@ -299,7 +390,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: -delta,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: -delta,
+              }),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -309,7 +404,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: updDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
 
@@ -320,7 +415,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: deltaFoc,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: deltaFoc,
+              }),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -330,7 +429,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         } else if (deltaFoc < 0) {
           await subItemStock(
@@ -339,7 +438,11 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: -deltaFoc,
+              quantity: calculateGrnStockQty({
+                itemStockType,
+                unitDefaultValue: prevDetail.item?.unit?.defaultValue,
+                quantity: -deltaFoc,
+              }),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -349,7 +452,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: updDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
       } else {
@@ -360,7 +463,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.quantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.quantity),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -370,7 +473,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.quantity > 0) {
@@ -380,7 +483,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.quantity,
+              quantity: getInputStockQty(updDetail.id, updDetail.quantity),
               ccId: input.ccId,
               isFoc: false,
             },
@@ -390,7 +493,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
         if (prevDetail.focQuantity > 0) {
@@ -400,7 +503,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: prevDetail.batchNo ?? null,
               expiryDate: prevDetail.expiryDate ?? null,
               itemId: prevDetail.itemId,
-              quantity: prevDetail.focQuantity,
+              quantity: getPrevStockQty(prevDetail, prevDetail.focQuantity),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -410,7 +513,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: prevGrn.id,
               refDetailsId: prevDetail.id,
               refNo: prevGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.focQuantity > 0) {
@@ -420,7 +523,10 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.focQuantity,
+              quantity: getInputFocStockQty(
+                updDetail.id,
+                updDetail.focQuantity
+              ),
               ccId: input.ccId,
               isFoc: true,
             },
@@ -430,7 +536,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
       }
@@ -438,6 +544,8 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
 
     for (const updDetail of updatedGrn.goodReceiveDetails) {
       if (!prevMap.has(updDetail.id)) {
+        const inputDetail = newInputDetailByKey.get(getDetailKey(updDetail));
+
         if (updDetail.quantity > 0) {
           await addItemStock(
             tx,
@@ -445,7 +553,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.quantity,
+              quantity: inputDetail?.stockQuantity ?? updDetail.quantity,
               ccId: input.ccId,
               isFoc: false,
             },
@@ -455,7 +563,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
         if (updDetail.focQuantity > 0) {
@@ -465,7 +573,7 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               batchNo: updDetail.batchNo ?? null,
               expiryDate: updDetail.expiryDate ?? null,
               itemId: updDetail.itemId,
-              quantity: updDetail.focQuantity,
+              quantity: inputDetail?.stockFocQuantity ?? updDetail.focQuantity,
               ccId: input.ccId,
               isFoc: true,
             },
@@ -475,19 +583,42 @@ export const updateGrnInDb = async (input: CreateGrnInput) => {
               refId: updatedGrn.id,
               refDetailsId: updDetail.id,
               refNo: updatedGrn.grnNumber,
-            },
+            }
           );
         }
       }
     }
-
+    // voucher entry
+    // TODO: Add accounting
+    // if (settings?.isAccounting && updatedGrn.status === GRN_STATUS.COMPLETED) {
+    //   const result = await voucherService.createVoucher({
+    //     ccId: updatedGrn.ccId,
+    //     refType: VoucherReferenceType.INVENTORY_GRN,
+    //     refNo: updatedGrn.grnNumber,
+    //     refId: updatedGrn.id,
+    //     refDate: updatedGrn.date,
+    //     currencyId: updatedGrn.currencyId ?? undefined,
+    //     currencyConversionRate: updatedGrn.conversionRate
+    //       ? Number(updatedGrn.conversionRate)
+    //       : undefined,
+    //     totalAmount: Number(updatedGrn.totalAmount),
+    //     clientId: updatedGrn.supplierId,
+    //     clientPayAmount: 0,
+    //     customerPayAmount: 0,
+    //     customerName: "",
+    //     createdBy: currentUser,
+    //   });
+    //   if (!result.success) {
+    //     throw new ErrorHandler(result.status, result.message);
+    //   }
+    // }
     return updatedGrn;
   });
 };
 
 export const getCountGRNDetailsFromDb = async (
   detailIds: number[],
-  grnId: number,
+  grnId: number
 ): Promise<number> => {
   logger.info("entering::getCountGRNDetailsFromDb::repository");
 
@@ -512,8 +643,12 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
       goodReceiveDetails: {
         where: {
           isActive: true,
-          quantity: {
-            gt: 0,
+        },
+        include: {
+          item: {
+            include: {
+              unit: true,
+            },
           },
         },
       },
@@ -521,10 +656,8 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
         select: {
           id: true,
           date: true,
-          verifiedBy1: true,
-          verifiedAt1: true,
-          verifiedBy2: true,
-          verifiedAt2: true,
+          lastVerifiedBy: true,
+          lastVerifiedAt: true,
           createdBy: true,
           status: true,
           currency: true,
@@ -539,7 +672,7 @@ export const getAllGrnFromDb = async (): Promise<GrnResponse[]> => {
 };
 
 export const getGrnByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<GrnResponse | null> => {
   logger.info(`entering::getGrnByIdFromDb::repository id=${id}`);
 
@@ -549,13 +682,10 @@ export const getGrnByIdFromDb = async (
       goodReceiveDetails: {
         where: {
           isActive: true,
-          quantity: {
-            gt: 0,
-          },
         },
         include: {
           item: {
-            select: { item: true },
+            select: { item: true, unit: true },
           },
         },
       },
@@ -563,10 +693,8 @@ export const getGrnByIdFromDb = async (
         select: {
           id: true,
           date: true,
-          verifiedBy1: true,
-          verifiedAt1: true,
-          verifiedBy2: true,
-          verifiedAt2: true,
+          lastVerifiedBy: true,
+          lastVerifiedAt: true,
           createdBy: true,
           status: true,
           currency: true,
@@ -581,11 +709,11 @@ export const getGrnByIdFromDb = async (
 };
 
 export const getGrnDetailsByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<InvGoodReceiveDetails | null> => {
   logger.info(`entering::getGrnDetailsByIdFromDb::repository id=${id}`);
 
-  const grnDetails = await db.invGoodReceiveDetails.findUnique({
+  const grnDetails = await db.invGoodReceiveDetails.findFirst({
     where: { id, isActive: true },
   });
 
@@ -622,7 +750,7 @@ export const deleteGrnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteGrnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteGrnFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
@@ -670,3 +798,41 @@ export const deleteGrnFromDb = async (id: number) => {
 //   });
 //   return results;
 // };
+
+export const getExistingBatchItemConflictsFromDb = async (
+  batches: { itemId: number; batchNo: string }[],
+  excludeGrnDetailIds: number[] = []
+) => {
+  logger.info("entering::getExistingBatchItemConflictsFromDb::repository");
+
+  const batchNos = Array.from(
+    new Set(batches.map((b) => b.batchNo.trim()).filter(Boolean))
+  );
+
+  if (!batchNos.length) return [];
+
+  const conflicts = await db.invGoodReceiveDetails.findMany({
+    where: {
+      isActive: true,
+      batchNo: {
+        in: batchNos,
+      },
+      ...(excludeGrnDetailIds.length
+        ? {
+            id: {
+              notIn: excludeGrnDetailIds,
+            },
+          }
+        : {}),
+    },
+    select: {
+      id: true,
+      itemId: true,
+      batchNo: true,
+    },
+  });
+
+  logger.info("exiting::getExistingBatchItemConflictsFromDb::repository");
+
+  return conflicts;
+};

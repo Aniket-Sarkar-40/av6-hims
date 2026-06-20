@@ -21,7 +21,7 @@ import { validateWarehouseId } from "../master/warehouse.service.validation.js";
 import { settingsService } from "@/services/master/settings.service.js";
 
 export const validateIdStockAdjustment = async (
-  id: number,
+  id: number
 ): Promise<StockAdjustmentResponse> => {
   logger.info("entering::validateIdStockAdjustment::service::validation");
   validIdCheck(id);
@@ -30,7 +30,7 @@ export const validateIdStockAdjustment = async (
   if (!record) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Stock Adjustment"),
+      generateErrorMessage("NOT_FOUND", "Stock Adjustment")
     );
   }
   logger.info("exiting::validateIdStockAdjustment::service::validation");
@@ -39,7 +39,7 @@ export const validateIdStockAdjustment = async (
 
 export const validateStockAdjustmentCollectionCenters = async (
   ccId: number,
-  targetCcId: number,
+  targetCcId: number
 ) => {
   const settings = await settingsService.getSettings(true);
   const warehouseMode = settings?.warehouseMode;
@@ -48,10 +48,10 @@ export const validateStockAdjustmentCollectionCenters = async (
     if (warehouseMode) {
       const warehouse = await validateWarehouseId(ccId);
       return { sourceCc: warehouse, targetCc: warehouse };
+    } else {
+      const branch = await validateIdBranch(ccId);
+      return { sourceCc: branch, targetCc: branch };
     }
-
-    const branch = await validateIdBranch(ccId);
-    return { sourceCc: branch, targetCc: branch };
   }
 
   if (warehouseMode) {
@@ -67,7 +67,7 @@ export const validateStockAdjustmentCollectionCenters = async (
   if (!sourceCc.isMain) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("ACCESS_FAIL", "Switch To Main Branch"),
+      generateErrorMessage("ACCESS_FAIL", "Switch To Main Branch")
     );
   }
 
@@ -75,14 +75,15 @@ export const validateStockAdjustmentCollectionCenters = async (
 };
 
 export const createStockAdjustmentServiceValidation = async (
-  input: CreateStockAjustmentInput,
+  input: CreateStockAjustmentInput
 ) => {
   logger.info("entering::createStockAdjustment::service::validation");
 
   await validateStockAdjustmentCollectionCenters(input.ccId, input.targetCcId);
 
-  const availQtyMismatchResult =
-    await commonStockAdjustmentServiceValidation(input);
+  const availQtyMismatchResult = await commonStockAdjustmentServiceValidation(
+    input
+  );
 
   logger.info("exiting::createStockAdjustment::service::validation");
 
@@ -90,14 +91,14 @@ export const createStockAdjustmentServiceValidation = async (
 };
 
 export const updateStockAdjustmentServiceValidation = async (
-  input: UpdateStockAjustmentInput,
+  input: UpdateStockAjustmentInput
 ) => {
   logger.info("entering::updateStockAdjustment::service::validation");
   const existing = await validateIdStockAdjustment(input.id);
   if (existing.status !== InvStockAdjustmentStatus.DRAFT) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Stock Adjustment"),
+      generateErrorMessage("INVALID_STATUS", "Stock Adjustment")
     );
   }
   input.existing = existing;
@@ -106,14 +107,15 @@ export const updateStockAdjustmentServiceValidation = async (
     throw new ErrorHandler(403, generateErrorMessage("ACCESS_FAIL"));
   if (input.targetCcId !== existing.targetCcId)
     throw new ErrorHandler(403, generateErrorMessage("ACCESS_FAIL"));
-  const availQtyMismatchResult =
-    await commonStockAdjustmentServiceValidation(input);
+  const availQtyMismatchResult = await commonStockAdjustmentServiceValidation(
+    input
+  );
   logger.info("exiting::updateStockAdjustment::service::validation");
   return availQtyMismatchResult;
 };
 
 export const commonStockAdjustmentServiceValidation = async (
-  input: CreateStockAjustmentInput | UpdateStockAjustmentInput,
+  input: CreateStockAjustmentInput | UpdateStockAjustmentInput
 ) => {
   logger.info("entering::commonStockAdjustment::service::validation");
   const { stockAdjustmentDetails } = input as {
@@ -122,12 +124,12 @@ export const commonStockAdjustmentServiceValidation = async (
   const itemIds = [...new Set(stockAdjustmentDetails.map((d) => d.itemId))];
   const items = await itemMasterService.getAllItemMasterWoDto();
   const itemsNotFound = itemIds.filter(
-    (id) => !items.some((item) => item.id === id),
+    (id) => !items.some((item) => item.id === id)
   );
   if (itemsNotFound.length > 0) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", `Item Id: ${itemsNotFound.join(", ")}`),
+      generateErrorMessage("NOT_FOUND", `Item Id: ${itemsNotFound.join(", ")}`)
     );
   }
 
@@ -136,15 +138,15 @@ export const commonStockAdjustmentServiceValidation = async (
     if (detail.id) {
       const { existing } = input as UpdateStockAjustmentInput;
       const exist = existing.stockAdjustmentDetails.find(
-        (d) => d.id === detail.id,
+        (d) => d.id === detail.id
       );
       if (!exist) {
         throw new ErrorHandler(
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            `Stock adjustment details with id: ${detail.id} does not exist in stock adjustment with id: ${input.id}`,
-          ),
+            `Stock adjustment details with id: ${detail.id} does not exist in stock adjustment with id: ${input.id}`
+          )
         );
       }
     }
@@ -156,14 +158,17 @@ export const commonStockAdjustmentServiceValidation = async (
       detail.batchNo,
       detail.expiryDate ? new Date(detail.expiryDate) : undefined,
       !!detail.isFoc,
+      detail.batchId ?? undefined
     );
     if (!stock) {
       throw new ErrorHandler(
         404,
         generateErrorMessage(
           "NOT_FOUND",
-          `Stock of Item: ${item.item}, Batch:${detail.batchNo}, Expiry:${detail.expiryDate}, Foc:${detail.isFoc ?? false} in row no: ${index}`,
-        ),
+          `Stock of Item: ${item.item}, Batch:${detail.batchNo}, Expiry:${
+            detail.expiryDate
+          }, Foc:${detail.isFoc ?? false} in row no: ${index}`
+        )
       );
     }
     if (stock.id !== detail.batchId) {
@@ -171,8 +176,14 @@ export const commonStockAdjustmentServiceValidation = async (
         404,
         generateErrorMessage(
           "MISMATCH",
-          `Provided batch id: ${detail.batchId} does not match with stock  of Item: ${item.item}, Batch:${detail.batchNo}, Expiry:${detail.expiryDate}, Foc:${detail.isFoc ?? false}  in row no: ${index}`,
-        ),
+          `Provided batch id: ${
+            detail.batchId
+          } does not match with stock  of Item: ${item.item}, Batch:${
+            detail.batchNo
+          }, Expiry:${detail.expiryDate}, Foc:${
+            detail.isFoc ?? false
+          }  in row no: ${index}`
+        )
       );
     }
     if (input.isAvailQtyCheck && stock.quantity !== detail.availableQty) {
@@ -194,8 +205,12 @@ export const commonStockAdjustmentServiceValidation = async (
           404,
           generateErrorMessage(
             "INSUFFICIENT_STOCK",
-            `Item:${item.item}, Batch:${detail.batchNo}, Expiry:${detail.expiryDate}, Foc:${detail.isFoc ?? false}, Qty:${detail.quantity} in row no:${index}`,
-          ),
+            `Item:${item.item}, Batch:${detail.batchNo}, Expiry:${
+              detail.expiryDate
+            }, Foc:${detail.isFoc ?? false}, Qty:${
+              detail.quantity
+            } in row no:${index}`
+          )
         );
       }
     }

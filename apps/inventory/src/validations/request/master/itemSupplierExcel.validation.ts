@@ -1,0 +1,185 @@
+import { Prisma, VendorType } from "@repo/db/generated/prisma/client";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { getPattern } from "av6-core-v2";
+
+export type ItemSupplierExcelStagingRow = Omit<
+  Prisma.InvItemSupplierExcelUncheckedCreateInput,
+  "batchJobId"
+>;
+
+const pushRowError = (errors: string[], rowNo: number, message: string) => {
+  errors.push(`Row ${rowNo}: ${message}`);
+};
+
+const hasValue = (value: unknown) => {
+  return value != null && String(value).trim() !== "";
+};
+
+export const validateItemSupplierExcelArray = (
+  rows: ItemSupplierExcelStagingRow[]
+) => {
+  const errors: string[] = [];
+
+  for (const row of rows) {
+    const rowNo = row.rowNo;
+
+    if (
+      rowNo == null ||
+      typeof rowNo !== "number" ||
+      !Number.isInteger(rowNo) ||
+      rowNo < 1
+    ) {
+      pushRowError(errors, rowNo ?? 0, "row number is required");
+      continue;
+    }
+
+    if (!row.vendorCompanyName?.trim()) {
+      pushRowError(errors, rowNo, "Vendor Company Name is required");
+    }
+
+    if (!row.billTo?.trim()) {
+      pushRowError(errors, rowNo, "Bill To is required");
+    }
+
+    if (!row.shipTo?.trim()) {
+      pushRowError(errors, rowNo, "Ship To is required");
+    }
+
+    if (row.supplierCode != null && typeof row.supplierCode !== "string") {
+      pushRowError(errors, rowNo, "Vendor Code must be a string");
+    }
+
+    const validatePhoneField = (
+      value: string | null | undefined,
+      label: string
+    ) => {
+      if (value == null || String(value).trim() === "") return;
+      if (
+        typeof value !== "string" ||
+        !getPattern.phonePattern.test(value.trim())
+      ) {
+        pushRowError(errors, rowNo, `${label} must be exactly 9 digits`);
+      }
+    };
+
+    const validateBooleanField = (value: unknown, label: string) => {
+      if (value == null || value === "") return;
+
+      if (typeof value !== "boolean") {
+        pushRowError(errors, rowNo, `${label} must be true or false`);
+      }
+    };
+
+    validatePhoneField(row.phone, "Phone");
+    validatePhoneField(row.salesPersonPhone, "Sales Person Phone");
+    validatePhoneField(row.proprietaryPersonPhone, "Proprietary Person Phone");
+
+    if (row.email != null && typeof row.email !== "string") {
+      pushRowError(errors, rowNo, "Email must be a string");
+    }
+
+    if (
+      row.salesPersonEmail != null &&
+      typeof row.salesPersonEmail !== "string"
+    ) {
+      pushRowError(errors, rowNo, "Sales Person Email must be a string");
+    }
+
+    if (
+      row.proprietaryPersonEmail != null &&
+      typeof row.proprietaryPersonEmail !== "string"
+    ) {
+      pushRowError(errors, rowNo, "Proprietary Person Email must be a string");
+    }
+
+    if (
+      row.vendorType != null &&
+      !Object.values(VendorType).includes(row.vendorType as VendorType)
+    ) {
+      pushRowError(errors, rowNo, "Vendor Type is invalid");
+    }
+
+    validateBooleanField(row.isPoWhatsapp, "PO Whatsapp");
+    validateBooleanField(row.isPoEmail, "PO Email");
+    validateBooleanField(row.isPoSms, "PO SMS");
+
+    validateBooleanField(row.isGrnWhatsapp, "GRN Whatsapp");
+    validateBooleanField(row.isGrnEmail, "GRN Email");
+    validateBooleanField(row.isGrnSms, "GRN SMS");
+
+    validateBooleanField(row.isReturnWhatsapp, "Return Whatsapp");
+    validateBooleanField(row.isReturnEmail, "Return Email");
+    validateBooleanField(row.isReturnSms, "Return SMS");
+
+    const bankGiven =
+      hasValue(row.accountNo) ||
+      hasValue(row.accountHolderName) ||
+      hasValue(row.typeOfAccount) ||
+      hasValue(row.ifscCode) ||
+      hasValue(row.bankName) ||
+      hasValue(row.bankAddress);
+
+    if (bankGiven) {
+      if (
+        row.accountNo == null ||
+        !Number.isInteger(row.accountNo) ||
+        row.accountNo < 1
+      ) {
+        pushRowError(
+          errors,
+          rowNo,
+          "Bank Account No is required and must be a positive integer when bank details are provided"
+        );
+      }
+
+      if (!row.ifscCode?.trim()) {
+        pushRowError(
+          errors,
+          rowNo,
+          "IFSC Code is required when bank details are provided"
+        );
+      }
+
+      if (!row.bankName?.trim()) {
+        pushRowError(
+          errors,
+          rowNo,
+          "Bank Name is required when bank details are provided"
+        );
+      }
+    }
+
+    const taxGiven =
+      hasValue(row.taxIdentificationName) ||
+      hasValue(row.taxIdentificationValue) ||
+      hasValue(row.taxIdentificationNumber);
+
+    if (taxGiven) {
+      if (!row.taxIdentificationName?.trim()) {
+        pushRowError(
+          errors,
+          rowNo,
+          "Tax Identification Name is required when tax details are provided"
+        );
+      }
+
+      if (
+        row.taxIdentificationValue == null ||
+        !Number.isInteger(row.taxIdentificationValue) ||
+        row.taxIdentificationValue < 1
+      ) {
+        pushRowError(
+          errors,
+          rowNo,
+          "Tax Identification Value is required and must be a positive integer when tax details are provided"
+        );
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new ErrorHandler(400, errors.join("; "));
+  }
+
+  return { value: rows };
+};

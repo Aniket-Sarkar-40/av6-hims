@@ -1,3 +1,4 @@
+import { ItemMasterToDto } from "@/types/grn/grn.js";
 import { ItemMasterDto } from "@/types/master/itemMaster.js";
 import { EmployeeCache } from "@apps/core/types/staff/employee.js";
 import {
@@ -99,3 +100,13 @@ export type StockTransferDetailsResponse = Prisma.InvStockTransferGetPayload<{
     stockTransferDetails: true;
   };
 }>;
+
+export interface StockTransferDetailRowDTO
+  extends Omit<
+    InvStockTransferDetails,
+    "itemId" | "createdBy" | "updatedBy" | "deletedBy"
+  > {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}

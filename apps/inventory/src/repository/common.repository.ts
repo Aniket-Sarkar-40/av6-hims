@@ -1,4 +1,5 @@
 import {
+  CommonActiveInactiveRequestRepository,
   CommonFindManyInput,
   CommonFindUniqueInput,
   FindFirstResult,
@@ -7,12 +8,12 @@ import {
   LockUnlockRequestRepository,
   ModelName,
 } from "@/types/common.js";
+import { createCache } from "@/utils/redisHelper.utils.js";
 import { db } from "@repo/db/client";
 import {
   InvDynamicShortCode,
   PrismaClient,
 } from "@repo/db/generated/prisma/client";
-import { createCache } from "@repo/platform/cache/redis.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
@@ -83,7 +84,7 @@ export const fetchTableData = async (table: string) => {
     });
   }
 
-  await createCache(table, dbData, "inv");
+  await createCache(table, dbData);
 
   logger.info("exiting::fetchTableData::repository");
 
@@ -195,4 +196,40 @@ export const commonFetch = async ({
 
   logger.info("exiting::commonFetch::repository");
   return results;
+};
+
+export const commonActiveInactive = async ({
+  id,
+  shortCodeData,
+  field,
+  value,
+}: CommonActiveInactiveRequestRepository) => {
+  logger.info("entering::commonActiveInactive::repository");
+
+  const tableName = shortCodeData.tableName;
+  // @ts-expect-error dynamic model
+  const model = db[tableName];
+
+  if (!model) {
+    throw new ErrorHandler(400, generateErrorMessage("INVALID_TABLE"));
+  }
+
+  const currentRecord = await model.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+
+  if (!currentRecord) {
+    throw new ErrorHandler(404, "Record not found");
+  }
+
+  const updatedRecord = await model.update({
+    where: { id },
+    data: {
+      [field]: value,
+    },
+  });
+
+  logger.info("exiting::commonActiveInactive::repository");
+  return updatedRecord;
 };

@@ -12,6 +12,7 @@ enum Action {
 enum Inv_Batch_Type {
     ITEM
     ITEM_PRICING
+    ITEM_SUPPLIER
 }
 
 enum Batch_Status {
@@ -42,6 +43,7 @@ enum InvOperation {
     GOOD_RECEIVE
     GOOD_RECEIVE_RETURN
     STORE_REQUISITION
+    BRANCH_REQUISITION
     SELL
     SELL_RETURN
     STOCK_TRANSFER
@@ -49,13 +51,9 @@ enum InvOperation {
     SELL_RETURN_APPROVAL
     CONSUMPTION
     STOCK_ADJUSTMENT
-}
-
-enum DefaultUnit {
-    PACK
-    BOX
-    LITER
-    ML
+    EXPIRY_UPDATE
+    STORE_REQUISITION_RETURN
+    BRANCH_REQUISITION_RETURN
 }
 
 enum PO_STATUS {
@@ -113,6 +111,10 @@ enum InvUinShortCode {
     CN
     STAJ
     ST_TR
+    BRN
+    SRR
+    BRR
+    VENDOR
 }
 
 enum InvStockAdjustmentStatus {
@@ -155,4 +157,21 @@ enum CorporateReferralMode {
 enum LocationWiseRole {
     enabled
     disabled
+}
+
+enum ItemStockType {
+    PACK_WISE
+    EACH_WISE
+}
+
+enum ConsumptionType {
+    MANUAL
+    AUTO
+}
+
+enum CronStatus {
+    PENDING
+    IN_PROGRESS
+    SUCCESS
+    FAILED
 }

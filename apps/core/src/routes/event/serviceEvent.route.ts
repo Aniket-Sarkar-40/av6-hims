@@ -39,7 +39,7 @@ const serviceEventRouter: Router = Router();
  */
 serviceEventRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "SERVICE_EVENT", "CREATE")),
   validateServiceEventCreate,
   createServiceEvent
@@ -69,7 +69,7 @@ serviceEventRouter.post(
  */
 serviceEventRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "SERVICE_EVENT", "UPDATE")),
   validateServiceEventUpdate,
   updateServiceEvent

@@ -43,7 +43,7 @@ export const collectionCenterRouter: Router = Router();
  */
 collectionCenterRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "CREATE")),
   validateCollectionCenter,
   createCollectionCenter
@@ -60,7 +60,7 @@ collectionCenterRouter.post(
  */
 collectionCenterRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
   getAllCollectionCenter
 );
@@ -76,7 +76,7 @@ collectionCenterRouter.get(
  */
 collectionCenterRouter.get(
   "/avl",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
   getAvailableCollectionCenter
 );
@@ -97,7 +97,7 @@ collectionCenterRouter.get(
  */
 collectionCenterRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
   getCollectionCenterById
 );
@@ -126,7 +126,7 @@ collectionCenterRouter.get(
  */
 collectionCenterRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "COLLECTION_CENTER", "VIEW"),
     getPermission("CORE", "COLLECTION_CENTER", "UPDATE")
@@ -146,7 +146,7 @@ collectionCenterRouter.put(
  */
 collectionCenterRouter.get(
   "/staffId",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
   getBranchOrWarehouse
 );

@@ -1,16 +1,15 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
+import { subItemStock } from "@/repository/stock/stock.repository.js";
 import {
   CreateGrnReturnInput,
   GoodReceivedReturnResponse,
   GrnReturnDetailInput,
   GrnReturnResponse,
 } from "@/types/grn/grnReturn.js";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { db } from "@repo/db/client";
 import { RETURN_STS } from "@repo/db/generated/prisma/client";
-import { subItemStock } from "../stock/stock.repository.js";
-import { eventEmailService } from "@/services/master/emailConfig.service.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { customOmit } from "av6-utils";
 
 export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   logger.info("entering::createGrnReturnInDb::repository");
@@ -32,13 +31,19 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
             (detail) => {
               const omittedGrnRetDet = customOmit<
                 GrnReturnDetailInput,
-                "id" | "purchasedPrice" | "inHandQty" | "isExpiry" | "isBatch"
+                | "id"
+                | "purchasedPrice"
+                | "inHandQty"
+                | "isExpiry"
+                | "isBatch"
+                | "stockQuantity"
               >(detail, [
                 "id",
                 "inHandQty",
                 "purchasedPrice",
                 "isBatch",
                 "isExpiry",
+                "stockQuantity",
               ]);
               return {
                 ...omittedGrnRetDet.rest,
@@ -47,7 +52,7 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
                   : null,
                 createdBy: currentUser,
               };
-            },
+            }
           ),
         },
       },
@@ -59,30 +64,6 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
         },
       },
     });
-
-    const supplier = omittedGRNReturn.omitted.supplier;
-
-    if (supplier.isReturnEmail && supplier?.email) {
-      const emailTemplate = await eventEmailService.getEventEmail();
-
-      if (emailTemplate && emailTemplate.emailBody && store?.user?.email) {
-        // sendTemplatedEmail({
-        //   template: emailTemplate,
-        //   to: [supplier.email],
-        //   variables: {
-        //     name: store.user.userName || "User",
-        //     companyDetails: "Aerial View-6 Infotech Pvt. Ltd.",
-        //     message: `Good Receive Return created.`,
-        //     signature: `Aerial View-6 Pvt. Ltd.`,
-        //   },
-        // })
-        //   .then(() => {
-        //     logger.info("Email Sent Successfully.");
-        //   })
-        //   .catch((e) => logger.error(`Email Failed:: ${e.message} `));
-        // TODO: Send notification
-      }
-    }
 
     return createdGrnReturn;
   });
@@ -117,13 +98,13 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number",
+    (d) => typeof d.id === "number"
   );
   const toCreate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id !== "number",
+    (d) => typeof d.id !== "number"
   );
   const toDelete = grnReturn.goodReceiveReturnDetails.filter(
-    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id),
+    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id)
   );
 
   return await db.$transaction(async (tx) => {
@@ -139,8 +120,20 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           update: toUpdate.map((d) => {
             const omittedGrnRetDet = customOmit<
               GrnReturnDetailInput,
-              "id" | "purchasedPrice" | "inHandQty" | "isExpiry" | "isBatch"
-            >(d, ["id", "inHandQty", "purchasedPrice", "isBatch", "isExpiry"]);
+              | "id"
+              | "purchasedPrice"
+              | "inHandQty"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+            >(d, [
+              "id",
+              "inHandQty",
+              "purchasedPrice",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+            ]);
 
             return {
               where: { id: omittedGrnRetDet.omitted.id },
@@ -156,8 +149,20 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           create: toCreate.map((d) => {
             const omittedGrnRetDet = customOmit<
               GrnReturnDetailInput,
-              "id" | "purchasedPrice" | "inHandQty" | "isExpiry" | "isBatch"
-            >(d, ["id", "inHandQty", "purchasedPrice", "isBatch", "isExpiry"]);
+              | "id"
+              | "purchasedPrice"
+              | "inHandQty"
+              | "isExpiry"
+              | "isBatch"
+              | "stockQuantity"
+            >(d, [
+              "id",
+              "inHandQty",
+              "purchasedPrice",
+              "isBatch",
+              "isExpiry",
+              "stockQuantity",
+            ]);
             return {
               ...omittedGrnRetDet.rest,
               expiryDate: omittedGrnRetDet.rest.expiryDate
@@ -196,7 +201,7 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
 
 export const getCountGrnReturnDetailsFromDb = async (
   detailIds: number[],
-  grnReturnId: number,
+  grnReturnId: number
 ): Promise<number> => {
   logger.info("entering::getCountGrnReturnDetailsFromDb::repository");
 
@@ -229,7 +234,7 @@ export const getAllGrnReturnFromDb = async (): Promise<GrnReturnResponse[]> => {
 };
 
 export const getGrnReturnByIdFromDb = async (
-  id: number,
+  id: number
 ): Promise<GoodReceivedReturnResponse | null> => {
   logger.info(`entering::getGrnReturnByIdFromDb::repository id=${id}`);
 
@@ -274,7 +279,7 @@ export const deleteGrnReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`,
+    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`
   );
 };
 
@@ -287,7 +292,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number",
+    (d) => typeof d.id === "number"
   );
   // const toCreate = goodReceiveReturnDetails.filter(
   //   (d) => typeof d.id !== "number"
@@ -305,6 +310,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
             where: { id: d.id! },
             data: {
               quantity: d.quantity,
+              focQuantity: d.focQuantity ?? 0,
               netAmount: d.netAmount,
               netTax: d.netTax,
               netDiscount: d.netDiscount,
@@ -328,7 +334,10 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
         tx,
         {
           itemId: detail.itemId,
-          quantity: Number(detail.quantity),
+          quantity: Number(
+            detail.stockQuantity ??
+              Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0)
+          ),
           batchNo: detail.batchNo ?? null,
           ccId: grnReturnData.ccId,
           expiryDate: detail.expiryDate ?? null,
@@ -342,6 +351,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           refId: id,
           refNo: grnReturnData.grnNumber,
         },
+        { consumeFromAll: true }
       );
     }
 
@@ -355,11 +365,12 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           },
           data: {
             returnQuantity: {
-              increment: detail.quantity ?? 0,
+              increment:
+                Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0),
             },
           },
         });
-      }),
+      })
     );
 
     await tx.invGoodReceive.update({
@@ -370,6 +381,35 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
         },
       },
     });
+
+    // Create voucher in accounting
+    // if (
+    //   store?.settings?.isAccounting &&
+    //   (updatedGrnReturn.status === RETURN_STS.APPROVED ||
+    //     RETURN_STS.PARTIALLY_APPROVED)
+    // ) {
+    //   const result = await accountingExternalService.createVoucher({
+    //     ccId: updatedGrnReturn.ccId,
+    //     currencyId: updatedGrnReturn.currencyId ?? undefined,
+    //     conversionRate: updatedGrnReturn.conversionRate
+    //       ? Number(updatedGrnReturn.conversionRate)
+    //       : undefined,
+    //     refType: VoucherReferenceType.INVENTORY_GRN_RETURN,
+    //     refNo: updatedGrnReturn.grnNumber,
+    //     refId: updatedGrnReturn.id,
+    //     refDate: updatedGrnReturn.approveAt ?? new Date(),
+    //     pId: updatedGrnReturn.supplierId.toString(),
+    //     totalAmount: Number(updatedGrnReturn.totalAmount),
+    //     clientId: updatedGrnReturn.supplierId,
+    //     clientPayAmount: 0,
+    //     customerPayAmount: 0,
+    //     customerName: "",
+    //     createdBy: currentUser,
+    //   });
+    //   if (!result.success) {
+    //     throw new ErrorHandler(result.status, result.message);
+    //   }
+    // }
 
     return updatedGrnReturn;
   });
@@ -405,4 +445,52 @@ export const rejectGrnReturnInDb = async (input: {
       rejectedAt: new Date(),
     },
   });
+};
+
+export const getOpenGrnReturnDetailsByGrnDetailIdsFromDb = async ({
+  grnId,
+  grnDetailIds,
+  excludeGrnReturnId,
+}: {
+  grnId: number;
+  grnDetailIds: number[];
+  excludeGrnReturnId?: number;
+}) => {
+  logger.info(
+    "entering::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+  );
+
+  const uniqueGrnDetailIds = [...new Set(grnDetailIds.filter(Boolean))];
+
+  if (!uniqueGrnDetailIds.length) {
+    logger.info(
+      "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+    );
+    return [];
+  }
+
+  const openDetails = await db.invGoodReceiveReturnDetails.findMany({
+    where: {
+      isActive: true,
+      grnDetailId: { in: uniqueGrnDetailIds },
+      goodReceiveReturn: {
+        isActive: true,
+        grnId,
+        status: { in: [RETURN_STS.PENDING, RETURN_STS.PARTIALLY_APPROVED] },
+        ...(excludeGrnReturnId && { id: { not: excludeGrnReturnId } }),
+      },
+    },
+    select: {
+      grnReturnId: true,
+      grnDetailId: true,
+      item: { select: { item: true } },
+      goodReceiveReturn: { select: { grnNumber: true } },
+    },
+  });
+
+  logger.info(
+    "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+  );
+
+  return openDetails;
 };

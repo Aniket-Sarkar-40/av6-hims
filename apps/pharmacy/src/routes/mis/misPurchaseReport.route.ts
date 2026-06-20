@@ -2,6 +2,7 @@ import {
   excelMisPurchaseReport,
   misPurchaseReportList,
 } from "@/controllers/mis/misPurchaseReport.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -35,15 +36,15 @@ export const misPurchaseReportRouter: Router = Router();
  */
 misPurchaseReportRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_PURCHASE_REPORT", "VIEW")),
-  misPurchaseReportList,
+  misPurchaseReportList
 );
 
 misPurchaseReportRouter.get(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_PURCHASE_REPORT", "VIEW")),
   //   validateGatePassFilter,
-  excelMisPurchaseReport,
+  excelMisPurchaseReport
 );

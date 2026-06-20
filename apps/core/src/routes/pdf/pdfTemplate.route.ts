@@ -49,7 +49,7 @@ export const pdfTemplateRouter: Router = Router();
  */
 pdfTemplateRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   createUploadMiddleware("pdfTemplate"),
   uploadToHetzner("sampleImage"),
   authorize(getPermission("CORE", "PDF_TEMPLATE", "CREATE")),
@@ -125,7 +125,7 @@ pdfTemplateRouter.delete(
  */
 pdfTemplateRouter.put(
   "/make-default",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "PDF_TEMPLATE", "UPDATE"),
     getPermission("CORE", "PDF_TEMPLATE", "VIEW")
@@ -136,7 +136,7 @@ pdfTemplateRouter.put(
 
 pdfTemplateRouter.post(
   "/build",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "PDF_TEMPLATE", "VIEW")),
   // validatePdfTemplateUpdate,
   buildPdf
@@ -144,7 +144,7 @@ pdfTemplateRouter.post(
 
 pdfTemplateRouter.get(
   "/contract-keys",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "PDF_CONTRACT", "VIEW")),
   // validatePdfTemplateUpdate,
   getContractKeys
@@ -152,7 +152,7 @@ pdfTemplateRouter.get(
 
 pdfTemplateRouter.get(
   "/module-and-type",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "PDF_TEMPLATE", "VIEW")),
   validateGetPdfTemplateByModuleAndType,
   getPdfTemplateByModuleAndType

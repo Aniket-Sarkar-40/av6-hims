@@ -13,6 +13,7 @@ import {
   validateUpdateItemDosageMap,
 } from "@/validations/request/item/item.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const itemDosageRouter: Router = Router();
 
@@ -40,10 +41,10 @@ export const itemDosageRouter: Router = Router();
  */
 itemDosageRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_DOSAGE_MAP", "CREATE")),
   validateCreateItemDosageMap,
-  createItemDosageMap,
+  createItemDosageMap
 );
 
 /**
@@ -63,13 +64,13 @@ itemDosageRouter.post(
  */
 itemDosageRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_DOSAGE_MAP", "VIEW"),
-    getPermission("PMS", "ITEM_DOSAGE_MAP", "UPDATE"),
+    getPermission("PMS", "ITEM_DOSAGE_MAP", "UPDATE")
   ),
   validateUpdateItemDosageMap,
-  updateItemDosageMap,
+  updateItemDosageMap
 );
 
 /**
@@ -83,7 +84,7 @@ itemDosageRouter.put(
  */
 itemDosageRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_DOSAGE_MAP", "DELETE")),
-  deleteItemDosage,
+  deleteItemDosage
 );

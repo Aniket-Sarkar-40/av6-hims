@@ -1,18 +1,26 @@
+import { ItemSupplierDTO } from "@/types/master/itemSupplier.js";
+import { EmployeeCache } from "@apps/core/types/staff/employee.js";
 import {
+  InvBranch,
   InvGoodReceiveDetails,
   InvItem,
+  InvItemSupplier,
+  InvUnitMaster,
+  InvWarehouse,
   PO_STATUS,
   Prisma,
 } from "@repo/db/generated/prisma/client";
-import { BaseModelAttr, IdValue } from "@repo/shared/types/global.js";
-import { EmployeeCache } from "av6-core-v2";
-import { ItemSupplierDTO } from "../master/itemSupplier.js";
+import { IdValue } from "@repo/shared/types/common.js";
+import { BaseModelAttr } from "@repo/shared/types/global.js";
 
 export interface GrnDetailInput
   extends Prisma.InvGoodReceiveDetailsUncheckedCreateWithoutGoodReceiveInput {
   poDetailsId: number;
   isBatch: boolean;
   isExpiry: boolean;
+
+  stockQuantity?: number;
+  stockFocQuantity?: number;
 }
 
 export type CreateGrnInput = Omit<
@@ -41,37 +49,64 @@ export interface GrnDTO
     | "poId"
     | "ccId"
     | "storeId"
+    | "currencyId"
   > {
+  currency: IdValue | null;
   supplier: IdValue | null;
   warehouse: IdValue | null;
   branch: IdValue | null;
+  location: IdValue | null;
   createdBy: EmployeeCache | null;
   goodReceiveDetails: GrnDetailDTO[];
 }
 
-export interface GrnDetailDTO extends InvGoodReceiveDetails {
+export interface GoodReceiveDetailPdfDTO
+  extends Omit<InvGoodReceiveDetails, "itemId"> {
+  item: InvItem | null;
+}
+export interface GoodReceiveDetailDTO
+  extends Omit<InvGoodReceiveDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}
+export interface GrnDetailDTO
+  extends Omit<InvGoodReceiveDetails, "createdBy" | "updatedBy"> {
   item: ItemMasterToDto | null;
   inHandQty: number | null;
+  grnQty: number | null;
+  totalGrnQty: number | null;
+  alreadyReturnedQty: number | null;
+  grnRemainingQty: number | null;
+  stockQtyForReturn: number | null;
+  availableTotalQtyToReturn: number | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }
 
 export interface ItemMasterToDto extends InvItem {
   itemCategory: IdValue | null;
-  unitMaster: IdValue | null;
+  unitMaster: InvUnitMaster | null;
 }
 
 export type GrnResponse = Prisma.InvGoodReceiveGetPayload<{
   include: {
     goodReceiveDetails: {
       where: { isActive: true };
+      include: {
+        item: {
+          include: {
+            unit: true;
+          };
+        };
+      };
     };
     po: {
       select: {
         id: true;
         date: true;
-        verifiedBy1: true;
-        verifiedAt1: true;
-        verifiedBy2: true;
-        verifiedAt2: true;
+        lastVerifiedBy: true;
+        lastVerifiedAt: true;
         createdBy: true;
         status: true;
         currency: true;
@@ -102,4 +137,34 @@ export interface ItemCommon {
   reOrderLevel: number | null;
   unitMaster: number;
   itemCategory: number;
+}
+
+export interface GoodReceiveDetailDTO
+  extends Omit<InvGoodReceiveDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}
+
+export interface GrnPdfDTO
+  extends Omit<
+    GrnDTO,
+    | "warehouse"
+    | "branch"
+    | "location"
+    | "supplier"
+    | "date"
+    | "goodReceiveDetails"
+  > {
+  cc: InvBranch | InvWarehouse | null;
+  supplier: InvItemSupplier | null;
+  date: string;
+
+  amountInWords: string;
+  goodReceiveDetails: GoodReceiveDetailPdfDTO[];
+}
+
+export interface GoodReceiveDetailPdfDTO
+  extends Omit<InvGoodReceiveDetails, "itemId"> {
+  item: InvItem | null;
 }

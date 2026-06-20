@@ -41,6 +41,7 @@ export const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || ".fixuji.com";
 export const JWT_TOKEN = process.env.JWT_TOKEN || "access-token-av6";
 export const SUPER_ADMIN_ID = Number(process.env.SUPER_ADMIN_ID) || 1;
 export const PERMISSION_PREFIX = process.env.PERMISSION_PREFIX || "";
+export const JWT_SECRET = process.env.JWT_SECRET || "AV6";
 
 export const CRON_RETRY_DELAY_MS = 5 * 60 * 1000;
 export const CRON_MAX_RETRIES = 3;
@@ -65,3 +66,22 @@ export const CLIENT_ID = process.env.CLIENT_ID || "";
 export const EXT_EMP_CACHE = process.env.EXT_EMP_CACHE;
 
 export const CORE_SERVICE_URL = `${MASTER_SERVICE_URL}/api/v1/core`;
+
+export const CORE_REDIS_PREFIX = process.env.CORE_REDIS_PREFIX || "";
+export const FRONTEND_URL = process.env.FRONTEND_URL;
+export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "";
+export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "";
+export const CASH_BANK_GROUPS = process.env.CASH_BANK_GROUPS
+  ? process.env.CASH_BANK_GROUPS.split(",")
+  : [];
+export const RECEIVABLE_GROUPS = process.env.RECEIVABLE_GROUPS
+  ? process.env.RECEIVABLE_GROUPS.split(",")
+  : [];
+export const PAYABLE_GROUPS = process.env.PAYABLE_GROUPS
+  ? process.env.PAYABLE_GROUPS.split(",")
+  : [];
+export const DEFAULT_COMPANY_ID = Number(process.env.DEFAULT_COMPANY_ID) || 1;
+export const EXT_CURRENCY_URL = `${MASTER_SERVICE_URL}/api/v1/master/currency`;
+
+export const COMPANY_LOGO_BASE_URL =
+  (process.env.IMAGE_URL || "") + "/hospital_content/logo";

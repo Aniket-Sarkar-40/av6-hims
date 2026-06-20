@@ -1,4 +1,5 @@
 import {
+  commonActiveInactive,
   commonCreate,
   commonDelete,
   commonDropdownSearch,
@@ -33,6 +34,8 @@ import {
 import { Router } from "express";
 import { authorizeCommonSearch } from "@/middleware/auth.middleware.js";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import { validateCommonActiveInactive } from "@/validations/request/commonActiveInactive.validation.js";
 
 export const commonRouter: Router = Router();
 /**
@@ -44,25 +47,25 @@ export const commonRouter: Router = Router();
 
 commonRouter.post(
   "/lock",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonLock,
-  commonLockUnlock,
+  commonLockUnlock
 );
 
 commonRouter.post(
   "/create",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonCreate,
-  commonCreate,
+  commonCreate
 );
 commonRouter.put(
   "/update",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonUpdate,
-  commonUpdate,
+  commonUpdate
 );
 
 /**
@@ -81,10 +84,10 @@ commonRouter.put(
 // POST /fixedSearch
 commonRouter.post(
   "/fixedSearch",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch,
+  fixedSearch
 );
 
 /**
@@ -103,10 +106,10 @@ commonRouter.post(
 // POST /users
 commonRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch,
+  commonSearch
 );
 
 /**
@@ -125,10 +128,10 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/dropdownSearch",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch,
+  commonDropdownSearch
 );
 
 /**
@@ -147,10 +150,10 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/fixedSearchWOP",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController,
+  fixedSearchWoPaginationController
 );
 
 /**
@@ -169,10 +172,10 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/excel-export-fs",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport,
+  commonFSExcelExport
 );
 
 /**
@@ -191,10 +194,10 @@ commonRouter.post(
 // POST /fetch
 commonRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch,
+  commonFetch
 );
 
 /**
@@ -216,7 +219,7 @@ commonRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport,
+  commonExcelImport
 );
 
 /**
@@ -245,10 +248,10 @@ commonRouter.post("/exportExcel", validateCommonExportExcel, commonExcelExport);
 // DELETE/:shortCode/:id
 commonRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete,
+  commonDelete
 );
 
 /**
@@ -267,10 +270,10 @@ commonRouter.delete(
 // DELETE/:shortCode/:id
 commonRouter.patch(
   "/updateStatus",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus,
+  commonUpdateStatus
 );
 
 // /**
@@ -288,3 +291,11 @@ commonRouter.patch(
 //  */
 // // DELETE/:shortCode/:id
 // commonRouter.get("/image/:fileName", getImage);
+
+commonRouter.put(
+  "/change-one",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateCommonActiveInactive,
+  commonActiveInactive
+);

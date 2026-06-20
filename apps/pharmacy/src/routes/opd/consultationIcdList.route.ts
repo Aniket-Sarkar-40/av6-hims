@@ -1,4 +1,5 @@
 import { getConsultationIcdList } from "@/controllers/opd/consultationIcdList.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -32,7 +33,7 @@ export const consultationIcdListRouter: Router = Router();
  */
 consultationIcdListRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CONSULTATION_ICD_LIST", "VIEW")),
-  getConsultationIcdList,
+  getConsultationIcdList
 );

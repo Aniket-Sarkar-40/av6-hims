@@ -7,18 +7,19 @@ import {
   getConsumptionByUserId,
   rejectConsumption,
   updateConsumption,
-} from "@/controllers/consumption/cosumption.controller.js";
-import {
-  authorize,
-  verifyToken,
-} from "@repo/platform/middlewares/auth.middleware.js";
-import { getPermission } from "@repo/shared/utils/permission.utils.js";
+} from "@/controllers/consumption/consumption.controller.js";
 import {
   validateApproveConsumption,
   validateCommonConsumptionInput,
   validateCreateConsumption,
   validateUpdateConsumption,
 } from "@/validations/request/consumption/consumption.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { Router } from "express";
 
 export const consumptionRouter: Router = Router();
@@ -46,10 +47,10 @@ export const consumptionRouter: Router = Router();
  */
 consumptionRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "CREATE")),
   validateCreateConsumption,
-  createConsumption,
+  createConsumption
 );
 
 /**
@@ -73,7 +74,7 @@ consumptionRouter.put(
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "UPDATE")),
   validateUpdateConsumption,
-  updateConsumption,
+  updateConsumption
 );
 
 /**
@@ -87,9 +88,9 @@ consumptionRouter.put(
  */
 consumptionRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getAllConsumption,
+  getAllConsumption
 );
 
 /** * @swagger
@@ -109,9 +110,9 @@ consumptionRouter.get(
  */
 consumptionRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getConsumptionById,
+  getConsumptionById
 );
 
 /**
@@ -132,10 +133,10 @@ consumptionRouter.get(
 
 consumptionRouter.put(
   "/approve",
-  verifyToken,
-  authorize(getPermission("INV", "CONSUMPTION", "APPROVE")),
+  verifyToken(ServiceCode.INVENTORY),
+  authorize(getPermission("INV", "CONSUMPTION_APPROVE", "CREATE")),
   validateApproveConsumption,
-  approveConsumption,
+  approveConsumption
 );
 
 /**
@@ -155,10 +156,10 @@ consumptionRouter.put(
  */
 consumptionRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "DELETE")),
   validateCommonConsumptionInput,
-  deleteConsumptionById,
+  deleteConsumptionById
 );
 
 /**
@@ -178,10 +179,10 @@ consumptionRouter.delete(
  */
 consumptionRouter.put(
   "/reject",
-  verifyToken,
-  authorize(getPermission("INV", "CONSUMPTION", "REJECT")),
+  verifyToken(ServiceCode.INVENTORY),
+  authorize(getPermission("INV", "CONSUMPTION_REJECT", "CREATE")),
   validateCommonConsumptionInput,
-  rejectConsumption,
+  rejectConsumption
 );
 
 /**
@@ -201,7 +202,7 @@ consumptionRouter.put(
 
 consumptionRouter.get(
   "/by-user",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getConsumptionByUserId,
+  getConsumptionByUserId
 );

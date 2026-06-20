@@ -7,21 +7,25 @@ import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   GoodReceiveReturnDetailDTO,
   GoodReceiveReturnDTO,
+  GrnReturnDetailDTO,
   GrnReturnResponse,
 } from "@/types/grn/grnReturn.js";
 import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit } from "av6-utils";
 import { omitAudit, toIdValue } from "av6-utils";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 import { settingsService } from "@/services/master/settings.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
+import { ItemStockType } from "@repo/db/generated/prisma/enums.js";
+import { InvGoodReceiveReturnDetails } from "@repo/db/generated/prisma/client";
 
 export const toGrnReturnDTO = async (
   data: GrnReturnResponse[]
 ): Promise<GoodReceiveReturnDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
-  const settings = await settingsService.getSettings();
-
+  const settings = await settingsService.getSettings(true);
+  const ccSettingsId = settings?.warehouseMode;
   return Promise.all(
     data.map(async (grnReturn) => {
       const omittedGrnReturn = customOmit<
@@ -31,6 +35,7 @@ export const toGrnReturnDTO = async (
         | "rejectedBy"
         | "createdBy"
         | "goodReceiveReturnDetails"
+        | "currencyId"
       >(grnReturn, [
         "createdBy",
         "updatedBy",
@@ -41,12 +46,17 @@ export const toGrnReturnDTO = async (
         "approvedBy",
         "rejectedBy",
         "goodReceiveReturnDetails",
+        "currencyId",
       ]);
 
       const supplierDTO = suppliers.find(
         (supplier) => supplier.id === grnReturn.supplierId
       );
-      const ccSettingsId = settings?.warehouseMode;
+      const currency = grnReturn.currencyId
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+            grnReturn.currencyId
+          )
+        : null;
       let warehouseDTO, branchDTO;
       if (ccSettingsId) {
         warehouseDTO = await warehouseService.getWarehouseById(
@@ -58,26 +68,25 @@ export const toGrnReturnDTO = async (
       }
 
       const createdBy = grnReturn.createdBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            grnReturn.createdBy,
-            true
-          )
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(grnReturn.createdBy)
         : null;
       const approvedBy = grnReturn.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            grnReturn.approvedBy,
-            true
+            grnReturn.approvedBy
           )
         : null;
       const rejectedBy = grnReturn.rejectedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            grnReturn.rejectedBy,
-            true
+            grnReturn.rejectedBy
           )
         : null;
 
       const detailDTO: GoodReceiveReturnDetailDTO[] = await Promise.all(
         (grnReturn.goodReceiveReturnDetails || []).map(async (detail) => {
+          const omittedDetail = customOmit<
+            InvGoodReceiveReturnDetails,
+            "createdBy" | "updatedBy"
+          >(detail, ["createdBy", "updatedBy"]);
           const item = await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
             true
@@ -92,25 +101,98 @@ export const toGrnReturnDTO = async (
 
           const grnDetails = await getGrnDetailsByIdFromDb(detail.grnDetailId);
 
+          const createdBy = detail.createdBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.createdBy
+              )
+            : null;
+          const updatedBy = detail.updatedBy
+            ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+                detail.updatedBy
+              )
+            : null;
+
+          const stockQty = Number(inHandQty ?? 0);
+          const unitDefaultValue = Number(item?.unitMaster?.defaultValue || 1);
+
+          const stockQtyForReturn =
+            settings?.itemStockType === ItemStockType.EACH_WISE
+              ? stockQty / unitDefaultValue
+              : stockQty;
+
+          const totalGrnQty =
+            Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0);
+          const alreadyReturnedQty = Number(grnDetails?.returnQuantity ?? 0);
+          const grnRemainingQty = Math.max(totalGrnQty - alreadyReturnedQty, 0);
+          const availableTotalQtyToReturn = Math.min(
+            grnRemainingQty,
+            stockQtyForReturn
+          );
+
           return {
-            ...detail,
+            ...omittedDetail.rest,
+            quantity:
+              Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0),
+            totalGrnQty:
+              (grnDetails?.quantity ?? 0) + (grnDetails?.focQuantity ?? 0),
             inHandQty: inHandQty ? inHandQty : 0,
             returnedQty: grnDetails?.returnQuantity ?? 0,
-            purchasePrice: grnDetails?.purchasedPrice ?? 0,
+            purchasePrice: Number(grnDetails?.purchasedPrice ?? 0),
             item: item ? await itemMasterToDto(item) : null,
+            availableTotalQtyToReturn: availableTotalQtyToReturn,
+            createdBy: omitAudit(createdBy),
+            updatedBy: omitAudit(updatedBy),
           };
         })
       );
 
+      const location = warehouseDTO
+        ? toIdValue(warehouseDTO, "name")
+        : toIdValue(branchDTO, "name");
+
       return {
         ...omittedGrnReturn.rest,
-        goodReceiveReturnDetails: omitAudit(detailDTO),
+        goodReceiveReturnDetails: detailDTO,
+        currency: toIdValue(currency, "name"),
         warehouse: ccSettingsId ? toIdValue(warehouseDTO, "name") : null,
         branch: ccSettingsId ? null : toIdValue(branchDTO, "name"),
-        supplier: toIdValue(supplierDTO, "name"),
+        location: location,
+        supplier: toIdValue(supplierDTO, "vendorCompanyName"),
         createdBy: createdBy,
         approvedBy: approvedBy,
         rejectedBy: rejectedBy,
+      };
+    })
+  );
+};
+
+export const toGrnReturnDetailsDto = async (
+  grnReturnDetails: InvGoodReceiveReturnDetails[]
+): Promise<GrnReturnDetailDTO[]> => {
+  return Promise.all(
+    grnReturnDetails.map(async (detail) => {
+      const omittedData = customOmit<
+        InvGoodReceiveReturnDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
       };
     })
   );

@@ -6,14 +6,17 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import {
   PurchaseOrderDetailDTO,
+  PurchaseOrderDetailResponse,
   PurchaseOrderDTO,
   PurchaseOrderPdfDTO,
   PurchaseOrderWithDetails,
 } from "@/types/purchase/purchase.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { customOmit, omitAudit, toIdValue } from "av6-utils";
-import { itemMasterToDto } from "../master/itemMaster.mapper.js";
 import dayjs from "dayjs";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
+import { InvPurchaseOrderDetails } from "@repo/db/generated/prisma/client";
 
 export const toPurchaseOrderDTO = async (
   purchaseOrders: PurchaseOrderWithDetails[]
@@ -51,8 +54,20 @@ export const toPurchaseOrderDTO = async (
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(po.updatedBy, true)
         : null;
 
+      const lastVerifiedBy = po.lastVerifiedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(po.lastVerifiedBy)
+        : null;
+
+      const currency = po.currencyId
+        ? await currencyService.getCurrencyById(po.currencyId)
+        : null;
+
       const detailDTO: PurchaseOrderDetailDTO[] = await Promise.all(
         po.purchaseOrderDetails.map(async (detail) => {
+          const omittedDetail = customOmit<
+            PurchaseOrderDetailResponse,
+            "createdBy" | "updatedBy"
+          >(detail, ["createdBy", "updatedBy"]);
           const itemDTO = detail.itemId
             ? await itemMasterService.getItemMasterById(
                 { itemId: detail.itemId },
@@ -73,23 +88,29 @@ export const toPurchaseOrderDTO = async (
             : null;
 
           return {
-            ...detail,
+            ...omittedDetail.rest,
             item: itemDTO ? await itemMasterToDto(itemDTO) : null,
-            createdBy: createdBy,
-            updatedBy: updatedBy,
+            createdBy: omitAudit(createdBy),
+            updatedBy: omitAudit(updatedBy),
           };
         })
       );
 
+      const location = warehouse
+        ? toIdValue(warehouse, "name")
+        : toIdValue(branch, "name");
       return {
         ...omittedPo.rest,
         store: toIdValue(storeDTO, "itemStoreName"),
-        supplier: toIdValue(supplierDTO, "name"),
+        supplier: toIdValue(supplierDTO, "vendorCompanyName"),
         warehouse: toIdValue(warehouse, "name"),
         branch: toIdValue(branch, "name"),
+        location,
+        currency: toIdValue(currency, "code"),
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),
-        purchaseOrderDetails: omitAudit(detailDTO),
+        purchaseOrderDetails: detailDTO,
+        lastVerifiedBy: omitAudit(lastVerifiedBy),
       };
     })
   );
@@ -168,6 +189,38 @@ export const toPurchaseOrderPdfDTO = async (
         createdBy: omitAudit(createdBy),
         updatedBy: omitAudit(updatedBy),
         purchaseOrderDetails: omitAudit(detailDTO),
+      };
+    })
+  );
+};
+
+export const toPurchaseOrderDetailsDto = async (
+  purchaseOrderDetails: InvPurchaseOrderDetails[]
+): Promise<PurchaseOrderDetailDTO[]> => {
+  return Promise.all(
+    purchaseOrderDetails.map(async (detail) => {
+      const omittedData = customOmit<
+        InvPurchaseOrderDetails,
+        "itemId" | "createdBy" | "updatedBy"
+      >(detail, ["itemId", "createdBy", "updatedBy"]);
+      const itemDTO = detail.itemId
+        ? await itemMasterService.getItemMasterById(
+            { itemId: detail.itemId },
+            true
+          )
+        : null;
+      const createdBy = detail.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
+        : null;
+      const updatedBy = detail.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.updatedBy)
+        : null;
+
+      return {
+        ...omittedData.rest,
+        item: itemDTO ? await itemMasterToDto(itemDTO) : null,
+        createdBy,
+        updatedBy,
       };
     })
   );

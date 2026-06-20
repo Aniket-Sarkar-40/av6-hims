@@ -5,16 +5,12 @@ import {
   getBulkItemSupplierPrices,
   getItemMasterById,
   getItemStocksByItemId,
+  itemExcelExport,
+  itemExcelImport,
   itemExcelSampleExport,
   itemSearch,
   updateItemMaster,
 } from "@/controllers/master/itemMaster.controller.js";
-import {
-  authorize,
-  verifyToken,
-} from "@repo/platform/middlewares/auth.middleware.js";
-import { createUploadFieldsMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
-import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { validateBulkItemSupplierPrices } from "@/validations/request/itemSupplierMap/itemSupplierMap.validation.js";
 import {
   validateGetItem,
@@ -23,6 +19,17 @@ import {
   validateItemSearch,
   validateItemStock,
 } from "@/validations/request/master/itemMaster.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
+import {
+  createUploadFieldsMiddleware,
+  createUploadMiddleware,
+} from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
 import { Router } from "express";
 
 export const itemMasterRouter: Router = Router();
@@ -51,7 +58,7 @@ export const itemMasterRouter: Router = Router();
  */
 itemMasterRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
   createUploadFieldsMiddleware("item", [
     "frontImage",
@@ -60,7 +67,7 @@ itemMasterRouter.post(
     "rightSideImage",
   ]),
   validateItemMasterCreate,
-  createItemMaster,
+  createItemMaster
 );
 
 /**
@@ -74,9 +81,9 @@ itemMasterRouter.post(
  */
 itemMasterRouter.put(
   "/active",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
-  ActiveItem,
+  ActiveItem
 );
 
 /**
@@ -90,9 +97,9 @@ itemMasterRouter.put(
  */
 itemMasterRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
-  getAllItemMaster,
+  getAllItemMaster
 );
 
 /**
@@ -111,10 +118,10 @@ itemMasterRouter.get(
  */
 itemMasterRouter.post(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
   validateGetItem,
-  getItemMasterById,
+  getItemMasterById
 );
 
 /**
@@ -141,10 +148,10 @@ itemMasterRouter.post(
  */
 itemMasterRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "ITEM_MASTER", "VIEW"),
-    getPermission("INV", "ITEM_MASTER", "UPDATE"),
+    getPermission("INV", "ITEM_MASTER", "UPDATE")
   ),
   createUploadFieldsMiddleware("item", [
     "frontImage",
@@ -153,7 +160,7 @@ itemMasterRouter.put(
     "rightSideImage",
   ]),
   validateItemMasterUpdate,
-  updateItemMaster,
+  updateItemMaster
 );
 
 /**
@@ -173,10 +180,10 @@ itemMasterRouter.put(
  */
 itemMasterRouter.post(
   "/search",
-  verifyToken,
-  authorize(getPermission("INV", "ITEM_SEARCH", "CREATE")),
+  verifyToken(ServiceCode.INVENTORY),
+  authorize(getPermission("INV", "ITEM_SEARCH", "VIEW")),
   validateItemSearch,
-  itemSearch,
+  itemSearch
 );
 
 /**
@@ -206,10 +213,10 @@ itemMasterRouter.post(
  */
 itemMasterRouter.post(
   "/items",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEMS_SUP", "VIEW")),
   validateBulkItemSupplierPrices,
-  getBulkItemSupplierPrices,
+  getBulkItemSupplierPrices
 );
 
 /**
@@ -229,10 +236,10 @@ itemMasterRouter.post(
  */
 itemMasterRouter.post(
   "/stock",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_BATCHES", "VIEW")),
   validateItemStock,
-  getItemStocksByItemId,
+  getItemStocksByItemId
 );
 
 /**
@@ -243,9 +250,33 @@ itemMasterRouter.post(
  *     tags: [Common]
  */
 // POST /export
-itemMasterRouter.post(
+itemMasterRouter.get(
   "/export",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
-  itemExcelSampleExport,
+  itemExcelSampleExport
+);
+
+/**
+ * @swagger
+ * /api/v1/item/excel-export:
+ *   post:
+ *     summary: Export excel data
+ *     tags: [Common]
+ */
+// POST /export
+itemMasterRouter.get(
+  "/item-excel-export",
+  verifyToken,
+  authorize(getPermission("INV", "ITEM", "CREATE")),
+  itemExcelExport
+);
+
+itemMasterRouter.post(
+  "/import",
+  verifyToken,
+  createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
+  authorize(getPermission("INV", "ITEM", "CREATE")),
+  itemExcelImport
 );

@@ -13,6 +13,7 @@ import {
 } from "@/validations/request/master/consultationNotesMapping.validation.js";
 
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const consultationNotesMappingRouter: Router = Router();
 
@@ -45,10 +46,10 @@ export const consultationNotesMappingRouter: Router = Router();
  */
 consultationNotesMappingRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_NOTES_MAPPING", "CREATE")),
   validateConsultationNotesMappingCreate,
-  createConsultationNotesMapping,
+  createConsultationNotesMapping
 );
 
 /**
@@ -75,8 +76,8 @@ consultationNotesMappingRouter.post(
  */
 consultationNotesMappingRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_NOTES_MAPPING", "UPDATE")),
   validateConsultationNotesMappingUpdate,
-  updateConsultationNotesMapping,
+  updateConsultationNotesMapping
 );

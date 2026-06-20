@@ -21,8 +21,9 @@ import {
 } from "@/types/auth.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { AxiosError } from "axios";
-import jwt from "jsonwebtoken";
 import { logger } from "@repo/platform/logging/logger.js";
+import { decodeToken, encodeToken } from "@repo/shared/utils/auth.utils.js";
+import { moduleConfigService } from "@/services/moduleConfig.service.js";
 
 export const authService = {
   async loginExternal(payload: LoginPayload): Promise<ApiLoginResponse> {
@@ -38,18 +39,28 @@ export const authService = {
       uuid: data.uuid ?? "",
     };
   },
-  /** decode or verify token and return payload */
-  decodeToken(shortToken: string): JwtPayload {
-    return jwt.decode(shortToken) as JwtPayload;
-  },
 
   async login(credentials: LoginPayload): Promise<LoginResponse> {
     logger.info("entering::login::service");
     try {
-      const { token, shortToken, uuid } = await this.loginExternal(credentials);
+      let { token, shortToken, uuid } = await this.loginExternal(credentials);
 
-      if (!token || !shortToken || !uuid)
+      if (!token || !shortToken || !uuid) {
         throw new ErrorHandler(401, "Invalid credentials: No token received");
+      }
+
+      const decodedToken = decodeToken(token);
+      const decodedShortToken = decodeToken(shortToken);
+
+      const activeModules = (
+        await moduleConfigService.getEnabledModulesFromDb()
+      ).map((item) => item.module);
+
+      decodedToken.modules = activeModules;
+      decodedShortToken.modules = activeModules;
+
+      token = encodeToken(decodedToken);
+      shortToken = encodeToken(decodedShortToken);
 
       logger.info("exiting::login::service");
       return { token, shortToken, uuid };

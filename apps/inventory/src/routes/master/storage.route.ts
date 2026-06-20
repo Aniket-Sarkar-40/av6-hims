@@ -12,6 +12,7 @@ import {
   validateStorageUpdate,
 } from "@/validations/request/master/storage.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const storageRouter: Router = Router();
 
@@ -39,10 +40,10 @@ export const storageRouter: Router = Router();
  */
 storageRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORAGE", "CREATE")),
   validateStorageCreate,
-  createStorage,
+  createStorage
 );
 
 /**
@@ -69,11 +70,11 @@ storageRouter.post(
  */
 storageRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STORAGE", "VIEW"),
-    getPermission("INV", "STORAGE", "UPDATE"),
+    getPermission("INV", "STORAGE", "UPDATE")
   ),
   validateStorageUpdate,
-  updateStorage,
+  updateStorage
 );

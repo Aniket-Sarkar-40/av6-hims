@@ -1,8 +1,13 @@
+import { ItemSupplierSearchType } from "@/enums/itemSupplier.enums.js";
+import { ItemSupplierLookupInput } from "@/types/master/itemSupplier.js";
+import { VendorType } from "@repo/db/generated/prisma/client";
 import {
   arrayOptional,
   boolOptional,
+  boolRequired,
   emailOptional,
   enumOptional,
+  enumRequired,
   idOptional,
   idRequired,
   phoneOptional,
@@ -10,13 +15,13 @@ import {
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
-import { VendorType } from "@repo/db/generated/prisma/client";
 import Joi from "joi";
 
 const taxIdentificationDetailSchema = Joi.object({
   id: idOptional("Tax Identification ID"),
   taxIdentificationName: strRequired("Tax Identification Name"),
   taxIdentificationValue: idRequired("Tax Identification Value"),
+  taxIdentificationNumber: strRequired("Tax Identification Number"),
 });
 
 const bankDetailsSchema = Joi.object({
@@ -30,14 +35,12 @@ const bankDetailsSchema = Joi.object({
 });
 
 export const itemSupplierCreateSchema = Joi.object({
-  supplierCode: strRequired("Supplier Code"),
-  name: strRequired("Supplier Name"),
+  supplierCode: strOptional("Supplier Code"),
+  vendorCompanyName: strRequired("Vendor Company Name"),
   phone: phoneOptional("Phone number"),
   email: emailOptional("Email"),
-  address: strRequired("Address"),
-  billTo: strOptional("Bill To"),
-  shipTo: strOptional("Ship To"),
-  branchDetailsId: idRequired("Branch Details ID"),
+  billTo: strRequired("Bill To"),
+  shipTo: strRequired("Ship To"),
   vendorType: enumOptional("Vendor Type", VendorType),
   salesPerson: strOptional("Sales Person"),
   salesPersonPhone: phoneOptional("Sales Person Phone number"),
@@ -48,20 +51,20 @@ export const itemSupplierCreateSchema = Joi.object({
   taxDetailsId: idOptional("Tax Details ID"),
   termsAndCondition: strOptional("Terms And Condition"),
   stockShipmentDetails: strOptional("Stock Shipment Details"),
-  contactPersonName: strOptional("Contact Person Name"),
-  contactPersonPhone: phoneOptional("Contact Person Phone number"),
-  contactPersonEmail: emailOptional("Contact Person Email"),
-  isPoWhatsapp: boolOptional("Is PO Whatsapp"),
-  isPoEmail: boolOptional("Is PO Email"),
-  isGrnWhatsapp: boolOptional("Is GRN Whatsapp"),
-  isGrnEmail: boolOptional("Is GRN Email"),
-  isReturnWhatsapp: boolOptional("Is Return Whatsapp"),
-  isReturnEmail: boolOptional("Is Return Email"),
-  description: strOptional("Description"),
+  isSmsSend: boolOptional("Is SMS Send"),
+  isPoWhatsapp: boolRequired("Is PO Whatsapp"),
+  isPoEmail: boolRequired("Is PO Email"),
+  isPoSms: boolRequired("Is PO SMS"),
+  isGrnWhatsapp: boolRequired("Is GRN Whatsapp"),
+  isGrnEmail: boolRequired("Is GRN Email"),
+  isGrnSms: boolRequired("Is GRN SMS"),
+  isReturnWhatsapp: boolRequired("Is Return Whatsapp"),
+  isReturnSms: boolRequired("Is Return SMS"),
+  isReturnEmail: boolRequired("Is Return Email"),
   isLock: boolOptional("Is Lock"),
   taxIdentificationDetails: arrayOptional(
     "Tax Identification Details",
-    taxIdentificationDetailSchema,
+    taxIdentificationDetailSchema
   ),
 
   bankDetails: arrayOptional("Bank Details", bankDetailsSchema),
@@ -77,4 +80,13 @@ export const itemSupplierUpdateSchema = itemSupplierCreateSchema.keys({
 
 export const validateUpdateItemSupplier = validationHandler({
   schema: itemSupplierUpdateSchema,
+});
+
+export const itemSupplierLookupSchema = Joi.object<ItemSupplierLookupInput>({
+  type: enumRequired("Type", ItemSupplierSearchType),
+  searchText: strRequired("Search text", 1),
+});
+
+export const validateItemSupplierLookup = validationHandler({
+  schema: itemSupplierLookupSchema,
 });

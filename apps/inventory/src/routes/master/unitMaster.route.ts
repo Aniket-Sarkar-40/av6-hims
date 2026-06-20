@@ -14,6 +14,7 @@ import {
   validateUnitMasterUpdate,
 } from "@/validations/request/master/unitMaster.validation.js";
 import { Router } from "express";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 
 export const unitMasterRouter: Router = Router();
 
@@ -41,10 +42,10 @@ export const unitMasterRouter: Router = Router();
  */
 unitMasterRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UNIT_MASTER", "CREATE")),
   validateUnitMasterCreate,
-  createUnitMaster,
+  createUnitMaster
 );
 
 /**
@@ -58,9 +59,9 @@ unitMasterRouter.post(
  */
 unitMasterRouter.get(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UNIT_MASTER", "VIEW")),
-  getAllUnitMaster,
+  getAllUnitMaster
 );
 
 /**
@@ -79,9 +80,9 @@ unitMasterRouter.get(
  */
 unitMasterRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UNIT_MASTER", "VIEW")),
-  getUnitMasterById,
+  getUnitMasterById
 );
 
 /**
@@ -108,11 +109,11 @@ unitMasterRouter.get(
  */
 unitMasterRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "UNIT_MASTER", "VIEW"),
-    getPermission("INV", "UNIT_MASTER", "UPDATE"),
+    getPermission("INV", "UNIT_MASTER", "UPDATE")
   ),
   validateUnitMasterUpdate,
-  updateUnitMaster,
+  updateUnitMaster
 );

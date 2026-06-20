@@ -26,8 +26,10 @@ import {
   validateStartFlowRequest,
 } from "@/validations/request/common.validation.js";
 import { authorizeCommonSearch } from "@apps/core/middleware/auth.middleware.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { Router } from "express";
 
 const commonRouter: Router = Router();
@@ -54,10 +56,10 @@ const commonRouter: Router = Router();
 // POST /users
 commonRouter.post(
   "/search",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch,
+  commonSearch
 );
 
 /**
@@ -76,10 +78,10 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/dropdownSearch",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch,
+  commonDropdownSearch
 );
 
 /**
@@ -98,10 +100,10 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/fixedSearch",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch,
+  fixedSearch
 );
 
 /**
@@ -120,10 +122,10 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/fixedSearchWOP",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController,
+  fixedSearchWoPaginationController
 );
 
 /**
@@ -142,10 +144,10 @@ commonRouter.post(
 // POST /fixedSearch
 commonRouter.post(
   "/excel-export-fs",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport,
+  commonFSExcelExport
 );
 
 /**
@@ -164,10 +166,10 @@ commonRouter.post(
 // POST /fetch
 commonRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch,
+  commonFetch
 );
 
 /**
@@ -187,8 +189,9 @@ commonRouter.post(
 commonRouter.post(
   "/importExcel",
   createUploadMiddleware("excelFile"),
+  uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport,
+  commonExcelImport
 );
 
 /**
@@ -217,10 +220,10 @@ commonRouter.post("/exportExcel", validateCommonExportExcel, commonExcelExport);
 // DELETE/:shortCode/:id
 commonRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete,
+  commonDelete
 );
 
 /**
@@ -239,10 +242,10 @@ commonRouter.delete(
 // DELETE/:shortCode/:id
 commonRouter.patch(
   "/updateStatus",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus,
+  commonUpdateStatus
 );
 
 // /**

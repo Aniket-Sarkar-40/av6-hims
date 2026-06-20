@@ -1,4 +1,5 @@
 import { getICDTenById } from "@/controllers/master/icdTen.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -32,7 +33,7 @@ export const icdTenRouter: Router = Router();
  */
 icdTenRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "ICD_TEN", "VIEW")),
-  getICDTenById,
+  getICDTenById
 );

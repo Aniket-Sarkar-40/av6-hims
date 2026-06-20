@@ -1,10 +1,12 @@
-import { BASE_URL, CLIENT_ID } from "@repo/shared/config/index.js";
 import { DecodedToken } from "@/types/auth.js";
-import fs from "fs";
-import path from "path";
-import jwt from "jsonwebtoken";
+import { toUTCDateOnly } from "@/utils/date.utils.js";
 import { Decimal } from "@prisma/client/runtime/client";
+import { BASE_URL, CLIENT_ID } from "@repo/shared/config/index.js";
 import crypto from "crypto";
+import fs from "fs";
+import jwt from "jsonwebtoken";
+import path from "path";
+import { ToWords } from "to-words";
 
 export const toRelativeImagePath = (absolutePath: string): string => {
   if (
@@ -180,3 +182,45 @@ export const generateHashForAuth = (randomNum: string) => {
   const firstHash = generateMd5(CLIENT_ID);
   return generateMd5(firstHash + randomNum);
 };
+
+export const getNormalizedParams = (cornName: string, runDate: Date) => ({
+  name: cornName.trim(),
+  runDate: toUTCDateOnly(runDate),
+});
+
+export const calcDurationMs = (
+  startedAt: Date | null | undefined,
+  endedAt: Date
+) =>
+  Math.max(0, endedAt.getTime() - (startedAt?.getTime() ?? endedAt.getTime()));
+
+export const errToMessage = (err: unknown) => {
+  if (err instanceof Error)
+    return `${err.name}: ${err.message}${err.stack ? `\n${err.stack}` : ""}`;
+  if (typeof err === "string") return err;
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return String(err);
+  }
+};
+
+export const numberToWords = new ToWords({
+  localeCode: "en-GH",
+  converterOptions: {
+    currency: true,
+    ignoreDecimal: false,
+    ignoreZeroCurrency: false,
+    doNotAddOnly: false,
+    currencyOptions: {
+      name: "Cedi",
+      plural: "Cedis",
+      symbol: "₵",
+      fractionalUnit: {
+        name: "Pesewa",
+        plural: "Pesewas",
+        symbol: "",
+      },
+    },
+  },
+});

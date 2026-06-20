@@ -1,29 +1,27 @@
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
-import { eventEmailService } from "@/services/master/emailConfig.service.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 import {
   CreatePurchaseOrderInput,
   PurchaseOrderWithDetails,
   UpdatePurchaseOrder,
 } from "@/types/purchase/purchase.js";
-import { applyRound } from "av6-utils";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { approvalService } from "@apps/core/services/approval/approval.service.js";
+import { db } from "@repo/db/client";
 import {
   InvPurchaseOrder,
   InvPurchaseOrderDetails,
-  RoundFormat,
   InvUinShortCode,
   PO_STATUS,
+  RoundFormat,
 } from "@repo/db/generated/prisma/client";
-import { approvalService } from "@apps/core/services/approval/approval.service.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { applyRound, customOmit } from "av6-utils";
 
 export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
   logger.info("entering::createPurchaseOrder::repository");
 
   const store = requestStorage.getStore();
-  const currentUser = store?.user?.id ?? 1;
+  const currentUser = store?.user?.id ?? null;
   const setting = store?.settings;
   const precision = setting?.defaultPrecision;
   const omittedPO = customOmit<
@@ -88,9 +86,11 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
       subjectType: "INV_PURCHASE_ORDER",
       subjectId: poCreate.id,
       extra: {
-        supplier: omittedPO.omitted.supplier?.name || null,
+        supplier: omittedPO.omitted.supplier?.vendorCompanyName || null,
         cc: poCreate.collectionCenter.colName || null,
+        supplierCode: omittedPO.omitted.supplier?.supplierCode || null,
       },
+      createdBy: currentUser!,
     });
   }
 
@@ -142,7 +142,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
   const toCreate = incomingDetails.filter(
     (d) => d.id == null || !existingIds.has(d.id)
   );
-  const toDelete = omittedPO.omitted.purchaseOrderDetails.filter(
+  const toDelete = omittedPO.omitted.po.purchaseOrderDetails.filter(
     (d) => !incomingDetails.some((detail) => detail.id === d.id)
   );
 
@@ -162,12 +162,12 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
             packingQty: d.packingQty,
             quantity: d.quantity,
             purchasedPrice: applyRound(
-              d.purchasedPrice,
+              Number(d.purchasedPrice),
               RoundFormat.TO_FIXED,
               precision
             ),
             totalAmount: applyRound(
-              d.totalAmount,
+              Number(d.totalAmount),
               RoundFormat.TO_FIXED,
               precision
             ),
@@ -177,7 +177,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
         create: toCreate.map((d) => ({
           itemId: d.itemId,
           purchasedPrice: applyRound(
-            d.purchasedPrice,
+            Number(d.purchasedPrice),
             RoundFormat.TO_FIXED,
             precision
           ),
@@ -185,7 +185,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           quantity: d.quantity,
           receivedQty: d.receivedQty,
           totalAmount: applyRound(
-            d.totalAmount,
+            Number(d.totalAmount),
             RoundFormat.TO_FIXED,
             precision
           ),
@@ -214,8 +214,24 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           isActive: true,
         },
       },
+      collectionCenter: true,
     },
   });
+
+  if (updated.status === "SENT_FOR_APPROVAL") {
+    await approvalService.startFlow({
+      ccId: updated.ccId,
+      netTotal: Number(updated.grandTotal),
+      refNo: updated.poNumber,
+      service: "INVENTORY",
+      subjectType: "INV_PURCHASE_ORDER",
+      subjectId: updated.id,
+      extra: {
+        supplier: omittedPO.omitted.supplier?.vendorCompanyName || null,
+        cc: updated.collectionCenter.colName || null,
+      },
+    });
+  }
 
   return updated;
 };
@@ -360,10 +376,11 @@ export const updatePurchaseOrderStatusFromDb = async (
   logger.info(
     `entering::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`
   );
-
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
   await db.invPurchaseOrder.update({
     where: { id },
-    data: { status },
+    data: { status, lastVerifiedBy: currentUser, lastVerifiedAt: new Date() },
   });
 
   logger.info(

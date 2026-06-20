@@ -7,6 +7,7 @@ import {
   getHighestSellingDrugByBranch,
   getHighestSellingDrugByBranchExcel,
 } from "@/controllers/mis/branchOnMonthExpiration.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -40,48 +41,48 @@ export const branchOnMonthExpirationRouter: Router = Router();
  */
 branchOnMonthExpirationRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH_MONTH_EXPIRATION", "VIEW")),
-  getBranchOnMonthExpiration,
+  getBranchOnMonthExpiration
 );
 branchOnMonthExpirationRouter.post(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH_MONTH_EXPIRATION", "VIEW")),
-  getBranchOnMonthExpirationExcel,
+  getBranchOnMonthExpirationExcel
 );
 
 branchOnMonthExpirationRouter.get(
   "/expiration-amount",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH_MONTH_EXPIRATION", "VIEW")),
-  getBranchesOnMonthExpirationAmt,
+  getBranchesOnMonthExpirationAmt
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-selling-drug",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_SELLING_DRUG", "VIEW")),
-  getHighestSellingDrugByBranch,
+  getHighestSellingDrugByBranch
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-amt-selling-drug",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_AMOUNT_SELLING_DRUG", "VIEW")),
-  getHighestAmountSellDrugByBranch,
+  getHighestAmountSellDrugByBranch
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-selling-drug-excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_SELLING_DRUG", "VIEW")),
-  getHighestSellingDrugByBranchExcel,
+  getHighestSellingDrugByBranchExcel
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-amt-selling-drug-excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_AMOUNT_SELLING_DRUG", "VIEW")),
-  getHighestAmtSellingDrugByBranchExcel,
+  getHighestAmtSellingDrugByBranchExcel
 );

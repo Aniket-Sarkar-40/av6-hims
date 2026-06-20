@@ -1,10 +1,22 @@
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import {
+  commonActiveInactive,
   commonLockUnlock,
   getAll,
   getByUnique,
 } from "@/repository/common.repository.js";
-import { commonLockUnlockValidation } from "@/validations/service/commonService.validation.js";
+import {
+  CommonActiveInactiveParams,
+  CommonGetAllInput,
+  CommonGetByIdInput,
+  FullRow,
+  LockUnlockParams,
+  ModelName,
+} from "@/types/common.js";
+import {
+  commonActiveInactiveValidation,
+  commonLockUnlockValidation,
+} from "@/validations/service/commonService.validation.js";
 import {
   getAllCache,
   getCacheById,
@@ -13,13 +25,6 @@ import {
 import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
-import {
-  CommonGetAllInput,
-  CommonGetByIdInput,
-  FullRow,
-  LockUnlockParams,
-  ModelName,
-} from "./../types/common.js";
 
 export const commonService = {
   async lockUnlock(lockParams: LockUnlockParams) {
@@ -27,7 +32,7 @@ export const commonService = {
 
     const shortCodeData = await commonLockUnlockValidation(
       lockParams.shortCode,
-      lockParams.id,
+      lockParams.id
     );
 
     const lockResult = await commonLockUnlock({ ...lockParams, shortCodeData });
@@ -36,7 +41,7 @@ export const commonService = {
       await updateCache(
         `inv:${shortCodeData.tableName}:all`,
         lockParams.id,
-        lockResult,
+        lockResult
       );
     }
 
@@ -46,7 +51,7 @@ export const commonService = {
   },
 
   async getElementById<M extends ModelName>(
-    input: CommonGetByIdInput,
+    input: CommonGetByIdInput
   ): Promise<FullRow<M> | null> {
     logger.info("entering::getCommonById::service");
     const cacheKey = getRedisKey(input.cacheCode, "all");
@@ -70,7 +75,7 @@ export const commonService = {
       if (!input.canNullReturnable)
         throw new ErrorHandler(
           404,
-          SHORT_CODE[input.shortCode].replace("_", " "),
+          SHORT_CODE[input.shortCode].replace("_", " ")
         );
     }
 
@@ -79,7 +84,7 @@ export const commonService = {
   },
 
   async getAllElements<M extends ModelName>(
-    input: CommonGetAllInput,
+    input: CommonGetAllInput
   ): Promise<FullRow<M>[]> {
     logger.info("entering::getCommons::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE[input.shortCode]);
@@ -97,5 +102,35 @@ export const commonService = {
     }
     logger.info("exiting::getCommons::service");
     return rows;
+  },
+
+  async activeInactive(activeInactiveParams: CommonActiveInactiveParams) {
+    logger.info("entering::activeInactive::service");
+
+    const { shortCodeData, normalizedValue } =
+      await commonActiveInactiveValidation(
+        activeInactiveParams.shortCode,
+        activeInactiveParams.id,
+        activeInactiveParams.field,
+        activeInactiveParams.value
+      );
+
+    const result = await commonActiveInactive({
+      ...activeInactiveParams,
+      value: normalizedValue,
+      shortCodeData,
+    });
+
+    if (result) {
+      await updateCache(
+        `inv:${shortCodeData.tableName}:all`,
+        activeInactiveParams.id,
+        result
+      );
+    }
+
+    logger.info("exiting::activeInactive::service");
+
+    return result;
   },
 };

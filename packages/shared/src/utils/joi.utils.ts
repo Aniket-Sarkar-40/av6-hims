@@ -2,23 +2,23 @@ import Joi, { SchemaLikeWithoutArray } from "joi";
 import { generateValidationErrorMessage } from "./responseMessage.utils.js";
 import { getPattern } from "av6-utils";
 
-export const priceRequired = (label: string) =>
+export const priceRequired = (label: string, getPrecision?: () => number) =>
   Joi.number()
     .min(0)
     .required()
-    .precision(2)
+    .precision(getPrecision?.() ?? 2)
     .messages({
       "number.base": generateValidationErrorMessage("NUMBER", label),
       "number.min": generateValidationErrorMessage("NON_NEGATIVE", label),
       "any.required": generateValidationErrorMessage("REQUIRED", label),
     });
 
-export const priceOptional = (label: string) =>
+export const priceOptional = (label: string, getPrecision?: () => number) =>
   Joi.number()
     .min(0)
     .optional()
     .allow(null)
-    .precision(2)
+    .precision(getPrecision?.() ?? 2)
     .messages({
       "number.base": generateValidationErrorMessage("NUMBER", label),
       "number.min": generateValidationErrorMessage("NON_NEGATIVE", label),
@@ -35,6 +35,7 @@ export const dateRequired = (label: string) =>
 export const dateOptional = (label: string) =>
   Joi.date()
     .optional()
+    .allow(null)
     .messages({
       "date.base": `${label} must be a valid date`,
     });
@@ -63,22 +64,40 @@ export const strOptional = (label: string, max = 255) =>
       "string.max": `${label} must be at most ${max} characters`,
     });
 
-export const boolOptional = (label: string, defaultValue: boolean = false) =>
-  Joi.boolean()
-    .default(defaultValue)
-    .optional()
-    .messages({
-      "boolean.base": `${label} must be a boolean`,
-    });
+const baseBoolean = (
+  label: string,
+  options?: {
+    required?: boolean;
+    defaultValue?: boolean;
+  }
+) => {
+  let schema = Joi.boolean();
 
-export const boolRequired = (label: string, defaultValue: boolean = false) =>
-  Joi.boolean()
-    .default(defaultValue)
-    .required()
-    .messages({
-      "boolean.base": `${label} must be a boolean`,
-      "any.required": `${label} is required`,
-    });
+  if (options?.required) {
+    schema = schema.required();
+  } else {
+    schema = schema.optional();
+  }
+
+  if (options?.defaultValue !== undefined) {
+    schema = schema.default(options.defaultValue);
+  }
+
+  return schema.messages({
+    "boolean.base": generateValidationErrorMessage("BOOLEAN", label),
+    ...(options?.required && {
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+    }),
+  });
+};
+
+export const boolRequired = (label: string) =>
+  baseBoolean(label, { required: true });
+
+export const boolOptional = (label: string) => baseBoolean(label);
+
+export const boolWithDefault = (label: string, defaultValue = false) =>
+  baseBoolean(label, { defaultValue });
 
 export const enumRequired = <T extends Record<string, string>>(
   label: string,
@@ -323,7 +342,12 @@ export const numberArrayOptional = (label: string, min?: number) => {
     });
 };
 
-export const numberWithMaxDecimals = (fieldName: string, precision = 2) => {
+export const numberWithMaxDecimals = (
+  fieldName: string,
+  getPrecision?: () => number
+) => {
+  const precision = getPrecision?.() ?? 2;
+
   return Joi.number()
     .positive()
     .messages({
@@ -333,19 +357,32 @@ export const numberWithMaxDecimals = (fieldName: string, precision = 2) => {
     .custom((value, helpers) => {
       const raw = value.toString();
       const [, decPart = ""] = raw.split(".");
+
       if (decPart.length > precision) {
-        return helpers.error("number.decimals", { precision });
+        return helpers.error("number.decimals");
       }
+
       return value;
     })
     .messages({
       "number.decimals": `${fieldName} must have at most ${precision} decimal places`,
     });
 };
-export const numberWithMaxDecimalsRequired = (fieldName: string) =>
-  numberWithMaxDecimals(fieldName)
+
+export const numberWithMaxDecimalsRequired = (
+  fieldName: string,
+  getPrecision?: () => number
+) =>
+  numberWithMaxDecimals(fieldName, getPrecision)
     .required()
-    .messages({ "any.required": `${fieldName} is required` });
+    .messages({
+      "any.required": `${fieldName} is required`,
+    });
+
+export const numberWithMaxDecimalsOptional = (
+  fieldName: string,
+  getPrecision?: () => number
+) => numberWithMaxDecimals(fieldName, getPrecision).optional().allow(null, 0);
 
 export const emailRequired = (label: string) =>
   Joi.string()
@@ -445,7 +482,11 @@ export const aadharOptional = (label: string) =>
       "string.pattern.base": generateValidationErrorMessage("AADHAR", label),
     });
 
-export const intRequired = (label: string, min?: number, max?: number) => {
+export const intRequired = (
+  label: string,
+  min?: number | Joi.Reference,
+  max?: number | Joi.Reference
+) => {
   let schema = Joi.number().integer().required();
 
   if (min !== undefined) schema = schema.min(min);
@@ -468,7 +509,11 @@ export const intRequired = (label: string, min?: number, max?: number) => {
   });
 };
 
-export const intOptional = (label: string, min?: number, max?: number) => {
+export const intOptional = (
+  label: string,
+  min?: number | Joi.Reference,
+  max?: number | Joi.Reference
+) => {
   let schema = Joi.number().integer().optional().allow(null);
 
   if (min !== undefined) schema = schema.min(min);
@@ -544,4 +589,26 @@ export const decimalOptional = (label: string, precision = 2) =>
         label,
         String(precision)
       ),
+    });
+
+export const modelFieldRequired = (label: string) =>
+  Joi.string()
+    .trim()
+    .pattern(/^[a-z][a-zA-Z0-9]*$/)
+    .required()
+    .messages({
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
+      "string.base": generateValidationErrorMessage("STRING", label),
+      "string.pattern.base": generateValidationErrorMessage(
+        "INVALID_FORMAT",
+        label
+      ),
+    });
+
+export const scalarValueRequired = (label: string) =>
+  Joi.any()
+    .allow(null)
+    .required()
+    .messages({
+      "any.required": generateValidationErrorMessage("REQUIRED", label),
     });

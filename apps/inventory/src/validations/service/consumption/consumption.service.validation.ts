@@ -1,18 +1,19 @@
-import { logger } from "@repo/platform/logging/logger.js";
-import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import { getConsumptionByIdFromDb } from "@/repository/consumption/consumption.repository.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { getCountItemsFromDb } from "@/repository/master/itemMaster.repository.js";
+import { getItemStockQtyByBatchWise } from "@/repository/stock/stock.repository.js";
 import {
   CommonConsumptionInput,
   ConsumptionApproveInput,
   ConsumptionCreateInput,
   ConsumptionUpdateInput,
 } from "@/types/consumption/consumption.js";
-import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { validateBranchOrWarehouse } from "@/utils/getCollectionCenter.utils.js";
-import { getCountItemsFromDb } from "@/repository/master/itemMaster.repository.js";
-import { getItemStockQtyByBatchWise } from "@/repository/stock/stock.repository.js";
+import { validateStaffCollectionCenter } from "@/validations/service/master/collectionCenter.service.validation.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdConsumption = async (consumptionId: number) => {
   logger.info("entering::validateIdConsumption::service::validation");
@@ -21,7 +22,7 @@ export const validateIdConsumption = async (consumptionId: number) => {
   if (!consumption) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Consumption"),
+      generateErrorMessage("NOT_FOUND", "Consumption")
     );
   }
   logger.info("exiting::validateIdConsumption::service::validation");
@@ -29,27 +30,22 @@ export const validateIdConsumption = async (consumptionId: number) => {
 };
 
 export const createConsumptionServiceValidation = async (
-  input: ConsumptionCreateInput,
+  input: ConsumptionCreateInput
 ) => {
   logger.info("entering::createConsumption::service::validation");
-  /*--------------------- Validation of Header data---------------------------------*/
+
+  await validateStaffCollectionCenter(input.requestedBy, input.ccId);
+
   await validateBranchOrWarehouse(input.ccId);
-  const approver = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    input.approvalFrom,
-    true,
-  );
-  if (!approver) {
-    throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Approver"));
-  }
+
   const consumer = await employeeService.getEmployeeByIdFrmCacheOrDb(
     input.requestedBy,
-    true,
+    true
   );
   if (!consumer) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Requester"));
   }
 
-  /*---------------------Validate all itemIds exists---------------------------*/
   const itemIds = [...new Set(input.consumptionDetails.map((d) => d.itemId))];
   const existingItems = await getCountItemsFromDb(itemIds);
 
@@ -57,22 +53,37 @@ export const createConsumptionServiceValidation = async (
     throw new ErrorHandler(400, generateErrorMessage("NOT_FOUND", "Item"));
   }
 
-  /*---------------------------------------------------------------------------*/
-  /*--------------------- Validation of detail data----------------------------*/
   for (const detail of input.consumptionDetails) {
-    // Check if item stock is available and sufficient
-    const stock = await getItemStockQtyByBatchWise({
-      itemId: detail.itemId,
-      batchNo: detail.batchNo ? detail.batchNo : null,
-      userId: input.requestedBy,
-      expiryDate: detail.expiryDate ? new Date(detail.expiryDate) : null,
-      ccId: null,
-    });
-    const name = existingItems.find((i) => i.id === detail.itemId)?.item;
-    if (stock === undefined || stock < detail.requestedQty) {
+    const consumedQty = detail.consumedQty ?? detail.requestedQty;
+
+    if (consumedQty > detail.requestedQty) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`),
+        generateErrorMessage(
+          "INVALID_VALUE",
+          `Approved qty ${consumedQty} is greater than requested qty ${detail.requestedQty}`
+        )
+      );
+    }
+
+    const stock = await getItemStockQtyByBatchWise({
+      itemId: detail.itemId,
+      batchNo: detail.isBatch && detail.batchNo ? detail.batchNo : null,
+      userId: input.requestedBy,
+      expiryDate:
+        detail.isExpiry && detail.expiryDate
+          ? new Date(detail.expiryDate)
+          : null,
+    });
+
+    const name =
+      existingItems.find((i) => i.id === detail.itemId)?.item ??
+      `Item Id:${detail.itemId}`;
+
+    if (!stock || stock < consumedQty) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`)
       );
     }
   }
@@ -80,7 +91,7 @@ export const createConsumptionServiceValidation = async (
 };
 
 export const updateConsumptionServiceValidation = async (
-  input: ConsumptionUpdateInput,
+  input: ConsumptionUpdateInput
 ) => {
   logger.info("entering::updateConsumption::service::validation");
   const existing = await validateIdConsumption(input.id);
@@ -89,7 +100,7 @@ export const updateConsumptionServiceValidation = async (
   if (existing.status !== "DRAFT") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption"),
+      generateErrorMessage("INVALID_STATUS", "Consumption")
     );
   }
 
@@ -97,36 +108,23 @@ export const updateConsumptionServiceValidation = async (
 };
 
 export const approveConsumptionServiceValidation = async (
-  input: ConsumptionApproveInput,
+  input: ConsumptionApproveInput
 ) => {
   logger.info("entering::approveConsumption::service::validation");
   const existing = await validateIdConsumption(input.id);
   input.existing = existing;
-  if (existing.approvalFrom !== input.approvalFrom) {
-    throw new ErrorHandler(
-      401,
-      generateErrorMessage("INVALID_FOREIGN_KEY", "Approver"),
-    );
-  }
+
   if (existing.status !== "SENT_FOR_APPROVAL") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption"),
+      generateErrorMessage("INVALID_STATUS", "Consumption")
     );
   }
 
   await validateBranchOrWarehouse(input.ccId);
 
-  const approver = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    input.approvalFrom,
-    true,
-  );
-  if (!approver) {
-    throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Approver"));
-  }
   const consumer = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    input.requestedBy,
-    true,
+    input.requestedBy
   );
   if (!consumer) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Requester"));
@@ -155,7 +153,7 @@ export const approveConsumptionServiceValidation = async (
     if (stock === undefined || stock < detail.consumedQty) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`),
+        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`)
       );
     }
 
@@ -164,8 +162,8 @@ export const approveConsumptionServiceValidation = async (
         400,
         generateErrorMessage(
           "INVALID_VALUE",
-          `Approved qty ${detail.consumedQty} is greater than requested qty ${detail.requestedQty}`,
-        ),
+          `Approved qty ${detail.consumedQty} is greater than requested qty ${detail.requestedQty}`
+        )
       );
     }
   }
@@ -174,21 +172,16 @@ export const approveConsumptionServiceValidation = async (
 };
 
 export const rejectConsumptionServiceValidation = async (
-  input: CommonConsumptionInput,
+  input: CommonConsumptionInput
 ) => {
   logger.info("entering::rejectConsumption::service::validation");
 
   const existing = await validateIdConsumption(input.id);
-  if (existing.approvalFrom !== input.userId) {
-    throw new ErrorHandler(
-      401,
-      generateErrorMessage("INVALID_FOREIGN_KEY", "Approver"),
-    );
-  }
+
   if (existing.status === "REJECTED" || existing.status === "APPROVED") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption"),
+      generateErrorMessage("INVALID_STATUS", "Consumption")
     );
   }
 
@@ -196,21 +189,18 @@ export const rejectConsumptionServiceValidation = async (
 };
 
 export const deleteConsumptionServiceValidation = async (
-  input: CommonConsumptionInput,
+  input: CommonConsumptionInput
 ) => {
   logger.info("entering::deleteConsumption::service::validation");
 
   const existing = await validateIdConsumption(input.id);
   if (existing.requestedBy !== input.userId) {
-    throw new ErrorHandler(
-      401,
-      generateErrorMessage("INVALID_FOREIGN_KEY", "Requester"),
-    );
+    throw new ErrorHandler(400, generateErrorMessage("UNAUTHORIZED"));
   }
   if (existing.status !== "DRAFT") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption"),
+      generateErrorMessage("INVALID_STATUS", "Consumption")
     );
   }
 
@@ -218,7 +208,7 @@ export const deleteConsumptionServiceValidation = async (
 };
 
 export const getConsumptionByUserIdServiceValidation = async (
-  userId: number,
+  userId: number
 ) => {
   logger.info("entering::getConsumptionByUserId::service::validation");
   const user = await employeeService.getEmployeeByIdFrmCacheOrDb(userId, true);

@@ -2,6 +2,7 @@ import {
   excelMisBranch,
   misBranchList,
 } from "@/controllers/mis/misBranch.controller.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -35,14 +36,14 @@ export const misBranchRouter: Router = Router();
  */
 misBranchRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_BRANCH", "VIEW")),
-  misBranchList,
+  misBranchList
 );
 
 misBranchRouter.post(
   "/excel",
-  verifyToken,
+  verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_BRANCH", "VIEW")),
-  excelMisBranch,
+  excelMisBranch
 );

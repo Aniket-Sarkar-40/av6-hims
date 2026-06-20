@@ -2,6 +2,7 @@
   "name": "@apps/inv",
   "version": "0.0.1",
   "dependencies": {
+    "@apps/acc": "workspace:*",
     "@apps/core": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/platform": "workspace:*",
@@ -12,7 +13,9 @@
     "dayjs": "^1.11.19",
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
+    "handlebars": "^4.7.8",
     "joi": "^17.13.3",
+    "puppeteer": "^24.13.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

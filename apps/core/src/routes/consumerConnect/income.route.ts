@@ -44,7 +44,7 @@ export const incomeRouter: Router = Router();
  */
 incomeRouter.post(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "INCOME", "CREATE")),
   createUploadMiddleware("documents"),
   uploadToHetzner("Documents"),
@@ -63,7 +63,7 @@ incomeRouter.post(
  */
 incomeRouter.get(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "INCOME", "VIEW")),
   getAllIncome
 );
@@ -86,7 +86,7 @@ incomeRouter.get(
  */
 incomeRouter.get(
   "/id",
-  verifyToken,
+  verifyToken(),
   authorize(getPermission("CORE", "INCOME", "VIEW")),
   getIncomeId
 );
@@ -115,12 +115,13 @@ incomeRouter.get(
  */
 incomeRouter.put(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "INCOME", "VIEW"),
     getPermission("CORE", "INCOME", "UPDATE")
   ),
   createUploadMiddleware("documents"),
+  uploadToHetzner("documents"),
   validateUpdateIncome,
   updateIncome
 );
@@ -135,7 +136,7 @@ incomeRouter.put(
 // DELETE/:shortCode/:id
 incomeRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(),
   authorize(
     getPermission("CORE", "INCOME", "VIEW"),
     getPermission("CORE", "INCOME", "DELETE")

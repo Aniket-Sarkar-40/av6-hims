@@ -63,13 +63,11 @@ export interface ConsumptionDTO
     ConsumptionResponse,
     | "consumptionDetails"
     | "ccId"
-    | "approvalFrom"
     | "requestedBy"
     | "rejectedBy"
     | "approvedBy"
     | BaseModelAttr
   > {
-  approvalFrom: IdValue | null;
   requestedBy: EmployeeCache | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
@@ -83,6 +81,15 @@ export interface ConsumptionDTO
 export interface ConsumptionDetailsDTO
   extends Omit<ConsumptionDetails, "itemId" | BaseModelAttr> {
   item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
+}
+
+export interface ConDetailDTO
+  extends Omit<ConsumptionDetails, "itemId" | "createdBy" | "updatedBy"> {
+  item: ItemMasterToDto | null;
+  createdBy: EmployeeCache | null;
+  updatedBy: EmployeeCache | null;
 }
 
 export interface CommonConsumptionInput {

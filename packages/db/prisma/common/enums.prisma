@@ -64,6 +64,10 @@ enum ServiceCode {
     GENERAL_BILL
     PROCEDURE
     RADIOLOGY
+    FIXUJI
+    STARTER
+    AMS
+    ACCOUNTING
 }
 
 enum TemplateType {
@@ -118,6 +122,7 @@ enum PdfTemplateType {
     INVOICE
     REPORT
     PURCHASE_ORDER
+    GOOD_RECEIVE_NOTE
 }
 
 enum DiscMethod {
