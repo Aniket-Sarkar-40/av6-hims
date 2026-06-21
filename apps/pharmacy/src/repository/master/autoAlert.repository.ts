@@ -9,17 +9,17 @@ import {
 import { logger } from "@repo/platform/logging/logger.js";
 import {
   ALERT_TYPE,
-  AutoAlertAudit,
-  AutoAlertEmail,
+  PmsAutoAlertAudit,
+  PmsAutoAlertEmail,
 } from "@repo/db/generated/prisma/client";
 
 export const createAutoAlertEmailInDb = async (
-  input: CreateAutoAlertEmailInput,
-): Promise<AutoAlertEmail> => {
+  input: CreateAutoAlertEmailInput
+): Promise<PmsAutoAlertEmail> => {
   logger.info("entering::createAutoAlertEmailInDb::repository");
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
-  return db.autoAlertEmail.create({
+  return db.pmsAutoAlertEmail.create({
     data: {
       ...input,
       createdBy: currentUser,
@@ -28,13 +28,13 @@ export const createAutoAlertEmailInDb = async (
 };
 
 export const updateAutoAlertEmailInDb = async (
-  input: UpdateAutoAlertEmailInput,
-): Promise<AutoAlertEmail> => {
+  input: UpdateAutoAlertEmailInput
+): Promise<PmsAutoAlertEmail> => {
   logger.info("entering::updateAutoAlertEmailInDb::repository");
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
   const { id, ...rest } = input;
-  return db.autoAlertEmail.update({
+  return db.pmsAutoAlertEmail.update({
     where: {
       id,
     },
@@ -46,10 +46,10 @@ export const updateAutoAlertEmailInDb = async (
 };
 
 export const getAutoAlertEmailByIdFromDb = async (
-  id: number,
-): Promise<AutoAlertEmail | null> => {
+  id: number
+): Promise<PmsAutoAlertEmail | null> => {
   logger.info("entering::getAutoAlertEmailByIdFromDb::repository");
-  return db.autoAlertEmail.findFirst({
+  return db.pmsAutoAlertEmail.findFirst({
     where: {
       id,
       isActive: true,
@@ -58,10 +58,10 @@ export const getAutoAlertEmailByIdFromDb = async (
 };
 
 export const getAutoAlertEmailByShortCodeFromDb = async (
-  shortCode: ALERT_TYPE,
-): Promise<AutoAlertEmail | null> => {
+  shortCode: ALERT_TYPE
+): Promise<PmsAutoAlertEmail | null> => {
   logger.info("entering::getAutoAlertEmailByIdFromDb::repository");
-  return db.autoAlertEmail.findFirst({
+  return db.pmsAutoAlertEmail.findFirst({
     where: {
       shortCode,
       isActive: true,
@@ -70,12 +70,12 @@ export const getAutoAlertEmailByShortCodeFromDb = async (
 };
 
 export const createAutoAlertAuditInDb = async (
-  input: CreateAutoAlertAuditInput,
-): Promise<AutoAlertAudit> => {
+  input: CreateAutoAlertAuditInput
+): Promise<PmsAutoAlertAudit> => {
   logger.info("entering::createAutoAlertAuditInDb::repository");
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
-  return db.autoAlertAudit.create({
+  return db.pmsAutoAlertAudit.create({
     data: {
       ...input,
       createdBy: currentUser,
@@ -84,13 +84,13 @@ export const createAutoAlertAuditInDb = async (
 };
 
 export const updateAutoAlertAuditInDb = async (
-  input: UpdateAutoAlertAuditInput,
-): Promise<AutoAlertAudit> => {
+  input: UpdateAutoAlertAuditInput
+): Promise<PmsAutoAlertAudit> => {
   logger.info("entering::updateAutoAlertAuditInDb::repository");
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
   const { id, ...rest } = input;
-  return db.autoAlertAudit.update({
+  return db.pmsAutoAlertAudit.update({
     where: {
       id,
     },
@@ -102,10 +102,10 @@ export const updateAutoAlertAuditInDb = async (
 };
 
 export const getAutoAlertAuditByIdFromDb = async (
-  id: number,
-): Promise<AutoAlertAudit | null> => {
+  id: number
+): Promise<PmsAutoAlertAudit | null> => {
   logger.info("entering::getAutoAlertAuditByIdFromDb::repository");
-  return db.autoAlertAudit.findFirst({
+  return db.pmsAutoAlertAudit.findFirst({
     where: {
       id,
     },

@@ -18,6 +18,7 @@ export enum SuccessMessageType {
   RESCHEDULED = "%1 has been successfully rescheduled",
   UPGRADED = "%1 has been successfully upgraded.",
   STARTED = "%1 has been started successfully.",
+  RESEND = "%1 has been successfully resend.",
 }
 
 export enum ErrorMessageType {

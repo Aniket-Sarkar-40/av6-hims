@@ -23,19 +23,22 @@ import {
   resendAutoAlertEmailServiceValidation,
   updateAutoAlertEmailServiceValidation,
 } from "@/validations/service/master/autoAlert.service.validation.js";
-import { ALERT_TYPE, AutoAlertEmail } from "@repo/db/generated/prisma/client";
+import {
+  ALERT_TYPE,
+  PmsAutoAlertEmail,
+} from "@repo/db/generated/prisma/client";
 import {
   expiredItemAlert,
   expiringItemAlert,
   lowStockAlert,
-} from "../scheduler/scheduler.service.js";
+} from "@/services/scheduler/scheduler.service.js";
 
 const cacheKey = getRedisKey("AUTO_ALERT_EMAIL", "all");
 
 export const autoAlertService = {
   async createAutoAlertEmail(
-    input: CreateAutoAlertEmailInput,
-  ): Promise<AutoAlertEmail> {
+    input: CreateAutoAlertEmailInput
+  ): Promise<PmsAutoAlertEmail> {
     logger.info("entering::createAutoAlertEmail::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.AUTO_ALERT_EMAIL);
     await createAutoAlertEmailServiceValidation(input);
@@ -48,8 +51,8 @@ export const autoAlertService = {
   },
 
   async updateAutoAlertEmail(
-    input: UpdateAutoAlertEmailInput,
-  ): Promise<AutoAlertEmail> {
+    input: UpdateAutoAlertEmailInput
+  ): Promise<PmsAutoAlertEmail> {
     logger.info("entering::updateAutoAlertEmail::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.AUTO_ALERT_EMAIL);
     await updateAutoAlertEmailServiceValidation(input);
@@ -63,18 +66,18 @@ export const autoAlertService = {
 
   async getAutoAlertEmailById(
     id: number,
-    canNullReturnable: boolean = false,
-  ): Promise<AutoAlertEmail | null> {
+    canNullReturnable: boolean = false
+  ): Promise<PmsAutoAlertEmail | null> {
     logger.info("entering::getAutoAlertEmailById::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.AUTO_ALERT_EMAIL);
     validIdCheck(id);
-    let autoAlertEmail: AutoAlertEmail | null = null;
+    let autoAlertEmail: PmsAutoAlertEmail | null = null;
 
     if (isCacheable) {
       autoAlertEmail = (await getCacheById(
         cacheKey,
-        id,
-      )) as AutoAlertEmail | null;
+        id
+      )) as PmsAutoAlertEmail | null;
     } else {
       autoAlertEmail = await getAutoAlertEmailByIdFromDb(id);
     }
@@ -84,7 +87,7 @@ export const autoAlertService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Auto Alert Email"),
+          generateErrorMessage("NOT_FOUND", "Auto Alert Email")
         );
       return null;
     }

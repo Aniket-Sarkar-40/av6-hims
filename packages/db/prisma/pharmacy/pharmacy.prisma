@@ -2017,7 +2017,7 @@ model PharmacyClientPaymentSettings {
     @@map("pharmacy_client_payment_settings")
 }
 
-model FeatureFlag {
+model PmsFeatureFlag {
     id            Int     @id @default(autoincrement())
     shortCode     String  @map("short_code")
     flagName      String  @map("flag_name")
@@ -2129,26 +2129,26 @@ model StockAdjustmentDetails {
     @@map("pms_stock_adjustment_details")
 }
 
-model AutoAlertEmail {
+model PmsAutoAlertEmail {
     id        Int        @id @default(autoincrement())
     shortCode ALERT_TYPE @map("short_code")
     to        String     @db.Text
     cc        String?    @db.Text
     bcc       String?    @db.Text
 
-    isActive        Boolean          @default(true) @map("is_active")
-    createdBy       Int?             @map("created_by")
-    createdAt       DateTime         @default(now()) @map("created_at")
-    updatedBy       Int?             @map("updated_by")
-    updatedAt       DateTime         @updatedAt @map("updated_at")
-    deletedAt       DateTime?        @map("deleted_at")
-    deletedBy       Int?             @map("deleted_by")
-    autoAlertAudits AutoAlertAudit[]
+    isActive        Boolean             @default(true) @map("is_active")
+    createdBy       Int?                @map("created_by")
+    createdAt       DateTime            @default(now()) @map("created_at")
+    updatedBy       Int?                @map("updated_by")
+    updatedAt       DateTime            @updatedAt @map("updated_at")
+    deletedAt       DateTime?           @map("deleted_at")
+    deletedBy       Int?                @map("deleted_by")
+    autoAlertAudits PmsAutoAlertAudit[]
 
     @@map("pms_auto_alert_email")
 }
 
-model AutoAlertAudit {
+model PmsAutoAlertAudit {
     id             Int                   @id @default(autoincrement())
     recipientId    Int?                  @map("recipient_id")
     runDate        DateTime              @map("run_date")
@@ -2162,11 +2162,11 @@ model AutoAlertAudit {
     successDate    DateTime?    @map("success_date")
     alertMode      ALERT_MODE   @default(SYSTEM) @map("alert_mode")
 
-    createdAt DateTime        @default(now()) @map("created_at")
-    updatedAt DateTime        @updatedAt @map("updated_at")
-    createdBy Int?            @map("created_by")
-    updatedBy Int?            @map("updated_by")
-    recipient AutoAlertEmail? @relation(fields: [recipientId], references: [id])
+    createdAt DateTime           @default(now()) @map("created_at")
+    updatedAt DateTime           @updatedAt @map("updated_at")
+    createdBy Int?               @map("created_by")
+    updatedBy Int?               @map("updated_by")
+    recipient PmsAutoAlertEmail? @relation(fields: [recipientId], references: [id])
 
     @@index([recipientId], name: "auto_alert_audit_recipient_id_idx")
     @@map("pms_auto_alert_audit")

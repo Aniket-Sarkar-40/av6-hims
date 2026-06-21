@@ -15,11 +15,16 @@
     "express": "^5.1.0",
     "handlebars": "^4.7.8",
     "joi": "^17.13.3",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^9.0.1",
+    "nodemailer-express-handlebars": "^7.0.0",
     "puppeteer": "^24.13.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/nodemailer": "^8.0.1",
+    "@types/nodemailer-express-handlebars": "^4.0.6",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.20.0",
     "typescript": "^5.9.2"
