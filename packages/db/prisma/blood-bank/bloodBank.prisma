@@ -60,3 +60,32 @@ model BloodBankSetting {
 
     @@map("bb_settings")
 }
+
+model Hospital {
+    id                 Int              @id
+    name               String           @map("name")
+    code               String?          @map("code")
+    registrationNumber String?          @map("registration_number")
+    licenseNumber      String?          @map("license_number")
+    contactPerson      String?          @map("contact_person")
+    countryCode        String?          @map("country_code")
+    phone              String           @map("phone")
+    alternatePhone     String?          @map("alternate_phone")
+    emergencyPhone     String?          @map("emergency_phone")
+    email              String           @map("email")
+    address            String           @map("address")
+    area               String?          @map("area")
+    pinCode            Int?             @map("pin_code")
+    latitudeLongitude  String?          @map("latitude_longitude")
+    isActive           Boolean          @default(true) @map("is_active")
+    createdBy          Int?             @map("created_by")
+    updatedBy          Int?             @map("updated_by")
+    createdAt          DateTime         @default(now()) @map("created_at")
+    updatedAt          DateTime         @updatedAt @map("updated_at")
+    deletedAt          DateTime?        @map("deleted_at")
+    deletedBy          Int?             @map("deleted_by")
+    collectionCenter   CollectionCenter @relation(fields: [id], references: [id])
+
+    @@index([id], name: "idx_hospital_id")
+    @@map("bb_master_hospital")
+}

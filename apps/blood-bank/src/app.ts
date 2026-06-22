@@ -4,6 +4,7 @@ import { commonRouter } from "./routes/common.route.js";
 import { locationRouter } from "./routes/location/location.route.js";
 import { settingsRouter } from "./routes/master/settings.route.js";
 import { uinConfigRouter } from "./routes/master/uinConfig.route.js";
+import hospitalRouter from "@/routes/master/hospital.route.js";
 
 export const bloodBankRouter: ExpressRouter = Router();
 
@@ -16,3 +17,4 @@ bloodBankRouter.use("/common", commonRouter);
 // Master
 bloodBankRouter.use("/master/settings", settingsRouter);
 bloodBankRouter.use("/master/uin-config", uinConfigRouter);
+bloodBankRouter.use("/master/hospital", hospitalRouter);

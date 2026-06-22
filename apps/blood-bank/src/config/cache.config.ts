@@ -12,6 +12,8 @@ export enum RedisResource {
   SETTINGS = "bloodBankSetting",
   DYNAMIC_SHORT_CODE = "bloodBankDynamicShortCode",
   UIN_CONFIG = "bloodBankUINConfig",
+  HOSPITAL = "hospital",
+  COLLECTION_CENTER = "collectionCenter",
 }
 
 export const getRedisKey = (

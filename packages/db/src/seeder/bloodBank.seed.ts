@@ -50,7 +50,7 @@ export async function runSeed() {
   for (const r of rows) map[r.shortCode] = r.config;
 
   console.log("🧹 Truncating tables...");
-  await db.$executeRawUnsafe("TRUNCATE TABLE `blood_bank_dynamic_short_code`;");
+  await db.$executeRawUnsafe("TRUNCATE TABLE `bb_dynamic_short_code`;");
 
   await redis.del(DYNAMIC_SC_CACHE_KEY);
 
@@ -69,6 +69,27 @@ export async function runSeed() {
       isDTO: true,
       isCacheable: true,
       permission: "blood-bank:uin-config:view",
+    },
+    {
+      shortCode: "COLLECTION_CENTER",
+      tableName: "collectionCenter",
+      isDTO: true,
+      isCacheable: true,
+      permission: "blood-bank:collection-center:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "name" }),
+    },
+    {
+      shortCode: "HOSPITAL",
+      tableName: "hospital",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: true,
+      permission: "blood-bank:hospital:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "name" }),
     },
   ];
 

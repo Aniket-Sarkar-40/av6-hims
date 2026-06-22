@@ -250,6 +250,7 @@ export enum PermissionResource {
   SETTINGS = "settings",
 
   //Blood Bank
+  HOSPITAL = "hospital",
 }
 
 export enum PermissionModule {
