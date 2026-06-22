@@ -42,12 +42,12 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
             create: omittedPO.omitted.purchaseOrderDetails.map((detail) => ({
               ...detail,
               purchasedPrice: applyRound(
-                detail.purchasedPrice,
+                Number(detail.purchasedPrice),
                 RoundFormat.TO_FIXED,
                 precision
               ),
               totalAmount: applyRound(
-                detail.totalAmount,
+                Number(detail.totalAmount),
                 RoundFormat.TO_FIXED,
                 precision
               ),
@@ -80,7 +80,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
   if (poCreate.status === "SENT_FOR_APPROVAL") {
     await approvalService.startFlow({
       ccId: poCreate.ccId,
-      netTotal: poCreate.grandTotal,
+      netTotal: Number(poCreate.grandTotal),
       refNo: poCreate.poNumber,
       service: "INVENTORY",
       subjectType: "INV_PURCHASE_ORDER",
@@ -90,7 +90,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
         cc: poCreate.collectionCenter.colName || null,
         supplierCode: omittedPO.omitted.supplier?.supplierCode || null,
       },
-      createdBy: currentUser!,
+      //createdBy: currentUser!,
     });
   }
 

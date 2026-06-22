@@ -456,6 +456,33 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "name" }),
     },
+    {
+      shortCode: "AUTO_ALERT_EMAIL",
+      tableName: "invAutoAlertEmail",
+      isDTO: false,
+      isCacheable: true,
+      permission: "inv:auto-alert:view",
+      isDropDown: false,
+      whereClause: JSON.stringify({ isActive: true }),
+    },
+    {
+      shortCode: "AUTO_ALERT_AUDIT",
+      tableName: "invAutoAlertAudit",
+      isDTO: true,
+      isCacheable: false,
+      permission: "inv:auto-alert:view",
+      isDropDown: false,
+    },
+    {
+      shortCode: "FEATURE_FLAG",
+      tableName: "invFeatureFlag",
+      isDTO: false,
+      isCacheable: true,
+      permission: "inv:feature-flag:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "flagName" }),
+    },
   ];
 
   const eventEmails: EventEmailSeeder[] = [

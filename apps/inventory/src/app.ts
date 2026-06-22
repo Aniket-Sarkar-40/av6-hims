@@ -29,6 +29,11 @@ import { storeRequisitionReturnRouter } from "@/routes/purchase/storeRequisition
 import { branchRequisitionReturnRouter } from "@/routes/purchase/branchRequisitionReturn.route.js";
 import { loadSchemaPrecisionSettings } from "@/middlewares/schemaPrecision.middleware.js";
 import { defaultUnitMasterRouter } from "@/routes/master/defaultUnitMaster.route.js";
+import { registerCron } from "@/cron/scheduler.cron.js";
+import featureRouter from "@/routes/feature/feature.route.js";
+import { autoAlertRouter } from "@/routes/master/autoAlert.route.js";
+
+registerCron();
 
 export const inventoryRouter: ExpressRouter = Router();
 
@@ -45,6 +50,7 @@ inventoryRouter.use(
 );
 inventoryRouter.use("/common", commonRouter);
 inventoryRouter.use("/master/item-supplier", itemSupplierRouter);
+inventoryRouter.use("/master/auto-alert", autoAlertRouter);
 
 inventoryRouter.use("/master/uin-config", uinConfigRouter);
 inventoryRouter.use("/master/item-master", itemMasterRouter);
@@ -88,3 +94,6 @@ inventoryRouter.use(
 
 //Store requisition return
 inventoryRouter.use("/store-requisition-return", storeRequisitionReturnRouter);
+
+//feature-flag
+inventoryRouter.use("/feature-flag", featureRouter);

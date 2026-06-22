@@ -1574,28 +1574,6 @@ model InvItemSupplierExcel {
     @@map("inv_item_supplier_excel")
 }
 
-model CronDetails {
-    id       Int      @id @default(autoincrement()) @map("id")
-    cronName String   @map("cron_name")
-    runDate  DateTime @map("run_date") @db.Date
-
-    runKey  String @map("run_key") @db.VarChar(50)
-    attempt Int    @default(1) @map("attempt")
-
-    status     CronStatus @default(PENDING) @map("status")
-    startedAt  DateTime?  @map("started_at")
-    endedAt    DateTime?  @map("ended_at")
-    durationMs Int?       @map("duration_ms")
-    message    String?    @map("message") @db.LongText
-
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt @map("updated_at")
-
-    @@unique([cronName, runDate, runKey, attempt], name: "cron_unique_runkey_attempt")
-    @@index([cronName, runDate, runKey], name: "cron_find_latest_idx")
-    @@map("inv_cron_details")
-}
-
 model InvDefaultUnitMaster {
     id          Int     @id @default(autoincrement())
     name        String  @map("name")
@@ -1611,4 +1589,66 @@ model InvDefaultUnitMaster {
     unitMasters InvUnitMaster[]
 
     @@map("inv_default_unit_master")
+}
+
+model InvAutoAlertEmail {
+    id        Int            @id @default(autoincrement())
+    shortCode INV_ALERT_TYPE @map("short_code")
+    to        String         @db.Text
+    cc        String?        @db.Text
+    bcc       String?        @db.Text
+
+    isActive        Boolean             @default(true) @map("is_active")
+    createdBy       Int?                @map("created_by")
+    createdAt       DateTime            @default(now()) @map("created_at")
+    updatedBy       Int?                @map("updated_by")
+    updatedAt       DateTime            @updatedAt @map("updated_at")
+    deletedAt       DateTime?           @map("deleted_at")
+    deletedBy       Int?                @map("deleted_by")
+    autoAlertAudits InvAutoAlertAudit[]
+
+    @@map("inv_auto_alert_email")
+}
+
+model InvAutoAlertAudit {
+    id             Int                   @id @default(autoincrement())
+    recipientId    Int?                  @map("recipient_id")
+    runDate        DateTime              @map("run_date")
+    deliveryMethod ALERT_DELIVERY_METHOD @map("delivery_method")
+    alertType      INV_ALERT_TYPE        @map("alert_type")
+
+    status         ALERT_STATUS @default(PENDING)
+    errorMsg       String?      @map("error_msg") @db.Text
+    isResend       Boolean      @default(false) @map("is_resend")
+    resendMasterId Int?         @map("resend_master_id")
+    successDate    DateTime?    @map("success_date")
+    alertMode      ALERT_MODE   @default(SYSTEM) @map("alert_mode")
+
+    createdAt DateTime           @default(now()) @map("created_at")
+    updatedAt DateTime           @updatedAt @map("updated_at")
+    createdBy Int?               @map("created_by")
+    updatedBy Int?               @map("updated_by")
+    recipient InvAutoAlertEmail? @relation(fields: [recipientId], references: [id])
+
+    @@index([recipientId], name: "auto_alert_audit_recipient_id_idx")
+    @@map("inv_auto_alert_audit")
+}
+
+model InvFeatureFlag {
+    id            Int     @id @default(autoincrement())
+    shortCode     String  @map("short_code")
+    flagName      String  @map("flag_name")
+    isEnabled     Boolean @map("is_enabled")
+    description   String  @db.LongText
+    featureConfig Json?   @map("feature_config")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("inv_feature_flag")
 }

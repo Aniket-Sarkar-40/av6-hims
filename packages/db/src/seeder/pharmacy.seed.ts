@@ -642,7 +642,7 @@ export async function runSeed() {
     },
     {
       shortCode: "FEATURE_FLAG",
-      tableName: "featureFlag",
+      tableName: "pmsFeatureFlag",
       isDTO: false,
       isCacheable: true,
       permission: "pms:feature-flag:view",
@@ -679,7 +679,7 @@ export async function runSeed() {
     },
     {
       shortCode: "AUTO_ALERT_EMAIL",
-      tableName: "autoAlertEmail",
+      tableName: "pmsAutoAlertEmail",
       isDTO: false,
       isCacheable: true,
       permission: "pms:auto-alert:view",
@@ -688,7 +688,7 @@ export async function runSeed() {
     },
     {
       shortCode: "AUTO_ALERT_AUDIT",
-      tableName: "autoAlertAudit",
+      tableName: "pmsAutoAlertAudit",
       isDTO: true,
       isCacheable: false,
       permission: "pms:auto-alert:view",

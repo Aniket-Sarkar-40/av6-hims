@@ -4,6 +4,8 @@ import { db } from "@repo/db/client";
 import { toStockEntity } from "@/mapper/purchase/storeRequisition.mapper.js";
 import {
   CreateItemStockInput,
+  ExpiredItemsResponse,
+  ExpiringItemsResponse,
   InTransitStockByBatchInput,
   ItemBatchStockLookupInput,
   ItemStockAudit,
@@ -13,6 +15,7 @@ import {
   ItemStockResponse,
   ItemStockSearchFilter,
   ItemStockSummaryRow,
+  LowStockResponse,
   RawItemStock,
 } from "@/types/stock/stock.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
@@ -23,6 +26,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 import { serializeBigInt } from "@repo/shared/utils/bigInt.utils.js";
 import { customOmit } from "av6-core-v2";
 import { resolveItemStockLocationFlags } from "@/utils/getCollectionCenter.utils.js";
+import { getSettingsInDb } from "@/repository/master/settings.repository.js";
 
 type Tx = Prisma.TransactionClient;
 
@@ -1658,4 +1662,110 @@ export const getItemStockByItemId = async (itemId: number) => {
       isActive: true,
     },
   });
+};
+
+export const fetchReOrderItems = async (
+  date: Date
+): Promise<LowStockResponse[]> => {
+  logger.info(`entering::fetchReOrderItems::repository`);
+  const lowStockItems = await db.$queryRaw<LowStockResponse[]>`
+    SELECT 
+        i.id AS itemId,
+        i.item AS itemName,
+        COALESCE(b.name, w.name) AS collectionCenterName,
+        COALESCE(b.id, w.id) AS ccId,
+        SUM(s.quantity) AS availableQty,
+        i.re_order_level AS minStockQty
+    FROM inv_item_stock s
+    LEFT JOIN inv_item_master i ON i.id = s.item_id
+    LEFT JOIN inv_branch b ON b.id = s.cc_id
+    LEFT JOIN inv_warehouse w ON w.id = s.cc_id
+    WHERE s.is_active = TRUE
+    AND (
+      expiry_date IS NULL     
+      OR expiry_date >= ${date}
+    )
+    GROUP BY 
+        i.id,
+        COALESCE(b.id, w.id)
+    HAVING 
+        SUM(s.quantity) < i.re_order_level
+`;
+
+  logger.info(`exiting::fetchReOrderItems::repository`);
+  return lowStockItems;
+};
+
+export const fetchExpiredItems = async (
+  date: Date
+): Promise<ExpiredItemsResponse[]> => {
+  logger.info(`entering::fetchExpiredItems::repository`);
+
+  const expiredItems = await db.$queryRaw<ExpiredItemsResponse[]>`
+    SELECT 
+        s.item_id AS itemId,
+        i.item AS itemName,
+        COALESCE(b.name, w.name) AS collectionCenterName,
+        COALESCE(b.id, w.id) AS ccId,
+        s.quantity AS quantity,
+        s.batch_no AS batchNo,
+        s.expiry_date AS expiryDate,
+        CASE WHEN s.is_foc = 1 THEN 'YES' ELSE 'NO' END AS isFoc
+    FROM inv_item_stock s
+    LEFT JOIN inv_item_master i ON i.id = s.item_id
+    LEFT JOIN inv_branch b ON b.id = s.cc_id
+    LEFT JOIN inv_warehouse w ON w.id = s.cc_id
+    WHERE s.is_active = TRUE
+    AND (
+      expiry_date IS NOT NULL     
+      AND expiry_date < ${date}  
+    ) 
+`;
+  logger.info(`exiting::fetchExpiredItems::repository`);
+  return expiredItems;
+};
+
+export const fetchExpiringItems = async (
+  date: Date
+): Promise<ExpiringItemsResponse> => {
+  logger.info(`entering::fetchExpiringItems::repository`);
+
+  const store = requestStorage.getStore();
+  const settings = store?.settings;
+  let expiry: number = 0;
+  if (settings) {
+    expiry = settings.expiryInMonth ?? 1;
+  } else {
+    const settings = await getSettingsInDb();
+    if (settings) expiry = settings.expiryInMonth;
+  }
+
+  if (!expiry) {
+    expiry = 1;
+  }
+
+  const expiredItems = await db.$queryRaw<ExpiredItemsResponse[]>`
+    SELECT 
+        s.item_id AS itemId,
+        i.item AS itemName,
+        COALESCE(b.name, w.name) AS collectionCenterName,
+        COALESCE(b.id, w.id) AS ccId,
+        s.quantity AS quantity,
+        s.batch_no AS batchNo,
+        s.expiry_date AS expiryDate,
+        CASE WHEN s.is_foc = 1 THEN 'YES' ELSE 'NO' END AS isFoc
+    FROM inv_item_stock s
+    LEFT JOIN inv_item_master i ON i.id = s.item_id
+    LEFT JOIN inv_branch b ON b.id = s.cc_id
+    LEFT JOIN inv_warehouse w ON w.id = s.cc_id
+    WHERE s.is_active = TRUE
+    AND (
+      s.expiry_date IS NOT NULL
+      AND s.expiry_date >= ${date}
+      AND s.expiry_date <= DATE_ADD(${date}, INTERVAL ${expiry} MONTH)
+    )
+  `;
+
+  logger.info(`exiting::fetchExpiringItems::repository`);
+  return { data: expiredItems, expiryInMonth: expiry };
 };

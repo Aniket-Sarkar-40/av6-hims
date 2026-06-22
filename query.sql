@@ -1485,15 +1485,19 @@ ALTER TABLE `inv_store_requisition_details` ADD COLUMN `returned_quantity` DOUBL
 -- CreateTable
 CREATE TABLE `core_mono_repo_modules` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS') NOT NULL,
+    `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL,
+    `is_enabled` BOOLEAN NOT NULL DEFAULT true,
     `is_active` BOOLEAN NOT NULL DEFAULT true,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
     `created_by` INTEGER NULL,
     `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 INSERT INTO core_mono_repo_modules
 (module, is_active, created_at, updated_at, created_by, updated_by)
@@ -1514,9 +1518,6 @@ ALTER TABLE `core_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMA
 -- AlterTable
 ALTER TABLE `core_event_delivery` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
 
--- AlterTable
-ALTER TABLE `core_mono_repo_modules` ADD COLUMN `is_enabled` BOOLEAN NOT NULL DEFAULT true,
-    MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
 
 -- AlterTable
 ALTER TABLE `core_pdf_template` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
@@ -1532,11 +1533,6 @@ ALTER TABLE `notifications` MODIFY `source` ENUM('PATHOLOGY', 'OPD', 'PHARMACY',
 
 -- AlterTable
 ALTER TABLE `pathology_b2b_invoice_amount_summary` MODIFY `service_type` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL DEFAULT 'PATHOLOGY';
-
-
--- AlterTable
-ALTER TABLE `core_mono_repo_modules` ADD COLUMN `deleted_at` DATETIME(3) NOT NULL,
-    ADD COLUMN `deleted_by` INTEGER NULL;
 
 
 -- DropIndex
@@ -1814,6 +1810,249 @@ ALTER TABLE `inv_settings` ADD COLUMN `is_auto_consumption` BOOLEAN NOT NULL DEF
 
 ALTER TABLE `inv_settings` DROP COLUMN `is_auto_consumption`,
     ADD COLUMN `is_auto_approve_consumption` BOOLEAN NOT NULL DEFAULT true;
+
+
+------- 20/06/2026
+-- AlterTable
+ALTER TABLE `core_pdf_template` MODIFY `template_type` ENUM('BILL', 'INVOICE', 'REPORT', 'PURCHASE_ORDER', 'GOOD_RECEIVE_NOTE') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_batch_job` MODIFY `type` ENUM('ITEM', 'ITEM_PRICING', 'ITEM_SUPPLIER') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_consumption` DROP COLUMN `approval_from`,
+    MODIFY `priority` ENUM('HIGH', 'MEDIUM', 'LOW') NOT NULL DEFAULT 'MEDIUM',
+    MODIFY `status` ENUM('DRAFT', 'SENT_FOR_APPROVAL', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'APPROVED';
+
+-- AlterTable
+ALTER TABLE `inv_consumption_details` ALTER COLUMN `consumed_qty` DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE `inv_dynamic_short_code` ADD COLUMN `delete_config` JSON NULL;
+
+-- AlterTable
+ALTER TABLE `inv_good_receive` MODIFY `total_amount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `paid_amount` DECIMAL(18, 5) NOT NULL DEFAULT 0,
+    MODIFY `returned_amount` DECIMAL(18, 5) NOT NULL DEFAULT 0,
+    MODIFY `net_total` DECIMAL(18, 5) NOT NULL,
+    MODIFY `discount` DECIMAL(18, 5) NOT NULL DEFAULT 0,
+    MODIFY `net_discount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `net_tax` DECIMAL(18, 5) NOT NULL,
+    MODIFY `conversion_rate` DECIMAL(18, 5) NULL;
+
+-- AlterTable
+ALTER TABLE `inv_good_receive_details` MODIFY `purchased_price` DECIMAL(18, 5) NOT NULL,
+    MODIFY `net_tax` DECIMAL(18, 5) NOT NULL,
+    MODIFY `total_amount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `net_amount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `net_discount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `discount_amount` DECIMAL(18, 5) NULL;
+
+-- AlterTable
+ALTER TABLE `inv_good_receive_return` MODIFY `total_amount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `net_discount` DECIMAL(18, 5) NULL,
+    MODIFY `net_total` DECIMAL(18, 5) NOT NULL,
+    MODIFY `paid_amount` DECIMAL(18, 5) NOT NULL DEFAULT 0,
+    MODIFY `net_tax` DECIMAL(18, 5) NOT NULL,
+    MODIFY `conversion_rate` DECIMAL(18, 5) NULL;
+
+-- AlterTable
+ALTER TABLE `inv_good_receive_return_details` ADD COLUMN `foc_quantity` DOUBLE NOT NULL DEFAULT 0,
+    MODIFY `total_amount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `net_tax` DECIMAL(18, 5) NOT NULL,
+    MODIFY `net_amount` DECIMAL(18, 5) NOT NULL,
+    MODIFY `discount` DECIMAL(18, 5) NULL,
+    MODIFY `net_Discount` DECIMAL(18, 5) NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_in_transit_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'BRANCH_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'EXPIRY_UPDATE', 'STORE_REQUISITION_RETURN', 'BRANCH_REQUISITION_RETURN') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_item_master` DROP COLUMN `is_returnable`,
+    ADD COLUMN `consumption_type` ENUM('MANUAL', 'AUTO') NOT NULL DEFAULT 'MANUAL',
+    ADD COLUMN `is_price_variable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_user_returnable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_vendor_returnable` BOOLEAN NOT NULL DEFAULT true;
+
+-- AlterTable
+ALTER TABLE `inv_item_master_excel` DROP COLUMN `back_image`,
+    DROP COLUMN `front_image`,
+    DROP COLUMN `is_returnable`,
+    DROP COLUMN `item_category_id`,
+    DROP COLUMN `left_side_image`,
+    DROP COLUMN `right_side_image`,
+    DROP COLUMN `storage_id`,
+    DROP COLUMN `unit_id`,
+    ADD COLUMN `batch_job_id` INTEGER NOT NULL,
+    ADD COLUMN `consumption_type` ENUM('MANUAL', 'AUTO') NOT NULL DEFAULT 'MANUAL',
+    ADD COLUMN `is_price_variable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_user_returnable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `is_vendor_returnable` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `item_category` VARCHAR(191) NOT NULL,
+    ADD COLUMN `storage` VARCHAR(191) NULL,
+    ADD COLUMN `unit` VARCHAR(191) NOT NULL,
+    MODIFY `base_price` DECIMAL(18, 5) NULL;
+
+-- AlterTable
+ALTER TABLE `inv_item_stock_audit` MODIFY `operation` ENUM('GOOD_RECEIVE', 'GOOD_RECEIVE_RETURN', 'STORE_REQUISITION', 'BRANCH_REQUISITION', 'SELL', 'SELL_RETURN', 'STOCK_TRANSFER', 'GRN_RETURN_APPROVAL', 'SELL_RETURN_APPROVAL', 'CONSUMPTION', 'STOCK_ADJUSTMENT', 'EXPIRY_UPDATE', 'STORE_REQUISITION_RETURN', 'BRANCH_REQUISITION_RETURN') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_item_supplier` DROP COLUMN `address`,
+    DROP COLUMN `billTo`,
+    DROP COLUMN `branch_details_id`,
+    DROP COLUMN `contact_person_email`,
+    DROP COLUMN `contact_person_name`,
+    DROP COLUMN `contact_person_phone`,
+    DROP COLUMN `description`,
+    DROP COLUMN `name`,
+    DROP COLUMN `shipTo`,
+    ADD COLUMN `bill_to` VARCHAR(191) NOT NULL,
+    ADD COLUMN `is_grn_sms` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_po_sms` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_return_sms` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `is_sms_send` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `ship_to` VARCHAR(191) NOT NULL,
+    ADD COLUMN `vendor_company_name` VARCHAR(191) NOT NULL,
+    MODIFY `supplier_code` VARCHAR(191) NULL,
+    MODIFY `is_po_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_po_email` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_grn_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_grn_email` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_return_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `is_return_email` BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE `inv_purchase_order` MODIFY `grand_total` DECIMAL(18, 5) NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_purchase_order_details` MODIFY `purchased_price` DECIMAL(18, 5) NOT NULL,
+    MODIFY `total_amount` DECIMAL(18, 5) NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_settings` ADD COLUMN `grn_precision` INTEGER NOT NULL DEFAULT 2,
+    ADD COLUMN `is_auto_approve_consumption` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `item_precision` INTEGER NOT NULL DEFAULT 2,
+    ADD COLUMN `item_stock_type` ENUM('PACK_WISE', 'EACH_WISE') NOT NULL DEFAULT 'PACK_WISE',
+    ADD COLUMN `po_calculation_method` ENUM('STEP_WISE', 'FINAL') NOT NULL DEFAULT 'STEP_WISE',
+    ADD COLUMN `po_precision` INTEGER NOT NULL DEFAULT 2,
+    ADD COLUMN `po_rounded_format` ENUM('ROUND', 'SPECIAL_ROUND', 'TO_FIXED', 'CEIL', 'FLOOR', 'TRUNC', 'NONE') NOT NULL DEFAULT 'TO_FIXED';
+
+-- AlterTable
+ALTER TABLE `inv_stock_adjustment_details` ADD COLUMN `invItemId` INTEGER NULL;
+
+-- AlterTable
+ALTER TABLE `inv_uin_config` MODIFY `short_code` ENUM('PO', 'GRN', 'POR', 'SRN', 'ITEM', 'BATCH_JOB', 'CN', 'STAJ', 'ST_TR', 'BRN', 'SRR', 'BRR', 'VENDOR') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_unit_master` DROP COLUMN `default_unit`,
+    ADD COLUMN `default_unit_master_id` INTEGER NOT NULL,
+    MODIFY `default_value` INTEGER NOT NULL;
+
+-- CreateTable
+CREATE TABLE `core_cron_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `cron_name` VARCHAR(191) NOT NULL,
+    `run_date` DATE NOT NULL,
+    `run_key` VARCHAR(50) NOT NULL,
+    `attempt` INTEGER NOT NULL DEFAULT 1,
+    `status` ENUM('PENDING', 'IN_PROGRESS', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'PENDING',
+    `started_at` DATETIME(3) NULL,
+    `ended_at` DATETIME(3) NULL,
+    `duration_ms` INTEGER NULL,
+    `message` LONGTEXT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `cron_find_latest_idx`(`cron_name`, `run_date`, `run_key`),
+    UNIQUE INDEX `core_cron_details_cron_name_run_date_run_key_attempt_key`(`cron_name`, `run_date`, `run_key`, `attempt`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateIndex
+CREATE INDEX `good_receive_currency_id_idx` ON `inv_good_receive`(`currency_id`);
+
+-- CreateIndex
+CREATE INDEX `item_master_excel_batch_job_id_idx` ON `inv_item_master_excel`(`batch_job_id`);
+
+-- CreateIndex
+CREATE INDEX `purchase_order_last_verified_by_idx` ON `inv_purchase_order`(`last_verified_by`);
+
+-- CreateIndex
+CREATE INDEX `store_requisition_cc_id_idx` ON `inv_store_requisition`(`cc_id`);
+
+-- CreateIndex
+CREATE INDEX `idx_default_unit_master_id` ON `inv_unit_master`(`default_unit_master_id`);
+
+
+-- CreateTable
+CREATE TABLE `inv_auto_alert_email` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `short_code` ENUM('LOW_STOCK', 'EXPIRED_ITEMS', 'EXPIRING_ITEMS') NOT NULL,
+    `to` TEXT NOT NULL,
+    `cc` TEXT NULL,
+    `bcc` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_by` INTEGER NULL,
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `inv_auto_alert_audit` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `recipient_id` INTEGER NULL,
+    `run_date` DATETIME(3) NOT NULL,
+    `delivery_method` ENUM('EMAIL', 'SMS', 'WHATSAPP') NOT NULL,
+    `alert_type` ENUM('LOW_STOCK', 'EXPIRED_ITEMS', 'EXPIRING_ITEMS') NOT NULL,
+    `status` ENUM('PENDING', 'SENT', 'FAILED') NOT NULL DEFAULT 'PENDING',
+    `error_msg` TEXT NULL,
+    `is_resend` BOOLEAN NOT NULL DEFAULT false,
+    `resend_master_id` INTEGER NULL,
+    `success_date` DATETIME(3) NULL,
+    `alert_mode` ENUM('SYSTEM', 'MANUAL') NOT NULL DEFAULT 'SYSTEM',
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+
+    INDEX `auto_alert_audit_recipient_id_idx`(`recipient_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AlterTable
+ALTER TABLE `inv_auto_alert_email` MODIFY `short_code` ENUM('RE_ORDER_ITEMS', 'EXPIRED_ITEMS', 'EXPIRING_ITEMS') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_event_email` MODIFY `email_type` ENUM('GENERAL', 'LOW_STOCK_ALERT', 'EXPIRED_ITEM_ALERT', 'EXPIRING_ITEM_ALERT', 'ERROR_ALERT', 'RE_ORDER_ITEM_ALERT') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `inv_auto_alert_audit` MODIFY `alert_type` ENUM('RE_ORDER_ITEMS', 'EXPIRED_ITEMS', 'EXPIRING_ITEMS') NOT NULL;
+
+
+-- CreateTable
+CREATE TABLE `inv_feature_flag` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `short_code` VARCHAR(191) NOT NULL,
+    `flag_name` VARCHAR(191) NOT NULL,
+    `is_enabled` BOOLEAN NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    `feature_config` JSON NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 -- AlterTable
 ALTER TABLE `accounting_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;

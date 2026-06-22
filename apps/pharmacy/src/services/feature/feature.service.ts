@@ -27,12 +27,14 @@ import {
   validateIdFeatureFlag,
   validateUpdateFeatureFlag,
 } from "@/validations/service/feature/feature.service.validation.js";
-import { FeatureFlag } from "@repo/db/generated/prisma/client";
+import { PmsFeatureFlag } from "@repo/db/generated/prisma/client";
 
 const cacheKey = getMasterRedisKey("FEATURE_FLAG", "all");
 
 export const featureFlagService = {
-  async createFeatureFlag(input: CreateFeatureFlagInput): Promise<FeatureFlag> {
+  async createFeatureFlag(
+    input: CreateFeatureFlagInput
+  ): Promise<PmsFeatureFlag> {
     logger.info("entering::createFeatureFlag::service");
     await validateCreateFeatureFlag(input);
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
@@ -44,7 +46,9 @@ export const featureFlagService = {
     return created;
   },
 
-  async updateFeatureFlag(input: UpdateFeatureFlagInput): Promise<FeatureFlag> {
+  async updateFeatureFlag(
+    input: UpdateFeatureFlagInput
+  ): Promise<PmsFeatureFlag> {
     logger.info("entering::updateFeatureFlag::service");
     await validateUpdateFeatureFlag(input);
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
@@ -56,26 +60,26 @@ export const featureFlagService = {
     return updated;
   },
 
-  async getAllFeatureFlags(): Promise<FeatureFlag[]> {
+  async getAllFeatureFlags(): Promise<PmsFeatureFlag[]> {
     logger.info("entering::getAllFeatureFlags::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
     if (isCacheable) {
       const cachedFeatures = (await getAllCache(cacheKey)) as
-        | FeatureFlag[]
+        | PmsFeatureFlag[]
         | null;
       if (cachedFeatures && cachedFeatures.length > 0) {
         return cachedFeatures;
       }
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Feature Flags"),
+        generateErrorMessage("NOT_FOUND", "Feature Flags")
       );
     } else {
       const records = await getAllFeatureFlagsFromDb();
       if (!records || records.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Feature Flags"),
+          generateErrorMessage("NOT_FOUND", "Feature Flags")
         );
       }
       logger.info("exiting::getAllFeatureFlags::service");
@@ -85,13 +89,16 @@ export const featureFlagService = {
 
   async getFeatureFlagByShortCode(
     shortCode: string,
-    canNullReturnable: boolean = false,
-  ): Promise<FeatureFlag | null> {
+    canNullReturnable: boolean = false
+  ): Promise<PmsFeatureFlag | null> {
     logger.info("entering::getFeatureFlagByName::service");
-    let record: FeatureFlag | null = null;
+    let record: PmsFeatureFlag | null = null;
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
     if (isCacheable) {
-      record = (await getCacheById(cacheKey, shortCode)) as FeatureFlag | null;
+      record = (await getCacheById(
+        cacheKey,
+        shortCode
+      )) as PmsFeatureFlag | null;
     } else {
       record = await getFeatureFlagByShortCodeFromDb(shortCode);
     }
@@ -100,7 +107,7 @@ export const featureFlagService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Feature Flags"),
+          generateErrorMessage("NOT_FOUND", "Feature Flags")
         );
       } else {
         return null;
@@ -110,7 +117,7 @@ export const featureFlagService = {
     return record;
   },
 
-  async toggleEnabled(id: number): Promise<FeatureFlag> {
+  async toggleEnabled(id: number): Promise<PmsFeatureFlag> {
     logger.info("entering::toggleEnabled::service");
     const existing = await validateIdFeatureFlag(id);
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);

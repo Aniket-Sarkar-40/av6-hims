@@ -5,16 +5,16 @@ import {
   UpdateFeatureFlagInput,
 } from "@/types/feature/feature.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { FeatureFlag } from "@repo/db/generated/prisma/client";
+import { PmsFeatureFlag } from "@repo/db/generated/prisma/client";
 
 export const createFeatureFlagInDb = async (
-  input: CreateFeatureFlagInput,
-): Promise<FeatureFlag> => {
+  input: CreateFeatureFlagInput
+): Promise<PmsFeatureFlag> => {
   logger.info("entering::createFeatureFlagInDb::repository");
   const store = requestStorage.getStore();
   const currentUserId = store?.user?.id;
 
-  const created = await db.featureFlag.create({
+  const created = await db.pmsFeatureFlag.create({
     data: {
       ...input,
       createdBy: currentUserId,
@@ -27,15 +27,15 @@ export const createFeatureFlagInDb = async (
 };
 
 export const updateFeatureFlagInDb = async (
-  input: UpdateFeatureFlagInput,
-): Promise<FeatureFlag> => {
+  input: UpdateFeatureFlagInput
+): Promise<PmsFeatureFlag> => {
   logger.info("entering::updateFeatureFlagInDb::repository");
   const store = requestStorage.getStore();
   const currentUserId = store?.user?.id;
 
   const { id, ...rest } = input;
 
-  const updated = await db.featureFlag.update({
+  const updated = await db.pmsFeatureFlag.update({
     where: { id, isActive: true },
     data: {
       ...rest,
@@ -48,10 +48,10 @@ export const updateFeatureFlagInDb = async (
 };
 
 export const getFeatureFlagByIdFromDb = async (
-  id: number,
-): Promise<FeatureFlag | null> => {
+  id: number
+): Promise<PmsFeatureFlag | null> => {
   logger.info("entering::getFeatureFlagByIdFromDb::repository");
-  const record = await db.featureFlag.findFirst({
+  const record = await db.pmsFeatureFlag.findFirst({
     where: {
       id,
       isActive: true,
@@ -61,9 +61,9 @@ export const getFeatureFlagByIdFromDb = async (
   return record;
 };
 
-export const getAllFeatureFlagsFromDb = async (): Promise<FeatureFlag[]> => {
+export const getAllFeatureFlagsFromDb = async (): Promise<PmsFeatureFlag[]> => {
   logger.info("entering::getAllFeatureFlagsFromDb::repository");
-  const records = await db.featureFlag.findMany({
+  const records = await db.pmsFeatureFlag.findMany({
     where: {
       isActive: true,
     },
@@ -74,13 +74,13 @@ export const getAllFeatureFlagsFromDb = async (): Promise<FeatureFlag[]> => {
 
 export const toggleFeatureFlagInDb = async (
   id: number,
-  existing: FeatureFlag,
-): Promise<FeatureFlag> => {
+  existing: PmsFeatureFlag
+): Promise<PmsFeatureFlag> => {
   logger.info("entering::toggleFeatureFlagInDb::repository");
   const store = requestStorage.getStore();
   const currentUserId = store?.user?.id;
 
-  const updated = await db.featureFlag.update({
+  const updated = await db.pmsFeatureFlag.update({
     where: {
       id,
       isActive: true,
@@ -99,7 +99,7 @@ export const deleteFeatureFlagFromDb = async (id: number): Promise<boolean> => {
   logger.info("entering::deleteFeatureFlagFromDb::repository");
   const store = requestStorage.getStore();
   const currentUserId = store?.user?.id;
-  await db.featureFlag.update({
+  await db.pmsFeatureFlag.update({
     where: {
       id,
     },
@@ -114,10 +114,10 @@ export const deleteFeatureFlagFromDb = async (id: number): Promise<boolean> => {
 };
 
 export const getFeatureFlagByShortCodeFromDb = async (
-  shortCode: string,
-): Promise<FeatureFlag | null> => {
+  shortCode: string
+): Promise<PmsFeatureFlag | null> => {
   logger.info("entering::getFeatureFlagByShortCodeFromDb::repository");
-  const record = await db.featureFlag.findFirst({
+  const record = await db.pmsFeatureFlag.findFirst({
     where: {
       shortCode,
       isActive: true,

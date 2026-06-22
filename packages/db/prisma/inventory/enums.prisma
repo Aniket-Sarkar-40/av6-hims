@@ -99,6 +99,7 @@ enum EMAIL_TYPE {
     EXPIRED_ITEM_ALERT
     EXPIRING_ITEM_ALERT
     ERROR_ALERT
+    RE_ORDER_ITEM_ALERT
 }
 
 enum InvUinShortCode {
@@ -169,9 +170,8 @@ enum ConsumptionType {
     AUTO
 }
 
-enum CronStatus {
-    PENDING
-    IN_PROGRESS
-    SUCCESS
-    FAILED
+enum INV_ALERT_TYPE {
+    RE_ORDER_ITEMS
+    EXPIRED_ITEMS
+    EXPIRING_ITEMS
 }

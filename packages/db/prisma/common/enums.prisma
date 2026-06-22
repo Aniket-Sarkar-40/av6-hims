@@ -257,3 +257,10 @@ enum StepType {
     MIN_MAX
     NORMAL
 }
+
+enum CronStatus {
+    PENDING
+    IN_PROGRESS
+    SUCCESS
+    FAILED
+}

@@ -1,7 +1,7 @@
 import { Prisma } from "@repo/db/generated/prisma/client";
 
 export type CreateFeatureFlagInput = Omit<
-  Prisma.FeatureFlagCreateInput,
+  Prisma.PmsFeatureFlagCreateInput,
   | "createdAt"
   | "updatedAt"
   | "deletedAt"
