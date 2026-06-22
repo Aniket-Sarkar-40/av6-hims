@@ -13,7 +13,7 @@ export const initializeCache = async (): Promise<void> => {
 
   logger.info("Initializing cache…");
   try {
-    const tablesToCache = await fetchTableData("opdDynamicShortCode");
+    const tablesToCache = await fetchTableData("bloodBankDynamicShortCode");
 
     setTimeout(async () => {
       for (const table of tablesToCache) {
@@ -58,9 +58,10 @@ export const loadCache = async (
     isCacheable: boolean;
   };
 
-  const dynamicShortCodes: DSCRow[] = await db.opdDynamicShortCode.findMany({
-    select: { shortCode: true, tableName: true, isCacheable: true },
-  });
+  const dynamicShortCodes: DSCRow[] =
+    await db.bloodBankDynamicShortCode.findMany({
+      select: { shortCode: true, tableName: true, isCacheable: true },
+    });
 
   const validTables = new Set(
     dynamicShortCodes.filter((r) => r.isCacheable).map((r) => r.tableName)

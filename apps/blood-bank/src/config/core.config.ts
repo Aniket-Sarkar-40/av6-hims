@@ -26,7 +26,7 @@ import {
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
-import { SHORT_CODE } from "@repo/shared/utils/shortCode/opd.shortCode.utils.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/bloodBank.shortCode.utils.js";
 
 const createOpdCache = async (table: string, data: DataType[]) =>
   await createCache(table, data, "opd");
@@ -72,7 +72,7 @@ export const uinServiceFactory = uinConfigService({
   cacheKey: getRedisKey("UIN_CONFIG", "all"),
 
   db: db,
-  modelName: "opdUINConfig",
+  modelName: "bloodBankUINConfig",
   helpers: {
     ErrorHandler: ErrorHandler,
     generateErrorMessage: generateErrorMessage,

@@ -1,0 +1,4 @@
+export const SHORT_CODE = {
+  SETTINGS: "SETTINGS",
+  UIN_CONFIG: "UIN_CONFIG",
+};

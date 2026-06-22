@@ -1,0 +1,3 @@
+enum BloodBankUinShortCode {
+    TEMP_CODE
+}

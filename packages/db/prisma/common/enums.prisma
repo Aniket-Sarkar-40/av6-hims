@@ -68,6 +68,7 @@ enum ServiceCode {
     STARTER
     AMS
     ACCOUNTING
+    BLOOD_BANK
 }
 
 enum TemplateType {

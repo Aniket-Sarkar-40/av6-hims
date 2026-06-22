@@ -1814,3 +1814,110 @@ ALTER TABLE `inv_settings` ADD COLUMN `is_auto_consumption` BOOLEAN NOT NULL DEF
 
 ALTER TABLE `inv_settings` DROP COLUMN `is_auto_consumption`,
     ADD COLUMN `is_auto_approve_consumption` BOOLEAN NOT NULL DEFAULT true;
+
+-- AlterTable
+ALTER TABLE `accounting_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_event_delivery` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_mono_repo_modules` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_pdf_template` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_service_event` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL DEFAULT 'OPD';
+
+-- AlterTable
+ALTER TABLE `inv_event_email` MODIFY `email_type` ENUM('GENERAL', 'LOW_STOCK_ALERT', 'EXPIRED_ITEM_ALERT', 'EXPIRING_ITEM_ALERT', 'ERROR_ALERT') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `nopd_payment_transactions` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `notifications` MODIFY `source` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `pathology_b2b_invoice_amount_summary` MODIFY `service_type` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL DEFAULT 'PATHOLOGY';
+
+
+-- CreateTable
+CREATE TABLE `blood_bank_settings` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `is_email` BOOLEAN NOT NULL DEFAULT true,
+    `is_sms` BOOLEAN NOT NULL DEFAULT false,
+    `is_whatsapp` BOOLEAN NOT NULL DEFAULT false,
+    `expiry_in_month` INTEGER NOT NULL,
+    `county_code` VARCHAR(191) NULL,
+    `slow_moving_time_in_month` INTEGER NULL,
+    `batch_size` INTEGER NOT NULL DEFAULT 100,
+    `default_precision` INTEGER NOT NULL DEFAULT 2,
+    `grn_calculation_method` ENUM('STEP_WISE', 'FINAL') NOT NULL DEFAULT 'FINAL',
+    `sell_calculation_method` ENUM('STEP_WISE', 'FINAL') NOT NULL DEFAULT 'FINAL',
+    `grn_rounded_format` ENUM('ROUND', 'SPECIAL_ROUND', 'TO_FIXED', 'CEIL', 'FLOOR', 'TRUNC', 'NONE') NOT NULL DEFAULT 'TO_FIXED',
+    `sell_rounded_format` ENUM('ROUND', 'SPECIAL_ROUND', 'TO_FIXED', 'CEIL', 'FLOOR', 'TRUNC', 'NONE') NOT NULL DEFAULT 'ROUND',
+    `sell_final_round_format` ENUM('ROUND', 'SPECIAL_ROUND', 'TO_FIXED', 'CEIL', 'FLOOR', 'TRUNC', 'NONE') NOT NULL DEFAULT 'SPECIAL_ROUND',
+    `grn_final_round_format` ENUM('ROUND', 'SPECIAL_ROUND', 'TO_FIXED', 'CEIL', 'FLOOR', 'TRUNC', 'NONE') NOT NULL DEFAULT 'TO_FIXED',
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `blood_bank_dynamic_short_code` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `short_code` VARCHAR(191) NOT NULL,
+    `table_name` VARCHAR(191) NOT NULL,
+    `is_dto` BOOLEAN NOT NULL DEFAULT false,
+    `is_cacheable` BOOLEAN NOT NULL DEFAULT false,
+    `is_drop_down` BOOLEAN NOT NULL DEFAULT false,
+    `permission` VARCHAR(191) NULL,
+    `where_clause` JSON NULL,
+    `select_clause` JSON NULL,
+    `config` JSON NULL,
+    `is_single_dto` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `blood_bank_dynamic_short_code_short_code_key`(`short_code`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `blood_bank_uin_config` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `short_code` ENUM('TEMP_CODE') NOT NULL,
+    `sequence_no` BIGINT NOT NULL DEFAULT 0,
+    `seq_reset_date` DATE NOT NULL,
+    `seq_reset_policy` ENUM('daily', 'weekly', 'monthly', 'yearly', 'no') NOT NULL DEFAULT 'no',
+    `description` VARCHAR(191) NULL,
+    `uin_segments` JSON NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

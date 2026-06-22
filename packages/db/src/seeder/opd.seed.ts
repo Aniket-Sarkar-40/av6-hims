@@ -1,4 +1,4 @@
-import { db } from "@repo/db";
+import { db } from "@/client.js";
 import { Prisma } from "@repo/db/generated/prisma/client";
 
 import { createClient } from "redis";

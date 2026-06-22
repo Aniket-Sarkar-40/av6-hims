@@ -256,6 +256,7 @@ export enum PermissionModule {
   CORE = "core",
   INV = "inv",
   ACC = "acc",
+  BLOOD_BANK = "blood-bank",
 }
 
 export const getPermission = (

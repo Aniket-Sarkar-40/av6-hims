@@ -13,6 +13,8 @@ import { createPharmacyApp } from "@apps/pharmacy";
 import cors from "cors";
 import { createAccApp } from "@apps/acc";
 import { initializeCache as initializeAccCache } from "@apps/acc/config/redisClient.js";
+import { createBloodBankApp } from "@apps/blood-bank";
+import { initializeCache as initializeBloodBankCache } from "@apps/blood-bank/config/redisClient.js";
 
 const app = express();
 
@@ -39,6 +41,7 @@ app.use("/api/v1/opd", createOpdApp("GATEWAY"));
 app.use("/api/v1/pms", createPharmacyApp("GATEWAY"));
 app.use("/api/v1/inv", createInvApp("GATEWAY"));
 app.use("/api/v1/acc", createAccApp("GATEWAY"));
+app.use("/api/v1/blood-bank", createBloodBankApp("GATEWAY"));
 
 connectRedis()
   .then(() => {
@@ -51,6 +54,7 @@ connectRedis()
         await initializePharmacyCache();
         await initializeInvCache();
         await initializeAccCache();
+        await initializeBloodBankCache();
       }
     });
   })

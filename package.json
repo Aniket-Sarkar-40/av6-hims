@@ -19,6 +19,7 @@
     "deps:check": "syncpack lint",
     "deps:fix": "syncpack fix",
     "dev": "turbo run dev --parallel",
+    "dev:blood-bank": "pnpm --filter @apps/blood-bank dev",
     "dev:core": "pnpm --filter @apps/core dev",
     "dev:gateway": "pnpm --filter @apps/gateway dev",
     "dev:inv": "pnpm --filter @apps/inv dev",
