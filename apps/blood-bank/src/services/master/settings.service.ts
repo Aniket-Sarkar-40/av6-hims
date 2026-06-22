@@ -9,14 +9,14 @@ import { addToCache, getAllCache } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/opd.shortCode.utils.js";
-import { BloodBankSettings } from "@repo/db/generated/prisma/client";
+import { BloodBankSetting } from "@repo/db/generated/prisma/client";
 
 const cacheKey = getRedisKey("SETTINGS", "all");
 
 export const settingsService = {
   async upsertSettings(
     input: CreateOrUpdateSettings
-  ): Promise<BloodBankSettings> {
+  ): Promise<BloodBankSetting> {
     logger.info("entering::upsertSettings::service");
 
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
@@ -32,13 +32,13 @@ export const settingsService = {
   },
   async getSettings(
     canNullReturnable: boolean = false
-  ): Promise<BloodBankSettings | null> {
+  ): Promise<BloodBankSetting | null> {
     logger.info("entering::getSettings::service");
 
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
-    let settings: BloodBankSettings | null = null;
+    let settings: BloodBankSetting | null = null;
     if (isCacheable) {
-      const cached = (await getAllCache(cacheKey)) as BloodBankSettings[];
+      const cached = (await getAllCache(cacheKey)) as BloodBankSetting[];
       if (cached && cached.length > 0) {
         logger.info("exiting::getSettings::service (cache)");
         settings = cached[0];

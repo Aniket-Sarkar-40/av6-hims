@@ -9,7 +9,7 @@ export async function checkIsCacheable(shortCode: string): Promise<boolean> {
 }
 
 export enum RedisResource {
-  SETTINGS = "bloodBankSettings",
+  SETTINGS = "bloodBankSetting",
   DYNAMIC_SHORT_CODE = "bloodBankDynamicShortCode",
   UIN_CONFIG = "bloodBankUINConfig",
 }

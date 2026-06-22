@@ -248,6 +248,8 @@ export enum PermissionResource {
   BANK_RECONCILIATION_SUMMARY = "bank-reconciliation-summary",
   BANK_AUTO_SUGGESTIONS = "bank-auto-suggestions",
   SETTINGS = "settings",
+
+  //Blood Bank
 }
 
 export enum PermissionModule {

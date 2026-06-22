@@ -2160,3 +2160,76 @@ CREATE TABLE `blood_bank_uin_config` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- DropTable
+DROP TABLE `blood_bank_settings`;
+
+-- DropTable
+DROP TABLE `blood_bank_dynamic_short_code`;
+
+-- DropTable
+DROP TABLE `blood_bank_uin_config`;
+
+-- CreateTable
+CREATE TABLE `bb_dynamic_short_code` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `short_code` VARCHAR(191) NOT NULL,
+    `table_name` VARCHAR(191) NOT NULL,
+    `is_dto` BOOLEAN NOT NULL DEFAULT false,
+    `is_cacheable` BOOLEAN NOT NULL DEFAULT false,
+    `is_drop_down` BOOLEAN NOT NULL DEFAULT false,
+    `permission` VARCHAR(191) NULL,
+    `where_clause` JSON NULL,
+    `select_clause` JSON NULL,
+    `config` JSON NULL,
+    `is_single_dto` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `bb_dynamic_short_code_short_code_key`(`short_code`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_bank_uin_config` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `short_code` ENUM('TEMP_CODE') NOT NULL,
+    `sequence_no` BIGINT NOT NULL DEFAULT 0,
+    `seq_reset_date` DATE NOT NULL,
+    `seq_reset_policy` ENUM('daily', 'weekly', 'monthly', 'yearly', 'no') NOT NULL DEFAULT 'no',
+    `description` VARCHAR(191) NULL,
+    `uin_segments` JSON NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_settings` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `is_cross_match_required` BOOLEAN NOT NULL DEFAULT true,
+    `allow_emergency_issue_without_cross_match` BOOLEAN NOT NULL DEFAULT true,
+    `is_transfusion_tracking_required` BOOLEAN NOT NULL DEFAULT false,
+    `is_transfusion_vitals_required` BOOLEAN NOT NULL DEFAULT false,
+    `is_transfusion_reaction_required` BOOLEAN NOT NULL DEFAULT false,
+    `reservation_expiry_minutes` INTEGER NULL,
+    `allow_reservation_reversal` BOOLEAN NOT NULL DEFAULT true,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+

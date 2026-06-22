@@ -57,7 +57,7 @@ export async function runSeed() {
   const dynamicShortCodes: DynamicShortCodeSeeder[] = [
     {
       shortCode: "SETTINGS",
-      tableName: "bloodBankSettings",
+      tableName: "bloodBankSetting",
       isDTO: false,
       isCacheable: false,
       permission: "blood-bank:settings:view",

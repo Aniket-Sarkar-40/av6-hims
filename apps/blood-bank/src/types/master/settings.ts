@@ -1,7 +1,7 @@
 import { Prisma } from "@repo/db/generated/prisma/client";
 
 export type CreateOrUpdateSettings = Omit<
-  Prisma.BloodBankSettingsCreateInput,
+  Prisma.BloodBankSettingCreateInput,
   | "isActive"
   | "createdBy"
   | "updatedBy"

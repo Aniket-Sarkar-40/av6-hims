@@ -1,33 +1,3 @@
-model BloodBankSettings {
-    id Int @id @default(autoincrement())
-
-    isEmail                Boolean           @default(true) @map("is_email")
-    isSMS                  Boolean           @default(false) @map("is_sms")
-    isWhatsapp             Boolean           @default(false) @map("is_whatsapp")
-    expiryInMonth          Int               @map("expiry_in_month")
-    countryCode            String?           @map("county_code")
-    slowMovingTimeInMonth  Int?              @map("slow_moving_time_in_month")
-    batchSize              Int               @default(100) @map("batch_size")
-    defaultPrecision       Int               @default(2) @map("default_precision")
-    grnCalculationMethod   CalculationMethod @default(FINAL) @map("grn_calculation_method")
-    sellCalculationMethod  CalculationMethod @default(FINAL) @map("sell_calculation_method")
-    grnRoundedFormat       RoundFormat       @default(TO_FIXED) @map("grn_rounded_format")
-    sellRoundedFormat      RoundFormat       @default(ROUND) @map("sell_rounded_format")
-    sellFinalRoundedFormat RoundFormat       @default(SPECIAL_ROUND) @map("sell_final_round_format")
-    grnFinalRoundedFormat  RoundFormat       @default(TO_FIXED) @map("grn_final_round_format")
-
-    isActive Boolean @default(true) @map("is_active")
-
-    createdBy Int?      @map("created_by")
-    updatedBy Int?      @map("updated_by")
-    createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime  @updatedAt @map("updated_at")
-    deletedAt DateTime? @map("deleted_at")
-    deletedBy Int?      @map("deleted_by")
-
-    @@map("blood_bank_settings")
-}
-
 model BloodBankDynamicShortCode {
     id           Int      @id @default(autoincrement())
     shortCode    String   @unique @map("short_code")
@@ -45,7 +15,7 @@ model BloodBankDynamicShortCode {
     createdAt    DateTime @default(now()) @map("created_at")
     updatedAt    DateTime @updatedAt @map("updated_at")
 
-    @@map("blood_bank_dynamic_short_code")
+    @@map("bb_dynamic_short_code")
 }
 
 model BloodBankUINConfig {
@@ -64,5 +34,29 @@ model BloodBankUINConfig {
     deletedAt      DateTime?             @map("deleted_at")
     deletedBy      Int?                  @map("deleted_by")
 
-    @@map("blood_bank_uin_config")
+    @@map("bb_bank_uin_config")
+}
+
+model BloodBankSetting {
+    id Int @id @default(autoincrement())
+
+    isCrossMatchRequired                 Boolean @default(true) @map("is_cross_match_required")
+    allowEmergencyIssueWithoutCrossMatch Boolean @default(true) @map("allow_emergency_issue_without_cross_match")
+
+    isTransfusionTrackingRequired Boolean @default(false) @map("is_transfusion_tracking_required")
+    isTransfusionVitalsRequired   Boolean @default(false) @map("is_transfusion_vitals_required")
+    isTransfusionReactionRequired Boolean @default(false) @map("is_transfusion_reaction_required")
+
+    reservationExpiryMinutes Int?    @map("reservation_expiry_minutes")
+    allowReservationReversal Boolean @default(true) @map("allow_reservation_reversal")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("bb_settings")
 }

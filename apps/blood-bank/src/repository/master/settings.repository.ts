@@ -2,25 +2,25 @@ import { API_TIMEOUT } from "@repo/shared/config/index.js";
 import { db } from "@repo/db/client";
 import { CreateOrUpdateSettings } from "@/types/master/settings.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { BloodBankSettings } from "@repo/db/generated/prisma/client";
+import { BloodBankSetting } from "@repo/db/generated/prisma/client";
 
 export const createSettingsInDb = async (
   data: CreateOrUpdateSettings
-): Promise<BloodBankSettings> => {
+): Promise<BloodBankSetting> => {
   logger.info("entering::createSettingsInDb::repository");
   return db.$transaction(
     async (tx) => {
-      const prevSettings = await tx.bloodBankSettings.findFirst({
+      const prevSettings = await tx.bloodBankSetting.findFirst({
         where: {
           isActive: true,
         },
       });
       if (!prevSettings) {
-        return tx.bloodBankSettings.create({
+        return tx.bloodBankSetting.create({
           data,
         });
       } else {
-        return tx.bloodBankSettings.update({
+        return tx.bloodBankSetting.update({
           where: {
             id: prevSettings.id,
           },
@@ -34,12 +34,11 @@ export const createSettingsInDb = async (
   );
 };
 
-export const getSettingsFromDb =
-  async (): Promise<BloodBankSettings | null> => {
-    logger.info("entering::getSettingsFromDb::repository");
-    return db.bloodBankSettings.findFirst({
-      where: {
-        isActive: true,
-      },
-    });
-  };
+export const getSettingsFromDb = async (): Promise<BloodBankSetting | null> => {
+  logger.info("entering::getSettingsFromDb::repository");
+  return db.bloodBankSetting.findFirst({
+    where: {
+      isActive: true,
+    },
+  });
+};

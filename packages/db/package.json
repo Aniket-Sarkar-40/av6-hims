@@ -43,7 +43,8 @@
     "p:mig": "prisma migrate dev",
     "p:seed": "prisma db seed",
     "p:studio": "prisma studio",
-    "p:validate": "prisma validate"
+    "p:validate": "prisma validate",
+    "prisma:generate": "prisma generate"
   },
   "type": "module",
   "types": "./dist/src/index.d.ts"
