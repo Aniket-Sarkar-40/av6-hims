@@ -2288,3 +2288,63 @@ CREATE TABLE `bb_master_blood_bank_centers` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AlterTable
+ALTER TABLE `bb_bank_uin_config` MODIFY `short_code` ENUM('TEMP_CODE', 'HOS', 'BBC', 'COM') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `nopd_patient_consultation` MODIFY `blood_group` ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'BOMBAY', 'UNKNOWN') NULL;
+
+-- CreateTable
+CREATE TABLE `bb_master_blood_component` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `component_code` VARCHAR(50) NOT NULL,
+    `component_name` VARCHAR(150) NOT NULL,
+    `min_storage_temp_c` DECIMAL(6, 2) NULL,
+    `max_storage_temp_c` DECIMAL(6, 2) NULL,
+    `shelf_life_value` INTEGER NULL,
+    `shelf_life_unit` ENUM('HOUR', 'DAY', 'MONTH', 'YEAR') NULL,
+    `is_whole_blood` BOOLEAN NOT NULL DEFAULT false,
+    `is_separated_component` BOOLEAN NOT NULL DEFAULT true,
+    `anti_coagulant` VARCHAR(100) NULL,
+    `is_irradiated` BOOLEAN NOT NULL DEFAULT false,
+    `is_leukoreduced` BOOLEAN NOT NULL DEFAULT false,
+    `is_pathogen_inactivated` BOOLEAN NOT NULL DEFAULT false,
+    `remark` TEXT NULL,
+    `description` TEXT NULL,
+    `caution` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `bb_master_blood_component_blood_bank_center_id_component_nam_idx`(`blood_bank_center_id`, `component_name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_master_blood_cross_match_method` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `method_name` VARCHAR(150) NOT NULL,
+    `method_type` VARCHAR(100) NULL,
+    `temperature_c` DECIMAL(6, 2) NULL,
+    `incubation_time_sec` INTEGER NULL,
+    `reagent_type` VARCHAR(100) NULL,
+    `equipment` VARCHAR(150) NULL,
+    `is_incubation` BOOLEAN NOT NULL DEFAULT false,
+    `remark` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

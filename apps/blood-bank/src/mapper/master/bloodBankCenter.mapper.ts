@@ -29,7 +29,9 @@ export const toBloodBankCenterDTO = async (
       "hospitalId",
     ]);
 
-    const hospital = allHospitals.find((h) => h.id === bloodBankCenter.id);
+    const hospital = allHospitals.find(
+      (h) => h.id === bloodBankCenter.hospitalId
+    );
     return {
       ...omittedBloodBankCenter.rest,
       hospital: toIdValue(hospital, "name") ?? null,

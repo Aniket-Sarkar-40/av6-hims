@@ -1,8 +1,12 @@
+import { uinServiceFactory } from "@/config/core.config.js";
 import { getByUnique } from "@/repository/common.repository.js";
 import { commonService } from "@/services/common.service.js";
 import { CreateOrUpdateBloodBankCenter } from "@/types/master/bloodBankCenter.js";
 import { validateHospitalId } from "@/validations/service/master/hospital.service.validation.js";
-import { BloodBankCenter } from "@repo/db/generated/prisma/client";
+import {
+  BloodBankCenter,
+  BloodBankUinShortCode,
+} from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
@@ -44,6 +48,12 @@ export const createOrUpdateBloodBankCenterServiceValidation = async (
     await validateIdBloodBankCenter(body.id);
   }
 
+  if (!body.centerCode) {
+    body.centerCode = await uinServiceFactory.generateUIN(
+      BloodBankUinShortCode.BBC
+    );
+  }
+
   await validateHospitalId(body.hospitalId);
 
   const bloodBankCenter = await getByUnique({
@@ -61,5 +71,7 @@ export const createOrUpdateBloodBankCenterServiceValidation = async (
     );
   }
 
-  logger.info("exiting::createShiftServiceValidation::service::validation");
+  logger.info(
+    "exiting::createOrUpdateBloodBankCenterServiceValidation::service::validation"
+  );
 };

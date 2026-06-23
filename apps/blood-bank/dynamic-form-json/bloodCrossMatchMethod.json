@@ -1,0 +1,366 @@
+{
+  "version": 1,
+  "primaryKey": "id",
+  "validation": {
+    "abortEarly": true,
+    "allowUnknown": true,
+    "stripUnknown": true,
+    "convert": true
+  },
+  "audit": {
+    "createdByField": "createdBy",
+    "updatedByField": "updatedBy"
+  },
+  "operations": {
+    "create": {
+      "requirePrimaryKey": true
+    },
+    "update": {
+      "requirePrimaryKey": true,
+      "primaryKeyFrom": "body"
+    }
+  },
+  "uniques": [],
+  "fields": [
+    {
+      "name": "methodName",
+      "db": "methodName",
+      "type": "string",
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "trim": true,
+        "min": 1,
+        "max": 100
+      },
+      "label": "Method Name",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Method Name",
+        "accessorKey": "methodName",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1,
+        "chip": {
+          "enabled": true,
+          "defaultColor": "primary"
+        }
+      }
+    },
+    {
+      "name": "bloodBankCenter",
+      "db": "bloodBankCenterId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "label": "Blood Bank Center",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_BANK_CENTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Blood Bank Center Id",
+        "accessorPath": "bloodBankCenter.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "methodType",
+      "db": "methodType",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Method Type",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Method Type",
+        "accessorKey": "methodType",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "temperatureC",
+      "db": "temperatureC",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Temperature C",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Temperature C",
+        "accessorKey": "temperatureC",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "incubationTimeSec",
+      "db": "incubationTimeSec",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Incubation Time Sec",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Incubation Time Sec",
+        "accessorKey": "incubationTimeSec",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "reagentType",
+      "db": "reagentType",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Reagent Type",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Reagent Type",
+        "accessorKey": "reagentType",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "equipment",
+      "db": "equipment",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Equipment",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Equipment",
+        "accessorKey": "equipment",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "isIncubation",
+      "db": "isIncubation",
+      "type": "boolean",
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Is Incubation",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Is Incubation",
+        "accessorKey": "isIncubation",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "remark",
+      "db": "remark",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Remark",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Remark",
+        "accessorKey": "remark",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    }
+  ],
+  "relations": [],
+  "response": {
+    "include": {},
+    "select": null
+  },
+  "modal": {
+    "size": "xs",
+    "entityLabel": "Blood Component",
+    "formLayout": {
+      "spacing": 2,
+      "columns": {
+        "xs": 1,
+        "md": 2
+      }
+    }
+  },
+  "table": {
+    "shortCode": "BLODD_CROSS_MATCH_METHOD",
+    "service": "",
+    "isFormData": true,
+    "endpoint": "",
+    "includes": {},
+    "searchColumns": [],
+    "enableGrouping": false,
+    "enableSorting": true,
+    "enablePagination": true,
+    "enableGlobalFilter": true,
+    "enableColumnVisibility": true,
+    "enableRowSelection": false,
+    "enableExpanding": false,
+    "enableCSVExport": true,
+    "enableTableHeaders": true,
+    "enableColumnDragging": true,
+    "enableRowDragging": false,
+    "isActive": true,
+    "sortById": "",
+    "iconsEnabled": true,
+    "useMainCard": true,
+    "mainCardTitle": "",
+    "mainCardSubheader": "",
+    "globalSearchPlaceholder": "Search...",
+    "showSrNo": true,
+    "initialPageSize": 10,
+    "fieldOrder": [
+      "",
+      "",
+      "",
+      "",
+      "isActive",
+      "isActive",
+      "",
+      "isActive",
+      "isActive",
+      "isActive",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "buttons": [
+      {
+        "action": "add",
+        "tooltip": "Add",
+        "iconKey": "AddCircle",
+        "color": "primary"
+      }
+    ],
+    "rowActions": [
+      {
+        "type": "edit",
+        "tooltip": "Edit",
+        "iconKey": "Edit",
+        "color": "primary"
+      },
+      {
+        "type": "delete",
+        "tooltip": "Delete",
+        "iconKey": "Trash",
+        "color": "error"
+      }
+    ]
+  }
+}

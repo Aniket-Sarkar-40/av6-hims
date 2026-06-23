@@ -15,6 +15,8 @@ export enum RedisResource {
   HOSPITAL = "hospital",
   COLLECTION_CENTER = "collectionCenter",
   BLOOD_BANK_CENTER = "bloodBankCenter",
+  BLOOD_COMPONENT = "bloodComponent",
+  BLOOD_CROSS_MATCH_METHOD = "bloodCrossMatchMethod",
 }
 
 export const getRedisKey = (
