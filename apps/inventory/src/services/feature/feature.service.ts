@@ -21,20 +21,20 @@ import {
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getMasterRedisKey } from "@/config/cache.config.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 import {
   validateCreateFeatureFlag,
   validateIdFeatureFlag,
   validateUpdateFeatureFlag,
 } from "@/validations/service/feature/feature.service.validation.js";
-import { PmsFeatureFlag } from "@repo/db/generated/prisma/client";
+import { InvFeatureFlag } from "@repo/db/generated/prisma/client";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/inventory.shortCode.utils.js";
 
 const cacheKey = getMasterRedisKey("FEATURE_FLAG", "all");
 
 export const featureFlagService = {
   async createFeatureFlag(
     input: CreateFeatureFlagInput
-  ): Promise<PmsFeatureFlag> {
+  ): Promise<InvFeatureFlag> {
     logger.info("entering::createFeatureFlag::service");
     await validateCreateFeatureFlag(input);
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
@@ -48,7 +48,7 @@ export const featureFlagService = {
 
   async updateFeatureFlag(
     input: UpdateFeatureFlagInput
-  ): Promise<PmsFeatureFlag> {
+  ): Promise<InvFeatureFlag> {
     logger.info("entering::updateFeatureFlag::service");
     await validateUpdateFeatureFlag(input);
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
@@ -60,12 +60,12 @@ export const featureFlagService = {
     return updated;
   },
 
-  async getAllFeatureFlags(): Promise<PmsFeatureFlag[]> {
+  async getAllFeatureFlags(): Promise<InvFeatureFlag[]> {
     logger.info("entering::getAllFeatureFlags::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
     if (isCacheable) {
       const cachedFeatures = (await getAllCache(cacheKey)) as
-        | PmsFeatureFlag[]
+        | InvFeatureFlag[]
         | null;
       if (cachedFeatures && cachedFeatures.length > 0) {
         return cachedFeatures;
@@ -90,15 +90,15 @@ export const featureFlagService = {
   async getFeatureFlagByShortCode(
     shortCode: string,
     canNullReturnable: boolean = false
-  ): Promise<PmsFeatureFlag | null> {
+  ): Promise<InvFeatureFlag | null> {
     logger.info("entering::getFeatureFlagByName::service");
-    let record: PmsFeatureFlag | null = null;
+    let record: InvFeatureFlag | null = null;
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);
     if (isCacheable) {
       record = (await getCacheById(
         cacheKey,
         shortCode
-      )) as PmsFeatureFlag | null;
+      )) as InvFeatureFlag | null;
     } else {
       record = await getFeatureFlagByShortCodeFromDb(shortCode);
     }
@@ -117,7 +117,7 @@ export const featureFlagService = {
     return record;
   },
 
-  async toggleEnabled(id: number): Promise<PmsFeatureFlag> {
+  async toggleEnabled(id: number): Promise<InvFeatureFlag> {
     logger.info("entering::toggleEnabled::service");
     const existing = await validateIdFeatureFlag(id);
     const isCacheable = await checkIsCacheable(SHORT_CODE.FEATURE_FLAG);

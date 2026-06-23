@@ -288,3 +288,27 @@ export type ItemStockExcelExportFilter = Omit<
   ItemStockSearchFilter,
   "pageNo" | "pageSize"
 >;
+
+export interface ExpiredItemsResponse {
+  itemId: number;
+  itemName: string;
+  ccId: number;
+  collectionCenterName: string;
+  quantity: number;
+  batchNo: string;
+  expiryDate: Date;
+  isFoc: boolean;
+}
+export type ExpiringItemsResponse = {
+  data: ExpiredItemsResponse[];
+  expiryInMonth: number;
+};
+
+export interface LowStockResponse {
+  itemId: number;
+  itemName: string;
+  collectionCenterName: string;
+  ccId: number;
+  availableQty: number;
+  minStockQty: number;
+}

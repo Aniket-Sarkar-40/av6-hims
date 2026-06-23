@@ -1,12 +1,12 @@
 import {
-  PmsAutoAlertAudit,
-  PmsAutoAlertEmail,
+  InvAutoAlertAudit,
+  InvAutoAlertEmail,
   Prisma,
 } from "@repo/db/generated/prisma/client";
-import { IdValue } from "@repo/shared/types/global.js";
+import { IdValue } from "@repo/shared/types/common.js";
 
 export type CreateAutoAlertEmailInput = Omit<
-  Prisma.PmsAutoAlertEmailUncheckedCreateWithoutAutoAlertAuditsInput,
+  Prisma.InvAutoAlertEmailUncheckedCreateWithoutAutoAlertAuditsInput,
   | "id"
   | "isActive"
   | "createdAt"
@@ -22,7 +22,7 @@ export interface UpdateAutoAlertEmailInput extends CreateAutoAlertEmailInput {
 }
 
 export type CreateAutoAlertAuditInput = Omit<
-  Prisma.PmsAutoAlertAuditUncheckedCreateInput,
+  Prisma.InvAutoAlertAuditUncheckedCreateInput,
   "id" | "isActive" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
 >;
 export interface UpdateAutoAlertAuditInput
@@ -31,7 +31,7 @@ export interface UpdateAutoAlertAuditInput
 }
 
 export type AutoAlertEmailDTO = Omit<
-  PmsAutoAlertEmail,
+  InvAutoAlertEmail,
   | "isActive"
   | "createdBy"
   | "updatedBy"
@@ -42,7 +42,7 @@ export type AutoAlertEmailDTO = Omit<
 >;
 
 export interface AutoAlertAuditDTO
-  extends Omit<PmsAutoAlertAudit, "createdBy" | "updatedBy" | "recipientId"> {
+  extends Omit<InvAutoAlertAudit, "createdBy" | "updatedBy" | "recipientId"> {
   createdBy: IdValue | null;
   updatedBy: IdValue | null;
   recipient: AutoAlertEmailDTO | null;

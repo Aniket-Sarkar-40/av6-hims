@@ -1363,3 +1363,25 @@ model MonoRepoModule {
 
     @@map("core_mono_repo_modules")
 }
+
+model CronDetails {
+    id       Int      @id @default(autoincrement()) @map("id")
+    cronName String   @map("cron_name")
+    runDate  DateTime @map("run_date") @db.Date
+
+    runKey  String @map("run_key") @db.VarChar(50)
+    attempt Int    @default(1) @map("attempt")
+
+    status     CronStatus @default(PENDING) @map("status")
+    startedAt  DateTime?  @map("started_at")
+    endedAt    DateTime?  @map("ended_at")
+    durationMs Int?       @map("duration_ms")
+    message    String?    @map("message") @db.LongText
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@unique([cronName, runDate, runKey, attempt], name: "cron_unique_runkey_attempt")
+    @@index([cronName, runDate, runKey], name: "cron_find_latest_idx")
+    @@map("core_cron_details")
+}

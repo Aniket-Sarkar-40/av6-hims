@@ -25,6 +25,8 @@ export enum RedisResource {
   CURRENCY = "currency",
   STORAGE = "invStorage",
   DEFAULT_UNIT_MASTER = "invDefaultUnitMaster",
+  AUTO_ALERT_EMAIL = "invAutoAlertEmail",
+  FEATURE_FLAG = "pmsFeatureFlag",
 }
 
 export const getRedisKey = (

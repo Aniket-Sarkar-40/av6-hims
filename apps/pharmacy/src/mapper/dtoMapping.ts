@@ -62,7 +62,6 @@ import { toStockAdjustmentDTO } from "./stock/stockAdjustment.mapper.js";
 import { toStockTransferDTO } from "./stock/stockTransfer.mapper.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/pharmacy.shortCode.utils.js";
 import {
-  AutoAlertAudit,
   BranchItemMap,
   CashNBankHead,
   City,
@@ -76,6 +75,7 @@ import {
   MobileMoneyMethod,
   Patient,
   PatientInsurance,
+  PmsAutoAlertAudit,
   PmsGatePass,
   PmsInTransitStock,
   PmsItem,
@@ -157,7 +157,7 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.STORE_REQ_RETURN]: (data: unknown) =>
     toStoreRequisitionReturnDTO(data as GetStoreRequisitionReturnResponse),
   [SHORT_CODE.AUTO_ALERT_AUDIT]: (data: unknown) =>
-    toAutoAlertAuditDTO(data as AutoAlertAudit),
+    toAutoAlertAuditDTO(data as PmsAutoAlertAudit),
   [SHORT_CODE.SELL_DETAILS]: (data: unknown) =>
     toSellDetailsDTO(data as SellDetailsResponseBase[]),
   [SHORT_CODE.PO_DETAILS]: (data: unknown) =>
