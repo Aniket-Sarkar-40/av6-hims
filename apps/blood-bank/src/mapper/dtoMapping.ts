@@ -1,4 +1,8 @@
-import { BloodBankUINConfig } from "@repo/db/generated/prisma/client";
+import { toBloodBankCenterDTO } from "@/mapper/master/bloodBankCenter.mapper.js";
+import {
+  BloodBankCenter,
+  BloodBankUINConfig,
+} from "@repo/db/generated/prisma/client";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/bloodBank.shortCode.utils.js";
 import { toUINConfigDTO } from "av6-core-v2";
 
@@ -7,4 +11,6 @@ type DtoMappingFunction = (data: unknown) => unknown;
 export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.UIN_CONFIG]: (data: unknown) =>
     toUINConfigDTO(data as BloodBankUINConfig),
+  [SHORT_CODE.BLOOD_BANK_CENTER]: (data: unknown) =>
+    toBloodBankCenterDTO(data as BloodBankCenter[]),
 };

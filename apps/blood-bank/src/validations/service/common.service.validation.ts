@@ -2,11 +2,11 @@ import { shortCodeService } from "@/services/shortCode.service.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { validIdCheck } from "../global.validation.js";
 import { commonFetch } from "@/repository/common.repository.js";
 import { UpdateConfigByCodeInput } from "av6-core-v2";
 import { CommonFieldScalarValue } from "@/types/common.js";
 import { validateModelFieldUpdate } from "@/utils/prismaModelField.utils.js";
+import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 
 export const commonShortCodeServiceValidation = async (
   shortCode: string,

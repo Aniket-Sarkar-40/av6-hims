@@ -2091,7 +2091,7 @@ ALTER TABLE `notifications` MODIFY `source` ENUM('PATHOLOGY', 'OPD', 'PHARMACY',
 ALTER TABLE `pathology_b2b_invoice_amount_summary` MODIFY `service_type` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL DEFAULT 'PATHOLOGY';
 
 
------------------ BLOOD BANK QUERY --------------------
+-- BLOOD BANK QUERY --------------------
 
 -- CreateTable
 CREATE TABLE `blood_bank_settings` (
@@ -2235,8 +2235,7 @@ CREATE TABLE `bb_settings` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-
------------------- HOSPITAL ------------------------------
+-- HOSPITAL ------------------------------
 -- CreateTable
 CREATE TABLE `bb_master_hospital` (
     `id` INTEGER NOT NULL,
@@ -2268,3 +2267,24 @@ CREATE TABLE `bb_master_hospital` (
 
 -- AlterTable
 ALTER TABLE `bb_bank_uin_config` MODIFY `short_code` ENUM('TEMP_CODE', 'HOS') NOT NULL;
+
+-- CreateTable
+CREATE TABLE `bb_master_blood_bank_centers` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `hospital_id` INTEGER NOT NULL,
+    `center_code` VARCHAR(50) NOT NULL,
+    `center_name` VARCHAR(150) NOT NULL,
+    `address` TEXT NULL,
+    `license_number` VARCHAR(100) NULL,
+    `phone` VARCHAR(30) NULL,
+    `email` VARCHAR(100) NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

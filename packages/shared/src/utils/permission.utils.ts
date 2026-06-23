@@ -251,6 +251,7 @@ export enum PermissionResource {
 
   //Blood Bank
   HOSPITAL = "hospital",
+  BLOOD_BANK_CENTER = "blood-bank-center",
 }
 
 export enum PermissionModule {

@@ -3,19 +3,28 @@ import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
 import { shortCodeService } from "@/services/shortCode.service.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
+  generateSuccessMessage,
+  generateValidationErrorMessage,
+} from "@repo/shared/utils/responseMessage.utils.js";
+import {
+  CommonExcelRequest,
   DeleteParams,
   DropdownRequest,
+  DynamicCrudConfig,
   ExportExcel,
   FetchRequest,
   ImportExcel,
   NewFixedSearchRequest,
   SearchRequest,
+  UpdateConfigByCodeInput,
   updateStatusParams,
 } from "av6-core-v2";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { validateUpdateDynamicShortCodeConfig } from "@/validations/service/common.service.validation.js";
+import { BloodBankDynamicShortCode } from "@repo/db/generated/prisma/client";
 
 export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::fixedSearch::controller");
@@ -377,6 +386,260 @@ export const commonUpdateStatus = TryCatch(
       data
     );
     logger.info("exiting::commonUpdateStatus::controller");
+    return res.status(200).json(response);
+  }
+);
+
+export const commonCreate = TryCatch(async (req: Request, res: Response) => {
+  logger.info("entering::commonCreate::controller");
+  const input = req.body as Record<string, unknown>;
+  const shortCode = req.query.shortCode as string;
+
+  if (!shortCode) {
+    throw new ErrorHandler(
+      400,
+      generateValidationErrorMessage("REQUIRED", `short code`)
+    );
+  }
+
+  const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
+
+  if (!shortCodeData) {
+    return res.status(404).json(
+      new BaseResponse({
+        success: false,
+        message: "Short code not found.",
+        errorCode: "NOT_FOUND",
+        errorMessage: "Short code not found.",
+      })
+    );
+  }
+  const data = await commonServiceFactory.create({
+    body: input,
+    shortCodeData,
+  });
+
+  const response = BaseResponse.success({ type: "CREATED", data }, "Create");
+
+  logger.info("exiting::commonCreate::controller");
+  return res.status(201).json(response);
+});
+
+export const commonUpdate = TryCatch(async (req: Request, res: Response) => {
+  logger.info("entering::commonUpdate::controller");
+  const input = req.body as Record<string, unknown>;
+  const shortCode = req.query.shortCode as string;
+
+  if (!shortCode) {
+    throw new ErrorHandler(
+      400,
+      generateValidationErrorMessage("REQUIRED", `short code`)
+    );
+  }
+
+  const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
+
+  if (!shortCodeData) {
+    return res.status(404).json(
+      new BaseResponse({
+        success: false,
+        message: "Short code not found.",
+        errorCode: "NOT_FOUND",
+        errorMessage: "Short code not found.",
+      })
+    );
+  }
+
+  const cfg = shortCodeData.config as unknown as DynamicCrudConfig;
+  if (!cfg) {
+    throw new ErrorHandler(
+      500,
+      `Configuration not found for short code: ${shortCodeData.shortCode}`
+    );
+  }
+
+  const pkField = cfg?.primaryKey;
+  const pkLocation = cfg?.operations?.update?.primaryKeyFrom;
+  if (!pkField || !pkLocation) {
+    throw new ErrorHandler(
+      500,
+      `Primary key configuration not found for short code: ${shortCodeData.shortCode}`
+    );
+  }
+
+  const pkValue =
+    pkLocation === "body"
+      ? input[pkField]
+      : pkLocation === "params"
+      ? req.params[pkField]
+      : req.query[pkField];
+
+  if (isNaN(Number(pkValue))) {
+    throw new ErrorHandler(400, `Invalid primary key value: ${pkValue}`);
+  }
+
+  const data = await commonServiceFactory.update({
+    body: input,
+    shortCodeData,
+    id: Number(pkValue),
+  });
+
+  const response = BaseResponse.success({ type: "UPDATED", data }, "Update");
+
+  logger.info("exiting::commonUpdate::controller");
+  return res.status(200).json(response);
+});
+
+export const commonMultiCreateUpdate = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::commonMultiCreateUpdate::controller");
+    const input = req.body as Record<string, unknown>;
+    const shortCode = req.query.shortCode as string;
+
+    if (!shortCode) {
+      throw new ErrorHandler(
+        400,
+        generateValidationErrorMessage("REQUIRED", `short code`)
+      );
+    }
+
+    const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
+
+    if (!shortCodeData) {
+      return res.status(404).json(
+        new BaseResponse({
+          success: false,
+          message: "Short code not found.",
+          errorCode: "NOT_FOUND",
+          errorMessage: "Short code not found.",
+        })
+      );
+    }
+
+    const data = await commonServiceFactory.commonBulkUpsert({
+      body: input,
+      shortCodeData,
+    });
+
+    const response = BaseResponse.success(
+      { type: "CREATED", data },
+      shortCode.replace("_", " ")
+    );
+
+    logger.info("exiting::commonMultiCreateUpdate::controller");
+    return res.status(201).json(response);
+  }
+);
+
+export const commonFSExcelExport = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::commonExcelExport::controller");
+
+    const inp = req.body as CommonExcelRequest<BloodBankDynamicShortCode>;
+    const shortCodeData = await shortCodeService.getShortCodeByCode(
+      inp.shortCode
+    );
+
+    if (!shortCodeData) {
+      return res.status(404).json(
+        new BaseResponse({
+          success: false,
+          message: "Short code not found.",
+          errorCode: "NOT_FOUND",
+          errorMessage: "Short code not found.",
+        })
+      );
+    }
+
+    const wb: Workbook = await commonServiceFactory.commonExcelService({
+      ...inp,
+      shortCodeData,
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${inp.sheetName}.xlsx"`
+    );
+    await wb.xlsx.write(res);
+    res.end();
+  }
+);
+
+export const updateConfigByCode = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::updateConfigByCode::controller");
+    const input = req.body as UpdateConfigByCodeInput;
+    const shortCode = input.shortCode;
+
+    if (!shortCode) {
+      throw new ErrorHandler(
+        400,
+        generateValidationErrorMessage("REQUIRED", `short code`)
+      );
+    }
+    await validateUpdateDynamicShortCodeConfig(input);
+
+    const data = await commonServiceFactory.updateConfigByCode(input);
+
+    const response = BaseResponse.success(
+      { type: "UPDATED", data },
+      "Short Code Config"
+    );
+
+    logger.info("exiting::updateConfigByCode::controller");
+    return res.status(200).json(response);
+  }
+);
+
+export const getConfigByShortCode = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::getConfigByShortCode::controller");
+    const shortCode = req.query.shortCode as string;
+
+    if (!shortCode) {
+      throw new ErrorHandler(
+        400,
+        generateValidationErrorMessage("REQUIRED", `short code`)
+      );
+    }
+
+    const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
+
+    if (!shortCodeData) {
+      return res.status(404).json(
+        new BaseResponse({
+          success: false,
+          message: "Short code not found.",
+          errorCode: "NOT_FOUND",
+          errorMessage: "Short code not found.",
+        })
+      );
+    }
+
+    const cfg = shortCodeData.config as unknown as DynamicCrudConfig;
+    if (!cfg) {
+      throw new ErrorHandler(
+        404,
+        `Configuration not found for short code: ${shortCodeData.shortCode}`
+      );
+    }
+
+    const response = BaseResponse.success(
+      {
+        type: "FETCHED",
+        data: {
+          config: cfg,
+          permission: shortCodeData.permission,
+        },
+      },
+      "Short Code Config"
+    );
+
+    logger.info("exiting::getConfigByShortCode::controller");
     return res.status(200).json(response);
   }
 );

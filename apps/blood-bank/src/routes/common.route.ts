@@ -1,18 +1,28 @@
 import {
+  commonCreate,
   commonDelete,
   commonDropdownSearch,
   commonExcelExport,
   commonExcelImport,
   commonFetch,
+  commonFSExcelExport,
+  commonMultiCreateUpdate,
   commonSearch,
+  commonUpdate,
   commonUpdateStatus,
   fixedSearch,
   fixedSearchWoPaginationController,
+  getConfigByShortCode,
+  updateConfigByCode,
 } from "@/controllers/common.controller.js";
-import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
+import {
+  authorize,
+  verifyToken,
+} from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import {
   validateCommonDelete,
+  validateCommonExcelExport,
   validateCommonExportExcel,
   validateCommonFetch,
   validateCommonImportExcel,
@@ -26,6 +36,8 @@ import { Router } from "express";
 import { authorizeCommonSearch } from "@/middleware/auth.middleware.js";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import { getPermission } from "@repo/shared/utils/permission.utils.js";
+import { validateUpdateConfigByCode } from "@/validations/request/commonCreateUpdate.validation.js";
 
 export const commonRouter: Router = Router();
 /**
@@ -210,4 +222,62 @@ commonRouter.patch(
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
   commonUpdateStatus
+);
+
+commonRouter.post(
+  "/create",
+  verifyToken(ServiceCode.BLOOD_BANK),
+  authorizeCommonSearch(),
+  commonCreate
+);
+
+commonRouter.post(
+  "/multi-create-update",
+  verifyToken(ServiceCode.BLOOD_BANK),
+  authorizeCommonSearch(),
+  commonMultiCreateUpdate
+);
+
+commonRouter.put(
+  "/update",
+  verifyToken(ServiceCode.BLOOD_BANK),
+  authorizeCommonSearch(),
+  commonUpdate
+);
+
+/**
+ * @swagger
+ * /api/v1/common/excel-export-fs:
+ *   post:
+ *     summary: filter data
+ *     tags: [Common]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/commonExcelExportSchema'
+ */
+// POST /fixedSearch
+commonRouter.post(
+  "/excel-export-fs",
+  verifyToken(ServiceCode.BLOOD_BANK),
+  authorizeCommonSearch(),
+  validateCommonExcelExport,
+  commonFSExcelExport
+);
+
+commonRouter.patch(
+  "/update-shortcode-config",
+  verifyToken(ServiceCode.BLOOD_BANK),
+  authorize(getPermission("BLOOD_BANK", "DYNAMIC_SHORT_CODE", "UPDATE")),
+  validateUpdateConfigByCode,
+  updateConfigByCode
+);
+
+commonRouter.get(
+  "/shortcode-config",
+  verifyToken(ServiceCode.BLOOD_BANK),
+  authorize(getPermission("BLOOD_BANK", "DYNAMIC_SHORT_CODE", "VIEW")),
+  getConfigByShortCode
 );

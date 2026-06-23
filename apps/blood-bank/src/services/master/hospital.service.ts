@@ -22,7 +22,7 @@ import {
   createHospitalServiceValidation,
   updateHospitalServiceValidation,
   validateHospitalId,
-} from "@/validations/service/hospital.service.validation.js";
+} from "@/validations/service/master/hospital.service.validation.js";
 import {
   createHospitalInDb,
   getAllHospitalFromDb,

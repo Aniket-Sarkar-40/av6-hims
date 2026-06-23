@@ -91,6 +91,17 @@ export async function runSeed() {
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "name" }),
     },
+    {
+      shortCode: "BLOOD_BANK_CENTER",
+      tableName: "bloodBankCenter",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: true,
+      permission: "blood-bank:blood-bank-center:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "centerName" }),
+    },
   ];
 
   await db.bloodBankDynamicShortCode.createMany({
