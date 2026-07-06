@@ -12,6 +12,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "sourceMap": true,
+    "inlineSources": true
   }
 }

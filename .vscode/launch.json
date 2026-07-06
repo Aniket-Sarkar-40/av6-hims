@@ -7,10 +7,59 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Debug Gateway (all modules, from source)",
+      "cwd": "${workspaceFolder}/apps/gateway",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--conditions=development",
+        "--import",
+        "tsx",
+        "--import",
+        "../../tooling/register-dev-hooks.mjs"
+      ],
+      "program": "${workspaceFolder}/apps/gateway/src/server.ts",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\apps\\core\\src\\repository\\common.repository.ts",
-      "outFiles": ["${workspaceFolder}/**/*.js"]
+      "sourceMaps": true,
+      "resolveSourceMapLocations": ["${workspaceFolder}/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Inventory (standalone)",
+      "cwd": "${workspaceFolder}/apps/inventory",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--conditions=development",
+        "--import",
+        "tsx",
+        "--import",
+        "../../tooling/register-dev-hooks.mjs"
+      ],
+      "program": "${workspaceFolder}/apps/inventory/src/server.ts",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true,
+      "resolveSourceMapLocations": ["${workspaceFolder}/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Pharmacy (standalone)",
+      "cwd": "${workspaceFolder}/apps/pharmacy",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--conditions=development",
+        "--import",
+        "tsx",
+        "--import",
+        "../../tooling/register-dev-hooks.mjs"
+      ],
+      "program": "${workspaceFolder}/apps/pharmacy/src/server.ts",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true,
+      "resolveSourceMapLocations": ["${workspaceFolder}/**"],
+      "console": "integratedTerminal"
     }
   ]
 }

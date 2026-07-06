@@ -21,7 +21,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsx watch src/server.ts",
+    "dev": "node --conditions=development --enable-source-maps --import tsx --import ../../tooling/register-dev-hooks.mjs --watch src/server.ts",
     "lint": "echo lint gateway",
     "start": "node dist/server.js",
     "test": "echo test gateway"

@@ -13,6 +13,7 @@
   "scripts": {
     "build": "pnpm check:repo && turbo build",
     "check:repo": "pnpm pkg:format && pnpm deps:check && pnpm lint:monorepo",
+    "clean": "find . -type d -name dist -not -path '*/node_modules/*' -prune -exec rm -rf {} +",
     "db:deploy": "pnpm --filter @repo/db prisma:deploy",
     "db:studio": "pnpm --filter @repo/db prisma:studio",
     "db:validate": "pnpm --filter @repo/db prisma:validate",

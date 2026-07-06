@@ -29,15 +29,19 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
       "default": "./dist/index.js"
     },
-    "./*": "./dist/*"
+    "./*": {
+      "development": "./src/*",
+      "default": "./dist/*"
+    }
   },
   "main": "./dist/index.js",
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
-    "dev": "tsx watch src/server.ts",
+    "dev": "node --conditions=development --enable-source-maps --import tsx --import ../../tooling/register-dev-hooks.mjs --watch src/server.ts",
     "lint": "echo lint core",
     "start": "node dist/src/server.js",
     "test": "echo test core"

@@ -18,10 +18,12 @@
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
+      "development": "./src/index.ts",
       "default": "./dist/src/index.js"
     },
     "./client": {
       "types": "./dist/src/client.d.ts",
+      "development": "./src/client.ts",
       "default": "./dist/src/client.js"
     },
     "./generated/prisma/client": {
