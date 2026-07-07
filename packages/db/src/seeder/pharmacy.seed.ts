@@ -31,7 +31,7 @@ const redisPrefix = process.env.REDIS_PREFIX || "";
 const DYNAMIC_SC_CACHE_KEY = `${redisPrefix}pms:dynamicShortCode:all`;
 
 async function updateDynamicShortCodeConfigsByShortCode(
-  input: Record<string, Prisma.InputJsonObject>
+  input: Record<string, Prisma.InputJsonObject>,
 ) {
   const mapping = Object.entries(input);
 
@@ -40,8 +40,8 @@ async function updateDynamicShortCodeConfigsByShortCode(
       db.pmsDynamicShortCode.updateMany({
         where: { shortCode },
         data: { config },
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -62,6 +62,17 @@ export async function runSeed() {
   await redis.del(DYNAMIC_SC_CACHE_KEY);
 
   const dynamicShortCodes: DynamicShortCodeSeeder[] = [
+    {
+      shortCode: "DYNAMIC_SHORT_CODE",
+      tableName: "pmsDynamicShortCode",
+      isDTO: true,
+      isCacheable: true,
+      permission: "pms:dynamic-from:view",
+      isDropDown: true,
+      isSingleDto: false,
+      whereClause: JSON.stringify({}),
+      selectClause: JSON.stringify({ id: "id", value: "shortCode" }),
+    },
     {
       shortCode: "MED_UNIT",
       tableName: "medicineUnit",
