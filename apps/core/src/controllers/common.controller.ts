@@ -1,4 +1,14 @@
+import { commonServiceFactory } from "@/config/core.config.js";
+import { shortCodeService } from "@/services/shortCode.service.js";
+import { CoreDynamicShortCode } from "@repo/db/generated/prisma/client";
+import { TryCatch } from "@repo/platform";
+import { logger } from "@repo/platform/logging/logger.js";
+import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { IMAGE_URL } from "@repo/shared";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
+  CommonExcelRequest,
   DeleteParams,
   DropdownRequest,
   ExportExcel,
@@ -7,19 +17,9 @@ import {
   NewFixedSearchRequest,
   SearchRequest,
   updateStatusParams,
-  CommonExcelRequest,
 } from "av6-core-v2";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
-import { commonServiceFactory } from "@/config/core.config.js";
-import { shortCodeService } from "@/services/shortCode.service.js";
-import { TryCatch } from "@repo/platform";
-import { logger } from "@repo/platform/logging/logger.js";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { CoreDynamicShortCode } from "@repo/db/generated/prisma/client";
-import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
-import { IMAGE_URL } from "@repo/shared";
 
 export const commonSearch = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::commonSearch::controller");
@@ -42,7 +42,7 @@ export const commonSearch = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      })
+      }),
     );
   }
 
@@ -60,7 +60,7 @@ export const commonSearch = TryCatch(async (req: Request, res: Response) => {
 
   const response = new BaseResponse(
     { success: true, message: "Data fetched successfully." },
-    searchData
+    searchData,
   );
   logger.info("exiting::commonSearch::controller");
   return res.status(200).json(response);
@@ -76,6 +76,9 @@ export const commonDropdownSearch = TryCatch(
       fixedNotSearch,
       fixedSearch,
       logic,
+      selectColumns,
+      sortBy,
+      sortDir,
     } = req.body as DropdownRequest;
     const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
 
@@ -86,7 +89,7 @@ export const commonDropdownSearch = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        })
+        }),
       );
     }
 
@@ -98,15 +101,18 @@ export const commonDropdownSearch = TryCatch(
       fixedNotSearch,
       fixedSearch,
       logic,
+      selectColumns,
+      sortBy,
+      sortDir,
     });
 
     const response = new BaseResponse(
       { success: true, message: "Data fetched successfully." },
-      searchData
+      searchData,
     );
     logger.info("exiting::commonDropdownSearch::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
@@ -132,7 +138,7 @@ export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      })
+      }),
     );
   }
 
@@ -152,7 +158,7 @@ export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
 
   const response = new BaseResponse(
     { success: true, message: "Data fetched successfully." },
-    searchData
+    searchData,
   );
   logger.info("exiting::fixedSearch::controller");
   return res.status(200).json(response);
@@ -180,7 +186,7 @@ export const fixedSearchWoPaginationController = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        })
+        }),
       );
     }
 
@@ -199,11 +205,11 @@ export const fixedSearchWoPaginationController = TryCatch(
 
     const response = new BaseResponse(
       { success: true, message: "Data fetched successfully." },
-      searchData
+      searchData,
     );
     logger.info("exiting::fixedSearchWoPaginationController::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const commonFSExcelExport = TryCatch(
@@ -212,7 +218,7 @@ export const commonFSExcelExport = TryCatch(
 
     const inp = req.body as CommonExcelRequest<CoreDynamicShortCode>;
     const shortCodeData = await shortCodeService.getShortCodeByCode(
-      inp.shortCode
+      inp.shortCode,
     );
 
     if (!shortCodeData) {
@@ -222,7 +228,7 @@ export const commonFSExcelExport = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        })
+        }),
       );
     }
 
@@ -233,15 +239,15 @@ export const commonFSExcelExport = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${inp.sheetName}.xlsx"`
+      `attachment; filename="${inp.sheetName}.xlsx"`,
     );
     await wb.xlsx.write(res);
     res.end();
-  }
+  },
 );
 
 export const commonFetch = TryCatch(async (req: Request, res: Response) => {
@@ -256,7 +262,7 @@ export const commonFetch = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      })
+      }),
     );
   }
 
@@ -272,7 +278,7 @@ export const commonFetch = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Data"),
     },
-    fetchData
+    fetchData,
   );
   logger.info("exiting::commonFetch::controller");
   return res.status(200).json(response);
@@ -291,7 +297,7 @@ export const commonExcelImport = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        })
+        }),
       );
     }
 
@@ -312,11 +318,11 @@ export const commonExcelImport = TryCatch(
 
     const response = new BaseResponse(
       { success: true, message: "Data Imported successfully." },
-      excelImport
+      excelImport,
     );
     logger.info("exiting::commonExcelImport::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const commonExcelExport = TryCatch(
@@ -333,7 +339,7 @@ export const commonExcelExport = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        })
+        }),
       );
     }
 
@@ -345,15 +351,15 @@ export const commonExcelExport = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${shortCodeData.tableName}.xlsx"`
+      `attachment; filename="${shortCodeData.tableName}.xlsx"`,
     );
     await wb.xlsx.write(res);
     res.end();
-  }
+  },
 );
 
 export const commonDelete = TryCatch(async (req: Request, res: Response) => {
@@ -368,7 +374,7 @@ export const commonDelete = TryCatch(async (req: Request, res: Response) => {
         message: "Short code not found.",
         errorCode: "NOT_FOUND",
         errorMessage: "Short code not found.",
-      })
+      }),
     );
   }
   await commonServiceFactory.delete({
@@ -397,7 +403,7 @@ export const commonUpdateStatus = TryCatch(
           message: "Short code not found.",
           errorCode: "NOT_FOUND",
           errorMessage: "Short code not found.",
-        })
+        }),
       );
     }
     const data = await commonServiceFactory.updateStatus({
@@ -412,11 +418,11 @@ export const commonUpdateStatus = TryCatch(
         success: true,
         message: generateSuccessMessage("UPDATED", "Data"),
       },
-      data
+      data,
     );
     logger.info("exiting::commonUpdateStatus::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getImage = TryCatch(
@@ -427,20 +433,21 @@ export const getImage = TryCatch(
     const fullFilePath = `${IMAGE_URL}/${directoryPath}`;
     const response = await commonServiceFactory.fetchImageStream(
       fullFilePath,
-      `/${fileName}`
+      `/${fileName}`,
     );
 
     res.setHeader(
       "Content-Type",
-      (response.headers["content-type"] as string) || "application/octet-stream"
+      (response.headers["content-type"] as string) ||
+        "application/octet-stream",
     );
     if (response.headers["content-length"]) {
       res.setHeader(
         "Content-Length",
-        response.headers["content-length"] as string
+        response.headers["content-length"] as string,
       );
     }
 
     response.data.pipe(res);
-  }
+  },
 );
