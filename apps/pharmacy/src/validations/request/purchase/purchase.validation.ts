@@ -21,7 +21,7 @@ import {
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const purchaseOrderDetailSchema = Joi.object<PurchaseOrderDetailInput>({
-  id: idRequired("Id"),
+  id: idOptional("Id"),
 
   uom: strOptional("UOM"),
 
@@ -123,7 +123,7 @@ export const purchaseSchema = Joi.object<CreatePurchaseOrderInput>({
   purchaseOrderDetails: arrayRequired(
     "Purchase order details",
     purchaseOrderDetailSchema,
-    1
+    1,
   ),
 });
 

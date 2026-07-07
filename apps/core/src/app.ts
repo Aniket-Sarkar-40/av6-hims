@@ -66,7 +66,7 @@ coreRouter.use("/master/expense-head", expenseHeadRouter);
 coreRouter.use("/income", incomeRouter);
 coreRouter.use("/expense", expenseRouter);
 
-coreRouter.use("/approval", approvalRouter);
+coreRouter.use("/common/approval", approvalRouter);
 
 coreRouter.use("/company-settings", companySettingsRouter);
 
