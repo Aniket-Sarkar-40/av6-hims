@@ -2,21 +2,22 @@ import {
   GeneralBillingCreateInput,
   GeneralBillingDetailsInput,
 } from "@/types/appointment/generalBilling.js";
-import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import {
   PercentageOrAmount,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/client";
-import Joi from "joi";
 import {
   arrayRequired,
   boolRequired,
   enumOptional,
+  idOptional,
   idRequired,
   intRequired,
   priceOptional,
   priceRequired,
 } from "@repo/shared/utils/joi.utils.js";
+import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
+import Joi from "joi";
 
 export const GeneralBillingDetailsCreateSchema =
   Joi.object<GeneralBillingDetailsInput>({
@@ -53,7 +54,7 @@ export const GeneralBillingCreateSchema = Joi.object<GeneralBillingCreateInput>(
 
     additionalDiscountMode: enumOptional(
       "Additional Discount Mode",
-      PercentageOrAmount
+      PercentageOrAmount,
     ),
 
     additionalDiscountValue: priceOptional("Additional Discount Value"),
@@ -73,14 +74,14 @@ export const GeneralBillingCreateSchema = Joi.object<GeneralBillingCreateInput>(
     generalBillingDetails: arrayRequired(
       "General Billing Details",
       GeneralBillingDetailsCreateSchema,
-      1
+      1,
     ),
-  }
+  },
 );
 
 const GeneralBillingDetailsUpdateSchema =
   GeneralBillingDetailsCreateSchema.keys({
-    id: idRequired("General Billing Details ID"),
+    id: idOptional("General Billing Details ID"),
   });
 
 export const GeneralBillingUpdateSchema = GeneralBillingCreateSchema.keys({
@@ -88,7 +89,7 @@ export const GeneralBillingUpdateSchema = GeneralBillingCreateSchema.keys({
   generalBillingDetails: arrayRequired(
     "General Billing Details",
     GeneralBillingDetailsUpdateSchema,
-    1
+    1,
   ),
 });
 
@@ -98,7 +99,7 @@ export const GeneralBillingReturnSchema = Joi.object({
   detailId: arrayRequired(
     "General Billing Details ID",
     intRequired("General Billing Details ID"),
-    1
+    1,
   ),
 });
 export const validateCreateGeneralBilling = validationHandler({

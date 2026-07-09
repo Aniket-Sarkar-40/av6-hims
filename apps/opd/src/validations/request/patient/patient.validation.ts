@@ -41,13 +41,13 @@ export const patientsSchema = Joi.object<PatientReq>({
 
   bloodGroup: strOptional("Blood Group", 10),
 
-  address: strOptional("Address", 255)
+  address: strRequired("Address", 255)
     .min(5)
     .messages({
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Address",
-        "5"
+        "5",
       ),
     }),
 
@@ -57,7 +57,7 @@ export const patientsSchema = Joi.object<PatientReq>({
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Guardian Name",
-        "3"
+        "3",
       ),
     }),
 
@@ -97,7 +97,7 @@ export const patientsSchema = Joi.object<PatientReq>({
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Aadhar",
-        "12"
+        "12",
       ),
     }),
 
@@ -107,7 +107,7 @@ export const patientsSchema = Joi.object<PatientReq>({
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Passport",
-        "3"
+        "3",
       ),
     }),
 
