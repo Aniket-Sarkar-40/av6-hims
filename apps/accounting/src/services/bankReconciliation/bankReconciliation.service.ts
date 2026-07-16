@@ -38,7 +38,7 @@ import { getLedgerBalancesNumber } from "../report/ledgerBalanceEngine.service.j
 import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { DrCr } from "@repo/db/generated/prisma/enums.js";
+import { BankReconcileStatus, DrCr } from "@repo/db/generated/prisma/enums.js";
 import {
   addSigned,
   decToNum,
@@ -49,6 +49,7 @@ import {
   getBankMovementFromStatementRowDrCr,
   getBankMovementFromVoucherLineDrCr,
   normalizeText,
+  validateBankStatementExcelHeaders,
 } from "@/utils/bankReconciliation.utils.js";
 import {
   validateAutoMatchSuggestionServiceValidation,
@@ -57,6 +58,8 @@ import {
   validateManualReconcileVoucherLinesServiceValidation,
 } from "@/validations/service/bankReconciliation/bankReconciliation.service.validation.js";
 import { validateIdLedger } from "@/validations/service/master/ledger.service.validation.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+
 const bankReconciliationRaw = {
   async getUnReconciledBankLedgerBook(
     input: BankLedgerBookRequestInput
@@ -111,7 +114,36 @@ const bankReconciliationRaw = {
 
     let runningSigned = opening.dr - opening.cr;
 
+    // Get unreconciled voucher lines
     const lines = await getBankLedgerBookLines(input);
+
+    // Get Reconciled or Unreconciled voucher lines
+    const reconciledOrUnreconciledLines = await getBankLedgerBookLines({
+      companyId,
+      financialYearId,
+      ledgerId,
+      fromDate,
+      toDate,
+      ccId,
+      status:
+        input.status === BankReconcileStatus.RECONCILED
+          ? BankReconcileStatus.UNRECONCILED
+          : BankReconcileStatus.RECONCILED,
+    });
+
+    const { bankOrUnreconciledTotalDr, bankOrUnreconciledTotalCr } =
+      reconciledOrUnreconciledLines.reduce(
+        (totals, line) => {
+          const amt = decToNum(line.amount);
+          const dr = line.drCr === DrCr.DR ? amt : 0;
+          const cr = line.drCr === DrCr.CR ? amt : 0;
+          return {
+            bankOrUnreconciledTotalDr: totals.bankOrUnreconciledTotalDr + dr,
+            bankOrUnreconciledTotalCr: totals.bankOrUnreconciledTotalCr + cr,
+          };
+        },
+        { bankOrUnreconciledTotalDr: 0, bankOrUnreconciledTotalCr: 0 }
+      );
 
     let totalDr = 0;
     let totalCr = 0;
@@ -131,6 +163,12 @@ const bankReconciliationRaw = {
       const voucherType = voucherTypes.find(
         (v) => v.id === l.voucher.voucherTypeId
       );
+      const createdBy = l.voucher.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.createdBy)
+        : null;
+      const updatedBy = l.voucher.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.updatedBy)
+        : null;
       const voucherHeadResponse: voucherHeadResponseForLedgerBook = {
         ...customOmit(l.voucher, [
           "voucherTypeId",
@@ -143,6 +181,8 @@ const bankReconciliationRaw = {
           "deletedAt",
         ]).rest,
         voucherType: voucherType ? toIdValue(voucherType, "name") : null,
+        createdBy: toIdValue(createdBy, "name"),
+        updatedBy: toIdValue(updatedBy, "name"),
       };
 
       const bankMatches = l.bankMatches.map((bankMatch) => {
@@ -165,6 +205,31 @@ const bankReconciliationRaw = {
 
     const closing = toDrCr(runningSigned);
 
+    const amt = applyRound(
+      totalDr - totalCr,
+      roundingMethod,
+      roundingPrecision
+    ); // amount not reflected in bank
+    const amountNotReflectedInBank =
+      input.status === BankReconcileStatus.UNRECONCILED
+        ? toDrCr(amt)
+        : toDrCr(
+            applyRound(
+              bankOrUnreconciledTotalDr - bankOrUnreconciledTotalCr,
+              roundingMethod,
+              roundingPrecision
+            )
+          );
+    const balanceAsPerBank =
+      input.status === BankReconcileStatus.UNRECONCILED
+        ? toDrCr(
+            applyRound(
+              bankOrUnreconciledTotalDr - bankOrUnreconciledTotalCr,
+              roundingMethod,
+              roundingPrecision
+            )
+          )
+        : toDrCr(amt);
     return {
       ledger: toIdValue(ledger, "name"),
       openingBalance: opening,
@@ -174,6 +239,9 @@ const bankReconciliationRaw = {
         cr: applyRound(totalCr, roundingMethod, roundingPrecision),
       },
       closingBalance: closing,
+      balanceAsPerCompanyBooks: balance.closing,
+      amountNotReflectedInBank,
+      balanceAsPerBank,
     };
   },
   async manualReconcileVoucherLines(
@@ -193,33 +261,44 @@ const bankReconciliationRaw = {
 
     const { filePath, baseInput } = params;
 
-    await validateBankReconciliationCommonServiceValidation({
-      companyId: baseInput.companyId,
-      financialYearId: baseInput.financialYearId,
-      ledgerId: baseInput.ledgerId,
-      fromDate: baseInput.statementFrom,
-      toDate: baseInput.statementTo,
-    });
-
     if (!filePath) {
       throw new ErrorHandler(400, "No file path provided");
     }
 
+    const statementFormat =
+      await validateUploadBankStatementExcelServiceValidation(baseInput);
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
+      header: 1,
+      raw: false,
+    });
+
+    if (rows.length === 0) {
+      throw new ErrorHandler(400, "Excel file is empty");
+    }
+
+    const headers = rows[0]
+      .map((header) => String(header || "").trim())
+      .filter((header) => header !== "");
+
+    validateBankStatementExcelHeaders({ headers, statementFormat });
 
     const data = XLSX.utils.sheet_to_json(sheet, {
       raw: false,
     }) as BankStatementExcelRow[];
 
     if (data.length === 0) {
-      throw new ErrorHandler(400, "Excel file is empty");
+      throw new ErrorHandler(400, "Excel file does not contain data rows");
     }
 
-    // validateBankStatementExcelHeaders(data[0]);
-
     const convertedData = data.map((row, index) =>
-      mapRowToBankStatementExcelCreateInput(row, index + 1)
+      mapRowToBankStatementExcelCreateInput({
+        row,
+        rowNo: index + 1,
+        statementFormat,
+      })
     );
 
     const batch = await createBankStatementExcelInDb(convertedData);
@@ -471,6 +550,7 @@ const bankReconciliationRaw = {
       shortCode: "VOUCHER_TYPE",
       useActiveFlag: true,
     });
+
     const voucherRows = await getUnmatchedVoucherLinesForBankAutoSuggestion({
       ledgerId,
       fromDate,
@@ -493,10 +573,59 @@ const bankReconciliationRaw = {
     const mapTxnId = new Map<string, BankStatementRow[]>();
     const mapVoucherNo = new Map<string, BankStatementRow[]>();
 
+    const getNumberTokens = (text?: string | null) => {
+      return normalizeText(text || "")
+        .split(" ")
+        .filter((word) => /^\d{4,}$/.test(word));
+    };
+
+    const isDateMatched = (voucherDate: Date, row: BankStatementRow) => {
+      const vDate = dayjs(voucherDate);
+
+      const transactionDateDiff = Math.abs(
+        vDate.diff(dayjs(row.transactionDate), "day")
+      );
+      const valueDateDiff = row.valueDate
+        ? Math.abs(vDate.diff(dayjs(row.valueDate), "day"))
+        : 999;
+
+      return transactionDateDiff <= 2 || valueDateDiff <= 2;
+    };
+
+    const getDateScore = (voucherDate: Date, row: BankStatementRow) => {
+      const vDate = dayjs(voucherDate);
+
+      const transactionDateDiff = Math.abs(
+        vDate.diff(dayjs(row.transactionDate), "day")
+      );
+      const valueDateDiff = row.valueDate
+        ? Math.abs(vDate.diff(dayjs(row.valueDate), "day"))
+        : 999;
+
+      const dateDiff = Math.min(transactionDateDiff, valueDateDiff);
+
+      if (dateDiff === 0) return 100;
+      if (dateDiff === 1) return 80;
+      if (dateDiff === 2) return 60;
+
+      return 0;
+    };
+
+    const addToMap = (
+      map: Map<string, BankStatementRow[]>,
+      key: string,
+      row: BankStatementRow
+    ) => {
+      if (!key) return;
+
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(row);
+    };
+
     for (const row of statementRows) {
       const amount = Number(row.amount);
 
-      //reverse DR/CR for indexing
+      // reverse DR/CR for indexing
       const oppositeDrCr = row.drCr === "DR" ? "CR" : "DR";
       const key = `${amount}_${oppositeDrCr}`;
 
@@ -504,21 +633,21 @@ const bankReconciliationRaw = {
       mapAmountDrCr.get(key)!.push(row);
 
       if (row.chequeNo) {
-        const k = normalizeText(row.chequeNo);
-        if (!mapCheque.has(k)) mapCheque.set(k, []);
-        mapCheque.get(k)!.push(row);
+        addToMap(mapCheque, normalizeText(row.chequeNo), row);
+      }
+
+      // new: cheque/instrument no may come inside description
+      const descriptionNumberTokens = getNumberTokens(row.description);
+      for (const token of descriptionNumberTokens) {
+        addToMap(mapCheque, token, row);
       }
 
       if (row.transactionId) {
-        const k = normalizeText(row.transactionId);
-        if (!mapTxnId.has(k)) mapTxnId.set(k, []);
-        mapTxnId.get(k)!.push(row);
+        addToMap(mapTxnId, normalizeText(row.transactionId), row);
       }
 
       if (row.voucherNo) {
-        const k = normalizeText(row.voucherNo);
-        if (!mapVoucherNo.has(k)) mapVoucherNo.set(k, []);
-        mapVoucherNo.get(k)!.push(row);
+        addToMap(mapVoucherNo, normalizeText(row.voucherNo), row);
       }
     }
 
@@ -530,8 +659,152 @@ const bankReconciliationRaw = {
 
       let matchedRow: BankStatementRow | null = null;
 
-      //PRIORITY 1: Voucher No + DR/CR + Voucher Type
-      if (voucherLine.voucher.voucherNo) {
+      // PRIORITY 1: Date / Value Date + DR/CR + Amount
+      if (!matchedRow) {
+        const key = `${amount}_${drCr}`;
+        const candidates = mapAmountDrCr.get(key) || [];
+
+        const voucherTypeName =
+          voucherTypes.find((vt) => vt.id === voucherLine.voucher.voucherTypeId)
+            ?.name || "";
+
+        const voucherText = normalizeText(
+          [
+            voucherLine.description || "",
+            voucherLine.voucher.narration || "",
+            voucherLine.instrumentNo || "",
+            voucherLine.voucher.voucherNo || "",
+            voucherTypeName,
+          ].join(" ")
+        );
+
+        const scoredCandidates = candidates
+          .filter((row) => {
+            return (
+              !usedStatementRowIds.has(row.id) &&
+              isDateMatched(voucherLine.voucher.voucherDate, row)
+            );
+          })
+          .map((row) => {
+            let score = getDateScore(voucherLine.voucher.voucherDate, row);
+
+            const statementText = normalizeText(
+              [
+                row.description || "",
+                row.chequeNo || "",
+                row.transactionId || "",
+                row.voucherNo || "",
+                row.voucherType || "",
+                row.ledgerName || "",
+                row.bankName || "",
+              ].join(" ")
+            );
+
+            const statementDescriptionNumbers = getNumberTokens(
+              row.description
+            );
+
+            if (voucherLine.instrumentNo) {
+              const instrumentNo = normalizeText(voucherLine.instrumentNo);
+
+              if (
+                row.chequeNo &&
+                normalizeText(row.chequeNo) === instrumentNo
+              ) {
+                score += 50;
+              }
+
+              if (statementText.includes(instrumentNo)) {
+                score += 45;
+              }
+            }
+
+            for (const token of statementDescriptionNumbers) {
+              if (voucherText.includes(token)) {
+                score += 35;
+                break;
+              }
+            }
+
+            if (
+              row.transactionId &&
+              voucherText.includes(normalizeText(row.transactionId))
+            ) {
+              score += 25;
+            }
+
+            if (row.voucherNo && voucherLine.voucher.voucherNo) {
+              if (
+                normalizeText(row.voucherNo) ===
+                normalizeText(voucherLine.voucher.voucherNo)
+              ) {
+                score += 20;
+              }
+            }
+
+            if (row.voucherType && voucherTypeName) {
+              if (
+                normalizeText(row.voucherType).includes(
+                  normalizeText(voucherTypeName)
+                )
+              ) {
+                score += 10;
+              }
+            }
+
+            if (row.description && voucherText) {
+              const bankDesc = normalizeText(row.description);
+
+              if (bankDesc && voucherText.includes(bankDesc.slice(0, 10))) {
+                score += 10;
+              }
+            }
+
+            return {
+              row,
+              score,
+            };
+          })
+          .sort((a, b) => b.score - a.score);
+
+        if (scoredCandidates.length === 1) {
+          matchedRow = scoredCandidates[0].row;
+        }
+
+        if (scoredCandidates.length > 1) {
+          const best = scoredCandidates[0];
+          const second = scoredCandidates[1];
+
+          if (best.score > second.score) {
+            matchedRow = best.row;
+          }
+        }
+      }
+
+      // PRIORITY 2: Instrument ↔ Cheque
+      if (!matchedRow && voucherLine.instrumentNo) {
+        const key = normalizeText(voucherLine.instrumentNo);
+        const candidates = mapCheque.get(key) || [];
+
+        const valid = candidates.filter((r) => {
+          const oppositeDrCr = r.drCr === "DR" ? "CR" : "DR";
+
+          return (
+            !usedStatementRowIds.has(r.id) &&
+            Number(r.amount) === amount &&
+            oppositeDrCr === drCr &&
+            isDateMatched(voucherLine.voucher.voucherDate, r)
+          );
+        });
+
+        if (valid.length === 1) {
+          matchedRow = valid[0];
+        }
+      }
+      // PRIORITY 3: Voucher No + DR/CR + Voucher Type
+      // kept as optional fallback
+
+      if (!matchedRow && voucherLine.voucher.voucherNo) {
         const key = normalizeText(voucherLine.voucher.voucherNo);
         const candidates = mapVoucherNo.get(key) || [];
 
@@ -542,7 +815,8 @@ const bankReconciliationRaw = {
             !usedStatementRowIds.has(r.id) &&
             Number(r.amount) === amount &&
             oppositeDrCr === drCr &&
-            (!r.voucherType || // optional match
+            isDateMatched(voucherLine.voucher.voucherDate, r) &&
+            (!r.voucherType ||
               normalizeText(r.voucherType).includes(
                 normalizeText(
                   voucherTypes.find(
@@ -558,10 +832,12 @@ const bankReconciliationRaw = {
         }
       }
 
-      //PRIORITY 2: TransactionId in narration
+      // PRIORITY 4: TransactionId in narration
+      // kept as optional fallback
       if (!matchedRow) {
         const text = normalizeText(
           (voucherLine.description || "") +
+            " " +
             (voucherLine.voucher.narration || "")
         );
 
@@ -574,7 +850,8 @@ const bankReconciliationRaw = {
             return (
               !usedStatementRowIds.has(r.id) &&
               Number(r.amount) === amount &&
-              oppositeDrCr === drCr
+              oppositeDrCr === drCr &&
+              isDateMatched(voucherLine.voucher.voucherDate, r)
             );
           });
 
@@ -590,27 +867,7 @@ const bankReconciliationRaw = {
         }
       }
 
-      //PRIORITY 3: Instrument ↔ Cheque
-      if (!matchedRow && voucherLine.instrumentNo) {
-        const key = normalizeText(voucherLine.instrumentNo);
-        const candidates = mapCheque.get(key) || [];
-
-        const valid = candidates.filter((r) => {
-          const oppositeDrCr = r.drCr === "DR" ? "CR" : "DR";
-
-          return (
-            !usedStatementRowIds.has(r.id) &&
-            Number(r.amount) === amount &&
-            oppositeDrCr === drCr
-          );
-        });
-
-        if (valid.length === 1) {
-          matchedRow = valid[0];
-        }
-      }
-
-      //PRIORITY 4: Date + Narration (STRICT)
+      // PRIORITY 5: Date + Narration
       if (!matchedRow) {
         const key = `${amount}_${drCr}`;
         const candidates = mapAmountDrCr.get(key) || [];
@@ -620,26 +877,23 @@ const bankReconciliationRaw = {
         for (const row of candidates) {
           if (usedStatementRowIds.has(row.id)) continue;
 
-          const voucherDate = dayjs(voucherLine.voucher.voucherDate);
-          const statementDate = dayjs(row.valueDate ?? row.transactionDate);
-
-          const dateDiff = Math.abs(voucherDate.diff(statementDate, "day"));
-          if (dateDiff > 2) continue;
+          if (!isDateMatched(voucherLine.voucher.voucherDate, row)) continue;
 
           const vText = normalizeText(
             (voucherLine.description || "") +
+              " " +
               (voucherLine.voucher.narration || "")
           );
-
           const sText = normalizeText(row.description || "");
 
           if (!vText || !sText) continue;
 
           if (sText.includes(vText.slice(0, 10))) {
             if (found) {
-              found = null; // ambiguity
+              found = null;
               break;
             }
+
             found = row;
           }
         }
@@ -647,7 +901,7 @@ const bankReconciliationRaw = {
         matchedRow = found;
       }
 
-      //FINAL SAFETY
+      // FINAL SAFETY
       if (!matchedRow) continue;
 
       suggestions.push({
@@ -668,6 +922,10 @@ const bankReconciliationRaw = {
               )?.name ?? null
             : null,
           amount,
+          transactionType: voucherLine.transactionType,
+          instrumentDate: voucherLine.instrumentDate
+            ? dayjs(voucherLine.instrumentDate).format("DD-MM-YYYY")
+            : null,
           instrumentNo: voucherLine.instrumentNo,
           description: voucherLine.description,
           narration: voucherLine.voucher.narration,

@@ -2,38 +2,77 @@ import { commonGetService } from "@/services/common.service.js";
 import {
   BankMatchResponseForBankStatementRowDTO,
   BankStatementDTO,
-  BankStatementExcelRow,
   BankStatementRowDTO,
   BankStatementRowResponse,
   CreateOrUpdateBankStatementExcelCreateInput,
+  ExcelRow,
 } from "@/types/bankReconciliation/bankReconciliation.js";
 import { BaseModelAttrWoCancel } from "@/types/common.js";
-import { BankStatement } from "@repo/db/generated/prisma/client";
-import { DrCr } from "@repo/db/generated/prisma/enums.js";
-import { toPublicImageUrl } from "@repo/shared/utils/helper.utils.js";
-
+import {
+  getAmountAndDrCr,
+  getExcelFormatConfig,
+  getMappedValue,
+  isRecord,
+  parseDateOrNull,
+  parseStringOrNull,
+} from "@/utils/bankReconciliation.utils.js";
+import { toPublicImageUrl } from "@/utils/helper.utils.js";
+import { BankStatement, DrCr } from "@repo/db/generated/prisma/client";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
-import dayjs from "dayjs";
 
-export function mapRowToBankStatementExcelCreateInput(
-  row: BankStatementExcelRow,
-  rowNo: number
-): CreateOrUpdateBankStatementExcelCreateInput {
+export const mapRowToBankStatementExcelCreateInput = (params: {
+  row: unknown;
+  rowNo: number;
+  statementFormat: BankStatementFormatMapping;
+}): CreateOrUpdateBankStatementExcelCreateInput => {
+  const { row, rowNo, statementFormat } = params;
+
+  if (!isRecord(row)) {
+    throw new ErrorHandler(400, `Row ${rowNo}: Invalid excel row format`);
+  }
+
+  if (!statementFormat) {
+    throw new ErrorHandler(400, "Bank statement not configured in the system");
+  }
+
+  const config = getExcelFormatConfig(statementFormat.excelFormat);
+
+  const { transactionAmount, drCr } = getAmountAndDrCr({
+    row: row as ExcelRow,
+    config,
+    rowNo,
+  });
+
   return {
     rowNo,
-    transactionDate: dayjs(row["Transaction Date"]).format("YYYY-MM-DD"),
-    valueDate: dayjs(row["Value Date"]).format("YYYY-MM-DD") ?? null,
-    transactionId: row["Transaction ID"],
-    chequeNo: row["Cheque No"] ?? null,
-    description: row["Description"] ?? null,
-    drCr: row["Dr/Cr"] as DrCr,
-    transactionAmount: Number(row["Transaction Amount"]),
-    voucherNo: row["Voucher No"] ?? null,
-    voucherType: row["Voucher Type"] ?? null,
-    ledgerName: row["Ledger Name"] ?? null,
-    bankName: row["Bank Name"] ?? null,
+    transactionDate: parseDateOrNull({
+      value: getMappedValue(row, config, "transactionDate"),
+      rowNo,
+      label: "Transaction Date",
+      dateFormats: config.dateFormats,
+      required: true,
+    }) as string,
+    valueDate: parseDateOrNull({
+      value: getMappedValue(row, config, "valueDate"),
+      rowNo,
+      label: "Value Date",
+      dateFormats: config.dateFormats,
+      required: false,
+    }),
+    transactionId: parseStringOrNull(
+      getMappedValue(row, config, "transactionId")
+    ),
+    chequeNo: parseStringOrNull(getMappedValue(row, config, "chequeNo")),
+    description: parseStringOrNull(getMappedValue(row, config, "description")),
+    drCr,
+    transactionAmount,
+    voucherNo: parseStringOrNull(getMappedValue(row, config, "voucherNo")),
+    voucherType: parseStringOrNull(getMappedValue(row, config, "voucherType")),
+    ledgerName: parseStringOrNull(getMappedValue(row, config, "ledgerName")),
+    bankName: parseStringOrNull(getMappedValue(row, config, "bankName")),
   };
-}
+};
 
 export const toBankStatementRowDTO = async (
   input: BankStatementRowResponse[]

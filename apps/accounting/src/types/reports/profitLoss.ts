@@ -39,3 +39,76 @@ export type InternalNode = GroupMeta & {
   amount: DrCrAmt;
   children: InternalNode[];
 };
+
+/**
+ * Inventory Opening and Closing Stock Request
+ */
+
+export interface InventoryOpeningAndClosingStockRequest {
+  financialYearId: number;
+  fromDate: Date;
+  toDate: Date;
+  ccId?: number;
+}
+
+export const STOCK_SUMMARY_TYPE = {
+  ITEM_STOCK: "ITEM_STOCK",
+  IN_TRANSIT_STOCK: "IN_TRANSIT_STOCK",
+} as const;
+
+export type StockSummaryType =
+  (typeof STOCK_SUMMARY_TYPE)[keyof typeof STOCK_SUMMARY_TYPE];
+export interface StockOpeningClosingRow {
+  stockType: StockSummaryType;
+
+  itemId: number;
+  itemName: string | null;
+  itemCode: string | null;
+  categoryId: number | null;
+  categoryName: string | null;
+
+  ccId: number | null;
+  fromCcId: number | null;
+  toCcId: number | null;
+  userId: number | null;
+
+  batchNo: string | null;
+  expiryDate: Date | string | null;
+  isFoc: boolean;
+
+  openingQty: number;
+  openingAmount: number;
+
+  inQty: number;
+  outQty: number;
+  netQty: number;
+
+  inAmount: number;
+  outAmount: number;
+  netAmount: number;
+
+  closingQty: number;
+  closingAmount: number;
+}
+
+export interface StockOpeningClosingTotals {
+  openingQty: number;
+  openingAmount: number;
+
+  inQty: number;
+  outQty: number;
+  netQty: number;
+
+  inAmount: number;
+  outAmount: number;
+  netAmount: number;
+
+  closingQty: number;
+  closingAmount: number;
+}
+
+export interface StockOpeningClosingResponse {
+  rows: StockOpeningClosingRow[];
+  totals: StockOpeningClosingTotals;
+  totalRecords: number;
+}

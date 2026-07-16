@@ -1,5 +1,6 @@
 import { auditProxy } from "@/config/audit.config.js";
 import { checkIsCacheable, getRedisKey } from "@/config/cache.config.js";
+import { toSettingsDto } from "@/mapper/master/settings.mapper.js";
 import {
   getAllSettingsFromDb,
   getSettingFromDb,
@@ -23,7 +24,7 @@ import { SHORT_CODE } from "@repo/shared/utils/shortCode/accounting.shortCode.ut
 const cacheKey = getRedisKey("SETTINGS", "all");
 
 const settingsServiceRaw = {
-  async upsertSettings(input: CreateOrUpdateSettings): Promise<AccSettings> {
+  async upsertSettings(input: CreateOrUpdateSettings): Promise<SettingsDTO> {
     logger.info("entering::upsertSettings::service");
 
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
@@ -34,13 +35,13 @@ const settingsServiceRaw = {
     }
 
     logger.info("exiting::upsertSettings::service");
-    return setting;
+    return await toSettingsDto(setting);
   },
 
   async getSettingsById(
     id: number,
     canNullReturnable: boolean = false
-  ): Promise<AccSettings | null> {
+  ): Promise<SettingsDTO | null> {
     logger.info("entering::getSettingsById::service");
 
     validIdCheck(id);
@@ -65,26 +66,26 @@ const settingsServiceRaw = {
 
     logger.info("exiting::getSettingsById::service");
 
-    return setting;
+    return setting ? await toSettingsDto(setting) : null;
   },
 
-  async getAllSettings(): Promise<AccSettings[]> {
+  async getAllSettings(): Promise<AccSettingsDTO[]> {
     logger.info("entering::getAllSettings::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
 
     let settings: AccSettings[] = [];
 
     if (isCacheable) {
-      settings = (await getAllCache(cacheKey)) as AccSettings[];
+      settings = (await getAllCache(cacheKey)) as Settings[];
     } else {
       settings = await getAllSettingsFromDb();
     }
 
     logger.info("exiting::getAllSettings::service");
-    return settings;
+    return Promise.all(settings.map(async (s) => await toSettingsDto(s)));
   },
 
-  async getSettings(): Promise<AccSettings | null> {
+  async getSettings(): Promise<SettingsDTO | null> {
     logger.info("entering::getSettings::service");
 
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
@@ -94,14 +95,14 @@ const settingsServiceRaw = {
       if (cached && cached.length > 0) {
         logger.info("exiting::getSettings::service (cache)");
         settings = cached[0];
-        return settings;
+        return await toSettingsDto(settings);
       }
     }
 
     settings = await getSettingFromDb();
 
     logger.info("exiting::getSettings::service");
-    return settings;
+    return settings ? await toSettingsDto(settings) : null;
   },
 };
 

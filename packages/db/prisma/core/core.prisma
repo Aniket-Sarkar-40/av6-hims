@@ -238,6 +238,9 @@ model CollectionCenter {
     branchRequisitionReturns   BranchRequisitionReturn[]
     branchReturnItemDetails    BranchReturnItemDetails[]
     invStoreRequisitions       InvStoreRequisition[]
+    multiVouchers              MultiVoucher[]
+    multiVoucherDetails        MultiVoucherDetails[]
+    voucherAudits              VoucherAudit[]
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")
@@ -429,6 +432,9 @@ model Currency {
     invGoodReceives       InvGoodReceive[]
     invGoodReceiveReturns InvGoodReceiveReturn[]
     invPurchaseOrders     InvPurchaseOrder[]
+    voucherAudits         VoucherAudit[]
+    rateOfExchanges       RateOfExchange[]
+    companies             Company[]
 
     @@map("core_currency")
 }

@@ -11,7 +11,10 @@ import { toCostCenterDto } from "@/mapper/master/costCenter.mapper.js";
 import { toGroupDto } from "@/mapper/master/group.mapper.js";
 import { toLedgerDto } from "@/mapper/master/ledger.mapper.js";
 import { toVoucherTypeDto } from "@/mapper/master/voucherType.mapper.js";
-import { toVoucherDTO } from "@/mapper/voucher/voucher.mapper.js";
+import {
+  toUsedChequeNumberDTO,
+  toVoucherDTO,
+} from "@/mapper/voucher/voucher.mapper.js";
 import { BankStatementRowResponse } from "@/types/bankReconciliation/bankReconciliation.js";
 import { AccountingIntegrationConfigResponse } from "@/types/integrationConfig/accountingIntegrationConfig.js";
 import { CompanyFinancialYearResponse } from "@/types/master/companyFinancialYear.js";
@@ -26,10 +29,19 @@ import { SHORT_CODE } from "@repo/shared/utils/shortCode/accounting.shortCode.ut
 import { toPickFieldsArray } from "av6-utils";
 import {
   AccDynamicShortCode,
+  AccSettings,
   AccUINConfig,
   BankStatement,
+  ClientLedgerMapping,
   Narration,
 } from "@repo/db/generated/prisma/client";
+import { toVoucherUINConfigDTO } from "@/mapper/master/voucherUinConfig.mapper.js";
+import { toChequeMasterDto } from "@/mapper/master/chequeMaster.mapper.js";
+import { toChequeMasterDto } from "@/mapper/master/chequeMaster.mapper.js";
+import { toMultiVoucherDto } from "@/mapper/multiVoucher/multiVoucher.mapper.js";
+import { toClientLedgerMappingDto } from "@/mapper/mapping/clientLedgerMapping.mapper.js";
+import { toSettingsDto } from "@/mapper/master/settings.mapper.js";
+import { toRateOfExchangeDto } from "@/mapper/master/rateOfExchange.mapper.js";
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
 export const dtoMapping: Record<string, DtoMappingFunction> = {
@@ -59,4 +71,18 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toBankStatementRowDTO(data as BankStatementRowResponse[]),
   [SHORT_CODE.BANK_STATEMENT]: (data: unknown) =>
     toBankStatementDTO(data as BankStatement[]),
+  [SHORT_CODE.VOUCHER_UIN_CONFIG]: (data: unknown) =>
+    toVoucherUINConfigDTO(data as VoucherUINConfig[]),
+  [SHORT_CODE.CHEQUE_MASTER]: (data: unknown) =>
+    toChequeMasterDto(data as ChequeMaster[]),
+  [SHORT_CODE.MULTI_VOUCHER]: (data: unknown) =>
+    toMultiVoucherDto(data as MultiVoucherResponseForDTO[]),
+  [SHORT_CODE.SETTINGS]: (data: unknown) => toSettingsDto(data as AccSettings),
+  [SHORT_CODE.CLIENT_LEDGER_MAPPING]: (data: unknown) =>
+    toClientLedgerMappingDto(data as ClientLedgerMapping[]),
+
+  [SHORT_CODE.RATE_OF_EXCHANGE]: (data: unknown) =>
+    toRateOfExchangeDto(data as RateOfExchangeResponse[]),
+  [SHORT_CODE.USED_CHEQUE_NUMBER]: (data: unknown) =>
+    toUsedChequeNumberDTO(data as UsedChequeNumberResponse[]),
 };

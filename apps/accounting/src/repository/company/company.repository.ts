@@ -312,3 +312,12 @@ export const getFyByIdFromDb = async (
     },
   });
 };
+
+export const getCompanyByIdFromDb = async (
+  id: number
+): Promise<Company | null> => {
+  logger.info("entering::getCompanyByIdFromDb::repository");
+  return db.company.findFirst({
+    where: { id, isActive: true },
+  });
+};

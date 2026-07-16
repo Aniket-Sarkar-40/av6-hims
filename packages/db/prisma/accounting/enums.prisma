@@ -219,3 +219,16 @@ enum EmailConfigType {
     ADMIN
     ISSUE
 }
+
+enum BankTransactionType {
+    CARD
+    CHEQUE
+    UPI
+    E_FUND_TRANSFER
+    OTHERS
+}
+
+enum MultiVoucherStatus {
+    DRAFT
+    POSTED
+}

@@ -1,9 +1,15 @@
 import { AccSettings, Prisma } from "@repo/db/generated/prisma/client";
-import { BaseModelAttr } from "../common.js";
+import { BaseModelAttr, BaseModelAttrWoCancel } from "../common.js";
+import { IdValue } from "@/types/global.js";
 
 export type CreateOrUpdateSettings = Omit<
   Prisma.AccSettingsUncheckedCreateInput,
   BaseModelAttr
 > & {
-  existing: AccSettings | null;
+  existing: SettingsDTO | null;
 };
+
+export interface SettingsDTO
+  extends Omit<AccSettings, BaseModelAttrWoCancel | "mainBranchId"> {
+  mainBranch: IdValue | null;
+}

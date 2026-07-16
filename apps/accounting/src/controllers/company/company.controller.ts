@@ -1,9 +1,9 @@
+import { companyService } from "@/services/company/company.service.js";
 import { CreateOrUpdateCompanyInput } from "@/types/company/company.js";
-import { Request, Response } from "express";
-import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
+import { TryCatch } from "@repo/platform";
 import { logger } from "@repo/platform/logging/logger.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { companyService } from "@/services/company/company.service.js";
+import { Request, Response } from "express";
 
 export const createCompany = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::createCompany::controller");

@@ -1,7 +1,7 @@
 import { requestStorage } from "@/config/requestContext.js";
 import { CreateOrUpdateSettings } from "@/types/settings/settings.js";
 import { db } from "@repo/db";
-import { AccSettings } from "@repo/db/generated/prisma/client";
+import { AccSettings, CompanySettings } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 
@@ -54,5 +54,12 @@ export const getAllSettingsFromDb = async (): Promise<AccSettings[]> => {
   logger.info("entering::getSettingsFromDb::repository");
   return db.accSettings.findMany({
     where: { isActive: true },
+  });
+};
+
+export const getCompanySettings = async (): Promise<CompanySettings | null> => {
+  logger.info("entering::getCompanySettings::repository");
+  return db.companySettings.findFirst({
+    where: {},
   });
 };

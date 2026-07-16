@@ -5,8 +5,8 @@ import {
   BillStatus,
   BillType,
   DrCr,
-} from "@repo/db/generated/prisma/enums.js";
-import { Prisma } from "@repo/db/generated/prisma/client";
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 
 type Tx = Prisma.TransactionClient;
 

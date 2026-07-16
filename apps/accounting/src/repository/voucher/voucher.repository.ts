@@ -1,30 +1,28 @@
-import { uinServiceFactory } from "@/config/core.config.js";
 import { requestStorage } from "@/config/requestContext.js";
+import db from "@/db/client.js";
 import {
   BankLedgerBookRequestInput,
   ManualReconcileRequestInput,
   VoucherLineResponseForBankLedgerBook,
 } from "@/types/bankReconciliation/bankReconciliation.js";
+import { SumRow } from "@/types/reports/ledgerBalanceEngine.js";
 import { VoucherLineResponseForLedgerBook } from "@/types/reports/ledgerBook.js";
 import {
   CreateOrUpdateVoucherInput,
+  CreateVoucherAuditInput,
   VoucherResponse,
   VoucherResponseForDTO,
 } from "@/types/voucher/voucher.js";
-
 import { customOmit } from "av6-utils";
 import { processBillAllocationsTx } from "./billAllocation.repository.js";
 import { createCostCenterAllocations } from "./costCenterAllocation.repository.js";
-import { logger } from "@repo/platform/logging/logger.js";
-import { db } from "@repo/db";
 import {
-  AccUinShortCode,
-  BankReconcileStatus,
+  Prisma,
+  Voucher,
   VoucherStatus,
-} from "@repo/db/generated/prisma/enums.js";
-import { SumRow } from "@/types/reports/ledgerBalanceEngine.js";
-import { Prisma } from "@repo/db/generated/prisma/client";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+  VoucherTypeNature,
+} from "@repo/db/generated/prisma/client";
+import { logger } from "@repo/platform/logging/logger.js";
 type Tx = Prisma.TransactionClient;
 
 export const getVoucherById = async (
@@ -58,12 +56,16 @@ export const createVoucherInDb = async (input: CreateOrUpdateVoucherInput) => {
     | "existing"
     | "billAllocations"
     | "costCenterAllocations"
+    | "usedChequeMasterId"
+    | "lineNo"
   >(input, [
     "id",
     "voucherLines",
     "existing",
     "billAllocations",
     "costCenterAllocations",
+    "usedChequeMasterId",
+    "lineNo",
   ]);
 
   return await db.$transaction(async (tx) => {
@@ -126,6 +128,24 @@ export const createVoucherInDb = async (input: CreateOrUpdateVoucherInput) => {
           throw new ErrorHandler(400, res.error ?? "Bill allocation failed");
       }
     }
+    for (const voucherLine of voucher.voucherLines) {
+      if (
+        voucherLine.transactionType === BankTransactionType.CHEQUE &&
+        input.usedChequeMasterId
+      ) {
+        await tx.usedChequeNumber.create({
+          data: {
+            chequeMasterId: input.usedChequeMasterId,
+            chequeNo: voucherLine.instrumentNo
+              ? Number(voucherLine.instrumentNo)
+              : 0,
+            isUsed: true,
+            voucherLineId: voucherLine.id,
+            createdBy: currentUser,
+          },
+        });
+      }
+    }
     logger.info("exiting::createVoucherInDb::repository");
     return voucher;
   });
@@ -143,12 +163,16 @@ export const updateVoucherInDb = async (input: CreateOrUpdateVoucherInput) => {
     | "existing"
     | "billAllocations"
     | "costCenterAllocations"
+    | "usedChequeMasterId"
+    | "lineNo"
   >(input, [
     "id",
     "voucherLines",
     "existing",
     "billAllocations",
     "costCenterAllocations",
+    "usedChequeMasterId",
+    "lineNo",
   ]);
 
   const incomingIds = new Set(input.voucherLines.map((l) => l.id));
@@ -208,6 +232,19 @@ export const updateVoucherInDb = async (input: CreateOrUpdateVoucherInput) => {
       },
     });
 
+    /**
+     * Audit voucher table
+     */
+    const omittedExistingDataForAudit = customOmit(input.existing, [
+      "voucherLines",
+      "id",
+    ]);
+
+    await createVoucherAuditInDb(tx, {
+      ...omittedExistingDataForAudit.rest,
+      voucherId: omittedExistingDataForAudit.omitted.id,
+    });
+
     const lineNoToId = new Map<number, number>();
     voucher.voucherLines.forEach((l) => lineNoToId.set(l.lineNo, l.id));
 
@@ -252,6 +289,46 @@ export const updateVoucherInDb = async (input: CreateOrUpdateVoucherInput) => {
           })),
           allocations: input.billAllocations,
           createdBy: currentUser ?? null,
+        });
+      }
+    }
+    for (const voucherLine of voucher.voucherLines) {
+      const usedChequeNumber = await tx.usedChequeNumber.findMany({
+        where: {
+          voucherLineId: voucherLine.id,
+          isActive: true,
+          isUsed: true,
+        },
+      });
+
+      if (usedChequeNumber.length > 0) {
+        await tx.usedChequeNumber.updateMany({
+          where: {
+            id: { in: usedChequeNumber.map((ucn) => ucn.id) },
+          },
+          data: {
+            isActive: false,
+            isUsed: false,
+            deletedBy: currentUser,
+            deletedAt: new Date(),
+            updatedBy: currentUser,
+          },
+        });
+      }
+      if (
+        voucherLine.transactionType === BankTransactionType.CHEQUE &&
+        input.usedChequeMasterId
+      ) {
+        await tx.usedChequeNumber.create({
+          data: {
+            chequeMasterId: input.usedChequeMasterId,
+            voucherLineId: voucherLine.id,
+            chequeNo: voucherLine.instrumentNo
+              ? Number(voucherLine.instrumentNo)
+              : 0,
+            isUsed: true,
+            createdBy: currentUser,
+          },
         });
       }
     }
@@ -442,13 +519,9 @@ export const createVoucherFromExcelInDb = async (
   tx: Tx,
   input: CreateOrUpdateVoucherInput
 ) => {
-  logger.info("entering::createVoucherInDb::repository");
+  logger.info("entering::createVoucherFromExcelInDb::repository");
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
-
-  const voucherNo = await uinServiceFactory.generateUIN(
-    AccUinShortCode.VOUCHER
-  );
 
   const omittedData = customOmit<
     CreateOrUpdateVoucherInput,
@@ -457,24 +530,30 @@ export const createVoucherFromExcelInDb = async (
     | "existing"
     | "billAllocations"
     | "costCenterAllocations"
+    | "lineNo"
   >(input, [
     "id",
     "voucherLines",
     "existing",
     "billAllocations",
     "costCenterAllocations",
+    "lineNo",
   ]);
   return await tx.voucher.create({
     data: {
       ...omittedData.rest,
-      voucherNo: voucherNo,
-      createdBy: input.createdBy ?? currentUser,
+      createdBy: currentUser,
       voucherDate: new Date(input.voucherDate),
+      approvedBy: input.status === VoucherStatus.POSTED ? currentUser : null,
+      approvedAt: input.status === VoucherStatus.POSTED ? new Date() : null,
       voucherLines: {
         createMany: {
           data: input.voucherLines.map((line) => ({
             ...customOmit(line, ["id"]).rest,
-            createdBy: input.createdBy ?? currentUser,
+            createdBy: currentUser,
+            instrumentDate: line.instrumentDate
+              ? new Date(line.instrumentDate)
+              : undefined,
           })),
         },
       },
@@ -550,8 +629,6 @@ export const manualReconcileVoucherLines = async (
         data: {
           bankReconcileStatus: BankReconcileStatus.RECONCILED,
           bankClearedDate: new Date(r.bankClearedDate),
-          bankReferenceNo: r.bankReferenceNo,
-          bankReconcileRemarks: r.remarks,
           lastReconciledAt: new Date(),
           lastReconciledBy: currentUser,
         },
@@ -696,4 +773,342 @@ export const getVoucherDetailsForInvoice = async (
       },
     },
   });
+};
+
+export const createVoucherFromMultiVoucherInDb = async (
+  tx: Tx,
+  input: CreateOrUpdateVoucherInput
+) => {
+  logger.info("entering::createVoucherFromMultiVoucherInDb::repository");
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
+
+  const omittedData = customOmit<
+    CreateOrUpdateVoucherInput,
+    | "id"
+    | "voucherLines"
+    | "existing"
+    | "billAllocations"
+    | "costCenterAllocations"
+    | "lineNo"
+    | "usedChequeMasterId"
+  >(input, [
+    "id",
+    "voucherLines",
+    "existing",
+    "billAllocations",
+    "costCenterAllocations",
+    "lineNo",
+    "usedChequeMasterId",
+  ]);
+  const createdVoucher = await tx.voucher.create({
+    data: {
+      ...omittedData.rest,
+      voucherNo: input.voucherNo,
+      createdBy: currentUser,
+      voucherDate: new Date(input.voucherDate),
+      approvedBy: input.status === VoucherStatus.POSTED ? currentUser : null,
+      approvedAt: input.status === VoucherStatus.POSTED ? new Date() : null,
+      voucherLines: {
+        createMany: {
+          data: input.voucherLines.map((line) => ({
+            ...customOmit(line, ["id"]).rest,
+            createdBy: currentUser,
+          })),
+        },
+      },
+    },
+    include: {
+      voucherLines: {
+        where: {
+          isActive: true,
+        },
+      },
+    },
+  });
+  for (const voucherLine of createdVoucher.voucherLines) {
+    if (
+      voucherLine.transactionType === BankTransactionType.CHEQUE &&
+      input.usedChequeMasterId
+    ) {
+      await tx.usedChequeNumber.create({
+        data: {
+          chequeMasterId: input.usedChequeMasterId,
+          chequeNo: voucherLine.instrumentNo
+            ? Number(voucherLine.instrumentNo)
+            : 0,
+          isUsed: true,
+          voucherLineId: voucherLine.id,
+          createdBy: currentUser,
+        },
+      });
+    }
+  }
+  return createdVoucher;
+};
+
+export const updateVoucherFromPostedMultiVoucherInDb = async (
+  tx: Tx,
+  input: CreateOrUpdateVoucherInput
+) => {
+  logger.info("entering::updateVoucherFromPostedMultiVoucherInDb::repository");
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
+
+  const omittedData = customOmit<
+    CreateOrUpdateVoucherInput,
+    | "id"
+    | "voucherLines"
+    | "existing"
+    | "billAllocations"
+    | "costCenterAllocations"
+    | "usedChequeMasterId"
+    | "lineNo"
+  >(input, [
+    "id",
+    "voucherLines",
+    "existing",
+    "billAllocations",
+    "costCenterAllocations",
+    "usedChequeMasterId",
+    "lineNo",
+  ]);
+
+  return await db.$transaction(async (tx) => {
+    const voucher = await tx.voucher.update({
+      where: { id: input.id },
+      data: {
+        ...omittedData.rest,
+        updatedBy: currentUser,
+        voucherDate: new Date(input.voucherDate),
+        voucherLines: {
+          updateMany: {
+            where: {
+              voucherId: input.id,
+            },
+            data: {
+              isActive: false,
+              deletedBy: currentUser,
+              deletedAt: new Date(),
+            },
+          },
+          createMany: {
+            data: input.voucherLines.map((line) => ({
+              ...customOmit(line, ["id"]).rest,
+              createdBy: currentUser,
+            })),
+          },
+        },
+      },
+      include: {
+        voucherLines: {
+          where: {
+            isActive: true,
+          },
+        },
+      },
+    });
+
+    /**
+     * Audit voucher table
+     */
+    const omittedExistingDataForAudit = customOmit(input.existing, [
+      "voucherLines",
+      "id",
+    ]);
+
+    await createVoucherAuditInDb(tx, {
+      ...omittedExistingDataForAudit.rest,
+      voucherId: omittedExistingDataForAudit.omitted.id,
+    });
+
+    for (const voucherLine of voucher.voucherLines) {
+      const usedChequeNumber = await tx.usedChequeNumber.findMany({
+        where: {
+          voucherLineId: voucherLine.id,
+          isActive: true,
+          isUsed: true,
+        },
+      });
+
+      if (usedChequeNumber.length > 0) {
+        await tx.usedChequeNumber.updateMany({
+          where: {
+            id: { in: usedChequeNumber.map((ucn) => ucn.id) },
+          },
+          data: {
+            isActive: false,
+            isUsed: false,
+            deletedBy: currentUser,
+            deletedAt: new Date(),
+            updatedBy: currentUser,
+          },
+        });
+      }
+      if (
+        voucherLine.transactionType === BankTransactionType.CHEQUE &&
+        input.usedChequeMasterId
+      ) {
+        await tx.usedChequeNumber.create({
+          data: {
+            chequeMasterId: input.usedChequeMasterId,
+            voucherLineId: voucherLine.id,
+            chequeNo: voucherLine.instrumentNo
+              ? Number(voucherLine.instrumentNo)
+              : 0,
+            isUsed: true,
+            createdBy: currentUser,
+          },
+        });
+      }
+    }
+    logger.info("exiting::updateVoucherFromPostedMultiVoucherInDb::repository");
+    return voucher;
+  });
+};
+
+export const createVoucherAuditInDb = async (
+  tx: Tx,
+  input: CreateVoucherAuditInput
+) => {
+  logger.info("entering::createVoucherAuditInDb::repository");
+
+  await tx.voucherAudit.create({
+    data: {
+      ...input,
+    },
+  });
+  logger.info("exiting::createVoucherAuditInDb::repository");
+};
+
+export const getLastSellingRateByCurrencyId = async (params: {
+  companyId: number;
+  currencyId: number;
+  financialYearId: number;
+}): Promise<Voucher | null> => {
+  logger.info("entering::getLastSellingRateByCurrencyId::repository");
+
+  const { companyId, currencyId, financialYearId } = params;
+
+  const result = await db.voucher.findFirst({
+    where: {
+      companyId,
+      currencyId,
+      financialYearId,
+      status: VoucherStatus.POSTED,
+      isActive: true,
+      voucherType: {
+        nature: VoucherTypeNature.SALES,
+      },
+    },
+    orderBy: [{ id: "desc" }, { voucherDate: "desc" }],
+  });
+
+  logger.info("exiting::getLastSellingRateByCurrencyId::repository");
+
+  return result;
+};
+
+export const getLastPurchaseRateByCurrencyId = async (params: {
+  companyId: number;
+  currencyId: number;
+  financialYearId: number;
+}): Promise<Voucher | null> => {
+  logger.info("entering::getLastPurchaseRateByCurrencyId::repository");
+
+  const { companyId, currencyId, financialYearId } = params;
+
+  const result = await db.voucher.findFirst({
+    where: {
+      companyId,
+      currencyId,
+      financialYearId,
+      status: VoucherStatus.POSTED,
+      isActive: true,
+      voucherType: {
+        nature: VoucherTypeNature.PURCHASE,
+      },
+    },
+    orderBy: [{ id: "desc" }, { voucherDate: "desc" }],
+  });
+
+  logger.info("exiting::getLastPurchaseRateByCurrencyId::repository");
+
+  return result;
+};
+export const getVoucherForexSumsBeforeDate = async (input: {
+  companyId: number;
+  financialYearId: number;
+  fromDate: Date;
+  ccId?: number;
+  ledgerIds: number[];
+}) => {
+  logger.info("entering::getVoucherForexSumsBeforeDate::repository");
+  const { companyId, financialYearId, fromDate, ccId, ledgerIds } = input;
+
+  if (!ledgerIds.length) return [];
+
+  const result = await db.voucherLine.groupBy({
+    by: ["ledgerId", "drCr"],
+    where: {
+      isActive: true,
+      ledger: {
+        isActive: true,
+      },
+      ...(ledgerIds?.length ? { ledgerId: { in: ledgerIds } } : {}),
+      voucher: {
+        isActive: true,
+        companyId,
+        financialYearId,
+        status: VoucherStatus.POSTED,
+        ...(ccId ? { ccId } : {}),
+        voucherDate: { lt: fromDate },
+      },
+    },
+    _sum: {
+      amount: true,
+      currencyAmount: true,
+    },
+  });
+  logger.info("exiting::getVoucherForexSumsBeforeDate::repository");
+  return result;
+};
+
+export const getVoucherForexSumsInRange = async (params: {
+  companyId: number;
+  financialYearId: number;
+  fromDate: Date;
+  toDate: Date;
+  ccId?: number;
+  ledgerIds?: number[];
+}) => {
+  logger.info("entering::getVoucherForexSumsInRange::repository");
+  const { companyId, financialYearId, fromDate, toDate, ccId, ledgerIds } =
+    params;
+
+  const rows = await db.voucherLine.groupBy({
+    by: ["ledgerId", "drCr"],
+    where: {
+      isActive: true,
+      ledger: {
+        isActive: true,
+      },
+      ...(ledgerIds?.length ? { ledgerId: { in: ledgerIds } } : {}),
+      voucher: {
+        isActive: true,
+        companyId,
+        financialYearId,
+        status: VoucherStatus.POSTED,
+        ...(ccId ? { ccId } : {}),
+        voucherDate: { gte: fromDate, lte: toDate },
+      },
+    },
+    _sum: {
+      amount: true,
+      currencyAmount: true,
+    },
+  });
+
+  logger.info("exiting::getVoucherForexSumsInRange::repository");
+  return rows;
 };

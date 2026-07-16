@@ -42,6 +42,9 @@ export type LedgerColumnMeta = {
   groupKey: string;
   amountKey: string;
   drCrKey?: string;
+  transactionType?: BankTransactionType;
+  instrumentNo?: string;
+  instrumentDate?: Date;
 };
 
 export type OtherLedger = {
@@ -49,4 +52,7 @@ export type OtherLedger = {
   ledgerGroup?: string;
   amount: number;
   drCr?: DrCr;
+  transactionType?: BankTransactionType;
+  instrumentNo?: string;
+  instrumentDate?: Date;
 };

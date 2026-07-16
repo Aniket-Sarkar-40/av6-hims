@@ -1,17 +1,23 @@
+import { reportService } from "@/services/report/report.service.js";
 import { BalanceSheetRequestInput } from "@/types/reports/balanceSheet.js";
 import { CashFlowRequestInput } from "@/types/reports/cashFlow.js";
+import {
+  ForexGainLossStatementInput,
+  LedgerForexReportInput,
+} from "@/types/reports/forexReport.js";
 import { FundFlowRequestInput } from "@/types/reports/fundFlow.js";
 import { GroupSummaryRequestInput } from "@/types/reports/groupSummary.js";
-import { LedgerBookRequestInput } from "@/types/reports/ledgerBook.js";
+import {
+  LedgerBookExcelRequestInput,
+  LedgerBookRequestInput,
+} from "@/types/reports/ledgerBook.js";
 import { ReportCommonRequestInput } from "@/types/reports/report.js";
 import { TrialBalanceRequestInput } from "@/types/reports/trialBalance.js";
-import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
+import { TryCatch } from "@repo/platform";
 import { logger } from "@repo/platform/logging/logger.js";
-
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
-import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { reportService } from "@/services/report/report.service.js";
 
 export const getTrialBalance = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::getTrialBalance::report::controller");
@@ -141,6 +147,35 @@ export const getFundFlow = TryCatch(async (req: Request, res: Response) => {
   return res.status(200).json(response);
 });
 
+export const getLedgerForexGainLoss = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::getLedgerForexGainLoss::report::controller");
+    const input = req.body as LedgerForexReportInput;
+    const forexGainLoss = await reportService.getLedgerForexGainLoss(input);
+    const response = BaseResponse.success(
+      { data: forexGainLoss, type: "FETCHED" },
+      "Ledger Forex Gain Loss"
+    );
+    logger.info("exiting::getLedgerForexGainLoss::report::controller");
+    return res.status(200).json(response);
+  }
+);
+
+export const getForexGainLossStatement = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::getForexGainLossStatement::report::controller");
+    const input = req.body as ForexGainLossStatementInput;
+    const forexGainLossStatement =
+      await reportService.getForexGainLossStatement(input);
+    const response = BaseResponse.success(
+      { data: forexGainLossStatement, type: "FETCHED" },
+      "Forex Gain Loss Statement"
+    );
+    logger.info("exiting::getForexGainLossStatement::report::controller");
+    return res.status(200).json(response);
+  }
+);
+
 export const excelBalanceSheetReport = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::excelBalanceSheetReport::controller");
@@ -192,7 +227,7 @@ export const excelLedgerBookReport = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::excelLedgerBookReport::controller");
 
-    const input = req.body as LedgerBookRequestInput;
+    const input = req.body as LedgerBookExcelRequestInput;
 
     const wb: Workbook = await reportService.buildExcelForLedgerBookReport(
       input
@@ -447,7 +482,7 @@ export const pdfLedgerBookReport = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::pdfLedgerBookReport::controller");
 
-    const input = req.body as LedgerBookRequestInput;
+    const input = req.body as LedgerBookExcelRequestInput;
 
     const pdfBuffer = await reportService.buildPdfForLedgerBookReport(input);
 

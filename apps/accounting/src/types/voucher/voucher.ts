@@ -1,11 +1,14 @@
 import {
+  AccountingNature,
   BillAllocation,
+  Company,
   CompanyFinancialYear,
   ConfigSubRefType,
   CostCenterAllocation,
   Prisma,
   VoucherLine,
   VoucherReferenceType,
+  VoucherTypeNature,
 } from "@repo/db/generated/prisma/client";
 import {
   BaseModelAttrWoCancel,
@@ -45,6 +48,8 @@ export interface CreateOrUpdateVoucherInput extends VoucherInput {
   billAllocations?: PostVoucherBillAllocationInput[];
   costCenterAllocations?: PostVoucherCostCenterAllocationInput[];
   existing: VoucherResponse;
+  usedChequeMasterId?: number;
+  lineNo?: number; // for multi voucher
 }
 
 export type VoucherResponse = Prisma.VoucherGetPayload<{
@@ -79,9 +84,18 @@ export type VoucherResponseForDTO = Prisma.VoucherGetPayload<{
   };
 }>;
 
+export type LedgerResponseForVoucherDTO = {
+  id: number;
+  value: string;
+  groupName: string | null;
+  nature: AccountingNature | null;
+  isBankAccount: boolean;
+  isCashAccount: boolean;
+};
+
 export interface VoucherLineDTO
   extends Omit<VoucherLine, BaseModelAttrWoCancel | "ledgerId"> {
-  ledger: IdValue | null;
+  ledger: LedgerResponseForVoucherDTO | null;
 }
 
 export interface BillAllocationDTO
@@ -117,16 +131,21 @@ export interface VoucherDTO
   > {
   createdBy: IdValue | null;
   approvedBy: IdValue | null;
-  company: IdValue | null;
+  company: Pick<Company, "id" | "name" | "currencyId"> | null;
   financialYear: Omit<CompanyFinancialYear, BaseModelAttrWoCancel>;
   collectionCenter: IdValue | null;
-  voucherType: IdValue | null;
+  voucherType: VoucherTypeForDTO | null;
   voucherLines: VoucherLineDTO[];
   billAllocations: BillAllocationDTO[];
   costCenterAllocations: CostCenterAllocationDTO[];
   currency: IdValue | null;
 }
 
+export type VoucherTypeForDTO = {
+  id: number;
+  value: string;
+  nature: VoucherTypeNature;
+};
 /** Type for integrating with external systems */
 export enum PaymentMode {
   CASH = "CASH",
@@ -135,7 +154,7 @@ export enum PaymentMode {
 
 export type paymentInput = {
   paymentMode: PaymentMode;
-  accountName: string;
+  bankOrCashId: number;
   paymentAmount: number;
 };
 
@@ -147,12 +166,15 @@ export type ExternalPostVoucherInput = {
   refId: number;
   refDate: Date;
   pId?: string;
+  currencyId?: number;
+  currencyConversionRate?: number;
   totalAmount: number;
   clientId?: number;
   clientPayAmount: number;
   customerName?: string;
   customerPayAmount: number;
   createdBy: number;
+  remarks?: string;
   payments?: paymentInput[];
 };
 
@@ -171,8 +193,9 @@ export type IntegrationConfigKeys = Pick<
   | "customerName"
   | "customerPayAmount"
   | "payments"
+  | "remarks"
 > &
-  Pick<paymentInput, "accountName" | "paymentAmount">;
+  Pick<paymentInput, "bankOrCashId" | "paymentAmount">;
 
 export const IntegrationConfigKeysKeys: (keyof IntegrationConfigKeys)[] = [
   "totalAmount",
@@ -181,11 +204,84 @@ export const IntegrationConfigKeysKeys: (keyof IntegrationConfigKeys)[] = [
   "customerName",
   "customerPayAmount",
   "payments",
-  "accountName",
+  "bankOrCashId",
   "paymentAmount",
+  "remarks",
 ];
 
 export type preparedVoucherInputFromExcel = Omit<
   CreateOrUpdateVoucherInput,
   "existing" | "billAllocations" | "costCenterAllocations" | "voucherNo"
 >;
+
+/** Excel export types */
+
+export type HeaderAttribute = {
+  text: string;
+  color?: string;
+  enumValues?: string[];
+};
+
+export enum VoucherStatusForExcel {
+  DRAFT = "DRAFT",
+  POSTED = "POSTED",
+}
+
+/**
+ * Voucher Audit Types
+ */
+
+export type CreateVoucherAuditInput = Omit<
+  Prisma.VoucherAuditUncheckedCreateInput,
+  BaseModelAttrWoCancelAndCreated | "id" | "approvedAt" | "approvedBy"
+>;
+
+/**
+ * used cheque no DTO type
+ */
+
+export type UsedChequeNumberResponse = Prisma.UsedChequeNumberGetPayload<{
+  include: {
+    voucherLine: {
+      include: {
+        voucher: true;
+      };
+    };
+  };
+}>;
+
+export type UsedChequeNumberDTO = {
+  id: number;
+  chequeNo: string;
+  isUsed: boolean;
+  voucherId: number;
+  voucherLineId: number;
+  voucherNo: string;
+  voucherDate: Date;
+  voucherType: IdValue | null;
+};
+
+export type topLedgerData = {
+  name: string;
+  label: string;
+  amount: number;
+};
+
+/* voucher pdf dto type */
+
+export interface VoucherPdfDTO
+  extends Omit<
+    VoucherDTO,
+    "voucherLines" | "costCenterAllocations" | "billAllocations"
+  > {
+  amountInWords: string;
+  transactionType: string | null;
+  instrumentNo: string | null;
+  instrumentDate: Date | null;
+  topLedger: topLedgerData | null;
+  voucherLines: VoucherLinePdfDTO[];
+}
+
+export interface VoucherLinePdfDTO extends VoucherLineDTO {
+  index: number;
+}

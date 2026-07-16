@@ -17,9 +17,144 @@ import { validateLedgerBalanceEngineServiceValidation } from "@/validations/serv
 import { applyRound, RoundFormat, toIdValue } from "av6-utils";
 import { commonGetService } from "../common.service.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { Group, Ledger } from "@repo/db/generated/prisma/client";
+import {
+  Currency,
+  Group,
+  Ledger,
+  LedgerOpeningBalance,
+} from "@repo/db/generated/prisma/client";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { getCompanyByIdFromDb } from "@/repository/company/company.repository.js";
+import dayjs from "dayjs";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
+
+/**
+ * For foreign-currency ledgers the closing balance is not the simple sum of base
+ * `amount`s; it is the net foreign-currency balance (from `currencyAmount`) revalued
+ * at the exchange rate effective on `toDate`. Returns a map of ledgerId -> revalued
+ * closing balance (signed; positive = DR, negative = CR) in base currency.
+ */
+const buildForeignLedgerClosingSignedMap = async (params: {
+  companyId: number;
+  financialYearId: number;
+  fromDate: Date;
+  toDate: Date;
+  ccId?: number;
+  foreignLedgers: Ledger[];
+  openingRows: LedgerOpeningBalance[];
+}): Promise<Map<number, number>> => {
+  logger.info("entering::buildForeignLedgerClosingSignedMap::service");
+  const {
+    companyId,
+    financialYearId,
+    fromDate,
+    toDate,
+    ccId,
+    foreignLedgers,
+    openingRows,
+  } = params;
+
+  const closingSignedMap = new Map<number, number>();
+  if (!foreignLedgers.length) {
+    logger.info(
+      "exiting::buildForeignLedgerClosingSignedMap::service (no foreign ledgers)"
+    );
+    return closingSignedMap;
+  }
+
+  const store = requestStorage.getStore();
+  const settings = store?.settings;
+  const roundingPrecision = settings?.roundingPrecision ?? 2;
+  const roundingMethod = settings?.roundingMethod ?? RoundFormat.TO_FIXED;
+  const asOfDateStr = dayjs(toDate).format("YYYY-MM-DD");
+
+  const foreignLedgerIds = foreignLedgers.map((ledger) => ledger.id);
+
+  const currencies = await currencyService.getAllCurrency();
+  const currencyMap = new Map<number, Currency>(
+    currencies.map((currency) => [currency.id, currency])
+  );
+
+  const rateMap = buildCurrentRateMap({
+    currencyIds: [
+      ...new Set(foreignLedgers.map((ledger) => ledger.currencyId as number)),
+    ],
+    rates: (await commonGetService.getAllElements<"RateOfExchange">({
+      cacheCode: "RATE_OF_EXCHANGE",
+      canNullReturnable: true,
+      modelName: "RateOfExchange",
+      shortCode: "RATE_OF_EXCHANGE",
+      useActiveFlag: true,
+    })) as RateOfExchange[],
+    companyId,
+    financialYearId,
+    asOfDate: toDate,
+  });
+
+  const beforeRows = await getVoucherForexSumsBeforeDate({
+    companyId,
+    financialYearId,
+    fromDate,
+    ccId,
+    ledgerIds: foreignLedgerIds,
+  });
+  const rangeRows = await getVoucherForexSumsInRange({
+    companyId,
+    financialYearId,
+    fromDate,
+    toDate,
+    ccId,
+    ledgerIds: foreignLedgerIds,
+  });
+  const voucherSums = [...(beforeRows ?? []), ...(rangeRows ?? [])];
+
+  for (const ledger of foreignLedgers) {
+    let foreignClosingSigned = 0;
+
+    for (const opening of openingRows) {
+      if (opening.ledgerId !== ledger.id) continue;
+      foreignClosingSigned += signedFromDrCr(
+        opening.drCr,
+        Number(opening.currencyAmount ?? 0)
+      );
+    }
+
+    for (const voucherSum of voucherSums) {
+      if (voucherSum.ledgerId !== ledger.id) continue;
+      foreignClosingSigned += signedFromDrCr(
+        voucherSum.drCr,
+        Number(voucherSum._sum.currencyAmount ?? 0)
+      );
+    }
+
+    const roundedForeignClosingSigned = applyRound(
+      foreignClosingSigned,
+      roundingMethod,
+      roundingPrecision
+    );
+    const currencyId = ledger.currencyId as number;
+    const currentRate = rateMap.get(currencyId);
+
+    if (
+      roundedForeignClosingSigned !== 0 &&
+      (currentRate === undefined || currentRate <= 0)
+    ) {
+      const currency = currencyMap.get(currencyId);
+      throw new ErrorHandler(
+        400,
+        `Exchange rate not found for ${
+          currency?.code ?? currency?.name ?? currencyId
+        } as on ${asOfDateStr}`
+      );
+    }
+
+    closingSignedMap.set(ledger.id, foreignClosingSigned * (currentRate ?? 0));
+  }
+
+  logger.info("exiting::buildForeignLedgerClosingSignedMap::service");
+  return closingSignedMap;
+};
 
 export const getLedgerBalancesNumber = async (
   input: LedgerBalanceEngineInput
@@ -60,6 +195,21 @@ export const getLedgerBalancesNumber = async (
   const ledgers = allLedgers.filter(
     (l) => l.companyId === companyId
   ) as Ledger[];
+
+  const company = await getCompanyByIdFromDb(companyId);
+  const baseCurrencyId = company?.currencyId ?? null;
+
+  // A ledger is "foreign currency" when it is tagged with a currency other than the
+  // company base currency; its closing balance must be revalued at the closing rate.
+  const ledgerIdFilter = ledgerIds?.length ? new Set(ledgerIds) : null;
+  const foreignLedgers = ledgers.filter(
+    (l) =>
+      l.currencyId !== null &&
+      baseCurrencyId !== null &&
+      l.currencyId !== baseCurrencyId &&
+      (!ledgerIdFilter || ledgerIdFilter.has(l.id))
+  );
+  const foreignLedgerIdSet = new Set(foreignLedgers.map((l) => l.id));
 
   const ledgerGroupMap = new Map<number, Group>();
   for (const ledger of ledgers) {
@@ -116,6 +266,16 @@ export const getLedgerBalancesNumber = async (
   const beforeMap = buildDrCrSumMap(beforeRows ?? []);
   const rangeMap = buildDrCrSumMap(rangeRows ?? []);
 
+  const foreignClosingSignedMap = await buildForeignLedgerClosingSignedMap({
+    companyId,
+    financialYearId,
+    fromDate,
+    toDate,
+    ccId,
+    foreignLedgers,
+    openingRows,
+  });
+
   // Ledger universe
   const ledgerIdSet = new Set<number>();
   for (const k of openingSignedMap.keys()) ledgerIdSet.add(k);
@@ -142,7 +302,12 @@ export const getLedgerBalancesNumber = async (
     const period = rangeMap.get(ledgerId) ?? { dr: 0, cr: 0 };
     const periodSigned = period.dr - period.cr;
 
-    const closingSigned = openingSigned + periodSigned;
+    // Foreign-currency ledgers close at the revalued (currencyAmount × closing rate)
+    // balance instead of the plain base-amount roll-forward.
+    const closingSigned =
+      foreignLedgerIdSet.has(ledgerId) && foreignClosingSignedMap.has(ledgerId)
+        ? (foreignClosingSignedMap.get(ledgerId) as number)
+        : openingSigned + periodSigned;
 
     const row: LedgerBalanceRowNum = {
       ledger: toIdValue(
