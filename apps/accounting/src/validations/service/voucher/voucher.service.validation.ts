@@ -5,6 +5,7 @@ import { getCostCentersByIds } from "@/repository/master/costCenter.repository.j
 import { getBillDocumentsByIds } from "@/repository/voucher/billDocument.repository.js";
 import { getVoucherById } from "@/repository/voucher/voucher.repository.js";
 import { commonGetService } from "@/services/common.service.js";
+import { voucherUINConfigService } from "@/services/master/voucherUinConfig.service.js";
 import { VoucherLineResponseForLedgerBook } from "@/types/reports/ledgerBook.js";
 import {
   CreateOrUpdateVoucherInput,
@@ -19,21 +20,26 @@ import {
   validateIdFinancialYear,
 } from "../company/company.service.validation.js";
 import { validateIdCollectionCenter } from "../master/collectionCenter.service.validation.js";
-import { validateIdVoucherType } from "../master/voucherType.service.validation.js";
 import { validateIdCurrency } from "../master/currency.service.validation.js";
-import { logger } from "@repo/platform/logging/logger.js";
+import { validateIdVoucherType } from "../master/voucherType.service.validation.js";
+import { checkChequeNumberIsUsed } from "@/repository/master/chequeMaster.repository.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { settingsService } from "@/services/settings/settings.service.js";
 import {
   AccUinShortCode,
   AllocationType,
+  BankTransactionType,
   BillStatus,
   DrCr,
+  Status,
   VoucherNumberingMode,
   VoucherStatus,
 } from "@repo/db/generated/prisma/enums.js";
 import {
   BillDocument,
+  ChequeMaster,
   CostCenter,
   Ledger,
 } from "@repo/db/generated/prisma/client";
@@ -82,18 +88,20 @@ export const validateIdVoucherLine = async (
   return voucherLine;
 };
 
-export const createOrUpdateVoucherServiceValidation = async (
-  input: CreateOrUpdateVoucherInput
-): Promise<void> => {
+export const createOrUpdateVoucherServiceValidation = async (params: {
+  input: CreateOrUpdateVoucherInput;
+  isCurrencyConversionRequired?: boolean;
+}): Promise<CreateOrUpdateVoucherInput> => {
   logger.info("entering::createOrUpdateVoucher::service::validation");
-
+  const { input, isCurrencyConversionRequired = true } = params;
   const store = requestStorage.getStore();
-  const settings = store?.settings;
+  const settings = await settingsService.getSettings();
   const roundingPrecision = settings?.roundingPrecision ?? 2;
   const roundingMethod = settings?.roundingMethod ?? RoundFormat.TO_FIXED;
 
   if (input.id) {
     const existingVoucher = await validateIdVoucher(input.id);
+    input.voucherNo = existingVoucher.voucherNo;
     input.existing = existingVoucher;
     if (existingVoucher.companyId !== input.companyId) {
       throw new ErrorHandler(
@@ -102,34 +110,46 @@ export const createOrUpdateVoucherServiceValidation = async (
       );
     }
 
-    if (existingVoucher.status !== VoucherStatus.DRAFT) {
-      throw new ErrorHandler(
-        400,
-        generateErrorMessage("INVALID_STATUS", "Voucher")
-      );
-    }
+    // if (existingVoucher.status !== VoucherStatus.DRAFT) {
+    //   throw new ErrorHandler(400, generateErrorMessage("INVALID_STATUS", "Voucher"));
+    // }
   }
 
   const company = await validateIdCompany(input.companyId);
   let currencyConversionRate: number = 1;
   if (input.currencyId) {
     const currency = await validateIdCurrency(input.currencyId);
-    if (
-      currency.code.toLowerCase() !==
-        company.companyCurrencySettings?.baseCurrencyCode?.toLowerCase() &&
-      !input.currencyConversionRate
-    ) {
+    if (currency.id !== company.currencyId && !input.currencyConversionRate) {
       throw new ErrorHandler(
         400,
         generateErrorMessage("FIELD_REQUIRED", "Currency Conversion Rate")
       );
     }
-    currencyConversionRate = Number(input.currencyConversionRate ?? 1);
+    currencyConversionRate = isCurrencyConversionRequired
+      ? Number(input.currencyConversionRate ?? 1)
+      : 1;
   }
   const fy = await validateIdFinancialYear(input.financialYearId);
-
+  /**
+   * Financial Year Validation
+   * 1. Check if the financial year is current
+   * 2. Check if the financial year is locked
+   * 3. Check if the financial year is closed
+   */
   if (!fy.isCurrent) {
     throw new ErrorHandler(400, "Please provide current financial year");
+  }
+  if (fy.isLocked) {
+    throw new ErrorHandler(
+      400,
+      "Financial Year is locked, cannot create voucher"
+    );
+  }
+  if (fy.isClosed) {
+    throw new ErrorHandler(
+      400,
+      "Financial Year is closed, cannot create voucher"
+    );
   }
 
   if (input.voucherDate < fy.booksBeginFrom) {
@@ -163,6 +183,9 @@ export const createOrUpdateVoucherServiceValidation = async (
   }
 
   const cc = await validateIdCollectionCenter(input.ccId);
+  if (cc.id === settings?.mainBranch?.id) {
+    throw new ErrorHandler(400, "Voucher cannot be created for head office ");
+  }
   if (cc.companyId !== input.companyId) {
     throw new ErrorHandler(
       400,
@@ -206,9 +229,11 @@ export const createOrUpdateVoucherServiceValidation = async (
     );
   }
 
-  let voucherLineTotalCr = 0;
-  let voucherLineTotalDr = 0;
-  let hasBankOrCashLedger = false;
+  let voucherLineTotalCr: number = 0;
+  let voucherLineTotalDr: number = 0;
+  let hasBankOrCashLedger: boolean = false;
+  let voucherLineTotalCrCurrencyAmount: number = 0;
+  let voucherLineTotalDrCurrencyAmount: number = 0;
 
   const allLedgers = await commonGetService.getAllElements<"Ledger">({
     cacheCode: "LEDGER",
@@ -265,6 +290,114 @@ export const createOrUpdateVoucherServiceValidation = async (
       );
     }
 
+    // check if transaction type is required
+    if (voucherType.isTransactionTypeRequired && ledger.isBankAccount) {
+      if (!voucherLine.transactionType) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_REQUIRED", "Transaction Type")
+        );
+      }
+      if (!voucherLine.instrumentNo) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_REQUIRED", "Instrument No")
+        );
+      }
+      if (!voucherLine.instrumentDate) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_REQUIRED", "Instrument Date")
+        );
+      }
+      if (voucherLine.transactionType === BankTransactionType.CHEQUE) {
+        const chequeNo = Number(voucherLine.instrumentNo);
+
+        const allChequeMasters =
+          (await commonGetService.getAllElements<"ChequeMaster">({
+            cacheCode: "CHEQUE_MASTER",
+            canNullReturnable: true,
+            modelName: "ChequeMaster",
+            shortCode: "CHEQUE_MASTER",
+            useActiveFlag: true,
+          })) as ChequeMaster[];
+
+        const chequeMaster = allChequeMasters.filter(
+          (cm) => cm.bankLedgerId === ledger.id && cm.status === Status.ACTIVE
+        );
+
+        if (!chequeMaster) {
+          throw new ErrorHandler(
+            400,
+            generateErrorMessage("NOT_FOUND", "Cheque Master")
+          );
+        }
+        // Check that the provided chequeNo exists in any ChequeMaster range
+        // If not, throw an error
+        // const checkNumberExists = chequeMaster.some((cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo);
+        const matchingChequeMaster = chequeMaster.find(
+          (cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo
+        );
+
+        if (!matchingChequeMaster) {
+          throw new ErrorHandler(
+            404,
+            `Cheque No ${chequeNo} does not exist in any Cheque Master range for bank ${ledger.name}`
+          );
+        }
+        const checkNumberIsUsed = await checkChequeNumberIsUsed(
+          matchingChequeMaster.id,
+          chequeNo
+        );
+        if (
+          checkNumberIsUsed &&
+          voucherLine.id !== checkNumberIsUsed.voucherLineId
+        ) {
+          throw new ErrorHandler(400, `Cheque No ${chequeNo} is already used`);
+        }
+        input.usedChequeMasterId = matchingChequeMaster.id;
+      }
+    }
+    if (voucherType.isTransactionTypeRequired && !ledger.isBankAccount) {
+      if (voucherLine.transactionType) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Transaction Type")
+        );
+      }
+      if (voucherLine.instrumentDate) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument Date")
+        );
+      }
+      if (voucherLine.instrumentNo) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument No")
+        );
+      }
+    }
+    if (!voucherType.isTransactionTypeRequired) {
+      if (voucherLine.transactionType) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Transaction Type")
+        );
+      }
+      if (voucherLine.instrumentDate) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument Date")
+        );
+      }
+      if (voucherLine.instrumentNo) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument No")
+        );
+      }
+    }
     const amt = Number(voucherLine.amount);
     if (amt <= 0)
       throw new ErrorHandler(
@@ -272,10 +405,19 @@ export const createOrUpdateVoucherServiceValidation = async (
         generateErrorMessage("MUST_GREATER_THEN", "Amount", "0")
       );
 
+    voucherLine.currencyAmount =
+      input.currencyId && input.currencyId !== company.currencyId
+        ? voucherLine.amount
+        : 0;
+
     //currency conversion
-    if (voucherLine.drCr === DrCr.CR)
+    if (voucherLine.drCr === DrCr.CR) {
       voucherLineTotalCr += amt * currencyConversionRate;
-    else voucherLineTotalDr += amt * currencyConversionRate;
+      voucherLineTotalCrCurrencyAmount += Number(voucherLine.currencyAmount);
+    } else {
+      voucherLineTotalDr += amt * currencyConversionRate;
+      voucherLineTotalDrCurrencyAmount += Number(voucherLine.currencyAmount);
+    }
 
     byLineNo.set(voucherLine.lineNo, {
       lineNo: voucherLine.lineNo,
@@ -290,7 +432,12 @@ export const createOrUpdateVoucherServiceValidation = async (
       roundingMethod,
       roundingPrecision
     );
+    voucherLine.currencyId = input.currencyId;
+    voucherLine.currencyConversionRate = input.currencyConversionRate;
   }
+  input.currencyTotalDebit = voucherLineTotalDrCurrencyAmount;
+  input.currencyTotalCredit = voucherLineTotalCrCurrencyAmount;
+
   const totalDebit: number = applyRound(
     Number(input.totalDebit ?? 0) * currencyConversionRate,
     roundingMethod,
@@ -304,6 +451,12 @@ export const createOrUpdateVoucherServiceValidation = async (
   input.totalDebit = totalDebit;
   input.totalCredit = totalCredit;
 
+  if (Number(input.totalDebit) <= 0 || Number(input.totalCredit) <= 0) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("MUST_GREATER_THEN", "Total Debit/Credit", "0")
+    );
+  }
   if (voucherType.requireBankOrCash && !hasBankOrCashLedger) {
     throw new ErrorHandler(
       400,
@@ -315,6 +468,12 @@ export const createOrUpdateVoucherServiceValidation = async (
     );
   }
 
+  if (voucherLineTotalCrCurrencyAmount !== voucherLineTotalDrCurrencyAmount) {
+    throw new ErrorHandler(
+      400,
+      "Total CR and DR amount before currency conversion should be equal for voucher lines"
+    );
+  }
   if (voucherLineTotalCr !== voucherLineTotalDr) {
     throw new ErrorHandler(
       400,
@@ -663,13 +822,24 @@ export const createOrUpdateVoucherServiceValidation = async (
     }
   }
 
-  if (voucherType.numberingMode === VoucherNumberingMode.AUTO) {
+  if (
+    voucherType.numberingMode === VoucherNumberingMode.AUTO &&
+    !input.voucherNo
+  ) {
     input.voucherNo = await uinServiceFactory.generateUIN(
       AccUinShortCode.VOUCHER
     );
+  } else if (
+    voucherType.numberingMode === VoucherNumberingMode.CUSTOM_AUTO &&
+    !input.voucherNo
+  ) {
+    input.voucherNo = await voucherUINConfigService.generateUIN(
+      input.voucherTypeId,
+      new Date(input.voucherDate)
+    );
   }
-
   logger.info("exiting::createOrUpdateVoucher::service::validation");
+  return input;
 };
 
 export const deleteVoucherServiceValidation = async (
@@ -698,4 +868,27 @@ export const cancelVoucherServiceValidation = async (
     );
   }
   logger.info("exiting::cancelVoucher::service::validation");
+};
+
+export const createVoucherFromExcelServiceValidation = async (params: {
+  filePath: string;
+  ccId: number;
+  voucherTypeId: number;
+}) => {
+  logger.info(
+    "entering::createVoucherFromExcelServiceValidation::service::validation"
+  );
+  if (!params.filePath) {
+    throw new ErrorHandler(400, "No file path provided");
+  }
+  const settings = await settingsService.getSettings();
+  const cc = await validateIdCollectionCenter(params.ccId);
+  if (cc.id === settings?.mainBranch?.id) {
+    throw new ErrorHandler(400, "Voucher cannot be created for head office ");
+  }
+
+  await validateIdVoucherType(params.voucherTypeId);
+  logger.info(
+    "exiting::createVoucherFromExcelServiceValidation::service::validation"
+  );
 };

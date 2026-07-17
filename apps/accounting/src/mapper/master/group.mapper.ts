@@ -7,16 +7,6 @@ import {
   GroupResponse,
 } from "@/types/master/group.js";
 import { customOmit, toIdValue } from "av6-utils";
-import {
-  parseOptionalString,
-  parseOptionalBoolean,
-  parseEnum,
-} from "@/utils/groupAndLedgerExcelImport.utils.js";
-import {
-  PRIMARY_CATEGORIES,
-  REPORT_TYPES,
-  NATURES,
-} from "@/utils/groupAndLedgerExcelImport.utils.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import {
   generateErrorMessage,
@@ -27,6 +17,16 @@ import {
   AccountingPrimaryCategory,
   AccountingReportType,
 } from "@repo/db/generated/prisma/enums.js";
+import {
+  NATURES,
+  parseEnum,
+  parseOptionalBoolean,
+  parseOptionalString,
+  PRIMARY_CATEGORIES,
+  REPORT_TYPES,
+} from "@/utils/groupAndLedgerExcelImport.utils.js";
+import { Group, GroupExcel } from "@repo/db/generated/prisma/client";
+import { getAll } from "@/repository/common.repository.js";
 
 export const mapRowToGroupExcelCreateInput = (
   row: GroupExcelRow,
@@ -69,21 +69,18 @@ export const mapRowToGroupExcelCreateInput = (
 };
 
 export const buildGroupInputFromExcel = async (params: {
-  item: GroupExcelRow;
+  item: GroupExcel;
   companyId: number;
 }): Promise<CreateOrUpdateGroupInput> => {
   const { item, companyId } = params;
 
-  const allGroups = await commonGetService.getAllElements<"Group">({
-    cacheCode: "GROUP",
-    canNullReturnable: true,
-    modelName: "Group",
-    shortCode: "GROUP",
-    useActiveFlag: true,
-  });
-  const existingGroup = allGroups.find(
-    (g) => g.name === item.name && g.companyId === companyId
-  );
+  const allGroups = (await getAll<"Group">({
+    model: "Group",
+    where: {
+      companyId: companyId,
+    },
+  })) as Group[];
+  const existingGroup = allGroups.find((g) => g.name === item.name);
   if (existingGroup) {
     throw new ErrorHandler(
       400,
@@ -105,9 +102,7 @@ export const buildGroupInputFromExcel = async (params: {
         generateErrorMessage("FIELD_REQUIRED", "Parent Group Name")
       );
     }
-    const parentGroup = allGroups.find(
-      (g) => g.name === item.parentGroupName && g.companyId === companyId
-    );
+    const parentGroup = allGroups.find((g) => g.name === item.parentGroupName);
     if (!parentGroup) {
       throw new ErrorHandler(
         400,

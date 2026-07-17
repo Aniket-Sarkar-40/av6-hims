@@ -11,6 +11,7 @@ import {
 } from "@/types/master/rateOfExchange.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { RateOfExchange } from "@repo/db/generated/prisma/client";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
 import dayjs from "dayjs";

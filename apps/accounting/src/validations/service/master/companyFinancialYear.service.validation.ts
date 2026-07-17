@@ -106,3 +106,47 @@ export const createOrUpdateCompanyFinancialYearServiceValidation = async (
     "exiting::createOrUpdateCompanyFinancialYear::service::validation"
   );
 };
+
+export const validateCloseCompanyFinancialYearServiceValidation = async (
+  id: number
+) => {
+  logger.info(
+    "entering::validateCloseCompanyFinancialYear::service::validation"
+  );
+  const fy = await validateIdCompanyFinancialYear(id);
+  if (fy.isClosed) {
+    throw new ErrorHandler(400, "Company Financial Year is already closed");
+  }
+  if (fy.isLocked) {
+    throw new ErrorHandler(
+      400,
+      "Company Financial Year is locked, cannot be closed"
+    );
+  }
+  logger.info(
+    "exiting::validateCloseCompanyFinancialYear::service::validation"
+  );
+};
+
+export const validateToggleLockCompanyFinancialYearServiceValidation = async (
+  id: number
+) => {
+  logger.info(
+    "entering::validateToggleLockCompanyFinancialYear::service::validation"
+  );
+  const fy = await validateIdCompanyFinancialYear(id);
+  // if (fy.isCurrent) {
+  //   throw new ErrorHandler(400, "Current Financial Year cannot be locked");
+  // }
+  if (fy.isClosed) {
+    throw new ErrorHandler(
+      400,
+      "Company Financial Year is closed, cannot be locked"
+    );
+  }
+  const status = fy.isLocked ? false : true;
+  logger.info(
+    "exiting::validateToggleLockCompanyFinancialYear::service::validation"
+  );
+  return status;
+};

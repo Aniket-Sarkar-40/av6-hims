@@ -17,7 +17,6 @@ import {
   strOptional,
   strRequired,
 } from "@repo/shared/utils/joi.utils.js";
-
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 
 export const fetchUnReconciledBankLedgerBookRequestInputSchema =
@@ -28,8 +27,6 @@ export const fetchUnReconciledBankLedgerBookRequestInputSchema =
 export const manualReconcileVoucherLineSchema = Joi.object<ManualReconcileRow>({
   voucherLineId: idRequired("Voucher Line Id"),
   bankClearedDate: dateRequired("Bank Cleared Date"),
-  bankReferenceNo: strOptional("Bank Reference No"),
-  remarks: strOptional("Remarks"),
 });
 
 export const manualReconcileVoucherLinesRequestInputSchema =
@@ -101,10 +98,12 @@ export const validateFetchUnReconciledBankLedgerBookRequestInput =
 export const validateManualReconcileVoucherLinesRequestInput =
   validationHandler({
     schema: manualReconcileVoucherLinesRequestInputSchema,
+    path: "body",
   });
 
 export const validateBankStatementExcelBaseInput = validationHandler({
   schema: bankStatementExcelBaseInputSchema,
+  path: "body",
   type: "FORMDATA",
   imgAttr: "fileUrl",
 });
@@ -112,8 +111,10 @@ export const validateBankStatementExcelBaseInput = validationHandler({
 export const validateManualBankReconcileWithBankStatementRequestInput =
   validationHandler({
     schema: manualBankReconcileWithBankStatementInputSchema,
+    path: "body",
   });
 
 export const validateBankReconciliationSummaryRequestInput = validationHandler({
   schema: bankReconciliationSummaryRequestInputSchema,
+  path: "body",
 });

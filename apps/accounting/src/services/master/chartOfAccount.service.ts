@@ -8,6 +8,7 @@ import { validateIdCompany } from "@/validations/service/company/company.service
 import { commonGetService } from "../common.service.js";
 import ExcelJs from "exceljs";
 import { logger } from "@repo/platform/logging/logger.js";
+import { toRequiredIdValue } from "@repo/shared/utils/helper.utils.js";
 
 const chartOfAccountsServiceRaw = {
   async fetchChartOfAccounts(

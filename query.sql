@@ -2052,3 +2052,394 @@ CREATE TABLE `inv_feature_flag` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+-- AlterTable
+ALTER TABLE `accounting_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_batch_job` MODIFY `type` ENUM('ITEM', 'ITEM_PRICING', 'VOUCHER_ENTRY', 'BANK_STATEMENT_UPLOAD', 'GROUP_IMPORT', 'LEDGER_IMPORT') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_client_ledger_mapping` MODIFY `client_type` ENUM('CORPORATE', 'INSURANCE', 'PMS_DISTRIBUTOR', 'INV_ITEM_SUPPLIER', 'BANK_OR_CASH') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_company` ADD COLUMN `currency_id` INTEGER NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_company_financial_year` ADD COLUMN `closed_at` DATE NULL,
+    ADD COLUMN `closed_by` INTEGER NULL,
+    ADD COLUMN `is_closed` BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE `accounting_ledger` ADD COLUMN `branch_name` VARCHAR(120) NULL,
+    ADD COLUMN `credit_period_in_days` INTEGER NULL,
+    ADD COLUMN `currency_id` INTEGER NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_ledger_opening_balances` ADD COLUMN `currency_amount` DECIMAL(18, 5) NULL,
+    ADD COLUMN `currency_conversion_rate` DECIMAL(18, 5) NULL,
+    ADD COLUMN `currency_id` INTEGER NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_settings` ADD COLUMN `main_branch_id` INTEGER NOT NULL DEFAULT 1;
+
+-- AlterTable
+ALTER TABLE `accounting_voucher` ADD COLUMN `currency_total_credit` DECIMAL(18, 5) NULL,
+    ADD COLUMN `currency_total_debit` DECIMAL(18, 5) NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_voucher_line` ADD COLUMN `currency_amount` DECIMAL(18, 5) NULL,
+    ADD COLUMN `currency_conversion_rate` DECIMAL(18, 5) NULL,
+    ADD COLUMN `currency_id` INTEGER NULL,
+    ADD COLUMN `transaction_type` ENUM('CARD', 'CHEQUE', 'UPI', 'E_FUND_TRANSFER', 'OTHERS') NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_voucher_type` ADD COLUMN `is_transaction_type_required` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `numbering_mode` ENUM('MANUAL', 'AUTO', 'CUSTOM_AUTO') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_event_delivery` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_mono_repo_modules` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_pdf_template` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL,
+    MODIFY `template_type` ENUM('BILL', 'INVOICE', 'REPORT', 'PURCHASE_ORDER', 'GOOD_RECEIVE_NOTE', 'MULTI_VOUCHER', 'JOURNAL_VOUCHER') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_service_event` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL DEFAULT 'OPD';
+
+-- AlterTable
+ALTER TABLE `nopd_patient_consultation` MODIFY `blood_group` ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NULL;
+
+-- AlterTable
+ALTER TABLE `nopd_payment_transactions` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `notifications` MODIFY `source` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `pathology_b2b_invoice_amount_summary` MODIFY `service_type` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING') NOT NULL DEFAULT 'PATHOLOGY';
+
+-- AlterTable
+ALTER TABLE `pms_batch_job` MODIFY `type` ENUM('ITEM', 'ITEM_PRICING', 'VOUCHER_ENTRY', 'BANK_STATEMENT_UPLOAD', 'GROUP_IMPORT', 'LEDGER_IMPORT') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `staff` ADD COLUMN `tele_radiologist` ENUM('Yes', 'No') NOT NULL DEFAULT 'No',
+    MODIFY `department` VARCHAR(100) NOT NULL,
+    MODIFY `qualification` VARCHAR(500) NOT NULL,
+    MODIFY `work_exp` VARCHAR(200) NOT NULL,
+    MODIFY `specialization` VARCHAR(200) NOT NULL,
+    MODIFY `surname` VARCHAR(200) NOT NULL,
+    MODIFY `father_name` VARCHAR(200) NOT NULL,
+    MODIFY `mother_name` VARCHAR(200) NOT NULL,
+    MODIFY `contact_no` VARCHAR(200) NOT NULL,
+    MODIFY `emergency_contact_name` VARCHAR(200) NOT NULL,
+    MODIFY `emergency_contact_no` VARCHAR(200) NOT NULL,
+    MODIFY `dob` DATE NOT NULL,
+    MODIFY `date_of_joining` DATE NOT NULL,
+    MODIFY `local_address` VARCHAR(300) NOT NULL,
+    MODIFY `permanent_address` VARCHAR(200) NOT NULL,
+    MODIFY `note` VARCHAR(200) NOT NULL,
+    MODIFY `image` VARCHAR(200) NOT NULL,
+    MODIFY `digital_sign` VARCHAR(255) NOT NULL,
+    MODIFY `gender` VARCHAR(50) NOT NULL,
+    MODIFY `blood_group` VARCHAR(100) NOT NULL,
+    MODIFY `account_title` VARCHAR(200) NOT NULL,
+    MODIFY `user_id` INTEGER NOT NULL,
+    MODIFY `is_eligible_discount` ENUM('0', '1') NOT NULL,
+    MODIFY `is_eligible_consumption` ENUM('0', '1') NOT NULL,
+    MODIFY `verification_code` VARCHAR(100) NOT NULL,
+    MODIFY `holiday_entitlement` VARCHAR(255) NOT NULL,
+    MODIFY `national_health_insurance_no` VARCHAR(255) NOT NULL,
+    MODIFY `ssnit_no` VARCHAR(255) NOT NULL,
+    MODIFY `other_scheme` VARCHAR(255) NOT NULL;
+
+-- DropTable
+DROP TABLE `bb_bank_uin_config`;
+
+-- DropTable
+DROP TABLE `bb_dynamic_short_code`;
+
+-- DropTable
+DROP TABLE `bb_master_blood_bank_centers`;
+
+-- DropTable
+DROP TABLE `bb_master_blood_component`;
+
+-- DropTable
+DROP TABLE `bb_master_blood_cross_match_method`;
+
+-- DropTable
+DROP TABLE `bb_master_hospital`;
+
+-- DropTable
+DROP TABLE `bb_settings`;
+
+-- CreateTable
+CREATE TABLE `accounting_multi_voucher` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `cc_id` INTEGER NOT NULL,
+    `company_id` INTEGER NOT NULL,
+    `financial_year_id` INTEGER NOT NULL,
+    `voucher_type_id` INTEGER NOT NULL,
+    `voucher_date` DATE NOT NULL,
+    `description` TEXT NULL,
+    `status` ENUM('DRAFT', 'POSTED') NOT NULL DEFAULT 'DRAFT',
+    `ledger_id` INTEGER NOT NULL,
+    `dr_cr` ENUM('DR', 'CR') NOT NULL,
+    `amount` DECIMAL(18, 5) NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+    `approved_by` INTEGER NULL,
+    `approved_at` DATETIME(3) NULL,
+
+    INDEX `idx_multi_voucher_company`(`company_id`),
+    INDEX `idx_multi_voucher_financial_year`(`financial_year_id`),
+    INDEX `idx_multi_voucher_collection_center`(`cc_id`),
+    INDEX `idx_multi_voucher_voucher_type`(`voucher_type_id`),
+    INDEX `idx_multi_voucher_ledger`(`ledger_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_multi_voucher_details` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `multi_voucher_id` INTEGER NOT NULL,
+    `line_no` INTEGER NULL,
+    `cc_id` INTEGER NOT NULL,
+    `voucher_no` VARCHAR(191) NULL,
+    `ledger_id` INTEGER NOT NULL,
+    `dr_cr` ENUM('DR', 'CR') NOT NULL,
+    `amount` DECIMAL(18, 5) NOT NULL,
+    `narration` TEXT NULL,
+    `transaction_type` ENUM('CARD', 'CHEQUE', 'UPI', 'E_FUND_TRANSFER', 'OTHERS') NULL,
+    `instrument_no` VARCHAR(191) NULL,
+    `instrument_date` DATETIME(3) NULL,
+    `voucher_id` INTEGER NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    UNIQUE INDEX `accounting_multi_voucher_details_voucher_id_key`(`voucher_id`),
+    INDEX `idx_multi_voucher_details_multi_voucher`(`multi_voucher_id`),
+    INDEX `idx_multi_voucher_details_collection_center`(`cc_id`),
+    INDEX `idx_multi_voucher_details_ledger`(`ledger_id`),
+    INDEX `idx_multi_voucher_details_voucher`(`voucher_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_voucher_audit` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `audit_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `voucher_id` INTEGER NOT NULL,
+    `company_id` INTEGER NOT NULL,
+    `financial_year_id` INTEGER NOT NULL,
+    `cc_id` INTEGER NOT NULL,
+    `voucher_type_id` INTEGER NOT NULL,
+    `voucher_no` VARCHAR(191) NOT NULL,
+    `voucher_date` DATE NOT NULL,
+    `ref_type` VARCHAR(191) NULL,
+    `sub_ref_type` VARCHAR(191) NULL,
+    `ref_no` VARCHAR(191) NULL,
+    `ref_id` INTEGER NULL,
+    `p_id` VARCHAR(191) NULL,
+    `narration` TEXT NULL,
+    `status` ENUM('DRAFT', 'POSTED', 'CANCELLED') NOT NULL DEFAULT 'POSTED',
+    `total_debit` DECIMAL(18, 5) NULL,
+    `total_credit` DECIMAL(18, 5) NULL,
+    `currency_total_debit` DECIMAL(18, 5) NULL,
+    `currency_total_credit` DECIMAL(18, 5) NULL,
+    `currency_id` INTEGER NULL,
+    `currency_conversion_rate` DECIMAL(18, 5) NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NULL,
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+    `approved_by` INTEGER NULL,
+    `approved_at` DATETIME(3) NULL,
+
+    INDEX `idx_voucher_audit_company`(`company_id`),
+    INDEX `idx_voucher_audit_financial_year`(`financial_year_id`),
+    INDEX `idx_voucher_audit_collection_center`(`cc_id`),
+    INDEX `idx_voucher_audit_voucher_type`(`voucher_type_id`),
+    INDEX `idx_voucher_audit_currency`(`currency_id`),
+    INDEX `idx_voucher_audit_voucher`(`voucher_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_bank_statement_format_mapping` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `bank_ledger_id` INTEGER NOT NULL,
+    `excel_format` JSON NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    INDEX `idx_bank_statement_format_mapping_bank_ledger`(`bank_ledger_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_rate_of_exchange` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `company_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `financial_year_id` INTEGER NOT NULL,
+    `date` DATE NOT NULL,
+    `std_rate` DOUBLE NOT NULL,
+    `selling_rate` DOUBLE NULL,
+    `buying_rate` DOUBLE NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    INDEX `idx_rate_of_exchange_company`(`company_id`),
+    INDEX `idx_rate_of_exchange_currency`(`currency_id`),
+    INDEX `idx_rate_of_exchange_financial_year`(`financial_year_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_group_excel` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `batch_job_id` INTEGER NOT NULL,
+    `row_no` INTEGER NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `alias` VARCHAR(191) NULL,
+    `is_primary_group` BOOLEAN NOT NULL,
+    `parent_group_name` VARCHAR(191) NULL,
+    `primary_category` ENUM('ASSET', 'LIABILITY', 'INCOME', 'EXPENSE') NULL,
+    `report_type` ENUM('BALANCE_SHEET', 'PROFIT_LOSS') NULL,
+    `nature` ENUM('DEBIT', 'CREDIT') NULL,
+    `affects_gross_profit` BOOLEAN NULL,
+
+    INDEX `idx_group_excel_batch_job`(`batch_job_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_ledger_excel` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `batch_job_id` INTEGER NOT NULL,
+    `row_no` INTEGER NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `group_name` VARCHAR(191) NOT NULL,
+    `alias` VARCHAR(191) NULL,
+    `ledger_type` ENUM('GENERAL', 'CUSTOMER', 'SUPPLIER', 'BANK', 'CASH', 'TAX') NOT NULL DEFAULT 'GENERAL',
+    `is_bank_account` BOOLEAN NOT NULL DEFAULT false,
+    `is_cash_account` BOOLEAN NOT NULL DEFAULT false,
+    `bank_name` VARCHAR(191) NULL,
+    `bank_ifsc` VARCHAR(191) NULL,
+    `bank_account_no` VARCHAR(191) NULL,
+    `upi_id` VARCHAR(191) NULL,
+    `branch_name` VARCHAR(191) NULL,
+    `contact_name` VARCHAR(191) NULL,
+    `phone` VARCHAR(191) NULL,
+    `email` VARCHAR(191) NULL,
+    `address` TEXT NULL,
+    `gst_type` ENUM('NA', 'REGISTERED', 'UNREGISTERED', 'COMPOSITION', 'SEZ', 'EXPORT', 'OTHER') NOT NULL DEFAULT 'NA',
+    `gstin` VARCHAR(191) NULL,
+    `place_of_supply_state_name` VARCHAR(191) NULL,
+    `currency_code` VARCHAR(191) NULL,
+
+    INDEX `idx_ledger_excel_batch_job`(`batch_job_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_voucher_uin_config` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `voucher_type_id` INTEGER NOT NULL,
+    `seq_start_date` DATE NOT NULL,
+    `sequence_no` BIGINT NOT NULL DEFAULT 0,
+    `seq_reset_date` DATE NOT NULL,
+    `seq_reset_policy` ENUM('daily', 'weekly', 'monthly', 'yearly', 'no') NOT NULL DEFAULT 'no',
+    `description` VARCHAR(191) NULL,
+    `uin_segments` JSON NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    INDEX `idx_voucher_uin_config_voucher_type`(`voucher_type_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_cheque_master` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `bank_ledger_id` INTEGER NOT NULL,
+    `start_cheque_no` INTEGER NOT NULL,
+    `end_cheque_no` INTEGER NOT NULL,
+    `status` ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    INDEX `idx_cheque_master_bank_ledger`(`bank_ledger_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `accounting_used_cheque_number` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `cheque_master_id` INTEGER NOT NULL,
+    `voucher_line_id` INTEGER NOT NULL,
+    `cheque_no` INTEGER NOT NULL,
+    `is_used` BOOLEAN NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+
+    INDEX `idx_used_cheque_number_cheque_master`(`cheque_master_id`),
+    INDEX `idx_used_cheque_number_voucher_line`(`voucher_line_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateIndex
+CREATE INDEX `company_currency_id_idx` ON `accounting_company`(`currency_id`);

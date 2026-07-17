@@ -23,6 +23,9 @@ export enum RedisResource {
   VOUCHER_TYPE = "voucherType",
   COST_CENTER = "costCenter",
   NARRATION = "narration",
+  CHEQUE_MASTER = "chequeMaster",
+  FEATURE_FLAG = "featureFlag",
+  RATE_OF_EXCHANGE = "rateOfExchange",
 }
 
 export const getRedisKey = (

@@ -6,7 +6,11 @@ import {
   updateCompanyFinancialYearInDb,
 } from "@/repository/master/companyFinancialYear.repository.js";
 import { CreateOrUpdateCompanyFinancialYear } from "@/types/master/companyFinancialYear.js";
-import { createOrUpdateCompanyFinancialYearServiceValidation } from "@/validations/service/master/companyFinancialYear.service.validation.js";
+import {
+  createOrUpdateCompanyFinancialYearServiceValidation,
+  validateCloseCompanyFinancialYearServiceValidation,
+  validateToggleLockCompanyFinancialYearServiceValidation,
+} from "@/validations/service/master/companyFinancialYear.service.validation.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
 const CompanyFinancialYearServiceRaw = {

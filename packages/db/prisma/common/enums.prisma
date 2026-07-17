@@ -123,6 +123,8 @@ enum PdfTemplateType {
     REPORT
     PURCHASE_ORDER
     GOOD_RECEIVE_NOTE
+    MULTI_VOUCHER
+    JOURNAL_VOUCHER
 }
 
 enum DiscMethod {

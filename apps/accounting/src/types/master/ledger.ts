@@ -59,6 +59,7 @@ export type LedgerExcelRow = {
   "Cash Account"?: string;
   "Bank Name"?: string;
   "Bank IFSC"?: string;
+  "Branch Name"?: string;
   "Bank Account No"?: string;
   "UPI Id"?: string;
   "Contact Name"?: string;

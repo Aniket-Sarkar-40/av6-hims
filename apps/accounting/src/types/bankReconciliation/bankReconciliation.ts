@@ -1,4 +1,7 @@
-import { BankReconcileStatus } from "@repo/db/generated/prisma/enums.js";
+import {
+  BankReconcileStatus,
+  BankTransactionType,
+} from "@repo/db/generated/prisma/enums.js";
 import { BaseModelAttrWoCancel } from "../common.js";
 import { IdValue } from "../global.js";
 import { DrCrAmt } from "../reports/ledgerBalanceEngine.js";

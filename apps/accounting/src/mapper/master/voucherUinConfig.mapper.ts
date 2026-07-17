@@ -1,6 +1,7 @@
 import { commonGetService } from "@/services/common.service.js";
 import { BaseModelAttrWoCancel } from "@/types/common.js";
 import { VoucherUINConfigDTO } from "@/types/master/voucherUinConfig.js";
+import { VoucherUINConfig } from "@repo/db/generated/prisma/client";
 import { UINSegment } from "av6-core-v2";
 import { customOmit, toIdValue } from "av6-utils";
 

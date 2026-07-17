@@ -97,6 +97,7 @@ model AccSettings {
     roundingPrecision Int               @default(2) @map("rounding_precision")
     timeZone          String?           @map("time_zone")
     excelBatchSize    Int               @default(100) @map("excel_batch_size")
+    mainBranchId      Int               @default(1) @map("main_branch_id")
 
     isActive  Boolean  @default(true) @map("is_active")
     createdBy Int?     @map("created_by")
@@ -221,6 +222,7 @@ model CompanyFinancialYear {
     booksBeginFrom DateTime @map("books_begin_from") @db.Date
     isCurrent      Boolean  @default(false) @map("is_current")
     isLocked       Boolean  @default(false) @map("is_locked")
+    isClosed       Boolean  @default(false) @map("is_closed")
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -229,6 +231,8 @@ model CompanyFinancialYear {
     updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
     deletedBy Int?      @map("deleted_by")
+    closedAt  DateTime? @map("closed_at") @db.Date
+    closedBy  Int?      @map("closed_by")
 
     company               Company                @relation(fields: [companyId], references: [id])
     ledgerOpeningBalances LedgerOpeningBalance[]
@@ -353,6 +357,7 @@ model Ledger {
     bankIfsc      String? @map("bank_ifsc") @db.VarChar(20)
     bankAccountNo String? @map("bank_account_no") @db.VarChar(40)
     upiId         String? @map("upi_id") @db.VarChar(120)
+    branchName    String? @map("branch_name") @db.VarChar(120)
 
     contactName String? @map("contact_name") @db.VarChar(120)
     phone       String? @db.VarChar(30)
@@ -363,6 +368,9 @@ model Ledger {
     gstType              LedgerGstType @default(NA) @map("gst_type")
     gstin                String?
     placeOfSupplyStateId Int?          @map("place_of_supply_state_id")
+
+    currencyId         Int? @map("currency_id")
+    creditPeriodInDays Int? @map("credit_period_in_days")
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -397,10 +405,12 @@ model LedgerOpeningBalance {
     ledgerId        Int @map("ledger_id")
 
     // ccId         Int?  @map("cc_id") //only if branch-wise opening
-
-    asOnDate DateTime @map("as_on_date") @db.Date
-    amount   Decimal  @db.Decimal(18, 5)
-    drCr     DrCr     @map("dr_cr")
+    currencyId             Int?     @map("currency_id")
+    currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+    currencyAmount         Decimal? @map("currency_amount") @db.Decimal(18, 5)
+    asOnDate               DateTime @map("as_on_date") @db.Date
+    amount                 Decimal  @db.Decimal(18, 5)
+    drCr                   DrCr     @map("dr_cr")
 
     source String? @db.VarChar(30) // MANUAL / MIGRATION / SYSTEM (optional)
     note   String? @db.VarChar(255)
@@ -435,6 +445,7 @@ model VoucherType {
     contraOnlyBankOrCash       Boolean              @default(false) @map("contra_only_bank_or_cash")
     enableBillWiseTracking     Boolean              @default(false) @map("enable_bill_wise_tracking")
     enableCostCenters          Boolean              @default(false) @map("enable_cost_centers")
+    isTransactionTypeRequired  Boolean              @default(false) @map("is_transaction_type_required")
     isReserved                 Boolean              @default(false) @map("is_reserved")
 
     isActive  Boolean   @default(true) @map("is_active")
@@ -507,6 +518,8 @@ model Voucher {
 
     currencyId             Int?     @map("currency_id")
     currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+    currencyTotalDebit     Decimal? @map("currency_total_debit") @db.Decimal(18, 5)
+    currencyTotalCredit    Decimal? @map("currency_total_credit") @db.Decimal(18, 5)
 
     isActive   Boolean   @default(true) @map("is_active")
     createdBy  Int?      @map("created_by")
@@ -548,7 +561,13 @@ model VoucherLine {
     drCr     DrCr    @map("dr_cr")
     amount   Decimal @db.Decimal(18, 5)
 
+    currencyId             Int?     @map("currency_id")
+    currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+    currencyAmount         Decimal? @map("currency_amount") @db.Decimal(18, 5)
+
     description String?
+
+    transactionType BankTransactionType? @map("transaction_type")
 
     // Optional (helps statement printing & bank recon later)
     instrumentNo   String?   @map("instrument_no")
@@ -1195,6 +1214,7 @@ model LedgerExcel {
     bankIfsc      String? @map("bank_ifsc")
     bankAccountNo String? @map("bank_account_no")
     upiId         String? @map("upi_id")
+    branchName    String? @map("branch_name")
 
     contactName String? @map("contact_name")
     phone       String?

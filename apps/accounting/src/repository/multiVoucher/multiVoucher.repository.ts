@@ -11,6 +11,7 @@ import {
 } from "../voucher/voucher.repository.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { db } from "@repo/db/client";
+import { MultiVoucherStatus } from "@repo/db/generated/prisma/enums.js";
 
 export const createMultiVoucherInDb = async (params: {
   input: CreateOrUpdateMultiVoucherInput;

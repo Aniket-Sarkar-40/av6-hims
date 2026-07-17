@@ -18,10 +18,10 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Ledger } from "@repo/db/generated/prisma/client";
 
-export const validatetrialBalanceServiceValidation = async (
+export const validateTrialBalanceServiceValidation = async (
   input: TrialBalanceRequestInput
 ) => {
-  logger.info("entering::validatetrialBalance::service::validation");
+  logger.info("entering::validateTrialBalance::service::validation");
   const { companyId, financialYearId, fromDate, toDate, ccId, ledgerIds } =
     input;
   await validateIdCompany(companyId);
@@ -84,7 +84,7 @@ export const validatetrialBalanceServiceValidation = async (
       }
     }
   }
-  logger.info("exiting::validatetrialBalance::service::validation");
+  logger.info("exiting::validateTrialBalance::service::validation");
 };
 
 export const validateLedgerBookServiceValidation = async (

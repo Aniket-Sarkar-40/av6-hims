@@ -8,6 +8,7 @@ import {
   postExternalVoucher,
   updateVoucher,
 } from "@/controllers/voucher/voucher.controller.js";
+import { authorizeExternalRequest } from "@/middleware/auth.middleware.js";
 import {
   validateCreateVoucher,
   validateCreateVoucherExcel,

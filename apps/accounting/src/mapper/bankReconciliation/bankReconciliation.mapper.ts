@@ -16,9 +16,13 @@ import {
   parseDateOrNull,
   parseStringOrNull,
 } from "@/utils/bankReconciliation.utils.js";
-import { toPublicImageUrl } from "@/utils/helper.utils.js";
-import { BankStatement, DrCr } from "@repo/db/generated/prisma/client";
+import {
+  BankStatement,
+  BankStatementFormatMapping,
+  DrCr,
+} from "@repo/db/generated/prisma/client";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { toPublicImageUrl } from "@repo/shared/utils/helper.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const mapRowToBankStatementExcelCreateInput = (params: {

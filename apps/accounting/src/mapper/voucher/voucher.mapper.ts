@@ -1,4 +1,3 @@
-import { coreRequests } from "@/client/core/request.js";
 import { getAllCollectionCentersFromDb } from "@/repository/master/collectionCenter.repository.js";
 import { commonGetService } from "@/services/common.service.js";
 import {
@@ -22,6 +21,8 @@ import {
 import { numberToWords } from "@/utils/helper.utils.js";
 import { extractOtherLedgersWithMeta } from "@/utils/voucherExcelImport.utils.js";
 import { getTopLedger } from "@/utils/voucherPdf.utils.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { VoucherStatus } from "@repo/db/generated/prisma/enums.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
@@ -101,10 +102,10 @@ export const toVoucherDTO = async (
         (vt) => vt.id === voucher.voucherTypeId
       );
       const createdBy = voucher.createdBy
-        ? await coreRequests.getEmployeeCache(voucher.createdBy)
+        ? await employeeService.getEmployeeById(voucher.createdBy)
         : null;
       const approvedBy = voucher.approvedBy
-        ? await coreRequests.getEmployeeCache(voucher.approvedBy)
+        ? await employeeService.getEmployeeById(voucher.approvedBy)
         : null;
       const voucherLineDto: VoucherLineDTO[] = voucher.voucherLines.map(
         (vl) => {
@@ -180,7 +181,7 @@ export const toVoucherDTO = async (
         });
 
       const currency = voucher.currencyId
-        ? await coreRequests.getCurrencyById(voucher.currencyId)
+        ? await currencyService.getCurrencyById(voucher.currencyId)
         : null;
 
       return {
@@ -334,10 +335,10 @@ export const toVoucherPdfDTO = async (
     (vt) => vt.id === voucher.voucherTypeId
   );
   const createdBy = voucher.createdBy
-    ? await coreRequests.getEmployeeCache(voucher.createdBy)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.createdBy)
     : null;
   const approvedBy = voucher.approvedBy
-    ? await coreRequests.getEmployeeCache(voucher.approvedBy)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.approvedBy)
     : null;
   const allLines = voucher.voucherLines;
   const topLedgerData = getTopLedger(
@@ -402,7 +403,7 @@ export const toVoucherPdfDTO = async (
     };
   });
   const currency = voucher.currencyId
-    ? await coreRequests.getCurrencyById(voucher.currencyId)
+    ? await currencyService.getCurrencyById(voucher.currencyId)
     : null;
   const amountInWords = topLine.amount
     ? numberToWords.convert(topLine.amount.toNumber())
@@ -510,10 +511,10 @@ export const toVoucherJournalPdfDTO = async (
     (vt) => vt.id === voucher.voucherTypeId
   );
   const createdBy = voucher.createdBy
-    ? await coreRequests.getEmployeeCache(voucher.createdBy)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.createdBy)
     : null;
   const approvedBy = voucher.approvedBy
-    ? await coreRequests.getEmployeeCache(voucher.approvedBy)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.approvedBy)
     : null;
   const byLines = voucher.voucherLines.filter((line) => line.drCr === "DR");
   const toLines = voucher.voucherLines.filter((line) => line.drCr === "CR");
@@ -550,7 +551,7 @@ export const toVoucherJournalPdfDTO = async (
   });
 
   const currency = voucher.currencyId
-    ? await coreRequests.getCurrencyById(voucher.currencyId)
+    ? await currencyService.getCurrencyById(voucher.currencyId)
     : null;
 
   const netAmount =

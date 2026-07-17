@@ -1,4 +1,8 @@
-import { DrCr, Prisma } from "@repo/db/generated/prisma/client";
+import {
+  BankTransactionType,
+  DrCr,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 import { BaseModelAttrWoCancel } from "../common.js";
 
 export type CreateOrUpdateBatchJobInput = Omit<

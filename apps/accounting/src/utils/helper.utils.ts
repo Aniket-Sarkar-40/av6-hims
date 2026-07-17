@@ -3,6 +3,7 @@ import { IdValue } from "@/types/global.js";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { customOmit } from "av6-utils";
 import Joi from "joi";
+import { ToWords } from "to-words";
 
 type PrecisionKey = "roundingPrecision";
 
@@ -115,3 +116,43 @@ export function toIdValueCountry<T extends { id: number }>(
   if (!row) return null;
   return { id: row.id, value: String(row[valueKey] ?? "") };
 }
+
+export function removeBaseModel<T extends BaseModel>(
+  input: T | undefined | null
+): Omit<T, BaseModelAttr> | null {
+  if (!input) return null;
+
+  const omitted = customOmit<T, BaseModelAttr>(input, [
+    "createdAt",
+    "canceledAt",
+    "canceledBy",
+    "createdBy",
+    "deletedAt",
+    "deletedBy",
+    "isActive",
+    "updatedAt",
+    "updatedBy",
+  ]);
+
+  return omitted.rest;
+}
+
+export const numberToWords = new ToWords({
+  localeCode: "en-GH",
+  converterOptions: {
+    currency: true,
+    ignoreDecimal: false,
+    ignoreZeroCurrency: false,
+    doNotAddOnly: false,
+    currencyOptions: {
+      name: "Cedi",
+      plural: "Cedis",
+      symbol: "₵",
+      fractionalUnit: {
+        name: "Pesewa",
+        plural: "Pesewas",
+        symbol: "",
+      },
+    },
+  },
+});

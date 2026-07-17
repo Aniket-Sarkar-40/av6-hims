@@ -33,6 +33,7 @@ enum ClientType {
     INSURANCE
     PMS_DISTRIBUTOR
     INV_ITEM_SUPPLIER
+    BANK_OR_CASH
 }
 
 enum ConfigLedgerType {
@@ -133,6 +134,7 @@ enum VoucherStatus {
 enum VoucherNumberingMode {
     MANUAL
     AUTO
+    CUSTOM_AUTO
 }
 
 enum VoucherTypeNature {

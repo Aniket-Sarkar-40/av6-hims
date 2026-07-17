@@ -1,4 +1,5 @@
 import { getCollectionCenterByIdFromDb } from "@/repository/master/collectionCenter.repository.js";
+import { SettingsDTO } from "@/types/settings/settings.js";
 import { AccSettings } from "@repo/db/generated/prisma/client";
 
 import { customOmit, toIdValue } from "av6-utils";

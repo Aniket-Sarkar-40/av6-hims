@@ -3,7 +3,10 @@ import { CostCenterResponse } from "@/types/master/costCenter.js";
 import { GroupResponse } from "@/types/master/group.js";
 import { LedgerResponse } from "@/types/master/ledger.js";
 import { VoucherTypeResponse } from "@/types/master/voucherType.js";
-import { VoucherResponseForDTO } from "@/types/voucher/voucher.js";
+import {
+  UsedChequeNumberResponse,
+  VoucherResponseForDTO,
+} from "@/types/voucher/voucher.js";
 
 import { toCompanyDto } from "@/mapper/company/company.mapper.js";
 import { toCompanyFinancialYearDto } from "@/mapper/master/companyFinancialYear.mapper.js";
@@ -32,16 +35,19 @@ import {
   AccSettings,
   AccUINConfig,
   BankStatement,
+  ChequeMaster,
   ClientLedgerMapping,
   Narration,
+  VoucherUINConfig,
 } from "@repo/db/generated/prisma/client";
 import { toVoucherUINConfigDTO } from "@/mapper/master/voucherUinConfig.mapper.js";
-import { toChequeMasterDto } from "@/mapper/master/chequeMaster.mapper.js";
 import { toChequeMasterDto } from "@/mapper/master/chequeMaster.mapper.js";
 import { toMultiVoucherDto } from "@/mapper/multiVoucher/multiVoucher.mapper.js";
 import { toClientLedgerMappingDto } from "@/mapper/mapping/clientLedgerMapping.mapper.js";
 import { toSettingsDto } from "@/mapper/master/settings.mapper.js";
 import { toRateOfExchangeDto } from "@/mapper/master/rateOfExchange.mapper.js";
+import { MultiVoucherResponseForDTO } from "@/types/multiVoucher/multiVoucher.js";
+import { RateOfExchangeResponse } from "@/types/master/rateOfExchange.js";
 // Define a type for DTO mapping functions.
 type DtoMappingFunction = (data: unknown) => unknown;
 export const dtoMapping: Record<string, DtoMappingFunction> = {

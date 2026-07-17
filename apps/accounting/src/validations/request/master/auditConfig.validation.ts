@@ -2,6 +2,7 @@ import { CreateOrUpdateAuditConfig } from "@/types/master/auditConfig.js";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+
 import Joi from "joi";
 
 export const auditConfigCreateSchema = Joi.object<CreateOrUpdateAuditConfig>({

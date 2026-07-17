@@ -1,6 +1,7 @@
 import { requestStorage } from "@/config/requestContext.js";
 import { CreateOrUpdateVoucherUINConfigRequest } from "@/types/master/voucherUinConfig.js";
 import { db } from "@repo/db/client";
+import { VoucherUINConfig } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 

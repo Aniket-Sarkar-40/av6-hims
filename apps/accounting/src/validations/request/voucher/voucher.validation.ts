@@ -2,6 +2,7 @@ import { PaymentMode } from "@/types/voucher/voucher.js";
 import { joiDecimalFromSettings } from "@/utils/helper.utils.js";
 import {
   AllocationType,
+  BankTransactionType,
   ConfigSubRefType,
   DrCr,
   VoucherReferenceType,
@@ -21,9 +22,12 @@ import {
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-
 import Joi from "joi";
 
+// transactionType BankTransactionType? @map("transaction_type")
+// // Optional (helps statement printing & bank recon later)
+// instrumentNo    String?              @map("instrument_no")
+// instrumentDate  DateTime?            @map("instrument_date")
 export const createVoucherLineSchema = Joi.object({
   lineNo: idRequired("Line No"),
   ledgerId: idRequired("Ledger Id"),
@@ -43,8 +47,17 @@ export const createVoucherLineSchema = Joi.object({
     "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
   }),
   description: strOptional("Description"),
-  instrumentNo: strOptional("Instrument No"),
-  instrumentDate: dateOptional("Instrument Date"),
+  transactionType: enumOptional("Transaction Type", BankTransactionType),
+  instrumentNo: Joi.when("transactionType", {
+    is: Joi.exist().not(null),
+    then: strRequired("Instrument No"),
+    otherwise: strOptional("Instrument No"),
+  }),
+  instrumentDate: Joi.when("transactionType", {
+    is: Joi.exist().not(null),
+    then: dateRequired("Instrument Date"),
+    otherwise: dateOptional("Instrument Date"),
+  }),
 });
 
 export const updateVoucherLineSchema = createVoucherLineSchema.keys({
@@ -154,57 +167,79 @@ export const createVoucherSchema = Joi.object({
     key: "roundingPrecision",
     required: true,
     min: 0,
-  }).messages({
-    "number.base": generateValidationErrorMessage("NUMBER", "Total Debit"),
-    "number.min": generateValidationErrorMessage("NON_NEGATIVE", "Total Debit"),
-    "number.precision": generateValidationErrorMessage(
-      "PRECISION",
-      "Total Debit",
-      "{{#limit}}"
-    ),
-    "any.required": generateValidationErrorMessage("REQUIRED", "Total Debit"),
-  }),
+  })
+    .greater(0)
+    .messages({
+      "number.base": generateValidationErrorMessage("NUMBER", "Total Debit"),
+      "number.min": generateValidationErrorMessage(
+        "NON_NEGATIVE",
+        "Total Debit"
+      ),
+      "number.precision": generateValidationErrorMessage(
+        "PRECISION",
+        "Total Debit",
+        "{{#limit}}"
+      ),
+      "any.required": generateValidationErrorMessage("REQUIRED", "Total Debit"),
+      "number.greater": generateValidationErrorMessage(
+        "MUST_GREATER_THAN",
+        "Total Debit",
+        "0"
+      ),
+    }),
   totalCredit: joiDecimalFromSettings({
     key: "roundingPrecision",
     required: true,
     min: 0,
-  }).messages({
-    "number.base": generateValidationErrorMessage("NUMBER", "Total Credit"),
-    "number.min": generateValidationErrorMessage(
-      "NON_NEGATIVE",
-      "Total Credit"
-    ),
-    "number.precision": generateValidationErrorMessage(
-      "PRECISION",
-      "Total Credit",
-      "{{#limit}}"
-    ),
-    "any.required": generateValidationErrorMessage("REQUIRED", "Total Credit"),
-  }),
+  })
+    .greater(0)
+    .messages({
+      "number.base": generateValidationErrorMessage("NUMBER", "Total Credit"),
+      "number.min": generateValidationErrorMessage(
+        "NON_NEGATIVE",
+        "Total Credit"
+      ),
+      "number.precision": generateValidationErrorMessage(
+        "PRECISION",
+        "Total Credit",
+        "{{#limit}}"
+      ),
+      "any.required": generateValidationErrorMessage(
+        "REQUIRED",
+        "Total Credit"
+      ),
+      "number.greater": generateValidationErrorMessage(
+        "MUST_GREATER_THAN",
+        "Total Credit",
+        "0"
+      ),
+    }),
   currencyId: idOptional("Currency Id"),
   currencyConversionRate: joiDecimalFromSettings({
     key: "roundingPrecision",
     required: true,
     min: 0,
-  }).messages({
-    "number.base": generateValidationErrorMessage(
-      "NUMBER",
-      "Currency Conversion Rate"
-    ),
-    "number.min": generateValidationErrorMessage(
-      "NON_NEGATIVE",
-      "Currency Conversion Rate"
-    ),
-    "number.precision": generateValidationErrorMessage(
-      "PRECISION",
-      "Currency Conversion Rate",
-      "{{#limit}}"
-    ),
-    "any.required": generateValidationErrorMessage(
-      "REQUIRED",
-      "Currency Conversion Rate"
-    ),
-  }),
+  })
+    .allow(null)
+    .messages({
+      "any.required": generateValidationErrorMessage(
+        "REQUIRED",
+        "Currency Conversion Rate"
+      ),
+      "number.base": generateValidationErrorMessage(
+        "NUMBER",
+        "Currency Conversion Rate"
+      ),
+      "number.min": generateValidationErrorMessage(
+        "NON_NEGATIVE",
+        "Currency Conversion Rate"
+      ),
+      "number.precision": generateValidationErrorMessage(
+        "PRECISION",
+        "Currency Conversion Rate",
+        "{{#limit}}"
+      ),
+    }),
   voucherLines: arrayRequired("Voucher Lines", createVoucherLineSchema, 2),
   billAllocations: arrayOptional(
     "Bill Allocations",
@@ -225,7 +260,7 @@ export const updateVoucherSchema = createVoucherSchema.keys({
 
 const paymentInputSchema = Joi.object({
   paymentMode: enumRequired("Payment Mode", PaymentMode),
-  accountName: strRequired("Account Name"),
+  bankOrCashId: idRequired("Bank Or Cash Id"),
   paymentAmount: joiDecimalFromSettings({
     key: "roundingPrecision",
     required: true,
@@ -256,7 +291,54 @@ export const postExternalVoucherSchema = Joi.object({
   refId: idRequired("Reference Id"),
   refDate: dateRequired("Reference Date"),
   pId: strOptional("P Id"),
-
+  currencyId: idOptional("Currency Id"),
+  currencyConversionRate: Joi.when("currencyId", {
+    is: Joi.exist().not(null),
+    then: joiDecimalFromSettings({
+      key: "roundingPrecision",
+      required: true,
+      min: 0,
+    }).messages({
+      "any.required": generateValidationErrorMessage(
+        "REQUIRED",
+        "Currency Conversion Rate"
+      ),
+      "number.base": generateValidationErrorMessage(
+        "NUMBER",
+        "Currency Conversion Rate"
+      ),
+      "number.min": generateValidationErrorMessage(
+        "NON_NEGATIVE",
+        "Currency Conversion Rate"
+      ),
+      "number.precision": generateValidationErrorMessage(
+        "PRECISION",
+        "Currency Conversion Rate",
+        "{{#limit}}"
+      ),
+    }),
+    otherwise: joiDecimalFromSettings({
+      key: "roundingPrecision",
+      required: false,
+      min: 0,
+    })
+      .allow(null)
+      .messages({
+        "number.base": generateValidationErrorMessage(
+          "NUMBER",
+          "Currency Conversion Rate"
+        ),
+        "number.min": generateValidationErrorMessage(
+          "NON_NEGATIVE",
+          "Currency Conversion Rate"
+        ),
+        "number.precision": generateValidationErrorMessage(
+          "PRECISION",
+          "Currency Conversion Rate",
+          "{{#limit}}"
+        ),
+      }),
+  }),
   totalAmount: joiDecimalFromSettings({
     key: "roundingPrecision",
     required: true,
@@ -334,7 +416,13 @@ export const postExternalVoucherSchema = Joi.object({
   }),
 
   createdBy: idRequired("Created By"),
+  // remarks: Joi.when("refType", {
+  //   is: Joi.valid(VoucherReferenceType.OPD_APPOINTMENT_RETURN, VoucherReferenceType.INVESTIGATION_RETURN),
+  //   then: strRequired("Remarks"),
+  //   otherwise: strOptional("Remarks"),
+  // }),
 
+  remarks: strOptional("Remarks"),
   payments: Joi.when("refType", {
     is: Joi.valid(
       VoucherReferenceType.PHARMACY_SELL_PAYMENT,
@@ -361,6 +449,10 @@ const createVoucherExcelSchema = Joi.object({
   excelFile: strOptional("Excel File"),
 });
 
+const voucherExcelExportSchema = Joi.object({
+  voucherTypeId: idRequired("Voucher Type Id"),
+});
+
 /**Middlewares Validation Functions */
 export const validateCreateVoucher = validationHandler({
   schema: createVoucherSchema,
@@ -379,4 +471,8 @@ export const validateCreateVoucherExcel = validationHandler({
   path: "body",
   type: "FORMDATA",
   imgAttr: "excelFile",
+});
+
+export const validateExportVoucherExcel = validationHandler({
+  schema: voucherExcelExportSchema,
 });

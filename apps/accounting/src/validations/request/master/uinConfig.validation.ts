@@ -2,7 +2,7 @@ import {
   AccUinShortCode,
   UIN_RESET_POLICY,
 } from "@repo/db/generated/prisma/enums.js";
-import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   CreateUINConfigRequest,
@@ -10,6 +10,7 @@ import {
   UINSegment,
   UpdateUINConfigRequest,
 } from "av6-core-v2";
+import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
 /**
@@ -238,7 +239,7 @@ export const previewConfigSchema = Joi.object<UINPreviewRequest>({
     }),
 });
 
-export const AccuinShortCodeSchema = Joi.object({
+export const uinShortCodeSchema = Joi.object({
   shortCode: Joi.string()
     .valid(...Object.values(AccUinShortCode))
     .trim()
@@ -256,18 +257,93 @@ export const AccuinShortCodeSchema = Joi.object({
     }),
 });
 
-export const validateCreateConfig = validationHandler({
-  schema: createUINConfigSchema,
-});
+export const validateCreateConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { error } = createUINConfigSchema.validate(req.body, {
+    abortEarly: false,
+  });
 
-export const validateUpdateConfig = validationHandler({
-  schema: updateUINConfigSchema,
-});
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      })
+    );
+  }
 
-export const validateGetUINConfig = validationHandler({
-  schema: AccuinShortCodeSchema,
-});
+  next();
+};
 
-export const validatePreviewCustomConfig = validationHandler({
-  schema: previewConfigSchema,
-});
+export const validateUpdateConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { error } = updateUINConfigSchema.validate(req.body, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      })
+    );
+  }
+
+  next();
+};
+export const validateGetUINConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { error } = uinShortCodeSchema.validate(req.query, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      })
+    );
+  }
+
+  next();
+};
+
+export const validatePreviewCustomConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { error } = previewConfigSchema.validate(req.body, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      })
+    );
+  }
+
+  next();
+};

@@ -10,20 +10,22 @@ import {
   BsNode,
   InternalNodeForBalanceSheet,
 } from "@/types/reports/balanceSheet.js";
+import type {
+  AgeingBucketAmount,
+  AgeingSummaryResponse,
+} from "@/types/reports/groupSummary.js";
 import {
   GroupSummaryNode,
   GroupSummaryRequestInput,
   GroupSummaryTreeResponse,
 } from "@/types/reports/groupSummary.js";
-import type {
-  AgeingBucketAmount,
-  AgeingSummaryResponse,
-} from "@/types/reports/groupSummary.js";
 import { DrCrAmt } from "@/types/reports/ledgerBalanceEngine.js";
 import {
+  LedgerBookExcelRequestInput,
   LedgerBookRequestInput,
   LedgerBookResponse,
   LedgerBookRow,
+  VirtualRow,
   voucherHeadResponseForLedgerBook,
 } from "@/types/reports/ledgerBook.js";
 import {
@@ -32,14 +34,32 @@ import {
   PlNode,
   ProfitLossResponse,
 } from "@/types/reports/profitLoss.js";
-import { ReportCommonRequestInput } from "@/types/reports/report.js";
 import type { AgeingBucketInput } from "@/types/reports/report.js";
+import { ReportCommonRequestInput } from "@/types/reports/report.js";
 import {
   TrialBalanceRequestInput,
   TrialBalanceResponse,
   TrialBalanceRow,
 } from "@/types/reports/trialBalance.js";
 
+import { IdValue } from "@/types/global.js";
+import {
+  CashFlowGroupRecursiveRow,
+  CashFlowLedgerRow,
+  CashFlowMonthRow,
+  CashFlowNode,
+  CashFlowRequestInput,
+  CashFlowResponse,
+} from "@/types/reports/cashFlow.js";
+import {
+  FundFlowGroupRecursiveRow,
+  FundFlowLedgerRow,
+  FundFlowMonthlyRow,
+  FundFlowRequestInput,
+  FundFlowResponse,
+  FundFlowSummaryRow,
+} from "@/types/reports/fundFlow.js";
+import { toPickFieldsWithoutNull } from "@/utils/helper.utils.js";
 import {
   addDifferenceNodeAdvanced,
   addDrCr,
@@ -62,54 +82,42 @@ import {
   validateFundFlowServiceValidation,
   validateLedgerBookServiceValidation,
   validateReportCommonServiceValidation,
-  validatetrialBalanceServiceValidation,
+  validateTrialBalanceServiceValidation,
 } from "@/validations/service/report/report.service.validation.js";
 import {
-  applyRound,
-  customOmit,
-  RoundFormat,
-  toIdValue,
-  toPickFields,
-} from "av6-utils";
-import { commonGetService } from "../common.service.js";
-import { getLedgerBalancesNumber } from "./ledgerBalanceEngine.service.js";
-import { IdValue } from "@/types/global.js";
-import {
-  CashFlowGroupRecursiveRow,
-  CashFlowLedgerRow,
-  CashFlowMonthRow,
-  CashFlowNode,
-  CashFlowRequestInput,
-  CashFlowResponse,
-} from "@/types/reports/cashFlow.js";
-import { cashFlowEngineService } from "./cashFlowEngine.service.js";
-import {
-  FundFlowGroupRecursiveRow,
-  FundFlowLedgerRow,
-  FundFlowMonthlyRow,
-  FundFlowRequestInput,
-  FundFlowResponse,
-  FundFlowSummaryRow,
-} from "@/types/reports/fundFlow.js";
-import { fundFlowEngineService } from "./fundFlowEngine.service.js";
-import ExcelJs from "exceljs";
-import dayjs from "dayjs";
-import PDFDocument from "pdfkit";
-import {
   AccountingReportType,
+  Currency,
   DrCr,
   Group,
   Ledger,
 } from "@repo/db/generated/prisma/client";
-import { toPickFieldsWithoutNull } from "@/utils/helper.utils.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   CASH_BANK_GROUPS,
   PAYABLE_GROUPS,
   RECEIVABLE_GROUPS,
 } from "@repo/shared";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { applyRound, customOmit, RoundFormat, toIdValue } from "av6-utils";
+import dayjs from "dayjs";
+import ExcelJs from "exceljs";
+import PDFDocument from "pdfkit";
+import { commonGetService } from "../common.service.js";
+import { cashFlowEngineService } from "./cashFlowEngine.service.js";
+import { fundFlowEngineService } from "./fundFlowEngine.service.js";
+import { getLedgerBalancesNumber } from "./ledgerBalanceEngine.service.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { getLedgerForexGainLossEngine } from "@/services/report/ledgerForexEngine.service.js";
+import { forexAmtToSigned, isRoundedZero } from "@/utils/forexReport.utils.js";
+import {
+  ForexDrCrAmt,
+  ForexGainLossNode,
+  ForexGainLossStatementInput,
+  ForexGainLossStatementResult,
+  LedgerForexGainLossRow,
+} from "@/types/reports/forexReport.js";
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
@@ -513,7 +521,7 @@ const reportServiceRaw = {
       );
     }
 
-    const currencies = await coreRequests.getAllCurrencies();
+    const currencies = await currencyService.getAllCurrency();
     const currencyMap = new Map<number, Currency>();
     for (const currency of currencies) {
       currencyMap.set(currency.id, currency);
@@ -561,10 +569,10 @@ const reportServiceRaw = {
         (v) => v.id === l.voucher.voucherTypeId
       );
       const createdBy = l.voucher.createdBy
-        ? await coreRequests.getEmployeeCache(l.voucher.createdBy)
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.createdBy)
         : null;
       const updatedBy = l.voucher.updatedBy
-        ? await coreRequests.getEmployeeCache(l.voucher.updatedBy)
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.updatedBy)
         : null;
       const voucherHeadResponse: voucherHeadResponseForLedgerBook = {
         ...customOmit(l.voucher, [

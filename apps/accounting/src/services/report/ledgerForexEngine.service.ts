@@ -19,7 +19,12 @@ import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
-import { Currency, Ledger } from "@repo/db/generated/prisma/client";
+import {
+  Currency,
+  Group,
+  Ledger,
+  RateOfExchange,
+} from "@repo/db/generated/prisma/client";
 
 export const toForexAmt = (signed: number): ForexDrCrAmt => ({
   amount: Math.abs(signed),

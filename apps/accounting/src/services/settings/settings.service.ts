@@ -7,7 +7,10 @@ import {
   getSettingsByIdFromDb,
   upsertSettingsInDb,
 } from "@/repository/settings/settings.repository.js";
-import { CreateOrUpdateSettings } from "@/types/settings/settings.js";
+import {
+  CreateOrUpdateSettings,
+  SettingsDTO,
+} from "@/types/settings/settings.js";
 import { validIdCheck } from "@/validations/global.validation.js";
 import { validateUpsertSettingsServiceValidation } from "@/validations/service/settings/settings.service.validation.js";
 import { AccSettings } from "@repo/db/generated/prisma/client";

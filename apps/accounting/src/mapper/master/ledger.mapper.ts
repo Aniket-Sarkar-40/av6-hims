@@ -10,7 +10,6 @@ import {
   LedgerExcelRow,
   LedgerResponse,
 } from "@/types/master/ledger.js";
-import ErrorHandler from "@/utils/errorHandler.utils.js";
 import {
   GST_TYPES,
   LEDGER_TYPES,
@@ -18,13 +17,17 @@ import {
   parseOptionalBoolean,
   parseOptionalString,
 } from "@/utils/groupAndLedgerExcelImport.utils.js";
-import { generateErrorMessage } from "@/utils/responseMessage.utils.js";
 import { GROUP_NAME_FOR_CLIENT_TYPE } from "@/validations/service/mapping/clientLedgerMapping.service.validation.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
-import { ClientLedgerMapping, Ledger } from "@repo/db/generated/prisma/client";
+import {
+  ClientLedgerMapping,
+  Ledger,
+  LedgerExcel,
+} from "@repo/db/generated/prisma/client";
 import { LedgerGstType, LedgerType } from "@repo/db/generated/prisma/enums.js";
 import { DEFAULT_COMPANY_ID } from "@repo/shared";
-
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const mapRowToLedgerExcelCreateInput = (
@@ -56,6 +59,7 @@ export const mapRowToLedgerExcelCreateInput = (
     isCashAccount: parseOptionalBoolean(row["Cash Account"]) ?? false,
     bankName: parseOptionalString(row["Bank Name"]),
     bankIfsc: parseOptionalString(row["Bank IFSC"]),
+    branchName: parseOptionalString(row["Branch Name"]),
     bankAccountNo: parseOptionalString(row["Bank Account No"]),
     upiId: parseOptionalString(row["UPI Id"]),
     contactName: parseOptionalString(row["Contact Name"]),
@@ -71,7 +75,7 @@ export const mapRowToLedgerExcelCreateInput = (
 };
 
 export const buildLedgerInputFromExcel = async (params: {
-  item: LedgerExcelRow;
+  item: LedgerExcel;
   companyId: number;
   stateMap: Map<string, number>;
 }): Promise<CreateOrUpdateLedgerInput> => {
@@ -86,7 +90,9 @@ export const buildLedgerInputFromExcel = async (params: {
   });
 
   const group = allGroups.find(
-    (g) => g.name === item.groupName && g.companyId === companyId
+    (g) =>
+      g.name.toLowerCase() === item.groupName.toLowerCase() &&
+      g.companyId === companyId
   );
   if (!group) {
     throw new ErrorHandler(400, generateErrorMessage("NOT_FOUND", "Group"));
@@ -101,7 +107,9 @@ export const buildLedgerInputFromExcel = async (params: {
   });
 
   const existingLedger = allLedgers.find(
-    (l) => l.name === item.name && l.companyId === companyId
+    (l) =>
+      l.name.toLowerCase() === item.name.toLowerCase() &&
+      l.companyId === companyId
   );
   if (existingLedger) {
     throw new ErrorHandler(
@@ -122,12 +130,6 @@ export const buildLedgerInputFromExcel = async (params: {
       throw new ErrorHandler(
         400,
         generateErrorMessage("FIELD_REQUIRED", "Bank Name")
-      );
-    }
-    if (!item.bankIfsc) {
-      throw new ErrorHandler(
-        400,
-        generateErrorMessage("FIELD_REQUIRED", "Bank IFSC")
       );
     }
     if (!item.bankAccountNo) {
@@ -201,6 +203,7 @@ export const buildLedgerInputFromExcel = async (params: {
     isReserved: false,
     bankName: item.bankName,
     bankIfsc: item.bankIfsc,
+    branchName: item.branchName,
     bankAccountNo: item.bankAccountNo,
     upiId: item.upiId,
     contactName: item.contactName,

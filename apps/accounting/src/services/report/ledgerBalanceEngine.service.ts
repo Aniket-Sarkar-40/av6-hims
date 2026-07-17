@@ -2,6 +2,8 @@ import { auditProxy } from "@/config/audit.config.js";
 import { requestStorage } from "@/config/requestContext.js";
 import { getOpeningBalancesByLedgerIds } from "@/repository/master/ledgerOpeningBalance.repository.js";
 import {
+  getVoucherForexSumsBeforeDate,
+  getVoucherForexSumsInRange,
   getVoucherLineSumsBeforeDate,
   getVoucherLineSumsInRange,
 } from "@/repository/voucher/voucher.repository.js";
@@ -22,12 +24,14 @@ import {
   Group,
   Ledger,
   LedgerOpeningBalance,
+  RateOfExchange,
 } from "@repo/db/generated/prisma/client";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { getCompanyByIdFromDb } from "@/repository/company/company.repository.js";
 import dayjs from "dayjs";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { buildCurrentRateMap } from "@/services/report/ledgerForexEngine.service.js";
 
 /**
  * For foreign-currency ledgers the closing balance is not the simple sum of base

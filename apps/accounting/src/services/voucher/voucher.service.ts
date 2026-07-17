@@ -20,11 +20,14 @@ import { VoucherEntryExcelRow } from "@/types/batch/batch.js";
 import {
   CreateOrUpdateVoucherInput,
   ExternalPostVoucherInput,
+  HeaderAttribute,
   VoucherLineDTO,
+  VoucherStatusForExcel,
 } from "@/types/voucher/voucher.js";
 import {
   cancelVoucherServiceValidation,
   createOrUpdateVoucherServiceValidation,
+  createVoucherFromExcelServiceValidation,
   deleteVoucherServiceValidation,
 } from "@/validations/service/voucher/voucher.service.validation.js";
 import XLSX from "xlsx";
@@ -42,6 +45,12 @@ import {
 import { CustomDocDefinition, renderCustomPdfToBuffer } from "av6-pdf-engine";
 import { pdfTemplateService } from "@apps/core/services/pdf/pdfTemplate.service.js";
 import { validateIdVoucherType } from "@/validations/service/master/voucherType.service.validation.js";
+import ExcelJs from "exceljs";
+import { BankTransactionType, DrCr } from "@repo/db/generated/prisma/enums.js";
+import { buildVoucherExcelSampleRow } from "@/utils/voucherExcelSampleExport.utils.js";
+import { resolvePdfTemplate } from "@/utils/applyTemplate.utils.js";
+import { generateVoucherInvoice } from "@/utils/voucherPdf.utils.js";
+import { convertDatesToYMD } from "@repo/shared/utils/date.utils.js";
 
 const voucherServiceRaw = {
   async createVoucher(

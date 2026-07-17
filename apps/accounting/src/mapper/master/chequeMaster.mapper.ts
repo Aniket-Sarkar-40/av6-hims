@@ -1,9 +1,10 @@
 import { commonGetService } from "@/services/common.service.js";
 import { ChequeMasterDTO } from "@/types/master/chequeMaster.js";
+import { ChequeMaster } from "@repo/db/generated/prisma/client";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toChequeMasterDto = async (
-  chequeMaster: ChequeMasterDTO[]
+  chequeMaster: ChequeMaster[]
 ): Promise<ChequeMasterDTO[]> => {
   const ledgers = await commonGetService.getAllElements<"Ledger">({
     cacheCode: "LEDGER",

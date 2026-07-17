@@ -11,7 +11,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 export const validateIdVoucherType = async (
   id: number
 ): Promise<VoucherType> => {
-  logger.info("entering::validateIdLedger::service::validation");
+  logger.info("entering::validateIdVoucherType::service::validation");
   validIdCheck(id);
   const voucherType = await commonGetService.getElementById<"VoucherType">({
     cacheCode: "VOUCHER_TYPE",
@@ -28,7 +28,7 @@ export const validateIdVoucherType = async (
       generateErrorMessage("NOT_FOUND", "Voucher Type")
     );
   }
-  logger.info("exiting::validateIdLedger::service::validation");
+  logger.info("exiting::validateIdVoucherType::service::validation");
   return voucherType;
 };
 

@@ -1,8 +1,12 @@
 import { uinServiceFactory } from "@/config/core.config.js";
 import { initializeCache } from "@/config/redisClient.js";
 import { requestStorage } from "@/config/requestContext.js";
+import { buildGroupInputFromExcel } from "@/mapper/master/group.mapper.js";
 import { createBatchJobInDb } from "@/repository/batch/batch.repository.js";
-import { CreateOrUpdateGroupInput } from "@/types/master/group.js";
+import {
+  CreateOrUpdateGroupExcelInput,
+  CreateOrUpdateGroupInput,
+} from "@/types/master/group.js";
 import { db } from "@repo/db";
 import { Prisma } from "@repo/db/generated/prisma/client";
 import {

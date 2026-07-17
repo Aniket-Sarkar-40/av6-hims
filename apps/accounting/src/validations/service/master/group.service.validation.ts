@@ -3,13 +3,11 @@ import { CreateOrUpdateGroupInput } from "@/types/master/group.js";
 import { validIdCheck } from "@/validations/global.validation.js";
 import { validateIdCompany } from "../company/company.service.validation.js";
 import { getLedgersByGroupId } from "@/repository/master/ledger.repository.js";
-import {
-  AccountingPrimaryCategory,
-  Group,
-} from "@repo/db/generated/prisma/client";
-import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { AccountingPrimaryCategory } from "@repo/db/generated/prisma/enums.js";
+import { Group } from "@repo/db/generated/prisma/client";
 
 export const validateIdGroup = async (id: number): Promise<Group> => {
   logger.info("entering::validateIdGroup::service::validation");
@@ -90,6 +88,26 @@ export const createOrUpdateGroupServiceValidation = async (
   }
 
   logger.info("exiting::createOrUpdateGroup::service::validation");
+};
+
+export const createGroupExcelServiceValidation = async (params: {
+  companyId: number;
+  filePath?: string;
+}): Promise<void> => {
+  logger.info(
+    "entering::createGroupExcelServiceValidation::service::validation"
+  );
+  const { companyId, filePath } = params;
+
+  await validateIdCompany(companyId);
+
+  if (!filePath) {
+    throw new ErrorHandler(400, "No file path provided");
+  }
+
+  logger.info(
+    "exiting::createGroupExcelServiceValidation::service::validation"
+  );
 };
 
 export const validateDeleteGroupServiceValidation = async (

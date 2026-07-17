@@ -1,6 +1,7 @@
-import { getByUnique } from "@/repository/common.repository.js";
+import { getAll, getByUnique } from "@/repository/common.repository.js";
 import {
   AutoMatchSuggestionInput,
+  BankStatementExcelBaseInput,
   BankStatementRowWithBankStatement,
   ManualBankReconcileWithBankStatementInput,
   ManualReconcileRequestInput,
@@ -11,10 +12,14 @@ import dayjs from "dayjs";
 import { validateIdLedger } from "../master/ledger.service.validation.js";
 import { validateLedgerBookServiceValidation } from "../report/report.service.validation.js";
 import { validateIdVoucherLine } from "../voucher/voucher.service.validation.js";
-import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { BankReconcileStatus } from "@repo/db/generated/prisma/enums.js";
+import {
+  BankStatement,
+  BankStatementFormatMapping,
+} from "@repo/db/generated/prisma/client";
 
 export const validateBankReconciliationCommonServiceValidation = async (
   input: LedgerBookRequestInput
@@ -80,14 +85,9 @@ export const validateManualReconcileVoucherLinesServiceValidation = async (
         generateErrorMessage("INVALID_ASSOCIATION", "Voucher Line", "Ledger")
       );
     }
-    if (
-      dayjs(voucherLine.voucher.voucherDate).isAfter(dayjs(row.bankClearedDate))
-    ) {
-      throw new ErrorHandler(
-        400,
-        "Bank Cleared Date cannot be before Voucher Date"
-      );
-    }
+    // if (dayjs(voucherLine.voucher.voucherDate).isAfter(dayjs(row.bankClearedDate))) {
+    //   throw new ErrorHandler(400, "Bank Cleared Date cannot be before Voucher Date");
+    // }
   }
   logger.info(
     "exiting::validateManualReconcileVoucherLines::service::validation"
@@ -186,4 +186,67 @@ export const validateAutoMatchSuggestionServiceValidation = async (
     throw new ErrorHandler(400, "From Date cannot be after To Date");
   }
   logger.info("exiting::validateAutoMatchSuggestion::service::validation");
+};
+
+export const validateUploadBankStatementExcelServiceValidation = async (
+  input: BankStatementExcelBaseInput
+) => {
+  logger.info(
+    "entering::validateUploadBankStatementExcelServiceValidation::service::validation"
+  );
+  const { ledgerId, companyId, financialYearId, statementFrom, statementTo } =
+    input;
+  await validateBankReconciliationCommonServiceValidation({
+    companyId,
+    financialYearId,
+    ledgerId,
+    fromDate: statementFrom,
+    toDate: statementTo,
+  });
+
+  const existingBankStatements = (await getAll({
+    model: "BankStatement",
+    where: {
+      ledgerId,
+    },
+  })) as BankStatement[];
+
+  const inputFrom = dayjs(statementFrom);
+  const inputTo = dayjs(statementTo);
+
+  if (existingBankStatements.length > 0) {
+    const overlap = existingBankStatements.some((statement) => {
+      const existingFrom = dayjs(statement.statementFrom).startOf("day");
+      const existingTo = dayjs(statement.statementTo).endOf("day");
+
+      const newFrom = inputFrom.startOf("day");
+      const newTo = inputTo.endOf("day");
+
+      return !newFrom.isAfter(existingTo) && !newTo.isBefore(existingFrom);
+    });
+    if (overlap) {
+      throw new ErrorHandler(
+        400,
+        "Bank statement for the provided date range overlaps with an existing statements."
+      );
+    }
+  }
+  const statementFormat = (await getByUnique({
+    model: "BankStatementFormatMapping",
+    where: {
+      bankLedgerId: ledgerId,
+    },
+  })) as BankStatementFormatMapping;
+
+  if (!statementFormat) {
+    throw new ErrorHandler(
+      400,
+      "Bank statement format not configured in the system"
+    );
+  }
+
+  logger.info(
+    "exiting::validateUploadBankStatementExcelServiceValidation::service::validation"
+  );
+  return statementFormat;
 };
