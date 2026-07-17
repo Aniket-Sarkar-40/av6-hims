@@ -42,8 +42,8 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0)
       av6-pdf-engine:
-        specifier: ^1.2.0
-        version: 1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
+        specifier: ^3.0.1
+        version: 3.0.1(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -163,8 +163,8 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0)
       av6-pdf-engine:
-        specifier: ^1.2.0
-        version: 1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
+        specifier: ^3.0.1
+        version: 3.0.1(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -270,8 +270,8 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2))(@types/react@19.2.2)(express@5.2.1)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(winston@3.19.0)
       av6-pdf-engine:
-        specifier: ^1.2.0
-        version: 1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
+        specifier: ^3.0.1
+        version: 3.0.1(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -551,8 +551,8 @@ importers:
         specifier: ^7.0.0
         version: 7.4.2(prisma@7.4.2(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2)
       av6-pdf-engine:
-        specifier: ^1.2.0
-        version: 1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
+        specifier: ^3.0.1
+        version: 3.0.1(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2)
       av6-utils:
         specifier: ^1.0.6
         version: 1.0.6(axios@1.13.6)(express@5.2.1)(joi@17.13.3)(notistack@3.0.2(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prettier@3.8.1)
@@ -1883,8 +1883,8 @@ packages:
       '@prisma/client': ^6.19.0
       winston: ^3.17.0
 
-  av6-pdf-engine@1.2.0:
-    resolution: {integrity: sha512-1UXpHMUj7TDu5Q+u8LsLLjaAs339ATP7IvSO3AIs/+zMms7UltjFCr0rL4O6ZPdC8u6p8/o8I7KixzZe+Y1luQ==}
+  av6-pdf-engine@3.0.1:
+    resolution: {integrity: sha512-nGBKpkxSYnGGZ3HcWY14uWb/MF2bHetxX1ryKj2ggFxj5m6TpO+84Ls9tYXNthEIL7DUcDgfOu3y9F1NwiLdSQ==}
 
   av6-utils@1.0.6:
     resolution: {integrity: sha512-4mZiOrCt8Z8IzP5FiivIyR5n+R/ooLOcdsd10mAmN+/5fYBub1+WA/KQnqXf8rtMZhamXs2mHeHmrDkzgcUqzQ==}
@@ -6200,7 +6200,7 @@ snapshots:
       - notistack
       - typescript
 
-  av6-pdf-engine@1.2.0(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2):
+  av6-pdf-engine@3.0.1(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.2):
     dependencies:
       '@types/pdfkit': 0.13.9
       axios: 1.13.6

@@ -86,6 +86,9 @@ export const EXT_CURRENCY_URL = `${MASTER_SERVICE_URL}/api/v1/master/currency`;
 export const COMPANY_LOGO_BASE_URL =
   (process.env.IMAGE_URL || "") + "/hospital_content/logo";
 
+export const INVENTORY_SERVICE_URL =
+  process.env.INVENTORY_SERVICE_URL || "http://127.0.0.1:4507/api/v1/inv";
+
 export const EMAIL_CONFIG = {
   smtpServer: process.env.EMAIL_SMTP_SERVER || "smtp.gmail.com",
   smtpPort: process.env.EMAIL_SMTP_PORT || 587,

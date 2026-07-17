@@ -72,14 +72,14 @@ const settingsServiceRaw = {
     return setting ? await toSettingsDto(setting) : null;
   },
 
-  async getAllSettings(): Promise<AccSettingsDTO[]> {
+  async getAllSettings(): Promise<SettingsDTO[]> {
     logger.info("entering::getAllSettings::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.SETTINGS);
 
     let settings: AccSettings[] = [];
 
     if (isCacheable) {
-      settings = (await getAllCache(cacheKey)) as Settings[];
+      settings = (await getAllCache(cacheKey)) as AccSettings[];
     } else {
       settings = await getAllSettingsFromDb();
     }

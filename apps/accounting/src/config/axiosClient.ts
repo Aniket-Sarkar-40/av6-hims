@@ -1,4 +1,5 @@
 import { EXT_CONNECTION_TYPE } from "@repo/shared/config/index.js";
+import { generateHashForAuth } from "@repo/shared/utils/helper.utils.js";
 import axios from "axios";
 
 export const axiosClient = axios.create({
@@ -18,5 +19,19 @@ export const interceptor = (token: string) => {
       "x-internal-request": "true",
     },
     withCredentials: true,
+  });
+};
+
+export const externalInterceptor = () => {
+  const randomNumber: number = Math.floor(Math.random() * 1000000);
+  const hash: string = generateHashForAuth(randomNumber.toString());
+
+  return axios.create({
+    headers: {
+      "Content-Type": "application/json",
+      "client-key": hash,
+      "client-id": randomNumber.toString(),
+    },
+    validateStatus: () => true,
   });
 };

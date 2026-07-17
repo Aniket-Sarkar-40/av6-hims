@@ -9,7 +9,7 @@ export const getCashAndBankHeadByIdFromDb = async (
   const cashAndBankHead = await db.cashNBankHead.findFirst({
     where: {
       id,
-      status: "ACTIVE",
+      status: "true",
     },
   });
   logger.info("exiting::getCashAndBankHeadByIdFromDb::repository");

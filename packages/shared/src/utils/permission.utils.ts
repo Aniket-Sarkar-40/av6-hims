@@ -70,6 +70,7 @@ export enum PermissionResource {
   GRN_RETURN_DETAILS = "grn-return-details",
   DEFAULT_UNIT_MASTER = "default-unit-master",
   STOCK_TRANSFER_DETAILS = "stock-transfer-details",
+  STOCK_OPENING_CLOSING = "stock-opening-closing",
 
   // CORE
   COUNTRY = "country",

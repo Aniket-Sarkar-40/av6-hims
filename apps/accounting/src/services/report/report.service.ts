@@ -116,8 +116,13 @@ import {
   ForexGainLossNode,
   ForexGainLossStatementInput,
   ForexGainLossStatementResult,
+  LedgerForexGainLossEngineResult,
   LedgerForexGainLossRow,
+  LedgerForexReportInput,
 } from "@/types/reports/forexReport.js";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { validateLedgerBalanceEngineServiceValidation } from "@/validations/service/report/ledgerBalanceEngine.service.validation.js";
+import { inventoryRequests } from "@/client/inventory/request.js";
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
@@ -875,43 +880,44 @@ const reportServiceRaw = {
     }
 
     /** add closing stock node if it exists */
-    if (
-      groupId &&
-      groups.find((g) => g.id === groupId)?.name === CURRENT_ASSETS_GROUP_NAME
-    ) {
-      const stockSummary = await inventoryRequests.getOpeningAndClosingStock({
-        financialYearId,
-        fromDate,
-        toDate,
-        ccId,
-      });
+    // if (
+    //   groupId &&
+    //   groups.find((g) => g.id === groupId)?.name === CURRENT_ASSETS_GROUP_NAME
+    // ) {
+    //   //:TODO
+    //   // const stockSummary = await inventoryRequests.getOpeningAndClosingStock({
+    //   //   financialYearId,
+    //   //   fromDate,
+    //   //   toDate,
+    //   //   ccId,
+    //   // });
 
-      const closingStockNode: GroupSummaryNode = {
-        group: {
-          id: CLOSING_STOCK_VIRTUAL_ID,
-          value: CLOSING_STOCK_LABEL,
-        },
-        parent: {
-          id: groupId,
-          value: CURRENT_ASSETS_GROUP_NAME,
-        },
-        opening: toDrCr(stockSummary?.totals.openingAmount ?? 0),
-        period: {
-          dr: stockSummary?.totals.inAmount ?? 0,
-          cr: stockSummary?.totals.outAmount ?? 0,
-        },
-        closing: toDrCr(stockSummary?.totals.closingAmount ?? 0),
-        children: [],
-        ledger: [],
-      };
-      const node = nodeMap.get(groupId);
-      if (node) {
-        node.children.push(closingStockNode);
-        node.closing = addDrCr(node.closing, closingStockNode.closing);
-        node.period = addDrCr(node.period, closingStockNode.period);
-        node.opening = addDrCr(node.opening, closingStockNode.opening);
-      }
-    }
+    //   const closingStockNode: GroupSummaryNode = {
+    //     group: {
+    //       id: CLOSING_STOCK_VIRTUAL_ID,
+    //       value: CLOSING_STOCK_LABEL,
+    //     },
+    //     parent: {
+    //       id: groupId,
+    //       value: CURRENT_ASSETS_GROUP_NAME,
+    //     },
+    //     opening: toDrCr(stockSummary?.totals.openingAmount ?? 0),
+    //     period: {
+    //       dr: stockSummary?.totals.inAmount ?? 0,
+    //       cr: stockSummary?.totals.outAmount ?? 0,
+    //     },
+    //     closing: toDrCr(stockSummary?.totals.closingAmount ?? 0),
+    //     children: [],
+    //     ledger: [],
+    //   };
+    //   const node = nodeMap.get(groupId);
+    //   if (node) {
+    //     node.children.push(closingStockNode);
+    //     node.closing = addDrCr(node.closing, closingStockNode.closing);
+    //     node.period = addDrCr(node.period, closingStockNode.period);
+    //     node.opening = addDrCr(node.opening, closingStockNode.opening);
+    //   }
+    // }
     /* ---------------- FILTER ZERO ---------------- */
 
     const hasValue = (n: GroupSummaryNode) =>

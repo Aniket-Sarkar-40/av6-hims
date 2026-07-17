@@ -1301,3 +1301,22 @@ model UsedChequeNumber {
     @@index([voucherLineId], map: "idx_used_cheque_number_voucher_line")
     @@map("accounting_used_cheque_number")
 }
+
+model AccFeatureFlag {
+    id            Int     @id @default(autoincrement())
+    shortCode     String  @map("short_code")
+    flagName      String  @map("flag_name")
+    isEnabled     Boolean @map("is_enabled")
+    description   String  @db.LongText
+    featureConfig Json?   @map("feature_config")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("accounting_feature_flag")
+}

@@ -58,5 +58,5 @@ export type OtherLedger = {
   drCr?: DrCr;
   transactionType?: BankTransactionType;
   instrumentNo?: string;
-  instrumentDate?: Date;
+  instrumentDate?: Date | string;
 };
