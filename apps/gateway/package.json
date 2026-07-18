@@ -10,7 +10,7 @@
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
     "cors": "^2.8.6",
-    "express": "^5.1.0"
+    "express": "catalog:"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

@@ -10,16 +10,16 @@
     "av6-core-v2": "^1.0.5",
     "av6-pdf-engine": "^3.0.1",
     "av6-utils": "^1.0.6",
-    "dayjs": "^1.11.19",
-    "exceljs": "^4.4.0",
-    "express": "^5.1.0",
+    "dayjs": "catalog:",
+    "exceljs": "catalog:",
+    "express": "catalog:",
     "handlebars": "^4.7.8",
-    "joi": "^17.13.3",
+    "joi": "catalog:",
     "node-cron": "^4.2.1",
     "nodemailer": "^9.0.1",
     "nodemailer-express-handlebars": "^7.0.0",
     "puppeteer": "^24.13.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "catalog:"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

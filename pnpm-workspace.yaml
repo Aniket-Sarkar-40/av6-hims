@@ -1,3 +1,13 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Shared dependency versions — reference with "catalog:" in package.json.
+# Complements syncpack: pin once here, consume everywhere.
+catalog:
+  axios: "^1.13.6"
+  dayjs: "^1.11.19"
+  exceljs: "^4.4.0"
+  express: "^5.1.0"
+  joi: "^17.13.3"
+  xlsx: "^0.18.5"

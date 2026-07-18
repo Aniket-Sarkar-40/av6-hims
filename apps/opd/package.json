@@ -8,12 +8,12 @@
     "@repo/shared": "workspace:*",
     "av6-core-v2": "^1.0.5",
     "av6-utils": "^1.0.6",
-    "axios": "^1.13.6",
-    "dayjs": "^1.11.19",
-    "exceljs": "^4.4.0",
-    "express": "^5.1.0",
-    "joi": "^17.13.3",
-    "xlsx": "^0.18.5"
+    "axios": "catalog:",
+    "dayjs": "catalog:",
+    "exceljs": "catalog:",
+    "express": "catalog:",
+    "joi": "catalog:",
+    "xlsx": "catalog:"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
