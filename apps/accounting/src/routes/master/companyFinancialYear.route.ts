@@ -17,16 +17,16 @@ export const companyFinancialYearRouter: Router = Router();
 
 companyFinancialYearRouter.post(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "COMPANY_FINANCIAL_YEAR", "CREATE")),
   validateCreateCompanyFinancialYear,
-  createCompanyFinancialYear
+  createCompanyFinancialYear,
 );
 
 companyFinancialYearRouter.put(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "COMPANY_FINANCIAL_YEAR", "UPDATE")),
   validateUpdateCompanyFinancialYear,
-  updateCompanyFinancialYear
+  updateCompanyFinancialYear,
 );

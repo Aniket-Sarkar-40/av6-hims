@@ -36,10 +36,10 @@ export const settingsRouter: Router = Router();
  */
 settingsRouter.post(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "SETTINGS", "CREATE")),
   validateSettings,
-  upsertSettings
+  upsertSettings,
 );
 
 /**
@@ -59,7 +59,7 @@ settingsRouter.post(
  */
 settingsRouter.get(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "SETTINGS", "VIEW")),
-  getSettings
+  getSettings,
 );

@@ -30,9 +30,9 @@ const cacheRouter: Router = Router();
  */
 cacheRouter.post(
   "/load",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CACHE", "VIEW")),
-  getAllCacheController
+  getAllCacheController,
 );
 /**
  * @swagger
@@ -52,15 +52,15 @@ cacheRouter.post(
  */
 cacheRouter.delete(
   "/delete",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CACHE", "DELETE")),
-  clearCacheController
+  clearCacheController,
 );
 cacheRouter.delete(
   "/all",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CACHE", "DELETE")),
-  clearAllCacheController
+  clearAllCacheController,
 );
 
 export default cacheRouter;

@@ -54,256 +54,256 @@ export const reportRouter: Router = Router();
 
 reportRouter.post(
   "/trial-balance",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "TRIAL_BALANCE", "VIEW")),
   validateTrialBalanceRequestInput,
-  getTrialBalance
+  getTrialBalance,
 );
 
 reportRouter.post(
   "/ledger-book",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "LEDGER_BOOK", "VIEW")),
   validateLedgerBookRequestInput,
-  getLedgerBook
+  getLedgerBook,
 );
 
 reportRouter.post(
   "/group-summary-tree",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "GROUP_SUMMARY_TREE", "VIEW")),
   validateGroupSummaryRequestInput,
-  getGroupSummaryTree
+  getGroupSummaryTree,
 );
 
 reportRouter.post(
   "/profit-loss",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "PROFIT_LOSS", "VIEW")),
   validateReportCommonRequestInput,
-  getProfitLoss
+  getProfitLoss,
 );
 
 reportRouter.post(
   "/balance-sheet",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BALANCE_SHEET", "VIEW")),
   validateBalanceSheetRequestInput,
-  getBalanceSheet
+  getBalanceSheet,
 );
 
 reportRouter.post(
   "/cash-bank-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CASH_BANK_SUMMARY", "VIEW")),
   validateCashBankSummaryRequestInput,
-  getCashBankSummary
+  getCashBankSummary,
 );
 
 reportRouter.post(
   "/receivable-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "RECEIVABLE_SUMMARY", "VIEW")),
   validateStatementOfAccountsRequestInput,
-  getReceivableSummary
+  getReceivableSummary,
 );
 
 reportRouter.post(
   "/payable-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "PAYABLE_SUMMARY", "VIEW")),
   validateStatementOfAccountsRequestInput,
-  getPayableSummary
+  getPayableSummary,
 );
 
 reportRouter.post(
   "/cash-flow",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CASH_FLOW", "VIEW")),
   validateCashFlowRequestInput,
-  getCashFlow
+  getCashFlow,
 );
 
 reportRouter.post(
   "/fund-flow",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "FUND_FLOW", "VIEW")),
   validateFundFlowRequestInput,
-  getFundFlow
+  getFundFlow,
 );
 
 reportRouter.post(
   "/excel-balance-sheet",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BALANCE_SHEET", "VIEW")),
   validateBalanceSheetRequestInput,
-  excelBalanceSheetReport
+  excelBalanceSheetReport,
 );
 
 reportRouter.post(
   "/excel-balance-sheet-with-children",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BALANCE_SHEET", "VIEW")),
   validateBalanceSheetRequestInput,
-  excelBalanceSheetReportWithChildren
+  excelBalanceSheetReportWithChildren,
 );
 
 reportRouter.post(
   "/excel-profit-loss",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "PROFIT_LOSS", "VIEW")),
   validateReportCommonRequestInput,
-  excelProfitLossReport
+  excelProfitLossReport,
 );
 
 reportRouter.post(
   "/excel-ledger-book",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "LEDGER_BOOK", "VIEW")),
   validateLedgerBookRequestInput,
-  excelLedgerBookReport
+  excelLedgerBookReport,
 );
 
 reportRouter.post(
   "/excel-trial-balance",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "TRIAL_BALANCE", "VIEW")),
   validateTrialBalanceRequestInput,
-  excelTrialBalanceReport
+  excelTrialBalanceReport,
 );
 
 reportRouter.post(
   "/excel-group-summary-tree",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "GROUP_SUMMARY_TREE", "VIEW")),
   validateGroupSummaryRequestInput,
-  excelGroupSummaryReport
+  excelGroupSummaryReport,
 );
 
 reportRouter.post(
   "/excel-cash-bank-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CASH_BANK_SUMMARY", "VIEW")),
   validateCashBankSummaryRequestInput,
-  excelCashBankSummaryReport
+  excelCashBankSummaryReport,
 );
 
 reportRouter.post(
   "/excel-receivable-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "RECEIVABLE_SUMMARY", "VIEW")),
   validateStatementOfAccountsRequestInput,
-  excelReceivableSummaryReport
+  excelReceivableSummaryReport,
 );
 
 reportRouter.post(
   "/excel-payable-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "PAYABLE_SUMMARY", "VIEW")),
   validateStatementOfAccountsRequestInput,
-  excelPayableSummaryReport
+  excelPayableSummaryReport,
 );
 
 reportRouter.post(
   "/excel-cash-flow",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CASH_FLOW", "VIEW")),
   validateCashFlowRequestInput,
-  excelCashFlowReport
+  excelCashFlowReport,
 );
 
 reportRouter.post(
   "/excel-fund-flow",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "FUND_FLOW", "VIEW")),
   validateFundFlowRequestInput,
-  excelFundFlowReport
+  excelFundFlowReport,
 );
 
 reportRouter.post(
   "/pdf-balance-sheet",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BALANCE_SHEET", "VIEW")),
   validateBalanceSheetRequestInput,
-  pdfBalanceSheetReport
+  pdfBalanceSheetReport,
 );
 
 reportRouter.post(
   "/pdf-balance-sheet-with-children",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BALANCE_SHEET", "VIEW")),
   validateBalanceSheetRequestInput,
-  pdfBalanceSheetReportWithChildren
+  pdfBalanceSheetReportWithChildren,
 );
 
 reportRouter.post(
   "/pdf-ledger-book",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "LEDGER_BOOK", "VIEW")),
   validateLedgerBookRequestInput,
-  pdfLedgerBookReport
+  pdfLedgerBookReport,
 );
 
 reportRouter.post(
   "/pdf-trial-balance",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "TRIAL_BALANCE", "VIEW")),
   validateTrialBalanceRequestInput,
-  pdfTrialBalanceReport
+  pdfTrialBalanceReport,
 );
 
 reportRouter.post(
   "/pdf-group-summary-tree",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "GROUP_SUMMARY_TREE", "VIEW")),
   validateGroupSummaryRequestInput,
-  pdfGroupSummaryReport
+  pdfGroupSummaryReport,
 );
 
 reportRouter.post(
   "/pdf-cash-bank-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CASH_BANK_SUMMARY", "VIEW")),
   validateCashBankSummaryRequestInput,
-  pdfCashBankSummaryReport
+  pdfCashBankSummaryReport,
 );
 
 reportRouter.post(
   "/pdf-receivable-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "RECEIVABLE_SUMMARY", "VIEW")),
   validateStatementOfAccountsRequestInput,
-  pdfReceivableSummaryReport
+  pdfReceivableSummaryReport,
 );
 
 reportRouter.post(
   "/pdf-payable-summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "PAYABLE_SUMMARY", "VIEW")),
   validateStatementOfAccountsRequestInput,
-  pdfPayableSummaryReport
+  pdfPayableSummaryReport,
 );
 
 reportRouter.post(
   "/pdf-profit-loss",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "PROFIT_LOSS", "VIEW")),
   validateReportCommonRequestInput,
-  pdfProfitLossReport
+  pdfProfitLossReport,
 );
 
 reportRouter.post(
   "/pdf-cash-flow",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "CASH_FLOW", "VIEW")),
   validateCashFlowRequestInput,
-  pdfCashFlowReport
+  pdfCashFlowReport,
 );
 
 reportRouter.post(
   "/pdf-fund-flow",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "FUND_FLOW", "VIEW")),
   validateFundFlowRequestInput,
-  pdfFundFlowReport
+  pdfFundFlowReport,
 );

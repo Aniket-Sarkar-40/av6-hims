@@ -46,10 +46,10 @@ export const uinConfigRouter: Router = Router();
  */
 uinConfigRouter.post(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UIN_CONFIG", "CREATE")),
   validateCreateConfig,
-  createUINConfig
+  createUINConfig,
 );
 
 /**
@@ -69,10 +69,10 @@ uinConfigRouter.post(
  */
 uinConfigRouter.put(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UIN_CONFIG", "UPDATE")),
   validateUpdateConfig,
-  updateUINConfig
+  updateUINConfig,
 );
 
 /**
@@ -93,10 +93,10 @@ uinConfigRouter.put(
  */
 uinConfigRouter.get(
   "/uin",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UIN_CONFIG", "VIEW")),
   validateGetUINConfig,
-  getUIN
+  getUIN,
 );
 
 /**
@@ -117,10 +117,10 @@ uinConfigRouter.get(
  */
 uinConfigRouter.get(
   "/uin-preview",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UIN_CONFIG", "VIEW")),
   validateGetUINConfig,
-  previewUIN
+  previewUIN,
 );
 
 /**
@@ -140,10 +140,10 @@ uinConfigRouter.get(
  */
 uinConfigRouter.post(
   "/uin-custom-preview",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UIN_CONFIG", "VIEW")),
   validatePreviewCustomConfig,
-  previewCustomUIN
+  previewCustomUIN,
 );
 
 /**
@@ -156,9 +156,9 @@ uinConfigRouter.post(
 // DELETE/:shortCode/:id
 uinConfigRouter.delete(
   "/:id",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UIN_CONFIG", "DELETE")),
-  deleteUINConfig
+  deleteUINConfig,
 );
 
 /**
@@ -171,7 +171,7 @@ uinConfigRouter.delete(
 // POST/uin-short-code
 uinConfigRouter.get(
   "/uin-short-code",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UIN_CONFIG", "VIEW")),
-  getAllUinShortCodes
+  getAllUinShortCodes,
 );
