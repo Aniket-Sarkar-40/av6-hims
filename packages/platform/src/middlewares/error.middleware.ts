@@ -45,6 +45,45 @@ export async function deleteFileByEnv(
   }
 }
 
+/**
+ * Translates a Prisma error into a user-safe ErrorHandler with an appropriate
+ * HTTP status. We never surface raw Prisma messages (they can leak schema
+ * details) - only stable, generic messages.
+ */
+function mapPrismaError(err: unknown): ErrorHandler | null {
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    switch (err.code) {
+      case "P2002":
+        return new ErrorHandler(409, "A record with these values already exists.");
+      case "P2025":
+        return new ErrorHandler(404, "The requested record was not found.");
+      case "P2003":
+        return new ErrorHandler(409, "Operation violates a data relationship.");
+      case "P2000":
+        return new ErrorHandler(400, "A provided value is too long.");
+      case "P2011":
+      case "P2012":
+        return new ErrorHandler(400, "A required value is missing.");
+      default:
+        return new ErrorHandler(400, "The request could not be processed.");
+    }
+  }
+
+  if (err instanceof Prisma.PrismaClientValidationError) {
+    return new ErrorHandler(400, "Invalid data supplied.");
+  }
+
+  if (
+    err instanceof Prisma.PrismaClientUnknownRequestError ||
+    err instanceof Prisma.PrismaClientInitializationError ||
+    err instanceof Prisma.PrismaClientRustPanicError
+  ) {
+    return new ErrorHandler(500, "A database error occurred.");
+  }
+
+  return null;
+}
+
 export const errorMiddleware = async (
   err: Error,
   req: AuthRequest,
@@ -55,34 +94,40 @@ export const errorMiddleware = async (
     return next(err);
   }
 
-  if (req.uploadedFile) {
-    const { bucket, key } = req.uploadedFile;
-    await deleteFileByEnv(bucket, key);
-  }
-  if (req.uploadedFiles?.length) {
-    for (const file of req.uploadedFiles) {
-      await hetznerS3.send(
-        new DeleteObjectCommand({
-          Bucket: file.bucket,
-          Key: file.key,
-        })
-      );
+  // Best-effort cleanup of any files uploaded during the failed request.
+  // Wrapped so a cleanup failure can never crash the error response itself.
+  try {
+    if (req.uploadedFile) {
+      const { bucket, key } = req.uploadedFile;
+      await deleteFileByEnv(bucket, key);
     }
+    if (req.uploadedFiles?.length) {
+      for (const file of req.uploadedFiles) {
+        await deleteFileByEnv(file.bucket, file.key);
+      }
+    }
+  } catch (cleanupErr) {
+    logger.error("Error during uploaded-file cleanup", cleanupErr);
   }
 
   let handler: ErrorHandler;
 
-  if (
-    err instanceof Prisma.PrismaClientKnownRequestError ||
-    err instanceof Prisma.PrismaClientUnknownRequestError ||
-    err instanceof Prisma.PrismaClientValidationError
-  ) {
-    handler = new ErrorHandler(500, "Something went wrong");
+  const prismaHandler = mapPrismaError(err);
+  if (prismaHandler) {
+    handler = prismaHandler;
   } else if (err instanceof ErrorHandler) {
     handler = err;
   } else {
-    handler = new ErrorHandler(500, err.message || "Internal Server Error");
+    // Unknown error: never leak the raw message to the client.
+    handler = new ErrorHandler(500, "Internal Server Error");
   }
+
+  // Log the FULL error server-side (stack + traceId), regardless of what the
+  // client sees.
+  logger.error(
+    `[${req.traceId ?? "-"}] ${req.method} ${req.originalUrl} -> ${handler.statusCode}`,
+    err instanceof Error ? err.stack ?? err.message : err
+  );
 
   const response: ApiResponse = {
     success: false,
@@ -93,14 +138,13 @@ export const errorMiddleware = async (
     errors: handler.errors,
   };
 
-  logger.error(handler.message);
-
   if (envMode.toUpperCase() === "TEST") {
     response.err = handler;
   }
 
   return res.status(handler.statusCode).json(new BaseResponse(response));
 };
+
 type ControllerType = (
   req: Request,
   res: Response,

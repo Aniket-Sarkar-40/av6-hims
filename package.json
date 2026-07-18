@@ -27,7 +27,7 @@
     "dev:pms": "pnpm --filter @apps/pharmacy dev",
     "lint": "turbo run lint",
     "lint:monorepo": "sherif",
-    "p:gen": "pnpm --filter @repo/db prisma:generate",
+    "p:gen": "pnpm --filter @repo/db p:gen",
     "p:mig": "pnpm --filter @repo/db prisma:migrate",
     "pkg:format": "syncpack format",
     "start:core": "pnpm --filter @apps/core start",

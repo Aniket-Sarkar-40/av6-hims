@@ -5,6 +5,10 @@
       "dependsOn": ["^build", "^prisma:generate"],
       "outputs": ["dist/**"]
     },
+    "@repo/db#build": {
+      "dependsOn": ["prisma:generate"],
+      "outputs": ["dist/**"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
@@ -16,7 +20,8 @@
       "dependsOn": ["^test"]
     },
     "prisma:generate": {
-      "cache": false
+      "cache": false,
+      "outputs": ["generated/**"]
     },
     "prisma:migrate": {
       "cache": false

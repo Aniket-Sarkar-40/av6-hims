@@ -1,11 +1,13 @@
 import {
   CalculationMethod,
   DiscMethod,
-  PercentageOrAmount,
-  Prisma,
   RoundFormat,
   TAX_METHOD,
 } from "@repo/db/generated/prisma/client";
+
+// Single source of truth lives in @repo/shared; re-exported here for the many
+// existing `@repo/platform/types/common` consumers.
+export type { DecimalToNumber } from "@repo/shared/utils/helper.utils.js";
 
 export interface BaseCoreResponse<T> {
   success: boolean;
@@ -35,11 +37,3 @@ export interface CalculationInput {
   roundFormat: RoundFormat;
   precision: number;
 }
-
-export type DecimalToNumber<T> = T extends Prisma.Decimal
-  ? number
-  : T extends (infer U)[]
-    ? DecimalToNumber<U>[]
-    : T extends object
-      ? { [K in keyof T]: DecimalToNumber<T[K]> }
-      : T;
