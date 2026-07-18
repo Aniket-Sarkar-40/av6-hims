@@ -10,10 +10,10 @@ import { validIdCheck } from "@/validations/global.validation.js";
 import { validateIdGroup } from "../master/group.service.validation.js";
 import { validateIdVoucherType } from "../master/voucherType.service.validation.js";
 import { getByUnique } from "@/repository/common.repository.js";
+import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { AccountingIntegrationConfigDetails } from "@repo/db/generated/prisma/client";
-import { logger } from "@repo/platform/logging/logger.js";
 
 export const validateIdAccountingIntegrationConfig = async (
   id: number

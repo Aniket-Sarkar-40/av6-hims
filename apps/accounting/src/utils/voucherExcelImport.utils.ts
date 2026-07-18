@@ -14,6 +14,7 @@ import {
   VoucherLineSeed,
 } from "@/utils/externalVoucherPost.utils.js";
 import {
+  BankTransactionType,
   DrCr,
   Ledger,
   VoucherEntryExcel,
@@ -23,30 +24,7 @@ import { DEFAULT_COMPANY_ID } from "@repo/shared";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { SHORT_CODE } from "@repo/shared/utils/shortCode/accounting.shortCode.utils.js";
-
-// export function extractOtherLedgers(row: VoucherEntryExcelRow): OtherLedger[] {
-//   const ledgers: OtherLedger[] = [];
-
-//   let index = 1;
-
-//   while (true) {
-//     const ledgerKey = `Ledger ${index}`;
-//     const groupKey = `Ledger ${index} Group`;
-//     const amountKey = `Ledger ${index} Amount`;
-
-//     if (!row[ledgerKey]) break;
-
-//     ledgers.push({
-//       ledgerName: row[ledgerKey],
-//       ledgerGroup: row[groupKey],
-//       amount: Number(row[amountKey] || 0),
-//     });
-
-//     index++;
-//   }
-
-//   return ledgers;
-// }
+import dayjs, { Dayjs } from "dayjs";
 
 export function getLedgerColumnMeta(
   row: VoucherEntryExcelRow
@@ -69,6 +47,11 @@ export function getLedgerColumnMeta(
       groupKey: `Ledger ${index} Group`,
       amountKey: `Ledger ${index} Amount`,
       drCrKey: `Ledger ${index} Dr/Cr`,
+      transactionType: row[
+        `Ledger ${index} Transaction Type`
+      ] as BankTransactionType,
+      instrumentNo: row[`Ledger ${index} Instrument No`],
+      instrumentDate: row[`Ledger ${index} Instrument Date`],
     }));
 }
 
@@ -114,6 +97,15 @@ export function extractOtherLedgersWithMeta(
     if (!ledgerName || ledgerName.toString().trim() === "") {
       break;
     }
+    let instrumentDate: Dayjs | undefined;
+    if (col.instrumentDate) {
+      instrumentDate = dayjs(col.instrumentDate, "DD-MM-YYYY", true); // strict parsing
+      if (!instrumentDate.isValid()) {
+        throw new Error(
+          `Invalid Instrument Date at row ${col.index}: ${col.instrumentDate}`
+        );
+      }
+    }
 
     ledgers.push({
       ledgerName: ledgerName.toString().trim(),
@@ -123,6 +115,11 @@ export function extractOtherLedgersWithMeta(
         col.drCrKey && row[col.drCrKey] !== undefined
           ? row[col.drCrKey]?.toString().trim().toUpperCase()
           : undefined,
+      transactionType: col.transactionType,
+      instrumentNo: col.instrumentNo,
+      instrumentDate: instrumentDate
+        ? instrumentDate.format("YYYY-MM-DD")
+        : undefined,
     });
   }
 
@@ -142,7 +139,7 @@ export async function buildVoucherInputFromExcel(params: {
   ccId: number;
 }): Promise<preparedVoucherInputFromExcel> {
   const { item, voucherTypeId, ccId } = params;
-  const otherLedgers = item.otherLedgers as OtherLedger[];
+  const otherLedgers = item.otherLedgers as unknown as OtherLedger[];
 
   if (!otherLedgers || otherLedgers.length === 0) {
     throw new ErrorHandler(
@@ -162,7 +159,18 @@ export async function buildVoucherInputFromExcel(params: {
       generateErrorMessage("NOT_FOUND", "Financial Year")
     );
   }
-
+  if (financialYear.isLocked) {
+    throw new ErrorHandler(
+      400,
+      "Financial Year is locked, cannot create voucher"
+    );
+  }
+  if (financialYear.isClosed) {
+    throw new ErrorHandler(
+      400,
+      "Financial Year is closed, cannot create voucher"
+    );
+  }
   const lines: VoucherLineSeed[] = [];
 
   const allLedgers = (await commonGetService.getAllElements<"Ledger">({
@@ -239,9 +247,9 @@ export async function buildVoucherInputFromExcel(params: {
   }
   /**-------------------------------- Other Ledgers -------------------------------- */
   for (const l of otherLedgers) {
-    if (l.amount <= 0) {
-      throw new ErrorHandler(400, `Invalid amount for ledger: ${l.ledgerName}`);
-    }
+    // if (l.amount <= 0) {
+    //   throw new ErrorHandler(400, `Invalid amount for ledger: ${l.ledgerName}`);
+    // }
 
     const ledger = ledgers.find((d) => d.name === l.ledgerName);
     let ledgerId = 0;
@@ -253,11 +261,21 @@ export async function buildVoucherInputFromExcel(params: {
           generateErrorMessage("NOT_FOUND", `Group for ledger: ${l.ledgerName}`)
         );
       }
+      let isBankAccount = false;
+      let isCashAccount = false;
+      if (group.name.trim().toUpperCase() === "BANK ACCOUNTS") {
+        isBankAccount = true;
+      }
+      if (group.name.trim().toUpperCase() === "CASH-in-HAND") {
+        isCashAccount = true;
+      }
       const ledgerGroupId = group.id;
       const ledgerCreateInput: CreateOrUpdateLedgerInput = {
         companyId: companyId,
         groupId: ledgerGroupId,
         name: l.ledgerName,
+        isBankAccount,
+        isCashAccount,
       };
       const createdLedger = await createLedgerInDb(ledgerCreateInput);
       if (isCacheable && createdLedger) {
@@ -288,8 +306,17 @@ export async function buildVoucherInputFromExcel(params: {
 
     lines.push({
       ledgerId: ledgerId,
-      drCr: drCr,
-      amount: l.amount,
+      drCr: l.amount < 0 ? (drCr === DrCr.DR ? DrCr.CR : DrCr.DR) : drCr,
+      amount: Math.abs(l.amount),
+      transactionType:
+        l.transactionType && l.transactionType.trim() !== ""
+          ? (l.transactionType.trim() as BankTransactionType)
+          : undefined,
+      instrumentNo:
+        l.instrumentNo && l.instrumentNo.trim() !== ""
+          ? l.instrumentNo.trim()
+          : undefined,
+      instrumentDate: l.instrumentDate ? new Date(l.instrumentDate) : undefined,
     });
   }
   const common = {
@@ -329,6 +356,10 @@ export function resolveDrCr(params: ResolveDrCrParams): DrCr {
       return ledgerType === "PARTY" ? DrCr.DR : DrCr.CR;
     case "RECEIPT":
       return ledgerType === "PARTY" ? DrCr.CR : DrCr.DR;
+    case "BANK PAYMENT":
+      return ledgerType === "PARTY" ? DrCr.DR : DrCr.CR;
+    case "CASH PAYMENT":
+      return ledgerType === "PARTY" ? DrCr.DR : DrCr.CR;
     default:
       throw new ErrorHandler(400, `Invalid voucher type: ${voucherType}`);
   }

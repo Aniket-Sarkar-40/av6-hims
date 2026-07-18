@@ -6,7 +6,6 @@ import {
   CreateOrUpdateBankStatementInput,
   ManualBankReconcileWithBankStatementRow,
 } from "@/types/bankReconciliation/bankReconciliation.js";
-
 import { customOmit } from "av6-utils";
 import { createBatchJobInDb } from "../batch/batch.repository.js";
 import { logger } from "@repo/platform/logging/logger.js";
@@ -19,9 +18,9 @@ import {
   Batch_Type,
   DrCr,
 } from "@repo/db/generated/prisma/enums.js";
-import { db } from "@repo/db";
-import { Prisma } from "@repo/db/generated/prisma/client";
+import { db } from "@repo/db/client";
 import { API_TIMEOUT } from "@repo/shared";
+import { Prisma } from "@repo/db/generated/prisma/client";
 
 export const createBankStatementExcelInDb = async (
   input: CreateOrUpdateBankStatementExcelCreateInput[]
@@ -288,7 +287,7 @@ export const manualBankReconcileWithBankStatementRowInDb = async (
           bankStatementRowId: bankStatementRowId,
           matchedAmount: matchedAmount,
           clearedDate: clearedDate,
-          matchType: BankMatchType.MANUAL,
+          matchType: BankMatchType.AUTO,
           matchConfidence: BankMatchConfidence.HIGH,
           remarks: remarks,
           createdBy: currentUser,

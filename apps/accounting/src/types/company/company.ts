@@ -1,9 +1,9 @@
 import {
   CompanyAddress,
-  CompanyCurrencySettings,
   CompanyFeatures,
   CompanyFinancialYear,
   CompanyStatutory,
+  Currency,
   Prisma,
 } from "@repo/db/generated/prisma/client";
 import { BaseModelAttrWoCancel } from "../common.js";
@@ -24,10 +24,6 @@ export type CompanyFinancialYearCreateInput = Omit<
   BaseModelAttrWoCancel
 >;
 
-export type CompanyCurrencySettingsCreateInput = Omit<
-  Prisma.CompanyCurrencySettingsUncheckedCreateInput,
-  BaseModelAttrWoCancel
->;
 export type CompanyFeaturesCreateInput = Omit<
   Prisma.CompanyFeaturesUncheckedCreateInput,
   BaseModelAttrWoCancel
@@ -38,7 +34,6 @@ export interface CreateOrUpdateCompanyInput
   addresses: CompanyAddressCreateInput[];
   statutory: CompanyStatutoryCreateInput;
   financialYears: CompanyFinancialYearCreateInput;
-  currencySettings: CompanyCurrencySettingsCreateInput;
   features: CompanyFeaturesCreateInput;
 
   existing: CompanyResponse;
@@ -57,7 +52,6 @@ export type CompanyResponse = Prisma.CompanyGetPayload<{
       };
     };
     companyStatutory: true;
-    companyCurrencySettings: true;
     companyFeatures: true;
   };
 }>;
@@ -84,15 +78,12 @@ export interface CompanyDTO
     | "companyAddresses"
     | "companyStatutory"
     | "companyFinancialYears"
-    | "companyCurrencySettings"
     | "companyFeatures"
+    | "currencyId"
   > {
+  currency: Omit<Currency, BaseModelAttrWoCancel> | null;
   companyAddresses: CompanyAddressDTO[];
   companyStatutory: Omit<CompanyStatutory, BaseModelAttrWoCancel> | null;
   companyFinancialYear: CompanyFinancialYearDTO[];
-  companyCurrencySettings: Omit<
-    CompanyCurrencySettings,
-    BaseModelAttrWoCancel
-  > | null;
   companyFeatures: Omit<CompanyFeatures, BaseModelAttrWoCancel> | null;
 }

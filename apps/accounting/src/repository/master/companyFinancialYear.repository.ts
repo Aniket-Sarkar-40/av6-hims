@@ -91,3 +91,31 @@ export const getCompanyFinancialYearByCompanyIdAndIsCurrentFromDb = async (
     where: { companyId, isCurrent: true, isActive: true },
   });
 };
+
+export const closeCompanyFinancialYearInDb = async (id: number) => {
+  logger.info("entering::closeCompanyFinancialYearInDb::repository");
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
+  return await db.companyFinancialYear.update({
+    where: { id, isActive: true },
+    data: {
+      isClosed: true,
+      closedAt: new Date(),
+      closedBy: currentUser,
+    },
+  });
+};
+
+export const toggleLockCompanyFinancialYearInDb = async (params: {
+  id: number;
+  status: boolean;
+}) => {
+  logger.info("entering::toggleLockCompanyFinancialYearInDb::repository");
+  const { id, status } = params;
+  const store = requestStorage.getStore();
+  const currentUser = store?.user?.id;
+  return await db.companyFinancialYear.update({
+    where: { id, isActive: true },
+    data: { isLocked: status, updatedBy: currentUser },
+  });
+};

@@ -32,6 +32,7 @@ import { defaultUnitMasterRouter } from "@/routes/master/defaultUnitMaster.route
 import { registerCron } from "@/cron/scheduler.cron.js";
 import featureRouter from "@/routes/feature/feature.route.js";
 import { autoAlertRouter } from "@/routes/master/autoAlert.route.js";
+import stockOpeningClosingRouter from "@/routes/stock/stockOpeningClosing.route.js";
 
 registerCron();
 
@@ -97,3 +98,6 @@ inventoryRouter.use("/store-requisition-return", storeRequisitionReturnRouter);
 
 //feature-flag
 inventoryRouter.use("/feature-flag", featureRouter);
+
+// Stock Opening Closing
+inventoryRouter.use("/api/v1/stock-opening-closing", stockOpeningClosingRouter);

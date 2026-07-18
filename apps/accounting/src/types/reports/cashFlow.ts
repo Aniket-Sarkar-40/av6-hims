@@ -84,7 +84,10 @@ export type CashFlowGroupDetailResponse = {
   totals: CashFlowAmount;
 };
 
-export type CashFlowResponse = CashFlowMonthlyResponse | CashFlowMonthDetailResponse | CashFlowGroupDetailResponse;
+export type CashFlowResponse =
+  | CashFlowMonthlyResponse
+  | CashFlowMonthDetailResponse
+  | CashFlowGroupDetailResponse;
 
 export type CashFlowMovementRow = {
   voucherId: number;

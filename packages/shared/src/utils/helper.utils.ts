@@ -1,4 +1,5 @@
 import { DecodedToken } from "@/types/auth.js";
+import { IdValue } from "@/types/common.js";
 import { toUTCDateOnly } from "@/utils/date.utils.js";
 import { Decimal } from "@prisma/client/runtime/client";
 import { BASE_URL, CLIENT_ID } from "@repo/shared/config/index.js";
@@ -224,3 +225,13 @@ export const numberToWords = new ToWords({
     },
   },
 });
+
+export function toRequiredIdValue<
+  T extends { id: number },
+  K extends keyof Omit<T, "id"> & string
+>(row: T, valueKey: K): IdValue {
+  return {
+    id: row.id,
+    value: String(row[valueKey] ?? ""),
+  };
+}

@@ -97,6 +97,7 @@ model AccSettings {
     roundingPrecision Int               @default(2) @map("rounding_precision")
     timeZone          String?           @map("time_zone")
     excelBatchSize    Int               @default(100) @map("excel_batch_size")
+    mainBranchId      Int               @default(1) @map("main_branch_id")
 
     isActive  Boolean  @default(true) @map("is_active")
     createdBy Int?     @map("created_by")
@@ -115,6 +116,8 @@ model Company {
     status         Status   @default(ACTIVE)
     booksBeginFrom DateTime @map("books_begin_from") @db.Date //go live date
 
+    currencyId Int? @map("currency_id")
+
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
     updatedBy Int?      @map("updated_by")
@@ -123,6 +126,8 @@ model Company {
     deletedAt DateTime? @map("deleted_at")
     deletedBy Int?      @map("deleted_by")
 
+    currency Currency? @relation(fields: [currencyId], references: [id])
+
     companyAddresses        CompanyAddress[]
     companyFinancialYears   CompanyFinancialYear[]
     collectionCenters       CollectionCenter[]
@@ -130,7 +135,6 @@ model Company {
     ledgers                 Ledger[]
     ledgerOpeningBalances   LedgerOpeningBalance[]
     companyStatutory        CompanyStatutory?
-    companyCurrencySettings CompanyCurrencySettings?
     companyFeatures         CompanyFeatures?
     voucherTypes            VoucherType[]
     costCenters             CostCenter[]
@@ -139,7 +143,12 @@ model Company {
     billDocuments           BillDocument[]
     billAllocations         BillAllocation[]
     bankStatements          BankStatement[]
+    multiVouchers           MultiVoucher[]
+    voucherAudits           VoucherAudit[]
+    rateOfExchanges         RateOfExchange[]
+    companyCurrencySettings CompanyCurrencySettings?
 
+    @@index([currencyId], name: "company_currency_id_idx")
     @@map("accounting_company")
 }
 
@@ -213,6 +222,7 @@ model CompanyFinancialYear {
     booksBeginFrom DateTime @map("books_begin_from") @db.Date
     isCurrent      Boolean  @default(false) @map("is_current")
     isLocked       Boolean  @default(false) @map("is_locked")
+    isClosed       Boolean  @default(false) @map("is_closed")
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -221,6 +231,8 @@ model CompanyFinancialYear {
     updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
     deletedBy Int?      @map("deleted_by")
+    closedAt  DateTime? @map("closed_at") @db.Date
+    closedBy  Int?      @map("closed_by")
 
     company               Company                @relation(fields: [companyId], references: [id])
     ledgerOpeningBalances LedgerOpeningBalance[]
@@ -228,6 +240,9 @@ model CompanyFinancialYear {
     billDocuments         BillDocument[]
     billAllocations       BillAllocation[]
     bankStatements        BankStatement[]
+    multiVouchers         MultiVoucher[]
+    voucherAudits         VoucherAudit[]
+    rateOfExchanges       RateOfExchange[]
 
     @@index([companyId], name: "company_financial_year_company_id_idx")
     @@map("accounting_company_financial_year")
@@ -342,6 +357,7 @@ model Ledger {
     bankIfsc      String? @map("bank_ifsc") @db.VarChar(20)
     bankAccountNo String? @map("bank_account_no") @db.VarChar(40)
     upiId         String? @map("upi_id") @db.VarChar(120)
+    branchName    String? @map("branch_name") @db.VarChar(120)
 
     contactName String? @map("contact_name") @db.VarChar(120)
     phone       String? @db.VarChar(30)
@@ -353,6 +369,9 @@ model Ledger {
     gstin                String?
     placeOfSupplyStateId Int?          @map("place_of_supply_state_id")
 
+    currencyId         Int? @map("currency_id")
+    creditPeriodInDays Int? @map("credit_period_in_days")
+
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
     updatedBy Int?      @map("updated_by")
@@ -361,14 +380,18 @@ model Ledger {
     deletedAt DateTime? @map("deleted_at")
     deletedBy Int?      @map("deleted_by")
 
-    company               Company                @relation(fields: [companyId], references: [id])
-    group                 Group                  @relation(fields: [groupId], references: [id])
-    ledgerOpeningBalances LedgerOpeningBalance[]
-    voucherLines          VoucherLine[]
-    billDocuments         BillDocument[]
-    billAllocations       BillAllocation[]
-    clientLedgerMappings  ClientLedgerMapping[]
-    bankStatements        BankStatement[]
+    company                     Company                      @relation(fields: [companyId], references: [id])
+    group                       Group                        @relation(fields: [groupId], references: [id])
+    ledgerOpeningBalances       LedgerOpeningBalance[]
+    voucherLines                VoucherLine[]
+    billDocuments               BillDocument[]
+    billAllocations             BillAllocation[]
+    clientLedgerMappings        ClientLedgerMapping[]
+    bankStatements              BankStatement[]
+    multiVouchers               MultiVoucher[]
+    multiVoucherDetails         MultiVoucherDetails[]
+    bankStatementFormatMappings BankStatementFormatMapping[]
+    chequeMasters               ChequeMaster[]
 
     @@index([companyId], map: "idx_ledger_company")
     @@index([groupId], map: "idx_ledger_group")
@@ -382,10 +405,12 @@ model LedgerOpeningBalance {
     ledgerId        Int @map("ledger_id")
 
     // ccId         Int?  @map("cc_id") //only if branch-wise opening
-
-    asOnDate DateTime @map("as_on_date") @db.Date
-    amount   Decimal  @db.Decimal(18, 5)
-    drCr     DrCr     @map("dr_cr")
+    currencyId             Int?     @map("currency_id")
+    currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+    currencyAmount         Decimal? @map("currency_amount") @db.Decimal(18, 5)
+    asOnDate               DateTime @map("as_on_date") @db.Date
+    amount                 Decimal  @db.Decimal(18, 5)
+    drCr                   DrCr     @map("dr_cr")
 
     source String? @db.VarChar(30) // MANUAL / MIGRATION / SYSTEM (optional)
     note   String? @db.VarChar(255)
@@ -420,6 +445,7 @@ model VoucherType {
     contraOnlyBankOrCash       Boolean              @default(false) @map("contra_only_bank_or_cash")
     enableBillWiseTracking     Boolean              @default(false) @map("enable_bill_wise_tracking")
     enableCostCenters          Boolean              @default(false) @map("enable_cost_centers")
+    isTransactionTypeRequired  Boolean              @default(false) @map("is_transaction_type_required")
     isReserved                 Boolean              @default(false) @map("is_reserved")
 
     isActive  Boolean   @default(true) @map("is_active")
@@ -433,6 +459,9 @@ model VoucherType {
     company                      Company                       @relation(fields: [companyId], references: [id])
     vouchers                     Voucher[]
     accountingIntegrationConfigs AccountingIntegrationConfig[]
+    multiVouchers                MultiVoucher[]
+    voucherAudits                VoucherAudit[]
+    voucherUINConfigs            VoucherUINConfig[]
 
     @@index([companyId], map: "idx_voucher_type_company")
     @@map("accounting_voucher_type")
@@ -489,6 +518,8 @@ model Voucher {
 
     currencyId             Int?     @map("currency_id")
     currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+    currencyTotalDebit     Decimal? @map("currency_total_debit") @db.Decimal(18, 5)
+    currencyTotalCredit    Decimal? @map("currency_total_credit") @db.Decimal(18, 5)
 
     isActive   Boolean   @default(true) @map("is_active")
     createdBy  Int?      @map("created_by")
@@ -510,6 +541,8 @@ model Voucher {
     costCenterAllocations CostCenterAllocation[]
     billDocuments         BillDocument[]
     billAllocations       BillAllocation[]
+    multiVoucherDetails   MultiVoucherDetails?
+    voucherAudits         VoucherAudit[]
 
     @@index([companyId], map: "idx_voucher_company")
     @@index([financialYearId], map: "idx_voucher_financial_year")
@@ -528,7 +561,13 @@ model VoucherLine {
     drCr     DrCr    @map("dr_cr")
     amount   Decimal @db.Decimal(18, 5)
 
+    currencyId             Int?     @map("currency_id")
+    currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+    currencyAmount         Decimal? @map("currency_amount") @db.Decimal(18, 5)
+
     description String?
+
+    transactionType BankTransactionType? @map("transaction_type")
 
     // Optional (helps statement printing & bank recon later)
     instrumentNo   String?   @map("instrument_no")
@@ -556,6 +595,7 @@ model VoucherLine {
     costCenterAllocations CostCenterAllocation[]
     billAllocations       BillAllocation[]
     bankMatches           BankReconciliationMatch[]
+    usedChequeNumbers     UsedChequeNumber[]
 
     @@index([voucherId], map: "idx_voucher_line_voucher")
     @@index([ledgerId], map: "idx_voucher_line_ledger")
@@ -785,6 +825,8 @@ model BatchJob {
     voucherEntryExcels  VoucherEntryExcel[]
     bankStatementExcels BankStatementExcel[]
     accBatchJobDetails  AccBatchJobDetails[]
+    groupExcels         GroupExcel[]
+    ledgerExcels        LedgerExcel[]
 
     @@map("accounting_batch_job")
 }
@@ -954,4 +996,327 @@ model BankStatementExcel {
     @@map("accounting_bank_statement_excel")
 }
 
-// All Enums are here
+model MultiVoucher {
+    id              Int                @id @default(autoincrement())
+    ccId            Int                @map("cc_id")
+    companyId       Int                @map("company_id")
+    financialYearId Int                @map("financial_year_id")
+    voucherTypeId   Int                @map("voucher_type_id")
+    voucherDate     DateTime           @map("voucher_date") @db.Date
+    description     String?            @db.Text
+    status          MultiVoucherStatus @default(DRAFT) @map("status")
+
+    ledgerId Int     @map("ledger_id")
+    drCr     DrCr    @map("dr_cr")
+    amount   Decimal @db.Decimal(18, 5)
+
+    isActive   Boolean   @default(true) @map("is_active")
+    createdBy  Int?      @map("created_by")
+    updatedBy  Int?      @map("updated_by")
+    createdAt  DateTime  @default(now()) @map("created_at")
+    updatedAt  DateTime  @updatedAt @map("updated_at")
+    deletedAt  DateTime? @map("deleted_at")
+    deletedBy  Int?      @map("deleted_by")
+    approvedBy Int?      @map("approved_by")
+    approvedAt DateTime? @map("approved_at")
+
+    company             Company               @relation(fields: [companyId], references: [id])
+    financialYear       CompanyFinancialYear  @relation(fields: [financialYearId], references: [id])
+    collectionCenter    CollectionCenter      @relation(fields: [ccId], references: [id])
+    voucherType         VoucherType           @relation(fields: [voucherTypeId], references: [id])
+    ledger              Ledger                @relation(fields: [ledgerId], references: [id])
+    multiVoucherDetails MultiVoucherDetails[]
+
+    @@index([companyId], map: "idx_multi_voucher_company")
+    @@index([financialYearId], map: "idx_multi_voucher_financial_year")
+    @@index([ccId], map: "idx_multi_voucher_collection_center")
+    @@index([voucherTypeId], map: "idx_multi_voucher_voucher_type")
+    @@index([ledgerId], map: "idx_multi_voucher_ledger")
+    @@map("accounting_multi_voucher")
+}
+
+model MultiVoucherDetails {
+    id             Int     @id @default(autoincrement())
+    multiVoucherId Int     @map("multi_voucher_id")
+    lineNo         Int?    @map("line_no")
+    ccId           Int     @map("cc_id")
+    voucherNo      String? @map("voucher_no")
+    ledgerId       Int     @map("ledger_id")
+    drCr           DrCr    @map("dr_cr")
+    amount         Decimal @db.Decimal(18, 5)
+    narration      String? @db.Text
+
+    transactionType BankTransactionType? @map("transaction_type")
+    instrumentNo    String?              @map("instrument_no")
+    instrumentDate  DateTime?            @map("instrument_date")
+
+    voucherId Int? @unique @map("voucher_id")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    multiVoucher     MultiVoucher     @relation(fields: [multiVoucherId], references: [id])
+    collectionCenter CollectionCenter @relation(fields: [ccId], references: [id])
+    ledger           Ledger           @relation(fields: [ledgerId], references: [id])
+    voucher          Voucher?         @relation(fields: [voucherId], references: [id])
+
+    @@index([multiVoucherId], map: "idx_multi_voucher_details_multi_voucher")
+    @@index([ccId], map: "idx_multi_voucher_details_collection_center")
+    @@index([ledgerId], map: "idx_multi_voucher_details_ledger")
+    @@index([voucherId], map: "idx_multi_voucher_details_voucher")
+    @@map("accounting_multi_voucher_details")
+}
+
+model VoucherAudit {
+    id        Int      @id @default(autoincrement())
+    auditDate DateTime @default(now()) @map("audit_date")
+
+    voucherId       Int @map("voucher_id")
+    companyId       Int @map("company_id")
+    financialYearId Int @map("financial_year_id")
+    ccId            Int @map("cc_id")
+    voucherTypeId   Int @map("voucher_type_id")
+
+    voucherNo   String   @map("voucher_no")
+    voucherDate DateTime @map("voucher_date") @db.Date
+
+    refType    String? @map("ref_type")
+    subRefType String? @map("sub_ref_type")
+
+    refNo String? @map("ref_no")
+    refId Int?    @map("ref_id")
+
+    pId String? @map("p_id")
+
+    narration String?       @db.Text
+    status    VoucherStatus @default(POSTED)
+
+    totalDebit          Decimal? @map("total_debit") @db.Decimal(18, 5)
+    totalCredit         Decimal? @map("total_credit") @db.Decimal(18, 5)
+    currencyTotalDebit  Decimal? @map("currency_total_debit") @db.Decimal(18, 5)
+    currencyTotalCredit Decimal? @map("currency_total_credit") @db.Decimal(18, 5)
+
+    currencyId             Int?     @map("currency_id")
+    currencyConversionRate Decimal? @map("currency_conversion_rate") @db.Decimal(18, 5)
+
+    isActive   Boolean   @default(true) @map("is_active")
+    createdBy  Int?      @map("created_by")
+    updatedBy  Int?      @map("updated_by")
+    createdAt  DateTime? @map("created_at")
+    updatedAt  DateTime? @map("updated_at")
+    deletedAt  DateTime? @map("deleted_at")
+    deletedBy  Int?      @map("deleted_by")
+    approvedBy Int?      @map("approved_by")
+    approvedAt DateTime? @map("approved_at")
+
+    company          Company              @relation(fields: [companyId], references: [id])
+    financialYear    CompanyFinancialYear @relation(fields: [financialYearId], references: [id])
+    collectionCenter CollectionCenter     @relation(fields: [ccId], references: [id])
+    voucherType      VoucherType          @relation(fields: [voucherTypeId], references: [id])
+    currency         Currency?            @relation(fields: [currencyId], references: [id])
+    voucher          Voucher?             @relation(fields: [voucherId], references: [id])
+
+    @@index([companyId], map: "idx_voucher_audit_company")
+    @@index([financialYearId], map: "idx_voucher_audit_financial_year")
+    @@index([ccId], map: "idx_voucher_audit_collection_center")
+    @@index([voucherTypeId], map: "idx_voucher_audit_voucher_type")
+    @@index([currencyId], map: "idx_voucher_audit_currency")
+    @@index([voucherId], map: "idx_voucher_audit_voucher")
+    @@map("accounting_voucher_audit")
+}
+
+model BankStatementFormatMapping {
+    id           Int       @id @default(autoincrement())
+    bankLedgerId Int       @map("bank_ledger_id")
+    excelFormat  Json      @map("excel_format")
+    isActive     Boolean   @default(true) @map("is_active")
+    createdBy    Int?      @map("created_by")
+    updatedBy    Int?      @map("updated_by")
+    createdAt    DateTime  @default(now()) @map("created_at")
+    updatedAt    DateTime  @updatedAt @map("updated_at")
+    deletedAt    DateTime? @map("deleted_at")
+    deletedBy    Int?      @map("deleted_by")
+
+    bankLedger Ledger @relation(fields: [bankLedgerId], references: [id])
+
+    @@index([bankLedgerId], map: "idx_bank_statement_format_mapping_bank_ledger")
+    @@map("accounting_bank_statement_format_mapping")
+}
+
+model RateOfExchange {
+    id              Int      @id @default(autoincrement())
+    companyId       Int      @map("company_id")
+    currencyId      Int      @map("currency_id")
+    financialYearId Int      @map("financial_year_id")
+    date            DateTime @map("date") @db.Date
+    stdRate         Float    @map("std_rate")
+    sellingRate     Float?   @map("selling_rate")
+    buyingRate      Float?   @map("buying_rate")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    company       Company              @relation(fields: [companyId], references: [id])
+    currency      Currency             @relation(fields: [currencyId], references: [id])
+    financialYear CompanyFinancialYear @relation(fields: [financialYearId], references: [id])
+
+    @@index([companyId], map: "idx_rate_of_exchange_company")
+    @@index([currencyId], map: "idx_rate_of_exchange_currency")
+    @@index([financialYearId], map: "idx_rate_of_exchange_financial_year")
+    @@map("accounting_rate_of_exchange")
+}
+
+model GroupExcel {
+    id         Int  @id @default(autoincrement())
+    batchJobId Int  @map("batch_job_id")
+    rowNo      Int? @map("row_no")
+
+    name            String
+    alias           String?
+    isPrimaryGroup  Boolean @map("is_primary_group")
+    parentGroupName String? @map("parent_group_name")
+
+    primaryCategory    AccountingPrimaryCategory? @map("primary_category")
+    reportType         AccountingReportType?      @map("report_type")
+    nature             AccountingNature?
+    affectsGrossProfit Boolean?                   @map("affects_gross_profit")
+
+    batchJob BatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], map: "idx_group_excel_batch_job")
+    @@map("accounting_group_excel")
+}
+
+model LedgerExcel {
+    id         Int  @id @default(autoincrement())
+    batchJobId Int  @map("batch_job_id")
+    rowNo      Int? @map("row_no")
+
+    name      String
+    groupName String  @map("group_name")
+    alias     String?
+
+    ledgerType    LedgerType @default(GENERAL) @map("ledger_type")
+    isBankAccount Boolean    @default(false) @map("is_bank_account")
+    isCashAccount Boolean    @default(false) @map("is_cash_account")
+
+    bankName      String? @map("bank_name")
+    bankIfsc      String? @map("bank_ifsc")
+    bankAccountNo String? @map("bank_account_no")
+    upiId         String? @map("upi_id")
+    branchName    String? @map("branch_name")
+
+    contactName String? @map("contact_name")
+    phone       String?
+    email       String?
+    address     String? @db.Text
+
+    gstType                LedgerGstType @default(NA) @map("gst_type")
+    gstin                  String?
+    placeOfSupplyStateName String?       @map("place_of_supply_state_name")
+
+    currencyCode String? @map("currency_code")
+
+    batchJob BatchJob @relation(fields: [batchJobId], references: [id])
+
+    @@index([batchJobId], map: "idx_ledger_excel_batch_job")
+    @@map("accounting_ledger_excel")
+}
+
+model VoucherUINConfig {
+    id             Int              @id @default(autoincrement())
+    voucherTypeId  Int              @map("voucher_type_id")
+    seqStartDate   DateTime         @map("seq_start_date") @db.Date
+    sequenceNo     BigInt           @default(0) @map("sequence_no")
+    seqResetDate   DateTime         @map("seq_reset_date") @db.Date
+    seqResetPolicy UIN_RESET_POLICY @default(no) @map("seq_reset_policy")
+    description    String?
+    uinSegments    Json             @map("uin_segments")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    voucherType VoucherType @relation(fields: [voucherTypeId], references: [id])
+
+    @@index([voucherTypeId], map: "idx_voucher_uin_config_voucher_type")
+    @@map("accounting_voucher_uin_config")
+}
+
+model ChequeMaster {
+    id            Int    @id @default(autoincrement())
+    bankLedgerId  Int    @map("bank_ledger_id")
+    startChequeNo Int    @map("start_cheque_no")
+    endChequeNo   Int    @map("end_cheque_no")
+    status        Status @default(ACTIVE) @map("status")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    bankLedger        Ledger             @relation(fields: [bankLedgerId], references: [id])
+    usedChequeNumbers UsedChequeNumber[]
+
+    @@index([bankLedgerId], map: "idx_cheque_master_bank_ledger")
+    @@map("accounting_cheque_master")
+}
+
+model UsedChequeNumber {
+    id             Int     @id @default(autoincrement())
+    chequeMasterId Int     @map("cheque_master_id")
+    voucherLineId  Int     @map("voucher_line_id")
+    chequeNo       Int     @map("cheque_no")
+    isUsed         Boolean @map("is_used")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    deletedBy Int?      @map("deleted_by")
+
+    chequeMaster ChequeMaster @relation(fields: [chequeMasterId], references: [id])
+    voucherLine  VoucherLine  @relation(fields: [voucherLineId], references: [id])
+
+    @@index([chequeMasterId], map: "idx_used_cheque_number_cheque_master")
+    @@index([voucherLineId], map: "idx_used_cheque_number_voucher_line")
+    @@map("accounting_used_cheque_number")
+}
+
+model AccFeatureFlag {
+    id            Int     @id @default(autoincrement())
+    shortCode     String  @map("short_code")
+    flagName      String  @map("flag_name")
+    isEnabled     Boolean @map("is_enabled")
+    description   String  @db.LongText
+    featureConfig Json?   @map("feature_config")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("accounting_feature_flag")
+}

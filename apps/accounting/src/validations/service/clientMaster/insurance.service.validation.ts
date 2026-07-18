@@ -1,4 +1,5 @@
 import { getInsuranceByIdFromDb } from "@/repository/clientMaster/insurance.repository.js";
+
 import { validIdCheck } from "@/validations/global.validation.js";
 import { InsuranceMaster } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";

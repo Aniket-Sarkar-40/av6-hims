@@ -1,4 +1,4 @@
-import { db } from "@repo/db";
+import { db } from "@repo/db/client";
 import { BillStatus, Prisma } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 

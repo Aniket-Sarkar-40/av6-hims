@@ -17,6 +17,7 @@ import {
 import { logger } from "@repo/platform/logging/logger.js";
 import { db } from "@repo/db";
 import { API_TIMEOUT } from "@repo/shared";
+import { createOrUpdateVoucherServiceValidation } from "@/validations/service/voucher/voucher.service.validation.js";
 
 export type PrismaTransactionClient = Omit<
   PrismaClient,
@@ -114,7 +115,9 @@ export async function voucherExcelBatchJob(params: {
               voucherTypeId,
               ccId,
             });
-
+            await createOrUpdateVoucherServiceValidation({
+              input: voucherInput as CreateOrUpdateVoucherInput,
+            });
             const createdVoucher = await createVoucherFromExcelInDb(
               tx,
               voucherInput as CreateOrUpdateVoucherInput

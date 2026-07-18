@@ -1,6 +1,6 @@
 import { BaseModelAttrWoCancel } from "@/types/common.js";
 import { IdValue } from "../global.js";
-import { Ledger, Prisma } from "@repo/db/generated/prisma/client";
+import { ClientType, Ledger, Prisma } from "@repo/db/generated/prisma/client";
 
 export type CreateOrUpdateLedgerOpeningBalanceInput = Omit<
   Prisma.LedgerOpeningBalanceUncheckedCreateInput,
@@ -29,10 +29,11 @@ export type LedgerResponse = Prisma.LedgerGetPayload<{
 export interface LedgerDTO
   extends Omit<
     LedgerResponse,
-    BaseModelAttrWoCancel | "company" | "companyId" | "groupId"
+    BaseModelAttrWoCancel | "company" | "companyId" | "groupId" | "currencyId"
   > {
   company: IdValue | null;
   group: IdValue | null;
+  currency: IdValue | null;
 }
 
 export interface LedgerDTOForTrialBalance
@@ -40,3 +41,38 @@ export interface LedgerDTOForTrialBalance
   group: IdValue | null;
   parentGroup: IdValue | null;
 }
+
+export type FetchLedgerForExternalMappingInput = {
+  clientType: ClientType;
+};
+
+export type LedgerExcelBaseInput = {
+  companyId: number;
+};
+
+export type LedgerExcelRow = {
+  Name: string;
+  "Group Name": string;
+  Alias?: string;
+  "Ledger Type"?: string;
+  "Bank Account"?: string;
+  "Cash Account"?: string;
+  "Bank Name"?: string;
+  "Bank IFSC"?: string;
+  "Branch Name"?: string;
+  "Bank Account No"?: string;
+  "UPI Id"?: string;
+  "Contact Name"?: string;
+  Phone?: string;
+  Email?: string;
+  Address?: string;
+  "TIN Type"?: string;
+  "TIN Number"?: string;
+  "Place of Supply State"?: string;
+  "Currency Code"?: string;
+};
+
+export type CreateOrUpdateLedgerExcelInput = Omit<
+  Prisma.LedgerExcelUncheckedCreateInput,
+  "batchJobId"
+>;

@@ -1,5 +1,6 @@
 import { upsertEmailConfig } from "@/controllers/master/emailConfig.controller.js";
 import { validateEmailConfig } from "@/validations/request/master/emailConfig.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/client";
 import {
   authorize,
   verifyToken,
@@ -38,7 +39,7 @@ export const emailConfigRouter: Router = Router();
 
 emailConfigRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "EMAIL_CONFIG", "CREATE")),
   validateEmailConfig,
   upsertEmailConfig

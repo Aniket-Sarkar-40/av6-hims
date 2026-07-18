@@ -1,10 +1,10 @@
+import { accountingIntegrationConfigService } from "@/services/integrationConfig/accountingIntegrationConfig.service.js";
 import { CreateOrUpdateAccountingIntegrationConfigInput } from "@/types/integrationConfig/accountingIntegrationConfig.js";
 import { IntegrationConfigKeysKeys } from "@/types/voucher/voucher.js";
-import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
+import { TryCatch } from "@repo/platform";
 import { logger } from "@repo/platform/logging/logger.js";
-import { Request, Response } from "express";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
-import { accountingIntegrationConfigService } from "@/services/integrationConfig/accountingIntegrationConfig.service.js";
+import { Request, Response } from "express";
 
 export const createAccountingIntegrationConfig = TryCatch(
   async (req: Request, res: Response) => {

@@ -5,10 +5,11 @@ import {
   CompanyDTO,
   CompanyResponse,
 } from "@/types/company/company.js";
-import { customOmit, removeBaseModel, toIdValue } from "av6-utils";
-import { toCityDTO } from "@/mapper/master/city.mapper.js";
+import { customOmit, toIdValue } from "av6-utils";
+import { removeBaseModel, removeBaseModelArray } from "@/utils/helper.utils.js";
 import { City } from "@repo/db/generated/prisma/client";
-import { removeBaseModelArray } from "@/utils/helper.utils.js";
+import { toCityDTO } from "@/mapper/master/city.mapper.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
 
 export const toCompanyDto = async (
   input: CompanyResponse
@@ -28,7 +29,7 @@ export const toCompanyDto = async (
     | "companyAddresses"
     | "companyStatutory"
     | "companyFinancialYears"
-    | "companyCurrencySettings"
+    | "currencyId"
     | "companyFeatures"
   >(input, [
     "isActive",
@@ -41,7 +42,7 @@ export const toCompanyDto = async (
     "companyAddresses",
     "companyStatutory",
     "companyFinancialYears",
-    "companyCurrencySettings",
+    "currencyId",
     "companyFeatures",
   ]);
 
@@ -69,12 +70,15 @@ export const toCompanyDto = async (
     }
   );
 
+  const currency = input.currencyId
+    ? await currencyService.getCurrencyById(input.currencyId)
+    : null;
   return {
     ...omittedData.rest,
     companyAddresses,
     companyStatutory: removeBaseModel(input.companyStatutory),
     companyFinancialYear: removeBaseModelArray(input.companyFinancialYears),
-    companyCurrencySettings: removeBaseModel(input.companyCurrencySettings),
+    currency: currency ? removeBaseModel(currency) : null,
     companyFeatures: removeBaseModel(input.companyFeatures),
   };
 };

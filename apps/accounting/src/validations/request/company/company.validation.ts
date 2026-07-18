@@ -120,17 +120,6 @@ const CompanyFinancialYearUpdateSchema = CompanyFinancialYearCreateSchema.keys({
   id: idRequired("Financial Year Id"),
 });
 
-const CompanyCurrencySettings = Joi.object({
-  baseCurrencyCode: strRequired("Currency Code", 1, 3),
-  symbol: strRequired("Symbol", 1, 1),
-  currencyName: strRequired("Currency Name"),
-  subUnitName: strRequired("Sub Unit Name"),
-});
-
-const CompanyCurrencySettingsUpdateSchema = CompanyCurrencySettings.keys({
-  id: idRequired("Currency Settings Id"),
-});
-
 const CompanyFeatures = Joi.object({
   enableCostCenter: boolRequired("Enable Cost Center"),
   enableBillWiseTracking: boolRequired("Enable Bill Wise Tracking"),
@@ -147,6 +136,7 @@ export const CompanyCreateSchema = Joi.object({
   name: strRequired("Name"),
   legalName: strOptional("Legal Name"),
   booksBeginFrom: dateRequired("Books Begin From"),
+  currencyId: idRequired("Currency Id"),
   addresses: Joi.array()
     .items(CompanyAddressesCreateSchema)
     .required()
@@ -178,7 +168,6 @@ export const CompanyCreateSchema = Joi.object({
     }),
   statutory: CompanyStatutoryCreateSchema,
   financialYears: CompanyFinancialYearCreateSchema,
-  currencySettings: CompanyCurrencySettings,
   features: CompanyFeatures,
 });
 
@@ -215,7 +204,6 @@ export const CompanyUpdateSchema = CompanyCreateSchema.keys({
     }),
   statutory: CompanyStatutoryUpdateSchema,
   financialYears: CompanyFinancialYearUpdateSchema,
-  currencySettings: CompanyCurrencySettingsUpdateSchema,
   features: CompanyFeaturesUpdateSchema,
 });
 export const validateCreateCompany = validationHandler({

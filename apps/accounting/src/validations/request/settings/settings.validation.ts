@@ -1,12 +1,9 @@
 import { CreateOrUpdateSettings } from "@/types/settings/settings.js";
-import {
-  CalculationMethod,
-  RoundFormat,
-} from "@repo/db/generated/prisma/enums.js";
-import { idOptional } from "@repo/shared/utils/joi.utils.js";
+import { CalculationMethod } from "@repo/db/generated/prisma/enums.js";
+import { idOptional, idRequired } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-
+import { RoundFormat } from "av6-utils";
 import Joi from "joi";
 
 export const settingsSchema = Joi.object<CreateOrUpdateSettings>({
@@ -99,6 +96,7 @@ export const settingsSchema = Joi.object<CreateOrUpdateSettings>({
         "Excel Batch Size"
       ),
     }),
+  mainBranchId: idRequired("Main Branch Id"),
 });
 
 export const validateSettings = validationHandler({ schema: settingsSchema });

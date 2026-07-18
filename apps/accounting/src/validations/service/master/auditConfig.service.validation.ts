@@ -2,14 +2,14 @@ import { checkAuditConfigFieldDuplicate } from "@/repository/master/auditConfig.
 import { commonGetService } from "@/services/common.service.js";
 import { CreateOrUpdateAuditConfig } from "@/types/master/auditConfig.js";
 import { validIdCheck } from "@/validations/global.validation.js";
-import { AccAuditConfig } from "@repo/db/generated/prisma/client";
+import { AuditConfig } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdAuditConfig = async (
   id: number
-): Promise<AccAuditConfig> => {
+): Promise<AuditConfig> => {
   logger.info("entering::validateIdAuditConfig::service::validation");
   validIdCheck(id);
   const auditConfig = await commonGetService.getElementById<"AuditConfig">({

@@ -10,13 +10,14 @@ import {
   CreateOrUpdateCompanyInput,
 } from "@/types/company/company.js";
 import { validIdCheck } from "@/validations/global.validation.js";
+import { validateIdCurrency } from "../master/currency.service.validation.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   CompanyFinancialYear,
   GstRegistrationType,
 } from "@repo/db/generated/prisma/client";
-import { logger } from "@repo/platform/logging/logger.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdCompany = async (
   id: number
@@ -52,8 +53,7 @@ export const createOrUpdateCompanyServiceValidation = async (
   input: CreateOrUpdateCompanyInput
 ) => {
   logger.info("entering::createOrUpdateCompany::service::validation");
-  const { addresses, statutory, financialYears, currencySettings, features } =
-    input;
+  const { addresses, statutory, financialYears, features } = input;
   if (input.id) {
     const company = await validateIdCompany(input.id);
     input.existing = company;
@@ -94,22 +94,16 @@ export const createOrUpdateCompanyServiceValidation = async (
         generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
       );
     }
-    if (company.companyCurrencySettings?.id !== currencySettings.id) {
-      throw new ErrorHandler(
-        400,
-        generateErrorMessage(
-          "INVALID_ASSOCIATION",
-          "Currency Settings",
-          "Company"
-        )
-      );
-    }
     if (company.companyFeatures?.id !== features.id) {
       throw new ErrorHandler(
         400,
         generateErrorMessage("INVALID_ASSOCIATION", "Features", "Company")
       );
     }
+  }
+
+  if (input.currencyId) {
+    await validateIdCurrency(input.currencyId);
   }
 
   const sameCode = await getCompanyByCode(input.code, input.id);

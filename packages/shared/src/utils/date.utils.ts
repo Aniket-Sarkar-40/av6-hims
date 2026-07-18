@@ -200,3 +200,36 @@ export const parseTimeToDate = (time: string, date: Date): Date => {
   d.setHours(hours, minutes, 0, 0);
   return d;
 };
+
+export const formatDateToYMD = (date: Date): string => {
+  return dayjs(date).format(ISO_DATE_FORMAT);
+};
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (!value || typeof value !== "object") return false;
+
+  const prototype = Object.getPrototypeOf(value);
+
+  return prototype === Object.prototype || prototype === null;
+};
+
+export const convertDatesToYMD = <T>(data: T): T => {
+  if (data instanceof Date) {
+    return formatDateToYMD(data) as T;
+  }
+
+  if (Array.isArray(data)) {
+    return data.map((item) => convertDatesToYMD(item)) as T;
+  }
+
+  if (isPlainObject(data)) {
+    return Object.fromEntries(
+      Object.entries(data).map(([key, value]) => [
+        key,
+        convertDatesToYMD(value),
+      ])
+    ) as T;
+  }
+
+  return data;
+};

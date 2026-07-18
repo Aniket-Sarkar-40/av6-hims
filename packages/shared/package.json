@@ -4,7 +4,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1003.0",
     "@prisma/client": "^7.0.0",
-    "av6-pdf-engine": "^1.2.0",
+    "av6-pdf-engine": "^3.0.1",
     "av6-utils": "^1.0.6",
     "axios": "^1.13.6",
     "bcrypt": "^6.0.0",

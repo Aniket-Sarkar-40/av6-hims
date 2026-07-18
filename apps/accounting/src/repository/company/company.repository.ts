@@ -1,14 +1,13 @@
 import { requestStorage } from "@/config/requestContext.js";
 import {
   CompanyAddressCreateInput,
-  CompanyCurrencySettingsCreateInput,
   CompanyFeaturesCreateInput,
   CompanyFinancialYearCreateInput,
   CompanyResponse,
   CompanyStatutoryCreateInput,
   CreateOrUpdateCompanyInput,
 } from "@/types/company/company.js";
-import { db } from "@repo/db";
+import { db } from "@repo/db/client";
 import {
   Company,
   CompanyFinancialYear,
@@ -27,7 +26,6 @@ export const createCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
     | "addresses"
     | "statutory"
     | "financialYears"
-    | "currencySettings"
     | "features"
     | "existing"
   >(input, [
@@ -35,12 +33,11 @@ export const createCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
     "addresses",
     "statutory",
     "financialYears",
-    "currencySettings",
     "features",
     "existing",
   ]);
 
-  const { addresses, statutory, financialYears, currencySettings, features } =
+  const { addresses, statutory, financialYears, features } =
     omittedData.omitted;
   return await db.$transaction(async (tx) => {
     await tx.company.create({
@@ -70,12 +67,6 @@ export const createCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
             createdBy: currentUser,
           },
         },
-        companyCurrencySettings: {
-          create: {
-            ...currencySettings,
-            createdBy: currentUser,
-          },
-        },
         companyFeatures: {
           create: {
             ...features,
@@ -98,7 +89,6 @@ export const updateCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
     | "addresses"
     | "statutory"
     | "financialYears"
-    | "currencySettings"
     | "features"
     | "existing"
   >(input, [
@@ -106,19 +96,12 @@ export const updateCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
     "addresses",
     "statutory",
     "financialYears",
-    "currencySettings",
     "features",
     "existing",
   ]);
 
-  const {
-    addresses,
-    statutory,
-    financialYears,
-    currencySettings,
-    features,
-    existing,
-  } = omittedData.omitted;
+  const { addresses, statutory, financialYears, features, existing } =
+    omittedData.omitted;
   const incomingIdSet = new Set(addresses.filter((a) => a.id).map((a) => a.id));
 
   const addressToDelete = existing.companyAddresses
@@ -195,20 +178,6 @@ export const updateCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
             },
           },
         },
-        companyCurrencySettings: {
-          update: {
-            where: {
-              id: currencySettings.id,
-            },
-            data: {
-              ...customOmit<CompanyCurrencySettingsCreateInput, "id">(
-                currencySettings,
-                ["id"]
-              ).rest,
-              updatedBy: currentUser,
-            },
-          },
-        },
         companyFeatures: {
           update: {
             where: {
@@ -247,7 +216,6 @@ export const getCompanyById = async (
           isActive: true,
         },
       },
-      companyCurrencySettings: true,
       companyFeatures: true,
     },
   });
@@ -287,11 +255,11 @@ export const getCompanyFYByCompanyAndDateRange = async (
   });
 };
 
-export const getCompanyFYByCompayIdAndFyIdFromDb = async (
+export const getCompanyFYByCompanyIdAndFyIdFromDb = async (
   companyId: number,
   fyId: number
 ): Promise<CompanyFinancialYear | null> => {
-  logger.info("entering::getCompanyFYByCompayIdAndFyIdFromDb::repository");
+  logger.info("entering::getCompanyFYByCompanyIdAndFyIdFromDb::repository");
   return db.companyFinancialYear.findFirst({
     where: {
       id: fyId,
@@ -310,5 +278,14 @@ export const getFyByIdFromDb = async (
       id,
       isActive: true,
     },
+  });
+};
+
+export const getCompanyByIdFromDb = async (
+  id: number
+): Promise<Company | null> => {
+  logger.info("entering::getCompanyByIdFromDb::repository");
+  return db.company.findFirst({
+    where: { id, isActive: true },
   });
 };

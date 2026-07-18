@@ -1,4 +1,7 @@
-import { BankReconcileStatus } from "@repo/db/generated/prisma/enums.js";
+import {
+  BankReconcileStatus,
+  BankTransactionType,
+} from "@repo/db/generated/prisma/enums.js";
 import { BaseModelAttrWoCancel } from "../common.js";
 import { IdValue } from "../global.js";
 import { DrCrAmt } from "../reports/ledgerBalanceEngine.js";
@@ -43,13 +46,14 @@ export type BankLedgerBookResponse = {
   rows: BankLedgerBookRow[];
   totals: DrCrAmt;
   closingBalance: DrCrAmt;
+  balanceAsPerCompanyBooks: DrCrAmt;
+  amountNotReflectedInBank: DrCrAmt;
+  balanceAsPerBank: DrCrAmt;
 };
 
 export type ManualReconcileRow = {
   voucherLineId: number;
   bankClearedDate: string;
-  bankReferenceNo?: string | null;
-  remarks?: string | null;
 };
 
 export interface ManualReconcileRequestInput {
@@ -192,7 +196,9 @@ export interface AutoMatchSuggestionRow {
     voucherDate: string;
     drCr: "DR" | "CR";
     amount: number;
+    transactionType: BankTransactionType | null;
     instrumentNo: string | null;
+    instrumentDate: string | null;
     description: string | null;
     narration: string | null;
   };
@@ -257,5 +263,38 @@ export type BankReconciliationSummaryResponse = {
     expectedBankBalance: number;
     balanceAsPerBankStatement: number;
     difference: number;
+  };
+};
+
+/**
+ * changes types for dynamic statement format
+ */
+
+export type ExcelRow = Record<string, unknown>;
+
+export type BankStatementExcelImportField =
+  | "transactionDate"
+  | "valueDate"
+  | "transactionId"
+  | "chequeNo"
+  | "description"
+  | "drCr"
+  | "transactionAmount"
+  | "debitAmount"
+  | "creditAmount"
+  | "voucherNo"
+  | "voucherType"
+  | "ledgerName"
+  | "bankName";
+
+export type BankStatementExcelAmountMode = "SINGLE" | "DEBIT_CREDIT";
+
+export type BankStatementExcelFormatConfig = {
+  amountMode?: BankStatementExcelAmountMode;
+  dateFormats?: string[];
+  columns: Partial<Record<BankStatementExcelImportField, string>>;
+  drCrValues?: {
+    DR?: string[];
+    CR?: string[];
   };
 };

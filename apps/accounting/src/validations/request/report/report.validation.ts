@@ -1,6 +1,7 @@
 import { CashFlowView } from "@/types/reports/cashFlow.js";
 import { FundFlowView, SummaryLevel } from "@/types/reports/fundFlow.js";
 import {
+  boolRequired,
   boolWithDefault,
   dateRequired,
   enumOptional,
@@ -11,6 +12,7 @@ import {
   strOptional,
 } from "@repo/shared/utils/joi.utils.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
+
 import Joi from "joi";
 
 const trialBalanceRequestInputSchema = Joi.object({
@@ -32,6 +34,13 @@ export const ledgerBookRequestInputSchema = Joi.object({
   ccId: idOptional("Cost Center Id"),
 });
 
+export const ledgerBookExcelRequestInputSchema =
+  ledgerBookRequestInputSchema.keys({
+    showNarration: boolRequired("Show Narration"),
+    showCreatedBy: boolRequired("Show Created By"),
+    showUpdatedBy: boolRequired("Show Updated By"),
+  });
+
 export const reportCommonRequestInputSchema = Joi.object({
   companyId: idRequired("Company Id"),
   financialYearId: idRequired("Financial Year Id"),
@@ -44,6 +53,11 @@ export const reportCommonRequestInputSchema = Joi.object({
 const groupSummaryRequestInputSchema = reportCommonRequestInputSchema.keys({
   groupId: idRequired("Group Id"),
 });
+
+const forexGainLossStatementRequestInputSchema =
+  reportCommonRequestInputSchema.keys({
+    groupId: idOptional("Group Id"),
+  });
 
 const balanceSheetRequestInputSchema = Joi.object({
   companyId: idRequired("Company Id"),
@@ -103,36 +117,55 @@ const fundFlowRequestInputSchema = cashAndFundFlowCommonSchema.keys({
 
 export const validateTrialBalanceRequestInput = validationHandler({
   schema: trialBalanceRequestInputSchema,
+  path: "body",
 });
 
 export const validateLedgerBookRequestInput = validationHandler({
   schema: ledgerBookRequestInputSchema,
+  path: "body",
+});
+
+export const validateLedgerBookExcelRequestInput = validationHandler({
+  schema: ledgerBookExcelRequestInputSchema,
+  path: "body",
 });
 
 export const validateReportCommonRequestInput = validationHandler({
   schema: reportCommonRequestInputSchema,
+  path: "body",
 });
 
 export const validateBalanceSheetRequestInput = validationHandler({
   schema: balanceSheetRequestInputSchema,
+  path: "body",
 });
 
 export const validateGroupSummaryRequestInput = validationHandler({
   schema: groupSummaryRequestInputSchema,
+  path: "body",
+});
+
+export const validateForexGainLossStatementRequestInput = validationHandler({
+  schema: forexGainLossStatementRequestInputSchema,
+  path: "body",
 });
 
 export const validateCashBankSummaryRequestInput = validationHandler({
   schema: reportCommonRequestInputSchema,
+  path: "body",
 });
 
 export const validateStatementOfAccountsRequestInput = validationHandler({
   schema: statementOfAccountsRequestInputSchema,
+  path: "body",
 });
 
 export const validateCashFlowRequestInput = validationHandler({
   schema: cashFlowRequestInputSchema,
+  path: "body",
 });
 
 export const validateFundFlowRequestInput = validationHandler({
   schema: fundFlowRequestInputSchema,
+  path: "body",
 });

@@ -1,4 +1,8 @@
-import { DrCr, Prisma } from "@repo/db/generated/prisma/client";
+import {
+  BankTransactionType,
+  DrCr,
+  Prisma,
+} from "@repo/db/generated/prisma/client";
 import { BaseModelAttrWoCancel } from "../common.js";
 
 export type CreateOrUpdateBatchJobInput = Omit<
@@ -42,6 +46,9 @@ export type LedgerColumnMeta = {
   groupKey: string;
   amountKey: string;
   drCrKey?: string;
+  transactionType?: BankTransactionType;
+  instrumentNo?: string;
+  instrumentDate?: Date;
 };
 
 export type OtherLedger = {
@@ -49,4 +56,7 @@ export type OtherLedger = {
   ledgerGroup?: string;
   amount: number;
   drCr?: DrCr;
+  transactionType?: BankTransactionType;
+  instrumentNo?: string;
+  instrumentDate?: Date | string;
 };

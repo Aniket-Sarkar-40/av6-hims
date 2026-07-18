@@ -2,6 +2,8 @@ import { auditProxy } from "@/config/audit.config.js";
 import {
   mapRowToVoucherExcelCreateInput,
   toVoucherDTO,
+  toVoucherJournalPdfDTO,
+  toVoucherPdfDTO,
 } from "@/mapper/voucher/voucher.mapper.js";
 import {
   createVoucherExcelInDb,
@@ -18,11 +20,14 @@ import { VoucherEntryExcelRow } from "@/types/batch/batch.js";
 import {
   CreateOrUpdateVoucherInput,
   ExternalPostVoucherInput,
+  HeaderAttribute,
   VoucherLineDTO,
+  VoucherStatusForExcel,
 } from "@/types/voucher/voucher.js";
 import {
   cancelVoucherServiceValidation,
   createOrUpdateVoucherServiceValidation,
+  createVoucherFromExcelServiceValidation,
   deleteVoucherServiceValidation,
 } from "@/validations/service/voucher/voucher.service.validation.js";
 import XLSX from "xlsx";
@@ -37,29 +42,47 @@ import {
   getLedgerColumnMeta,
   validateVoucherExcelHeaders,
 } from "@/utils/voucherExcelImport.utils.js";
+import { CustomDocDefinition, renderCustomPdfToBuffer } from "av6-pdf-engine";
+import { pdfTemplateService } from "@apps/core/services/pdf/pdfTemplate.service.js";
+import { validateIdVoucherType } from "@/validations/service/master/voucherType.service.validation.js";
+import ExcelJs from "exceljs";
+import { BankTransactionType, DrCr } from "@repo/db/generated/prisma/enums.js";
+import { buildVoucherExcelSampleRow } from "@/utils/voucherExcelSampleExport.utils.js";
+import { resolvePdfTemplate } from "@/utils/applyTemplate.utils.js";
+import { generateVoucherInvoice } from "@/utils/voucherPdf.utils.js";
+import { convertDatesToYMD } from "@repo/shared/utils/date.utils.js";
+
 const voucherServiceRaw = {
-  async createVoucher(input: CreateOrUpdateVoucherInput) {
+  async createVoucher(
+    input: CreateOrUpdateVoucherInput,
+    isCurrencyConversionRequired: boolean = true
+  ) {
     logger.info("entering::createVoucher::service");
-    await createOrUpdateVoucherServiceValidation(input);
+    await createOrUpdateVoucherServiceValidation({
+      input,
+      isCurrencyConversionRequired,
+    });
     const voucher = await createVoucherInDb(input);
     logger.info("exiting::createVoucher::service");
     return voucher;
   },
   async updateVoucher(input: CreateOrUpdateVoucherInput) {
     logger.info("entering::updateVoucher::service");
-    await createOrUpdateVoucherServiceValidation(input);
+    await createOrUpdateVoucherServiceValidation({ input });
     const voucher = await updateVoucherInDb(input);
     logger.info("exiting::updateVoucher::service");
     return voucher;
   },
   async postExternalVoucher(input: ExternalPostVoucherInput) {
     logger.info("entering::postExternalVoucher::service");
-    const voucherData = await prepareExternalVoucherPostInput(input);
-    if (voucherData.length) {
-      for (const voucher of voucherData) {
-        await this.createVoucher({
-          ...voucher,
-        } as CreateOrUpdateVoucherInput);
+    const { preparedVoucherInputs, isCurrencyConversionRequired } =
+      await prepareExternalVoucherPostInput(input);
+    if (preparedVoucherInputs.length) {
+      for (const voucher of preparedVoucherInputs) {
+        await this.createVoucher(
+          { ...voucher } as CreateOrUpdateVoucherInput,
+          isCurrencyConversionRequired
+        );
       }
     }
     logger.info("exiting::postExternalVoucher::service");
@@ -84,10 +107,11 @@ const voucherServiceRaw = {
   }) {
     logger.info("entering::createVoucherExcel::service");
     const { filePath, ccId, voucherTypeId } = params;
-    if (!filePath) {
-      throw new Error("No file path provided");
-    }
-
+    await createVoucherFromExcelServiceValidation({
+      filePath,
+      ccId,
+      voucherTypeId,
+    });
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
@@ -120,6 +144,319 @@ const voucherServiceRaw = {
     logger.info("exiting::createVoucherExcel::service");
   },
 
+  async buildExcelForVoucherExport(voucherTypeId: number) {
+    logger.info("entering::buildExcelForVoucherExport::service");
+
+    const voucherType = await validateIdVoucherType(voucherTypeId);
+    const name = voucherType.name.toUpperCase();
+
+    const wb = new ExcelJs.Workbook();
+    const ws = wb.addWorksheet(`${name}`);
+
+    let headerAttributes: HeaderAttribute[] = [];
+
+    switch (name) {
+      case "CONTRA":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            color: "FF0000",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 2 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 2 ? "FF0000" : undefined },
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 2 ? "FF0000" : undefined,
+            },
+            {
+              text: `Ledger ${i} Dr/Cr`,
+              color: i <= 2 ? "FF0000" : undefined,
+              enumValues: Object.values(DrCr),
+            }
+          );
+        }
+
+        break;
+      case "JOURNAL":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            color: "FF0000",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 2 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 2 ? "FF0000" : undefined },
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 2 ? "FF0000" : undefined,
+            },
+            {
+              text: `Ledger ${i} Dr/Cr`,
+              color: i <= 2 ? "FF0000" : undefined,
+              enumValues: Object.values(DrCr),
+            }
+          );
+        }
+        break;
+      case "SALES":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+          { text: "Party Ledger", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+          );
+        }
+        break;
+      case "PAYMENT":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+          { text: "Party Ledger", color: "FF0000" },
+          { text: "Party Ledger Group", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+          );
+        }
+        break;
+      case "RECEIPT":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+          { text: "Party Ledger", color: "FF0000" },
+          { text: "Party Ledger Group", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+          );
+        }
+        break;
+      case "PURCHASE":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+          { text: "Party Ledger", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+          );
+        }
+        break;
+      case "BANK PAYMENT":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+          { text: "Party Ledger", color: "FF0000" },
+          { text: "Party Ledger Group", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 1 ? "FF0000" : undefined,
+            },
+            {
+              text: `Ledger ${i} Transaction Type`,
+              color: i <= 1 ? "FF0000" : undefined,
+              enumValues: Object.values(BankTransactionType),
+            },
+            {
+              text: `Ledger ${i} Instrument No`,
+              color: i <= 1 ? "FF0000" : undefined,
+            },
+            {
+              text: `Ledger ${i} Instrument Date`,
+              color: i <= 1 ? "FF0000" : undefined,
+            }
+          );
+        }
+        break;
+      case "CASH PAYMENT":
+        headerAttributes = [
+          { text: "Voucher Date", color: "FF0000" },
+          { text: "Voucher Type", color: "FF0000" },
+          { text: "Ref Type" },
+          { text: "Sub Ref Type" },
+          { text: "Ref No" },
+          {
+            text: "Status",
+            enumValues: Object.values(VoucherStatusForExcel),
+          },
+          { text: "Narration", color: "FF0000" },
+          { text: "Party Ledger", color: "FF0000" },
+          { text: "Party Ledger Group", color: "FF0000" },
+        ];
+
+        for (let i = 1; i <= 10; i++) {
+          headerAttributes.push(
+            { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
+            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+          );
+        }
+        break;
+      default:
+        throw new ErrorHandler(
+          400,
+          `Excel export is not configured for voucher type ${name.toLowerCase()}`
+        );
+    }
+
+    const headerRow = ws.addRow(headerAttributes.map((header) => header.text));
+    headerRow.eachCell((cell, colNumber) => {
+      const header = headerAttributes[colNumber - 1];
+      cell.font = {
+        bold: true,
+        color: {
+          argb: header.color
+            ? header.color.startsWith("FF")
+              ? header.color
+              : `FF${header.color}`
+            : "FF000000",
+        },
+      };
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+          argb: "FFD9D9D9",
+        },
+      };
+
+      cell.alignment = {
+        vertical: "middle",
+        horizontal: "center",
+      };
+    });
+
+    const sampleRowData = buildVoucherExcelSampleRow(voucherType.name);
+
+    const sampleRow = ws.addRow(
+      headerAttributes.map((header) => sampleRowData[header.text] ?? "")
+    );
+
+    sampleRow.eachCell((cell) => {
+      cell.alignment = {
+        vertical: "middle",
+        horizontal: "center",
+      };
+    });
+    headerAttributes.forEach((header, index) => {
+      if (!header.enumValues?.length) return;
+
+      const columnNumber = index + 1;
+
+      for (let row = 2; row <= 50; row++) {
+        ws.getCell(row, columnNumber).dataValidation = {
+          type: "list",
+          allowBlank: true,
+          formulae: [`"${header.enumValues.join(",")}"`],
+          showErrorMessage: true,
+        };
+      }
+    });
+
+    /* Auto size the columns */
+    ws.columns.forEach((col) => {
+      let max = 10;
+      col.eachCell?.({ includeEmpty: true }, (cell) => {
+        const len = cell.value ? String(cell.value).length : 0;
+        if (len > max) max = len;
+      });
+      col.width = max + 2;
+    });
+
+    logger.info("exiting::buildExcelForVoucherExport::service");
+
+    return {
+      excel: wb,
+      name: voucherType.name,
+    };
+  },
+
   async buildPdfForVoucherInvoice(
     voucherId: number
   ): Promise<{ pdf: Buffer; voucherNo: string | number | null }> {
@@ -130,424 +467,41 @@ const voucherServiceRaw = {
       throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Voucher"));
     }
 
-    const voucherDto = await toVoucherDTO([voucherData]);
-    const data = voucherDto[0];
+    const voucherTypeId = voucherData.voucherTypeId;
+    const voucherType = await validateIdVoucherType(voucherTypeId);
 
-    const doc = new PDFDocument({ margin: 30, size: "A4", layout: "portrait" });
-    const chunks: Buffer[] = [];
-    doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+    let fileDef;
 
-    const FONT_NORMAL = "Helvetica";
-    const FONT_BOLD = "Helvetica-Bold";
-
-    const PAGE_LEFT = 30;
-    const PAGE_WIDTH = doc.page.width - 60;
-    const PAGE_BOTTOM = doc.page.height - 30;
-
-    const ROW_H = 20;
-    const FONT_SIZE = 9;
-
-    const conversionRate = data.currencyConversionRate;
-
-    let y = 30;
-
-    const val = (v: unknown): string =>
-      v === null || v === undefined || v === "" ? "-" : String(v);
-    const fmtDate = (d: unknown): string =>
-      d ? dayjs(d as string | Date).format("DD-MM-YYYY") : "-";
-    const fmtAmt = (v: unknown): string => {
-      const n = Number(v);
-      const rate = Number(conversionRate);
-
-      if (v === null || v === undefined || v === "" || isNaN(n)) {
-        return "-";
-      }
-
-      if (
-        conversionRate === null ||
-        conversionRate === undefined ||
-        isNaN(rate)
-      ) {
-        return n.toFixed(2);
-      }
-
-      if (rate === 0) {
-        return "-";
-      }
-
-      return (n / rate).toFixed(2);
-    };
-    const fmtEnum = (v: unknown): string => val(v).replace(/_/g, " ");
-
-    const drawHLine = (x: number, yw: number, w: number) => {
-      doc
-        .moveTo(x, yw)
-        .lineTo(x + w, yw)
-        .stroke("#000000");
-    };
-    const drawVLine = (xv: number, yt: number, h: number) => {
-      doc
-        .moveTo(xv, yt)
-        .lineTo(xv, yt + h)
-        .stroke("#000000");
-    };
-
-    const calcRowH = (
-      text: string,
-      w: number,
-      fontSize: number = FONT_SIZE
-    ): number => {
-      const availW = w - 8;
-      const lineH = fontSize * 1.4;
-      const lines = Math.ceil(
-        doc.font(FONT_NORMAL).fontSize(fontSize).widthOfString(text) / availW
-      );
-      return Math.max(ROW_H, lines * lineH + 8);
-    };
-
-    const writeCell = (
-      text: string,
-      x: number,
-      yt: number,
-      w: number,
-      h: number,
-      opts: {
-        bold?: boolean;
-        align?: "left" | "right" | "center";
-        fontSize?: number;
-        indent?: number;
-        lineBreak?: boolean;
-      } = {}
-    ) => {
-      const xOffset = opts.indent ?? 4;
-      doc
-        .font(opts.bold ? FONT_BOLD : FONT_NORMAL)
-        .fontSize(opts.fontSize ?? FONT_SIZE)
-        .fillColor("#000000")
-        .text(String(text ?? ""), x + xOffset, yt + 5, {
-          width: w - xOffset - 4,
-          height: h - 5,
-          align: opts.align ?? "left",
-          ellipsis: !opts.lineBreak,
-          lineBreak: opts.lineBreak ?? false,
+    if (voucherType.nature == "JOURNAL") {
+      const voucherJournalDto = await toVoucherJournalPdfDTO(voucherData);
+      const pdfTemplate =
+        await pdfTemplateService.getPdfTemplateByModuleAndType({
+          module: "ACCOUNTING",
+          type: "JOURNAL_VOUCHER",
         });
-    };
 
-    const TOTAL_W = PAGE_WIDTH;
-    const metaColW = TOTAL_W / 3;
-
-    // writeLabelValue: dynamically sizes label width based on actual text
-    // so value always has room and never truncates
-    const writeLabelValue = (
-      label: string,
-      value: string,
-      x: number,
-      rowY: number,
-      colW: number
-    ) => {
-      const labelText = `${label}:`;
-      const labelW =
-        doc.font(FONT_BOLD).fontSize(FONT_SIZE).widthOfString(labelText) + 6;
-      const valueX = x + labelW;
-      const valueW = colW - labelW - 4;
-
-      doc
-        .font(FONT_BOLD)
-        .fontSize(FONT_SIZE)
-        .fillColor("#000000")
-        .text(labelText, x + 2, rowY + 4, {
-          width: labelW,
-          height: ROW_H - 4,
-          lineBreak: false,
-          ellipsis: false,
-        });
-      doc
-        .font(FONT_NORMAL)
-        .fontSize(FONT_SIZE)
-        .fillColor("#000000")
-        .text(value, valueX, rowY + 4, {
-          width: valueW,
-          height: ROW_H - 4,
-          lineBreak: false,
-          ellipsis: false,
-        });
-    };
-
-    const TOTAL_W_CONST = PAGE_WIDTH;
-
-    // ── TITLE ──────────────────────────────────────────────
-    const titleH = ROW_H + 10;
-    writeCell("Voucher", PAGE_LEFT, y, TOTAL_W_CONST, titleH, {
-      bold: true,
-      fontSize: 16,
-      align: "center",
-    });
-    y += titleH;
-
-    doc
-      .moveTo(PAGE_LEFT, y)
-      .lineTo(PAGE_LEFT + TOTAL_W_CONST, y)
-      .lineWidth(1.5)
-      .stroke("#000000");
-    doc.lineWidth(1);
-    y += 12;
-
-    // ── REFERENCE NO + DATE ROW ────────────────────────────
-    doc
-      .font(FONT_NORMAL)
-      .fontSize(FONT_SIZE)
-      .fillColor("#000000")
-      .text("Reference No: ", PAGE_LEFT, y, { continued: true })
-      .font(FONT_BOLD)
-      .text(val(data.voucherNo), { continued: false });
-
-    doc
-      .font(FONT_NORMAL)
-      .fontSize(FONT_SIZE)
-      .fillColor("#000000")
-      .text("Date: ", PAGE_LEFT + TOTAL_W_CONST - 120, y, {
-        continued: true,
-        width: 120,
-      })
-      .font(FONT_BOLD)
-      .text(fmtDate(data.voucherDate), { continued: false });
-
-    y += ROW_H + 4;
-
-    // ── META INFO ──────────────────────────────────────────
-    // Row 1
-    writeLabelValue(
-      "Voucher Type",
-      val(data.voucherType?.value),
-      PAGE_LEFT,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Status",
-      val(data.status),
-      PAGE_LEFT + metaColW,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Ref Type",
-      fmtEnum(data.refType),
-      PAGE_LEFT + metaColW * 2,
-      y,
-      metaColW
-    );
-    y += ROW_H;
-
-    // Row 2
-    writeLabelValue(
-      "Sub Ref Type",
-      fmtEnum(data.subRefType),
-      PAGE_LEFT,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Ref No",
-      val(data.refNo),
-      PAGE_LEFT + metaColW,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Created By",
-      val(data.createdBy?.value),
-      PAGE_LEFT + metaColW * 2,
-      y,
-      metaColW
-    );
-    y += ROW_H;
-
-    // Row 3
-    writeLabelValue(
-      "Created At",
-      fmtDate(data.createdAt),
-      PAGE_LEFT,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Approved By",
-      val(data.approvedBy?.value),
-      PAGE_LEFT + metaColW,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Approved At",
-      fmtDate(data.approvedAt),
-      PAGE_LEFT + metaColW * 2,
-      y,
-      metaColW
-    );
-    y += ROW_H;
-
-    // Row 4
-    writeLabelValue(
-      "Currency",
-      val(data.currency?.value ?? ""),
-      PAGE_LEFT,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Currency Conversion Rate",
-      val(data.currencyConversionRate),
-      PAGE_LEFT + metaColW,
-      y,
-      metaColW
-    );
-    writeLabelValue(
-      "Total Debit",
-      fmtAmt(data.totalDebit),
-      PAGE_LEFT + metaColW * 2,
-      y,
-      metaColW
-    );
-    y += ROW_H;
-
-    // Row 5
-    writeLabelValue(
-      "Total Credit",
-      fmtAmt(data.totalCredit),
-      PAGE_LEFT,
-      y,
-      metaColW
-    );
-    y += ROW_H;
-
-    // Narration — full width wrapping
-    const narration = val(data.narration);
-    const narrationLabelText = "Narration:";
-    const narrationLabelW =
-      doc
-        .font(FONT_BOLD)
-        .fontSize(FONT_SIZE)
-        .widthOfString(narrationLabelText) + 6;
-    const narrationValueW = TOTAL_W_CONST - narrationLabelW - 4;
-    const narrationH = calcRowH(narration, narrationValueW);
-
-    doc
-      .font(FONT_BOLD)
-      .fontSize(FONT_SIZE)
-      .fillColor("#000000")
-      .text(narrationLabelText, PAGE_LEFT + 2, y + 4, {
-        width: narrationLabelW,
-        lineBreak: false,
-      });
-    doc
-      .font(FONT_NORMAL)
-      .fontSize(FONT_SIZE)
-      .fillColor("#000000")
-      .text(narration, PAGE_LEFT + narrationLabelW + 2, y + 4, {
-        width: narrationValueW,
-        lineBreak: true,
-      });
-    y += narrationH;
-    y += 8;
-
-    // ── VOUCHER LINES TABLE ────────────────────────────────
-    const snW = TOTAL_W_CONST * 0.08;
-    const ledW = TOTAL_W_CONST * 0.52;
-    const drW = TOTAL_W_CONST * 0.2;
-    const crW = TOTAL_W_CONST * 0.2;
-
-    const snX = PAGE_LEFT;
-    const ledX = snX + snW;
-    const drX = ledX + ledW;
-    const crX = drX + drW;
-
-    const drawLinesBorder = (rowY: number, h: number = ROW_H) => {
-      drawVLine(snX, rowY, h);
-      drawVLine(ledX, rowY, h);
-      drawVLine(drX, rowY, h);
-      drawVLine(crX, rowY, h);
-      drawVLine(crX + crW, rowY, h);
-    };
-
-    // Table header
-    doc
-      .rect(PAGE_LEFT, y, TOTAL_W_CONST, ROW_H)
-      .fill("#f0f0f0")
-      .stroke("#000000");
-    doc.fillColor("#000000");
-    drawHLine(PAGE_LEFT, y, TOTAL_W_CONST);
-    drawLinesBorder(y);
-    writeCell("SR NO", snX, y, snW, ROW_H, { bold: true, align: "center" });
-    writeCell("LEDGER", ledX, y, ledW, ROW_H, { bold: true, align: "center" });
-    writeCell("DR", drX, y, drW, ROW_H, { bold: true, align: "center" });
-    writeCell("CR", crX, y, crW, ROW_H, { bold: true, align: "center" });
-    drawHLine(PAGE_LEFT, y + ROW_H, TOTAL_W_CONST);
-    y += ROW_H;
-
-    // Table rows
-    (data.voucherLines ?? []).forEach((line: VoucherLineDTO, idx: number) => {
-      if (y + ROW_H > PAGE_BOTTOM) {
-        doc.addPage();
-        y = 30;
+      if (!pdfTemplate) {
+        throw new ErrorHandler(
+          404,
+          generateErrorMessage("NOT_FOUND", "PDF template")
+        );
       }
-      drawHLine(PAGE_LEFT, y, TOTAL_W_CONST);
-      drawLinesBorder(y);
-      writeCell(String(line.lineNo ?? idx + 1), snX, y, snW, ROW_H, {
-        align: "center",
-      });
-      writeCell(val(line.ledger?.value), ledX, y, ledW, ROW_H);
-      writeCell(
-        line.drCr === "DR" ? fmtAmt(line.amount) : "-",
-        drX,
-        y,
-        drW,
-        ROW_H,
-        { align: "right" }
-      );
-      writeCell(
-        line.drCr === "CR" ? fmtAmt(line.amount) : "-",
-        crX,
-        y,
-        crW,
-        ROW_H,
-        { align: "right" }
-      );
-      y += ROW_H;
-    });
 
-    // ── TOTALS ROW ─────────────────────────────────────────
-    doc
-      .rect(PAGE_LEFT, y, TOTAL_W_CONST, ROW_H)
-      .fill("#f0f0f0")
-      .stroke("#000000");
-    doc.fillColor("#000000");
-    drawHLine(PAGE_LEFT, y, TOTAL_W_CONST);
-    drawLinesBorder(y);
-    writeCell("Total", snX, y, snW + ledW, ROW_H, {
-      bold: true,
-      align: "right",
-    });
-    writeCell(fmtAmt(data.totalDebit), drX, y, drW, ROW_H, {
-      bold: true,
-      align: "right",
-    });
-    writeCell(fmtAmt(data.totalCredit), crX, y, crW, ROW_H, {
-      bold: true,
-      align: "right",
-    });
-    drawHLine(PAGE_LEFT, y + ROW_H, TOTAL_W_CONST);
-    y += ROW_H;
-
-    doc.end();
-    return new Promise((resolve) => {
-      doc.on("end", () =>
-        resolve({
-          pdf: Buffer.concat(chunks),
-          voucherNo: data.voucherNo ?? null,
-        })
+      fileDef = await resolvePdfTemplate(
+        pdfTemplate.bodyJson as unknown as CustomDocDefinition,
+        voucherJournalDto
       );
-    });
+    } else {
+      const voucherDto = await toVoucherPdfDTO(voucherData);
+      fileDef = await generateVoucherInvoice(convertDatesToYMD(voucherDto));
+    }
+
+    const pdfBuffer = await renderCustomPdfToBuffer(fileDef);
+
+    return {
+      pdf: pdfBuffer,
+      voucherNo: voucherData.voucherNo,
+    };
   },
 };
 
