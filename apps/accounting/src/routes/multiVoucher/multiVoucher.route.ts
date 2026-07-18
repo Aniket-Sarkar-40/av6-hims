@@ -25,7 +25,7 @@ multiVoucherRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "MULTI_VOUCHER", "CREATE")),
   validateCreateMultiVoucher,
-  createMultiVoucher
+  createMultiVoucher,
 );
 
 multiVoucherRouter.put(
@@ -33,7 +33,7 @@ multiVoucherRouter.put(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "MULTI_VOUCHER", "UPDATE")),
   validateUpdateMultiVoucher,
-  updateMultiVoucher
+  updateMultiVoucher,
 );
 
 multiVoucherRouter.put(
@@ -41,21 +41,21 @@ multiVoucherRouter.put(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "UPDATE_POSTED_MULTI_VOUCHER", "UPDATE")),
   validateUpdatePostedMultiVoucher,
-  updatePostedMultiVoucher
+  updatePostedMultiVoucher,
 );
 
 multiVoucherRouter.delete(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "MULTI_VOUCHER", "DELETE")),
-  deleteMultiVoucherById
+  deleteMultiVoucherById,
 );
 
 multiVoucherRouter.get(
   "/invoice",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "MULTI_VOUCHER", "VIEW")),
-  getMultiVoucherInvoice
+  getMultiVoucherInvoice,
 );
 
 export default multiVoucherRouter;
