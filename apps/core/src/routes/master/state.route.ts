@@ -45,7 +45,7 @@ stateRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "STATE", "CREATE")),
   validateState,
-  createState
+  createState,
 );
 
 /**
@@ -61,7 +61,7 @@ stateRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "STATE", "VIEW")),
-  getAllStates
+  getAllStates,
 );
 
 /**
@@ -84,7 +84,7 @@ stateRouter.get(
   "/:stateId",
   verifyToken(),
   authorize(getPermission("CORE", "STATE", "VIEW")),
-  getStateById
+  getStateById,
 );
 
 /**
@@ -107,10 +107,10 @@ stateRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "STATE", "VIEW"),
-    getPermission("CORE", "STATE", "UPDATE")
+    getPermission("CORE", "STATE", "UPDATE"),
   ),
   validateStateUpdate,
-  updateState
+  updateState,
 );
 
 /**
@@ -133,7 +133,7 @@ stateRouter.delete(
   "/:stateId",
   verifyToken(),
   authorize(getPermission("CORE", "STATE", "DELETE")),
-  deleteState
+  deleteState,
 );
 
 export default stateRouter;

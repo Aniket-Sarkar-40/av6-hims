@@ -6,7 +6,7 @@ export type SchemaPrecisionModule = "default" | "item" | "po" | "grn";
 
 export const getSchemaPrecision = (
   module: SchemaPrecisionModule = "default",
-  defaultPrecision: number = 2
+  defaultPrecision: number = 2,
 ): number => {
   const settings = schemaPrecisionSettings;
   switch (module) {
@@ -30,7 +30,7 @@ export const getSchemaPrecision = (
 };
 
 export const setSchemaPrecisionSettings = (
-  settings: InvSettings | null | undefined
+  settings: InvSettings | null | undefined,
 ) => {
   schemaPrecisionSettings = settings;
 };

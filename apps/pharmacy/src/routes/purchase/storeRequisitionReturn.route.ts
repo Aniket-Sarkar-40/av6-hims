@@ -53,7 +53,7 @@ storeRequisitionReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "CREATE")),
   validateStoreRequisitionReturn,
-  createStoreRequisitionReturn
+  createStoreRequisitionReturn,
 );
 
 /**
@@ -69,7 +69,7 @@ storeRequisitionReturnRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "VIEW")),
-  getAllStoreRequisitionReturn
+  getAllStoreRequisitionReturn,
 );
 
 /**
@@ -90,7 +90,7 @@ storeRequisitionReturnRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "VIEW")),
-  getStoreRequisitionReturnById
+  getStoreRequisitionReturnById,
 );
 
 /**
@@ -120,10 +120,10 @@ storeRequisitionReturnRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORE_REQUISITION_RETURN", "VIEW"),
-    getPermission("PMS", "STORE_REQUISITION_RETURN", "UPDATE")
+    getPermission("PMS", "STORE_REQUISITION_RETURN", "UPDATE"),
   ),
   validateStoreRequisitionReturnUpdate,
-  updateStoreRequisitionReturn
+  updateStoreRequisitionReturn,
 );
 
 /**
@@ -137,7 +137,7 @@ storeRequisitionReturnRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN", "DELETE")),
-  deleteStoreRequisitionReturn
+  deleteStoreRequisitionReturn,
 );
 
 /**
@@ -160,7 +160,7 @@ storeRequisitionReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN_REJECT", "CREATE")),
   validateStoreRequisitionReturnReject,
-  rejectStoreRequisitionReturn
+  rejectStoreRequisitionReturn,
 );
 
 /**
@@ -183,7 +183,7 @@ storeRequisitionReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN_SENT", "CREATE")),
   validateApproveStoreRequisitionReturn,
-  approveStoreRequisitionReturn
+  approveStoreRequisitionReturn,
 );
 
 /**
@@ -206,7 +206,7 @@ storeRequisitionReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_RETURN_ACK", "CREATE")),
   validateAcknowledgeStoreRequisitionReturn,
-  acknowledgeStoreRequisitionReturn
+  acknowledgeStoreRequisitionReturn,
 );
 
 // /**

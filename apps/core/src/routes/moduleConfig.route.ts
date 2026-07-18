@@ -37,5 +37,5 @@ moduleConfigRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "MODULE_CONFIG", "UPDATE")),
   validateModuleConfig,
-  createOrUpdateModuleConfig
+  createOrUpdateModuleConfig,
 );

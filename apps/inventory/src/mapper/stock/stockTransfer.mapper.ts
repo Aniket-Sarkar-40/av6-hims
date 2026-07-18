@@ -18,7 +18,7 @@ import {
 import { toIdValue } from "av6-utils";
 
 export const toStockTransferDTO = async (
-  stockTransfers: StockTransferResponse[]
+  stockTransfers: StockTransferResponse[],
 ): Promise<StockTransferDTO[]> => {
   const allWarehouses = await warehouseService.getAllWarehouse(true);
   const allItems = await itemMasterService.getAllItemMaster(true);
@@ -27,40 +27,40 @@ export const toStockTransferDTO = async (
   return Promise.all(
     stockTransfers.map(async (stockTransfer) => {
       const staff = await employeeService.getEmployeeByIdFrmCacheOrDb(
-        stockTransfer.staffId
+        stockTransfer.staffId,
       );
       const ccWarehouseDTO = allWarehouses.find(
-        (warehouse) => warehouse.id === stockTransfer.ccId
+        (warehouse) => warehouse.id === stockTransfer.ccId,
       );
       const ccBranchDTO = allBranches.find(
-        (branch) => branch.id === stockTransfer.ccId
+        (branch) => branch.id === stockTransfer.ccId,
       );
       const fromBranch = allBranches.find(
-        (branch) => branch.id === stockTransfer.fromId
+        (branch) => branch.id === stockTransfer.fromId,
       );
       const toBranch = allBranches.find(
-        (branch) => branch.id === stockTransfer.toId
+        (branch) => branch.id === stockTransfer.toId,
       );
 
       const createdBy = stockTransfer.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            stockTransfer.createdBy
+            stockTransfer.createdBy,
           )
         : null;
 
       const approvedBy = stockTransfer.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            stockTransfer.approvedBy
+            stockTransfer.approvedBy,
           )
         : null;
       const acknowledgedBy = stockTransfer.acknowledgedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            stockTransfer.acknowledgedBy
+            stockTransfer.acknowledgedBy,
           )
         : null;
       const returnApprovedBy = stockTransfer.returnApprovedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            stockTransfer.returnApprovedBy
+            stockTransfer.returnApprovedBy,
           )
         : null;
       const from = toIdValue(fromBranch, "name");
@@ -94,7 +94,7 @@ export const toStockTransferDTO = async (
             fromBranchItemQty: fromStock,
             toBranchItemQty: toStock,
           };
-        })
+        }),
       );
 
       return {
@@ -109,7 +109,7 @@ export const toStockTransferDTO = async (
         returnApprovedBy,
         stockTransferDetails: detailDTO,
       };
-    })
+    }),
   );
 };
 
@@ -134,13 +134,13 @@ export const toStockEntity = (raw: RawItemStock): InvItemStock => {
 };
 
 export const toStockTransferDetailDTO = async (
-  details: InvStockTransferDetails[]
+  details: InvStockTransferDetails[],
 ): Promise<StockTransferDetailRowDTO[]> => {
   return Promise.all(
     details.map(async (detail) => {
       const item = await itemMasterService.getItemMasterById(
         { itemId: detail.itemId },
-        true
+        true,
       );
       const createdBy = detail.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
@@ -155,6 +155,6 @@ export const toStockTransferDetailDTO = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

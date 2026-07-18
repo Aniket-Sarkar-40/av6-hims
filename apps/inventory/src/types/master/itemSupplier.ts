@@ -24,8 +24,10 @@ export type ItemSupplierResponse = Prisma.InvItemSupplierGetPayload<{
   };
 }>;
 
-export interface ItemSupplierDTO
-  extends Omit<ItemSupplierResponse, BaseModelAttrWoCancel | "taxDetailsId"> {
+export interface ItemSupplierDTO extends Omit<
+  ItemSupplierResponse,
+  BaseModelAttrWoCancel | "taxDetailsId"
+> {
   taxDetails: IdValue | null;
 }
 

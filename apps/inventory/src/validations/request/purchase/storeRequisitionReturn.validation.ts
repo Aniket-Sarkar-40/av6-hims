@@ -129,7 +129,7 @@ const acknowledgeReturnItemBatchSchema = Joi.object<AcknowledgeReturnItemBatch>(
     isBatch: boolRequired("Is Batch"),
     isExpiry: boolRequired("Is Expiry"),
     acknowledgedQty: intRequired("Acknowledged Quantity"),
-  }
+  },
 );
 
 const acknowledgeReturnItemSchema = Joi.object<AcknowledgeReturnItem>({
@@ -146,7 +146,7 @@ export const acknowledgeRequisitionReturnSchema =
     acknowledgeItems: arrayRequired(
       "Acknowledge Items",
       acknowledgeReturnItemSchema,
-      1
+      1,
     ),
   });
 

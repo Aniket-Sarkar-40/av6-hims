@@ -11,13 +11,12 @@ const cacheKey = getRedisKey("CHEQUE_MASTER", "all");
 const chequeMasterServiceRaw = {
   async toggleStatusChequeMaster(chequeMasterId: number) {
     logger.info("entering::toggleStatusChequeMaster::service");
-    const newStatus = await toggleStatusChequeMasterServiceValidation(
-      chequeMasterId
-    );
+    const newStatus =
+      await toggleStatusChequeMasterServiceValidation(chequeMasterId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.CHEQUE_MASTER);
     const updatedChequeMaster = await toggleStatusChequeMasterByIdFromDb(
       chequeMasterId,
-      newStatus
+      newStatus,
     );
     if (isCacheable && updatedChequeMaster) {
       await updateCache(cacheKey, updatedChequeMaster.id, updatedChequeMaster);
@@ -29,5 +28,5 @@ const chequeMasterServiceRaw = {
 
 export const chequeMasterService = auditProxy.createAuditedService(
   "chequeMaster",
-  chequeMasterServiceRaw
+  chequeMasterServiceRaw,
 );

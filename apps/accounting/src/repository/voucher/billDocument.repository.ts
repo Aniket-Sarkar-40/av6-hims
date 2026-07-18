@@ -23,7 +23,7 @@ export const adjustBillDocumentAgainstRef = async (
     partyLedgerId: number;
     amountToAdjust: number;
     updatedBy: number | null;
-  }
+  },
 ): Promise<{ ok: boolean; reason?: string }> => {
   const {
     billDocumentId,

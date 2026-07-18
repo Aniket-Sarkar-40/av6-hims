@@ -33,7 +33,7 @@ approvalRouter.patch(
   "/ext",
   authorizeExternal(),
   validateCommonApprove,
-  commonApproval
+  commonApproval,
 );
 
 /**
@@ -53,13 +53,13 @@ approvalRouter.post(
   "/",
   verifyToken(),
   validateGetMyApprovalFlow,
-  getStaffPendingApproval
+  getStaffPendingApproval,
 );
 approvalRouter.post(
   "/ext",
   authorizeExternal(),
   validateGetMyApprovalFlow,
-  getStaffPendingApproval
+  getStaffPendingApproval,
 );
 
 /**
@@ -69,17 +69,17 @@ approvalRouter.post(
 approvalRouter.post(
   "/getApprovalActions",
   verifyToken(),
-  getApprovalActDetails
+  getApprovalActDetails,
 );
 approvalRouter.post(
   "/getApprovalActions-ext",
   authorizeExternal(),
-  getApprovalActDetails
+  getApprovalActDetails,
 );
 
 approvalRouter.post(
   "/start-flow-ext",
   authorizeExternal(),
   validateStartFlowRequest,
-  startApprovalFlow
+  startApprovalFlow,
 );

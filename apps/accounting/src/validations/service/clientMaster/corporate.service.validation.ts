@@ -6,7 +6,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdClientMaster = async (
-  id: number
+  id: number,
 ): Promise<ClientMaster> => {
   logger.info("entering::validateIdClientMaster::service::validation");
   validIdCheck(id);
@@ -14,7 +14,7 @@ export const validateIdClientMaster = async (
   if (!client) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Client Master")
+      generateErrorMessage("NOT_FOUND", "Client Master"),
     );
   }
   logger.info("exiting::validateIdClientMaster::service::validation");

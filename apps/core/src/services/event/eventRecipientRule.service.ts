@@ -23,7 +23,7 @@ import { EventRecipientRule } from "@repo/db/generated/prisma/client";
 
 export const recipientRuleService = {
   async createRecipientRule(
-    input: CreateOrUpdateEventRecipients
+    input: CreateOrUpdateEventRecipients,
   ): Promise<EventRecipientRule> {
     logger.info("entering::createRecipientRule::service");
 
@@ -36,7 +36,7 @@ export const recipientRuleService = {
   },
 
   async multiCreateUpdateRecipientRule(
-    input: MultiCreateUpdateEventRecipients
+    input: MultiCreateUpdateEventRecipients,
   ) {
     logger.info("entering::multiCreateUpdateRecipientRule::service");
 
@@ -55,7 +55,7 @@ export const recipientRuleService = {
     if (!rows) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Recipient Rule")
+        generateErrorMessage("NOT_FOUND", "Recipient Rule"),
       );
     }
 
@@ -73,7 +73,7 @@ export const recipientRuleService = {
     if (!row) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Recipient Rule")
+        generateErrorMessage("NOT_FOUND", "Recipient Rule"),
       );
     }
 
@@ -82,7 +82,7 @@ export const recipientRuleService = {
   },
 
   async updateRecipientRule(
-    input: CreateOrUpdateEventRecipients
+    input: CreateOrUpdateEventRecipients,
   ): Promise<EventRecipientRule> {
     logger.info("entering::updateRecipientRule::service");
 

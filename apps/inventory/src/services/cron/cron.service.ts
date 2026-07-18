@@ -26,7 +26,7 @@ import { interpolate } from "av6-core-v2";
 import ExcelJs from "exceljs";
 
 export const getSummary = (
-  items: LowStockResponse[] | ExpiredItemsResponse[]
+  items: LowStockResponse[] | ExpiredItemsResponse[],
 ) => {
   const map = new Map<number, { ccId: number; name: string; total: number }>();
 
@@ -48,7 +48,7 @@ export const cronService = {
     resendMasterId?: number;
   }) {
     const feature = await featureFlagService.getFeatureFlagByShortCode(
-      "RE_ORDER_EMAIL_ALERT"
+      "RE_ORDER_EMAIL_ALERT",
     );
     if (!feature || feature.isEnabled === false) {
       logger.error("Reorder email alert feature is disabled");
@@ -63,30 +63,33 @@ export const cronService = {
 
     // Fetch email template
     const emailTemplate = await getEventEmailByEmailType(
-      EMAIL_TYPE.RE_ORDER_ITEM_ALERT
+      EMAIL_TYPE.RE_ORDER_ITEM_ALERT,
     );
     if (!emailTemplate) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Re Order Alert Email Template")
+        generateErrorMessage("NOT_FOUND", "Re Order Alert Email Template"),
       );
     }
 
     if (emailTemplate && !emailTemplate.emailBody) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Re order Alert Email Body")
+        generateErrorMessage("NOT_FOUND", "Re order Alert Email Body"),
       );
     }
 
     // Fetch recipient mails
     const alertMails = await getAutoAlertEmailByShortCodeFromDb(
-      INV_ALERT_TYPE.RE_ORDER_ITEMS
+      INV_ALERT_TYPE.RE_ORDER_ITEMS,
     );
     if (!alertMails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Recipient Emails for Re order Alert")
+        generateErrorMessage(
+          "NOT_FOUND",
+          "Recipient Emails for Re order Alert",
+        ),
       );
     }
 
@@ -126,7 +129,7 @@ export const cronService = {
       if (!tbodyMatch) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Table Body in email template")
+          generateErrorMessage("NOT_FOUND", "Table Body in email template"),
         );
       }
 
@@ -137,7 +140,7 @@ export const cronService = {
       if (!trRows || trRows.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Table row inside table body")
+          generateErrorMessage("NOT_FOUND", "Table row inside table body"),
         );
       }
 
@@ -153,7 +156,7 @@ export const cronService = {
           interpolate(rowTemplate, {
             collectionCenterName: item.name,
             count: item.total,
-          })
+          }),
         )
         .join("");
 
@@ -162,7 +165,7 @@ export const cronService = {
         /<tbody[^>]*>[\s\S]*?<\/tbody>/i,
         `<tbody>
         ${rows}
-      </tbody>`
+      </tbody>`,
       );
 
       const wb = new ExcelJs.Workbook();
@@ -234,8 +237,8 @@ export const cronService = {
         error instanceof Error
           ? error.message
           : typeof error === "string"
-          ? error
-          : "Unknown error";
+            ? error
+            : "Unknown error";
 
       await updateAutoAlertAuditInDb({
         id: autoAlertAudit.id,
@@ -253,7 +256,7 @@ export const cronService = {
     resendMasterId?: number;
   }) {
     const feature = await featureFlagService.getFeatureFlagByShortCode(
-      "EXPIRED_ITEM_EMAIL_ALERT"
+      "EXPIRED_ITEM_EMAIL_ALERT",
     );
     if (!feature || feature.isEnabled === false) {
       logger.error("Expired item alert feature is disabled");
@@ -276,35 +279,35 @@ export const cronService = {
 
     try {
       const emailTemplate = await getEventEmailByEmailType(
-        EMAIL_TYPE.EXPIRED_ITEM_ALERT
+        EMAIL_TYPE.EXPIRED_ITEM_ALERT,
       );
       if (!emailTemplate) {
         throw new ErrorHandler(
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Expired Item Alert Email template."
-          )
+            "Expired Item Alert Email template.",
+          ),
         );
       }
 
       if (emailTemplate && !emailTemplate.emailBody) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Expired Item Alert Email Body")
+          generateErrorMessage("NOT_FOUND", "Expired Item Alert Email Body"),
         );
       }
       // Fetch recipient mails
       const alertMails = await getAutoAlertEmailByShortCodeFromDb(
-        INV_ALERT_TYPE.EXPIRED_ITEMS
+        INV_ALERT_TYPE.EXPIRED_ITEMS,
       );
       if (!alertMails) {
         throw new ErrorHandler(
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Recipient Mails for expired item alert"
-          )
+            "Recipient Mails for expired item alert",
+          ),
         );
       }
       const toMails = alertMails.to
@@ -332,7 +335,7 @@ export const cronService = {
       if (!tbodyMatch) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Table Body in email template")
+          generateErrorMessage("NOT_FOUND", "Table Body in email template"),
         );
       }
 
@@ -343,7 +346,7 @@ export const cronService = {
       if (!trRows || trRows.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Table row inside table body")
+          generateErrorMessage("NOT_FOUND", "Table row inside table body"),
         );
       }
 
@@ -359,7 +362,7 @@ export const cronService = {
           interpolate(rowTemplate, {
             collectionCenterName: item.name,
             count: item.total,
-          })
+          }),
         )
         .join("");
 
@@ -368,7 +371,7 @@ export const cronService = {
         /<tbody[^>]*>[\s\S]*?<\/tbody>/i,
         `<tbody>
           ${rows}
-        </tbody>`
+        </tbody>`,
       );
 
       const wb = new ExcelJs.Workbook();
@@ -446,8 +449,8 @@ export const cronService = {
         error instanceof Error
           ? error.message
           : typeof error === "string"
-          ? error
-          : "Unknown error";
+            ? error
+            : "Unknown error";
 
       await updateAutoAlertAuditInDb({
         id: autoAlertAudit.id,
@@ -465,7 +468,7 @@ export const cronService = {
     resendMasterId?: number;
   }) {
     const feature = await featureFlagService.getFeatureFlagByShortCode(
-      "EXPIRING_SOON_ITEM_EMAIL_ALERT"
+      "EXPIRING_SOON_ITEM_EMAIL_ALERT",
     );
     if (!feature || feature.isEnabled === false) {
       logger.error("Expiring item email alert feature is disabled");
@@ -490,34 +493,34 @@ export const cronService = {
 
     try {
       const emailTemplate = await getEventEmailByEmailType(
-        EMAIL_TYPE.EXPIRING_ITEM_ALERT
+        EMAIL_TYPE.EXPIRING_ITEM_ALERT,
       );
       if (!emailTemplate) {
         throw new ErrorHandler(
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Expiring item alert Email template."
-          )
+            "Expiring item alert Email template.",
+          ),
         );
       }
       if (emailTemplate && !emailTemplate.emailBody) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Expiring item alert Email Body")
+          generateErrorMessage("NOT_FOUND", "Expiring item alert Email Body"),
         );
       }
       // Fetch recipient mails
       const alertMails = await getAutoAlertEmailByShortCodeFromDb(
-        INV_ALERT_TYPE.EXPIRING_ITEMS
+        INV_ALERT_TYPE.EXPIRING_ITEMS,
       );
       if (!alertMails) {
         throw new ErrorHandler(
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Recipient Mails for expiring item alert"
-          )
+            "Recipient Mails for expiring item alert",
+          ),
         );
       }
 
@@ -546,7 +549,7 @@ export const cronService = {
       if (!tbodyMatch) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Table Body in email template")
+          generateErrorMessage("NOT_FOUND", "Table Body in email template"),
         );
       }
 
@@ -557,7 +560,7 @@ export const cronService = {
       if (!trRows || trRows.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Table row inside table body")
+          generateErrorMessage("NOT_FOUND", "Table row inside table body"),
         );
       }
 
@@ -573,7 +576,7 @@ export const cronService = {
           interpolate(rowTemplate, {
             collectionCenterName: item.name,
             count: item.total,
-          })
+          }),
         )
         .join("");
 
@@ -582,7 +585,7 @@ export const cronService = {
         /<tbody[^>]*>[\s\S]*?<\/tbody>/i,
         `<tbody>
           ${rows}
-        </tbody>`
+        </tbody>`,
       );
 
       const wb = new ExcelJs.Workbook();
@@ -663,8 +666,8 @@ export const cronService = {
         error instanceof Error
           ? error.message
           : typeof error === "string"
-          ? error
-          : "Unknown error";
+            ? error
+            : "Unknown error";
 
       await updateAutoAlertAuditInDb({
         id: autoAlertAudit.id,

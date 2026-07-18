@@ -13,11 +13,11 @@ export const createCompanyFinancialYear = TryCatch(
       await companyFinancialYearService.createCompanyFinancialYear(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: created },
-      "CompanyFinancialYear"
+      "CompanyFinancialYear",
     );
     logger.info("exiting::createCompanyFinancialYear::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateCompanyFinancialYear = TryCatch(
@@ -28,11 +28,11 @@ export const updateCompanyFinancialYear = TryCatch(
       await companyFinancialYearService.updateCompanyFinancialYear(input);
     const response = BaseResponse.success(
       { type: "UPDATED", data: updated },
-      "CompanyFinancialYear"
+      "CompanyFinancialYear",
     );
     logger.info("exiting::updateCompanyFinancialYear::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const closeCompanyFinancialYear = TryCatch(
@@ -40,15 +40,15 @@ export const closeCompanyFinancialYear = TryCatch(
     logger.info("entering::closeCompanyFinancialYear::controller");
     const { financialYearId } = req.query as { financialYearId: string };
     await companyFinancialYearService.closeCompanyFinancialYear(
-      Number(financialYearId)
+      Number(financialYearId),
     );
     const response = BaseResponse.success(
       { type: "CLOSED" },
-      "CompanyFinancialYear"
+      "CompanyFinancialYear",
     );
     logger.info("exiting::closeCompanyFinancialYear::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const toggleLockCompanyFinancialYear = TryCatch(
@@ -57,13 +57,13 @@ export const toggleLockCompanyFinancialYear = TryCatch(
     const { financialYearId } = req.query as { financialYearId: string };
     const updated =
       await companyFinancialYearService.toggleLockCompanyFinancialYear(
-        Number(financialYearId)
+        Number(financialYearId),
       );
     const response = BaseResponse.success(
       { type: updated.isLocked ? "LOCKED" : "UNLOCKED" },
-      "CompanyFinancialYear"
+      "CompanyFinancialYear",
     );
     logger.info("exiting::toggleLockCompanyFinancialYear::controller");
     return res.status(200).json(response);
-  }
+  },
 );

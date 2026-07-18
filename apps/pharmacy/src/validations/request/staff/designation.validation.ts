@@ -6,7 +6,7 @@ import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js
 
 export const staffDesignationSchema = Joi.object<CreateStaffDesignationInput>({
   designation: strRequired("Designation", 2, 50).pattern(
-    getPattern.nameWithNumPattern
+    getPattern.nameWithNumPattern,
   ),
 });
 

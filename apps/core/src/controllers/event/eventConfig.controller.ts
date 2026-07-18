@@ -9,16 +9,15 @@ export const createEventConfig = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::createEventConfig::controller");
     const data = req.body as UpsertEventConfigWithKeysInput;
-    const eventConfig = await eventConfigService.upsertEventConfigWithKeys(
-      data
-    );
+    const eventConfig =
+      await eventConfigService.upsertEventConfigWithKeys(data);
     const response = BaseResponse.success(
       { type: "CREATED", data: eventConfig },
-      "Event Config"
+      "Event Config",
     );
     logger.info("exiting::createEventConfig::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const markReadNotifications = TryCatch(
@@ -29,5 +28,5 @@ export const markReadNotifications = TryCatch(
     const response = BaseResponse.success({ type: "UPDATED" }, "Notification");
     logger.info("exiting::markReadNotifications::controller");
     return res.status(200).json(response);
-  }
+  },
 );

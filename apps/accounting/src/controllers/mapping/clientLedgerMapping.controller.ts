@@ -17,25 +17,24 @@ export const createExternalClientLedgerMapping = TryCatch(
       await clientLedgerMappingService.createExternalClientLedgerMapping(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: mapping },
-      "Client Ledger Mapping"
+      "Client Ledger Mapping",
     );
     logger.info("exiting::createExternalClientLedgerMapping::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const fetchClientLedgerMapping = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::fetchClientLedgerMapping::controller");
     const input = req.body as FetchClientLedgerMappingInput;
-    const mapping = await clientLedgerMappingService.fetchClientLedgerMapping(
-      input
-    );
+    const mapping =
+      await clientLedgerMappingService.fetchClientLedgerMapping(input);
     const response = BaseResponse.success(
       { type: "FETCHED", data: mapping },
-      "Client Ledger Mapping"
+      "Client Ledger Mapping",
     );
     logger.info("exiting::fetchClientLedgerMapping::controller");
     return res.status(200).json(response);
-  }
+  },
 );

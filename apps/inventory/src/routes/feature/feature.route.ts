@@ -47,7 +47,7 @@ featureRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "FEATURE_FLAG", "CREATE")),
   validateCreateFeatureFlag,
-  createFeatureFlag
+  createFeatureFlag,
 );
 
 /**
@@ -70,10 +70,10 @@ featureRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "FEATURE_FLAG", "VIEW"),
-    getPermission("INV", "FEATURE_FLAG", "UPDATE")
+    getPermission("INV", "FEATURE_FLAG", "UPDATE"),
   ),
   validateUpdateFeatureFlag,
-  updateFeatureFlag
+  updateFeatureFlag,
 );
 
 /**
@@ -89,7 +89,7 @@ featureRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "FEATURE_FLAG", "VIEW")),
-  getAllFeatureFlags
+  getAllFeatureFlags,
 );
 
 /**
@@ -111,7 +111,7 @@ featureRouter.get(
   "/shortCode",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "FEATURE_FLAG", "VIEW")),
-  getFeatureFlagByShortCode
+  getFeatureFlagByShortCode,
 );
 
 /**
@@ -134,9 +134,9 @@ featureRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "FEATURE_FLAG", "VIEW"),
-    getPermission("INV", "FEATURE_FLAG", "UPDATE")
+    getPermission("INV", "FEATURE_FLAG", "UPDATE"),
   ),
-  toggleFeatureFlag
+  toggleFeatureFlag,
 );
 
 /**
@@ -158,7 +158,7 @@ featureRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "FEATURE_FLAG", "DELETE")),
-  deleteFeatureFlag
+  deleteFeatureFlag,
 );
 
 export default featureRouter;

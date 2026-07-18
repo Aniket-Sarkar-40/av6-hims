@@ -5,7 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 
 export const validateItemStockSearch = async (
-  input: ItemStockSearchFilter
+  input: ItemStockSearchFilter,
 ): Promise<void> => {
   logger.info("entering::validateItemStockSearch::service::validation");
 

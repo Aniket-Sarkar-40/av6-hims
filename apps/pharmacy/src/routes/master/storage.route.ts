@@ -46,7 +46,7 @@ storage.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORAGE", "CREATE")),
   validateDropDownName,
-  createStorage
+  createStorage,
 );
 
 /**
@@ -70,10 +70,10 @@ storage.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORAGE", "VIEW"),
-    getPermission("PMS", "STORAGE", "UPDATE")
+    getPermission("PMS", "STORAGE", "UPDATE"),
   ),
   validateDropDownNameUpdate,
-  updateStorage
+  updateStorage,
 );
 
 /**
@@ -90,7 +90,7 @@ storage.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORAGE", "VIEW")),
-  getAllStorage
+  getAllStorage,
 );
 
 /**
@@ -114,6 +114,6 @@ storage.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORAGE", "VIEW")),
-  getStorageById
+  getStorageById,
 );
 export default storage;

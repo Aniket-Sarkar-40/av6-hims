@@ -14,11 +14,11 @@ export const createDefaultUnitMaster = TryCatch(
       await defaultUnitMasterService.createDefaultUnitMaster(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: defaultUnitMaster },
-      "Default Unit Master"
+      "Default Unit Master",
     );
     logger.info("exiting::createDefaultUnitMaster::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateDefaultUnitMaster = TryCatch(
@@ -31,8 +31,8 @@ export const updateDefaultUnitMaster = TryCatch(
     logger.info("exiting::updateDefaultUnitMaster::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedDefaultUnitMaster },
-      "Default Unit Master"
+      "Default Unit Master",
     );
     return res.status(200).json(response);
-  }
+  },
 );

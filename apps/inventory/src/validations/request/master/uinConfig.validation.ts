@@ -35,7 +35,7 @@ const UINSegmentSchema = Joi.object<UINSegment>({
     is: Joi.valid(
       UINPartType.TEXT,
       UINPartType.SEPARATOR,
-      UINPartType.DATE_FORMAT
+      UINPartType.DATE_FORMAT,
     ),
     then: strRequired("Value"),
     otherwise: forbiddenField("Value"),

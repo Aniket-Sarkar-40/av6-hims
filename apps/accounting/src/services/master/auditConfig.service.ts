@@ -26,7 +26,7 @@ const cacheKey = getRedisKey("AUDIT_CONFIG", "all");
 
 const auditConfigServiceRaw = {
   async createAuditConfig(
-    input: CreateOrUpdateAuditConfig
+    input: CreateOrUpdateAuditConfig,
   ): Promise<AccAuditConfig> {
     logger.info("entering::createAuditConfig::service");
     await createOrUpdateAuditConfigServiceValidation(input);
@@ -42,7 +42,7 @@ const auditConfigServiceRaw = {
   },
 
   async updateAuditConfig(
-    input: CreateOrUpdateAuditConfig
+    input: CreateOrUpdateAuditConfig,
   ): Promise<AccAuditConfig> {
     logger.info("entering::updateAuditConfig::service");
     await createOrUpdateAuditConfigServiceValidation(input);
@@ -60,7 +60,7 @@ const auditConfigServiceRaw = {
 
   async getAuditConfigById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<AccAuditConfig | null> {
     logger.info("entering::getAuditConfigById::service");
     validIdCheck(id);
@@ -79,7 +79,7 @@ const auditConfigServiceRaw = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "AuditConfig")
+          generateErrorMessage("NOT_FOUND", "AuditConfig"),
         );
     }
 
@@ -106,5 +106,5 @@ const auditConfigServiceRaw = {
 
 export const auditConfigService = auditProxy.createAuditedService(
   "auditConfig",
-  auditConfigServiceRaw
+  auditConfigServiceRaw,
 );

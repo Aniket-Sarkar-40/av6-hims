@@ -15,5 +15,5 @@ const uinConfigServiceRaw = {
 
 export const uinConfigService = auditProxy.createAuditedService(
   "uinConfig",
-  uinConfigServiceRaw
+  uinConfigServiceRaw,
 );

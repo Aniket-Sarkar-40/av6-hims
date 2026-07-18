@@ -7,7 +7,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdInsuranceMaster = async (
-  id: number
+  id: number,
 ): Promise<InsuranceMaster> => {
   logger.info("entering::validateIdInsuranceMaster::service::validation");
   validIdCheck(id);
@@ -15,7 +15,7 @@ export const validateIdInsuranceMaster = async (
   if (!insurance) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Insurance Master")
+      generateErrorMessage("NOT_FOUND", "Insurance Master"),
     );
   }
   logger.info("exiting::validateIdInsuranceMaster::service::validation");

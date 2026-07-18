@@ -56,7 +56,7 @@ itemBranchRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "CREATE")),
   validateCreateItemBranchMap,
-  createItemBranchMap
+  createItemBranchMap,
 );
 
 /**
@@ -79,7 +79,7 @@ itemBranchRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
   validateGetItemBranchMap,
-  getItemBranch
+  getItemBranch,
 );
 
 /**
@@ -102,10 +102,10 @@ itemBranchRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
   ),
   validateUpdateItemBranchMap,
-  updateItemBranchMap
+  updateItemBranchMap,
 );
 
 /**
@@ -121,7 +121,7 @@ itemBranchRouter.delete(
   "/:id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "DELETE")),
-  deleteItemBranch
+  deleteItemBranch,
 );
 
 /**
@@ -144,7 +144,7 @@ itemBranchRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH_EXCEL", "VIEW")),
   validateInputExcelItemBranchMap,
-  excelBranchItemMap
+  excelBranchItemMap,
 );
 
 /**
@@ -179,7 +179,7 @@ itemBranchRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
-  branchItemMapExcelImport
+  branchItemMapExcelImport,
 );
 
 /**
@@ -202,10 +202,10 @@ itemBranchRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
   ),
   validateItemWiseItemBranchMapUpdate,
-  updateItemWiseItemBranchMap
+  updateItemWiseItemBranchMap,
 );
 
 /**
@@ -229,10 +229,10 @@ itemBranchRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_BRANCH", "VIEW"),
-    getPermission("PMS", "ITEM_BRANCH", "UPDATE")
+    getPermission("PMS", "ITEM_BRANCH", "UPDATE"),
   ),
   validateItemBranchMapCopy,
-  BranchToBranchCopyItemBranchMap
+  BranchToBranchCopyItemBranchMap,
 );
 
 /**
@@ -255,5 +255,5 @@ itemBranchRouter.get(
   "/mapping",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BRANCH", "VIEW")),
-  getItemBranchMapDetailsForUpdate
+  getItemBranchMapDetailsForUpdate,
 );

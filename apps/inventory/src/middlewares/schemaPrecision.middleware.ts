@@ -13,7 +13,7 @@ export const refreshSchemaPrecisionSettings = async () => {
 export const loadSchemaPrecisionSettings = async (
   _req: Request,
   _res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     if (!isSchemaPrecisionLoaded) {

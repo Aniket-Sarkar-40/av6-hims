@@ -15,11 +15,11 @@ export const createAutoAlertEmail = TryCatch(
     const createdData = await autoAlertService.createAutoAlertEmail(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: createdData },
-      "Auto Alert Email"
+      "Auto Alert Email",
     );
     logger.info("exiting::createAutoAlertEmail::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateAutoAlertEmail = TryCatch(
@@ -33,10 +33,10 @@ export const updateAutoAlertEmail = TryCatch(
       .json(
         BaseResponse.success(
           { type: "UPDATED", data: updatedData },
-          "Auto Alert Email"
-        )
+          "Auto Alert Email",
+        ),
       );
-  }
+  },
 );
 
 export const resendAutoAlertEmail = TryCatch(
@@ -44,7 +44,7 @@ export const resendAutoAlertEmail = TryCatch(
     logger.info("entering::resendAutoAlertEmail::controller");
     const { auditId } = req.query as { auditId: string };
     const isSuccess = await autoAlertService.resendAutoAlertEmail(
-      Number(auditId)
+      Number(auditId),
     );
     if (!isSuccess) {
       return res
@@ -55,5 +55,5 @@ export const resendAutoAlertEmail = TryCatch(
     return res
       .status(200)
       .json(BaseResponse.success({ type: "RESEND" }, "Email Alert"));
-  }
+  },
 );

@@ -64,13 +64,13 @@ async function readSeedInputsFromTerminal(): Promise<SeedInputs> {
 
   try {
     const codeAnswer = await rl.question(
-      `Company code [${COMPANY_ROW.code}]: `
+      `Company code [${COMPANY_ROW.code}]: `,
     );
     const nameAnswer = await rl.question(
-      `Company name [${COMPANY_ROW.name}]: `
+      `Company name [${COMPANY_ROW.name}]: `,
     );
     const legalNameAnswer = await rl.question(
-      `Legal name [${COMPANY_ROW.legalName}]: `
+      `Legal name [${COMPANY_ROW.legalName}]: `,
     );
 
     return {
@@ -78,7 +78,7 @@ async function readSeedInputsFromTerminal(): Promise<SeedInputs> {
       companyName: requiredSeedValue(nameAnswer || COMPANY_ROW.name, "name"),
       legalName: requiredSeedValue(
         legalNameAnswer || COMPANY_ROW.legalName,
-        "legalName"
+        "legalName",
       ),
     };
   } finally {
@@ -116,7 +116,7 @@ function toDate(value: string | null | undefined): Date | null {
 function requireMappedId(
   map: Map<number, number>,
   oldId: number | null | undefined,
-  label: string
+  label: string,
 ): number {
   if (oldId == null) throw new Error(`Missing old id for ${label}`);
   const newId = map.get(oldId);
@@ -5172,7 +5172,7 @@ async function main() {
 
   if (existingCompany) {
     throw new Error(
-      `Company already exists for code=${companyCode}. Aborting to avoid duplicate seed.`
+      `Company already exists for code=${companyCode}. Aborting to avoid duplicate seed.`,
     );
   }
 
@@ -5200,7 +5200,7 @@ async function main() {
           companyId: requireMappedId(
             companyIdMap,
             row.companyId,
-            "company address companyId"
+            "company address companyId",
           ),
           addressType: row.addressType as AddressType,
           addressLine1: row.addressLine1,
@@ -5222,7 +5222,7 @@ async function main() {
           companyId: requireMappedId(
             companyIdMap,
             row.companyId,
-            "company statutory companyId"
+            "company statutory companyId",
           ),
           pan: row.pan,
           gstin: row.gstin,
@@ -5243,7 +5243,7 @@ async function main() {
           companyId: requireMappedId(
             companyIdMap,
             row.companyId,
-            "company features companyId"
+            "company features companyId",
           ),
           enableCostCenter: row.enableCostCenter,
           enableBillWiseTracking: row.enableBillWiseTracking,
@@ -5259,7 +5259,7 @@ async function main() {
           companyId: requireMappedId(
             companyIdMap,
             row.companyId,
-            "financial year companyId"
+            "financial year companyId",
           ),
           fyName: row.fyName,
           startDate: toDate(row.startDate)!,
@@ -5285,7 +5285,7 @@ async function main() {
             companyId: requireMappedId(
               companyIdMap,
               row.companyId,
-              "group companyId"
+              "group companyId",
             ),
             name: row.name,
             alias: row.alias,
@@ -5312,7 +5312,7 @@ async function main() {
         throw new Error(
           `Unable to resolve group parent mapping. Pending old group ids: ${pendingGroups
             .map((g) => g.id)
-            .join(", ")}`
+            .join(", ")}`,
         );
       }
     }
@@ -5323,7 +5323,7 @@ async function main() {
           companyId: requireMappedId(
             companyIdMap,
             row.companyId,
-            "voucher type companyId"
+            "voucher type companyId",
           ),
           name: row.name,
           nature: row.nature as VoucherTypeNature,
@@ -5346,7 +5346,7 @@ async function main() {
           companyId: requireMappedId(
             companyIdMap,
             row.companyId,
-            "ledger companyId"
+            "ledger companyId",
           ),
           groupId: requireMappedId(groupIdMap, row.groupId, "ledger groupId"),
           name: row.name,
@@ -5375,7 +5375,7 @@ async function main() {
 
     for (const row of ACCOUNTING_INTEGRATION_CONFIG_ROWS) {
       const details = ACCOUNTING_INTEGRATION_CONFIG_DETAIL_ROWS.filter(
-        (detail) => detail.accountingIntegrationConfigId === row.id
+        (detail) => detail.accountingIntegrationConfigId === row.id,
       );
 
       await tx.accountingIntegrationConfig.create({
@@ -5385,7 +5385,7 @@ async function main() {
           voucherTypeId: requireMappedId(
             voucherTypeIdMap,
             row.voucherTypeId as number,
-            "integration config voucherTypeId"
+            "integration config voucherTypeId",
           ),
           narrationText: row.narrationText,
           accountingIntegrationConfigDetails: {
@@ -5396,8 +5396,8 @@ async function main() {
                       requireMappedId(
                         ledgerIdMap,
                         Number(detail.ledgerValue),
-                        "integration detail ledgerValue"
-                      )
+                        "integration detail ledgerValue",
+                      ),
                     )
                   : detail.ledgerValue;
 
@@ -5412,7 +5412,7 @@ async function main() {
                   ? requireMappedId(
                       groupIdMap,
                       detail.groupId,
-                      "integration detail groupId"
+                      "integration detail groupId",
                     )
                   : null,
                 isPaymentRelated: detail.isPaymentRelated,

@@ -34,7 +34,7 @@ const validateWarehouseModeEnabled = async (): Promise<void> => {
   if (!isWarehouseModeEnabled) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Warehouse mode is not enabled")
+      generateErrorMessage("INVALID_STATUS", "Warehouse mode is not enabled"),
     );
   }
 };
@@ -49,7 +49,7 @@ export const validateIdBranchRequisition = async (id: number) => {
   if (!branchReq) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Branch Requisition")
+      generateErrorMessage("NOT_FOUND", "Branch Requisition"),
     );
   }
 
@@ -59,7 +59,7 @@ export const validateIdBranchRequisition = async (id: number) => {
 };
 
 export const validateBranchRequisitionCommon = async (
-  body: CreateBranchRequisitionInput
+  body: CreateBranchRequisitionInput,
 ): Promise<void> => {
   logger.info("entering::validateBranchRequisitionCommon::service::validation");
 
@@ -72,13 +72,13 @@ export const validateBranchRequisitionCommon = async (
     if (body.locationId !== body.branchId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("ACCESS_FAIL", "Branch Location")
+        generateErrorMessage("ACCESS_FAIL", "Branch Location"),
       );
     }
   }
 
   const user = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    body.requisitionFrom
+    body.requisitionFrom,
   );
   if (!user) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "User"));
@@ -91,12 +91,12 @@ export const validateBranchRequisitionCommon = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch requisition")
+      generateErrorMessage("INVALID_STATUS", "Branch requisition"),
     );
   }
 
   const itemIds: number[] = body.branchRequisitionDetails.map(
-    (d: BranchRequisitionDetailInput) => d.itemId
+    (d: BranchRequisitionDetailInput) => d.itemId,
   );
 
   const uniqueItemIds = [...new Set(itemIds)];
@@ -111,24 +111,24 @@ export const validateBranchRequisitionCommon = async (
 };
 
 export const createBranchRequisitionServiceValidation = async (
-  body: CreateBranchRequisitionInput
+  body: CreateBranchRequisitionInput,
 ) => {
   logger.info(
-    "entering::createBranchRequisitionServiceValidation::service::validation"
+    "entering::createBranchRequisitionServiceValidation::service::validation",
   );
 
   await validateBranchRequisitionCommon(body);
 
   logger.info(
-    "exiting::createBranchRequisitionServiceValidation::service::validation"
+    "exiting::createBranchRequisitionServiceValidation::service::validation",
   );
 };
 
 export const updateBranchRequisitionServiceValidation = async (
-  body: CreateBranchRequisitionInput
+  body: CreateBranchRequisitionInput,
 ) => {
   logger.info(
-    "entering::updateBranchRequisitionServiceValidation::service::validation"
+    "entering::updateBranchRequisitionServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -136,7 +136,7 @@ export const updateBranchRequisitionServiceValidation = async (
   if (body.id == null) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Branch Requisition id")
+      generateErrorMessage("NOT_FOUND", "Branch Requisition id"),
     );
   }
 
@@ -149,7 +149,7 @@ export const updateBranchRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch requisition")
+      generateErrorMessage("INVALID_STATUS", "Branch requisition"),
     );
   }
 
@@ -157,14 +157,14 @@ export const updateBranchRequisitionServiceValidation = async (
     body.ccId,
     currReq.ccId,
     "Warehouse Id",
-    "Branch Requisition Warehouse Id"
+    "Branch Requisition Warehouse Id",
   );
 
   ensureMatch(
     body.requisitionFrom,
     currReq.requisitionFrom,
     "Requisition From User Id",
-    "Branch Requisition User Id"
+    "Branch Requisition User Id",
   );
 
   const updatedIds: number[] = body.branchRequisitionDetails
@@ -175,7 +175,7 @@ export const updateBranchRequisitionServiceValidation = async (
   const existingIds = currReq.branchRequisitionDetails.map((item) => item.id);
 
   const notInRequisitionDetails = updatedIds.filter(
-    (id) => !existingIds.includes(id)
+    (id) => !existingIds.includes(id),
   );
 
   if (notInRequisitionDetails.length > 0) {
@@ -184,24 +184,24 @@ export const updateBranchRequisitionServiceValidation = async (
       generateErrorMessage(
         "INVALID_VALUE",
         `Ids ${notInRequisitionDetails.join(
-          ", "
-        )} of Branch Requisition Details`
-      )
+          ", ",
+        )} of Branch Requisition Details`,
+      ),
     );
   }
 
   await validateBranchRequisitionCommon(body);
 
   logger.info(
-    "exiting::updateBranchRequisitionServiceValidation::service::validation"
+    "exiting::updateBranchRequisitionServiceValidation::service::validation",
   );
 };
 
 export const rejectBranchRequisitionServiceValidation = async (
-  body: RejectBranchRequisitionInput
+  body: RejectBranchRequisitionInput,
 ) => {
   logger.info(
-    "entering::rejectBranchRequisitionServiceValidation::service::validation"
+    "entering::rejectBranchRequisitionServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -214,7 +214,7 @@ export const rejectBranchRequisitionServiceValidation = async (
     body.ccId,
     currBranchReq.ccId,
     "Warehouse Id",
-    "Branch Requisition Warehouse Id"
+    "Branch Requisition Warehouse Id",
   );
 
   if (
@@ -223,20 +223,20 @@ export const rejectBranchRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch requisition")
+      generateErrorMessage("INVALID_STATUS", "Branch requisition"),
     );
   }
 
   logger.info(
-    "exiting::rejectBranchRequisitionServiceValidation::service::validation"
+    "exiting::rejectBranchRequisitionServiceValidation::service::validation",
   );
 };
 
 export const approveBranchRequisitionServiceValidation = async (
-  body: ApproveBranchReqInput
+  body: ApproveBranchReqInput,
 ) => {
   logger.info(
-    "entering::approveBranchRequisitionServiceValidation::service::validation"
+    "entering::approveBranchRequisitionServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -250,14 +250,14 @@ export const approveBranchRequisitionServiceValidation = async (
     body.ccId,
     currBranchReq.ccId,
     "Warehouse Id",
-    "Branch Requisition Warehouse Id"
+    "Branch Requisition Warehouse Id",
   );
 
   ensureMatch(
     body.brNumber,
     currBranchReq.brNumber,
     "Branch Requisition Number",
-    "Branch Requisition Number"
+    "Branch Requisition Number",
   );
 
   if (
@@ -266,7 +266,7 @@ export const approveBranchRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch requisition")
+      generateErrorMessage("INVALID_STATUS", "Branch requisition"),
     );
   }
 
@@ -274,7 +274,7 @@ export const approveBranchRequisitionServiceValidation = async (
 
   for (const [index, detail] of body.assignItems.entries()) {
     const brDetails = currBranchReq.branchRequisitionDetails.find(
-      (elem) => elem.id === detail.branchRequisitionDetailsId
+      (elem) => elem.id === detail.branchRequisitionDetailsId,
     );
 
     if (!brDetails) {
@@ -282,8 +282,8 @@ export const approveBranchRequisitionServiceValidation = async (
         404,
         generateErrorMessage(
           "NOT_FOUND",
-          `Branch requisition detail for item ${index + 1}`
-        )
+          `Branch requisition detail for item ${index + 1}`,
+        ),
       );
     }
 
@@ -293,7 +293,7 @@ export const approveBranchRequisitionServiceValidation = async (
       detail.itemId,
       brDetails.itemId,
       `Assign Item ${index + 1} Item Id`,
-      "Branch Requisition Detail Item Id"
+      "Branch Requisition Detail Item Id",
     );
 
     const assignQty = body.assignItems.reduce((acc, item) => {
@@ -309,7 +309,7 @@ export const approveBranchRequisitionServiceValidation = async (
     if (brDetails.reqQuantity < assignQty) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Assign Quantity")
+        generateErrorMessage("INVALID_FIELD", "Assign Quantity"),
       );
     }
 
@@ -318,7 +318,7 @@ export const approveBranchRequisitionServiceValidation = async (
     if (!stock) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Item Stock")
+        generateErrorMessage("NOT_FOUND", "Item Stock"),
       );
     }
 
@@ -326,21 +326,21 @@ export const approveBranchRequisitionServiceValidation = async (
       detail.itemId,
       stock.itemId,
       `Assign Item ${index + 1} Item Id`,
-      "Item Stock Item Id"
+      "Item Stock Item Id",
     );
 
     ensureMatch(
       body.ccId,
       stock.ccId,
       `Assign Item ${index + 1} Warehouse Id`,
-      "Item Stock Warehouse Id"
+      "Item Stock Warehouse Id",
     );
 
     ensureMatch(
       detail.isFoc,
       stock.isFoc,
       `Assign Item ${index + 1} FOC`,
-      "Item Stock FOC"
+      "Item Stock FOC",
     );
 
     if (detail.isBatch) {
@@ -348,7 +348,7 @@ export const approveBranchRequisitionServiceValidation = async (
         detail.batchNo ?? null,
         stock.batchNo ?? null,
         `Assign Item ${index + 1} Batch No`,
-        "Item Stock Batch No"
+        "Item Stock Batch No",
       );
     }
 
@@ -365,7 +365,7 @@ export const approveBranchRequisitionServiceValidation = async (
         bodyExpiryDate,
         stockExpiryDate,
         `Assign Item ${index + 1} Expiry Date`,
-        "Item Stock Expiry Date"
+        "Item Stock Expiry Date",
       );
     }
 
@@ -374,31 +374,31 @@ export const approveBranchRequisitionServiceValidation = async (
         400,
         generateErrorMessage(
           "INSUFFICIENT_STOCK",
-          `Batch no : ${detail.batchNo ?? "-"}`
-        )
+          `Batch no : ${detail.batchNo ?? "-"}`,
+        ),
       );
     }
   }
 
   const totalReqQty = currBranchReq.branchRequisitionDetails.reduce(
     (acc, details) => acc + details.reqQuantity,
-    0
+    0,
   );
 
   const alreadyAssignedQty = currBranchReq.branchRequisitionDetails.reduce(
     (acc, details) => acc + details.assignedQuantity,
-    0
+    0,
   );
 
   const alreadyAckQty = currBranchReq.branchRequisitionDetails.reduce(
     (acc, details) => acc + details.acknowledgedQuantity,
-    0
+    0,
   );
 
   if (totalAssignQty + alreadyAssignedQty > totalReqQty) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_VALUE", "Item Total quantity")
+      generateErrorMessage("INVALID_VALUE", "Item Total quantity"),
     );
   } else if (totalAssignQty + alreadyAssignedQty < totalReqQty) {
     body.branchReqStatus = "Partially_Approved";
@@ -414,15 +414,15 @@ export const approveBranchRequisitionServiceValidation = async (
   }
 
   logger.info(
-    "exiting::approveBranchRequisitionServiceValidation::service::validation"
+    "exiting::approveBranchRequisitionServiceValidation::service::validation",
   );
 };
 
 export const acknowledgeBranchRequisitionServiceValidation = async (
-  body: AcknowledgeBranchRequisition
+  body: AcknowledgeBranchRequisition,
 ) => {
   logger.info(
-    "entering::acknowledgeBranchRequisitionServiceValidation::service::validation"
+    "entering::acknowledgeBranchRequisitionServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -431,7 +431,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
   body.branchReq = currBranchReq;
 
   const approvedPendingReturns = await getApprovedPendingBRRFromBRId(
-    body.branchReqId
+    body.branchReqId,
   );
 
   if (approvedPendingReturns.length > 0) {
@@ -439,8 +439,8 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
       400,
       generateErrorMessage(
         "INVALID_STATUS",
-        "Branch Requisition Return is pending acknowledgement"
-      )
+        "Branch Requisition Return is pending acknowledgement",
+      ),
     );
   }
 
@@ -450,14 +450,14 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
     body.branchId,
     currBranchReq.branchId,
     "Current Branch Id",
-    "Branch Requisition Branch Id"
+    "Branch Requisition Branch Id",
   );
 
   ensureMatch(
     body.brNumber,
     currBranchReq.brNumber,
     "Branch Requisition Number",
-    "Branch Requisition Number"
+    "Branch Requisition Number",
   );
 
   if (
@@ -466,7 +466,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch requisition status")
+      generateErrorMessage("INVALID_STATUS", "Branch requisition status"),
     );
   }
 
@@ -475,8 +475,8 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
       400,
       generateErrorMessage(
         "INVALID_STATUS",
-        "Branch requisition acknowledge status"
-      )
+        "Branch requisition acknowledge status",
+      ),
     );
   }
 
@@ -486,7 +486,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
     currTotalAckQty += detail.totalAcknowledgeQty;
 
     const brDetails = currBranchReq.branchRequisitionDetails.find(
-      (elem) => elem.id === detail.branchRequisitionDetailsId
+      (elem) => elem.id === detail.branchRequisitionDetailsId,
     );
 
     if (!brDetails) {
@@ -494,8 +494,8 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
         404,
         generateErrorMessage(
           "NOT_FOUND",
-          `Branch requisition detail for item ${index + 1}`
-        )
+          `Branch requisition detail for item ${index + 1}`,
+        ),
       );
     }
 
@@ -503,7 +503,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
       detail.itemId,
       brDetails.itemId,
       `Acknowledge Item ${index + 1} Item Id`,
-      "Branch Requisition Detail Item Id"
+      "Branch Requisition Detail Item Id",
     );
 
     let totalAckQty = 0;
@@ -516,8 +516,8 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            `Branch item detail for batch ${batchIndex + 1}`
-          )
+            `Branch item detail for batch ${batchIndex + 1}`,
+          ),
         );
       }
 
@@ -525,21 +525,21 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
         body.branchReqId,
         branchItem.branchRequisitionId,
         `Acknowledge Item ${index + 1} Branch Requisition Id`,
-        "Branch Item Detail Branch Requisition Id"
+        "Branch Item Detail Branch Requisition Id",
       );
 
       ensureMatch(
         detail.branchRequisitionDetailsId,
         branchItem.branchRequisitionDetailsId,
         `Acknowledge Item ${index + 1} Branch Requisition Details Id`,
-        "Branch Item Detail Branch Requisition Details Id"
+        "Branch Item Detail Branch Requisition Details Id",
       );
 
       ensureMatch(
         detail.itemId,
         branchItem.itemId,
         `Acknowledge Item ${index + 1} Item Id`,
-        "Branch Item Detail Item Id"
+        "Branch Item Detail Item Id",
       );
 
       if (item.isBatch) {
@@ -547,7 +547,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
           item.batchNo ?? null,
           branchItem.batchNo ?? null,
           `Acknowledge Item ${index + 1} Batch ${batchIndex + 1} Batch No`,
-          "Branch Item Detail Batch No"
+          "Branch Item Detail Batch No",
         );
       }
 
@@ -564,7 +564,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
           bodyExpiryDate,
           branchItemExpiryDate,
           `Acknowledge Item ${index + 1} Batch ${batchIndex + 1} Expiry Date`,
-          "Branch Item Detail Expiry Date"
+          "Branch Item Detail Expiry Date",
         );
       }
 
@@ -572,7 +572,7 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
         item.isFoc,
         branchItem.isFoc,
         `Acknowledge Item ${index + 1} Batch ${batchIndex + 1} FOC`,
-        "Branch Item Detail FOC"
+        "Branch Item Detail FOC",
       );
 
       const alreadyUsedQty =
@@ -584,8 +584,8 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
           400,
           generateErrorMessage(
             "INVALID_FIELD",
-            `Acknowledge quantity for Batch no : ${item.batchNo ?? "-"}`
-          )
+            `Acknowledge quantity for Batch no : ${item.batchNo ?? "-"}`,
+          ),
         );
       }
 
@@ -598,29 +598,29 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
       detail.totalAcknowledgeQty,
       totalAckQty,
       `Acknowledge Item ${index + 1} Total Acknowledge Quantity`,
-      "Calculated Total Acknowledge Quantity"
+      "Calculated Total Acknowledge Quantity",
     );
   }
 
   const totalReqQty = currBranchReq.branchRequisitionDetails.reduce(
     (acc, details) => acc + details.reqQuantity,
-    0
+    0,
   );
 
   const totalAckQtyTill = currBranchReq.branchRequisitionDetails.reduce(
     (acc, details) => acc + details.acknowledgedQuantity,
-    0
+    0,
   );
 
   const totalAssignQty = currBranchReq.branchRequisitionDetails.reduce(
     (acc, details) => acc + details.assignedQuantity,
-    0
+    0,
   );
 
   if (totalReqQty < totalAckQtyTill + currTotalAckQty) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", "Item Total quantity")
+      generateErrorMessage("INVALID_FIELD", "Item Total quantity"),
     );
   } else if (totalAssignQty === totalAckQtyTill + currTotalAckQty) {
     body.branchReqAckStatus = "ACK_RECEIVED";
@@ -629,13 +629,13 @@ export const acknowledgeBranchRequisitionServiceValidation = async (
   }
 
   logger.info(
-    "exiting::acknowledgeBranchRequisitionServiceValidation::service::validation"
+    "exiting::acknowledgeBranchRequisitionServiceValidation::service::validation",
   );
 };
 
 export const deleteBranchRequisitionServiceValidation = async (id: number) => {
   logger.info(
-    "entering::deleteBranchRequisitionServiceValidation::service::validation"
+    "entering::deleteBranchRequisitionServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -648,11 +648,11 @@ export const deleteBranchRequisitionServiceValidation = async (id: number) => {
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch requisition")
+      generateErrorMessage("INVALID_STATUS", "Branch requisition"),
     );
   }
 
   logger.info(
-    "exiting::deleteBranchRequisitionServiceValidation::service::validation"
+    "exiting::deleteBranchRequisitionServiceValidation::service::validation",
   );
 };

@@ -12,7 +12,7 @@ import { toRequiredIdValue } from "@repo/shared/utils/helper.utils.js";
 
 const chartOfAccountsServiceRaw = {
   async fetchChartOfAccounts(
-    companyId: number
+    companyId: number,
   ): Promise<ChartOfAccountsResponse> {
     logger.info("entering::fetchChartOfAccounts::service");
 
@@ -43,7 +43,7 @@ const chartOfAccountsServiceRaw = {
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const getSectionKey = (
-      primaryCategory: string
+      primaryCategory: string,
     ): keyof ChartOfAccountsResponse | null => {
       switch (primaryCategory) {
         case "ASSET":
@@ -259,7 +259,7 @@ const chartOfAccountsServiceRaw = {
 
     const addGroupWithChildren = (
       group: GroupForChartOfAccounts,
-      level: number
+      level: number,
     ) => {
       addGroupRow(group.group.value, level);
 
@@ -285,10 +285,8 @@ const chartOfAccountsServiceRaw = {
     addSection(chartOfAccounts.expenses);
     addSection(chartOfAccounts.income);
 
-    ws.getCell(
-      rowNo,
-      1
-    ).value = `Total ${chartOfAccounts.totalGroups} Group(s) and ${chartOfAccounts.totalLedgers} Ledger(s)`;
+    ws.getCell(rowNo, 1).value =
+      `Total ${chartOfAccounts.totalGroups} Group(s) and ${chartOfAccounts.totalLedgers} Ledger(s)`;
     ws.getCell(rowNo, 1).font = {
       name: "Arial",
       size: 10,
@@ -305,5 +303,5 @@ const chartOfAccountsServiceRaw = {
 
 export const chartOfAccountsService = auditProxy.createAuditedService(
   "chartOfAccounts",
-  chartOfAccountsServiceRaw
+  chartOfAccountsServiceRaw,
 );

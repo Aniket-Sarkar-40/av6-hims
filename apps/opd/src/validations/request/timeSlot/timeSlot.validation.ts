@@ -47,7 +47,7 @@ export const doctorConsultationWithTimeSlotSchema: Joi.ObjectSchema<DoctorConsul
         "number.max": generateValidationErrorMessage(
           "MAX_VALUE",
           "Tax Value",
-          "100"
+          "100",
         ),
       }),
   })
@@ -63,7 +63,7 @@ export const doctorConsultationWithTimeSlotSchema: Joi.ObjectSchema<DoctorConsul
     .messages({
       "any.invalid": generateValidationErrorMessage(
         "INVALID",
-        "Booking Type (VIP and Special cannot both be true)"
+        "Booking Type (VIP and Special cannot both be true)",
       ),
     });
 

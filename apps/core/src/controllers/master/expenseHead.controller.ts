@@ -24,11 +24,11 @@ export const createExpenseHead = TryCatch(
         success: true,
         message: generateSuccessMessage("CREATED", "Expense Head"),
       },
-      expenseHead
+      expenseHead,
     );
     logger.info("exiting::createExpenseHead::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const getAllExpenseHeads = TryCatch(
@@ -40,11 +40,11 @@ export const getAllExpenseHeads = TryCatch(
         success: true,
         message: generateSuccessMessage("FETCHED", "Expense Heads"),
       },
-      expenseHeads
+      expenseHeads,
     );
     logger.info("exiting::getAllExpenseHeads::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getExpenseHeadById = TryCatch(
@@ -53,14 +53,14 @@ export const getExpenseHeadById = TryCatch(
     const { expenseHeadId } = req.query as { expenseHeadId: string };
 
     const expenseHead = await expenseHeadService.getExpenseHeadById(
-      Number(expenseHeadId)
+      Number(expenseHeadId),
     );
     if (!expenseHead) {
       return res.status(404).json(
         new BaseResponse({
           success: false,
           message: generateErrorMessage("NOT_FOUND", "Expense Head"),
-        })
+        }),
       );
     }
     const response = new BaseResponse(
@@ -68,11 +68,11 @@ export const getExpenseHeadById = TryCatch(
         success: true,
         message: generateSuccessMessage("FETCHED", "Expense Head"),
       },
-      expenseHead
+      expenseHead,
     );
     logger.info("exiting::getExpenseHeadById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const updateExpenseHead = TryCatch(
@@ -86,7 +86,7 @@ export const updateExpenseHead = TryCatch(
         new BaseResponse({
           success: false,
           message: generateErrorMessage("NOT_FOUND", "Expense Head"),
-        })
+        }),
       );
     }
     const response = new BaseResponse(
@@ -94,25 +94,25 @@ export const updateExpenseHead = TryCatch(
         success: true,
         message: generateSuccessMessage("UPDATED", "Expense Head"),
       },
-      updatedExpenseHead
+      updatedExpenseHead,
     );
     logger.info("exiting::updateExpenseHead::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 export const deleteExpenseHead = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::deleteExpenseHead::controller");
     const { expenseHeadId } = req.query as { expenseHeadId: string };
     const deletedExpenseHead = await expenseHeadService.deleteExpenseHead(
-      Number(expenseHeadId)
+      Number(expenseHeadId),
     );
     if (!deletedExpenseHead) {
       return res.status(404).json(
         new BaseResponse({
           success: false,
           message: generateErrorMessage("NOT_FOUND", "Expense Head"),
-        })
+        }),
       );
     }
     const response = new BaseResponse(
@@ -120,9 +120,9 @@ export const deleteExpenseHead = TryCatch(
         success: true,
         message: generateSuccessMessage("DELETED", "Expense Head"),
       },
-      deletedExpenseHead
+      deletedExpenseHead,
     );
     logger.info("exiting::deleteExpenseHead::controller");
     return res.status(200).json(response);
-  }
+  },
 );

@@ -11,7 +11,7 @@ export const createCompany = TryCatch(async (req: Request, res: Response) => {
   const created = await companyService.createCompany(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: created },
-    "Company"
+    "Company",
   );
   logger.info("exiting::createCompany::controller");
   return res.status(201).json(response);
@@ -23,7 +23,7 @@ export const updateCompany = TryCatch(async (req: Request, res: Response) => {
   const updated = await companyService.updateCompany(input);
   const response = BaseResponse.success(
     { type: "UPDATED", data: updated },
-    "Company"
+    "Company",
   );
   logger.info("exiting::createCompany::controller");
   return res.status(200).json(response);

@@ -18,7 +18,7 @@ export const validateIdFeatureFlag = async (id: number) => {
   if (!record) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Feature Flag")
+      generateErrorMessage("NOT_FOUND", "Feature Flag"),
     );
   }
   logger.info("exiting::validateIdFeatureFlag::service::validation");
@@ -26,14 +26,14 @@ export const validateIdFeatureFlag = async (id: number) => {
 };
 
 export const validateCreateFeatureFlag = async (
-  input: CreateFeatureFlagInput
+  input: CreateFeatureFlagInput,
 ) => {
   logger.info("entering::validateCreateFeatureFlag::service::validation");
   const existing = await getFeatureFlagByShortCodeFromDb(input.shortCode);
   if (existing) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Feature Flag")
+      generateErrorMessage("DUPLICATE_ITEM", "Feature Flag"),
     );
   }
   logger.info("exiting::validateCreateFeatureFlag::service::validation");
@@ -41,7 +41,7 @@ export const validateCreateFeatureFlag = async (
 };
 
 export const validateUpdateFeatureFlag = async (
-  input: UpdateFeatureFlagInput
+  input: UpdateFeatureFlagInput,
 ) => {
   logger.info("entering::validateUpdateFeatureFlag::service::validation");
   const { id, shortCode } = input;
@@ -50,7 +50,7 @@ export const validateUpdateFeatureFlag = async (
   if (existing && existing.id !== id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Feature Flag")
+      generateErrorMessage("DUPLICATE_ITEM", "Feature Flag"),
     );
   }
   logger.info("exiting::validateUpdateFeatureFlag::service::validation");

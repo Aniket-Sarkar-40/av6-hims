@@ -67,7 +67,7 @@ itemMasterRouter.post(
     "rightSideImage",
   ]),
   validateItemMasterCreate,
-  createItemMaster
+  createItemMaster,
 );
 
 /**
@@ -83,7 +83,7 @@ itemMasterRouter.put(
   "/active",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
-  ActiveItem
+  ActiveItem,
 );
 
 /**
@@ -99,7 +99,7 @@ itemMasterRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
-  getAllItemMaster
+  getAllItemMaster,
 );
 
 /**
@@ -121,7 +121,7 @@ itemMasterRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "VIEW")),
   validateGetItem,
-  getItemMasterById
+  getItemMasterById,
 );
 
 /**
@@ -151,7 +151,7 @@ itemMasterRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "ITEM_MASTER", "VIEW"),
-    getPermission("INV", "ITEM_MASTER", "UPDATE")
+    getPermission("INV", "ITEM_MASTER", "UPDATE"),
   ),
   createUploadFieldsMiddleware("item", [
     "frontImage",
@@ -160,7 +160,7 @@ itemMasterRouter.put(
     "rightSideImage",
   ]),
   validateItemMasterUpdate,
-  updateItemMaster
+  updateItemMaster,
 );
 
 /**
@@ -183,7 +183,7 @@ itemMasterRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SEARCH", "VIEW")),
   validateItemSearch,
-  itemSearch
+  itemSearch,
 );
 
 /**
@@ -216,7 +216,7 @@ itemMasterRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEMS_SUP", "VIEW")),
   validateBulkItemSupplierPrices,
-  getBulkItemSupplierPrices
+  getBulkItemSupplierPrices,
 );
 
 /**
@@ -239,7 +239,7 @@ itemMasterRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_BATCHES", "VIEW")),
   validateItemStock,
-  getItemStocksByItemId
+  getItemStocksByItemId,
 );
 
 /**
@@ -254,7 +254,7 @@ itemMasterRouter.get(
   "/export",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_MASTER", "CREATE")),
-  itemExcelSampleExport
+  itemExcelSampleExport,
 );
 
 /**
@@ -269,7 +269,7 @@ itemMasterRouter.get(
   "/item-excel-export",
   verifyToken,
   authorize(getPermission("INV", "ITEM", "CREATE")),
-  itemExcelExport
+  itemExcelExport,
 );
 
 itemMasterRouter.post(
@@ -278,5 +278,5 @@ itemMasterRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("INV", "ITEM", "CREATE")),
-  itemExcelImport
+  itemExcelImport,
 );

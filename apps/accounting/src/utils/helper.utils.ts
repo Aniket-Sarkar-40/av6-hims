@@ -74,7 +74,7 @@ export function joiDecimalFromSettings(opts: Opts) {
 
 export function toPickFieldsWithoutNull<
   T extends { id: number },
-  K extends keyof T
+  K extends keyof T,
 >(row: T, ...keys: K[]): Pick<T, "id" | K> {
   const out = {} as Pick<T, "id" | K>;
   out.id = row.id;
@@ -87,7 +87,7 @@ export function toPickFieldsWithoutNull<
 }
 
 export function removeBaseModelArray<T extends BaseModel>(
-  input: (T | undefined | null)[]
+  input: (T | undefined | null)[],
 ): Omit<T, BaseModelAttr>[] {
   if (!input?.length) return [];
 
@@ -105,20 +105,20 @@ export function removeBaseModelArray<T extends BaseModel>(
           "isActive",
           "updatedAt",
           "updatedBy",
-        ]).rest
+        ]).rest,
     );
 }
 
 export function toIdValueCountry<T extends { id: number }>(
   row: T | null | undefined,
-  valueKey: keyof Omit<T, "id"> & string
+  valueKey: keyof Omit<T, "id"> & string,
 ): IdValue | null {
   if (!row) return null;
   return { id: row.id, value: String(row[valueKey] ?? "") };
 }
 
 export function removeBaseModel<T extends BaseModel>(
-  input: T | undefined | null
+  input: T | undefined | null,
 ): Omit<T, BaseModelAttr> | null {
   if (!input) return null;
 

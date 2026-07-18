@@ -38,7 +38,7 @@ misPurchaseReportRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_PURCHASE_REPORT", "VIEW")),
-  misPurchaseReportList
+  misPurchaseReportList,
 );
 
 misPurchaseReportRouter.get(
@@ -46,5 +46,5 @@ misPurchaseReportRouter.get(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_PURCHASE_REPORT", "VIEW")),
   //   validateGatePassFilter,
-  excelMisPurchaseReport
+  excelMisPurchaseReport,
 );

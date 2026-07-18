@@ -6,7 +6,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 
 export const createVoucherUINConfigInDb = async (
-  voucherUINConfig: CreateOrUpdateVoucherUINConfigRequest
+  voucherUINConfig: CreateOrUpdateVoucherUINConfigRequest,
 ) => {
   logger.info("entering::createVoucherUINConfigInDb::repository");
   const store = requestStorage.getStore();
@@ -27,7 +27,7 @@ export const createVoucherUINConfigInDb = async (
 
 export async function updateVoucherUINConfig(
   updatedConfig: CreateOrUpdateVoucherUINConfigRequest,
-  prevConfig: VoucherUINConfig
+  prevConfig: VoucherUINConfig,
 ): Promise<VoucherUINConfig> {
   logger.info("entering::updateUINConfig::repository");
   const store = requestStorage.getStore();
@@ -50,7 +50,7 @@ export async function updateVoucherUINConfig(
 
 export const getVoucherUINConfigByVoucherTypeIdAndDate = async (
   voucherTypeId: number,
-  date: Date
+  date: Date,
 ): Promise<VoucherUINConfig | null> => {
   logger.info("entering::getVoucherUINConfigByVoucherTypeId::repository");
   return db.voucherUINConfig.findFirst({
@@ -65,7 +65,7 @@ export const getVoucherUINConfigByVoucherTypeIdAndDate = async (
 
 export const updateVoucherUINConfigSequenceNo = async (
   id: number,
-  next: bigint
+  next: bigint,
 ): Promise<void> => {
   logger.info("entering::updateVoucherUINConfigSequenceNo::repository");
   await db.voucherUINConfig.update({
@@ -77,10 +77,10 @@ export const updateVoucherUINConfigSequenceNo = async (
 export const updateVoucherUINConfigSequenceNoAndResetDate = async (
   id: number,
   next: bigint,
-  resetDate: Date
+  resetDate: Date,
 ) => {
   logger.info(
-    "entering::updateVoucherUINConfigSequenceNoAndResetDate::repository"
+    "entering::updateVoucherUINConfigSequenceNoAndResetDate::repository",
   );
   await db.voucherUINConfig.update({
     where: { id },
@@ -109,7 +109,7 @@ export const deleteVoucherUINConfigById = async (id: number): Promise<void> => {
 export const checkForNextVoucherUINConfigExists = async (
   id: number,
   voucherTypeId: number,
-  resetDate: Date
+  resetDate: Date,
 ) => {
   logger.info("entering::checkForNextVoucherUINConfigExists::repository");
   return db.voucherUINConfig.findMany({
@@ -129,7 +129,7 @@ export const checkOverlapAndFutureVoucherUINConfig = async (
   id: number,
   voucherTypeId: number,
   seqStartDate: Date,
-  seqResetDate: Date
+  seqResetDate: Date,
 ) => {
   logger.info("entering::checkOverlapAndFutureVoucherUINConfig::repository");
 

@@ -58,7 +58,7 @@ export const getCityWithIncludesFromDB = async (id: number) => {
 
 export const getCityByCityNameFromDb = async (
   name: string,
-  stateId: number
+  stateId: number,
 ): Promise<City | null> => {
   logger.info("entering::getCityByCityNameFromDb::repository");
   return db.city.findFirst({

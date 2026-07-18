@@ -33,7 +33,7 @@ voucherRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "CREATE")),
   validateCreateVoucher,
-  createVoucher
+  createVoucher,
 );
 
 voucherRouter.put(
@@ -41,28 +41,28 @@ voucherRouter.put(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "UPDATE")),
   validateUpdateVoucher,
-  updateVoucher
+  updateVoucher,
 );
 
 voucherRouter.post(
   "/external",
   authorizeExternalRequest(),
   validatePostExternalVoucher,
-  postExternalVoucher
+  postExternalVoucher,
 );
 
 voucherRouter.delete(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "DELETE")),
-  deleteVoucher
+  deleteVoucher,
 );
 
 voucherRouter.patch(
   "/cancel",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "CANCEL_VOUCHER", "CREATE")),
-  cancelVoucher
+  cancelVoucher,
 );
 
 voucherRouter.post(
@@ -72,7 +72,7 @@ voucherRouter.post(
   uploadToHetzner("excel"),
   authorize(getPermission("ACC", "VOUCHER_EXCEL_IMPORT", "CREATE")),
   validateCreateVoucherExcel,
-  createVoucherExcel
+  createVoucherExcel,
 );
 
 voucherRouter.post(
@@ -80,14 +80,14 @@ voucherRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_EXCEL_EXPORT", "CREATE")),
   validateExportVoucherExcel,
-  exportVoucherExcel
+  exportVoucherExcel,
 );
 
 voucherRouter.get(
   "/invoice",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "VIEW")),
-  createVoucherInvoice
+  createVoucherInvoice,
 );
 
 voucherRouter.post(
@@ -95,7 +95,7 @@ voucherRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_SINGLE_ENTRY", "CREATE")),
   validateCreateVoucher,
-  createVoucher
+  createVoucher,
 );
 
 voucherRouter.put(
@@ -103,5 +103,5 @@ voucherRouter.put(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_SINGLE_ENTRY", "UPDATE")),
   validateUpdateVoucher,
-  updateVoucher
+  updateVoucher,
 );

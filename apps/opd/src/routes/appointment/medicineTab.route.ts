@@ -49,7 +49,7 @@ medicineTabRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "MEDICINE_TAB", "CREATE")),
   validateMedicineTabCreate,
-  createMedicineTab
+  createMedicineTab,
 );
 
 /**
@@ -79,7 +79,7 @@ medicineTabRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "MEDICINE_TAB", "UPDATE")),
   validateMedicineTabUpdate,
-  updateMedicineTab
+  updateMedicineTab,
 );
 
 /**
@@ -103,5 +103,5 @@ medicineTabRouter.delete(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "MEDICINE_TAB", "DELETE")),
-  deleteMedicineTab
+  deleteMedicineTab,
 );

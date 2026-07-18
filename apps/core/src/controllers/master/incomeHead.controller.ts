@@ -23,12 +23,12 @@ export const createIncomeHead = TryCatch(
         success: true,
         message: generateSuccessMessage("CREATED", "Income Head"),
       },
-      newIncomeHead
+      newIncomeHead,
     );
 
     logger.info("exiting::createIncomeHead::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateIncomeHead = TryCatch(
@@ -43,12 +43,12 @@ export const updateIncomeHead = TryCatch(
         success: true,
         message: generateSuccessMessage("UPDATED", "Income Head"),
       },
-      updatedIncomeHead
+      updatedIncomeHead,
     );
 
     logger.info("exiting::updateIncomeHead::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getIncomeHeadId = TryCatch(async (req: Request, res: Response) => {
@@ -56,7 +56,7 @@ export const getIncomeHeadId = TryCatch(async (req: Request, res: Response) => {
   const { incomeHeadId } = req.query as { incomeHeadId: string };
 
   const allIncomeHeadsById = await incomeHeadService.getIncomeHeadById(
-    Number(incomeHeadId)
+    Number(incomeHeadId),
   );
 
   const response = new BaseResponse(
@@ -64,7 +64,7 @@ export const getIncomeHeadId = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Income Head"),
     },
-    allIncomeHeadsById
+    allIncomeHeadsById,
   );
 
   logger.info("exiting::getIncomeHeadId::controller");
@@ -82,12 +82,12 @@ export const getAllIncomeHead = TryCatch(
         success: true,
         message: generateSuccessMessage("FETCHED", "Income Head"),
       },
-      allIncomeHeads
+      allIncomeHeads,
     );
 
     logger.info("exiting::getAllIncomeHead::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteIncomeHead = TryCatch(
@@ -102,7 +102,7 @@ export const deleteIncomeHead = TryCatch(
       new BaseResponse({
         success: true,
         message: generateSuccessMessage("DELETED", "Income Head"),
-      })
+      }),
     );
-  }
+  },
 );

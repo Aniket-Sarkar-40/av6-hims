@@ -10,11 +10,10 @@ export type CreateOrUpdateAccountingIntegrationConfigDetailsInput = Omit<
   BaseModelAttrWoCancel | "accountingIntegrationConfigId"
 >;
 
-export interface CreateOrUpdateAccountingIntegrationConfigInput
-  extends Omit<
-    Prisma.AccountingIntegrationConfigCreateManyInput,
-    BaseModelAttrWoCancel | "accountingIntegrationConfigDetails"
-  > {
+export interface CreateOrUpdateAccountingIntegrationConfigInput extends Omit<
+  Prisma.AccountingIntegrationConfigCreateManyInput,
+  BaseModelAttrWoCancel | "accountingIntegrationConfigDetails"
+> {
   accountingIntegrationConfigDetails: CreateOrUpdateAccountingIntegrationConfigDetailsInput[];
   existing: AccountingIntegrationConfigResponse;
 }
@@ -30,22 +29,18 @@ export type AccountingIntegrationConfigResponse =
     };
   }>;
 
-export interface AccountingIntegrationConfigDetailsDTO
-  extends Omit<
-    AccountingIntegrationConfigDetails,
-    BaseModelAttrWoCancel | "groupId" | "ledgerValue"
-  > {
+export interface AccountingIntegrationConfigDetailsDTO extends Omit<
+  AccountingIntegrationConfigDetails,
+  BaseModelAttrWoCancel | "groupId" | "ledgerValue"
+> {
   group: IdValue | null;
   ledgerValue: IdValue | null | string;
 }
 
-export interface AccountingIntegrationConfigDTO
-  extends Omit<
-    AccountingIntegrationConfigResponse,
-    | BaseModelAttrWoCancel
-    | "voucherTypeId"
-    | "accountingIntegrationConfigDetails"
-  > {
+export interface AccountingIntegrationConfigDTO extends Omit<
+  AccountingIntegrationConfigResponse,
+  BaseModelAttrWoCancel | "voucherTypeId" | "accountingIntegrationConfigDetails"
+> {
   voucherType: IdValue | null;
 
   accountingIntegrationConfigDetails: AccountingIntegrationConfigDetailsDTO[];

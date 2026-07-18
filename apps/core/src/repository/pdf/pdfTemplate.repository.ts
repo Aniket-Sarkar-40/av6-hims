@@ -11,7 +11,7 @@ import { PdfTemplate } from "@repo/db/generated/prisma/client";
 import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export const createPdfTemplateInDb = async (
-  input: CreatePdfTemplateInput
+  input: CreatePdfTemplateInput,
 ): Promise<PdfTemplate> => {
   logger.info("entering::createPdfTemplateInDb::repository");
   const store = requestStorage.getStore();
@@ -42,7 +42,7 @@ export const createPdfTemplateInDb = async (
 };
 
 export const updatePdfTemplateInDb = async (
-  input: UpdatePdfTemplateInput
+  input: UpdatePdfTemplateInput,
 ): Promise<PdfTemplate> => {
   logger.info("entering::updatePdfTemplateInDb::repository");
   const store = requestStorage.getStore();
@@ -75,7 +75,7 @@ export const updatePdfTemplateInDb = async (
 };
 
 export const getPdfTemplateByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<PdfTemplate | null> => {
   logger.info("entering::getPdfTemplateByIdFromDb::repository");
   return db.pdfTemplate.findFirst({
@@ -84,7 +84,7 @@ export const getPdfTemplateByIdFromDb = async (
 };
 
 export const getPdfTemplateByNameFromDb = async (
-  templateName: string
+  templateName: string,
 ): Promise<PdfTemplate | null> => {
   logger.info("entering::getPdfTemplateByNameFromDb::repository");
   return db.pdfTemplate.findFirst({
@@ -103,7 +103,7 @@ export const deletePdfTemplateByIdFromDb = async (id: number) => {
 };
 
 export const makeDefaultPdfTemplateByIdFromDb = async (
-  input: MakeDefaultPdfTemplateInput
+  input: MakeDefaultPdfTemplateInput,
 ) => {
   logger.info("entering::makeDefaultPdfTemplateByIdFromDb::repository");
   const store = requestStorage.getStore();
@@ -147,7 +147,7 @@ export const updatePdfTemplateImageUrl = async (url: string, id: number) => {
 };
 
 export const getPdfTemplateByModuleAndTypeFromDb = async (
-  input: GetPdfTemplateByModuleAndTypeInput
+  input: GetPdfTemplateByModuleAndTypeInput,
 ): Promise<PdfTemplate | null> => {
   logger.info("entering::getPdfTemplateByModuleAndTypeFromDb::repository");
   return db.pdfTemplate.findFirst({

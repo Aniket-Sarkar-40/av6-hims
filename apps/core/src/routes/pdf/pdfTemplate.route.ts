@@ -54,7 +54,7 @@ pdfTemplateRouter.post(
   uploadToHetzner("sampleImage"),
   authorize(getPermission("CORE", "PDF_TEMPLATE", "CREATE")),
   validateCreatePdfTemplate,
-  createPdfTemplate
+  createPdfTemplate,
 );
 
 /**
@@ -79,10 +79,10 @@ pdfTemplateRouter.put(
   uploadToHetzner("sampleImage"),
   authorize(
     getPermission("CORE", "PDF_TEMPLATE", "UPDATE"),
-    getPermission("CORE", "PDF_TEMPLATE", "VIEW")
+    getPermission("CORE", "PDF_TEMPLATE", "VIEW"),
   ),
   validateUpdatePdfTemplate,
-  updatePdfTemplate
+  updatePdfTemplate,
 );
 
 /**
@@ -105,7 +105,7 @@ pdfTemplateRouter.delete(
   "/",
   verifyToken,
   authorize(getPermission("CORE", "PDF_TEMPLATE", "DELETE")),
-  deletePdfTemplate
+  deletePdfTemplate,
 );
 
 /**
@@ -128,10 +128,10 @@ pdfTemplateRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "PDF_TEMPLATE", "UPDATE"),
-    getPermission("CORE", "PDF_TEMPLATE", "VIEW")
+    getPermission("CORE", "PDF_TEMPLATE", "VIEW"),
   ),
   validatemakeDefaultPdfTemplate,
-  makeDefaultPdfTemplate
+  makeDefaultPdfTemplate,
 );
 
 pdfTemplateRouter.post(
@@ -139,7 +139,7 @@ pdfTemplateRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "PDF_TEMPLATE", "VIEW")),
   // validatePdfTemplateUpdate,
-  buildPdf
+  buildPdf,
 );
 
 pdfTemplateRouter.get(
@@ -147,7 +147,7 @@ pdfTemplateRouter.get(
   verifyToken(),
   authorize(getPermission("CORE", "PDF_CONTRACT", "VIEW")),
   // validatePdfTemplateUpdate,
-  getContractKeys
+  getContractKeys,
 );
 
 pdfTemplateRouter.get(
@@ -155,12 +155,12 @@ pdfTemplateRouter.get(
   verifyToken(),
   authorize(getPermission("CORE", "PDF_TEMPLATE", "VIEW")),
   validateGetPdfTemplateByModuleAndType,
-  getPdfTemplateByModuleAndType
+  getPdfTemplateByModuleAndType,
 );
 
 pdfTemplateRouter.get(
   "/module-and-type-ext",
   authorizeExternal(),
   validateGetPdfTemplateByModuleAndType,
-  getPdfTemplateByModuleAndType
+  getPdfTemplateByModuleAndType,
 );

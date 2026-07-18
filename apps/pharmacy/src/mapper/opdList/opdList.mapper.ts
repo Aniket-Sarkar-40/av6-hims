@@ -16,7 +16,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 
 export const toOpdBillDto = async (
   opdBill: OpdBill,
-  input: OpdBillReq
+  input: OpdBillReq,
 ): Promise<OpdBillDTO> => {
   const medicines: MedicineDto[] = await Promise.all(
     opdBill.medicines.map(async (medicine) => {
@@ -35,7 +35,7 @@ export const toOpdBillDto = async (
           insuranceId: opdBill.insurerId || undefined,
           corporateClientId: opdBill.clientId || undefined,
         },
-        true
+        true,
       );
       // const packSize = isNaN(Number(item?.packSize?.name)) ? 15 : Number(item?.packSize?.name);
       let expectedQty = 1;
@@ -70,7 +70,7 @@ export const toOpdBillDto = async (
         item,
         stocks: itemStocks,
       };
-    })
+    }),
   );
 
   return {
@@ -81,7 +81,7 @@ export const toOpdBillDto = async (
 
 export const toOpdAppointDto = async (
   result: OpdBill,
-  items: ItemAppointmentDTO[]
+  items: ItemAppointmentDTO[],
 ): Promise<AppointmentDosageDto> => {
   const medicineAppointments: MedicineAppointment[] = result.medicines.map(
     (med): MedicineAppointment => {
@@ -99,7 +99,7 @@ export const toOpdAppointDto = async (
         duration: med.duration,
         notes: med.notes,
       };
-    }
+    },
   );
 
   const collectionCenter =

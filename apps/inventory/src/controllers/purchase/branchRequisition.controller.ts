@@ -26,10 +26,10 @@ export const createBranchRequisition = TryCatch(
       .json(
         BaseResponse.success(
           { type: "CREATED", data: branchRequisition },
-          "Branch Requisition"
-        )
+          "Branch Requisition",
+        ),
       );
-  }
+  },
 );
 
 export const updateBranchRequisition = TryCatch(
@@ -38,9 +38,8 @@ export const updateBranchRequisition = TryCatch(
 
     const input = req.body as CreateBranchRequisitionInput;
 
-    const updated = await branchRequisitionService.updateBranchRequisition(
-      input
-    );
+    const updated =
+      await branchRequisitionService.updateBranchRequisition(input);
 
     logger.info("exiting::updateBranchRequisition::controller");
     return res
@@ -48,10 +47,10 @@ export const updateBranchRequisition = TryCatch(
       .json(
         BaseResponse.success(
           { type: "UPDATED", data: updated },
-          "Branch Requisition"
-        )
+          "Branch Requisition",
+        ),
       );
-  }
+  },
 );
 
 export const deleteBranchRequisition = TryCatch(
@@ -67,7 +66,7 @@ export const deleteBranchRequisition = TryCatch(
     return res
       .status(200)
       .json(BaseResponse.success({ type: "DELETED" }, "Branch Requisition"));
-  }
+  },
 );
 
 export const rejectBranchRequisition = TryCatch(
@@ -83,7 +82,7 @@ export const rejectBranchRequisition = TryCatch(
     return res
       .status(200)
       .json(BaseResponse.success({ type: "UPDATED" }, "Branch Requisition"));
-  }
+  },
 );
 
 export const approveBranchRequisition = TryCatch(
@@ -99,7 +98,7 @@ export const approveBranchRequisition = TryCatch(
     return res
       .status(200)
       .json(BaseResponse.success({ type: "UPDATED" }, "Branch Requisition"));
-  }
+  },
 );
 
 export const acknowledgeBranchRequisition = TryCatch(
@@ -115,7 +114,7 @@ export const acknowledgeBranchRequisition = TryCatch(
     return res
       .status(200)
       .json(BaseResponse.success({ type: "UPDATED" }, "Branch Requisition"));
-  }
+  },
 );
 
 export const getBranchRequisitionBatchWiseById = TryCatch(
@@ -127,7 +126,7 @@ export const getBranchRequisitionBatchWiseById = TryCatch(
 
     const branchRequisition =
       await branchRequisitionService.getBranchRequisitionBatchWiseById(
-        Number(branchRequisitionId)
+        Number(branchRequisitionId),
       );
 
     logger.info("exiting::getBranchRequisitionBatchWiseById::controller");
@@ -136,10 +135,10 @@ export const getBranchRequisitionBatchWiseById = TryCatch(
       .json(
         BaseResponse.success(
           { type: "FETCHED", data: branchRequisition },
-          "Batch Wise"
-        )
+          "Batch Wise",
+        ),
       );
-  }
+  },
 );
 
 export const getAllBranchRequisitionBatchWiseById = TryCatch(
@@ -151,7 +150,7 @@ export const getAllBranchRequisitionBatchWiseById = TryCatch(
 
     const branchRequisition =
       await branchRequisitionService.getAllBranchRequisitionBatchWiseById(
-        Number(branchRequisitionId)
+        Number(branchRequisitionId),
       );
 
     logger.info("exiting::getAllBranchRequisitionBatchWiseById::controller");
@@ -160,8 +159,8 @@ export const getAllBranchRequisitionBatchWiseById = TryCatch(
       .json(
         BaseResponse.success(
           { type: "FETCHED", data: branchRequisition },
-          "Batch Wise"
-        )
+          "Batch Wise",
+        ),
       );
-  }
+  },
 );

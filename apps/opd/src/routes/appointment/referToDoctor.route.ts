@@ -43,7 +43,7 @@ referToDoctorRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "REFER_TO_DOCTOR", "CREATE")),
   validateCreateReferToDoctor,
-  createReferToDoctor
+  createReferToDoctor,
 );
 
 /**
@@ -66,8 +66,8 @@ referToDoctorRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "REFER_TO_DOCTOR", "UPDATE"),
-    getPermission("OPD", "REFER_TO_DOCTOR", "VIEW")
+    getPermission("OPD", "REFER_TO_DOCTOR", "VIEW"),
   ),
   validateUpdateReferToDoctor,
-  updateReferToDoctor
+  updateReferToDoctor,
 );

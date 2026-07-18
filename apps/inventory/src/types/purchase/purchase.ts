@@ -25,19 +25,18 @@ export interface UpdatePurchaseOrder extends CreatePurchaseOrderInput {
   id: number;
 }
 
-export interface PurchaseOrderDTO
-  extends Omit<
-    POResponse,
-    | "supplier"
-    | "store"
-    | "purchaseOrderDetails"
-    | BaseModelAttr
-    | "storeId"
-    | "supplierId"
-    | "warehouseId"
-    | "currencyId"
-    | "lastVerifiedBy"
-  > {
+export interface PurchaseOrderDTO extends Omit<
+  POResponse,
+  | "supplier"
+  | "store"
+  | "purchaseOrderDetails"
+  | BaseModelAttr
+  | "storeId"
+  | "supplierId"
+  | "warehouseId"
+  | "currencyId"
+  | "lastVerifiedBy"
+> {
   supplier: IdValue | null;
   store: IdValue | null;
   createdBy: EmployeeCache | null;
@@ -50,19 +49,18 @@ export interface PurchaseOrderDTO
   lastVerifiedBy: EmployeeCache | null;
 }
 
-export interface PurchaseOrderDetailDTO
-  extends Omit<
-    PurchaseOrderDetailResponse,
-    | "item"
-    | "itemCategory"
-    | BaseModelAttr
-    | "itemId"
-    | "itemCategoryId"
-    | "medUnitId"
-    | "itemMedUnit"
-    | "createdBy"
-    | "updatedBy"
-  > {
+export interface PurchaseOrderDetailDTO extends Omit<
+  PurchaseOrderDetailResponse,
+  | "item"
+  | "itemCategory"
+  | BaseModelAttr
+  | "itemId"
+  | "itemCategoryId"
+  | "medUnitId"
+  | "itemMedUnit"
+  | "createdBy"
+  | "updatedBy"
+> {
   id: number;
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
@@ -101,18 +99,17 @@ export type PurchaseOrderWithDetails = Prisma.InvPurchaseOrderGetPayload<{
   };
 }>;
 
-export interface PurchaseOrderPdfDTO
-  extends Omit<
-    POResponse,
-    | "supplier"
-    | "store"
-    | "purchaseOrderDetails"
-    | BaseModelAttr
-    | "storeId"
-    | "supplierId"
-    | "warehouseId"
-    | "date"
-  > {
+export interface PurchaseOrderPdfDTO extends Omit<
+  POResponse,
+  | "supplier"
+  | "store"
+  | "purchaseOrderDetails"
+  | BaseModelAttr
+  | "storeId"
+  | "supplierId"
+  | "warehouseId"
+  | "date"
+> {
   date: string;
   supplier: InvItemSupplier | null;
   store: IdValue | null;

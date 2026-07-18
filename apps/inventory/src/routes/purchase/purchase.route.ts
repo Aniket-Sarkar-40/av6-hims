@@ -51,7 +51,7 @@ purchaseRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "CREATE")),
   validatePurchase,
-  createPurchase
+  createPurchase,
 );
 
 /**
@@ -67,7 +67,7 @@ purchaseRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
-  getAllPurchase
+  getAllPurchase,
 );
 
 /**
@@ -88,7 +88,7 @@ purchaseRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
-  getPurchaseById
+  getPurchaseById,
 );
 
 /**
@@ -118,10 +118,10 @@ purchaseRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "PURCHASE_ORDER", "VIEW"),
-    getPermission("INV", "PURCHASE_ORDER", "UPDATE")
+    getPermission("INV", "PURCHASE_ORDER", "UPDATE"),
   ),
   validatePurchaseUpdate,
-  updatePurchase
+  updatePurchase,
 );
 
 /**
@@ -165,7 +165,7 @@ purchaseRouter.post(
   "/:id/approval",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_APPROVAL", "CREATE")),
-  purchaseApproval
+  purchaseApproval,
 );
 
 /**
@@ -229,7 +229,7 @@ purchaseRouter.post("/approval", authorizeExternal(), purchaseApproval);
 purchaseRouter.post(
   "/partial-approval",
   authorizeExternal(),
-  purchasePartialApproval
+  purchasePartialApproval,
 );
 
 purchaseRouter.post("/rejection", authorizeExternal(), purchaseRejection);
@@ -247,5 +247,5 @@ purchaseRouter.post(
   "/pdf",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "PURCHASE_ORDER", "VIEW")),
-  generatePurchaseOrderPdf
+  generatePurchaseOrderPdf,
 );

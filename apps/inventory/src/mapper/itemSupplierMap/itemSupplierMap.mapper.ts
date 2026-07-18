@@ -17,7 +17,7 @@ import {
 
 export function mapRowToItemSupplierMapImportExcelInput(
   row: ItemSupplierMapExcelRow,
-  rowNo: number
+  rowNo: number,
 ): Prisma.InvItemSupplierMapExcelCreateInput {
   const mappedData: Prisma.InvItemSupplierMapExcelCreateInput = {
     rowNo,
@@ -32,7 +32,7 @@ export function mapRowToItemSupplierMapImportExcelInput(
 }
 
 export function toItemSupplierMapImportExcelEntity(
-  req: ItemSupplierMapImportExcelReq
+  req: ItemSupplierMapImportExcelReq,
 ): ItemSupplierMapImportExcelInput {
   return {
     ccId: Number(req.ccId),
@@ -41,7 +41,7 @@ export function toItemSupplierMapImportExcelEntity(
 }
 
 export const toItemSupplierMapDTO = async (
-  data: InvItemSupplierMapping[]
+  data: InvItemSupplierMapping[],
 ): Promise<ItemSupplierMapDTO[]> => {
   const items = await itemMasterService.getAllItemMaster(true);
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
@@ -75,6 +75,6 @@ export const toItemSupplierMapDTO = async (
         supplier: supplier ? toIdValue(supplier, "vendorCompanyName") : null,
         collectionCenter: toIdValue(CollectionCenter, "name"),
       };
-    })
+    }),
   );
 };

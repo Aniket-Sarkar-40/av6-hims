@@ -28,7 +28,7 @@ import {
 
 export const validateIdStoreRequisitionReturn = async (id: number) => {
   logger.info(
-    "entering::validateIdStoreRequisitionReturn::service::validation"
+    "entering::validateIdStoreRequisitionReturn::service::validation",
   );
 
   validIdCheck(id);
@@ -38,7 +38,7 @@ export const validateIdStoreRequisitionReturn = async (id: number) => {
   if (!storeReqReturn) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Store Requisition Return")
+      generateErrorMessage("NOT_FOUND", "Store Requisition Return"),
     );
   }
 
@@ -47,14 +47,14 @@ export const validateIdStoreRequisitionReturn = async (id: number) => {
 };
 
 export const validateStoreRequisitionReturnCommon = async (
-  body: CreateStoreRequisitionReturnInput
+  body: CreateStoreRequisitionReturnInput,
 ): Promise<void> => {
   logger.info(
-    "entering::validateStoreRequisitionReturnCommon::service::validation"
+    "entering::validateStoreRequisitionReturnCommon::service::validation",
   );
 
   const user = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    body.requisitionFrom
+    body.requisitionFrom,
   );
   if (!user) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Employee"));
@@ -67,14 +67,14 @@ export const validateStoreRequisitionReturnCommon = async (
     if (!body.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+        generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
       );
     }
     const isAnyPendingReturn = pendingSRR.some((srr) => srr.id !== body.id);
     if (isAnyPendingReturn) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+        generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
       );
     }
   }
@@ -82,7 +82,7 @@ export const validateStoreRequisitionReturnCommon = async (
   if (body.returnStatus && body.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
     );
   }
 
@@ -96,14 +96,14 @@ export const validateStoreRequisitionReturnCommon = async (
   if (!storeReq) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Store Requisition")
+      generateErrorMessage("NOT_FOUND", "Store Requisition"),
     );
   }
 
   if (storeReq.requisitionFrom !== body.requisitionFrom) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Login Role")
+      generateErrorMessage("ACCESS_FAIL", "Login Role"),
     );
   }
 
@@ -113,7 +113,7 @@ export const validateStoreRequisitionReturnCommon = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition"),
     );
   }
 
@@ -123,20 +123,20 @@ export const validateStoreRequisitionReturnCommon = async (
     let totalReturnQty = 0;
 
     const storeReqDet = storeReq.storeRequisitionDetails.find(
-      (d) => d.id === element.storeRequisitionDetailsId
+      (d) => d.id === element.storeRequisitionDetailsId,
     );
 
     if (!storeReqDet) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition details")
+        generateErrorMessage("NOT_FOUND", "Store Requisition details"),
       );
     }
 
     if (storeReqDet.itemId !== element.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item")
+        generateErrorMessage("INVALID_FIELD", "Item"),
       );
     }
 
@@ -146,7 +146,7 @@ export const validateStoreRequisitionReturnCommon = async (
         if (!itemData.isUserReturnable) {
           throw new ErrorHandler(
             400,
-            `Item: ${itemData.item} is set as non-returnable for user`
+            `Item: ${itemData.item} is set as non-returnable for user`,
           );
         }
       }
@@ -156,7 +156,7 @@ export const validateStoreRequisitionReturnCommon = async (
       totalReturnQty += item.returnQty;
 
       const storeReqItem = storeReq.requisitionInvItemDetails.find(
-        (d) => d.id === item.requisitionItemDetailsId
+        (d) => d.id === item.requisitionItemDetailsId,
       );
 
       if (!storeReqItem) {
@@ -165,8 +165,8 @@ export const validateStoreRequisitionReturnCommon = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.batchNo}`,
-            "Store Requisition"
-          )
+            "Store Requisition",
+          ),
         );
       }
 
@@ -176,14 +176,14 @@ export const validateStoreRequisitionReturnCommon = async (
       ) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_FIELD", "Store Requisition details")
+          generateErrorMessage("INVALID_FIELD", "Store Requisition details"),
         );
       }
 
       if (storeReqItem.itemId !== element.itemId) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_FIELD", "Item")
+          generateErrorMessage("INVALID_FIELD", "Item"),
         );
       }
 
@@ -196,8 +196,8 @@ export const validateStoreRequisitionReturnCommon = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.batchNo}`,
-            "Store Requisition"
-          )
+            "Store Requisition",
+          ),
         );
       }
 
@@ -219,8 +219,8 @@ export const validateStoreRequisitionReturnCommon = async (
             "NOT_FOUND",
             `Item Stock for Batch no : ${
               item.isBatch && item.batchNo ? item.batchNo : "-"
-            }`
-          )
+            }`,
+          ),
         );
       }
 
@@ -229,8 +229,8 @@ export const validateStoreRequisitionReturnCommon = async (
           400,
           generateErrorMessage(
             "INSUFFICIENT_STOCK",
-            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`
-          )
+            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`,
+          ),
         );
       }
     }
@@ -239,41 +239,41 @@ export const validateStoreRequisitionReturnCommon = async (
       totalReturnQty,
       element.requestedReturnQty,
       "Returned Qty",
-      "Requested Qty"
+      "Requested Qty",
     );
   }
 
   logger.info(
-    "exiting::validateStoreRequisitionReturnCommon::service::validation"
+    "exiting::validateStoreRequisitionReturnCommon::service::validation",
   );
 };
 
 export const createStoreRequisitionReturnServiceValidation = async (
-  body: CreateStoreRequisitionReturnInput
+  body: CreateStoreRequisitionReturnInput,
 ) => {
   logger.info(
-    "entering::createStoreRequisitionReturnServiceValidation::service::validation"
+    "entering::createStoreRequisitionReturnServiceValidation::service::validation",
   );
 
   await validateStoreRequisitionReturnCommon(body);
 
   logger.info(
-    "exiting::createStoreRequisitionReturnServiceValidation::service::validation"
+    "exiting::createStoreRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const updateStoreRequisitionReturnServiceValidation = async (
-  body: CreateStoreRequisitionReturnInput
+  body: CreateStoreRequisitionReturnInput,
 ) => {
   logger.info(
-    "entering::updateStoreRequisitionReturnServiceValidation::service::validation"
+    "entering::updateStoreRequisitionReturnServiceValidation::service::validation",
   );
 
   if (body.id == null) {
     logger.error("missing store requisition return id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Store Requisition Return id")
+      generateErrorMessage("NOT_FOUND", "Store Requisition Return id"),
     );
   }
 
@@ -283,36 +283,36 @@ export const updateStoreRequisitionReturnServiceValidation = async (
   if (currReqReturn.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
     );
   }
 
   if (currReqReturn.ccId !== body.ccId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Location")
+      generateErrorMessage("ACCESS_FAIL", "Correct Location"),
     );
   }
 
   if (currReqReturn.requisitionFrom !== body.requisitionFrom) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Location")
+      generateErrorMessage("ACCESS_FAIL", "Correct Location"),
     );
   }
 
   await validateStoreRequisitionReturnCommon(body);
 
   logger.info(
-    "exiting::updateStoreRequisitionReturnServiceValidation::service::validation"
+    "exiting::updateStoreRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const rejectStoreRequisitionReturnServiceValidation = async (
-  body: RejectStoreRequisitionReturnInput
+  body: RejectStoreRequisitionReturnInput,
 ) => {
   logger.info(
-    "entering::rejectStoreRequisitionReturnServiceValidation::service::validation"
+    "entering::rejectStoreRequisitionReturnServiceValidation::service::validation",
   );
 
   const currStoreReqReturn = await validateIdStoreRequisitionReturn(body.id);
@@ -322,27 +322,27 @@ export const rejectStoreRequisitionReturnServiceValidation = async (
   if (currStoreReqReturn.ccId !== body.ccId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Location")
+      generateErrorMessage("ACCESS_FAIL", "Correct Location"),
     );
   }
 
   if (currStoreReqReturn.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
     );
   }
 
   logger.info(
-    "exiting::rejectStoreRequisitionReturnServiceValidation::service::validation"
+    "exiting::rejectStoreRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const approveStoreRequisitionReturnServiceValidation = async (
-  body: ApproveStoreReqReturnInput
+  body: ApproveStoreReqReturnInput,
 ) => {
   logger.info(
-    "entering::approveStoreRequisitionReturnServiceValidation::service::validation"
+    "entering::approveStoreRequisitionReturnServiceValidation::service::validation",
   );
 
   const currStoreReqReturn = await validateIdStoreRequisitionReturn(body.id);
@@ -353,17 +353,17 @@ export const approveStoreRequisitionReturnServiceValidation = async (
   if (currStoreReqReturn.ccId !== body.ccId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Location")
+      generateErrorMessage("ACCESS_FAIL", "Correct Location"),
     );
   }
 
   const storeReq = await getStoreRequisitionBatchWiseFromDb(
-    currStoreReqReturn.storeRequisitionId
+    currStoreReqReturn.storeRequisitionId,
   );
   if (!storeReq) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Store Requisition")
+      generateErrorMessage("NOT_FOUND", "Store Requisition"),
     );
   }
 
@@ -373,7 +373,7 @@ export const approveStoreRequisitionReturnServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition"),
     );
   }
 
@@ -382,26 +382,26 @@ export const approveStoreRequisitionReturnServiceValidation = async (
   if (currStoreReqReturn.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
     );
   }
 
   for (const detail of body.returnItems) {
     const srrDetails = currStoreReqReturn.storeRequisitionReturnDetails.find(
-      (elem) => elem.id === detail.id
+      (elem) => elem.id === detail.id,
     );
 
     if (!srrDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition Return details")
+        generateErrorMessage("NOT_FOUND", "Store Requisition Return details"),
       );
     }
 
     if (srrDetails.itemId !== detail.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item")
+        generateErrorMessage("INVALID_FIELD", "Item"),
       );
     }
 
@@ -412,7 +412,7 @@ export const approveStoreRequisitionReturnServiceValidation = async (
 
       const requisitionReturnItem =
         srrDetails.requisitionReturnItemDetails.find(
-          (det) => det.id === item.id
+          (det) => det.id === item.id,
         );
 
       if (!requisitionReturnItem) {
@@ -420,13 +420,13 @@ export const approveStoreRequisitionReturnServiceValidation = async (
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Store Requisition Return batch details"
-          )
+            "Store Requisition Return batch details",
+          ),
         );
       }
 
       const storeReqItem = storeReq.requisitionInvItemDetails.find(
-        (d) => d.id === requisitionReturnItem.requisitionItemDetailsId
+        (d) => d.id === requisitionReturnItem.requisitionItemDetailsId,
       );
 
       if (!storeReqItem) {
@@ -435,8 +435,8 @@ export const approveStoreRequisitionReturnServiceValidation = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.batchNo}`,
-            "Store Requisition"
-          )
+            "Store Requisition",
+          ),
         );
       }
 
@@ -449,8 +449,8 @@ export const approveStoreRequisitionReturnServiceValidation = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.batchNo}`,
-            "Store Requisition"
-          )
+            "Store Requisition",
+          ),
         );
       }
 
@@ -472,8 +472,8 @@ export const approveStoreRequisitionReturnServiceValidation = async (
             "NOT_FOUND",
             `Item Stock for Batch no : ${
               item.isBatch && item.batchNo ? item.batchNo : "-"
-            }`
-          )
+            }`,
+          ),
         );
       }
 
@@ -482,8 +482,8 @@ export const approveStoreRequisitionReturnServiceValidation = async (
           400,
           generateErrorMessage(
             "INSUFFICIENT_STOCK",
-            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`
-          )
+            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`,
+          ),
         );
       }
     }
@@ -492,20 +492,20 @@ export const approveStoreRequisitionReturnServiceValidation = async (
       totalReturnQty,
       detail.requestedReturnQty,
       "Returned Qty",
-      "Requested Qty"
+      "Requested Qty",
     );
   }
 
   logger.info(
-    "exiting::approveStoreRequisitionReturnServiceValidation::service::validation"
+    "exiting::approveStoreRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const acknowledgeStoreRequisitionReturnServiceValidation = async (
-  body: AcknowledgeRequisitionReturn
+  body: AcknowledgeRequisitionReturn,
 ) => {
   logger.info(
-    "entering::acknowledgeStoreRequisitionReturnServiceValidation::service::validation"
+    "entering::acknowledgeStoreRequisitionReturnServiceValidation::service::validation",
   );
 
   const currSRR = await validateIdStoreRequisitionReturn(body.id);
@@ -519,7 +519,7 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
     );
   }
 
@@ -528,8 +528,8 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
       400,
       generateErrorMessage(
         "INVALID_STATUS",
-        "Store Requisition Return Acknowledge"
-      )
+        "Store Requisition Return Acknowledge",
+      ),
     );
   }
 
@@ -539,20 +539,20 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
     currTotalAckQty += detail.acknowledgedReturnQty;
 
     const srrDetails = currSRR.storeRequisitionReturnDetails.find(
-      (elem) => elem.id === detail.id
+      (elem) => elem.id === detail.id,
     );
 
     if (!srrDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition Return details")
+        generateErrorMessage("NOT_FOUND", "Store Requisition Return details"),
       );
     }
 
     if (srrDetails.itemId !== detail.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item")
+        generateErrorMessage("INVALID_FIELD", "Item"),
       );
     }
 
@@ -561,7 +561,7 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
     for (const item of detail.itemBatch) {
       const requisitionReturnItem =
         srrDetails.requisitionReturnItemDetails.find(
-          (itemDet) => itemDet.id === item.id
+          (itemDet) => itemDet.id === item.id,
         );
 
       if (!requisitionReturnItem) {
@@ -569,8 +569,8 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Store Requisition Return batch details"
-          )
+            "Store Requisition Return batch details",
+          ),
         );
       }
 
@@ -582,8 +582,8 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
           400,
           generateErrorMessage(
             "INVALID_FIELD",
-            `Acknowledge quantity for Batch no : ${item.batchNo}`
-          )
+            `Acknowledge quantity for Batch no : ${item.batchNo}`,
+          ),
         );
       }
 
@@ -597,24 +597,24 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
       totalAckQty,
       detail.acknowledgedReturnQty,
       "Total Acknowledge Quantity",
-      "Acknowledged Return Quantity"
+      "Acknowledged Return Quantity",
     );
   }
 
   const totalAckQtyTill = currSRR.storeRequisitionReturnDetails.reduce(
     (acc, details) => acc + details.acknowledgedReturnQty,
-    0
+    0,
   );
 
   const totalReturnQty = currSRR.storeRequisitionReturnDetails.reduce(
     (acc, details) => acc + details.requestedReturnQty,
-    0
+    0,
   );
 
   if (totalReturnQty < totalAckQtyTill + currTotalAckQty) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", "Item Total quantity")
+      generateErrorMessage("INVALID_FIELD", "Item Total quantity"),
     );
   }
 
@@ -625,15 +625,15 @@ export const acknowledgeStoreRequisitionReturnServiceValidation = async (
   }
 
   logger.info(
-    "exiting::acknowledgeStoreRequisitionReturnServiceValidation::service::validation"
+    "exiting::acknowledgeStoreRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const deleteStoreRequisitionReturnServiceValidation = async (
-  id: number
+  id: number,
 ) => {
   logger.info(
-    "entering::deleteStoreRequisitionReturnServiceValidation::service::validation"
+    "entering::deleteStoreRequisitionReturnServiceValidation::service::validation",
   );
 
   const srr = await validateIdStoreRequisitionReturn(id);
@@ -641,11 +641,11 @@ export const deleteStoreRequisitionReturnServiceValidation = async (
   if (srr.returnStatus !== STORE_REQ_STATUS.Pending) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Store Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Store Requisition Return"),
     );
   }
 
   logger.info(
-    "exiting::deleteStoreRequisitionReturnServiceValidation::service::validation"
+    "exiting::deleteStoreRequisitionReturnServiceValidation::service::validation",
   );
 };

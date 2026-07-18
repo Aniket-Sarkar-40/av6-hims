@@ -65,7 +65,7 @@ export const mapRowToBankStatementExcelCreateInput = (params: {
       required: false,
     }),
     transactionId: parseStringOrNull(
-      getMappedValue(row, config, "transactionId")
+      getMappedValue(row, config, "transactionId"),
     ),
     chequeNo: parseStringOrNull(getMappedValue(row, config, "chequeNo")),
     description: parseStringOrNull(getMappedValue(row, config, "description")),
@@ -79,7 +79,7 @@ export const mapRowToBankStatementExcelCreateInput = (params: {
 };
 
 export const toBankStatementRowDTO = async (
-  input: BankStatementRowResponse[]
+  input: BankStatementRowResponse[],
 ): Promise<BankStatementRowDTO[]> => {
   const response: BankStatementRowDTO[] = await Promise.all(
     input.map(async (bankStatement) => {
@@ -146,12 +146,12 @@ export const toBankStatementRowDTO = async (
         // lastReconciledBy: lastReconciledBy ? toIdValue(lastReconciledBy, "name") : null,
         bankMatches,
       };
-    })
+    }),
   );
   return response;
 };
 export const toBankStatementDTO = async (
-  input: BankStatement[]
+  input: BankStatement[],
 ): Promise<BankStatementDTO[]> => {
   const ledgers = await commonGetService.getAllElements<"Ledger">({
     cacheCode: "LEDGER",
@@ -176,7 +176,7 @@ export const toBankStatementDTO = async (
       ]).rest,
       ledger: toIdValue(
         ledgers.find((ledger) => ledger.id === bankStatement.ledgerId),
-        "name"
+        "name",
       ),
       fileUrl: toPublicImageUrl(bankStatement.fileUrl),
     };

@@ -28,9 +28,8 @@ const multiVoucherServiceRaw = {
   async createMultiVoucher(input: CreateOrUpdateMultiVoucherInput) {
     logger.info("entering::createMultiVoucher::service");
     await createOrUpdateMultiVoucherServiceValidation(input);
-    const preparedVoucherInput = await prepareVoucherInputForMultiVoucher(
-      input
-    );
+    const preparedVoucherInput =
+      await prepareVoucherInputForMultiVoucher(input);
     if (input.status === MultiVoucherStatus.POSTED) {
       for (const detail of preparedVoucherInput) {
         await createOrUpdateVoucherServiceValidation({
@@ -51,9 +50,8 @@ const multiVoucherServiceRaw = {
   async updateMultiVoucher(input: CreateOrUpdateMultiVoucherInput) {
     logger.info("entering::updateMultiVoucher::service");
     await createOrUpdateMultiVoucherServiceValidation(input);
-    const preparedVoucherInput = await prepareVoucherInputForMultiVoucher(
-      input
-    );
+    const preparedVoucherInput =
+      await prepareVoucherInputForMultiVoucher(input);
     if (input.status === MultiVoucherStatus.POSTED) {
       for (const detail of preparedVoucherInput) {
         await createOrUpdateVoucherServiceValidation({
@@ -77,9 +75,8 @@ const multiVoucherServiceRaw = {
   async updatePostedMultiVoucher(input: CreateOrUpdateMultiVoucherInput) {
     logger.info("entering::updatePostedMultiVoucher::service");
     await createOrUpdateMultiVoucherServiceValidation(input);
-    const preparedVoucherInput = await prepareVoucherInputForMultiVoucher(
-      input
-    );
+    const preparedVoucherInput =
+      await prepareVoucherInputForMultiVoucher(input);
     if (input.status === MultiVoucherStatus.POSTED) {
       for (const detail of preparedVoucherInput) {
         await createOrUpdateVoucherServiceValidation({
@@ -104,7 +101,7 @@ const multiVoucherServiceRaw = {
     if (!data) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Multi Voucher")
+        generateErrorMessage("NOT_FOUND", "Multi Voucher"),
       );
     }
     const multiVoucherDto = await toMultiVoucherPdfDto(data);
@@ -117,13 +114,13 @@ const multiVoucherServiceRaw = {
     if (!pdfTemplate) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "PDF template")
+        generateErrorMessage("NOT_FOUND", "PDF template"),
       );
     }
 
     const filledDef = await resolvePdfTemplate(
       pdfTemplate.bodyJson as unknown as CustomDocDefinition,
-      multiVoucherDto
+      multiVoucherDto,
     );
     const pdfBuffer = await renderCustomPdfToBuffer(filledDef);
 
@@ -138,5 +135,5 @@ const multiVoucherServiceRaw = {
 
 export const multiVoucherService = auditProxy.createAuditedService(
   "multiVoucher",
-  multiVoucherServiceRaw
+  multiVoucherServiceRaw,
 );

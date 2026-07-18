@@ -9,7 +9,9 @@ export type CreateOrUpdateSettings = Omit<
   existing: SettingsDTO | null;
 };
 
-export interface SettingsDTO
-  extends Omit<AccSettings, BaseModelAttrWoCancel | "mainBranchId"> {
+export interface SettingsDTO extends Omit<
+  AccSettings,
+  BaseModelAttrWoCancel | "mainBranchId"
+> {
   mainBranch: IdValue | null;
 }

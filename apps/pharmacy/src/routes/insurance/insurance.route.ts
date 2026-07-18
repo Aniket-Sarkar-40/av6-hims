@@ -48,7 +48,7 @@ insuranceRouter.post(
   authorize(getPermission("PMS", "INSURANCE", "CREATE")),
   createUploadFieldsMiddleware("insurance", ["logoImage", "attachments"]),
   validateInsurance,
-  createInsurance
+  createInsurance,
 );
 
 /**
@@ -71,11 +71,11 @@ insuranceRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "INSURANCE", "VIEW"),
-    getPermission("PMS", "INSURANCE", "UPDATE")
+    getPermission("PMS", "INSURANCE", "UPDATE"),
   ),
   createUploadFieldsMiddleware("insurance", ["logoImage", "attachments"]),
   validateInsuranceUpdate,
-  updateInsurance
+  updateInsurance,
 );
 
 /**
@@ -91,7 +91,7 @@ insuranceRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "INSURANCE", "VIEW")),
-  getAllInsurance
+  getAllInsurance,
 );
 
 /**
@@ -113,7 +113,7 @@ insuranceRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "INSURANCE", "VIEW")),
-  getInsuranceById
+  getInsuranceById,
 );
 
 /**
@@ -129,7 +129,7 @@ insuranceRouter.delete(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "INSURANCE", "DELETE")),
-  deleteInsurance
+  deleteInsurance,
 );
 
 // /**

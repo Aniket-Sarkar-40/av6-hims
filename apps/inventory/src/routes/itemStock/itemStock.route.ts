@@ -44,7 +44,7 @@ itemStockRouter.post(
   "/summary",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK_SUMMARY", "VIEW")),
-  getItemStockSummary
+  getItemStockSummary,
 );
 /**
  * @swagger
@@ -66,7 +66,7 @@ itemStockRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
   validateItemStockSearch,
-  getItemStock
+  getItemStock,
 );
 /**
  * @swagger
@@ -89,7 +89,7 @@ itemStockRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STOCK", "VIEW")),
   validateItemStockExcelExport,
-  exportItemStockExcel
+  exportItemStockExcel,
 );
 
 /**
@@ -111,5 +111,5 @@ itemStockRouter.post(
   "/batch-stock",
   verifyToken,
   authorize(getPermission("INV", "ITEM_BATCH_STOCK", "VIEW")),
-  getAllItemBatchStock
+  getAllItemBatchStock,
 );

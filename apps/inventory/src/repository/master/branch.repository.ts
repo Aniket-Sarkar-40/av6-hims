@@ -76,7 +76,7 @@ export const updateBranchInDb = async (branch: BranchReq) => {
 };
 
 export const getBranchByBranchNameFromDb = async (
-  name: string
+  name: string,
 ): Promise<InvBranch | null> => {
   logger.info("entering::getBranchByBranchNameFromDb::repository");
   return db.invBranch.findFirst({
@@ -134,7 +134,7 @@ export const getBranchesByCcIdsFromDb = async (ccIds: number[]) => {
 };
 
 export const getCollectionCenterByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<CollectionCenter | null> => {
   logger.info("entering::getCollectionCenterByIdFromDb::repository");
   return db.collectionCenter.findUnique({

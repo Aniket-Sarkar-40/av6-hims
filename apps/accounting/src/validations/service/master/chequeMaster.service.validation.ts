@@ -9,7 +9,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdChequeMaster = async (
-  id: number
+  id: number,
 ): Promise<ChequeMaster> => {
   logger.info("entering::validateIdChequeMaster::service::validation");
   validIdCheck(id);
@@ -25,7 +25,7 @@ export const validateIdChequeMaster = async (
   if (!chequeMaster) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Cheque Master")
+      generateErrorMessage("NOT_FOUND", "Cheque Master"),
     );
   }
   logger.info("exiting::validateIdChequeMaster::service::validation");
@@ -33,10 +33,10 @@ export const validateIdChequeMaster = async (
 };
 
 export const createOrUpdateChequeMasterServiceValidation = async (
-  body: CreateOrUpdateChequeMasterInput
+  body: CreateOrUpdateChequeMasterInput,
 ): Promise<void> => {
   logger.info(
-    "entering::createOrUpdateChequeMasterServiceValidation::service::validation"
+    "entering::createOrUpdateChequeMasterServiceValidation::service::validation",
   );
   if (body.id) {
     await validateIdChequeMaster(body.id);
@@ -46,13 +46,13 @@ export const createOrUpdateChequeMasterServiceValidation = async (
   if (!bankLedger.isBankAccount) {
     throw new ErrorHandler(
       400,
-      "Cheque Master can only be created for bank account"
+      "Cheque Master can only be created for bank account",
     );
   }
   if (body.startChequeNo > body.endChequeNo) {
     throw new ErrorHandler(
       400,
-      "Start cheque no must be less than end cheque no"
+      "Start cheque no must be less than end cheque no",
     );
   }
 
@@ -72,19 +72,19 @@ export const createOrUpdateChequeMasterServiceValidation = async (
   if (overlappingChequeMaster) {
     throw new ErrorHandler(
       400,
-      `Cheque number range overlaps with existing cheque range for this bank`
+      `Cheque number range overlaps with existing cheque range for this bank`,
     );
   }
   logger.info(
-    "exiting::createOrUpdateChequeMasterServiceValidation::service::validation"
+    "exiting::createOrUpdateChequeMasterServiceValidation::service::validation",
   );
 };
 
 export const toggleStatusChequeMasterServiceValidation = async (
-  chequeMasterId: number
+  chequeMasterId: number,
 ): Promise<Status> => {
   logger.info(
-    "entering::toggleStatusChequeMasterServiceValidation::service::validation"
+    "entering::toggleStatusChequeMasterServiceValidation::service::validation",
   );
   const chequeMaster = await validateIdChequeMaster(chequeMasterId);
   let newStatus: Status = Status.ACTIVE;
@@ -94,7 +94,7 @@ export const toggleStatusChequeMasterServiceValidation = async (
     newStatus = Status.ACTIVE;
   }
   logger.info(
-    "exiting::toggleStatusChequeMasterServiceValidation::service::validation"
+    "exiting::toggleStatusChequeMasterServiceValidation::service::validation",
   );
   return newStatus;
 };

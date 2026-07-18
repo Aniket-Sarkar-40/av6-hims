@@ -32,7 +32,7 @@ export const purchaseOrderDetailSchema = Joi.object<PurchaseOrderDetails>({
   totalAmount: priceRequired("Total amount", () => getSchemaPrecision("po")),
 
   purchasedPrice: priceRequired("Purchased price", () =>
-    getSchemaPrecision("po")
+    getSchemaPrecision("po"),
   ),
 });
 
@@ -46,7 +46,7 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
   ccId: idRequired("Cc Id"),
 
   grandTotal: numberWithMaxDecimalsRequired("Grand total", () =>
-    getSchemaPrecision("po")
+    getSchemaPrecision("po"),
   ),
 
   status: enumOptional("Status", PO_STATUS),
@@ -58,10 +58,10 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
   conversionRate: Joi.when("currencyId", {
     is: Joi.exist().not(null),
     then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
-      getSchemaPrecision("po")
+      getSchemaPrecision("po"),
     ),
     otherwise: numberWithMaxDecimalsOptional("Conversion Rate", () =>
-      getSchemaPrecision("po")
+      getSchemaPrecision("po"),
     ),
   }),
 
@@ -70,7 +70,7 @@ export const purchaseSchema = Joi.object<UpdatePurchaseOrder>({
   purchaseOrderDetails: arrayRequired(
     "Purchase order",
     purchaseOrderDetailSchema,
-    1
+    1,
   ),
 });
 

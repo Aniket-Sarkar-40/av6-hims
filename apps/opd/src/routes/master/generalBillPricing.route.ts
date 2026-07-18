@@ -51,7 +51,7 @@ generalBillPricingRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "CREATE")),
   validateCreateGeneralBillPricingSchema,
-  createGeneralBillPricing
+  createGeneralBillPricing,
 );
 
 /**
@@ -74,10 +74,10 @@ generalBillPricingRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW"),
-    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE")
+    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE"),
   ),
   validateUpdateGeneralBillPricingSchema,
-  updateGeneralBillPricing
+  updateGeneralBillPricing,
 );
 
 /**
@@ -99,7 +99,7 @@ generalBillPricingRouter.post(
   "/get-excel",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW")),
-  generalBillPricingMapExcelExport
+  generalBillPricingMapExcelExport,
 );
 
 /**
@@ -122,11 +122,11 @@ generalBillPricingRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW"),
-    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE")
+    getPermission("OPD", "GENERAL_BILL_PRICING", "UPDATE"),
   ),
   createUploadMiddleware("filePath"),
   uploadToHetzner("generalBillPricing"),
-  generalBillPricingMapExcelImport
+  generalBillPricingMapExcelImport,
 );
 
 /**
@@ -148,7 +148,7 @@ generalBillPricingRouter.post(
   "/copy-pricing",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW")),
-  copyGeneralBillPricing
+  copyGeneralBillPricing,
 );
 
 generalBillPricingRouter.post(
@@ -156,5 +156,5 @@ generalBillPricingRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_PRICING", "VIEW")),
   validateUpdateGeneralBillPricingSearchSchema,
-  getGeneralBillPricingWithItemByCcId
+  getGeneralBillPricingWithItemByCcId,
 );

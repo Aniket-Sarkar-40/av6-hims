@@ -17,7 +17,7 @@ export const createLedger = TryCatch(async (req: Request, res: Response) => {
   const created = await ledgerService.createLedger(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: created },
-    "Ledger"
+    "Ledger",
   );
   logger.info("exiting::createLedger::controller");
   return res.status(201).json(response);
@@ -29,7 +29,7 @@ export const updateLedger = TryCatch(async (req: Request, res: Response) => {
   const updated = await ledgerService.updateLedger(input);
   const response = BaseResponse.success(
     { type: "UPDATED", data: updated },
-    "Ledger"
+    "Ledger",
   );
   logger.info("exiting::updateLedger::controller");
   return res.status(200).json(response);
@@ -53,11 +53,11 @@ export const fetchLedgerForExternalMapping = TryCatch(
     });
     const response = BaseResponse.success(
       { type: "FETCHED", data: ledgers },
-      "Ledger"
+      "Ledger",
     );
     logger.info("exiting::fetchLedgerForExternalMapping::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const createLedgerExcelImport = TryCatch(
@@ -86,7 +86,7 @@ export const createLedgerExcelImport = TryCatch(
 
     logger.info("exiting::createLedgerExcelImport::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const exportLedgerExcel = TryCatch(
@@ -99,16 +99,16 @@ export const exportLedgerExcel = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="ledger_sample_excel.xlsx"`
+      `attachment; filename="ledger_sample_excel.xlsx"`,
     );
 
     await wb.xlsx.write(res);
     res.end();
 
     logger.info("exiting::exportLedgerExcel::controller");
-  }
+  },
 );

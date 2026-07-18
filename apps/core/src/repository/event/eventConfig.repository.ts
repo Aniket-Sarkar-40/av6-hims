@@ -11,7 +11,7 @@ import {
 } from "@repo/db/generated/prisma/client";
 
 export const upsertEventConfigWithKeysInDb = async (
-  input: UpsertEventConfigWithKeysInput
+  input: UpsertEventConfigWithKeysInput,
 ) => {
   logger.info("entering::upsertEventConfigWithKeysInDb::repository");
 
@@ -93,7 +93,7 @@ export const getAllEventConfigFromDb = async (): Promise<EventConfig[]> => {
 };
 
 export const getEventConfigByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<EventConfig | null> => {
   logger.info("entering::getEventConfigById::repository");
   return db.eventConfig.findUnique({
@@ -105,7 +105,7 @@ export const getEventConfigByIdFromDb = async (
 };
 
 export const getEventConfigKeyByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<EventConfigKey | null> => {
   logger.info("entering::getEventConfigById::repository");
   return db.eventConfigKey.findFirst({
@@ -115,7 +115,7 @@ export const getEventConfigKeyByIdFromDb = async (
 
 export const getEventConfigByEventConfigNameAndTypeFromDb = async (
   serviceEventId: number,
-  eventName: string
+  eventName: string,
 ): Promise<EventConfig | null> => {
   logger.info("entering::getEventConfigByEventConfigNameAndType::repository");
   return db.eventConfig.findFirst({
@@ -130,7 +130,7 @@ export const getEventConfigByEventConfigNameAndTypeFromDb = async (
 };
 
 export const deleteEventConfigInDb = async (
-  id: number
+  id: number,
 ): Promise<EventConfig> => {
   logger.info("entering::deleteEventConfig::repository");
   return db.eventConfig.delete({
@@ -142,10 +142,10 @@ export const deleteEventConfigInDb = async (
 };
 
 export const getAllEventConfigKeysByEventConfigIdFromDb = async (
-  eventConfigId: number
+  eventConfigId: number,
 ): Promise<EventConfigKey[]> => {
   logger.info(
-    "entering::getAllEventConfigKeysByEventConfigIdFromDb::repository"
+    "entering::getAllEventConfigKeysByEventConfigIdFromDb::repository",
   );
   return db.eventConfigKey.findMany({
     where: {

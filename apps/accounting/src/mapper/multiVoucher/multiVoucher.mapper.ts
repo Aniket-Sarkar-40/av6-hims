@@ -12,7 +12,7 @@ import { numberToWords } from "@repo/shared/utils/helper.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toMultiVoucherDto = async (
-  input: MultiVoucherResponseForDTO[]
+  input: MultiVoucherResponseForDTO[],
 ): Promise<MultiVoucherDTO[]> => {
   const collectionCenters = await getAllCollectionCentersFromDb();
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
@@ -64,19 +64,19 @@ export const toMultiVoucherDto = async (
       ]);
 
       const collectionCenter = collectionCenters.find(
-        (cc) => cc.id === multiVoucher.ccId
+        (cc) => cc.id === multiVoucher.ccId,
       );
       const voucherType = voucherTypes.find(
-        (vt) => vt.id === multiVoucher.voucherTypeId
+        (vt) => vt.id === multiVoucher.voucherTypeId,
       );
       const createdBy = multiVoucher.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            multiVoucher.createdBy
+            multiVoucher.createdBy,
           )
         : null;
       const approvedBy = multiVoucher.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            multiVoucher.approvedBy
+            multiVoucher.approvedBy,
           )
         : null;
       const ledger = ledgers.find((l) => l.id === multiVoucher.ledgerId);
@@ -95,7 +95,7 @@ export const toMultiVoucherDto = async (
             "ledgerId",
           ]);
           const collectionCenter = collectionCenters.find(
-            (cc) => cc.id === md.ccId
+            (cc) => cc.id === md.ccId,
           );
           const ledger = ledgers.find((l) => l.id === md.ledgerId);
           return {
@@ -123,13 +123,13 @@ export const toMultiVoucherDto = async (
         ]).rest,
         multiVoucherDetails: multiVoucherDetailsDto,
       };
-    })
+    }),
   );
   return response;
 };
 
 export const toMultiVoucherPdfDto = async (
-  multiVoucher: MultiVoucherResponseForDTO
+  multiVoucher: MultiVoucherResponseForDTO,
 ): Promise<MultiVoucherPdfDTO> => {
   const collectionCenters = await getAllCollectionCentersFromDb();
   const voucherType = await commonGetService.getElementById<"VoucherType">({
@@ -180,7 +180,7 @@ export const toMultiVoucherPdfDto = async (
   ]);
 
   const collectionCenter = collectionCenters.find(
-    (cc) => cc.id === multiVoucher.ccId
+    (cc) => cc.id === multiVoucher.ccId,
   );
   const createdBy = multiVoucher.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(multiVoucher.createdBy)
@@ -209,7 +209,7 @@ export const toMultiVoucherPdfDto = async (
       ]);
       index++;
       const collectionCenter = collectionCenters.find(
-        (cc) => cc.id === md.ccId
+        (cc) => cc.id === md.ccId,
       );
       const ledger = ledgers.find((l) => l.id === md.ledgerId);
       const amount = drCr !== md.drCr ? md.amount : md.amount.mul(-1);

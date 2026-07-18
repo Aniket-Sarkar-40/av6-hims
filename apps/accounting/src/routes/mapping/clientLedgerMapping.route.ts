@@ -15,12 +15,12 @@ clientLedgerMappingRouter.post(
   "/external",
   authorizeExternalRequest(),
   validateCreateExternalClientLedgerMapping,
-  createExternalClientLedgerMapping
+  createExternalClientLedgerMapping,
 );
 
 clientLedgerMappingRouter.post(
   "/external-fetch",
   authorizeExternalRequest(),
   validateFetchClientLedgerMapping,
-  fetchClientLedgerMapping
+  fetchClientLedgerMapping,
 );

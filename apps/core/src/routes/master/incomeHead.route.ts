@@ -45,7 +45,7 @@ incomeHeadRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "CREATE")),
   validateIncomeHeadCreate,
-  createIncomeHead
+  createIncomeHead,
 );
 
 /**
@@ -61,7 +61,7 @@ incomeHeadRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "VIEW")),
-  getAllIncomeHead
+  getAllIncomeHead,
 );
 
 /**
@@ -84,7 +84,7 @@ incomeHeadRouter.get(
   "/id",
   verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "VIEW")),
-  getIncomeHeadId
+  getIncomeHeadId,
 );
 
 /**
@@ -114,10 +114,10 @@ incomeHeadRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "INCOME_HEAD", "VIEW"),
-    getPermission("CORE", "INCOME_HEAD", "UPDATE")
+    getPermission("CORE", "INCOME_HEAD", "UPDATE"),
   ),
   validateIncomeHeadUpdate,
-  updateIncomeHead
+  updateIncomeHead,
 );
 
 /**
@@ -140,5 +140,5 @@ incomeHeadRouter.delete(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "INCOME_HEAD", "DELETE")),
-  deleteIncomeHead
+  deleteIncomeHead,
 );

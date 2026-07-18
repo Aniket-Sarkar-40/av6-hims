@@ -307,7 +307,7 @@ export enum PermissionModule {
 export const getPermission = (
   module: keyof typeof PermissionModule,
   resource: keyof typeof PermissionResource,
-  type: keyof typeof PermissionType
+  type: keyof typeof PermissionType,
 ): string => {
   return `${module}:${PermissionResource[resource]}:${PermissionType[type]}`;
 };

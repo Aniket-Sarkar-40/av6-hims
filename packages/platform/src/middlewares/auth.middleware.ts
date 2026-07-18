@@ -55,7 +55,7 @@ async function tokenStrategyV1(
   req: AuthRequest,
   _res: Response,
   token: string,
-  module: ServiceCode
+  module: ServiceCode,
 ): Promise<void> {
   const payload = decodeToken(token);
   const {
@@ -119,7 +119,7 @@ async function tokenStrategyV2(
   req: AuthRequest,
   res: Response,
   token: string,
-  module: ServiceCode
+  module: ServiceCode,
 ): Promise<void> {
   const payload = decodeAccessToken(token);
   const { currentLevelZero, username, userId, uuid, expireAt, modules } =
@@ -203,7 +203,7 @@ export const authorize =
       }
 
       const ok = required.every((p) =>
-        req.perms!.has(`${PERMISSION_PREFIX}${p}`)
+        req.perms!.has(`${PERMISSION_PREFIX}${p}`),
       );
       if (!ok) throw new ErrorHandler(403, "You are not authorized.");
 

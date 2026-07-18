@@ -20,7 +20,7 @@ export const validIdPdfTemplate = async (id: number): Promise<PdfTemplate> => {
   if (!response) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Pdf Template")
+      generateErrorMessage("NOT_FOUND", "Pdf Template"),
     );
   }
   logger.info("exiting::validIdPdfTemplate::service::validation");
@@ -28,7 +28,7 @@ export const validIdPdfTemplate = async (id: number): Promise<PdfTemplate> => {
 };
 
 export const createPdfTemplateServiceValidation = async (
-  input: CreatePdfTemplateInput
+  input: CreatePdfTemplateInput,
 ) => {
   logger.info("entering::createPdfTemplate::service::validation");
   const existing = await getPdfTemplateByNameFromDb(input.templateName);
@@ -37,15 +37,15 @@ export const createPdfTemplateServiceValidation = async (
       400,
       generateErrorMessage(
         "DUPLICATE_ITEM",
-        `Pdf Template with template name ${input.templateName}`
-      )
+        `Pdf Template with template name ${input.templateName}`,
+      ),
     );
   }
   logger.info("exiting::createPdfTemplate::service::validation");
 };
 
 export const updatePdfTemplateServiceValidation = async (
-  input: UpdatePdfTemplateInput
+  input: UpdatePdfTemplateInput,
 ) => {
   logger.info("entering::updatePdfTemplate::service::validation");
 
@@ -56,15 +56,15 @@ export const updatePdfTemplateServiceValidation = async (
       400,
       generateErrorMessage(
         "DUPLICATE_ITEM",
-        `Pdf Template with template name ${input.templateName}`
-      )
+        `Pdf Template with template name ${input.templateName}`,
+      ),
     );
   }
   // if (valid.sampleImageUrl) deleteFileByEnv(process.cwd() + valid.sampleImageUrl);
   logger.info("exiting::updatePdfTemplate::service::validation");
 };
 export const makeDefaultPdfTemplateServiceValidation = async (
-  input: MakeDefaultPdfTemplateInput
+  input: MakeDefaultPdfTemplateInput,
 ) => {
   logger.info("entering::makeDefaultPdfTemplate::service::validation");
 

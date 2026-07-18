@@ -4,7 +4,7 @@ import { WarehouseDTO } from "@/types/master/warehouse.js";
 
 export const toBranchOrWarehouseDto = async (
   branches: BranchDTO[],
-  warehouses: WarehouseDTO[]
+  warehouses: WarehouseDTO[],
 ): Promise<BranchOrWarehouseDTO[]> => {
   const branchItems = await Promise.all(
     branches.map(
@@ -14,8 +14,8 @@ export const toBranchOrWarehouseDto = async (
         name: branch.name,
         branch: branch,
         warehouse: null,
-      })
-    )
+      }),
+    ),
   );
 
   const warehouseDtos = await Promise.all(
@@ -26,8 +26,8 @@ export const toBranchOrWarehouseDto = async (
         name: warehouse.name,
         warehouse: warehouse,
         branch: null,
-      })
-    )
+      }),
+    ),
   );
 
   return [...warehouseDtos, ...branchItems];

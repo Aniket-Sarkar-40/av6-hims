@@ -22,7 +22,7 @@ export const validateIdCountryCode = async (id: number) => {
   if (!countryCode) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Country Code")
+      generateErrorMessage("NOT_FOUND", "Country Code"),
     );
   }
   logger.info("exiting::validateIdCountryCode::service::validation");
@@ -41,7 +41,7 @@ export const createCountryCodeValidation = async (input: CreateCountryCode) => {
   if (countryCodeName) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Country Code")
+      generateErrorMessage("DUPLICATE_ITEM", "Country Code"),
     );
   }
   logger.info("exiting::createCountryCode::service::validation");
@@ -60,7 +60,7 @@ export const updateCountryCodeValidation = async (input: UpdateCountryCode) => {
   if (countryCodeName && countryCodeName.id !== existingCountryCode.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Country Code")
+      generateErrorMessage("DUPLICATE_ITEM", "Country Code"),
     );
   }
   logger.info("exiting::updateCountryCode::service::validation");

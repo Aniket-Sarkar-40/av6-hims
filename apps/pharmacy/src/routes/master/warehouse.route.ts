@@ -44,7 +44,7 @@ warehouseRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "WAREHOUSE", "CREATE")),
   validateWarehouse,
-  createWarehouse
+  createWarehouse,
 );
 
 /**
@@ -60,7 +60,7 @@ warehouseRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "WAREHOUSE", "VIEW")),
-  getAllWarehouse
+  getAllWarehouse,
 );
 
 /**
@@ -81,7 +81,7 @@ warehouseRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "WAREHOUSE", "VIEW")),
-  getWarehouseById
+  getWarehouseById,
 );
 
 /**
@@ -111,10 +111,10 @@ warehouseRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "WAREHOUSE", "VIEW"),
-    getPermission("PMS", "WAREHOUSE", "UPDATE")
+    getPermission("PMS", "WAREHOUSE", "UPDATE"),
   ),
   validateWarehouse,
-  updateWarehouse
+  updateWarehouse,
 );
 
 /**
@@ -137,10 +137,10 @@ warehouseRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "WAREHOUSE", "VIEW"),
-    getPermission("PMS", "WAREHOUSE", "UPDATE")
+    getPermission("PMS", "WAREHOUSE", "UPDATE"),
   ),
   validateToggleActive,
-  toggleActiveWarehouse
+  toggleActiveWarehouse,
 );
 
 export default warehouseRouter;

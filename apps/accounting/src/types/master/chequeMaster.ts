@@ -7,7 +7,9 @@ export type CreateOrUpdateChequeMasterInput = Omit<
   BaseModelAttrWoCancel
 >;
 
-export interface ChequeMasterDTO
-  extends Omit<ChequeMaster, BaseModelAttrWoCancel | "bankLedgerId"> {
+export interface ChequeMasterDTO extends Omit<
+  ChequeMaster,
+  BaseModelAttrWoCancel | "bankLedgerId"
+> {
   bankLedger: IdValue | null;
 }

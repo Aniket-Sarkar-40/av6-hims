@@ -12,7 +12,7 @@ import { toCityDTO } from "@/mapper/master/city.mapper.js";
 import { currencyService } from "@apps/core/services/master/currency.service.js";
 
 export const toCompanyDto = async (
-  input: CompanyResponse
+  input: CompanyResponse,
 ): Promise<CompanyDTO> => {
   const cities = (await commonGetService.getAllElements<"City">({
     cacheCode: "CITY",
@@ -67,7 +67,7 @@ export const toCompanyDto = async (
         state: city?.state ? toIdValue(city.state, "value") : null,
         country: city?.country ? toIdValue(city.country, "value") : null,
       };
-    }
+    },
   );
 
   const currency = input.currencyId

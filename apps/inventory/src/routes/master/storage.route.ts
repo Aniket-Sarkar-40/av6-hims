@@ -43,7 +43,7 @@ storageRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORAGE", "CREATE")),
   validateStorageCreate,
-  createStorage
+  createStorage,
 );
 
 /**
@@ -73,8 +73,8 @@ storageRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STORAGE", "VIEW"),
-    getPermission("INV", "STORAGE", "UPDATE")
+    getPermission("INV", "STORAGE", "UPDATE"),
   ),
   validateStorageUpdate,
-  updateStorage
+  updateStorage,
 );

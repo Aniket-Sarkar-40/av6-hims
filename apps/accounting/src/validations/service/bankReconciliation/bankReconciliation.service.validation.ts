@@ -22,10 +22,10 @@ import {
 } from "@repo/db/generated/prisma/client";
 
 export const validateBankReconciliationCommonServiceValidation = async (
-  input: LedgerBookRequestInput
+  input: LedgerBookRequestInput,
 ) => {
   logger.info(
-    "entering::validateBankReconciliationCommon::service::validation"
+    "entering::validateBankReconciliationCommon::service::validation",
   );
 
   const ledger = await validateLedgerBookServiceValidation(input);
@@ -36,7 +36,7 @@ export const validateBankReconciliationCommonServiceValidation = async (
   return ledger;
 };
 export const validateIdBankStatementRow = async (
-  id: number
+  id: number,
 ): Promise<BankStatementRowWithBankStatement> => {
   logger.info("entering::validateIdBankStatementRow::service::validation");
   validIdCheck(id);
@@ -55,7 +55,7 @@ export const validateIdBankStatementRow = async (
   if (!bankStatementRow) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Bank Statement Row")
+      generateErrorMessage("NOT_FOUND", "Bank Statement Row"),
     );
   }
   logger.info("exiting::validateIdBankStatementRow::service::validation");
@@ -63,10 +63,10 @@ export const validateIdBankStatementRow = async (
 };
 
 export const validateManualReconcileVoucherLinesServiceValidation = async (
-  input: ManualReconcileRequestInput
+  input: ManualReconcileRequestInput,
 ) => {
   logger.info(
-    "entering::validateManualReconcileVoucherLines::service::validation"
+    "entering::validateManualReconcileVoucherLines::service::validation",
   );
   const { ledgerId, rows } = input;
   await validateIdLedger(ledgerId);
@@ -76,13 +76,13 @@ export const validateManualReconcileVoucherLinesServiceValidation = async (
     if (voucherLine.bankReconcileStatus === BankReconcileStatus.RECONCILED) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_STATUS", "Voucher Line")
+        generateErrorMessage("INVALID_STATUS", "Voucher Line"),
       );
     }
     if (voucherLine.ledgerId !== ledgerId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "Voucher Line", "Ledger")
+        generateErrorMessage("INVALID_ASSOCIATION", "Voucher Line", "Ledger"),
       );
     }
     // if (dayjs(voucherLine.voucher.voucherDate).isAfter(dayjs(row.bankClearedDate))) {
@@ -90,14 +90,14 @@ export const validateManualReconcileVoucherLinesServiceValidation = async (
     // }
   }
   logger.info(
-    "exiting::validateManualReconcileVoucherLines::service::validation"
+    "exiting::validateManualReconcileVoucherLines::service::validation",
   );
 };
 
 export const validateManualBankReconcileWithBankStatementServiceValidation =
   async (input: ManualBankReconcileWithBankStatementInput) => {
     logger.info(
-      "entering::validateManualBankReconcileWithBankStatement::service::validation"
+      "entering::validateManualBankReconcileWithBankStatement::service::validation",
     );
 
     const { ledgerId, rows } = input;
@@ -109,13 +109,13 @@ export const validateManualBankReconcileWithBankStatementServiceValidation =
     for (const row of rows) {
       const voucherLine = await validateIdVoucherLine(row.voucherLineId);
       const bankStatementRow = await validateIdBankStatementRow(
-        row.bankStatementRowId
+        row.bankStatementRowId,
       );
 
       if (voucherLine.ledgerId !== ledgerId) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_ASSOCIATION", "Voucher Line", "Ledger")
+          generateErrorMessage("INVALID_ASSOCIATION", "Voucher Line", "Ledger"),
         );
       }
       if (bankStatementRow.bankStatement?.ledgerId !== ledgerId) {
@@ -124,22 +124,22 @@ export const validateManualBankReconcileWithBankStatementServiceValidation =
           generateErrorMessage(
             "INVALID_ASSOCIATION",
             "Bank Statement Row",
-            "Ledger"
-          )
+            "Ledger",
+          ),
         );
       }
 
       if (bankStatementRow.reconcileStatus === BankReconcileStatus.RECONCILED) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_STATUS", "Bank Statement Row")
+          generateErrorMessage("INVALID_STATUS", "Bank Statement Row"),
         );
       }
 
       if (voucherLine.bankReconcileStatus === BankReconcileStatus.RECONCILED) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_STATUS", "Voucher Line")
+          generateErrorMessage("INVALID_STATUS", "Voucher Line"),
         );
       }
 
@@ -147,34 +147,34 @@ export const validateManualBankReconcileWithBankStatementServiceValidation =
         throw new ErrorHandler(
           400,
           `Voucher Line Amount ${Number(
-            voucherLine.amount
+            voucherLine.amount,
           )} is not matching with Bank Statement Row Amount ${Number(
-            bankStatementRow.amount
-          )}.`
+            bankStatementRow.amount,
+          )}.`,
         );
       }
 
       if (voucherLine.drCr === bankStatementRow.drCr) {
         throw new ErrorHandler(
           400,
-          `Voucher Line Dr Cr ${voucherLine.drCr} is not matching with Bank Statement Row Dr Cr ${bankStatementRow.drCr}.`
+          `Voucher Line Dr Cr ${voucherLine.drCr} is not matching with Bank Statement Row Dr Cr ${bankStatementRow.drCr}.`,
         );
       }
       row.matchedAmount = Number(voucherLine.amount);
       row.clearedDate = new Date(
-        bankStatementRow.valueDate ?? bankStatementRow.transactionDate
+        bankStatementRow.valueDate ?? bankStatementRow.transactionDate,
       );
       row.bankReferenceNo = bankStatementRow.transactionId;
       row.bankTransactionDate = new Date(bankStatementRow.transactionDate);
     }
 
     logger.info(
-      "exiting::validateManualBankReconcileWithBankStatement::service::validation"
+      "exiting::validateManualBankReconcileWithBankStatement::service::validation",
     );
   };
 
 export const validateAutoMatchSuggestionServiceValidation = async (
-  input: AutoMatchSuggestionInput
+  input: AutoMatchSuggestionInput,
 ) => {
   logger.info("entering::validateAutoMatchSuggestion::service::validation");
   const { ledgerId, fromDate, toDate } = input;
@@ -189,10 +189,10 @@ export const validateAutoMatchSuggestionServiceValidation = async (
 };
 
 export const validateUploadBankStatementExcelServiceValidation = async (
-  input: BankStatementExcelBaseInput
+  input: BankStatementExcelBaseInput,
 ) => {
   logger.info(
-    "entering::validateUploadBankStatementExcelServiceValidation::service::validation"
+    "entering::validateUploadBankStatementExcelServiceValidation::service::validation",
   );
   const { ledgerId, companyId, financialYearId, statementFrom, statementTo } =
     input;
@@ -227,7 +227,7 @@ export const validateUploadBankStatementExcelServiceValidation = async (
     if (overlap) {
       throw new ErrorHandler(
         400,
-        "Bank statement for the provided date range overlaps with an existing statements."
+        "Bank statement for the provided date range overlaps with an existing statements.",
       );
     }
   }
@@ -241,12 +241,12 @@ export const validateUploadBankStatementExcelServiceValidation = async (
   if (!statementFormat) {
     throw new ErrorHandler(
       400,
-      "Bank statement format not configured in the system"
+      "Bank statement format not configured in the system",
     );
   }
 
   logger.info(
-    "exiting::validateUploadBankStatementExcelServiceValidation::service::validation"
+    "exiting::validateUploadBankStatementExcelServiceValidation::service::validation",
   );
   return statementFormat;
 };

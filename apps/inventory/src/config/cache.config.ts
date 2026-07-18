@@ -31,14 +31,14 @@ export enum RedisResource {
 
 export const getRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string
+  type: string,
 ): string => {
   return `${REDIS_PREFIX}inv:${RedisResource[resource]}:${type}`;
 };
 
 export const getMasterRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string
+  type: string,
 ): string => {
   return `${REDIS_PREFIX}master:${RedisResource[resource]}:${type}`;
 };

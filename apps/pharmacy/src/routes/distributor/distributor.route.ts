@@ -54,7 +54,7 @@ distributorRouter.post(
     "distDrugDoc",
   ]),
   validateCreateDistributor,
-  distributorCreate
+  distributorCreate,
 );
 
 /**
@@ -77,7 +77,7 @@ distributorRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "DISTRIBUTOR", "VIEW"),
-    getPermission("PMS", "DISTRIBUTOR", "UPDATE")
+    getPermission("PMS", "DISTRIBUTOR", "UPDATE"),
   ),
   createUploadFieldsMiddleware("distributor", [
     "distLicNumber",
@@ -87,7 +87,7 @@ distributorRouter.put(
     "distDrugDoc",
   ]),
   validateUpdateDistributor,
-  distributorUpdate
+  distributorUpdate,
 );
 
 /**
@@ -103,7 +103,7 @@ distributorRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DISTRIBUTOR", "VIEW")),
-  getAllDistributor
+  getAllDistributor,
 );
 
 /**
@@ -119,7 +119,7 @@ distributorRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DISTRIBUTOR", "VIEW")),
-  getDistributorById
+  getDistributorById,
 );
 
 /**
@@ -135,5 +135,5 @@ distributorRouter.delete(
   "/:id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DISTRIBUTOR", "DELETE")),
-  distributorDelete
+  distributorDelete,
 );

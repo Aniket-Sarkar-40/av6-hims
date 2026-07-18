@@ -876,7 +876,7 @@ export const patientsSchema = Joi.object<PatientReq>({
 export const validatePatients = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   req.body = toPatientEntity(req.body, req.files as PatientImage);
   console.log(req.body.emergencyPhoneNumber);
@@ -892,7 +892,7 @@ export const validatePatients = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -910,7 +910,7 @@ export const patientsSchemaUpdate = patientsSchema.keys({
 export const validatePatientsUpdate = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   req.body = toPatientUpdateEntity(req.body, req.files as PatientImage);
   const { error } = patientsSchemaUpdate.validate(req.body, {
@@ -924,7 +924,7 @@ export const validatePatientsUpdate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

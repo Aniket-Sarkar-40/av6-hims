@@ -10,7 +10,7 @@ import { ConfigLedgerType } from "@repo/db/generated/prisma/enums.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toAccountingIntegrationConfigDTO = async (
-  accountingIntegrationConfig: AccountingIntegrationConfigResponse[]
+  accountingIntegrationConfig: AccountingIntegrationConfigResponse[],
 ): Promise<AccountingIntegrationConfigDTO[]> => {
   const groups = await commonGetService.getAllElements<"Group">({
     cacheCode: "GROUP",
@@ -39,7 +39,7 @@ export const toAccountingIntegrationConfigDTO = async (
   const response: AccountingIntegrationConfigDTO[] =
     accountingIntegrationConfig.map((config) => {
       const voucherType = voucherTypes.find(
-        (type) => type.id === config.voucherTypeId
+        (type) => type.id === config.voucherTypeId,
       );
 
       const omittedData = customOmit<
@@ -65,7 +65,7 @@ export const toAccountingIntegrationConfigDTO = async (
           const ledger =
             detail.ledgerType === ConfigLedgerType.ID
               ? ledgers.find(
-                  (ledger) => ledger.id === Number(detail.ledgerValue)
+                  (ledger) => ledger.id === Number(detail.ledgerValue),
                 )
               : null;
 

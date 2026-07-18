@@ -46,7 +46,7 @@ currencyRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CURRENCY", "CREATE")),
   validateCurrency,
-  createCurrency
+  createCurrency,
 );
 
 /**
@@ -62,7 +62,7 @@ currencyRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CURRENCY", "VIEW")),
-  getAllCurrency
+  getAllCurrency,
 );
 
 /**
@@ -85,7 +85,7 @@ currencyRouter.get(
   "/:currencyId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CURRENCY", "VIEW")),
-  getCurrencyById
+  getCurrencyById,
 );
 
 /**
@@ -115,10 +115,10 @@ currencyRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "CURRENCY", "VIEW"),
-    getPermission("PMS", "CURRENCY", "UPDATE")
+    getPermission("PMS", "CURRENCY", "UPDATE"),
   ),
   validateUpdateCurrency,
-  updateCurrency
+  updateCurrency,
 );
 
 /**
@@ -141,7 +141,7 @@ currencyRouter.delete(
   "/:currencyId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CURRENCY", "DELETE")),
-  deleteCurrency
+  deleteCurrency,
 );
 
 export default currencyRouter;

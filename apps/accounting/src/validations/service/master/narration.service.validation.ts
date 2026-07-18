@@ -28,7 +28,7 @@ export const validateIdNarration = async (id: number): Promise<Narration> => {
 };
 
 export const createOrUpdateNarrationServiceValidation = async (
-  input: CreateOrUpdateNarrationInput
+  input: CreateOrUpdateNarrationInput,
 ) => {
   logger.info("entering::createOrUpdateNarration::service::validation");
 
@@ -52,8 +52,8 @@ export const createOrUpdateNarrationServiceValidation = async (
       400,
       generateErrorMessage(
         "DUPLICATE_ITEM",
-        `Narration with name ${input.name}`
-      )
+        `Narration with name ${input.name}`,
+      ),
     );
   }
 

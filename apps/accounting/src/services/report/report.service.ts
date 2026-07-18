@@ -168,17 +168,17 @@ const collectLedgersFromGroupTree = (roots: GroupSummaryNode[]): IdValue[] => {
 
 const findAgeingBucketIndex = (
   ageDays: number,
-  buckets: AgeingBucketInput[]
+  buckets: AgeingBucketInput[],
 ): number => {
   return buckets.findIndex(
     (bucket) =>
-      ageDays >= bucket.from && (bucket.to === 0 || ageDays <= bucket.to)
+      ageDays >= bucket.from && (bucket.to === 0 || ageDays <= bucket.to),
   );
 };
 
 const toAgeingBucketAmounts = (
   bucketDefinitions: AgeingBucketInput[],
-  amounts: number[]
+  amounts: number[],
 ): AgeingBucketAmount[] => {
   return bucketDefinitions.map((bucket, index) => ({
     from: bucket.from,
@@ -251,8 +251,8 @@ const buildAgeingSummary = async (params: {
             ? amount
             : -amount
           : line.drCr === DrCr.CR
-          ? amount
-          : -amount;
+            ? amount
+            : -amount;
 
       if (!signedAmount) continue;
 
@@ -261,7 +261,7 @@ const buildAgeingSummary = async (params: {
       if (bucketIndex < 0) continue;
 
       bucketValues[bucketIndex] = roundValue(
-        bucketValues[bucketIndex] + signedAmount
+        bucketValues[bucketIndex] + signedAmount,
       );
       pending = roundValue(pending + signedAmount);
     }
@@ -273,7 +273,7 @@ const buildAgeingSummary = async (params: {
 
     for (let i = 0; i < roundedBucketValues.length; i++) {
       totals.bucketAmounts[i] = roundValue(
-        totals.bucketAmounts[i] + roundedBucketValues[i]
+        totals.bucketAmounts[i] + roundedBucketValues[i],
       );
     }
 
@@ -294,7 +294,7 @@ const buildAgeingSummary = async (params: {
       pending: roundValue(totals.pending),
       bucketAmounts: toAgeingBucketAmounts(
         buckets,
-        totals.bucketAmounts.map((value) => roundValue(value))
+        totals.bucketAmounts.map((value) => roundValue(value)),
       ),
     },
   };
@@ -303,7 +303,7 @@ const buildAgeingSummary = async (params: {
 const getPendingAdvance = (
   dr: number,
   cr: number,
-  type: "payable" | "receivable"
+  type: "payable" | "receivable",
 ) => {
   const diff = Number(type === "receivable" ? dr - cr : cr - dr);
   return {
@@ -322,7 +322,7 @@ const fmtPdfAmt = (value: number | string | null | undefined): string => {
 
 const reportServiceRaw = {
   async getTrialBalance(
-    input: TrialBalanceRequestInput
+    input: TrialBalanceRequestInput,
   ): Promise<TrialBalanceResponse> {
     logger.info("entering::getTrialBalance::report::service");
 
@@ -353,7 +353,7 @@ const reportServiceRaw = {
     const ledgerMaster = allLedgers.filter(
       (l) =>
         l.companyId === companyId &&
-        (ledgerIds?.length ? ledgerIds.includes(l.id) : true)
+        (ledgerIds?.length ? ledgerIds.includes(l.id) : true),
     ) as Ledger[];
 
     const ledgerDtos = await toLedgerDtoForTrialBalance(ledgerMaster);
@@ -409,7 +409,7 @@ const reportServiceRaw = {
     rows.sort(
       (a, b) =>
         (a.group?.id ?? 0) - (b.group?.id ?? 0) ||
-        (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0)
+        (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0),
     );
 
     //Opening balance difference in opening and closing balance check
@@ -490,7 +490,7 @@ const reportServiceRaw = {
   },
 
   async getLedgerBook(
-    input: LedgerBookRequestInput
+    input: LedgerBookRequestInput,
   ): Promise<LedgerBookResponse> {
     logger.info("entering::getLedgerBook::report::service");
     const { companyId, financialYearId, ledgerId, fromDate, toDate, ccId } =
@@ -522,7 +522,7 @@ const reportServiceRaw = {
     if (!group) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`)
+        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`),
       );
     }
 
@@ -571,7 +571,7 @@ const reportServiceRaw = {
       runningSigned = addSigned(runningSigned, dr, cr);
 
       const voucherType = voucherTypes.find(
-        (v) => v.id === l.voucher.voucherTypeId
+        (v) => v.id === l.voucher.voucherTypeId,
       );
       const createdBy = l.voucher.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.createdBy)
@@ -596,7 +596,7 @@ const reportServiceRaw = {
       };
 
       const currency = voucherHeadResponse.currencyId
-        ? currencyMap.get(voucherHeadResponse.currencyId) ?? null
+        ? (currencyMap.get(voucherHeadResponse.currencyId) ?? null)
         : null;
       //const createdBy
 
@@ -619,21 +619,21 @@ const reportServiceRaw = {
     });
 
     const ledgerForexRow = forexEngineResult.rows.find(
-      (row) => row.ledger?.id === ledgerId
+      (row) => row.ledger?.id === ledgerId,
     );
 
     if (ledgerForexRow) {
       const ledgerRevaluationSigned = applyRound(
         forexAmtToSigned(ledgerForexRow.ledgerRevaluationAmount),
         roundingMethod,
-        roundingPrecision
+        roundingPrecision,
       );
 
       if (
         !isRoundedZero(
           ledgerRevaluationSigned,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         )
       ) {
         const forexDr =
@@ -680,7 +680,7 @@ const reportServiceRaw = {
   },
 
   async getGroupSummaryTree(
-    input: GroupSummaryRequestInput
+    input: GroupSummaryRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getGroupSummaryTree::report::service");
 
@@ -701,7 +701,7 @@ const reportServiceRaw = {
 
     const selectedGroupIds = [
       ...new Set(
-        groupIds && groupIds.length ? groupIds : groupId ? [groupId] : []
+        groupIds && groupIds.length ? groupIds : groupId ? [groupId] : [],
       ),
     ];
 
@@ -745,7 +745,7 @@ const reportServiceRaw = {
       if (!groupMap.has(id)) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", `Group ${id} not found`)
+          generateErrorMessage("NOT_FOUND", `Group ${id} not found`),
         );
       }
     }
@@ -770,7 +770,7 @@ const reportServiceRaw = {
           throw new ErrorHandler(
             400,
 
-            `Overlapping groups are not allowed: group ${selectedGroupIds[i]} is ancestor of ${selectedGroupIds[j]}`
+            `Overlapping groups are not allowed: group ${selectedGroupIds[i]} is ancestor of ${selectedGroupIds[j]}`,
           );
         }
       }
@@ -828,7 +828,7 @@ const reportServiceRaw = {
 
       if (!node) {
         logger.warn(
-          `Ledger ${ledger.id} has invalid groupId ${ledger.groupId}`
+          `Ledger ${ledger.id} has invalid groupId ${ledger.groupId}`,
         );
         continue;
       }
@@ -850,7 +850,7 @@ const reportServiceRaw = {
       while (parentId) {
         if (visited.has(parentId)) {
           logger.error(
-            `Cycle detected in group hierarchy at group ${parentId}`
+            `Cycle detected in group hierarchy at group ${parentId}`,
           );
           break;
         }
@@ -949,7 +949,7 @@ const reportServiceRaw = {
           l.period.dr ||
           l.period.cr ||
           l.closing.dr ||
-          l.closing.cr
+          l.closing.cr,
       );
 
       return newNode;
@@ -986,12 +986,12 @@ const reportServiceRaw = {
 
     const sortTree = (node: GroupSummaryNode) => {
       node.children.sort((a, b) =>
-        (a.group?.value ?? "").localeCompare(b.group?.value ?? "")
+        (a.group?.value ?? "").localeCompare(b.group?.value ?? ""),
       );
       node.ledger.sort(
         (a, b) =>
           (a.ledger?.value ?? "").localeCompare(b.ledger?.value ?? "") ||
-          (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0)
+          (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0),
       );
       node.children.forEach(sortTree);
     };
@@ -1019,7 +1019,7 @@ const reportServiceRaw = {
 
   async getProfitLoss(
     input: ReportCommonRequestInput,
-    includeOpeningInPL: boolean = true
+    includeOpeningInPL: boolean = true,
   ): Promise<ProfitLossResponse> {
     logger.info("entering::getProfitLoss::report::service");
 
@@ -1041,7 +1041,7 @@ const reportServiceRaw = {
 
     const featureFlag = await featureFlagService.getFeatureFlagByShortCode(
       "PROFIT_LOSS_REPORT_ADD_OPENING",
-      true
+      true,
     );
 
     const allGroups: Group[] = await commonGetService.getAllElements<"Group">({
@@ -1055,7 +1055,7 @@ const reportServiceRaw = {
     const filteredGroups = allGroups.filter(
       (g) =>
         g.companyId === companyId &&
-        g.reportType === AccountingReportType.PROFIT_LOSS
+        g.reportType === AccountingReportType.PROFIT_LOSS,
     );
 
     const groups: GroupMeta[] = filteredGroups.map((g) => ({
@@ -1121,7 +1121,7 @@ const reportServiceRaw = {
 
       ownAmountByGroup.set(
         groupId,
-        addDrCr(ownAmountByGroup.get(groupId) ?? zero(), amountToAdd)
+        addDrCr(ownAmountByGroup.get(groupId) ?? zero(), amountToAdd),
       );
     }
 
@@ -1139,7 +1139,7 @@ const reportServiceRaw = {
       n.children.sort(
         (a, b) =>
           (a.id ?? 0) - (b.id ?? 0) ||
-          (a.name ?? "").localeCompare(b.name ?? "")
+          (a.name ?? "").localeCompare(b.name ?? ""),
       );
 
       for (const c of n.children) {
@@ -1150,7 +1150,7 @@ const reportServiceRaw = {
 
     roots.sort(
       (a, b) =>
-        (a.id ?? 0) - (b.id ?? 0) || (a.name ?? "").localeCompare(b.name ?? "")
+        (a.id ?? 0) - (b.id ?? 0) || (a.name ?? "").localeCompare(b.name ?? ""),
     );
 
     for (const r of roots) {
@@ -1169,7 +1169,7 @@ const reportServiceRaw = {
           children: filterTree(n.children),
         }))
         .filter(
-          (n) => includeZero || !isZero(n.amount) || n.children.length > 0
+          (n) => includeZero || !isZero(n.amount) || n.children.length > 0,
         );
 
     const incomeFiltered = filterTree(incomeRoots);
@@ -1244,17 +1244,17 @@ const reportServiceRaw = {
     const directIncome = applyRound(
       directIncomeBase + closingStockAmount,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const directExpense = applyRound(
       directExpenseBase + openingStockAmount,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const grossProfit = applyRound(
       directIncome - directExpense,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const indirectIncome = sumIncome(incomeRoots, false);
@@ -1262,7 +1262,7 @@ const reportServiceRaw = {
     const netProfit = applyRound(
       grossProfit + indirectIncome - indirectExpense,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const toPlNode = (n: InternalNode): PlNode => {
@@ -1337,7 +1337,7 @@ const reportServiceRaw = {
   },
 
   async getBalanceSheet(
-    input: BalanceSheetRequestInput
+    input: BalanceSheetRequestInput,
   ): Promise<BalanceSheetResponse> {
     logger.info("entering::getBalanceSheet::report::service");
 
@@ -1363,7 +1363,7 @@ const reportServiceRaw = {
       .filter(
         (g) =>
           g.companyId === companyId &&
-          g.reportType === AccountingReportType.BALANCE_SHEET
+          g.reportType === AccountingReportType.BALANCE_SHEET,
       )
       .map((g) => ({
         id: g.id,
@@ -1453,14 +1453,14 @@ const reportServiceRaw = {
         ccId,
         includeZero: true,
       },
-      false
+      false,
     );
 
     /* ---------------- CLOSING STOCK (FROM P&L) ---------------- */
     // if (featureFlagForAddOpeningAndClosingStockInPL?.isEnabled) {
     const findPlNodeByGroupId = (
       nodes: PlNode[],
-      groupId: number
+      groupId: number,
     ): PlNode | undefined => {
       for (const node of nodes) {
         if (node.group.id === groupId) return node;
@@ -1479,7 +1479,7 @@ const reportServiceRaw = {
 
     const closingStockPlNode = findPlNodeByGroupId(
       pl.income,
-      CLOSING_STOCK_VIRTUAL_ID
+      CLOSING_STOCK_VIRTUAL_ID,
     );
     if (closingStockPlNode) {
       const closingStockCr = closingStockPlNode.amount.cr;
@@ -1491,7 +1491,7 @@ const reportServiceRaw = {
         closingStockAmount.cr !== 0
       ) {
         const currentAssetsGroup = [...nodeMap.values()].find(
-          (g) => g.name === CURRENT_ASSETS_GROUP_NAME
+          (g) => g.name === CURRENT_ASSETS_GROUP_NAME,
         );
 
         if (currentAssetsGroup) {
@@ -1521,7 +1521,7 @@ const reportServiceRaw = {
     /* ---------------- REMOVE ZERO NODES ---------------- */
 
     const prune = (
-      nodes: InternalNodeForBalanceSheet[]
+      nodes: InternalNodeForBalanceSheet[],
     ): InternalNodeForBalanceSheet[] =>
       nodes
         .map((n) => ({ ...n, children: prune(n.children) }))
@@ -1530,7 +1530,7 @@ const reportServiceRaw = {
             includeZero ||
             n.amount.dr !== 0 ||
             n.amount.cr !== 0 ||
-            n.children.length
+            n.children.length,
         );
 
     const filteredRoots = prune(roots);
@@ -1539,12 +1539,12 @@ const reportServiceRaw = {
     const currentPL = applyRound(
       pl.totals.netProfit,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const totalPL = applyRound(
       openingPL + currentPL,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const plSide: "LIABILITIES" | "ASSETS" =
@@ -1595,14 +1595,14 @@ const reportServiceRaw = {
     for (const a of assets) {
       assetsTotal += Math.abs(a.amount.dr - a.amount.cr);
       assetsOpeningBalanceTotal += Math.abs(
-        a.openingBalance.dr - a.openingBalance.cr
+        a.openingBalance.dr - a.openingBalance.cr,
       );
     }
 
     for (const l of liabilities) {
       liabilitiesTotal += Math.abs(l.amount.cr - l.amount.dr);
       liabilitiesOpeningBalanceTotal += Math.abs(
-        l.openingBalance.cr - l.openingBalance.dr
+        l.openingBalance.cr - l.openingBalance.dr,
       );
     }
 
@@ -1643,14 +1643,14 @@ const reportServiceRaw = {
         assetsTotal = applyRound(
           assetsTotal + forexGainLoss.amount,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         );
       } else {
         liabilities.push(forexNode);
         liabilitiesTotal = applyRound(
           liabilitiesTotal + forexGainLoss.amount,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         );
       }
     }
@@ -1661,7 +1661,7 @@ const reportServiceRaw = {
     const openingBalanceDifference = applyRound(
       assetsOpeningBalanceTotal - liabilitiesOpeningBalanceTotal,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     if (openingBalanceDifference > 0) {
       const openingDifferenceNode: BsNode = {
@@ -1681,14 +1681,14 @@ const reportServiceRaw = {
         liabilitiesTotal = applyRound(
           liabilitiesTotal + Math.abs(openingBalanceDifference),
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         );
       } else {
         assets.push(openingDifferenceNode);
         assetsTotal = applyRound(
           assetsTotal + Math.abs(openingBalanceDifference),
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         );
       }
     }
@@ -1696,7 +1696,7 @@ const reportServiceRaw = {
     const difference = applyRound(
       assetsTotal - liabilitiesTotal,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const bsResult = addDifferenceNodeAdvanced<BsNode>({
       items: difference > 0 ? liabilities : assets,
@@ -1721,7 +1721,7 @@ const reportServiceRaw = {
     const resTotal = applyRound(
       assetsTotal - liabilitiesTotal,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     logger.info("exiting::getBalanceSheet::report::service");
 
@@ -1734,7 +1734,7 @@ const reportServiceRaw = {
         liabilities: applyRound(
           liabilitiesTotal,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         assets: applyRound(assetsTotal, roundingMethod, roundingPrecision),
         difference: resTotal,
@@ -1749,7 +1749,7 @@ const reportServiceRaw = {
   },
 
   async getCashBankSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getCashBankSummary::report::service");
     const {
@@ -1768,7 +1768,7 @@ const reportServiceRaw = {
       useActiveFlag: true,
     });
     const cashBankGroups = allGroups.filter(
-      (g) => CASH_BANK_GROUPS.includes(g.name) && g.companyId === companyId
+      (g) => CASH_BANK_GROUPS.includes(g.name) && g.companyId === companyId,
     );
     const groupIds = cashBankGroups.map((g) => g.id);
     const cashBankSummary = await reportServiceRaw.getGroupSummaryTree({
@@ -1785,7 +1785,7 @@ const reportServiceRaw = {
   },
 
   async getReceivableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getReceivableSummary::report::service");
     const {
@@ -1807,7 +1807,7 @@ const reportServiceRaw = {
     });
 
     const receivableGroups = allGroups.filter(
-      (g) => RECEIVABLE_GROUPS.includes(g.name) && g.companyId === companyId
+      (g) => RECEIVABLE_GROUPS.includes(g.name) && g.companyId === companyId,
     );
     const groupIds = receivableGroups.map((g) => g.id);
 
@@ -1839,7 +1839,7 @@ const reportServiceRaw = {
   },
 
   async getPayableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getPayableSummary::report::service");
     const {
@@ -1861,7 +1861,7 @@ const reportServiceRaw = {
     });
 
     const payableGroups = allGroups.filter(
-      (g) => PAYABLE_GROUPS.includes(g.name) && g.companyId === companyId
+      (g) => PAYABLE_GROUPS.includes(g.name) && g.companyId === companyId,
     );
     const groupIds = payableGroups.map((g) => g.id);
 
@@ -1906,7 +1906,7 @@ const reportServiceRaw = {
     return fundFlow;
   },
   async getLedgerForexGainLoss(
-    input: LedgerForexReportInput
+    input: LedgerForexReportInput,
   ): Promise<LedgerForexGainLossEngineResult> {
     logger.info("entering::getLedgerForexGainLoss::report::service");
     await validateLedgerBalanceEngineServiceValidation(input);
@@ -1915,7 +1915,7 @@ const reportServiceRaw = {
     return forexGainLoss;
   },
   async getForexGainLossStatement(
-    input: ForexGainLossStatementInput
+    input: ForexGainLossStatementInput,
   ): Promise<ForexGainLossStatementResult> {
     logger.info("entering::getForexGainLossStatement::report::service");
 
@@ -1949,8 +1949,8 @@ const reportServiceRaw = {
       amt.drCr === DrCr.DR
         ? amt.amount
         : amt.drCr === DrCr.CR
-        ? -amt.amount
-        : 0;
+          ? -amt.amount
+          : 0;
 
     /* ---------------- GET GROUPS ---------------- */
 
@@ -1992,7 +1992,7 @@ const reportServiceRaw = {
     if (groupId && !groupMap.has(groupId)) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group ${groupId} not found`)
+        generateErrorMessage("NOT_FOUND", `Group ${groupId} not found`),
       );
     }
 
@@ -2037,7 +2037,7 @@ const reportServiceRaw = {
       const node = nodeMap.get(groupIdForLedger);
       if (!node) {
         logger.warn(
-          `Ledger ${row.ledger?.id} has invalid groupId ${groupIdForLedger}`
+          `Ledger ${row.ledger?.id} has invalid groupId ${groupIdForLedger}`,
         );
         continue;
       }
@@ -2057,7 +2057,7 @@ const reportServiceRaw = {
       while (parentId) {
         if (visited.has(parentId)) {
           logger.error(
-            `Cycle detected in group hierarchy at group ${parentId}`
+            `Cycle detected in group hierarchy at group ${parentId}`,
           );
           break;
         }
@@ -2098,7 +2098,7 @@ const reportServiceRaw = {
         .map(finalize)
         .filter((c): c is ForexGainLossNode => c !== null)
         .sort((a, b) =>
-          (a.group?.value ?? "").localeCompare(b.group?.value ?? "")
+          (a.group?.value ?? "").localeCompare(b.group?.value ?? ""),
         );
 
       const ledger = node.ledger
@@ -2106,7 +2106,7 @@ const reportServiceRaw = {
         .sort(
           (a, b) =>
             (a.ledger?.value ?? "").localeCompare(b.ledger?.value ?? "") ||
-            (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0)
+            (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0),
         );
 
       const transactedBaseSigned = round(node.transactedBaseSigned);
@@ -2216,7 +2216,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, FIRST_COL, rowIndex, LAST_COL);
     const dateCell = ws.getCell(rowIndex, FIRST_COL);
     dateCell.value = `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(
-      periodEnd
+      periodEnd,
     ).format("DD MMM YYYY")}`;
     dateCell.font = { italic: true, size: 10 };
     dateCell.alignment = {
@@ -2398,23 +2398,23 @@ const reportServiceRaw = {
               isFirstRow || isLastRow
                 ? { style: "thin" }
                 : isHeaderRow
-                ? { style: "thin" }
-                : undefined,
+                  ? { style: "thin" }
+                  : undefined,
             bottom: isLastRow
               ? { style: "thin" }
               : isHeaderRow
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
             left: isFirstCol
               ? { style: "thin" }
               : isGapCol
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
             right: isLastCol
               ? { style: "thin" }
               : c === 2
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
           };
         }
       }
@@ -2472,7 +2472,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, FIRST_COL, rowIndex, LAST_COL);
     const dateCell = ws.getCell(rowIndex, FIRST_COL);
     dateCell.value = `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(
-      periodEnd
+      periodEnd,
     ).format("DD MMM YYYY")}`;
     dateCell.font = { italic: true, size: 10 };
     dateCell.alignment = { horizontal: "center", vertical: "middle" };
@@ -2488,7 +2488,7 @@ const reportServiceRaw = {
 
     const flatten = (
       nodes: BsNode[],
-      side: "liability" | "asset"
+      side: "liability" | "asset",
     ): {
       name: string;
       id: number;
@@ -2688,23 +2688,23 @@ const reportServiceRaw = {
             isFirstRow || isLastRow
               ? { style: "thin" }
               : isHeaderRow
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
           bottom: isLastRow
             ? { style: "thin" }
             : isHeaderRow
-            ? { style: "thin" }
-            : undefined,
+              ? { style: "thin" }
+              : undefined,
           left: isFirstCol
             ? { style: "thin" }
             : isGapCol
-            ? { style: "thin" }
-            : undefined,
+              ? { style: "thin" }
+              : undefined,
           right: isLastCol
             ? { style: "thin" }
             : c === 2
-            ? { style: "thin" }
-            : undefined,
+              ? { style: "thin" }
+              : undefined,
         };
       }
     }
@@ -2790,7 +2790,7 @@ const reportServiceRaw = {
     // Date Range
     ws.mergeCells(rowIndex, 1, rowIndex, TOTAL_COLS);
     ws.getCell(rowIndex, 1).value = `(${dayjs(input.fromDate).format(
-      "DD MMM YYYY"
+      "DD MMM YYYY",
     )} – ${dayjs(input.toDate).format("DD MMM YYYY")})`;
     ws.getCell(rowIndex, 1).alignment = { horizontal: "center" };
     ws.getCell(rowIndex, 1).font = { size: 10 };
@@ -2825,7 +2825,7 @@ const reportServiceRaw = {
       const isDr = r.drCr === "DR";
 
       ws.getCell(rowIndex, COL.DATE).value = dayjs(
-        r.voucher.voucherDate
+        r.voucher.voucherDate,
       ).format("DD MMM YYYY");
       ws.getCell(rowIndex, COL.VOUCHER_NO).value = r.voucher.voucherNo;
       ws.getCell(rowIndex, COL.VOUCHER_TYPE).value =
@@ -2995,7 +2995,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -3182,7 +3182,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -3476,7 +3476,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -3851,7 +3851,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -3959,17 +3959,17 @@ const reportServiceRaw = {
         const lPA = getPendingAdvance(
           l.closing?.dr ?? 0,
           l.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const OPA = getPendingAdvance(
           l.opening?.dr ?? 0,
           l.opening?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const PPA = getPendingAdvance(
           l.period?.dr ?? 0,
           l.period?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
 
         ws.getCell(rowIndex, 1).value = `${l.ledger?.value ?? ""}`;
@@ -3988,7 +3988,7 @@ const reportServiceRaw = {
 
           buckets.forEach((b, i) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amount = bucket?.amount ?? 0;
             ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -4037,17 +4037,17 @@ const reportServiceRaw = {
         const childPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const childOPA = getPendingAdvance(
           child.opening?.dr ?? 0,
           child.opening?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const childPPA = getPendingAdvance(
           child.period?.dr ?? 0,
           child.period?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
 
         ws.getCell(rowIndex, 1).value = `${child.group?.value ?? ""}`;
@@ -4124,7 +4124,7 @@ const reportServiceRaw = {
 
             buckets.forEach((b, i) => {
               const bucket = ageingRow?.bucketAmounts.find(
-                (ba) => ba.from === b.from && ba.to === b.to
+                (ba) => ba.from === b.from && ba.to === b.to,
               );
               const amount = bucket?.amount ?? 0;
               ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -4138,17 +4138,17 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "receivable"
+            "receivable",
           );
           const OPA = getPendingAdvance(
             l.opening?.dr ?? 0,
             l.opening?.cr ?? 0,
-            "receivable"
+            "receivable",
           );
           const PPA = getPendingAdvance(
             l.period?.dr ?? 0,
             l.period?.cr ?? 0,
-            "receivable"
+            "receivable",
           );
           ws.getCell(rowIndex, openingPendingCol).value = OPA.pending;
           ws.getCell(rowIndex, openingAdvanceCol).value = OPA.advance;
@@ -4195,7 +4195,7 @@ const reportServiceRaw = {
       totalRowData.push(ageing.totals.pending || "");
       buckets.forEach((b) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amount = bucket?.amount ?? 0;
         totalRowData.push(amount > 0 ? amount : "");
@@ -4204,17 +4204,17 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "receivable"
+      "receivable",
     );
     const TOPA = getPendingAdvance(
       totals.openingDr ?? 0,
       totals.openingCr ?? 0,
-      "receivable"
+      "receivable",
     );
     const TPPA = getPendingAdvance(
       totals.periodDr ?? 0,
       totals.periodCr ?? 0,
-      "receivable"
+      "receivable",
     );
     totalRowData.push(TOPA.pending || "");
     totalRowData.push(TOPA.advance || "");
@@ -4379,7 +4379,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -4487,17 +4487,17 @@ const reportServiceRaw = {
         const IPA = getPendingAdvance(
           l.closing?.dr ?? 0,
           l.closing?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const OPA = getPendingAdvance(
           l.opening?.dr ?? 0,
           l.opening?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const PPA = getPendingAdvance(
           l.period?.dr ?? 0,
           l.period?.cr ?? 0,
-          "payable"
+          "payable",
         );
 
         ws.getCell(rowIndex, 1).value = `${l.ledger?.value ?? ""}`;
@@ -4516,7 +4516,7 @@ const reportServiceRaw = {
 
           buckets.forEach((b, i) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amount = bucket?.amount ?? 0;
             ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -4565,17 +4565,17 @@ const reportServiceRaw = {
         const CPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const COPA = getPendingAdvance(
           child.opening?.dr ?? 0,
           child.opening?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const CPPA = getPendingAdvance(
           child.period?.dr ?? 0,
           child.period?.cr ?? 0,
-          "payable"
+          "payable",
         );
 
         ws.getCell(rowIndex, 1).value = `${child.group?.value ?? ""}`;
@@ -4652,7 +4652,7 @@ const reportServiceRaw = {
 
             buckets.forEach((b, i) => {
               const bucket = ageingRow?.bucketAmounts.find(
-                (ba) => ba.from === b.from && ba.to === b.to
+                (ba) => ba.from === b.from && ba.to === b.to,
               );
               const amount = bucket?.amount ?? 0;
               ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -4666,17 +4666,17 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "payable"
+            "payable",
           );
           const OPA = getPendingAdvance(
             l.opening?.dr ?? 0,
             l.opening?.cr ?? 0,
-            "payable"
+            "payable",
           );
           const PPA = getPendingAdvance(
             l.period?.dr ?? 0,
             l.period?.cr ?? 0,
-            "payable"
+            "payable",
           );
           ws.getCell(rowIndex, openingPendingCol).value = OPA.pending;
           ws.getCell(rowIndex, openingAdvanceCol).value = OPA.advance;
@@ -4723,7 +4723,7 @@ const reportServiceRaw = {
       totalRowData.push(ageing.totals.pending || "");
       buckets.forEach((b) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amount = bucket?.amount ?? 0;
         totalRowData.push(amount > 0 ? amount : "");
@@ -4732,17 +4732,17 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "payable"
+      "payable",
     );
     const TOPA = getPendingAdvance(
       totals.openingDr ?? 0,
       totals.openingCr ?? 0,
-      "payable"
+      "payable",
     );
     const TPPA = getPendingAdvance(
       totals.periodDr ?? 0,
       totals.periodCr ?? 0,
-      "payable"
+      "payable",
     );
     totalRowData.push(TOPA.pending || "");
     totalRowData.push(TOPA.advance || "");
@@ -4886,7 +4886,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -5422,7 +5422,7 @@ const reportServiceRaw = {
     ws.properties.defaultRowHeight = 18;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     // ============================================================
@@ -5625,7 +5625,7 @@ const reportServiceRaw = {
       const addGroupLines = (
         nodes: CashFlowNode[],
         lines: Line[],
-        type: string
+        type: string,
       ) => {
         nodes.forEach((node) => {
           lines.push({
@@ -5817,7 +5817,7 @@ const reportServiceRaw = {
       // Recursive renderer — typed properly
       const renderGroupNode = (
         node: CashFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         const label = `${"  ".repeat(indent)}${node.group?.value ?? ""}`;
         const row = ws.addRow([
@@ -5954,7 +5954,7 @@ const reportServiceRaw = {
     ws.properties.defaultRowHeight = 18;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     // ============================================================
@@ -6266,7 +6266,7 @@ const reportServiceRaw = {
             };
           }
           rowIndex++;
-        }
+        },
       );
 
       // Working Capital total row
@@ -6274,11 +6274,11 @@ const reportServiceRaw = {
       ws.getCell(rowIndex, 1).value = "Working Capital";
       ws.getCell(rowIndex, 2).value = fmtBal(
         workingCapital.openingWorkingCapital.dr,
-        workingCapital.openingWorkingCapital.cr
+        workingCapital.openingWorkingCapital.cr,
       );
       ws.getCell(rowIndex, 3).value = fmtBal(
         workingCapital.closingWorkingCapital.dr,
-        workingCapital.closingWorkingCapital.cr
+        workingCapital.closingWorkingCapital.cr,
       );
       ws.getCell(rowIndex, 4).value = workingCapital.increase || "";
       for (let c = 1; c <= COLS; c++) {
@@ -6460,7 +6460,7 @@ const reportServiceRaw = {
 
       const renderGroupNode = (
         node: FundFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         const label = `${"  ".repeat(indent)}${node.group?.value ?? ""}`;
         const row = ws.addRow([
@@ -6598,7 +6598,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForBalanceSheet(
-    input: BalanceSheetRequestInput
+    input: BalanceSheetRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForBalanceSheet::service");
 
@@ -6663,7 +6663,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         color?: string;
         fontSize?: number;
-      } = {}
+      } = {},
     ) => {
       doc
         .font(opts.bold ? FONT_BOLD : opts.italic ? FONT_ITALIC : FONT_NORMAL)
@@ -6736,7 +6736,7 @@ const reportServiceRaw = {
     doc.rect(PAGE_LEFT, y, TOTAL_W, ROW_H).stroke();
     writeCell(
       `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(periodEnd).format(
-        "DD MMM YYYY"
+        "DD MMM YYYY",
       )}`,
       PAGE_LEFT,
       y,
@@ -6746,7 +6746,7 @@ const reportServiceRaw = {
         italic: true,
         fontSize: 10,
         align: "center",
-      }
+      },
     );
     y += ROW_H;
 
@@ -6780,7 +6780,7 @@ const reportServiceRaw = {
           ROW_H,
           {
             align: isSpecial ? "left" : "right",
-          }
+          },
         );
       }
 
@@ -6880,7 +6880,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForBalanceSheetWithChildren(
-    input: BalanceSheetRequestInput
+    input: BalanceSheetRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForBalanceSheetWithChildren::service");
 
@@ -6947,7 +6947,7 @@ const reportServiceRaw = {
         color?: string;
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -6974,7 +6974,7 @@ const reportServiceRaw = {
     // ── Flatten helper ──
     const flatten = (
       nodes: BsNode[],
-      side: "liability" | "asset"
+      side: "liability" | "asset",
     ): {
       name: string;
       id: number;
@@ -7068,7 +7068,7 @@ const reportServiceRaw = {
     doc.rect(PAGE_LEFT, y, TOTAL_W, ROW_H).stroke();
     writeCell(
       `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(periodEnd).format(
-        "DD MMM YYYY"
+        "DD MMM YYYY",
       )}`,
       PAGE_LEFT,
       y,
@@ -7078,7 +7078,7 @@ const reportServiceRaw = {
         italic: true,
         fontSize: 10,
         align: "center",
-      }
+      },
     );
     y += ROW_H;
 
@@ -7209,7 +7209,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForLedgerBookReport(
-    input: LedgerBookExcelRequestInput
+    input: LedgerBookExcelRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForLedgerBookReport::service");
 
@@ -7306,7 +7306,7 @@ const reportServiceRaw = {
     const calcCellHeight = (
       text: string,
       w: number,
-      opts: { fontSize?: number; bold?: boolean } = {}
+      opts: { fontSize?: number; bold?: boolean } = {},
     ): number => {
       doc
         .font(opts.bold ? FONT_BOLD : FONT_NORMAL)
@@ -7327,7 +7327,7 @@ const reportServiceRaw = {
         bold?: boolean;
         align?: "left" | "right" | "center";
         fontSize?: number;
-      } = {}
+      } = {},
     ) => {
       doc
         .font(opts.bold ? FONT_BOLD : FONT_NORMAL)
@@ -7359,7 +7359,7 @@ const reportServiceRaw = {
     const drawHeaders = () => {
       // Calculate dynamic header height based on each label wrapping in its column
       const headerH = Math.max(
-        ...cols.map((c) => calcCellHeight(c.label, c.w, { bold: true }))
+        ...cols.map((c) => calcCellHeight(c.label, c.w, { bold: true })),
       );
 
       drawHLine(PAGE_LEFT, y, TOTAL_W);
@@ -7404,13 +7404,13 @@ const reportServiceRaw = {
     drawVLine(PAGE_LEFT + TOTAL_W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("DD MMM YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("DD MMM YYYY")})`,
       PAGE_LEFT,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -7445,8 +7445,8 @@ const reportServiceRaw = {
 
       const dynamicH = Math.max(
         ...cellContents.map((c) =>
-          calcCellHeight(c.text, c.w, { bold: c.bold })
-        )
+          calcCellHeight(c.text, c.w, { bold: c.bold }),
+        ),
       );
 
       checkPageBreak(dynamicH);
@@ -7460,7 +7460,7 @@ const reportServiceRaw = {
         dynamicH,
         {
           align: "center",
-        }
+        },
       );
       writeCell(
         r.voucher.voucherNo ?? "",
@@ -7468,7 +7468,7 @@ const reportServiceRaw = {
         y,
         colW("VOUCHER_NO"),
         dynamicH,
-        { align: "center" }
+        { align: "center" },
       );
       writeCell(
         r.voucher.voucherType?.value ?? "",
@@ -7478,7 +7478,7 @@ const reportServiceRaw = {
         dynamicH,
         {
           align: "center",
-        }
+        },
       );
 
       if (showNarration) {
@@ -7488,7 +7488,7 @@ const reportServiceRaw = {
           y,
           colW("NARRATION"),
           dynamicH,
-          { align: "center" }
+          { align: "center" },
         );
       }
       if (showCreatedBy) {
@@ -7500,7 +7500,7 @@ const reportServiceRaw = {
           dynamicH,
           {
             align: "center",
-          }
+          },
         );
       }
       if (showUpdatedBy) {
@@ -7512,7 +7512,7 @@ const reportServiceRaw = {
           dynamicH,
           {
             align: "center",
-          }
+          },
         );
       }
 
@@ -7522,7 +7522,7 @@ const reportServiceRaw = {
         y,
         colW("DR"),
         dynamicH,
-        { align: "center" }
+        { align: "center" },
       );
       writeCell(
         !isDr ? fmtAmt(Number(r.amount)) : "",
@@ -7530,7 +7530,7 @@ const reportServiceRaw = {
         y,
         colW("CR"),
         dynamicH,
-        { align: "center" }
+        { align: "center" },
       );
 
       y += dynamicH;
@@ -7590,7 +7590,7 @@ const reportServiceRaw = {
       const summaryH = Math.max(
         calcCellHeight(s.label, labelW, { bold: true }),
         calcCellHeight(s.dr, colW("DR"), { bold: true }),
-        calcCellHeight(s.cr, colW("CR"), { bold: true })
+        calcCellHeight(s.cr, colW("CR"), { bold: true }),
       );
 
       // Only draw outer left, DR divider, CR divider, right edge — NO inner col lines, NO horizontal lines
@@ -7626,7 +7626,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForTrialBalance(
-    input: TrialBalanceRequestInput
+    input: TrialBalanceRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForTrialBalance::service");
 
@@ -7707,7 +7707,7 @@ const reportServiceRaw = {
         bold?: boolean;
         align?: "left" | "right" | "center";
         fontSize?: number;
-      } = {}
+      } = {},
     ) => {
       doc
         .font(opts.bold ? FONT_BOLD : FONT_NORMAL)
@@ -7809,13 +7809,13 @@ const reportServiceRaw = {
     drawVLine(col7X + col7W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -7900,7 +7900,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForGroupSummary(
-    input: GroupSummaryRequestInput
+    input: GroupSummaryRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForGroupSummary::service");
 
@@ -7982,7 +7982,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -8035,7 +8035,7 @@ const reportServiceRaw = {
       drawHLine(
         col2X,
         y + ROW_H,
-        col2W + col3W + col4W + col5W + col6W + col7W
+        col2W + col3W + col4W + col5W + col6W + col7W,
       );
       y += ROW_H;
 
@@ -8080,7 +8080,7 @@ const reportServiceRaw = {
         bold: true,
         fontSize: 16,
         align: "center",
-      }
+      },
     );
     y += titleH;
 
@@ -8089,13 +8089,13 @@ const reportServiceRaw = {
     drawVLine(col7X + col7W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -8245,7 +8245,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForCashBankSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForCashBankSummary::service");
 
@@ -8323,7 +8323,7 @@ const reportServiceRaw = {
         fontSize?: number;
         indent?: number;
         wrap?: boolean;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -8342,7 +8342,7 @@ const reportServiceRaw = {
     const getRowHeight = (
       text: string,
       w: number,
-      opts: { bold?: boolean; italic?: boolean; indent?: number } = {}
+      opts: { bold?: boolean; italic?: boolean; indent?: number } = {},
     ): number => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -8403,7 +8403,7 @@ const reportServiceRaw = {
       drawHLine(
         col2X,
         y + ROW_H,
-        col2W + col3W + col4W + col5W + col6W + col7W
+        col2W + col3W + col4W + col5W + col6W + col7W,
       );
       y += ROW_H;
 
@@ -8441,13 +8441,13 @@ const reportServiceRaw = {
     drawVLine(col7X + col7W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -8632,7 +8632,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForReceivableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForReceivableSummary::service");
 
@@ -8735,7 +8735,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -8898,13 +8898,13 @@ const reportServiceRaw = {
     drawVLine(rightEdge, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -8935,7 +8935,7 @@ const reportServiceRaw = {
       periodAdvance: number | string,
       closingPending: number | string,
       closingAdvance: number | string,
-      opts: { bold?: boolean; italic?: boolean; indent?: number } = {}
+      opts: { bold?: boolean; italic?: boolean; indent?: number } = {},
     ) => {
       checkPageBreak();
       const rowHeight = getRowHeight(label, col1W);
@@ -8959,7 +8959,7 @@ const reportServiceRaw = {
             y,
             bucketWs[i],
             rowHeight,
-            { align: "right" }
+            { align: "right" },
           );
         });
       }
@@ -8970,7 +8970,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       writeCell(
         fmtAmt(openingAdvance),
@@ -8978,7 +8978,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       writeCell(fmtAmt(periodPending), periodPendingX, y, colPairW, rowHeight, {
         bold: opts.bold,
@@ -8994,7 +8994,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       writeCell(
         fmtAmt(closingAdvance),
@@ -9002,7 +9002,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       y += rowHeight;
     };
@@ -9019,21 +9019,21 @@ const reportServiceRaw = {
         const lPA = getPendingAdvance(
           l.closing?.dr ?? 0,
           l.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const OPA = getPendingAdvance(
           l.opening?.dr ?? 0,
           l.opening?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const PPA = getPendingAdvance(
           l.period?.dr ?? 0,
           l.period?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const bAmounts = buckets.map((b) => {
           const bucket = ageingRow?.bucketAmounts.find(
-            (ba) => ba.from === b.from && ba.to === b.to
+            (ba) => ba.from === b.from && ba.to === b.to,
           );
           const amt = bucket?.amount ?? 0;
           return amt > 0 ? amt : "";
@@ -9048,7 +9048,7 @@ const reportServiceRaw = {
           PPA.advance,
           lPA.pending,
           lPA.advance,
-          { italic: true }
+          { italic: true },
         );
       });
 
@@ -9056,17 +9056,17 @@ const reportServiceRaw = {
         const childPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const childOPA = getPendingAdvance(
           child.opening?.dr ?? 0,
           child.opening?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         const childPPA = getPendingAdvance(
           child.period?.dr ?? 0,
           child.period?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
         writeDataRow(
           child.group?.value ?? "",
@@ -9078,7 +9078,7 @@ const reportServiceRaw = {
           childPPA.advance,
           childPA.pending,
           childPA.advance,
-          { bold: true }
+          { bold: true },
         );
 
         child.ledger?.forEach((l) => {
@@ -9088,21 +9088,21 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "receivable"
+            "receivable",
           );
           const OPA = getPendingAdvance(
             l.opening?.dr ?? 0,
             l.opening?.cr ?? 0,
-            "receivable"
+            "receivable",
           );
           const PPA = getPendingAdvance(
             l.period?.dr ?? 0,
             l.period?.cr ?? 0,
-            "receivable"
+            "receivable",
           );
           const bAmounts = buckets.map((b) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amt = bucket?.amount ?? 0;
             return amt > 0 ? amt : "";
@@ -9117,7 +9117,7 @@ const reportServiceRaw = {
             PPA.advance,
             lPA.pending,
             lPA.advance,
-            { italic: true, indent: 12 }
+            { italic: true, indent: 12 },
           );
         });
       });
@@ -9136,17 +9136,17 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "receivable"
+      "receivable",
     );
     const TOPA = getPendingAdvance(
       totals.openingDr ?? 0,
       totals.openingCr ?? 0,
-      "receivable"
+      "receivable",
     );
     const TPPA = getPendingAdvance(
       totals.periodDr ?? 0,
       totals.periodCr ?? 0,
-      "receivable"
+      "receivable",
     );
 
     writeCell("Grand Total", col1X, y, col1W, ROW_H, { bold: true });
@@ -9158,7 +9158,7 @@ const reportServiceRaw = {
       });
       buckets.forEach((b, i) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amt = bucket?.amount ?? 0;
         writeCell(
@@ -9167,7 +9167,7 @@ const reportServiceRaw = {
           y,
           bucketWs[i],
           ROW_H,
-          { bold: true, align: "right" }
+          { bold: true, align: "right" },
         );
       });
     }
@@ -9208,7 +9208,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForPayableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForPayableSummary::service");
 
@@ -9310,7 +9310,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -9472,13 +9472,13 @@ const reportServiceRaw = {
     drawVLine(rightEdge, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -9509,7 +9509,7 @@ const reportServiceRaw = {
       periodAdvance: number | string,
       closingPending: number | string,
       closingAdvance: number | string,
-      opts: { bold?: boolean; italic?: boolean; indent?: number } = {}
+      opts: { bold?: boolean; italic?: boolean; indent?: number } = {},
     ) => {
       checkPageBreak();
       const rowHeight = getRowHeight(label, col1W);
@@ -9532,7 +9532,7 @@ const reportServiceRaw = {
             y,
             bucketWs[i],
             rowHeight,
-            { align: "right" }
+            { align: "right" },
           );
         });
       }
@@ -9543,7 +9543,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       writeCell(
         fmtAmt(openingAdvance),
@@ -9551,7 +9551,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       writeCell(fmtAmt(periodPending), periodPendingX, y, colPairW, rowHeight, {
         bold: opts.bold,
@@ -9567,7 +9567,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       writeCell(
         fmtAmt(closingAdvance),
@@ -9575,7 +9575,7 @@ const reportServiceRaw = {
         y,
         colPairW,
         rowHeight,
-        { bold: opts.bold, align: "right" }
+        { bold: opts.bold, align: "right" },
       );
       y += rowHeight;
     };
@@ -9592,21 +9592,21 @@ const reportServiceRaw = {
         const IPA = getPendingAdvance(
           l.closing?.dr ?? 0,
           l.closing?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const OPA = getPendingAdvance(
           l.opening?.dr ?? 0,
           l.opening?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const PPA = getPendingAdvance(
           l.period?.dr ?? 0,
           l.period?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const bAmounts = buckets.map((b) => {
           const bucket = ageingRow?.bucketAmounts.find(
-            (ba) => ba.from === b.from && ba.to === b.to
+            (ba) => ba.from === b.from && ba.to === b.to,
           );
           const amt = bucket?.amount ?? 0;
           return amt > 0 ? amt : "";
@@ -9621,7 +9621,7 @@ const reportServiceRaw = {
           PPA.advance,
           IPA.pending,
           IPA.advance,
-          { italic: true }
+          { italic: true },
         );
       });
 
@@ -9629,17 +9629,17 @@ const reportServiceRaw = {
         const CPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const COPA = getPendingAdvance(
           child.opening?.dr ?? 0,
           child.opening?.cr ?? 0,
-          "payable"
+          "payable",
         );
         const CPPA = getPendingAdvance(
           child.period?.dr ?? 0,
           child.period?.cr ?? 0,
-          "payable"
+          "payable",
         );
         writeDataRow(
           child.group?.value ?? "",
@@ -9651,7 +9651,7 @@ const reportServiceRaw = {
           CPPA.advance,
           CPA.pending,
           CPA.advance,
-          { bold: true }
+          { bold: true },
         );
 
         child.ledger?.forEach((l) => {
@@ -9661,21 +9661,21 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "payable"
+            "payable",
           );
           const OPA = getPendingAdvance(
             l.opening?.dr ?? 0,
             l.opening?.cr ?? 0,
-            "payable"
+            "payable",
           );
           const PPA = getPendingAdvance(
             l.period?.dr ?? 0,
             l.period?.cr ?? 0,
-            "payable"
+            "payable",
           );
           const bAmounts = buckets.map((b) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amt = bucket?.amount ?? 0;
             return amt > 0 ? amt : "";
@@ -9690,7 +9690,7 @@ const reportServiceRaw = {
             PPA.advance,
             lPA.pending,
             lPA.advance,
-            { italic: true, indent: 12 }
+            { italic: true, indent: 12 },
           );
         });
       });
@@ -9709,17 +9709,17 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "payable"
+      "payable",
     );
     const TOPA = getPendingAdvance(
       totals.openingDr ?? 0,
       totals.openingCr ?? 0,
-      "payable"
+      "payable",
     );
     const TPPA = getPendingAdvance(
       totals.periodDr ?? 0,
       totals.periodCr ?? 0,
-      "payable"
+      "payable",
     );
 
     writeCell("Grand Total", col1X, y, col1W, ROW_H, { bold: true });
@@ -9731,7 +9731,7 @@ const reportServiceRaw = {
       });
       buckets.forEach((b, i) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amt = bucket?.amount ?? 0;
         writeCell(
@@ -9740,7 +9740,7 @@ const reportServiceRaw = {
           y,
           bucketWs[i],
           ROW_H,
-          { bold: true, align: "right" }
+          { bold: true, align: "right" },
         );
       });
     }
@@ -9781,7 +9781,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForProfitLoss(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForProfitLoss::service");
 
@@ -9849,7 +9849,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -10233,13 +10233,13 @@ const reportServiceRaw = {
     drawVLine(col4X + col4W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -10275,7 +10275,7 @@ const reportServiceRaw = {
           {
             bold: left.bold,
             align: "right",
-          }
+          },
         );
       }
 
@@ -10292,7 +10292,7 @@ const reportServiceRaw = {
           {
             bold: right.bold,
             align: "right",
-          }
+          },
         );
       }
 
@@ -10367,7 +10367,7 @@ const reportServiceRaw = {
     const PAGE_BOTTOM = doc.page.height - 30;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     const ROW_H = 20;
@@ -10408,7 +10408,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -10793,7 +10793,7 @@ const reportServiceRaw = {
           bold: true,
           fontSize: 14,
           align: "center",
-        }
+        },
       );
       y += titleH;
 
@@ -10810,7 +10810,7 @@ const reportServiceRaw = {
 
       const renderGroupNode = (
         node: CashFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         checkPageBreak();
         drawRowBorders(y);
@@ -10905,7 +10905,7 @@ const reportServiceRaw = {
     const PAGE_BOTTOM = doc.page.height - 30;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     const ROW_H = 20;
@@ -10951,7 +10951,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -11301,7 +11301,7 @@ const reportServiceRaw = {
             y,
             col2W,
             ROW_H,
-            { bold: true, align: "right" }
+            { bold: true, align: "right" },
           );
           writeCell(
             fmtBal(g.closing.dr, g.closing.cr),
@@ -11309,7 +11309,7 @@ const reportServiceRaw = {
             y,
             col3W,
             ROW_H,
-            { bold: true, align: "right" }
+            { bold: true, align: "right" },
           );
           writeCell(
             increase !== 0 ? increase.toFixed(2) : "",
@@ -11317,10 +11317,10 @@ const reportServiceRaw = {
             y,
             col4W,
             ROW_H,
-            { bold: true, align: "right" }
+            { bold: true, align: "right" },
           );
           y += ROW_H;
-        }
+        },
       );
 
       checkPageBreakWc();
@@ -11330,24 +11330,24 @@ const reportServiceRaw = {
       writeCell(
         fmtBal(
           workingCapital.openingWorkingCapital.dr,
-          workingCapital.openingWorkingCapital.cr
+          workingCapital.openingWorkingCapital.cr,
         ),
         col2X,
         y,
         col2W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       writeCell(
         fmtBal(
           workingCapital.closingWorkingCapital.dr,
-          workingCapital.closingWorkingCapital.cr
+          workingCapital.closingWorkingCapital.cr,
         ),
         col3X,
         y,
         col3W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       writeCell(
         workingCapital.increase !== 0 ? workingCapital.increase.toFixed(2) : "",
@@ -11358,7 +11358,7 @@ const reportServiceRaw = {
         {
           bold: true,
           align: "right",
-        }
+        },
       );
       drawHLine(col1X, y + ROW_H, TOTAL_W);
       y += ROW_H;
@@ -11458,7 +11458,7 @@ const reportServiceRaw = {
           bold: true,
           fontSize: 13,
           align: "center",
-        }
+        },
       );
       y += titleH;
 
@@ -11485,7 +11485,7 @@ const reportServiceRaw = {
         {
           bold: true,
           align: "center",
-        }
+        },
       );
       drawHLine(col2X, y + ROW_H, col2W + col3W + col4W + col5W);
       y += ROW_H;
@@ -11506,7 +11506,7 @@ const reportServiceRaw = {
           ROW_H,
           {
             align: "right",
-          }
+          },
         );
         writeCell(fmtAmt(ledger.amount.debit), col3X, y, col3W, ROW_H, {
           align: "right",
@@ -11522,14 +11522,14 @@ const reportServiceRaw = {
           ROW_H,
           {
             align: "right",
-          }
+          },
         );
         y += ROW_H;
       };
 
       const renderGroupNode = (
         node: FundFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         checkPageBreak();
         drawRowBorders(y);
@@ -11546,7 +11546,7 @@ const reportServiceRaw = {
           {
             bold: indent === 0,
             align: "right",
-          }
+          },
         );
         writeCell(fmtAmt(node.amount.debit), col3X, y, col3W, ROW_H, {
           bold: indent === 0,
@@ -11565,7 +11565,7 @@ const reportServiceRaw = {
           {
             bold: indent === 0,
             align: "right",
-          }
+          },
         );
         y += ROW_H;
 
@@ -11590,7 +11590,7 @@ const reportServiceRaw = {
         y,
         col2W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       writeCell(fmtAmt(totals.debit), col3X, y, col3W, ROW_H, {
         bold: true,
@@ -11606,7 +11606,7 @@ const reportServiceRaw = {
         y,
         col5W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       drawHLine(col1X, y + ROW_H, TOTAL_W);
       y += ROW_H;
@@ -11622,5 +11622,5 @@ const reportServiceRaw = {
 
 export const reportService = auditProxy.createAuditedService(
   "report",
-  reportServiceRaw
+  reportServiceRaw,
 );

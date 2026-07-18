@@ -8,7 +8,7 @@ import {
 import { customOmit } from "av6-utils";
 
 export const toWarehouseDTO = async (
-  data: WarehouseResponse[]
+  data: WarehouseResponse[],
 ): Promise<WarehouseDTO[]> => {
   const allCollectionCenters =
     await commonService.getAllElements<"CollectionCenter">({
@@ -42,7 +42,7 @@ export const toWarehouseDTO = async (
 };
 
 export const toWarehouseDTOLocation = async (
-  warehouse: WarehouseResponse
+  warehouse: WarehouseResponse,
 ): Promise<WarehouseDTOLocation> => {
   const omittedWarehouse = customOmit<
     WarehouseResponse,

@@ -29,7 +29,7 @@ import {
 import { settingsService } from "@/services/settings/settings.service.js";
 
 export const validateIdMultiVoucher = async (
-  id: number
+  id: number,
 ): Promise<MultiVoucherResponse> => {
   logger.info("entering::validateIdMultiVoucher::service::validation");
   validIdCheck(id);
@@ -48,7 +48,7 @@ export const validateIdMultiVoucher = async (
   if (!multiVoucher) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Multi Voucher")
+      generateErrorMessage("NOT_FOUND", "Multi Voucher"),
     );
   }
   logger.info("exiting::validateIdMultiVoucher::service::validation");
@@ -56,7 +56,7 @@ export const validateIdMultiVoucher = async (
 };
 
 export const validateIdMultiVoucherDetails = async (
-  id: number
+  id: number,
 ): Promise<MultiVoucherDetails> => {
   logger.info("entering::validateIdMultiVoucherDetails::service::validation");
   validIdCheck(id);
@@ -70,7 +70,7 @@ export const validateIdMultiVoucherDetails = async (
   if (!multiVoucherDetails) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Multi Voucher Details")
+      generateErrorMessage("NOT_FOUND", "Multi Voucher Details"),
     );
   }
   logger.info("exiting::validateIdMultiVoucherDetails::service::validation");
@@ -78,10 +78,10 @@ export const validateIdMultiVoucherDetails = async (
 };
 
 export const createOrUpdateMultiVoucherServiceValidation = async (
-  input: CreateOrUpdateMultiVoucherInput
+  input: CreateOrUpdateMultiVoucherInput,
 ) => {
   logger.info(
-    "entering::createOrUpdateMultiVoucherServiceValidation::service::validation"
+    "entering::createOrUpdateMultiVoucherServiceValidation::service::validation",
   );
   const settings = await settingsService.getSettings();
   if (!settings) {
@@ -94,7 +94,7 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
     if (existingMultiVoucher.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        "You can't change company for existing multi voucher"
+        "You can't change company for existing multi voucher",
       );
     }
     // if (existingMultiVoucher.status !== MultiVoucherStatus.DRAFT) {
@@ -112,7 +112,7 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
   if (fy.companyId !== input.companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
   if (input.voucherDate < fy.booksBeginFrom) {
@@ -121,8 +121,8 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
       generateErrorMessage(
         "MUST_GREATER_THEN",
         "Voucher Date",
-        `As per Financial Year books begin from ${fy.booksBeginFrom.toDateString()}`
-      )
+        `As per Financial Year books begin from ${fy.booksBeginFrom.toDateString()}`,
+      ),
     );
   }
 
@@ -133,8 +133,8 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
         "MUST_BETWEEN",
         "Voucher Date",
         `Financial Year start date ${fy.startDate.toDateString()}`,
-        `Financial Year end date ${fy.endDate.toDateString()}`
-      )
+        `Financial Year end date ${fy.endDate.toDateString()}`,
+      ),
     );
   }
   const cc = await validateIdCollectionCenter(input.ccId);
@@ -147,8 +147,8 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
       generateErrorMessage(
         "INVALID_ASSOCIATION",
         "Collection Center",
-        "Company"
-      )
+        "Company",
+      ),
     );
   }
 
@@ -156,7 +156,7 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
   if (voucherType.companyId !== input.companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Voucher Type", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Voucher Type", "Company"),
     );
   }
 
@@ -175,14 +175,14 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
   if (!parentLedger) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("NOT_FOUND", "Parent Ledger")
+      generateErrorMessage("NOT_FOUND", "Parent Ledger"),
     );
   }
 
   if (Number(input.amount) <= 0) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("MUST_GREATER_THEN", "Header Amount", "0")
+      generateErrorMessage("MUST_GREATER_THEN", "Header Amount", "0"),
     );
   }
   let childLedgerTotalDrAmount = 0;
@@ -197,8 +197,8 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
           generateErrorMessage(
             "INVALID_ASSOCIATION",
             "Multi Voucher Details",
-            "Multi Voucher"
-          )
+            "Multi Voucher",
+          ),
         );
       }
     }
@@ -206,20 +206,20 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
     if (cc.id === settings?.mainBranch?.id) {
       throw new ErrorHandler(
         400,
-        "Multi Voucher Details cannot be created for head office "
+        "Multi Voucher Details cannot be created for head office ",
       );
     }
     const ledger = await validateIdLedger(detail.ledgerId);
     if (ledger.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company")
+        generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company"),
       );
     }
     if (voucherType.isNarrationMandatory && !detail.narration) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Narration")
+        generateErrorMessage("FIELD_REQUIRED", "Narration"),
       );
     }
     if (
@@ -228,14 +228,14 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
     ) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Voucher No")
+        generateErrorMessage("FIELD_REQUIRED", "Voucher No"),
       );
     }
 
     if (Number(detail.amount) <= 0) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("MUST_GREATER_THEN", "Details Amount", "0")
+        generateErrorMessage("MUST_GREATER_THEN", "Details Amount", "0"),
       );
     }
     // check if transaction type is required
@@ -243,7 +243,7 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
       if (!detail.transactionType) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Transaction Type")
+          generateErrorMessage("FIELD_REQUIRED", "Transaction Type"),
         );
       }
       if (detail.transactionType === BankTransactionType.CHEQUE) {
@@ -259,31 +259,31 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
           })) as ChequeMaster[];
 
         const chequeMaster = allChequeMasters.filter(
-          (cm) => cm.bankLedgerId === ledger.id && cm.status === Status.ACTIVE
+          (cm) => cm.bankLedgerId === ledger.id && cm.status === Status.ACTIVE,
         );
 
         if (!chequeMaster) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Cheque Master")
+            generateErrorMessage("NOT_FOUND", "Cheque Master"),
           );
         }
         // Check that the provided chequeNo exists in any ChequeMaster range
         // If not, throw an error
         // const checkNumberExists = chequeMaster.some((cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo);
         const matchingChequeMaster = chequeMaster.find(
-          (cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo
+          (cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo,
         );
 
         if (!matchingChequeMaster) {
           throw new ErrorHandler(
             404,
-            `Cheque No ${chequeNo} does not exist in any Cheque Master range for bank ${ledger.name}`
+            `Cheque No ${chequeNo} does not exist in any Cheque Master range for bank ${ledger.name}`,
           );
         }
         const checkNumberIsUsed = await checkChequeNumberIsUsed(
           matchingChequeMaster.id,
-          chequeNo
+          chequeNo,
         );
         if (checkNumberIsUsed) {
           throw new ErrorHandler(400, `Cheque No ${chequeNo} is already used`);
@@ -315,8 +315,8 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
         `Parent Ledger ${parentLedger.name} Amount: ${input.amount}`,
         `Child Ledger Total Amount: ${
           childLedgerTotalCrAmount - childLedgerTotalDrAmount
-        }`
-      )
+        }`,
+      ),
     );
   } else if (
     input.drCr === DrCr.CR &&
@@ -329,27 +329,27 @@ export const createOrUpdateMultiVoucherServiceValidation = async (
         `Parent Ledger ${parentLedger.name} Amount: ${input.amount}`,
         `Child Ledger Total Amount: ${
           childLedgerTotalDrAmount - childLedgerTotalCrAmount
-        }`
-      )
+        }`,
+      ),
     );
   }
   logger.info(
-    "exiting::createOrUpdateMultiVoucherServiceValidation::service::validation"
+    "exiting::createOrUpdateMultiVoucherServiceValidation::service::validation",
   );
 };
 
 export const deleteMultiVoucherServiceValidation = async (id: number) => {
   logger.info(
-    "entering::deleteMultiVoucherServiceValidation::service::validation"
+    "entering::deleteMultiVoucherServiceValidation::service::validation",
   );
   const multiVoucher = await validateIdMultiVoucher(id);
   if (multiVoucher.status !== MultiVoucherStatus.DRAFT) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Multi Voucher")
+      generateErrorMessage("INVALID_STATUS", "Multi Voucher"),
     );
   }
   logger.info(
-    "exiting::deleteMultiVoucherServiceValidation::service::validation"
+    "exiting::deleteMultiVoucherServiceValidation::service::validation",
   );
 };

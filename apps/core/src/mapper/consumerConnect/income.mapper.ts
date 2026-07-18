@@ -10,7 +10,7 @@ import { Income, IncomeHead } from "@repo/db/generated/prisma/client";
 import { BASE_URL } from "@repo/shared";
 
 export const toIncomeEntity = (
-  incomeReq: CreateIncomeReq
+  incomeReq: CreateIncomeReq,
 ): CreateIncomeInput => {
   const parsedAmount = incomeReq.amount ? parseFloat(incomeReq.amount) : null;
   const parsedDate = incomeReq.date ? new Date(incomeReq.date) : null;
@@ -45,7 +45,7 @@ export const toIncomeDTO = async (income: Income): Promise<IncomeDTO> => {
   if (income.incHeadId !== null) {
     const rawHead = await incomeHeadService.getIncomeHeadById(
       Number(income.incHeadId),
-      true
+      true,
     );
     if (rawHead) {
       incomeHead = toIncomeHeadDTO(rawHead);

@@ -118,7 +118,7 @@ const commonItemSchema = Joi.object<CreateItemInput | UpdateItemInput>({
     .required()
     .messages({
       "any.only": `Medicine Packing Type must be one of [${Object.values(
-        PmsMedPackType
+        PmsMedPackType,
       ).join(", ")}]`,
       "any.required": `Medicine Packing Type is required`,
     }),
@@ -177,7 +177,7 @@ const commonItemSchema = Joi.object<CreateItemInput | UpdateItemInput>({
     .required()
     .messages({
       "any.only": `Tax Method must be one of [${Object.values(TAX_METHOD).join(
-        ", "
+        ", ",
       )}]`,
       "any.required": `Tax Method is required`,
     }),
@@ -207,7 +207,7 @@ const commonItemSchema = Joi.object<CreateItemInput | UpdateItemInput>({
     .required()
     .messages({
       "any.only": `Status must be one of [${Object.values(PmsItemStatus).join(
-        ", "
+        ", ",
       )}]`,
       "any.required": `Status is required`,
     }),
@@ -341,7 +341,7 @@ export const commonItemInstructionSchema = Joi.object<CreateItemInstructionMap>(
       "number.integer": `Dosage Id must be an integer`,
       "any.required": `Dosage Id is required`,
     }),
-  }
+  },
 );
 
 // Update schema extends create schema with required id
@@ -408,7 +408,7 @@ export const createItemSearchSchema = Joi.object<CreateItemSearch>({
     .messages({
       "string.base": "Status must be a string",
       "any.only": `Status must be one of: ${Object.values(PmsItemStatus).join(
-        ", "
+        ", ",
       )}`,
     }),
 });
@@ -492,7 +492,7 @@ export const itemExcelSchema = Joi.object({
   maxStock: Joi.number().integer().required().label("max stock"),
 
   tax: joiDecimalFromSettings({ key: "itemPrecision", required: true }).label(
-    "tax"
+    "tax",
   ),
 
   taxMethod: Joi.string()
@@ -628,7 +628,7 @@ export function validateItemExcelArray(input: unknown): {
 export function validateCreateItem(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   req.body = toItemEntity(req.body, req.files as ItemImageFiles);
 
@@ -647,7 +647,7 @@ export function validateCreateItem(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -656,7 +656,7 @@ export function validateCreateItem(
 export function validateCreateItemDosageMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = commonItemDosageSchema.validate(req.body, {
     abortEarly: false,
@@ -673,7 +673,7 @@ export function validateCreateItemDosageMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -682,7 +682,7 @@ export function validateCreateItemDosageMap(
 export function validateCreateItemInstructionMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = commonItemInstructionSchema.validate(req.body, {
     abortEarly: false,
@@ -699,7 +699,7 @@ export function validateCreateItemInstructionMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -708,7 +708,7 @@ export function validateCreateItemInstructionMap(
 export function validateUpdateItemDosageMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = updateItemDosageMapSchema.validate(req.body, {
     abortEarly: false,
@@ -725,7 +725,7 @@ export function validateUpdateItemDosageMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
   next();
@@ -733,7 +733,7 @@ export function validateUpdateItemDosageMap(
 export function validateUpdateItemInstructionMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = updateItemInstructionMapSchema.validate(req.body, {
     abortEarly: false,
@@ -750,7 +750,7 @@ export function validateUpdateItemInstructionMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
   next();
@@ -759,7 +759,7 @@ export function validateUpdateItemInstructionMap(
 export function validateUpdateItem(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   // validIdCheck(itemId);
   req.body = toItemUpdateEntity(req.body, req.files as ItemImageFiles);
@@ -779,7 +779,7 @@ export function validateUpdateItem(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -789,7 +789,7 @@ export function validateUpdateItem(
 export function validateItemSearch(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = createItemSearchSchema.validate(req.body, {
     abortEarly: false,
@@ -806,7 +806,7 @@ export function validateItemSearch(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -816,7 +816,7 @@ export function validateItemSearch(
 export function validateItemStock(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = getItemStockReqSchema.validate(req.body, {
     abortEarly: false,
@@ -833,7 +833,7 @@ export function validateItemStock(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -867,7 +867,7 @@ export const itemFilterSchema = Joi.object<ItemFilter>({
     .messages({
       "string.base": "Status must be a string",
       "any.only": `Status must be one of ${Object.values(PmsItemStatus).join(
-        ", "
+        ", ",
       )}`,
     }),
 });
@@ -875,7 +875,7 @@ export const itemFilterSchema = Joi.object<ItemFilter>({
 export const validateItemExcelFilter = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = itemFilterSchema.validate(req.body, {
     abortEarly: false,
@@ -888,7 +888,7 @@ export const validateItemExcelFilter = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

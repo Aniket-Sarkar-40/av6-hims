@@ -29,7 +29,7 @@ import { db } from "@repo/db/client";
 type Tx = Prisma.TransactionClient;
 
 export const getVoucherById = async (
-  id: number
+  id: number,
 ): Promise<VoucherResponse | null> => {
   logger.info("entering::getVoucherById::repository");
   return db.voucher.findFirst({
@@ -78,7 +78,7 @@ export const createVoucherInDb = async (input: CreateOrUpdateVoucherInput) => {
         createdBy: input.createdBy ?? currentUser,
         approvedBy:
           input.status === VoucherStatus.POSTED
-            ? input.createdBy ?? currentUser
+            ? (input.createdBy ?? currentUser)
             : null,
         approvedAt: input.status === VoucherStatus.POSTED ? new Date() : null,
         voucherDate: new Date(input.voucherDate),
@@ -195,7 +195,7 @@ export const updateVoucherInDb = async (input: CreateOrUpdateVoucherInput) => {
         voucherDate: new Date(input.voucherDate),
         approvedBy:
           input.status === VoucherStatus.POSTED
-            ? input.createdBy ?? currentUser
+            ? (input.createdBy ?? currentUser)
             : null,
         approvedAt: input.status === VoucherStatus.POSTED ? new Date() : null,
         voucherLines: {
@@ -520,7 +520,7 @@ export const getLedgerBookLines = async (params: {
 
 export const createVoucherFromExcelInDb = async (
   tx: Tx,
-  input: CreateOrUpdateVoucherInput
+  input: CreateOrUpdateVoucherInput,
 ) => {
   logger.info("entering::createVoucherFromExcelInDb::repository");
   const store = requestStorage.getStore();
@@ -565,7 +565,7 @@ export const createVoucherFromExcelInDb = async (
 };
 
 export const getBankLedgerBookLines = async (
-  input: BankLedgerBookRequestInput
+  input: BankLedgerBookRequestInput,
 ): Promise<VoucherLineResponseForBankLedgerBook[]> => {
   logger.info("entering::getBankLedgerBookLines::repository");
   const {
@@ -613,7 +613,7 @@ export const getBankLedgerBookLines = async (
 };
 
 export const manualReconcileVoucherLines = async (
-  input: ManualReconcileRequestInput
+  input: ManualReconcileRequestInput,
 ) => {
   logger.info("entering::manualReconcileVoucherLines::repository");
   const store = requestStorage.getStore();
@@ -635,8 +635,8 @@ export const manualReconcileVoucherLines = async (
           lastReconciledAt: new Date(),
           lastReconciledBy: currentUser,
         },
-      })
-    )
+      }),
+    ),
   );
 
   return updatedLines;
@@ -714,7 +714,7 @@ export const getUnmatchedVoucherLinesForBankAutoSuggestion = async (params: {
   toDate: Date;
 }) => {
   logger.info(
-    "entering::getUnmatchedVoucherLinesForBankAutoSuggestion::repository"
+    "entering::getUnmatchedVoucherLinesForBankAutoSuggestion::repository",
   );
   const { ledgerId, fromDate, toDate } = params;
   const result = await db.voucherLine.findMany({
@@ -742,13 +742,13 @@ export const getUnmatchedVoucherLinesForBankAutoSuggestion = async (params: {
     orderBy: [{ voucher: { voucherDate: "asc" } }, { id: "asc" }],
   });
   logger.info(
-    "exiting::getUnmatchedVoucherLinesForBankAutoSuggestion::repository"
+    "exiting::getUnmatchedVoucherLinesForBankAutoSuggestion::repository",
   );
   return result;
 };
 
 export const getVoucherDetailsForInvoice = async (
-  voucherId: number
+  voucherId: number,
 ): Promise<VoucherResponseForDTO | null> => {
   logger.info("entering::getVoucherDetailsForInvoice::repository");
   return db.voucher.findFirst({
@@ -780,7 +780,7 @@ export const getVoucherDetailsForInvoice = async (
 
 export const createVoucherFromMultiVoucherInDb = async (
   tx: Tx,
-  input: CreateOrUpdateVoucherInput
+  input: CreateOrUpdateVoucherInput,
 ) => {
   logger.info("entering::createVoucherFromMultiVoucherInDb::repository");
   const store = requestStorage.getStore();
@@ -852,7 +852,7 @@ export const createVoucherFromMultiVoucherInDb = async (
 
 export const updateVoucherFromPostedMultiVoucherInDb = async (
   tx: Tx,
-  input: CreateOrUpdateVoucherInput
+  input: CreateOrUpdateVoucherInput,
 ) => {
   logger.info("entering::updateVoucherFromPostedMultiVoucherInDb::repository");
   const store = requestStorage.getStore();
@@ -972,7 +972,7 @@ export const updateVoucherFromPostedMultiVoucherInDb = async (
 
 export const createVoucherAuditInDb = async (
   tx: Tx,
-  input: CreateVoucherAuditInput
+  input: CreateVoucherAuditInput,
 ) => {
   logger.info("entering::createVoucherAuditInDb::repository");
 

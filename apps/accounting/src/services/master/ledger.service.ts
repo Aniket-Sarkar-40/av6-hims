@@ -72,7 +72,7 @@ const ledgerServiceRaw = {
     input: Pick<
       CreateOrUpdateLedgerInput,
       "id" | "currencyId" | "creditPeriodInDays"
-    >
+    >,
   ) {
     logger.info("entering::patchLedger::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.LEDGER);
@@ -95,7 +95,7 @@ const ledgerServiceRaw = {
     logger.info("exiting::deleteLedger::service");
   },
   async fetchLedgerForExternalMapping(
-    input: FetchLedgerForExternalMappingInput
+    input: FetchLedgerForExternalMappingInput,
   ) {
     logger.info("entering::fetchLedgerForExternalMapping::service");
     const ledgers = await toFetchLedgerForExternalMappingDto(input);
@@ -121,7 +121,7 @@ const ledgerServiceRaw = {
     }
 
     const convertedData = data.map((row, index) =>
-      mapRowToLedgerExcelCreateInput(row, index + 1)
+      mapRowToLedgerExcelCreateInput(row, index + 1),
     );
     const batch = await createLedgerExcelInDb(convertedData);
 
@@ -139,10 +139,10 @@ const ledgerServiceRaw = {
     const ws = wb.addWorksheet("LEDGER");
 
     const states: string[] = (await stateService.getAllStates()).map(
-      (state) => state.name
+      (state) => state.name,
     );
     const currencies: string[] = (await currencyService.getAllCurrency()).map(
-      (currency) => currency.code
+      (currency) => currency.code,
     );
 
     const headerAttributes: HeaderAttribute[] = [
@@ -197,7 +197,7 @@ const ledgerServiceRaw = {
     const sampleRows = buildLedgerExcelSampleRows();
     for (const sampleRowData of sampleRows) {
       const sampleRow = ws.addRow(
-        headerAttributes.map((header) => sampleRowData[header.text] ?? "")
+        headerAttributes.map((header) => sampleRowData[header.text] ?? ""),
       );
 
       sampleRow.eachCell((cell) => {
@@ -239,5 +239,5 @@ const ledgerServiceRaw = {
 };
 export const ledgerService = auditProxy.createAuditedService(
   "ledger",
-  ledgerServiceRaw
+  ledgerServiceRaw,
 );

@@ -23,7 +23,7 @@ export const validIdTemplate = async (id: number): Promise<Template> => {
 };
 
 export const templateServiceValidation = async (
-  body: CreateOrUpdateTemplate
+  body: CreateOrUpdateTemplate,
 ) => {
   logger.info("entering::templateServiceValidation::service::validation");
 
@@ -58,24 +58,24 @@ export const templateServiceValidation = async (
         400,
         generateErrorMessage(
           "DUPLICATE_ITEM",
-          `Template with name: ${body.templateName} and type: ${body.templateType} `
-        )
+          `Template with name: ${body.templateName} and type: ${body.templateType} `,
+        ),
       );
     } else if (existingTemplate.templateCode === body.templateCode) {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "DUPLICATE_ITEM",
-          `Template Code: ${body.templateCode} `
-        )
+          `Template Code: ${body.templateCode} `,
+        ),
       );
     } else {
       throw new ErrorHandler(
         400,
         generateErrorMessage(
           "DUPLICATE_ITEM",
-          `${body.templateType} Template with Given Notification Config`
-        )
+          `${body.templateType} Template with Given Notification Config`,
+        ),
       );
     }
   }

@@ -16,10 +16,10 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { AccountingIntegrationConfigDetails } from "@repo/db/generated/prisma/client";
 
 export const validateIdAccountingIntegrationConfig = async (
-  id: number
+  id: number,
 ): Promise<AccountingIntegrationConfigResponse> => {
   logger.info(
-    "entering::validateIdAccountingIntegrationConfig::service::validation"
+    "entering::validateIdAccountingIntegrationConfig::service::validation",
   );
   validIdCheck(id);
   const accountingIntegrationConfig =
@@ -28,20 +28,20 @@ export const validateIdAccountingIntegrationConfig = async (
   if (!accountingIntegrationConfig) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Accounting Integration Config")
+      generateErrorMessage("NOT_FOUND", "Accounting Integration Config"),
     );
   }
   logger.info(
-    "exiting::validateIdAccountingIntegrationConfig::service::validation"
+    "exiting::validateIdAccountingIntegrationConfig::service::validation",
   );
   return accountingIntegrationConfig;
 };
 
 export const validateIdAccountingIntegrationConfigDetails = async (
-  id: number
+  id: number,
 ): Promise<AccountingIntegrationConfigDetails> => {
   logger.info(
-    "entering::validateIdAccountingIntegrationConfigDetails::service::validation"
+    "entering::validateIdAccountingIntegrationConfigDetails::service::validation",
   );
   validIdCheck(id);
   const accountingIntegrationConfigDetails =
@@ -50,20 +50,23 @@ export const validateIdAccountingIntegrationConfigDetails = async (
   if (!accountingIntegrationConfigDetails) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Accounting Integration Config Details")
+      generateErrorMessage(
+        "NOT_FOUND",
+        "Accounting Integration Config Details",
+      ),
     );
   }
   logger.info(
-    "exiting::validateIdAccountingIntegrationConfigDetails::service::validation"
+    "exiting::validateIdAccountingIntegrationConfigDetails::service::validation",
   );
   return accountingIntegrationConfigDetails;
 };
 
 export const validateCreateOrUpdateAccountingIntegrationConfig = async (
-  input: CreateOrUpdateAccountingIntegrationConfigInput
+  input: CreateOrUpdateAccountingIntegrationConfigInput,
 ) => {
   logger.info(
-    "entering::validateCreateOrUpdateAccountingIntegrationConfig::service::validation"
+    "entering::validateCreateOrUpdateAccountingIntegrationConfig::service::validation",
   );
 
   if (input.id) {
@@ -86,14 +89,14 @@ export const validateCreateOrUpdateAccountingIntegrationConfig = async (
   if (config) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Accounting Integration Config")
+      generateErrorMessage("DUPLICATE_ITEM", "Accounting Integration Config"),
     );
   }
 
   for (const detail of input.accountingIntegrationConfigDetails) {
     if (detail.id) {
       const existingDetail = await validateIdAccountingIntegrationConfigDetails(
-        detail.id
+        detail.id,
       );
       if (existingDetail.accountingIntegrationConfigId !== input.id) {
         throw new ErrorHandler(
@@ -101,8 +104,8 @@ export const validateCreateOrUpdateAccountingIntegrationConfig = async (
           generateErrorMessage(
             "INVALID_ASSOCIATION",
             `Accounting Integration Config Details (id: ${detail.id})`,
-            `Accounting Integration Config (id: ${input.id})`
-          )
+            `Accounting Integration Config (id: ${input.id})`,
+          ),
         );
       }
     }
@@ -112,7 +115,7 @@ export const validateCreateOrUpdateAccountingIntegrationConfig = async (
   }
 
   logger.info(
-    "exiting::validateCreateOrUpdateAccountingIntegrationConfig::service::validation"
+    "exiting::validateCreateOrUpdateAccountingIntegrationConfig::service::validation",
   );
   return input;
 };

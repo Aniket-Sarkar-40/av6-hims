@@ -7,19 +7,17 @@ export interface UINPreviewRequest {
   uinSegments: UINSegment[];
 }
 
-export interface CreateOrUpdateVoucherUINConfigRequest
-  extends Omit<
-    Prisma.VoucherUINConfigUncheckedCreateInput,
-    BaseModelAttrWoCancel | "uinSegments" | "sequenceNo"
-  > {
+export interface CreateOrUpdateVoucherUINConfigRequest extends Omit<
+  Prisma.VoucherUINConfigUncheckedCreateInput,
+  BaseModelAttrWoCancel | "uinSegments" | "sequenceNo"
+> {
   uinSegments: UINSegment[];
 }
 
-export interface VoucherUINConfigDTO
-  extends Omit<
-    VoucherUINConfig,
-    BaseModelAttrWoCancel | "uinSegments" | "sequenceNo"
-  > {
+export interface VoucherUINConfigDTO extends Omit<
+  VoucherUINConfig,
+  BaseModelAttrWoCancel | "uinSegments" | "sequenceNo"
+> {
   voucherType: IdValue | null;
   sequenceNo: string;
   uinSegments: UINSegment[];

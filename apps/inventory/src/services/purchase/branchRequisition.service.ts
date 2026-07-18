@@ -120,7 +120,7 @@ export const branchRequisitionService = {
 
   async getBranchRequisitionBatchWiseById(id: number) {
     logger.info(
-      "entering::getBranchRequisitionBatchWiseById::service id=" + id
+      "entering::getBranchRequisitionBatchWiseById::service id=" + id,
     );
 
     validIdCheck(id);
@@ -128,7 +128,7 @@ export const branchRequisitionService = {
     if (!branchReq) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Branch Requisition")
+        generateErrorMessage("NOT_FOUND", "Branch Requisition"),
       );
     }
 
@@ -140,7 +140,7 @@ export const branchRequisitionService = {
 
   async getAllBranchRequisitionBatchWiseById(id: number) {
     logger.info(
-      "entering::getAllBranchRequisitionBatchWiseById::service id=" + id
+      "entering::getAllBranchRequisitionBatchWiseById::service id=" + id,
     );
 
     validIdCheck(id);
@@ -148,14 +148,14 @@ export const branchRequisitionService = {
     if (!branchReq) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Branch Requisition")
+        generateErrorMessage("NOT_FOUND", "Branch Requisition"),
       );
     }
 
     const dto = await toBranchRequisitionBatchWiseDTO(branchReq);
 
     logger.info(
-      "exiting::getAllBranchRequisitionBatchWiseById::service id=" + id
+      "exiting::getAllBranchRequisitionBatchWiseById::service id=" + id,
     );
     return dto;
   },

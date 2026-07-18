@@ -42,7 +42,7 @@ defaultUnitMasterRouter.post(
   verifyToken("INVENTORY"),
   authorize(getPermission("INV", "DEFAULT_UNIT_MASTER", "CREATE")),
   validateDefaultUnitMasterCreate,
-  createDefaultUnitMaster
+  createDefaultUnitMaster,
 );
 
 /**
@@ -72,8 +72,8 @@ defaultUnitMasterRouter.put(
   verifyToken("INVENTORY"),
   authorize(
     getPermission("INV", "DEFAULT_UNIT_MASTER", "VIEW"),
-    getPermission("INV", "DEFAULT_UNIT_MASTER", "UPDATE")
+    getPermission("INV", "DEFAULT_UNIT_MASTER", "UPDATE"),
   ),
   validateDefaultUnitMasterUpdate,
-  updateDefaultUnitMaster
+  updateDefaultUnitMaster,
 );

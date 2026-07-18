@@ -55,7 +55,7 @@ const ledgerCacheKey = getRedisKey("LEDGER", "all");
 
 /** Helper function to prepare the external voucher post input */
 export const prepareExternalVoucherPostInput = async (
-  input: ExternalPostVoucherInput
+  input: ExternalPostVoucherInput,
 ): Promise<{
   preparedVoucherInputs: preparedVoucherInput[];
   isCurrencyConversionRequired: boolean;
@@ -81,7 +81,7 @@ export const prepareExternalVoucherPostInput = async (
   if (!financialYear) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("NOT_FOUND", "Financial Year")
+      generateErrorMessage("NOT_FOUND", "Financial Year"),
     );
   }
 
@@ -119,7 +119,7 @@ export const prepareExternalVoucherPostInput = async (
   });
 
   const ledgerTypes = allLedgers.filter(
-    (ledger) => ledger.companyId === companyId
+    (ledger) => ledger.companyId === companyId,
   ) as Ledger[];
 
   const voucherConfigs = (await getAll({
@@ -158,12 +158,12 @@ export const prepareExternalVoucherPostInput = async (
 
         const amount = getNestedValue<number>(
           input,
-          accountingIntegrationConfigDetail.amountKey
+          accountingIntegrationConfigDetail.amountKey,
         );
         if (amount === null || amount === undefined || amount < 0) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Amount")
+            generateErrorMessage("NOT_FOUND", "Amount"),
           );
         }
         voucherLines.push({
@@ -174,12 +174,12 @@ export const prepareExternalVoucherPostInput = async (
       } else {
         const masterValues = getNestedValue<unknown[]>(
           input,
-          accountingIntegrationConfigDetail.masterKey
+          accountingIntegrationConfigDetail.masterKey,
         );
         if (!masterValues || masterValues.length === 0) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Master Values")
+            generateErrorMessage("NOT_FOUND", "Master Values"),
           );
         }
         for (const masterValue of masterValues) {
@@ -193,12 +193,12 @@ export const prepareExternalVoucherPostInput = async (
 
           const amount = getNestedValue<number>(
             masterValue,
-            accountingIntegrationConfigDetail.amountKey
+            accountingIntegrationConfigDetail.amountKey,
           );
           if (amount === null || amount === undefined || amount < 0) {
             throw new ErrorHandler(
               400,
-              generateErrorMessage("NOT_FOUND", "Amount")
+              generateErrorMessage("NOT_FOUND", "Amount"),
             );
           }
           voucherLines.push({
@@ -237,7 +237,7 @@ type GetLedgerIdByConfigInput = {
 
 /** Helper function to get the ledger id by the config */
 export const getFlatLedgerIdByConfig = async (
-  body: GetLedgerIdByConfigInput
+  body: GetLedgerIdByConfigInput,
 ): Promise<number> => {
   if (body.accountingIntegrationConfigDetail.ledgerType === "ID") {
     const ledgerId = body.accountingIntegrationConfigDetail.ledgerValue;
@@ -245,12 +245,12 @@ export const getFlatLedgerIdByConfig = async (
     if (!ledgerId || isNaN(Number(ledgerId))) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Ledger Id")
+        generateErrorMessage("NOT_FOUND", "Ledger Id"),
       );
     }
 
     const ledger = body.ledgerTypes.find(
-      (ledger) => ledger.id === Number(ledgerId)
+      (ledger) => ledger.id === Number(ledgerId),
     );
     if (!ledger) {
       throw new ErrorHandler(400, generateErrorMessage("NOT_FOUND", "Ledger"));
@@ -274,7 +274,7 @@ export const getFlatLedgerIdByConfig = async (
 
       if (pmsDistributorCase.includes(input.refType)) {
         const distributor = await validateIdPmsDistributor(
-          Number(input.clientId)
+          Number(input.clientId),
         );
 
         const clientLedgerMapping =
@@ -292,7 +292,7 @@ export const getFlatLedgerIdByConfig = async (
         if (!body.accountingIntegrationConfigDetail.groupId) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Group Id")
+            generateErrorMessage("NOT_FOUND", "Group Id"),
           );
         }
         const ledgerCreateInput: CreateOrUpdateLedgerInput = {
@@ -327,7 +327,7 @@ export const getFlatLedgerIdByConfig = async (
 
       if (inventorySupplierCase.includes(input.refType)) {
         const supplier = await validateIdInventorySupplier(
-          Number(input.clientId)
+          Number(input.clientId),
         );
 
         const clientLedgerMapping =
@@ -344,7 +344,7 @@ export const getFlatLedgerIdByConfig = async (
         if (!body.accountingIntegrationConfigDetail.groupId) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Group Id")
+            generateErrorMessage("NOT_FOUND", "Group Id"),
           );
         }
         const ledgerCreateInput: CreateOrUpdateLedgerInput = {
@@ -368,7 +368,7 @@ export const getFlatLedgerIdByConfig = async (
 
       if (input.refSubType === ConfigSubRefType.INSURANCE) {
         const insurance = await validateIdInsuranceMaster(
-          Number(input.clientId)
+          Number(input.clientId),
         );
         const clientLedgerMapping =
           await getClientLedgerMappingByClientIdAndClientType({
@@ -384,7 +384,7 @@ export const getFlatLedgerIdByConfig = async (
         if (!body.accountingIntegrationConfigDetail.groupId) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Group Id")
+            generateErrorMessage("NOT_FOUND", "Group Id"),
           );
         }
         const ledgerCreateInput: CreateOrUpdateLedgerInput = {
@@ -419,7 +419,7 @@ export const getFlatLedgerIdByConfig = async (
         if (!body.accountingIntegrationConfigDetail.groupId) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Group Id")
+            generateErrorMessage("NOT_FOUND", "Group Id"),
           );
         }
         const ledgerCreateInput: CreateOrUpdateLedgerInput = {
@@ -455,26 +455,26 @@ export const getFlatLedgerIdByConfig = async (
         useActiveFlag: true,
       });
       const groups = allGroups.filter(
-        (group) => group.companyId === body.companyId
+        (group) => group.companyId === body.companyId,
       ) as Group[];
 
       const paymentInput = body.input as paymentInput;
       if (!paymentInput?.paymentMode) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Payment Mode")
+          generateErrorMessage("NOT_FOUND", "Payment Mode"),
         );
       }
       if (!paymentInput?.bankOrCashId) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Bank Or Cash Id")
+          generateErrorMessage("NOT_FOUND", "Bank Or Cash Id"),
         );
       }
       if (!paymentInput?.paymentAmount) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Payment Amount")
+          generateErrorMessage("NOT_FOUND", "Payment Amount"),
         );
       }
 
@@ -489,12 +489,12 @@ export const getFlatLedgerIdByConfig = async (
       }
 
       const cashOrBankHead = await getCashAndBankHeadByIdFromDb(
-        Number(paymentInput.bankOrCashId)
+        Number(paymentInput.bankOrCashId),
       );
       if (!cashOrBankHead) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Cash or bank head")
+          generateErrorMessage("NOT_FOUND", "Cash or bank head"),
         );
       }
 
@@ -503,23 +503,23 @@ export const getFlatLedgerIdByConfig = async (
       let groupId = 0;
       if (paymentInput?.paymentMode === "CASH") {
         const group = groups.find(
-          (group) => group.name === CASH_BANK_GROUP_NAMES.CASH
+          (group) => group.name === CASH_BANK_GROUP_NAMES.CASH,
         );
         if (!group) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Group")
+            generateErrorMessage("NOT_FOUND", "Group"),
           );
         }
         groupId = group.id;
       } else {
         const group = groups.find(
-          (group) => group.name === CASH_BANK_GROUP_NAMES.BANK
+          (group) => group.name === CASH_BANK_GROUP_NAMES.BANK,
         );
         if (!group) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Group")
+            generateErrorMessage("NOT_FOUND", "Group"),
           );
         }
         groupId = group.id;
@@ -549,17 +549,17 @@ export const getFlatLedgerIdByConfig = async (
     } else {
       const ledgerName = getNestedValue<string>(
         body.input,
-        body.accountingIntegrationConfigDetail.ledgerValue
+        body.accountingIntegrationConfigDetail.ledgerValue,
       );
       if (!ledgerName) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Ledger Name")
+          generateErrorMessage("NOT_FOUND", "Ledger Name"),
         );
       }
 
       const ledger = body.ledgerTypes.find(
-        (ledger) => ledger.name === ledgerName
+        (ledger) => ledger.name === ledgerName,
       );
       if (ledger) {
         return ledger.id;
@@ -567,7 +567,7 @@ export const getFlatLedgerIdByConfig = async (
       if (!body.accountingIntegrationConfigDetail.groupId) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Group Id")
+          generateErrorMessage("NOT_FOUND", "Group Id"),
         );
       }
       const ledgerCreateInput: CreateOrUpdateLedgerInput = {
@@ -607,7 +607,7 @@ export const buildVoucher = (
     createdBy?: number;
     status?: VoucherStatus;
     voucherLines: VoucherLineSeed[];
-  }
+  },
 ): preparedVoucherInput => {
   const settings = requestStorage.getStore()?.settings;
   if (!settings) {
@@ -620,7 +620,7 @@ export const buildVoucher = (
     (line, index) => ({
       ...line,
       lineNo: index + 1,
-    })
+    }),
   );
 
   const totalDebit = voucherLines
@@ -640,8 +640,8 @@ export const buildVoucher = (
       generateErrorMessage(
         "MISMATCH",
         `Total Debit: ${totalDebitRounded}`,
-        `Total Credit: ${totalCreditRounded}`
-      )
+        `Total Credit: ${totalCreditRounded}`,
+      ),
     );
   }
 

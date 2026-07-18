@@ -40,7 +40,7 @@ settingsRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SETTING", "CREATE")),
   validateSettings,
-  upsertSettings
+  upsertSettings,
 );
 
 /**
@@ -56,7 +56,7 @@ settingsRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SETTING", "VIEW")),
-  getSettings
+  getSettings,
 );
 
 export default settingsRouter;

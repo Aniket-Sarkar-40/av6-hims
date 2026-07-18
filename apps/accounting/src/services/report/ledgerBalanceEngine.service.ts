@@ -62,7 +62,7 @@ const buildForeignLedgerClosingSignedMap = async (params: {
   const closingSignedMap = new Map<number, number>();
   if (!foreignLedgers.length) {
     logger.info(
-      "exiting::buildForeignLedgerClosingSignedMap::service (no foreign ledgers)"
+      "exiting::buildForeignLedgerClosingSignedMap::service (no foreign ledgers)",
     );
     return closingSignedMap;
   }
@@ -77,7 +77,7 @@ const buildForeignLedgerClosingSignedMap = async (params: {
 
   const currencies = await currencyService.getAllCurrency();
   const currencyMap = new Map<number, Currency>(
-    currencies.map((currency) => [currency.id, currency])
+    currencies.map((currency) => [currency.id, currency]),
   );
 
   const rateMap = buildCurrentRateMap({
@@ -120,7 +120,7 @@ const buildForeignLedgerClosingSignedMap = async (params: {
       if (opening.ledgerId !== ledger.id) continue;
       foreignClosingSigned += signedFromDrCr(
         opening.drCr,
-        Number(opening.currencyAmount ?? 0)
+        Number(opening.currencyAmount ?? 0),
       );
     }
 
@@ -128,14 +128,14 @@ const buildForeignLedgerClosingSignedMap = async (params: {
       if (voucherSum.ledgerId !== ledger.id) continue;
       foreignClosingSigned += signedFromDrCr(
         voucherSum.drCr,
-        Number(voucherSum._sum.currencyAmount ?? 0)
+        Number(voucherSum._sum.currencyAmount ?? 0),
       );
     }
 
     const roundedForeignClosingSigned = applyRound(
       foreignClosingSigned,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const currencyId = ledger.currencyId as number;
     const currentRate = rateMap.get(currencyId);
@@ -149,7 +149,7 @@ const buildForeignLedgerClosingSignedMap = async (params: {
         400,
         `Exchange rate not found for ${
           currency?.code ?? currency?.name ?? currencyId
-        } as on ${asOfDateStr}`
+        } as on ${asOfDateStr}`,
       );
     }
 
@@ -161,7 +161,7 @@ const buildForeignLedgerClosingSignedMap = async (params: {
 };
 
 export const getLedgerBalancesNumber = async (
-  input: LedgerBalanceEngineInput
+  input: LedgerBalanceEngineInput,
 ): Promise<LedgerBalanceRowNum[]> => {
   logger.info("entering::getLedgerBalancesNumber::service");
   const {
@@ -197,7 +197,7 @@ export const getLedgerBalancesNumber = async (
   })) as Ledger[];
 
   const ledgers = allLedgers.filter(
-    (l) => l.companyId === companyId
+    (l) => l.companyId === companyId,
   ) as Ledger[];
 
   const company = await getCompanyByIdFromDb(companyId);
@@ -211,7 +211,7 @@ export const getLedgerBalancesNumber = async (
       l.currencyId !== null &&
       baseCurrencyId !== null &&
       l.currencyId !== baseCurrencyId &&
-      (!ledgerIdFilter || ledgerIdFilter.has(l.id))
+      (!ledgerIdFilter || ledgerIdFilter.has(l.id)),
   );
   const foreignLedgerIdSet = new Set(foreignLedgers.map((l) => l.id));
 
@@ -221,7 +221,7 @@ export const getLedgerBalancesNumber = async (
     if (!group) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`)
+        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`),
       );
     }
     ledgerGroupMap.set(ledger.id, group);
@@ -257,13 +257,13 @@ export const getLedgerBalancesNumber = async (
     if (!group) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger?.name}`)
+        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger?.name}`),
       );
     }
     const signed = signedFromDrCr(row.drCr, Number(row.amount));
     openingSignedMap.set(
       row.ledgerId,
-      (openingSignedMap.get(row.ledgerId) ?? 0) + signed
+      (openingSignedMap.get(row.ledgerId) ?? 0) + signed,
     );
   }
 
@@ -294,7 +294,7 @@ export const getLedgerBalancesNumber = async (
     if (!group) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledgerId}`)
+        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledgerId}`),
       );
     }
     const openingBaseSigned = openingSignedMap.get(ledgerId) ?? 0;
@@ -316,17 +316,17 @@ export const getLedgerBalancesNumber = async (
     const row: LedgerBalanceRowNum = {
       ledger: toIdValue(
         ledgers.find((l) => l.id === ledgerId),
-        "name"
+        "name",
       ),
       opening: toDrCr(
-        applyRound(openingSigned, roundingMethod, roundingPrecision)
+        applyRound(openingSigned, roundingMethod, roundingPrecision),
       ),
       period: {
         dr: applyRound(period.dr, roundingMethod, roundingPrecision),
         cr: applyRound(period.cr, roundingMethod, roundingPrecision),
       },
       closing: toDrCr(
-        applyRound(closingSigned, roundingMethod, roundingPrecision)
+        applyRound(closingSigned, roundingMethod, roundingPrecision),
       ),
     };
 
@@ -341,7 +341,7 @@ export const getLedgerBalancesNumber = async (
 
 const ledgerBalanceRaw = {
   async getLedgerBalanceNumber(
-    input: LedgerBalanceEngineInput
+    input: LedgerBalanceEngineInput,
   ): Promise<LedgerBalanceRowNum[]> {
     logger.info("entering::getLedgerBalanceNumber::service");
     await validateLedgerBalanceEngineServiceValidation(input);
@@ -353,5 +353,5 @@ const ledgerBalanceRaw = {
 
 export const ledgerBalanceService = auditProxy.createAuditedService(
   "ledger-balance",
-  ledgerBalanceRaw
+  ledgerBalanceRaw,
 );

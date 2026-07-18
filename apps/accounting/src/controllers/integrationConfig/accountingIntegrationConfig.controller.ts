@@ -12,15 +12,15 @@ export const createAccountingIntegrationConfig = TryCatch(
     const input = req.body as CreateOrUpdateAccountingIntegrationConfigInput;
     const created =
       await accountingIntegrationConfigService.createAccountingIntegrationConfig(
-        input
+        input,
       );
     const response = BaseResponse.success(
       { type: "CREATED", data: created },
-      "Accounting Integration Config"
+      "Accounting Integration Config",
     );
     logger.info("exiting::createAccountingIntegrationConfig::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateAccountingIntegrationConfig = TryCatch(
@@ -29,15 +29,15 @@ export const updateAccountingIntegrationConfig = TryCatch(
     const input = req.body as CreateOrUpdateAccountingIntegrationConfigInput;
     const updated =
       await accountingIntegrationConfigService.updateAccountingIntegrationConfig(
-        input
+        input,
       );
     const response = BaseResponse.success(
       { type: "UPDATED", data: updated },
-      "Accounting Integration Config"
+      "Accounting Integration Config",
     );
     logger.info("exiting::updateAccountingIntegrationConfig::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getIntegrationConfigKeys = TryCatch(
@@ -46,9 +46,9 @@ export const getIntegrationConfigKeys = TryCatch(
     const keys = IntegrationConfigKeysKeys;
     const response = BaseResponse.success(
       { type: "SUCCESS", data: keys },
-      "Integration Config Keys"
+      "Integration Config Keys",
     );
     logger.info("exiting::getIntegrationConfigKeys::controller");
     return res.status(200).json(response);
-  }
+  },
 );

@@ -9,7 +9,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { VoucherUINConfig } from "@repo/db/generated/prisma/client";
 
 export const validateIdVoucherUINConfig = async (
-  voucherUINConfigId: number
+  voucherUINConfigId: number,
 ) => {
   logger.info("entering::validateIdUinConfig::service::validation");
 
@@ -26,7 +26,7 @@ export const validateIdVoucherUINConfig = async (
   if (!voucherUINConfig) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Voucher UIN Config")
+      generateErrorMessage("NOT_FOUND", "Voucher UIN Config"),
     );
   }
   logger.info("exiting::validateIdUinConfig::service::validation");
@@ -35,10 +35,10 @@ export const validateIdVoucherUINConfig = async (
 };
 
 export const createOrUpdateVoucherUINConfigServiceValidation = async (
-  body: CreateOrUpdateVoucherUINConfigRequest
+  body: CreateOrUpdateVoucherUINConfigRequest,
 ) => {
   logger.info(
-    "entering::createOrUpdateVoucherUINConfigServiceValidation::service::validation"
+    "entering::createOrUpdateVoucherUINConfigServiceValidation::service::validation",
   );
   let existingVoucherUINConfig: VoucherUINConfig | null = null;
   if (body.id) {
@@ -49,7 +49,7 @@ export const createOrUpdateVoucherUINConfigServiceValidation = async (
   if (voucherType.numberingMode !== "CUSTOM_AUTO") {
     throw new ErrorHandler(
       400,
-      "You can only create voucher UIN Config for CUSTOM_AUTO numbering mode"
+      "You can only create voucher UIN Config for CUSTOM_AUTO numbering mode",
     );
   }
 
@@ -95,12 +95,12 @@ export const createOrUpdateVoucherUINConfigServiceValidation = async (
     if (overlapConfig) {
       throw new ErrorHandler(
         400,
-        "Date range overlaps with an existing Voucher UIN Config for the same voucher type"
+        "Date range overlaps with an existing Voucher UIN Config for the same voucher type",
       );
     }
   }
   logger.info(
-    "exiting::createOrUpdateVoucherUINConfigServiceValidation::service::validation"
+    "exiting::createOrUpdateVoucherUINConfigServiceValidation::service::validation",
   );
   return existingVoucherUINConfig;
 };

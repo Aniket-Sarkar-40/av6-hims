@@ -8,11 +8,11 @@ interface ApprovalActionDto extends Omit<ApprovalAction, "actedBy"> {
 }
 
 export const toLastApproverDetailsDto = async (
-  appAction: ApprovalAction
+  appAction: ApprovalAction,
 ): Promise<ApprovalActionDto> => {
   const approverDetails = await employeeService.getEmployeeByIdFrmCacheOrDb(
     appAction.actedBy,
-    true
+    true,
   );
   const omittedAppAction = customOmit<ApprovalAction, "actedBy">(appAction, [
     "actedBy",

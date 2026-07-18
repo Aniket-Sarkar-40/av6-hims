@@ -52,7 +52,7 @@ patientsRouter.post(
     "patientSignature",
   ]),
   validatePatients,
-  createPatients
+  createPatients,
 );
 
 /**
@@ -75,7 +75,7 @@ patientsRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "PATIENT", "VIEW"),
-    getPermission("PMS", "PATIENT", "UPDATE")
+    getPermission("PMS", "PATIENT", "UPDATE"),
   ),
   createUploadFieldsMiddleware("patient_images/patient_captured_images", [
     "image",
@@ -83,7 +83,7 @@ patientsRouter.put(
     "patientSignature",
   ]),
   validatePatientsUpdate,
-  updatePatients
+  updatePatients,
 );
 
 /**
@@ -99,7 +99,7 @@ patientsRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PATIENT", "VIEW")),
-  getAllPatients
+  getAllPatients,
 );
 
 /**
@@ -121,7 +121,7 @@ patientsRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PATIENT", "VIEW")),
-  getPatientsById
+  getPatientsById,
 );
 
 /**
@@ -137,7 +137,7 @@ patientsRouter.delete(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PATIENT", "DELETE")),
-  deletePatients
+  deletePatients,
 );
 
 // /**

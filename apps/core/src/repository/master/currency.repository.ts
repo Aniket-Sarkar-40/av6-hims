@@ -6,7 +6,7 @@ import { CurrencyReq } from "@/types/master/currency.js";
 import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export const createCurrencyInDb = async (
-  currency: CurrencyReq
+  currency: CurrencyReq,
 ): Promise<Currency> => {
   logger.info("entering::createCurrency::repository");
   const store = requestStorage.getStore();
@@ -23,7 +23,7 @@ export const getAllCurrencyFromDb = async (): Promise<Currency[]> => {
 };
 
 export const getCurrencyByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Currency | null> => {
   logger.info("entering::getCurrencyById::repository");
   return db.currency.findUnique({
@@ -32,7 +32,7 @@ export const getCurrencyByIdFromDb = async (
 };
 
 export const getCurrencyByCurrencyNameFromDb = async (
-  name: string
+  name: string,
 ): Promise<Currency | null> => {
   logger.info("entering::getCurrencyByCurrencyName::repository");
   return db.currency.findFirst({
@@ -40,7 +40,7 @@ export const getCurrencyByCurrencyNameFromDb = async (
   });
 };
 export const getCurrencyByCurrencyCodeNameFromDb = async (
-  code: string
+  code: string,
 ): Promise<Currency | null> => {
   logger.info("entering::getCurrencyByCurrencyName::repository");
   return db.currency.findFirst({
@@ -50,7 +50,7 @@ export const getCurrencyByCurrencyCodeNameFromDb = async (
 
 export const updateCurrencyInDb = async (
   id: number,
-  currency: CurrencyReq
+  currency: CurrencyReq,
 ): Promise<Currency> => {
   logger.info("entering::updateCurrency::repository");
   const store = requestStorage.getStore();
@@ -61,7 +61,7 @@ export const updateCurrencyInDb = async (
 };
 
 export const updateActiveCurrencyInDb = async (
-  id: number
+  id: number,
 ): Promise<Currency> => {
   logger.info("entering::updateCurrency::repository");
   return db.currency.update({

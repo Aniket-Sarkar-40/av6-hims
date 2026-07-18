@@ -20,11 +20,10 @@ export interface inTransitStockAudit {
   refApprovedAt?: Date;
 }
 
-export interface inTransitStockDTO
-  extends Omit<
-    InvInTransitStock,
-    "fromCcId" | "toCcId" | "itemId" | "userId" | BaseModelAttr
-  > {
+export interface inTransitStockDTO extends Omit<
+  InvInTransitStock,
+  "fromCcId" | "toCcId" | "itemId" | "userId" | BaseModelAttr
+> {
   fromCc: IdValue | null;
   toCc: IdValue | null;
   item: IdValue | null;

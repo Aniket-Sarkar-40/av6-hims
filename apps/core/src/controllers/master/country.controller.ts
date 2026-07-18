@@ -15,7 +15,7 @@ export const createCountry = TryCatch(async (req: Request, res: Response) => {
   const country = await countryService.createCountry(data);
   const response = new BaseResponse(
     { success: true, message: generateSuccessMessage("CREATED", "Country") },
-    country
+    country,
   );
   logger.info("exiting::createCountry::controller");
   return res.status(201).json(response);
@@ -31,8 +31,8 @@ export const getAllCountries = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Country"),
       },
-      countries
-    )
+      countries,
+    ),
   );
 });
 
@@ -45,7 +45,7 @@ export const getCountryById = TryCatch(async (req: Request, res: Response) => {
     return res.status(404).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
   logger.info("exiting::getCountryById::controller");
@@ -55,8 +55,8 @@ export const getCountryById = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Country"),
       },
-      country
-    )
+      country,
+    ),
   );
 });
 
@@ -71,8 +71,8 @@ export const updateCountry = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Country"),
       },
-      updatedCountry
-    )
+      updatedCountry,
+    ),
   );
 });
 
@@ -85,6 +85,6 @@ export const deleteCountry = TryCatch(async (req: Request, res: Response) => {
     new BaseResponse({
       success: true,
       message: generateSuccessMessage("DELETED", "Country"),
-    })
+    }),
   );
 });

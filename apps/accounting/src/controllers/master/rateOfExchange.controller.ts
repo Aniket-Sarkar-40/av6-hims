@@ -15,11 +15,11 @@ export const createRateOfExchange = TryCatch(
     const created = await rateOfExchangeService.createRateOfExchange(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: created },
-      "Rate Of Exchange"
+      "Rate Of Exchange",
     );
     logger.info("exiting::createRateOfExchange::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const fetchRateOfExchange = TryCatch(
@@ -29,9 +29,9 @@ export const fetchRateOfExchange = TryCatch(
     const rate = await rateOfExchangeService.fetchRateOfExchange(input);
     const response = BaseResponse.success(
       { type: "FETCHED", data: rate },
-      "Rate Of Exchange"
+      "Rate Of Exchange",
     );
     logger.info("exiting::fetchRateOfExchange::controller");
     return res.status(200).json(response);
-  }
+  },
 );

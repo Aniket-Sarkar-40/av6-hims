@@ -25,10 +25,10 @@ export const GROUP_NAME_FOR_CLIENT_TYPE = {
 };
 
 export const createExternalClientLedgerMappingServiceValidation = async (
-  input: CreateExternalClientLedgerMappingInput
+  input: CreateExternalClientLedgerMappingInput,
 ) => {
   logger.info(
-    "entering::createExternalClientLedgerMappingServiceValidation::service::validation"
+    "entering::createExternalClientLedgerMappingServiceValidation::service::validation",
   );
   const {
     clientId,
@@ -63,7 +63,7 @@ export const createExternalClientLedgerMappingServiceValidation = async (
   if (existingMapping) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Client Ledger Mapping")
+      generateErrorMessage("DUPLICATE_ITEM", "Client Ledger Mapping"),
     );
   }
 
@@ -80,13 +80,13 @@ export const createExternalClientLedgerMappingServiceValidation = async (
       if (ledger.currencyId !== currencyId) {
         throw new ErrorHandler(
           400,
-          "Provided currency is different from existing ledger currency"
+          "Provided currency is different from existing ledger currency",
         );
       }
       if (ledger.creditPeriodInDays !== creditPeriodInDays) {
         throw new ErrorHandler(
           400,
-          "Provided credit period is different from existing ledger credit period"
+          "Provided credit period is different from existing ledger credit period",
         );
       }
     } else if (overrideExistingLedger === true) {
@@ -123,7 +123,7 @@ export const createExternalClientLedgerMappingServiceValidation = async (
     if (!ledgerName) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Ledger Name")
+        generateErrorMessage("FIELD_REQUIRED", "Ledger Name"),
       );
     }
 
@@ -135,7 +135,7 @@ export const createExternalClientLedgerMappingServiceValidation = async (
           if (!group) {
             throw new ErrorHandler(
               400,
-              generateErrorMessage("NOT_FOUND", "Group")
+              generateErrorMessage("NOT_FOUND", "Group"),
             );
           }
           const createLedgerInput: CreateOrUpdateLedgerInput = {
@@ -145,9 +145,8 @@ export const createExternalClientLedgerMappingServiceValidation = async (
             currencyId: currencyId,
             creditPeriodInDays: creditPeriodInDays,
           };
-          const createdLedger = await ledgerService.createLedger(
-            createLedgerInput
-          );
+          const createdLedger =
+            await ledgerService.createLedger(createLedgerInput);
           ledgerIdToReturn = createdLedger.id;
         }
         break;
@@ -158,7 +157,7 @@ export const createExternalClientLedgerMappingServiceValidation = async (
           if (!group) {
             throw new ErrorHandler(
               400,
-              generateErrorMessage("NOT_FOUND", "Group")
+              generateErrorMessage("NOT_FOUND", "Group"),
             );
           }
           const createLedgerInput: CreateOrUpdateLedgerInput = {
@@ -168,9 +167,8 @@ export const createExternalClientLedgerMappingServiceValidation = async (
             currencyId: currencyId,
             creditPeriodInDays: creditPeriodInDays,
           };
-          const createdLedger = await ledgerService.createLedger(
-            createLedgerInput
-          );
+          const createdLedger =
+            await ledgerService.createLedger(createLedgerInput);
           ledgerIdToReturn = createdLedger.id;
         }
         break;
@@ -181,7 +179,7 @@ export const createExternalClientLedgerMappingServiceValidation = async (
           if (!group) {
             throw new ErrorHandler(
               400,
-              generateErrorMessage("NOT_FOUND", "Group")
+              generateErrorMessage("NOT_FOUND", "Group"),
             );
           }
           const createLedgerInput: CreateOrUpdateLedgerInput = {
@@ -191,9 +189,8 @@ export const createExternalClientLedgerMappingServiceValidation = async (
             currencyId: currencyId,
             creditPeriodInDays: creditPeriodInDays,
           };
-          const createdLedger = await ledgerService.createLedger(
-            createLedgerInput
-          );
+          const createdLedger =
+            await ledgerService.createLedger(createLedgerInput);
           ledgerIdToReturn = createdLedger.id;
         }
         break;
@@ -204,7 +201,7 @@ export const createExternalClientLedgerMappingServiceValidation = async (
           if (!group) {
             throw new ErrorHandler(
               400,
-              generateErrorMessage("NOT_FOUND", "Group")
+              generateErrorMessage("NOT_FOUND", "Group"),
             );
           }
           const createLedgerInput: CreateOrUpdateLedgerInput = {
@@ -214,21 +211,20 @@ export const createExternalClientLedgerMappingServiceValidation = async (
             currencyId: currencyId,
             creditPeriodInDays: creditPeriodInDays,
           };
-          const createdLedger = await ledgerService.createLedger(
-            createLedgerInput
-          );
+          const createdLedger =
+            await ledgerService.createLedger(createLedgerInput);
           ledgerIdToReturn = createdLedger.id;
         }
         break;
       default:
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Client Type")
+          generateErrorMessage("NOT_FOUND", "Client Type"),
         );
     }
   }
   logger.info(
-    "exiting::createExternalClientLedgerMappingServiceValidation::service::validation"
+    "exiting::createExternalClientLedgerMappingServiceValidation::service::validation",
   );
   return ledgerIdToReturn;
 };

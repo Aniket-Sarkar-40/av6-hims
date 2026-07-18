@@ -12,8 +12,10 @@ import {
 } from "@repo/shared/types/global.js";
 import { NewSearchRequest } from "av6-core-v2";
 
-export interface CreateItemStockInput
-  extends Omit<Prisma.InvItemStockUncheckedCreateInput, "id" | BaseModelAttr> {
+export interface CreateItemStockInput extends Omit<
+  Prisma.InvItemStockUncheckedCreateInput,
+  "id" | BaseModelAttr
+> {
   quantity: number;
 }
 export interface UpdateItemStockInput extends CreateItemStockInput {
@@ -30,11 +32,10 @@ export type ItemStockResponse = Prisma.InvItemStockGetPayload<{
     collectionCenter: true;
   };
 }>;
-export interface ItemStockDTO
-  extends Omit<
-    InvItemStock,
-    BaseModelAttrWoCancel | "ccId" | "userId" | "itemId"
-  > {
+export interface ItemStockDTO extends Omit<
+  InvItemStock,
+  BaseModelAttrWoCancel | "ccId" | "userId" | "itemId"
+> {
   item: InvItem | null;
   user: IdValue | null;
 }
@@ -236,8 +237,10 @@ export type InTransitStockByRefBatchInput = {
   refDetailsId: number;
 };
 
-export interface ItemStockSearchFilter
-  extends Omit<NewSearchRequest, "searchColumns" | "includes"> {
+export interface ItemStockSearchFilter extends Omit<
+  NewSearchRequest,
+  "searchColumns" | "includes"
+> {
   ccId: number;
   userId?: number | null;
   itemId?: number | null;

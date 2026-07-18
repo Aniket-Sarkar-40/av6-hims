@@ -7,7 +7,7 @@ import {
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toCostCenterDto = async (
-  input: CostCenterResponse[]
+  input: CostCenterResponse[],
 ): Promise<CostCenterDTO[]> => {
   const costCenters = await commonGetService.getAllElements<"CostCenter">({
     cacheCode: "COST_CENTER",
@@ -37,7 +37,7 @@ export const toCostCenterDto = async (
       parent: costCenter.parentId
         ? toIdValue(
             costCenters.find((c) => c.id === costCenter.parentId),
-            "name"
+            "name",
           )
         : null,
     };

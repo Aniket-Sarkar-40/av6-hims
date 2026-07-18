@@ -63,12 +63,12 @@ export const voucherUINConfigService = {
   async loadConfig(voucherTypeId: number, date: Date) {
     const cfg = await getVoucherUINConfigByVoucherTypeIdAndDate(
       voucherTypeId,
-      date
+      date,
     );
     if (!cfg)
       throw new ErrorHandler(
         404,
-        `Voucher UIN Config not found for voucher type: ${voucherTypeId} and date: ${date}`
+        `Voucher UIN Config not found for voucher type: ${voucherTypeId} and date: ${date}`,
       );
 
     return cfg;
@@ -88,7 +88,7 @@ export const voucherUINConfigService = {
       typeof cfg.uinSegments === "string"
         ? (JSON.parse(cfg.uinSegments) as UINSegment[])
         : [],
-      next
+      next,
     );
   },
 
@@ -99,7 +99,7 @@ export const voucherUINConfigService = {
 
     const updatedVoucherUINConfig = await updateVoucherUINConfig(
       req,
-      existingVoucherUINConfig!
+      existingVoucherUINConfig!,
     );
 
     logger.info("exiting::updateUINConfig::service");
@@ -172,7 +172,7 @@ cron.schedule("01 0 * * *", async () => {
       const effectiveConfig = await checkForNextVoucherUINConfigExists(
         cfg.id,
         cfg.voucherTypeId,
-        new Date(today.format("YYYY-MM-DD"))
+        new Date(today.format("YYYY-MM-DD")),
       );
 
       /**
@@ -181,7 +181,7 @@ cron.schedule("01 0 * * *", async () => {
        */
       if (effectiveConfig.length) {
         logger.info(
-          `Skipping UIN reset for config ${cfg.id}, voucher type ${cfg.voucherTypeId}. Another config is effective.`
+          `Skipping UIN reset for config ${cfg.id}, voucher type ${cfg.voucherTypeId}. Another config is effective.`,
         );
         continue;
       }
@@ -189,7 +189,7 @@ cron.schedule("01 0 * * *", async () => {
       let currentConfigResetDate: string | null = null;
       currentConfigResetDate = getNextResetDate(
         today.toDate(),
-        cfg.seqResetPolicy
+        cfg.seqResetPolicy,
       );
 
       if (!currentConfigResetDate) continue;
@@ -198,18 +198,18 @@ cron.schedule("01 0 * * *", async () => {
         cfg.id,
         cfg.voucherTypeId,
         cfg.seqStartDate,
-        new Date(currentConfigResetDate)
+        new Date(currentConfigResetDate),
       );
       if (overlapConfig.length > 0) {
         const overlapOrNextConfigStartDate = overlapConfig[0].seqStartDate;
 
         if (
           dayjs(overlapOrNextConfigStartDate).isBefore(
-            dayjs(currentConfigResetDate)
+            dayjs(currentConfigResetDate),
           )
         ) {
           currentConfigResetDate = dayjs(overlapOrNextConfigStartDate).format(
-            "YYYY-MM-DD"
+            "YYYY-MM-DD",
           );
         }
       }
@@ -230,7 +230,7 @@ cron.schedule("01 0 * * *", async () => {
     } catch (error) {
       logger.error(
         `Failed to reset sequence for voucher type ${cfg.voucherTypeId} & id ${cfg.id}:`,
-        error
+        error,
       );
     }
   }

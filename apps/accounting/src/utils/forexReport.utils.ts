@@ -11,7 +11,7 @@ export const forexAmtToSigned = (value?: ForexDrCrAmt | null): number => {
 export const isRoundedZero = (
   value: number,
   roundingMethod: RoundFormat,
-  roundingPrecision: number
+  roundingPrecision: number,
 ): boolean => {
   return applyRound(value, roundingMethod, roundingPrecision) === 0;
 };

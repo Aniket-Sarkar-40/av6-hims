@@ -71,7 +71,7 @@ const employeeServiceRaw = {
 
   async getEmployeeById(
     employeeId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<EmployeeDTO | null> {
     logger.info("entering::getEmployeeById::service");
 
@@ -81,7 +81,7 @@ const employeeServiceRaw = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Employee")
+          generateErrorMessage("NOT_FOUND", "Employee"),
         );
       }
       return null;
@@ -94,7 +94,7 @@ const employeeServiceRaw = {
 
   async updateEmployee(
     employeeId: number,
-    input: CreateOrUpdateEmployee
+    input: CreateOrUpdateEmployee,
   ): Promise<void> {
     logger.info("entering::updateEmployee::service");
     await updateEmployeeServiceValidation(input, employeeId);
@@ -102,7 +102,7 @@ const employeeServiceRaw = {
     const updatedEmployee = await updateEmployeeInDb(
       employeeId,
       staffInput,
-      input
+      input,
     );
     const isCacheable = await checkIsCacheable(SHORT_CODE.STAFF);
 
@@ -128,7 +128,7 @@ const employeeServiceRaw = {
 
   async getEmployeeByIdFrmCacheOrDb(
     employeeId: number,
-    canNullReturnable = false
+    canNullReturnable = false,
   ): Promise<EmployeeCache | null> {
     logger.info("entering::getEmployeeById::service");
 
@@ -139,7 +139,7 @@ const employeeServiceRaw = {
     if (isCacheable) {
       const cached = (await getCacheById(
         cacheKey,
-        employeeId
+        employeeId,
       )) as EmployeeCache | null;
       if (cached) {
         logger.info("exiting::getEmployeeById::service (cache)");
@@ -152,7 +152,7 @@ const employeeServiceRaw = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Employee")
+          generateErrorMessage("NOT_FOUND", "Employee"),
         );
       }
       return null;
@@ -171,5 +171,5 @@ const employeeServiceRaw = {
 
 export const employeeService = auditProxy.createAuditedService(
   "employee",
-  employeeServiceRaw
+  employeeServiceRaw,
 );

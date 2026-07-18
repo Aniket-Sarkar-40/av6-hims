@@ -59,7 +59,7 @@ const groupServiceRaw = {
     }
 
     const convertedData = data.map((row, index) =>
-      mapRowToGroupExcelCreateInput(row, index + 1)
+      mapRowToGroupExcelCreateInput(row, index + 1),
     );
     const batch = await createGroupExcelInDb(convertedData);
 
@@ -130,7 +130,7 @@ const groupServiceRaw = {
     const sampleRows = buildGroupExcelSampleRows();
     for (const sampleRowData of sampleRows) {
       const sampleRow = ws.addRow(
-        headerAttributes.map((header) => sampleRowData[header.text] ?? "")
+        headerAttributes.map((header) => sampleRowData[header.text] ?? ""),
       );
 
       sampleRow.eachCell((cell) => {
@@ -173,5 +173,5 @@ const groupServiceRaw = {
 
 export const groupService = auditProxy.createAuditedService(
   "group",
-  groupServiceRaw
+  groupServiceRaw,
 );

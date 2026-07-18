@@ -30,7 +30,7 @@ import { customOmit, toIdValue } from "av6-utils";
 import dayjs from "dayjs";
 
 export const toVoucherDTO = async (
-  input: VoucherResponseForDTO[]
+  input: VoucherResponseForDTO[],
 ): Promise<VoucherDTO[]> => {
   const collectionCenters = await getAllCollectionCentersFromDb();
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
@@ -96,10 +96,10 @@ export const toVoucherDTO = async (
       ]);
 
       const collectionCenter = collectionCenters.find(
-        (cc) => cc.id === voucher.ccId
+        (cc) => cc.id === voucher.ccId,
       );
       const voucherType = voucherTypes.find(
-        (vt) => vt.id === voucher.voucherTypeId
+        (vt) => vt.id === voucher.voucherTypeId,
       );
       const createdBy = voucher.createdBy
         ? await employeeService.getEmployeeById(voucher.createdBy)
@@ -134,7 +134,7 @@ export const toVoucherDTO = async (
                 }
               : null,
           };
-        }
+        },
       );
 
       const billAllocationsDto: BillAllocationDTO[] =
@@ -172,7 +172,7 @@ export const toVoucherDTO = async (
             "costCenterId",
           ]);
           const costCenter = costCenters.find(
-            (cc) => cc.id === ca.costCenterId
+            (cc) => cc.id === ca.costCenterId,
           );
           return {
             ...omittedData.rest,
@@ -215,7 +215,7 @@ export const toVoucherDTO = async (
         costCenterAllocations: costCenterAllocationsDto,
         currency: toIdValue(currency, "code"),
       };
-    })
+    }),
   );
 
   return response;
@@ -224,7 +224,7 @@ export const toVoucherDTO = async (
 export function mapRowToVoucherExcelCreateInput(
   row: VoucherEntryExcelRow,
   rowNo: number,
-  meta: LedgerColumnMeta[]
+  meta: LedgerColumnMeta[],
 ): CreateOrUpdateVoucherEntryExcelInput {
   const otherLedgers: OtherLedger[] = extractOtherLedgersWithMeta(row, meta);
 
@@ -244,7 +244,7 @@ export function mapRowToVoucherExcelCreateInput(
 }
 
 export const toUsedChequeNumberDTO = async (
-  input: UsedChequeNumberResponse[]
+  input: UsedChequeNumberResponse[],
 ): Promise<UsedChequeNumberDTO[]> => {
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
     cacheCode: "VOUCHER_TYPE",
@@ -255,7 +255,7 @@ export const toUsedChequeNumberDTO = async (
   });
   const response: UsedChequeNumberDTO[] = input.map((usedChequeNumber) => {
     const voucherType = voucherTypes.find(
-      (vt) => vt.id === usedChequeNumber.voucherLine.voucher.voucherTypeId
+      (vt) => vt.id === usedChequeNumber.voucherLine.voucher.voucherTypeId,
     );
     return {
       id: usedChequeNumber.id,
@@ -272,7 +272,7 @@ export const toUsedChequeNumberDTO = async (
 };
 
 export const toVoucherPdfDTO = async (
-  voucher: VoucherResponseForDTO
+  voucher: VoucherResponseForDTO,
 ): Promise<VoucherPdfDTO> => {
   const collectionCenters = await getAllCollectionCentersFromDb();
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
@@ -329,10 +329,10 @@ export const toVoucherPdfDTO = async (
   ]);
 
   const collectionCenter = collectionCenters.find(
-    (cc) => cc.id === voucher.ccId
+    (cc) => cc.id === voucher.ccId,
   );
   const voucherType = voucherTypes.find(
-    (vt) => vt.id === voucher.voucherTypeId
+    (vt) => vt.id === voucher.voucherTypeId,
   );
   const createdBy = voucher.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.createdBy)
@@ -345,12 +345,12 @@ export const toVoucherPdfDTO = async (
     voucherType!.nature,
     allLines,
     ledgers,
-    groups
+    groups,
   );
   if (!topLedgerData) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Top Ledger")
+      generateErrorMessage("NOT_FOUND", "Top Ledger"),
     );
   }
   const topLine = topLedgerData.line;
@@ -363,7 +363,8 @@ export const toVoucherPdfDTO = async (
       : "Account";
   const transactionLine =
     allLines.find(
-      (line) => line.transactionType || line.instrumentNo || line.instrumentDate
+      (line) =>
+        line.transactionType || line.instrumentNo || line.instrumentDate,
     ) ?? null;
   const transactionType = transactionLine?.transactionType ?? null;
   const instrumentNo = transactionLine?.instrumentNo ?? null;
@@ -449,7 +450,7 @@ export const toVoucherPdfDTO = async (
 };
 
 export const toVoucherJournalPdfDTO = async (
-  voucher: VoucherResponseForDTO
+  voucher: VoucherResponseForDTO,
 ): Promise<VoucherPdfDTO> => {
   const collectionCenters = await getAllCollectionCentersFromDb();
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
@@ -505,10 +506,10 @@ export const toVoucherJournalPdfDTO = async (
   ]);
 
   const collectionCenter = collectionCenters.find(
-    (cc) => cc.id === voucher.ccId
+    (cc) => cc.id === voucher.ccId,
   );
   const voucherType = voucherTypes.find(
-    (vt) => vt.id === voucher.voucherTypeId
+    (vt) => vt.id === voucher.voucherTypeId,
   );
   const createdBy = voucher.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.createdBy)

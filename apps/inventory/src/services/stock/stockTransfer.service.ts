@@ -31,7 +31,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 
 export const stockTransferService = {
   async createStockTransfer(
-    input: CreateItemStockTransferInput
+    input: CreateItemStockTransferInput,
   ): Promise<StockTransferDTO> {
     logger.info("entering::createStockTransfer::service");
     await createStockTransferServiceValidation(input);
@@ -42,7 +42,7 @@ export const stockTransferService = {
   },
 
   async updateStockTransfer(
-    input: UpdateItemStockTransferInput
+    input: UpdateItemStockTransferInput,
   ): Promise<StockTransferDTO> {
     logger.info("entering::updateStockTransfer::service");
     await updateStockTransferServiceValidation(input);
@@ -60,7 +60,7 @@ export const stockTransferService = {
   },
 
   async approveStockTransfer(
-    input: StockTransferUpdate
+    input: StockTransferUpdate,
   ): Promise<StockTransferDTO> {
     logger.info("entering::approveStockTransfer::service");
     await approveStockTransferServiceValidation(input);
@@ -70,7 +70,7 @@ export const stockTransferService = {
     return stockTransferDTO[0];
   },
   async approveReturnStockTransfer(
-    input: StockTransferUpdate
+    input: StockTransferUpdate,
   ): Promise<StockTransferDTO> {
     logger.info("entering::approveReturnStockTransfer::service");
     await approveReturnStockTransferServiceValidation(input);
@@ -81,7 +81,7 @@ export const stockTransferService = {
   },
 
   async acknowledgeStockTransfer(
-    input: StockTransferAcknowledgeInput
+    input: StockTransferAcknowledgeInput,
   ): Promise<StockTransferDTO> {
     logger.info("entering::acknowledgeStockTransfer::service");
     await acknowledgeStockTransferServiceValidation(input);
@@ -107,7 +107,7 @@ export const stockTransferService = {
     return stockTransferDTOs;
   },
   async searchStockTransfers(
-    input: StockTransferSearchInput
+    input: StockTransferSearchInput,
   ): Promise<PaginatedResponse<StockTransferDTO>> {
     logger.info("entering::searchStockTransfers::service");
 

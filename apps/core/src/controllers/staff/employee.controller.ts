@@ -22,7 +22,7 @@ export const getAllEmployees = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "FETCHED", data: employees },
-    "Employee"
+    "Employee",
   );
 
   logger.info("exiting::getAllEmployees::controller");
@@ -36,7 +36,7 @@ export const getEmployeeById = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "FETCHED", data: employee },
-    "Employee"
+    "Employee",
   );
 
   logger.info("exiting::getEmployeeById::controller");
@@ -71,15 +71,15 @@ export const getEmployeeByIdWithCache = TryCatch(
     logger.info("entering::getEmployeeById::controller");
     const { employeeId } = req.params;
     const employee = await employeeService.getEmployeeByIdFrmCacheOrDb(
-      Number(employeeId)
+      Number(employeeId),
     );
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: employee },
-      "Employee"
+      "Employee",
     );
 
     logger.info("exiting::getEmployeeById::controller");
     return res.status(200).json(response);
-  }
+  },
 );

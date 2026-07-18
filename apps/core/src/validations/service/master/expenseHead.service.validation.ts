@@ -21,7 +21,7 @@ export const validateIdExpenseHead = async (id: number) => {
   if (!expenseHead || expenseHead.isActive === "no") {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "expenseHead")
+      generateErrorMessage("NOT_FOUND", "expenseHead"),
     );
   }
 
@@ -30,66 +30,66 @@ export const validateIdExpenseHead = async (id: number) => {
 };
 
 export const createExpenseHeadServiceValidation = async (
-  input: createExpenseHeadInput
+  input: createExpenseHeadInput,
 ): Promise<void> => {
   logger.info(
-    "entering::createExpenseHeadServiceValidation::service::validation"
+    "entering::createExpenseHeadServiceValidation::service::validation",
   );
 
   const existing = await getExpenseHeadByIncomeHeadNameFromDb(
-    input.expenseCategory
+    input.expenseCategory,
   );
 
   if (existing) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Expense Head")
+      generateErrorMessage("DUPLICATE_ITEM", "Expense Head"),
     );
   }
 
   logger.info(
-    "exiting::createExpenseHeadServiceValidation::service::validation"
+    "exiting::createExpenseHeadServiceValidation::service::validation",
   );
   return;
 };
 
 export const updateExpenseHeadServiceValidation = async (
-  input: updateExpenseHeadInput
+  input: updateExpenseHeadInput,
 ): Promise<void> => {
   logger.info(
-    "entering::updateExpenseHeadServiceValidation::service::validation"
+    "entering::updateExpenseHeadServiceValidation::service::validation",
   );
 
   await validateIdExpenseHead(input.id);
 
   const existing = await getExpenseHeadByIncomeHeadNameFromDb(
-    input.expenseCategory
+    input.expenseCategory,
   );
 
   if (existing && existing.id !== input.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Expense Head")
+      generateErrorMessage("DUPLICATE_ITEM", "Expense Head"),
     );
   }
 
   logger.info(
-    "exiting::updateExpenseHeadServiceValidation::service::validation"
+    "exiting::updateExpenseHeadServiceValidation::service::validation",
   );
   return;
 };
 
 export const deleteExpenseHeadServiceValidation = async (
-  id: number
+  id: number,
 ): Promise<void> => {
   logger.info(
-    "entering::deleteExpenseHeadServiceValidation::service::validation"
+    "entering::deleteExpenseHeadServiceValidation::service::validation",
   );
 
   await validateIdExpenseHead(id);
 
   logger.info(
-    "exiting::deleteExpenseHeadServiceValidation::service::validation"
+    "exiting::deleteExpenseHeadServiceValidation::service::validation",
   );
   return;
 };

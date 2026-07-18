@@ -51,7 +51,7 @@ itemSupplierMapRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "CREATE")),
   validateCreateItemSupplierMap,
-  createItemSupplierMap
+  createItemSupplierMap,
 );
 
 /**
@@ -74,7 +74,7 @@ itemSupplierMapRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "UPDATE")),
   validateUpdateItemSupplierMap,
-  updateItemSupplierMap
+  updateItemSupplierMap,
 );
 
 /**
@@ -90,7 +90,7 @@ itemSupplierMapRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
-  getAllItemSupplierMap
+  getAllItemSupplierMap,
 );
 
 /**
@@ -114,7 +114,7 @@ itemSupplierMapRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
-  getItemSupplierMapById
+  getItemSupplierMapById,
 );
 
 /**
@@ -138,7 +138,7 @@ itemSupplierMapRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "DELETE")),
-  deleteItemSupplierMapById
+  deleteItemSupplierMapById,
 );
 
 /**
@@ -155,7 +155,7 @@ itemSupplierMapRouter.get(
   "/export",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "VIEW")),
-  exportItemSupplierMapExcel
+  exportItemSupplierMapExcel,
 );
 
 /**
@@ -188,5 +188,5 @@ itemSupplierMapRouter.post(
   uploadToHetzner("excel"),
   authorize(getPermission("INV", "ITEM_SUPPLIER_MAP", "CREATE")),
   validateImportExcelItemSupplierMap,
-  importItemSupplierMapExcel
+  importItemSupplierMapExcel,
 );

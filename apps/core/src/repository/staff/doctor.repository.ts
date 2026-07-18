@@ -10,7 +10,7 @@ import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export async function createDoctorInDb(
   input: CreateStaffInput,
-  docInput: CreateOrUpdateDoctor
+  docInput: CreateOrUpdateDoctor,
 ) {
   const store = requestStorage.getStore();
   const createdBy = store?.user?.id;
@@ -32,7 +32,7 @@ export async function createDoctorInDb(
 
 export async function updateDoctorInDb(
   input: CreateStaffInput,
-  docInput: CreateOrUpdateDoctor
+  docInput: CreateOrUpdateDoctor,
 ) {
   const store = requestStorage.getStore();
   const updatedBy = store?.user?.id;
@@ -99,7 +99,7 @@ export const getStaffByIdFromDb = async (id: number) => {
 };
 
 export const getDoctorByDoctorEmailFromDb = async (
-  email: string
+  email: string,
 ): Promise<Staff | null> => {
   logger.info("entering::getDoctorByDoctorEmailFromDb::repository");
   return db.staff.findFirst({
@@ -107,7 +107,7 @@ export const getDoctorByDoctorEmailFromDb = async (
   });
 };
 export const getDoctorByDoctorIdFromDb = async (
-  employeeId: string
+  employeeId: string,
 ): Promise<Staff | null> => {
   logger.info("entering::getDoctorByDoctorIdFromDb::repository");
   return db.staff.findFirst({
@@ -138,7 +138,7 @@ export const checkForeignKeyForDoctor = async (
   id: number,
   siteId: number,
   departmentId: number,
-  locationId: number
+  locationId: number,
 ) => {
   logger.info("entering::checkForeignKeyForDoctor::repository");
 

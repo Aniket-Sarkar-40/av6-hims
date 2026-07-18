@@ -30,7 +30,7 @@ import { getAll } from "@/repository/common.repository.js";
 
 export const mapRowToGroupExcelCreateInput = (
   row: GroupExcelRow,
-  rowNo: number
+  rowNo: number,
 ): CreateOrUpdateGroupExcelInput => {
   const name = parseOptionalString(row.Name);
   if (!name) {
@@ -39,7 +39,7 @@ export const mapRowToGroupExcelCreateInput = (
   if (name.length < 3) {
     throw new ErrorHandler(
       400,
-      generateValidationErrorMessage("STRING_MIN", "Name", "3")
+      generateValidationErrorMessage("STRING_MIN", "Name", "3"),
     );
   }
 
@@ -56,12 +56,12 @@ export const mapRowToGroupExcelCreateInput = (
     primaryCategory: parseEnum<AccountingPrimaryCategory>(
       row["Primary Category"],
       PRIMARY_CATEGORIES,
-      "Primary Category"
+      "Primary Category",
     ),
     reportType: parseEnum<AccountingReportType>(
       row["Report Type"],
       REPORT_TYPES,
-      "Report Type"
+      "Report Type",
     ),
     nature: parseEnum<AccountingNature>(row.Nature, NATURES, "Nature"),
     affectsGrossProfit: parseOptionalBoolean(row["Affects Gross Profit"]),
@@ -84,7 +84,7 @@ export const buildGroupInputFromExcel = async (params: {
   if (existingGroup) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Group")
+      generateErrorMessage("DUPLICATE_ITEM", "Group"),
     );
   }
   let parentId: number | null = null;
@@ -99,14 +99,14 @@ export const buildGroupInputFromExcel = async (params: {
     if (!item.parentGroupName) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Parent Group Name")
+        generateErrorMessage("FIELD_REQUIRED", "Parent Group Name"),
       );
     }
     const parentGroup = allGroups.find((g) => g.name === item.parentGroupName);
     if (!parentGroup) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Parent Group")
+        generateErrorMessage("NOT_FOUND", "Parent Group"),
       );
     }
     parentId = parentGroup.id;
@@ -124,7 +124,7 @@ export const buildGroupInputFromExcel = async (params: {
     ) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Affects Gross Profit")
+        generateErrorMessage("FIELD_REQUIRED", "Affects Gross Profit"),
       );
     }
   }
@@ -134,7 +134,7 @@ export const buildGroupInputFromExcel = async (params: {
     if (item.affectsGrossProfit) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_NOT_ALLOWED", "Affects Gross Profit")
+        generateErrorMessage("FIELD_NOT_ALLOWED", "Affects Gross Profit"),
       );
     }
   }
@@ -152,7 +152,7 @@ export const buildGroupInputFromExcel = async (params: {
 };
 
 export const toGroupDto = async (
-  input: GroupResponse[]
+  input: GroupResponse[],
 ): Promise<GroupDTO[]> => {
   const allGroups = await commonGetService.getAllElements<"Group">({
     cacheCode: "GROUP",
@@ -180,7 +180,7 @@ export const toGroupDto = async (
       parent: group.parentId
         ? toIdValue(
             allGroups.find((g) => g.id === group.parentId),
-            "name"
+            "name",
           )
         : null,
     };

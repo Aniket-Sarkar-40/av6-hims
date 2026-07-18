@@ -29,7 +29,7 @@ const zeroCashFlowAmount = (): CashFlowAmount => ({
 
 const addCashFlowAmount = (
   a: CashFlowAmount,
-  b: CashFlowAmount
+  b: CashFlowAmount,
 ): CashFlowAmount => ({
   inflow: a.inflow + b.inflow,
   outflow: a.outflow + b.outflow,
@@ -57,7 +57,7 @@ const getMonthDateRange = (month: string) => {
 const roundAmount = (
   amount: CashFlowAmount,
   method: RoundFormat,
-  precision: number
+  precision: number,
 ): CashFlowAmount => ({
   inflow: applyRound(amount.inflow, method, precision),
   outflow: applyRound(amount.outflow, method, precision),
@@ -162,7 +162,7 @@ const createRowsByLedgerIdMap = (rows: CashFlowMovementRow[]) => {
 const getTotalsFromMovementRows = (
   rows: CashFlowMovementRow[],
   roundingMethod: RoundFormat,
-  roundingPrecision: number
+  roundingPrecision: number,
 ): CashFlowAmount => {
   const total = rows.reduce(
     (acc, row) => ({
@@ -170,7 +170,7 @@ const getTotalsFromMovementRows = (
       outflow: acc.outflow + row.outflow,
       net: acc.net + row.net,
     }),
-    zeroCashFlowAmount()
+    zeroCashFlowAmount(),
   );
 
   return roundAmount(total, roundingMethod, roundingPrecision);
@@ -240,7 +240,7 @@ const buildMovementRows = async (params: {
 
     const totalOppositeAmount = oppositeLines.reduce(
       (sum, line) => sum + Number(line.amount ?? 0),
-      0
+      0,
     );
     if (totalOppositeAmount <= 0) continue;
 
@@ -361,7 +361,7 @@ const buildCashFlowGroupTree = (params: {
         (node) =>
           includeZero ||
           !isZeroCashFlowAmount(node.amount) ||
-          node.children.length > 0
+          node.children.length > 0,
       );
 
   const filteredRoots = prune(roots);
@@ -411,7 +411,7 @@ const buildRecursiveGroupDetailTree = (params: {
     const currentAmount = getTotalsFromMovementRows(
       currentRows,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const directLedgers = (ledgersByGroupMap.get(groupId) ?? [])
@@ -425,7 +425,7 @@ const buildRecursiveGroupDetailTree = (params: {
           amount: getTotalsFromMovementRows(
             ledgerRows,
             roundingMethod,
-            roundingPrecision
+            roundingPrecision,
           ),
         };
       })
@@ -468,7 +468,7 @@ const filterRowsByMonth = (rows: CashFlowMovementRow[], month?: string) => {
 const filterRowsByGroupScope = (
   rows: CashFlowMovementRow[],
   selectedGroupId: number | undefined,
-  groups: Group[]
+  groups: Group[],
 ) => {
   if (!selectedGroupId) return rows;
 
@@ -513,13 +513,13 @@ export const cashFlowEngineService = {
     })) as Ledger[];
 
     const ledgers = allLedgers.filter(
-      (ledger) => ledger.companyId === companyId
+      (ledger) => ledger.companyId === companyId,
     );
 
     const cashBankLedgerIds = ledgers
       .filter(
         (ledger) =>
-          Boolean(ledger.isCashAccount) || Boolean(ledger.isBankAccount)
+          Boolean(ledger.isCashAccount) || Boolean(ledger.isBankAccount),
       )
       .map((ledger) => ledger.id);
 
@@ -556,7 +556,7 @@ export const cashFlowEngineService = {
       const totals = getTotalsFromMovementRows(
         monthFilteredRows,
         roundingMethod,
-        roundingPrecision
+        roundingPrecision,
       );
       const monthMap = new Map<string, CashFlowAmount>();
 
@@ -569,7 +569,7 @@ export const cashFlowEngineService = {
             inflow: row.inflow,
             outflow: row.outflow,
             net: row.net,
-          })
+          }),
         );
       }
 
@@ -581,17 +581,17 @@ export const cashFlowEngineService = {
           const roundedAmount = roundAmount(
             amount,
             roundingMethod,
-            roundingPrecision
+            roundingPrecision,
           );
           const openingBalance = applyRound(
             runningOpening,
             roundingMethod,
-            roundingPrecision
+            roundingPrecision,
           );
           const closingBalance = applyRound(
             runningOpening + roundedAmount.net,
             roundingMethod,
-            roundingPrecision
+            roundingPrecision,
           );
 
           runningOpening = closingBalance;
@@ -610,12 +610,12 @@ export const cashFlowEngineService = {
         openingBalance: applyRound(
           balance.opening,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         closingBalance: applyRound(
           balance.closing,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         totalInflow: totals.inflow,
         totalOutflow: totals.outflow,
@@ -631,7 +631,7 @@ export const cashFlowEngineService = {
       const totals = getTotalsFromMovementRows(
         monthFilteredRows,
         roundingMethod,
-        roundingPrecision
+        roundingPrecision,
       );
       const inflowRows = monthFilteredRows.filter((row) => row.inflow > 0);
       const outflowRows = monthFilteredRows.filter((row) => row.outflow > 0);
@@ -642,12 +642,12 @@ export const cashFlowEngineService = {
         openingBalance: applyRound(
           balance.opening,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         closingBalance: applyRound(
           balance.closing,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         inflows: buildCashFlowGroupTree({
           groups,
@@ -673,12 +673,12 @@ export const cashFlowEngineService = {
     const groupScopedRows = filterRowsByGroupScope(
       monthFilteredRows,
       input.groupId,
-      groups
+      groups,
     );
     const totals = getTotalsFromMovementRows(
       groupScopedRows,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const groupTree =
@@ -700,12 +700,12 @@ export const cashFlowEngineService = {
       openingBalance: applyRound(
         balance.opening,
         roundingMethod,
-        roundingPrecision
+        roundingPrecision,
       ),
       closingBalance: applyRound(
         balance.closing,
         roundingMethod,
-        roundingPrecision
+        roundingPrecision,
       ),
       groupTree,
       totals,

@@ -5,7 +5,7 @@ import {
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toCompanyFinancialYearDto = async (
-  input: CompanyFinancialYearResponse[]
+  input: CompanyFinancialYearResponse[],
 ): Promise<CompanyFinancialYearDTO[]> => {
   const response: CompanyFinancialYearDTO[] = input.map(
     (companyFinancialYear) => {
@@ -23,7 +23,7 @@ export const toCompanyFinancialYearDto = async (
         ]).rest,
         company: toIdValue(companyFinancialYear.company, "name"),
       };
-    }
+    },
   );
   return response;
 };

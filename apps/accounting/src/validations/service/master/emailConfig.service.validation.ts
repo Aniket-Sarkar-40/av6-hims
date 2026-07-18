@@ -4,10 +4,10 @@ import { EmailConfigType } from "@repo/db/generated/prisma/enums.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const createOrUpdateEmailConfigServiceValidation = async (
-  body: CreateOrUpdateEmailConfig
+  body: CreateOrUpdateEmailConfig,
 ) => {
   logger.info(
-    "entering::createOrUpdateEmailConfigServiceValidation::service::validation"
+    "entering::createOrUpdateEmailConfigServiceValidation::service::validation",
   );
 
   const type: EmailConfigType = body.configType ?? "ADMIN";
@@ -18,6 +18,6 @@ export const createOrUpdateEmailConfigServiceValidation = async (
   body.existing = existing;
 
   logger.info(
-    "exiting::createOrUpdateEmailConfigServiceValidation::service::validation"
+    "exiting::createOrUpdateEmailConfigServiceValidation::service::validation",
   );
 };

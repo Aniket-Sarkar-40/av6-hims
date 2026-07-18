@@ -11,7 +11,7 @@ import { CreateStaffInput } from "@/types/staff/doctor.js";
 
 export async function createEmployeeInDb(
   input: CreateStaffInput,
-  emplInput: CreateOrUpdateEmployee
+  emplInput: CreateOrUpdateEmployee,
 ): Promise<Staff> {
   const store = requestStorage.getStore();
   const createdBy = store?.user?.id;
@@ -35,7 +35,7 @@ export async function createEmployeeInDb(
 export async function updateEmployeeInDb(
   id: number,
   input: CreateStaffInput,
-  emplInput: CreateOrUpdateEmployee
+  emplInput: CreateOrUpdateEmployee,
 ): Promise<Staff> {
   const store = requestStorage.getStore();
   const updatedBy = store?.user?.id ?? null;
@@ -97,7 +97,7 @@ export const getStaffByIdFromDb = async (id: number) => {
 };
 
 export const getEmployeeByEmployeeEmailFromDb = async (
-  email: string
+  email: string,
 ): Promise<Staff | null> => {
   logger.info("entering::getEmployeeByEmployeeEmailFromDb::repository");
   return db.staff.findFirst({
@@ -105,7 +105,7 @@ export const getEmployeeByEmployeeEmailFromDb = async (
   });
 };
 export const getEmployeeByEmployeeIdFromDb = async (
-  employeeId: string
+  employeeId: string,
 ): Promise<Staff | null> => {
   logger.info("entering::getEmployeeByEmployeeIdFromDb::repository");
   return db.staff.findFirst({
@@ -136,7 +136,7 @@ export const checkForeignKeyForEmployee = async (
   id: number,
   siteId: number,
   departmentId: number,
-  locationId: number
+  locationId: number,
 ) => {
   logger.info("entering::checkForeignKeyForEmployee::repository");
 
@@ -163,7 +163,7 @@ export const updateActiveEmployeeInDb = async (id: number): Promise<Staff> => {
 };
 
 export const getStaffDetailsByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<StaffResponse | null> => {
   logger.info("entering::getStaffDetailsByIdFromDb::repository");
   return db.staff.findFirst({

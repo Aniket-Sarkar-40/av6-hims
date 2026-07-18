@@ -44,7 +44,7 @@ employeeRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "CREATE")),
   validateEmployee,
-  createEmployee
+  createEmployee,
 );
 
 /**
@@ -61,7 +61,7 @@ employeeRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "VIEW")),
-  getAllEmployees
+  getAllEmployees,
 );
 
 /**
@@ -85,7 +85,7 @@ employeeRouter.get(
   "/:employeeId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "VIEW")),
-  getEmployeeById
+  getEmployeeById,
 );
 
 /**
@@ -116,10 +116,10 @@ employeeRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "EMPLOYEE", "VIEW"),
-    getPermission("PMS", "EMPLOYEE", "UPDATE")
+    getPermission("PMS", "EMPLOYEE", "UPDATE"),
   ),
   validateEmployee,
-  updateEmployee
+  updateEmployee,
 );
 
 /**
@@ -143,5 +143,5 @@ employeeRouter.delete(
   "/:employeeId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMPLOYEE", "DELETE")),
-  deleteEmployee
+  deleteEmployee,
 );

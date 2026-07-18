@@ -11,7 +11,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { settingsService } from "@/services/master/settings.service.js";
 export const getBranchOrWarehouse = async (
-  ccId: number
+  ccId: number,
 ): Promise<BranchDTO | WarehouseDTO | null> => {
   const branch = await branchService.getBranchById(ccId, true);
   const warehouse = await warehouseService.getWarehouseById(ccId, true);
@@ -30,7 +30,7 @@ export const validateBranchOrWarehouse = async (ccId: number) => {
     if (!cc) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Collection Center")
+        generateErrorMessage("NOT_FOUND", "Collection Center"),
       );
     }
   }
@@ -86,7 +86,7 @@ export type ItemStockLocationFlags = {
 export const resolveItemStockLocationFlags = (
   warehouseMode: boolean,
   branch: { id: number } | null,
-  warehouse: { id: number } | null
+  warehouse: { id: number } | null,
 ): ItemStockLocationFlags => {
   if (warehouseMode) {
     if (branch) {

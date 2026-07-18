@@ -78,12 +78,12 @@ export const branchService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Branch")
+          generateErrorMessage("NOT_FOUND", "Branch"),
         );
       else return [];
     }
     const branchDTO = await Promise.all(
-      branch.map((branch) => toBranchDTO([branch]))
+      branch.map((branch) => toBranchDTO([branch])),
     );
     logger.info("exiting::getAllBranch::service");
     return branchDTO[0];
@@ -91,7 +91,7 @@ export const branchService = {
 
   async getBranchById(
     branchId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<BranchDTO | null> {
     logger.info("entering::getBranchById::service");
     validIdCheck(branchId);
@@ -100,7 +100,7 @@ export const branchService = {
     if (isCacheable) {
       branch = (await getCacheById(
         cacheKey,
-        branchId
+        branchId,
       )) as BranchResponse | null;
     } else {
       branch = await getBranchByIdFromDb(branchId);
@@ -109,7 +109,7 @@ export const branchService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Branch")
+          generateErrorMessage("NOT_FOUND", "Branch"),
         );
       else return null;
     }
@@ -120,7 +120,7 @@ export const branchService = {
 
   async getBranchByIdWoDTO(
     branchId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvBranch | null> {
     logger.info("entering::getBranchById::service");
     validIdCheck(branchId);
@@ -136,7 +136,7 @@ export const branchService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Branch")
+          generateErrorMessage("NOT_FOUND", "Branch"),
         );
       else return null;
     }
@@ -172,7 +172,7 @@ export const branchService = {
   },
 
   async getBranchesByCcIdsAsLocation(
-    ccIds: number[]
+    ccIds: number[],
   ): Promise<BranchDTOLocation[]> {
     logger.info("entering::getBranchesByCcIdsAsLocation::service");
     if (!ccIds.length) return [];
@@ -186,7 +186,7 @@ export const branchService = {
 
   async getCollectionCenterById(
     collectionCenterId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<CollectionCenter | null> {
     logger.info("entering::getCollectionCenterById::service");
     validIdCheck(collectionCenterId);
@@ -195,18 +195,17 @@ export const branchService = {
     if (isCacheable) {
       collectionCenter = (await getCacheById(
         getRedisKey("COLLECTION_CENTER", "all"),
-        collectionCenterId
+        collectionCenterId,
       )) as CollectionCenter | null;
     } else {
-      collectionCenter = await getCollectionCenterByIdFromDb(
-        collectionCenterId
-      );
+      collectionCenter =
+        await getCollectionCenterByIdFromDb(collectionCenterId);
     }
     if (!collectionCenter) {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Collection Center")
+          generateErrorMessage("NOT_FOUND", "Collection Center"),
         );
       else return null;
     }
@@ -216,7 +215,7 @@ export const branchService = {
   },
 
   async getAllBranchWoDto(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvBranch[]> {
     logger.info("entering::getAllBranch::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.BRANCH);
@@ -230,7 +229,7 @@ export const branchService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Branch")
+          generateErrorMessage("NOT_FOUND", "Branch"),
         );
       else return [];
     }

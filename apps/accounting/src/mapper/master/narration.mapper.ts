@@ -5,7 +5,7 @@ import { Narration } from "@repo/db/generated/prisma/client";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toNarrationDto = async (
-  input: Narration[]
+  input: Narration[],
 ): Promise<NarrationDTO[]> => {
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
     cacheCode: "VOUCHER_TYPE",
@@ -29,7 +29,7 @@ export const toNarrationDto = async (
       "deletedAt",
     ]);
     const voucherType = voucherTypes.find(
-      (vt) => vt.id === narration.voucherTypeId
+      (vt) => vt.id === narration.voucherTypeId,
     );
     return {
       ...omittedData.rest,

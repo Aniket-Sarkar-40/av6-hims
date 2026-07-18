@@ -13,7 +13,7 @@ import dayjs from "dayjs";
 import { CreateStaffInput } from "@/types/staff/doctor.js";
 
 export const toEmployeeFromExcel = (
-  row: ExcelEmployeeRow
+  row: ExcelEmployeeRow,
 ): CreateOrUpdateEmployee => {
   return {
     name: row.Name,
@@ -40,7 +40,7 @@ export const toEmployeeFromExcel = (
 };
 
 export const toExcelFromEmployee = (
-  employee: CreateOrUpdateEmployee | null
+  employee: CreateOrUpdateEmployee | null,
 ): ExcelEmployeeRow => {
   return {
     Name: employee ? employee.name : "",
@@ -59,7 +59,7 @@ export const toExcelFromEmployee = (
 };
 
 export const toStaffEntity = (
-  staff: CreateOrUpdateEmployee
+  staff: CreateOrUpdateEmployee,
 ): CreateStaffInput => ({
   employeeId: staff.employeeId,
   qualification: "",
@@ -100,19 +100,19 @@ export const toStaffEntity = (
 });
 
 export const toEmployeeDTO = async (
-  employee: StaffEntity
+  employee: StaffEntity,
 ): Promise<EmployeeDTO> => {
   const department = employee.employee?.departmentId
     ? await departmentService.getDepartmentById(
         employee.employee.departmentId,
-        true
+        true,
       )
     : null;
 
   const designation = employee.employee?.designationId
     ? await staffDesignationService.getStaffDesignationById(
         employee.employee?.designationId,
-        true
+        true,
       )
     : null;
 

@@ -23,7 +23,7 @@ import { subItemStock } from "../stock/stock.repository.js";
 import { settingsService } from "@/services/master/settings.service.js";
 
 export async function createConsumptionInDb(
-  data: ConsumptionCreateInput
+  data: ConsumptionCreateInput,
 ): Promise<ConsumptionResponse> {
   logger.info("entering::createConsumptionInDb::repository");
 
@@ -110,7 +110,7 @@ export async function createConsumptionInDb(
               refApprovedBy: consumption.approvedBy,
               refApprovedAt: consumption.approvedAt,
             },
-            { consumeFromAll: true }
+            { consumeFromAll: true },
           );
         }
       }
@@ -120,12 +120,12 @@ export async function createConsumptionInDb(
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 }
 
 export async function updateConsumptionInDb(
-  data: ConsumptionUpdateInput
+  data: ConsumptionUpdateInput,
 ): Promise<ConsumptionResponse> {
   logger.info("entering::updateConsumptionInDb::repository");
 
@@ -140,11 +140,11 @@ export async function updateConsumptionInDb(
   const details = consumptionDetails ?? [];
 
   const existingIds = new Set(
-    (existing?.consumptionDetails ?? []).map((d) => d.id)
+    (existing?.consumptionDetails ?? []).map((d) => d.id),
   );
   const toCreate = details.filter((d) => typeof d.id !== "number");
   const toUpdate = details.filter(
-    (d) => typeof d.id === "number" && existingIds.has(d.id as number)
+    (d) => typeof d.id === "number" && existingIds.has(d.id as number),
   );
   const toDelete = (existing?.consumptionDetails ?? [])
     .filter((ed) => !details.some((d) => d.id === ed.id))
@@ -216,7 +216,7 @@ export async function updateConsumptionInDb(
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 
   logger.info("exiting::updateConsumptionInDb::repository");
@@ -224,7 +224,7 @@ export async function updateConsumptionInDb(
 }
 
 export async function getConsumptionByIdFromDb(
-  id: number
+  id: number,
 ): Promise<ConsumptionResponse | null> {
   logger.info("entering::getConsumptionByIdFromDb::repository");
   return await db.consumption.findFirst({
@@ -291,13 +291,13 @@ export async function deleteConsumptionByIdFromDb(id: number): Promise<void> {
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
   logger.info("exiting::deleteConsumptionByIdFromDb::repository");
 }
 
 export async function approveConsumptionInDb(
-  data: ConsumptionApproveInput
+  data: ConsumptionApproveInput,
 ): Promise<ConsumptionResponse> {
   logger.info("entering::approveConsumptionInDb::repository");
   const store = requestStorage.getStore();
@@ -391,7 +391,7 @@ export async function approveConsumptionInDb(
             refApprovedBy: approvedConsumption.approvedBy,
             refApprovedAt: approvedConsumption.approvedAt,
           },
-          { consumeFromAll: true }
+          { consumeFromAll: true },
         );
       }
       logger.info("exiting::approveConsumptionInDb::repository");
@@ -399,12 +399,12 @@ export async function approveConsumptionInDb(
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 }
 
 export async function rejectConsumptionByIdFromDb(
-  data: CommonConsumptionInput
+  data: CommonConsumptionInput,
 ): Promise<void> {
   logger.info("entering::rejectConsumptionByIdFromDb::repository");
   const store = requestStorage.getStore();
@@ -424,7 +424,7 @@ export async function rejectConsumptionByIdFromDb(
 }
 
 export async function getConsumptionByUserIdFromDb(
-  userId: number
+  userId: number,
 ): Promise<ConsumptionResponse[]> {
   logger.info("entering::getConsumptionByUserIdFromDb::repository");
   const consumption = await db.consumption.findMany({

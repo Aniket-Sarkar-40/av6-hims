@@ -48,7 +48,7 @@ export const consumptionCreateSchema = Joi.object({
   consumptionDetails: arrayRequired(
     "Consumption Details",
     ConsumptionDetailsCreateSchema,
-    1
+    1,
   ),
 });
 
@@ -66,7 +66,7 @@ export const consumptionUpdateSchema = consumptionCreateSchema.keys({
   consumptionDetails: arrayRequired(
     "Consumption Details",
     ConsumptionDetailsUpdateSchema,
-    1
+    1,
   ),
 });
 
@@ -111,7 +111,7 @@ export const consumptionApproveSchema = consumptionCreateSchema.keys({
   consumptionDetails: arrayRequired(
     "Consumption Details",
     ConsumptionDetailsApproveSchema,
-    1
+    1,
   ),
 });
 

@@ -9,7 +9,7 @@ import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import { ServiceEvent } from "@repo/db/generated/prisma/client";
 
 export const validIdServiceEvent = async (
-  id: number
+  id: number,
 ): Promise<ServiceEvent> => {
   logger.info("entering::validIdServiceEvent::service::validation");
 
@@ -19,7 +19,7 @@ export const validIdServiceEvent = async (
   if (!row) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Service Event")
+      generateErrorMessage("NOT_FOUND", "Service Event"),
     );
   }
   logger.info("exiting::validIdServiceEvent::service::validation");
@@ -28,10 +28,10 @@ export const validIdServiceEvent = async (
 };
 
 export const updateIdServiceEventServiceValidation = async (
-  body: CreateServiceEvent[]
+  body: CreateServiceEvent[],
 ) => {
   logger.info(
-    "entering::updateIdServiceEventServiceValidation::service::validation"
+    "entering::updateIdServiceEventServiceValidation::service::validation",
   );
 
   for (const item of body) {
@@ -41,15 +41,15 @@ export const updateIdServiceEventServiceValidation = async (
 
     if (item.service) {
       const byName = await getServiceEventByServiceEventNameFromDb(
-        item.service
+        item.service,
       );
       if (byName && byName.id !== item.id) {
         throw new ErrorHandler(
           400,
           generateErrorMessage(
             "DUPLICATE_ITEM",
-            `Duplicate Service Event name "${item.service}"`
-          )
+            `Duplicate Service Event name "${item.service}"`,
+          ),
         );
       }
     }
@@ -61,23 +61,23 @@ export const updateIdServiceEventServiceValidation = async (
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            ` Country code : (${item.countryCode})`
-          )
+            ` Country code : (${item.countryCode})`,
+          ),
         );
       }
     }
   }
 
   logger.info(
-    "exiting::updateIdServiceEventServiceValidation::service::validation"
+    "exiting::updateIdServiceEventServiceValidation::service::validation",
   );
 };
 
 export const createServiceEventServiceValidation = async (
-  body: CreateServiceEvent
+  body: CreateServiceEvent,
 ) => {
   logger.info(
-    "entering::createServiceEventServiceValidation::service::validation"
+    "entering::createServiceEventServiceValidation::service::validation",
   );
 
   if (body.service) {
@@ -87,13 +87,13 @@ export const createServiceEventServiceValidation = async (
         400,
         generateErrorMessage(
           "DUPLICATE_ITEM",
-          `Duplicate Service Event name "${body.service}"`
-        )
+          `Duplicate Service Event name "${body.service}"`,
+        ),
       );
     }
   }
 
   logger.info(
-    "exiting::createServiceEventServiceValidation::service::validation"
+    "exiting::createServiceEventServiceValidation::service::validation",
   );
 };

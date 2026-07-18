@@ -5,7 +5,7 @@ import { cityService } from "@apps/core/services/master/city.service.js";
 import { PmsWarehouse } from "@repo/db/generated/prisma/client";
 
 export const toWarehouseDTO = async (
-  warehouse: PmsWarehouse
+  warehouse: PmsWarehouse,
 ): Promise<WarehouseDTO> => {
   const cityDTO =
     warehouse.cityId !== null

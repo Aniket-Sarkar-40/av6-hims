@@ -49,7 +49,7 @@ opdDepartmentRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "OPD_DEPARTMENT", "CREATE")),
   validateOpdDepartmentCreate,
-  createOpdDepartment
+  createOpdDepartment,
 );
 
 /**
@@ -80,5 +80,5 @@ opdDepartmentRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "OPD_DEPARTMENT", "UPDATE")),
   validateOpdDepartmentUpdate,
-  updateOpdDepartment
+  updateOpdDepartment,
 );

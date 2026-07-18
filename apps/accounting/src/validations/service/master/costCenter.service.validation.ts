@@ -23,7 +23,7 @@ export const validateIdCostCenter = async (id: number): Promise<CostCenter> => {
   if (!costCenter) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Cost Center")
+      generateErrorMessage("NOT_FOUND", "Cost Center"),
     );
   }
   logger.info("exiting::validateIdCostCenter::service::validation");
@@ -31,7 +31,7 @@ export const validateIdCostCenter = async (id: number): Promise<CostCenter> => {
 };
 
 export const CreateOrUpdateCostCenterServiceValidation = async (
-  input: CreateOrUpdateCostCenterInput
+  input: CreateOrUpdateCostCenterInput,
 ): Promise<void> => {
   logger.info("entering::createOrUpdateCostCenter::service::validation");
   if (input.id) {
@@ -39,7 +39,7 @@ export const CreateOrUpdateCostCenterServiceValidation = async (
     if (existingCostCenter.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        "You can't chnage company for existing cost center"
+        "You can't chnage company for existing cost center",
       );
     }
   }
@@ -56,8 +56,8 @@ export const CreateOrUpdateCostCenterServiceValidation = async (
       generateErrorMessage(
         "INVALID_ASSOCIATION",
         "Cost Center",
-        "Parent Cost Center"
-      )
+        "Parent Cost Center",
+      ),
     );
   }
 
@@ -74,8 +74,8 @@ export const CreateOrUpdateCostCenterServiceValidation = async (
       400,
       generateErrorMessage(
         "DUPLICATE_ITEM",
-        `Cost Center with name ${input.name}`
-      )
+        `Cost Center with name ${input.name}`,
+      ),
     );
   }
   logger.info("exiting::createOrUpdateCostCenter::service::validation");

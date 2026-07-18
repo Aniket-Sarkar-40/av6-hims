@@ -15,11 +15,10 @@ export enum MAPPING_STATUS {
   CREATED = "CREATED",
   CREATE = "CREATE",
 }
-export interface CreateExternalClientLedgerMappingInput
-  extends Omit<
-    Prisma.ClientLedgerMappingUncheckedCreateInput,
-    BaseModelAttrWoCancel | "ledgerId"
-  > {
+export interface CreateExternalClientLedgerMappingInput extends Omit<
+  Prisma.ClientLedgerMappingUncheckedCreateInput,
+  BaseModelAttrWoCancel | "ledgerId"
+> {
   ledgerId?: number;
   ledgerName?: string;
   currencyId?: number;
@@ -29,11 +28,10 @@ export interface CreateExternalClientLedgerMappingInput
   overrideExistingLedger?: boolean | null;
 }
 
-export interface ClientLedgerMappingDTO
-  extends Omit<
-    ClientLedgerMapping,
-    BaseModelAttrWoCancel | "ledgerId" | "clientId"
-  > {
+export interface ClientLedgerMappingDTO extends Omit<
+  ClientLedgerMapping,
+  BaseModelAttrWoCancel | "ledgerId" | "clientId"
+> {
   ledger: IdValue | null;
   client: IdValue | null;
 }

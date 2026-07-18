@@ -14,8 +14,10 @@ export type CreateOrUpdateMultiVoucherDetailsInput = Omit<
   Prisma.MultiVoucherDetailsUncheckedCreateInput,
   BaseModelAttrWoCancel | "multiVoucherId"
 >;
-export interface CreateOrUpdateMultiVoucherInput
-  extends Omit<Prisma.MultiVoucherCreateManyInput, BaseModelAttrWoCancel> {
+export interface CreateOrUpdateMultiVoucherInput extends Omit<
+  Prisma.MultiVoucherCreateManyInput,
+  BaseModelAttrWoCancel
+> {
   multiVoucherDetails: CreateOrUpdateMultiVoucherDetailsInput[];
   existing: MultiVoucherResponse;
 }
@@ -30,11 +32,10 @@ export type MultiVoucherResponse = Prisma.MultiVoucherGetPayload<{
   };
 }>;
 
-export interface MultiVoucherDetailsDTO
-  extends Omit<
-    MultiVoucherDetails,
-    BaseModelAttrWoCancel | "ccId" | "ledgerId"
-  > {
+export interface MultiVoucherDetailsDTO extends Omit<
+  MultiVoucherDetails,
+  BaseModelAttrWoCancel | "ccId" | "ledgerId"
+> {
   collectionCenter: IdValue | null;
   ledger: IdValue | null;
 }
@@ -51,21 +52,20 @@ export type MultiVoucherResponseForDTO = Prisma.MultiVoucherGetPayload<{
   };
 }>;
 
-export interface MultiVoucherDTO
-  extends Omit<
-    MultiVoucherResponseForDTO,
-    | BaseModelAttrWoCancelAndCreated
-    | "ccId"
-    | "companyId"
-    | "financialYearId"
-    | "voucherTypeId"
-    | "ledgerId"
-    | "multiVoucherDetails"
-    | "company"
-    | "financialYear"
-    | "createdBy"
-    | "approvedBy"
-  > {
+export interface MultiVoucherDTO extends Omit<
+  MultiVoucherResponseForDTO,
+  | BaseModelAttrWoCancelAndCreated
+  | "ccId"
+  | "companyId"
+  | "financialYearId"
+  | "voucherTypeId"
+  | "ledgerId"
+  | "multiVoucherDetails"
+  | "company"
+  | "financialYear"
+  | "createdBy"
+  | "approvedBy"
+> {
   createdBy: IdValue | null;
   approvedBy: IdValue | null;
   collectionCenter: IdValue | null;
@@ -76,11 +76,10 @@ export interface MultiVoucherDTO
   multiVoucherDetails: MultiVoucherDetailsDTO[];
 }
 
-export interface PreparedVoucherInputForMultiVoucher
-  extends Omit<
-    CreateOrUpdateVoucherInput,
-    "existing" | "billAllocations" | "costCenterAllocations" | "voucherNo"
-  > {
+export interface PreparedVoucherInputForMultiVoucher extends Omit<
+  CreateOrUpdateVoucherInput,
+  "existing" | "billAllocations" | "costCenterAllocations" | "voucherNo"
+> {
   lineNo: number;
 }
 

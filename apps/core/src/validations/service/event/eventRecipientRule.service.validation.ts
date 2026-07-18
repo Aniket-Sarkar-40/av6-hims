@@ -14,7 +14,7 @@ import {
 } from "@/repository/event/eventRecipientRule.repository.js";
 
 export const validIdEventRecipientRule = async (
-  id: number
+  id: number,
 ): Promise<EventRecipientRule> => {
   logger.info("entering::validIdEventRecipientRule::service::validation");
 
@@ -25,7 +25,7 @@ export const validIdEventRecipientRule = async (
   if (!row) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Event Recipient Rule")
+      generateErrorMessage("NOT_FOUND", "Event Recipient Rule"),
     );
   }
 
@@ -35,10 +35,10 @@ export const validIdEventRecipientRule = async (
 };
 
 export const createOrUpdateEventRecipientRuleServiceValidation = async (
-  body: CreateOrUpdateEventRecipients
+  body: CreateOrUpdateEventRecipients,
 ) => {
   logger.info(
-    "entering::createOrUpdateEventRecipientRuleServiceValidation::service::validation"
+    "entering::createOrUpdateEventRecipientRuleServiceValidation::service::validation",
   );
 
   await validIdEventConfig(body.eventConfigId);
@@ -50,9 +50,8 @@ export const createOrUpdateEventRecipientRuleServiceValidation = async (
     eventConfigId = existing.eventConfigId;
   }
 
-  const rules = await getEventRecipientRulesByEventConfigIdOnlyFromDb(
-    eventConfigId
-  );
+  const rules =
+    await getEventRecipientRulesByEventConfigIdOnlyFromDb(eventConfigId);
 
   if (
     rules.some(
@@ -60,12 +59,12 @@ export const createOrUpdateEventRecipientRuleServiceValidation = async (
         r.id !== body.id &&
         r.templateType === body.templateType &&
         r.sourceType === body.sourceType &&
-        r.isActive
+        r.isActive,
     )
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "RecipientRule")
+      generateErrorMessage("DUPLICATE_ITEM", "RecipientRule"),
     );
   }
 
@@ -78,22 +77,22 @@ export const createOrUpdateEventRecipientRuleServiceValidation = async (
   //     : maxSort + 1;
 
   logger.info(
-    "exiting::createOrUpdateEventRecipientRuleServiceValidation::service::validation"
+    "exiting::createOrUpdateEventRecipientRuleServiceValidation::service::validation",
   );
 };
 
 export const multiCreateUpdateEventRecipientRuleServiceValidation = async (
-  input: MultiCreateUpdateEventRecipients
+  input: MultiCreateUpdateEventRecipients,
 ) => {
   logger.info(
-    "entering::multiCreateUpdateEventRecipientRuleServiceValidation::service::validation"
+    "entering::multiCreateUpdateEventRecipientRuleServiceValidation::service::validation",
   );
 
   await validIdEventConfig(input.eventConfigId);
 
   const existingRules = await getEventRecipientRulesByEventConfigIdOnlyFromDb(
     input.eventConfigId,
-    input.templateType
+    input.templateType,
   );
   input.existingRules = existingRules;
 
@@ -103,7 +102,7 @@ export const multiCreateUpdateEventRecipientRuleServiceValidation = async (
       if (!findRule) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "RecipientRule")
+          generateErrorMessage("NOT_FOUND", "RecipientRule"),
         );
       }
     }

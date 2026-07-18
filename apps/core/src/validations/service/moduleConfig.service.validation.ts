@@ -10,10 +10,10 @@ import {
 } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateCreateOrUpdateModuleConfigServiceValidation = async (
-  data: CreateOrUpdateModuleConfigReq[]
+  data: CreateOrUpdateModuleConfigReq[],
 ) => {
   logger.info(
-    "entering::validateCreateOrUpdateModuleConfig::service::validation"
+    "entering::validateCreateOrUpdateModuleConfig::service::validation",
   );
 
   const existingModules = await getAllModulesFromDb();
@@ -28,7 +28,7 @@ export const validateCreateOrUpdateModuleConfigServiceValidation = async (
     if (!validServiceCodes.includes(item.module as ServiceCode)) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_VALUE", "Module")
+        generateErrorMessage("INVALID_VALUE", "Module"),
       );
     }
 
@@ -37,8 +37,8 @@ export const validateCreateOrUpdateModuleConfigServiceValidation = async (
         400,
         generateValidationErrorMessage(
           "DUPLICATE_ITEM",
-          `Module ${item.module} in payload`
-        )
+          `Module ${item.module} in payload`,
+        ),
       );
     }
 
@@ -55,13 +55,13 @@ export const validateCreateOrUpdateModuleConfigServiceValidation = async (
 
     if (item.id) {
       const existingModule = existingModules.find(
-        (module: MonoRepoModule) => module.id === item.id
+        (module: MonoRepoModule) => module.id === item.id,
       );
 
       if (!existingModule) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Module")
+          generateErrorMessage("NOT_FOUND", "Module"),
         );
       }
     }
@@ -71,11 +71,11 @@ export const validateCreateOrUpdateModuleConfigServiceValidation = async (
   if (!hasEnabledCoreModule) {
     throw new ErrorHandler(
       400,
-      "CORE module with isEnabled=true is required in payload"
+      "CORE module with isEnabled=true is required in payload",
     );
   }
 
   logger.info(
-    "exiting::validateCreateOrUpdateModuleConfig::service::validation"
+    "exiting::validateCreateOrUpdateModuleConfig::service::validation",
   );
 };

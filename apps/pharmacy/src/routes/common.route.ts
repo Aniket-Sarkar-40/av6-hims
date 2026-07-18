@@ -59,7 +59,7 @@ commonRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch
+  commonSearch,
 );
 
 /**
@@ -81,7 +81,7 @@ commonRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch
+  commonDropdownSearch,
 );
 
 /**
@@ -103,7 +103,7 @@ commonRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch
+  fixedSearch,
 );
 
 /**
@@ -125,7 +125,7 @@ commonRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController
+  fixedSearchWoPaginationController,
 );
 
 /**
@@ -147,7 +147,7 @@ commonRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport
+  commonFSExcelExport,
 );
 
 /**
@@ -169,7 +169,7 @@ commonRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch
+  commonFetch,
 );
 
 /**
@@ -191,7 +191,7 @@ commonRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport
+  commonExcelImport,
 );
 
 /**
@@ -223,7 +223,7 @@ commonRouter.delete(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete
+  commonDelete,
 );
 
 /**
@@ -245,7 +245,7 @@ commonRouter.patch(
   verifyToken(ServiceCode.PHARMACY),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus
+  commonUpdateStatus,
 );
 
 // /**

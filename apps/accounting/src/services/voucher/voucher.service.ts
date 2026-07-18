@@ -55,7 +55,7 @@ import { convertDatesToYMD } from "@repo/shared/utils/date.utils.js";
 const voucherServiceRaw = {
   async createVoucher(
     input: CreateOrUpdateVoucherInput,
-    isCurrencyConversionRequired: boolean = true
+    isCurrencyConversionRequired: boolean = true,
   ) {
     logger.info("entering::createVoucher::service");
     await createOrUpdateVoucherServiceValidation({
@@ -81,7 +81,7 @@ const voucherServiceRaw = {
       for (const voucher of preparedVoucherInputs) {
         await this.createVoucher(
           { ...voucher } as CreateOrUpdateVoucherInput,
-          isCurrencyConversionRequired
+          isCurrencyConversionRequired,
         );
       }
     }
@@ -131,7 +131,7 @@ const voucherServiceRaw = {
 
     // Convert rows
     const convertedData = data.map((row, index) =>
-      mapRowToVoucherExcelCreateInput(row, index + 1, ledgerMeta)
+      mapRowToVoucherExcelCreateInput(row, index + 1, ledgerMeta),
     );
 
     // Save to DB
@@ -183,7 +183,7 @@ const voucherServiceRaw = {
               text: `Ledger ${i} Dr/Cr`,
               color: i <= 2 ? "FF0000" : undefined,
               enumValues: Object.values(DrCr),
-            }
+            },
           );
         }
 
@@ -215,7 +215,7 @@ const voucherServiceRaw = {
               text: `Ledger ${i} Dr/Cr`,
               color: i <= 2 ? "FF0000" : undefined,
               enumValues: Object.values(DrCr),
-            }
+            },
           );
         }
         break;
@@ -238,7 +238,10 @@ const voucherServiceRaw = {
           headerAttributes.push(
             { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
             { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
-            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 1 ? "FF0000" : undefined,
+            },
           );
         }
         break;
@@ -262,7 +265,10 @@ const voucherServiceRaw = {
           headerAttributes.push(
             { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
             { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
-            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 1 ? "FF0000" : undefined,
+            },
           );
         }
         break;
@@ -286,7 +292,10 @@ const voucherServiceRaw = {
           headerAttributes.push(
             { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
             { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
-            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 1 ? "FF0000" : undefined,
+            },
           );
         }
         break;
@@ -309,7 +318,10 @@ const voucherServiceRaw = {
           headerAttributes.push(
             { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
             { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
-            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 1 ? "FF0000" : undefined,
+            },
           );
         }
         break;
@@ -349,7 +361,7 @@ const voucherServiceRaw = {
             {
               text: `Ledger ${i} Instrument Date`,
               color: i <= 1 ? "FF0000" : undefined,
-            }
+            },
           );
         }
         break;
@@ -373,14 +385,17 @@ const voucherServiceRaw = {
           headerAttributes.push(
             { text: `Ledger ${i}`, color: i <= 1 ? "FF0000" : undefined },
             { text: `Ledger ${i} Group`, color: i <= 1 ? "FF0000" : undefined },
-            { text: `Ledger ${i} Amount`, color: i <= 1 ? "FF0000" : undefined }
+            {
+              text: `Ledger ${i} Amount`,
+              color: i <= 1 ? "FF0000" : undefined,
+            },
           );
         }
         break;
       default:
         throw new ErrorHandler(
           400,
-          `Excel export is not configured for voucher type ${name.toLowerCase()}`
+          `Excel export is not configured for voucher type ${name.toLowerCase()}`,
         );
     }
 
@@ -415,7 +430,7 @@ const voucherServiceRaw = {
     const sampleRowData = buildVoucherExcelSampleRow(voucherType.name);
 
     const sampleRow = ws.addRow(
-      headerAttributes.map((header) => sampleRowData[header.text] ?? "")
+      headerAttributes.map((header) => sampleRowData[header.text] ?? ""),
     );
 
     sampleRow.eachCell((cell) => {
@@ -458,7 +473,7 @@ const voucherServiceRaw = {
   },
 
   async buildPdfForVoucherInvoice(
-    voucherId: number
+    voucherId: number,
   ): Promise<{ pdf: Buffer; voucherNo: string | number | null }> {
     logger.info("entering::buildPdfForVoucherInvoice::service");
 
@@ -483,13 +498,13 @@ const voucherServiceRaw = {
       if (!pdfTemplate) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "PDF template")
+          generateErrorMessage("NOT_FOUND", "PDF template"),
         );
       }
 
       fileDef = await resolvePdfTemplate(
         pdfTemplate.bodyJson as unknown as CustomDocDefinition,
-        voucherJournalDto
+        voucherJournalDto,
       );
     } else {
       const voucherDto = await toVoucherPdfDTO(voucherData);
@@ -507,5 +522,5 @@ const voucherServiceRaw = {
 
 export const voucherService = auditProxy.createAuditedService(
   "ledger",
-  voucherServiceRaw
+  voucherServiceRaw,
 );

@@ -15,7 +15,7 @@ export const documentSchema = Joi.object<DocumentMasterReq>({
   appointmentId: idRequired("Appointment Id"),
   filePath: patternRequired(
     "File Path",
-    new RegExp(getPattern.imageWithOtherPattern)
+    new RegExp(getPattern.imageWithOtherPattern),
   ),
 });
 

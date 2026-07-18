@@ -24,7 +24,7 @@ export const validateIdSettings = async (id: number): Promise<SettingsDTO> => {
 };
 
 export const validateUpsertSettingsServiceValidation = async (
-  input: CreateOrUpdateSettings
+  input: CreateOrUpdateSettings,
 ) => {
   logger.info("entering::validateUpsertSettings::service::validation");
 

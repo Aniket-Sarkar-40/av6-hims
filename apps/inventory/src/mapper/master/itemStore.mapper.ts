@@ -5,7 +5,7 @@ import { BaseModelAttrWoCancelWoActive } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toItemStoreDTO = async (
-  data: InvItemStore[]
+  data: InvItemStore[],
 ): Promise<ItemStoreDTO[]> => {
   const CollectionCenters = await getAllBranchAndWarehouse();
 
@@ -30,7 +30,7 @@ export const toItemStoreDTO = async (
         ...omittedItemStore.rest,
         collectionCenter: cc ? toIdValue(cc, "name") : null,
       };
-    })
+    }),
   );
 
   return itemStoreDTOs;

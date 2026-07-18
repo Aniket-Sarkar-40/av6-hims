@@ -13,12 +13,12 @@ export const createStaffCollectionCenter = TryCatch(
 
     const response = BaseResponse.success(
       { type: "CREATED" },
-      "Staff Collection Center"
+      "Staff Collection Center",
     );
 
     logger.info("exiting::createStaffCollectionCenter::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const getStaffCollectionCenterById = TryCatch(
@@ -27,17 +27,17 @@ export const getStaffCollectionCenterById = TryCatch(
     const { staffCollectionCenterId } = req.params;
     const staffCollectionCenter =
       await staffCollectionCenterService.getStaffCollectionCenterById(
-        Number(staffCollectionCenterId)
+        Number(staffCollectionCenterId),
       );
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: staffCollectionCenter },
-      "Staff Collection Center"
+      "Staff Collection Center",
     );
 
     logger.info("exiting::getStaffCollectionCenterById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getStaffCollectionCenterMapById = TryCatch(
@@ -46,17 +46,17 @@ export const getStaffCollectionCenterMapById = TryCatch(
     const { staffId } = req.params;
     const staffCollectionCenter =
       await staffCollectionCenterService.getStaffCollectionCenterMapById(
-        Number(staffId)
+        Number(staffId),
       );
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: staffCollectionCenter },
-      "Staff Collection Center"
+      "Staff Collection Center",
     );
 
     logger.info("exiting::getStaffCollectionCenterMapById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const updateStaffCollectionCenter = TryCatch(
@@ -66,17 +66,17 @@ export const updateStaffCollectionCenter = TryCatch(
     const body = req.body as CreateOrUpdateStaffCollectionCenter;
     await staffCollectionCenterService.updateStaffCollectionCenter(
       Number(staffCollectionCenterId),
-      body
+      body,
     );
 
     const response = BaseResponse.success(
       { type: "UPDATED" },
-      "Staff Collection Center"
+      "Staff Collection Center",
     );
 
     logger.info("exiting::updateStaffCollectionCenter::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteStaffCollectionCenter = TryCatch(
@@ -84,15 +84,15 @@ export const deleteStaffCollectionCenter = TryCatch(
     logger.info("entering::deleteStaffCollectionCenter::controller");
     const { staffCollectionCenterId } = req.params;
     await staffCollectionCenterService.deleteStaffCollectionCenter(
-      Number(staffCollectionCenterId)
+      Number(staffCollectionCenterId),
     );
 
     const response = BaseResponse.success(
       { type: "DELETED" },
-      "Staff Collection Center"
+      "Staff Collection Center",
     );
 
     logger.info("exiting::deleteStaffCollectionCenter::controller");
     return res.status(200).json(response);
-  }
+  },
 );

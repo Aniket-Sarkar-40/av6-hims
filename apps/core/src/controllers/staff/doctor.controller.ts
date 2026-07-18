@@ -23,7 +23,7 @@ export const getAllDoctors = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "FETCHED", data: doctors },
-    "Doctor"
+    "Doctor",
   );
 
   logger.info("exiting::getAllDoctors::controller");
@@ -37,7 +37,7 @@ export const getDoctorById = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "FETCHED", data: doctor },
-    "Doctor"
+    "Doctor",
   );
 
   logger.info("exiting::getDoctorById::controller");

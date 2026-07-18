@@ -31,7 +31,7 @@ export function registerPharmacyApprovalCallbacks() {
           await approvalServiceFactory.commonParentChildUpdate(
             config,
             childConfig,
-            inst
+            inst,
           );
           break;
       }
@@ -71,7 +71,7 @@ export function registerPharmacyApprovalCallbacks() {
           await approvalServiceFactory.commonParentChildUpdate(
             config,
             childConfig,
-            inst
+            inst,
           );
           break;
       }
@@ -111,7 +111,7 @@ export function registerPharmacyApprovalCallbacks() {
           await approvalServiceFactory.commonParentChildUpdate(
             config,
             childConfig,
-            inst
+            inst,
           );
           break;
       }

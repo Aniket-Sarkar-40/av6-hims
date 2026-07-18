@@ -6,7 +6,7 @@ import {
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toVoucherTypeDto = (
-  input: VoucherTypeResponse[]
+  input: VoucherTypeResponse[],
 ): VoucherTypeDTO[] => {
   const response = input.map((voucherType) => {
     const omittedData = customOmit<

@@ -22,15 +22,14 @@ export interface ItemImageFiles {
   rightSideImage?: Express.Multer.File[];
 }
 
-export interface ItemMasterDto
-  extends Omit<
-    DecimalToNumber<InvItem>,
-    | "itemCategoryId"
-    | "unitId"
-    | "taxDetailsId"
-    | "storageId"
-    | BaseModelAttrWoCancel
-  > {
+export interface ItemMasterDto extends Omit<
+  DecimalToNumber<InvItem>,
+  | "itemCategoryId"
+  | "unitId"
+  | "taxDetailsId"
+  | "storageId"
+  | BaseModelAttrWoCancel
+> {
   itemCategory: IdValue | null;
   unitMaster: InvUnitMaster | null;
   taxDetails: IdValue | null;

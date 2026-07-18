@@ -15,16 +15,16 @@ export const settingsSchema = Joi.object<CreateOrUpdateSettings>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Calculation Method"
+        "Calculation Method",
       ),
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Calculation Method",
-        Object.values(CalculationMethod).join(", ")
+        Object.values(CalculationMethod).join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Calculation Method"
+        "Calculation Method",
       ),
     }),
   roundingMethod: Joi.string()
@@ -34,16 +34,16 @@ export const settingsSchema = Joi.object<CreateOrUpdateSettings>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Rounding Method"
+        "Rounding Method",
       ),
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Rounding Method",
-        Object.values(RoundFormat).join(", ")
+        Object.values(RoundFormat).join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Rounding Method"
+        "Rounding Method",
       ),
     }),
 
@@ -55,19 +55,19 @@ export const settingsSchema = Joi.object<CreateOrUpdateSettings>({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Rounding Precision"
+        "Rounding Precision",
       ),
       "number.integer": generateValidationErrorMessage(
         "NUMBER",
-        "Rounding Precision"
+        "Rounding Precision",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Rounding Precision"
+        "Rounding Precision",
       ),
       "number.max": generateValidationErrorMessage(
         "MAX_NUMBER",
-        "Rounding Precision: 3"
+        "Rounding Precision: 3",
       ),
     }),
   timeZone: Joi.string()
@@ -85,15 +85,15 @@ export const settingsSchema = Joi.object<CreateOrUpdateSettings>({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Excel Batch Size"
+        "Excel Batch Size",
       ),
       "number.integer": generateValidationErrorMessage(
         "NUMBER",
-        "Excel Batch Size"
+        "Excel Batch Size",
       ),
       "number.positive": generateValidationErrorMessage(
         "NON_NEGATIVE",
-        "Excel Batch Size"
+        "Excel Batch Size",
       ),
     }),
   mainBranchId: idRequired("Main Branch Id"),

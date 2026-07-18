@@ -60,7 +60,7 @@ export const purchaseService = {
     if (pos.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Purchase Order")
+        generateErrorMessage("NOT_FOUND", "Purchase Order"),
       );
     }
 
@@ -72,7 +72,7 @@ export const purchaseService = {
 
   async getPurchaseById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<PurchaseOrderDTO | null> {
     logger.info("entering::getPurchaseById::service id=" + id);
 
@@ -85,7 +85,7 @@ export const purchaseService = {
       }
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "PurchaseOrder")
+        generateErrorMessage("NOT_FOUND", "PurchaseOrder"),
       );
     }
 
@@ -106,13 +106,13 @@ export const purchaseService = {
 
   async updatePurchaseOrderStatus(
     id: number,
-    status: PO_STATUS
+    status: PO_STATUS,
   ): Promise<void> {
     logger.info(
       "entering::updatePurchaseOrderStatus::service id=" +
         id +
         " status=" +
-        status
+        status,
     );
 
     await updatePurchaseOrderStatusServiceValidation(id);
@@ -123,7 +123,7 @@ export const purchaseService = {
       "exiting::updatePurchaseOrderStatus::service id=" +
         id +
         " status=" +
-        status
+        status,
     );
   },
 
@@ -133,7 +133,7 @@ export const purchaseService = {
     if (!purchase) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Purchase Order")
+        generateErrorMessage("NOT_FOUND", "Purchase Order"),
       );
     }
     const [purchaseDto] = await toPurchaseOrderPdfDTO([purchase]);
@@ -146,7 +146,7 @@ export const purchaseService = {
     if (!pdfTemplate) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "PDF template")
+        generateErrorMessage("NOT_FOUND", "PDF template"),
       );
     }
 
@@ -159,7 +159,7 @@ export const purchaseService = {
       applyPurchaseOrderReverseRateConversion(purchaseDto, {
         roundFormat,
         precision,
-      })
+      }),
     );
     const pdfBuffer = await renderCustomPdfToBuffer(filledDef);
 

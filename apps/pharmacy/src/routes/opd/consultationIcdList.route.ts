@@ -35,5 +35,5 @@ consultationIcdListRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CONSULTATION_ICD_LIST", "VIEW")),
-  getConsultationIcdList
+  getConsultationIcdList,
 );

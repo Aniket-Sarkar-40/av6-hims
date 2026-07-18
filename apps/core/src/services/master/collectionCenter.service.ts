@@ -36,7 +36,7 @@ import { auditProxy } from "@/config/audit.config.js";
 const cacheKey = getRedisKey("COLLECTION_CENTER", "all");
 const collectionCenterServiceRaw = {
   async createCollectionCenter(
-    input: CollectionCenterReq
+    input: CollectionCenterReq,
   ): Promise<CollectionCenter> {
     logger.info("entering::createCollectionCenter::service");
     await createCollectionCenterServiceValidation(input);
@@ -50,13 +50,13 @@ const collectionCenterServiceRaw = {
   },
 
   async updateCollectionCenter(
-    input: CollectionCenterReq
+    input: CollectionCenterReq,
   ): Promise<CollectionCenter> {
     logger.info("entering::updateCollectionCenter::service");
     if (input.id === undefined) {
       throw new ErrorHandler(
         400,
-        "ID is required for updating Collection Center"
+        "ID is required for updating Collection Center",
       );
     }
     await updateIdCollectionCenterServiceValidation(input.id, input);
@@ -82,7 +82,7 @@ const collectionCenterServiceRaw = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Collection Center")
+          generateErrorMessage("NOT_FOUND", "Collection Center"),
         );
       }
     } else {
@@ -90,7 +90,7 @@ const collectionCenterServiceRaw = {
       if (collectionCenter.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Collection Center")
+          generateErrorMessage("NOT_FOUND", "Collection Center"),
         );
       }
       logger.info("exiting::getAllCollectionCenter::service");
@@ -105,7 +105,7 @@ const collectionCenterServiceRaw = {
     if (collectionCenter.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Collection Center")
+        generateErrorMessage("NOT_FOUND", "Collection Center"),
       );
     }
     logger.info("exiting::getAllCollectionCenter::service");
@@ -114,7 +114,7 @@ const collectionCenterServiceRaw = {
 
   async getCollectionCenterById(
     collectionCenterId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<CollectionCenter | null> {
     logger.info("entering::getCollectionCenterById::service");
     validIdCheck(collectionCenterId);
@@ -123,18 +123,17 @@ const collectionCenterServiceRaw = {
     if (isCacheable) {
       collectionCenter = (await getCacheById(
         cacheKey,
-        collectionCenterId
+        collectionCenterId,
       )) as CollectionCenter | null;
     } else {
-      collectionCenter = await getCollectionCenterByIdFromDb(
-        collectionCenterId
-      );
+      collectionCenter =
+        await getCollectionCenterByIdFromDb(collectionCenterId);
     }
     if (!collectionCenter) {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Collection Center")
+          generateErrorMessage("NOT_FOUND", "Collection Center"),
         );
       else return null;
     }
@@ -144,7 +143,7 @@ const collectionCenterServiceRaw = {
   },
   //Get all branch and warehouse
   async getCollectionCentersForStaff(
-    staffId: number
+    staffId: number,
   ): Promise<CollectionCenterDTO[]> {
     logger.info("entering::getCollectionCentersForStaff::service");
 
@@ -153,7 +152,7 @@ const collectionCenterServiceRaw = {
     // 1) Get mapped CC IDs for this staff
     const ccIds =
       await staffCollectionCenterService.getStaffCollectionCenterMapById(
-        staffId
+        staffId,
       ); // throws 404 if none
     const uniqueIds = Array.from(new Set(ccIds));
 
@@ -163,7 +162,7 @@ const collectionCenterServiceRaw = {
     if (!centers || centers.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "collectionCenter")
+        generateErrorMessage("NOT_FOUND", "collectionCenter"),
       );
     }
 
@@ -177,5 +176,5 @@ const collectionCenterServiceRaw = {
 
 export const collectionCenterService = auditProxy.createAuditedService(
   "collectionCenter",
-  collectionCenterServiceRaw
+  collectionCenterServiceRaw,
 );

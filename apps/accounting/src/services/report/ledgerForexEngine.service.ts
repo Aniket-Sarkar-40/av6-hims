@@ -32,7 +32,7 @@ export const toForexAmt = (signed: number): ForexDrCrAmt => ({
 });
 
 export const getLedgerForexGainLossEngine = async (
-  input: LedgerForexReportInput
+  input: LedgerForexReportInput,
 ): Promise<LedgerForexGainLossEngineResult> => {
   logger.info("entering::getLedgerForexGainLossEngine::service");
   const {
@@ -57,11 +57,11 @@ export const getLedgerForexGainLossEngine = async (
 
   const currencies = await currencyService.getAllCurrency();
   const currencyMap = new Map<number, Currency>(
-    currencies.map((currency) => [currency.id, currency])
+    currencies.map((currency) => [currency.id, currency]),
   );
 
   const baseCurrency = company.currencyId
-    ? currencyMap.get(company.currencyId) ?? null
+    ? (currencyMap.get(company.currencyId) ?? null)
     : null;
 
   const allGroups: Group[] = await commonGetService.getAllElements<"Group">({
@@ -87,7 +87,7 @@ export const getLedgerForexGainLossEngine = async (
     (ledger) =>
       ledger.currencyId !== null &&
       ledger.currencyId !== company.currencyId &&
-      (!ledgerIdFilter || ledgerIdFilter.has(ledger.id))
+      (!ledgerIdFilter || ledgerIdFilter.has(ledger.id)),
   );
   const foreignLedgerIds = foreignLedgers.map((ledger) => ledger.id);
 
@@ -97,7 +97,7 @@ export const getLedgerForexGainLossEngine = async (
     if (!group) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`)
+        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`),
       );
     }
     foreignLedgerGroupMap.set(ledger.id, group);
@@ -105,7 +105,7 @@ export const getLedgerForexGainLossEngine = async (
 
   if (foreignLedgerIds.length === 0) {
     logger.info(
-      "exiting::getLedgerForexGainLossEngine::service (no foreign ledgers)"
+      "exiting::getLedgerForexGainLossEngine::service (no foreign ledgers)",
     );
     return {
       asOfDate: asOfDateStr,
@@ -206,7 +206,7 @@ export const getLedgerForexGainLossEngine = async (
     const roundedForeignClosingSigned = applyRound(
       foreignClosingSigned,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const currencyId = ledger.currencyId as number;
@@ -217,7 +217,7 @@ export const getLedgerForexGainLossEngine = async (
         400,
         `Exchange rate not found for ${
           currency?.code ?? currency?.name ?? currencyId
-        } as on ${asOfDateStr}`
+        } as on ${asOfDateStr}`,
       );
     }
     if (roundedForeignClosingSigned !== 0 && currentRate <= 0) {
@@ -226,7 +226,7 @@ export const getLedgerForexGainLossEngine = async (
         400,
         `Exchange rate not found for ${
           currency?.code ?? currency?.name ?? currencyId
-        } as on ${asOfDateStr}`
+        } as on ${asOfDateStr}`,
       );
     }
 
@@ -238,22 +238,22 @@ export const getLedgerForexGainLossEngine = async (
     const roundedTransactedBaseSigned = applyRound(
       transactedBaseSigned,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const roundedCurrentBaseSigned = applyRound(
       currentBaseSigned,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const roundedLedgerRevaluationSigned = applyRound(
       ledgerRevaluationSigned,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const roundedForexGainLossSigned = applyRound(
       forexGainLossSigned,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     if (
@@ -294,22 +294,22 @@ export const getLedgerForexGainLossEngine = async (
   const roundedTotalTransactedBaseSigned = applyRound(
     totalTransactedBaseSigned,
     roundingMethod,
-    roundingPrecision
+    roundingPrecision,
   );
   const roundedTotalCurrentBaseSigned = applyRound(
     totalCurrentBaseSigned,
     roundingMethod,
-    roundingPrecision
+    roundingPrecision,
   );
   const roundedTotalForexGainLossSigned = applyRound(
     totalForexGainLossSigned,
     roundingMethod,
-    roundingPrecision
+    roundingPrecision,
   );
   const roundedTotalForexRevaluationSigned = applyRound(
     totalForexRevaluationSigned,
     roundingMethod,
-    roundingPrecision
+    roundingPrecision,
   );
 
   logger.info("exiting::getLedgerForexGainLossEngine::service");
@@ -343,7 +343,7 @@ export const buildCurrentRateMap = (params: {
         (rate) =>
           rate.companyId === companyId &&
           rate.financialYearId === financialYearId &&
-          rate.currencyId === currencyId
+          rate.currencyId === currencyId,
       )
       .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
 
@@ -351,14 +351,14 @@ export const buildCurrentRateMap = (params: {
 
     effectiveRateOfExchangeRecord =
       currencyRates.find((rate) =>
-        dayjs(rate.date).isSame(dayjs(asOfDate), "day")
+        dayjs(rate.date).isSame(dayjs(asOfDate), "day"),
       ) ?? null;
 
     if (!effectiveRateOfExchangeRecord && currencyRates.length > 0) {
       const pastRates = currencyRates.filter(
         (rate) =>
           dayjs(rate.date).isBefore(dayjs(asOfDate), "day") ||
-          dayjs(rate.date).isSame(dayjs(asOfDate), "day")
+          dayjs(rate.date).isSame(dayjs(asOfDate), "day"),
       );
       if (pastRates.length > 0) {
         effectiveRateOfExchangeRecord = pastRates[pastRates.length - 1];

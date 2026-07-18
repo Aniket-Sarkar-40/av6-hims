@@ -15,10 +15,10 @@ export const upsertEmailConfig = TryCatch(
 
     const response = BaseResponse.success(
       { data: emailConfig, type: "UPDATED" },
-      "emailConfig"
+      "emailConfig",
     );
 
     logger.info("exiting::upsertEmailConfig::controller");
     return res.status(200).json(response);
-  }
+  },
 );

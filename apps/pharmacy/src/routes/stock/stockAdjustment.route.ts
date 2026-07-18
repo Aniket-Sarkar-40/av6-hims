@@ -46,7 +46,7 @@ stockAdjustmentRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_ADJUSTMENT", "CREATE")),
   validateStockAdjustment,
-  createStockAdjustment
+  createStockAdjustment,
 );
 
 stockAdjustmentRouter.put(
@@ -54,10 +54,10 @@ stockAdjustmentRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STOCK_ADJUSTMENT", "UPDATE"),
-    getPermission("PMS", "STOCK_ADJUSTMENT", "VIEW")
+    getPermission("PMS", "STOCK_ADJUSTMENT", "VIEW"),
   ),
   validateUpdateStockAdjustment,
-  updateStockAdjustment
+  updateStockAdjustment,
 );
 /**
  * @swagger
@@ -79,7 +79,7 @@ stockAdjustmentRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_ADJUSTMENT", "VIEW")),
-  getStockAdjustmentById
+  getStockAdjustmentById,
 );
 
 /**
@@ -102,7 +102,7 @@ stockAdjustmentRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_BATCH_WISE", "UPDATE")),
   validateUpdateBatchExpiry,
-  updateBatchExpiry
+  updateBatchExpiry,
 );
 
 export default stockAdjustmentRouter;

@@ -64,7 +64,7 @@ export const validateIdPO = async (id: number) => {
   if (!po) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Purchase Order")
+      generateErrorMessage("NOT_FOUND", "Purchase Order"),
     );
   }
   logger.info("exiting::validateIdPO::service::validation");
@@ -73,7 +73,7 @@ export const validateIdPO = async (id: number) => {
 };
 
 export const validatePurchaseOrderCommon = async (
-  body: CreatePurchaseOrderInput
+  body: CreatePurchaseOrderInput,
 ): Promise<void> => {
   logger.info("entering::validatePurchaseOrderCommon::service::validation");
 
@@ -90,7 +90,7 @@ export const validatePurchaseOrderCommon = async (
     if (!currency) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Currency")
+        generateErrorMessage("NOT_FOUND", "Currency"),
       );
     }
   }
@@ -103,7 +103,7 @@ export const validatePurchaseOrderCommon = async (
     if (!warehouse) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Warehouse")
+        generateErrorMessage("NOT_FOUND", "Warehouse"),
       );
     }
   } else {
@@ -114,7 +114,7 @@ export const validatePurchaseOrderCommon = async (
     if (!branch.isMain) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("ACCESS_FAIL", "Branch is not main")
+        generateErrorMessage("ACCESS_FAIL", "Branch is not main"),
       );
     }
   }
@@ -127,7 +127,7 @@ export const validatePurchaseOrderCommon = async (
   }
 
   const supplier = await itemSupplierService.getItemSupplierById(
-    body.supplierId
+    body.supplierId,
   );
   body.supplier = supplier;
   await validateIdItemSupplier(body.supplierId);
@@ -150,7 +150,7 @@ export const validatePurchaseOrderCommon = async (
       });
       const supplierPrice = mapping ? Number(mapping.purchasePrice) : undefined;
       const itemBasePrice = items.find(
-        (item) => item.id === detail.itemId
+        (item) => item.id === detail.itemId,
       )?.basePrice;
       const purchasedPrice = supplierPrice ?? itemBasePrice ?? 0;
 
@@ -165,13 +165,13 @@ export const validatePurchaseOrderCommon = async (
             `Purchased price mismatch: expected ${applyRound(
               Number(purchasedPrice),
               roundFormat,
-              precision
+              precision,
             )}, got ${applyRound(
               Number(detail.purchasedPrice),
               roundFormat,
-              precision
-            )})`
-          )
+              precision,
+            )})`,
+          ),
         );
       }
     } else {
@@ -179,7 +179,7 @@ export const validatePurchaseOrderCommon = async (
       if (!itemData?.isPriceVariable) {
         throw new ErrorHandler(
           400,
-          `Cannot change the price of item: ${itemData?.item}`
+          `Cannot change the price of item: ${itemData?.item}`,
         );
       }
     }
@@ -200,12 +200,12 @@ export const validatePurchaseOrderCommon = async (
     const roundedExpectedTotal = applyRound(
       expectedTotal,
       roundFormat,
-      precision
+      precision,
     );
     const roundedProvidedTotal = applyRound(
       Number(totalAmount),
       roundFormat,
-      precision
+      precision,
     );
 
     if (roundedExpectedTotal !== roundedProvidedTotal) {
@@ -213,8 +213,8 @@ export const validatePurchaseOrderCommon = async (
         400,
         generateErrorMessage(
           "VALUE_MISMATCH",
-          `Item total mismatch for item ${itemId}: expected ${roundedExpectedTotal}, got ${roundedProvidedTotal}`
-        )
+          `Item total mismatch for item ${itemId}: expected ${roundedExpectedTotal}, got ${roundedProvidedTotal}`,
+        ),
       );
     }
 
@@ -224,12 +224,12 @@ export const validatePurchaseOrderCommon = async (
   const roundedSumOfProductsTotal = applyRound(
     sumOfProductsTotal,
     roundFormat,
-    precision
+    precision,
   );
   const roundedGrandTotal = applyRound(
     Number(body.grandTotal),
     roundFormat,
-    precision
+    precision,
   );
 
   if (roundedSumOfProductsTotal !== roundedGrandTotal) {
@@ -237,8 +237,8 @@ export const validatePurchaseOrderCommon = async (
       400,
       generateErrorMessage(
         "VALUE_MISMATCH",
-        `Grand total mismatch: expected ${roundedSumOfProductsTotal}, got ${roundedGrandTotal}`
-      )
+        `Grand total mismatch: expected ${roundedSumOfProductsTotal}, got ${roundedGrandTotal}`,
+      ),
     );
   }
 
@@ -246,7 +246,7 @@ export const validatePurchaseOrderCommon = async (
 };
 
 export const createPOServiceValidation = async (
-  body: CreatePurchaseOrderInput
+  body: CreatePurchaseOrderInput,
 ) => {
   logger.info("entering::createPOServiceValidation::service::validation");
 
@@ -262,7 +262,7 @@ export const updatePOServiceValidation = async (body: UpdatePurchaseOrder) => {
     logger.error("missing PurchaseOrder id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "PurchaseOrder id")
+      generateErrorMessage("NOT_FOUND", "PurchaseOrder id"),
     );
   }
   logger.info(`validating existence of PurchaseOrder id=${body.id}`);
@@ -280,7 +280,7 @@ export const updatePOServiceValidation = async (body: UpdatePurchaseOrder) => {
   if (notInPODetails.length > 0) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", `of Purchase order Details`)
+      generateErrorMessage("INVALID_FIELD", `of Purchase order Details`),
     );
   }
 
@@ -289,14 +289,14 @@ export const updatePOServiceValidation = async (body: UpdatePurchaseOrder) => {
     existingPO.status !== PO_STATUS.SENT_FOR_APPROVAL
   ) {
     logger.error(
-      `cannot update PurchaseOrder id=${body.id} in status=${existingPO.status}`
+      `cannot update PurchaseOrder id=${body.id} in status=${existingPO.status}`,
     );
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "INVALID_STATUS",
-        `Cannot update Purchase Order when status is ${existingPO.status}`
-      )
+        `Cannot update Purchase Order when status is ${existingPO.status}`,
+      ),
     );
   }
 
@@ -313,11 +313,11 @@ export const deletePOServiceValidation = async (id: number) => {
     po.status !== PO_STATUS.SENT_FOR_APPROVAL
   ) {
     logger.error(
-      `Cannot delete Purchase Order with id=${id} in status=${po.status}`
+      `Cannot delete Purchase Order with id=${id} in status=${po.status}`,
     );
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Purchase Order")
+      generateErrorMessage("INVALID_STATUS", "Purchase Order"),
     );
   }
 
@@ -325,10 +325,10 @@ export const deletePOServiceValidation = async (id: number) => {
 };
 
 export const updatePurchaseOrderStatusServiceValidation = async (
-  id: number
+  id: number,
 ) => {
   logger.info(
-    "entering::updatePurchaseOrderStatusServiceValidation::service::validation"
+    "entering::updatePurchaseOrderStatusServiceValidation::service::validation",
   );
   const po = await validateIdPO(id);
   if (
@@ -337,14 +337,14 @@ export const updatePurchaseOrderStatusServiceValidation = async (
     po.status === PO_STATUS.REJECTED
   ) {
     logger.error(
-      `Cannot update Purchase Order status with id=${id} in status=${po.status}`
+      `Cannot update Purchase Order status with id=${id} in status=${po.status}`,
     );
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Purchase Order")
+      generateErrorMessage("INVALID_STATUS", "Purchase Order"),
     );
   }
   logger.info(
-    "exiting::updatePurchaseOrderStatusServiceValidation::service::validation"
+    "exiting::updatePurchaseOrderStatusServiceValidation::service::validation",
   );
 };

@@ -4,7 +4,7 @@ import { ChequeMaster } from "@repo/db/generated/prisma/client";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toChequeMasterDto = async (
-  chequeMaster: ChequeMaster[]
+  chequeMaster: ChequeMaster[],
 ): Promise<ChequeMasterDTO[]> => {
   const ledgers = await commonGetService.getAllElements<"Ledger">({
     cacheCode: "LEDGER",

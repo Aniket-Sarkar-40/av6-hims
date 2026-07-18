@@ -42,7 +42,7 @@ export const createVoucherLineSchema = Joi.object({
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
   }),
@@ -73,13 +73,13 @@ export const postVoucherBillAllocationSchema = Joi.object({
     then: Joi.valid(null).messages({
       "any.only": generateValidationErrorMessage(
         "ONLY_NULL",
-        "Bill Document Id"
+        "Bill Document Id",
       ),
     }),
     otherwise: Joi.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Bill Document Id"
+        "Bill Document Id",
       ),
     }),
   }),
@@ -89,7 +89,7 @@ export const postVoucherBillAllocationSchema = Joi.object({
     then: Joi.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Reference No"
+        "Reference No",
       ),
     }),
     otherwise: Joi.valid(null).messages({
@@ -104,7 +104,7 @@ export const postVoucherBillAllocationSchema = Joi.object({
       .messages({
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Reference Date"
+          "Reference Date",
         ),
       }),
     otherwise: Joi.valid(null).messages({
@@ -123,7 +123,7 @@ export const postVoucherBillAllocationSchema = Joi.object({
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
   }),
@@ -143,7 +143,7 @@ export const postVoucherCostCenterAllocationSchema = Joi.object({
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
   }),
@@ -173,18 +173,18 @@ export const createVoucherSchema = Joi.object({
       "number.base": generateValidationErrorMessage("NUMBER", "Total Debit"),
       "number.min": generateValidationErrorMessage(
         "NON_NEGATIVE",
-        "Total Debit"
+        "Total Debit",
       ),
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Total Debit",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Total Debit"),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Total Debit",
-        "0"
+        "0",
       ),
     }),
   totalCredit: joiDecimalFromSettings({
@@ -197,21 +197,21 @@ export const createVoucherSchema = Joi.object({
       "number.base": generateValidationErrorMessage("NUMBER", "Total Credit"),
       "number.min": generateValidationErrorMessage(
         "NON_NEGATIVE",
-        "Total Credit"
+        "Total Credit",
       ),
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Total Credit",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Total Credit"
+        "Total Credit",
       ),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Total Credit",
-        "0"
+        "0",
       ),
     }),
   currencyId: idOptional("Currency Id"),
@@ -224,32 +224,32 @@ export const createVoucherSchema = Joi.object({
     .messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.min": generateValidationErrorMessage(
         "NON_NEGATIVE",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Currency Conversion Rate",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
     }),
   voucherLines: arrayRequired("Voucher Lines", createVoucherLineSchema, 2),
   billAllocations: arrayOptional(
     "Bill Allocations",
     postVoucherBillAllocationSchema,
-    0
+    0,
   ),
   costCenterAllocations: arrayOptional(
     "Cost Center Allocations",
     postVoucherCostCenterAllocationSchema,
-    0
+    0,
   ),
 });
 
@@ -269,16 +269,16 @@ const paymentInputSchema = Joi.object({
     "number.base": generateValidationErrorMessage("NUMBER", "Payment Amount"),
     "number.min": generateValidationErrorMessage(
       "NON_NEGATIVE",
-      "Payment Amount"
+      "Payment Amount",
     ),
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Payment Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage(
       "REQUIRED",
-      "Payment Amount"
+      "Payment Amount",
     ),
   }),
 });
@@ -301,20 +301,20 @@ export const postExternalVoucherSchema = Joi.object({
     }).messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.min": generateValidationErrorMessage(
         "NON_NEGATIVE",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Currency Conversion Rate",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
     }),
     otherwise: joiDecimalFromSettings({
@@ -326,16 +326,16 @@ export const postExternalVoucherSchema = Joi.object({
       .messages({
         "number.base": generateValidationErrorMessage(
           "NUMBER",
-          "Currency Conversion Rate"
+          "Currency Conversion Rate",
         ),
         "number.min": generateValidationErrorMessage(
           "NON_NEGATIVE",
-          "Currency Conversion Rate"
+          "Currency Conversion Rate",
         ),
         "number.precision": generateValidationErrorMessage(
           "PRECISION",
           "Currency Conversion Rate",
-          "{{#limit}}"
+          "{{#limit}}",
         ),
       }),
   }),
@@ -347,12 +347,12 @@ export const postExternalVoucherSchema = Joi.object({
     "number.base": generateValidationErrorMessage("NUMBER", "Total Amount"),
     "number.min": generateValidationErrorMessage(
       "NON_NEGATIVE",
-      "Total Amount"
+      "Total Amount",
     ),
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Total Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage("REQUIRED", "Total Amount"),
   }),
@@ -372,20 +372,20 @@ export const postExternalVoucherSchema = Joi.object({
   }).messages({
     "number.base": generateValidationErrorMessage(
       "NUMBER",
-      "Client Pay Amount"
+      "Client Pay Amount",
     ),
     "number.min": generateValidationErrorMessage(
       "NON_NEGATIVE",
-      "Client Pay Amount"
+      "Client Pay Amount",
     ),
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Client Pay Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage(
       "REQUIRED",
-      "Client Pay Amount"
+      "Client Pay Amount",
     ),
   }),
 
@@ -398,20 +398,20 @@ export const postExternalVoucherSchema = Joi.object({
   }).messages({
     "number.base": generateValidationErrorMessage(
       "NUMBER",
-      "Customer Pay Amount"
+      "Customer Pay Amount",
     ),
     "number.min": generateValidationErrorMessage(
       "NON_NEGATIVE",
-      "Customer Pay Amount"
+      "Customer Pay Amount",
     ),
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Customer Pay Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage(
       "REQUIRED",
-      "Customer Pay Amount"
+      "Customer Pay Amount",
     ),
   }),
 
@@ -436,7 +436,7 @@ export const postExternalVoucherSchema = Joi.object({
       VoucherReferenceType.PREPAID_CORPORATE_REFUND,
       VoucherReferenceType.POSTPAID_CORPORATE_REFUND,
       VoucherReferenceType.PREPAID_INSURANCE_REFUND,
-      VoucherReferenceType.POSTPAID_INSURANCE_REFUND
+      VoucherReferenceType.POSTPAID_INSURANCE_REFUND,
     ),
     then: arrayRequired("Payments", paymentInputSchema, 1),
     otherwise: arrayOptional("Payments", paymentInputSchema, 0),

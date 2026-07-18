@@ -43,7 +43,7 @@ staffCollectionCenterRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "CREATE")),
   validateStaffCollectionCenter,
-  createStaffCollectionCenter
+  createStaffCollectionCenter,
 );
 
 /**
@@ -67,7 +67,7 @@ staffCollectionCenterRouter.get(
   "/:staffCollectionCenterId",
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "VIEW")),
-  getStaffCollectionCenterById
+  getStaffCollectionCenterById,
 );
 
 /**
@@ -91,7 +91,7 @@ staffCollectionCenterRouter.get(
   "/id/:staffId",
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "VIEW")),
-  getStaffCollectionCenterMapById
+  getStaffCollectionCenterMapById,
 );
 
 /**
@@ -122,10 +122,10 @@ staffCollectionCenterRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "STAFF_COLLECTION_CENTER", "VIEW"),
-    getPermission("CORE", "STAFF_COLLECTION_CENTER", "UPDATE")
+    getPermission("CORE", "STAFF_COLLECTION_CENTER", "UPDATE"),
   ),
   validateStaffCollectionCenter,
-  updateStaffCollectionCenter
+  updateStaffCollectionCenter,
 );
 
 /**
@@ -149,7 +149,7 @@ staffCollectionCenterRouter.delete(
   "/:staffCollectionCenterId",
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_COLLECTION_CENTER", "DELETE")),
-  deleteStaffCollectionCenter
+  deleteStaffCollectionCenter,
 );
 
 export default staffCollectionCenterRouter;

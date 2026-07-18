@@ -13,7 +13,7 @@ import {
 import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export const createEventRecipientRuleInDb = async (
-  input: CreateOrUpdateEventRecipients
+  input: CreateOrUpdateEventRecipients,
 ) => {
   logger.info("entering::createEventRecipientRuleInDb::repository");
 
@@ -30,7 +30,7 @@ export const createEventRecipientRuleInDb = async (
 };
 
 export const multiCreateUpdateEventRecipientRule = async (
-  input: MultiCreateUpdateEventRecipients
+  input: MultiCreateUpdateEventRecipients,
 ) => {
   logger.info("entering::multiCreateUpdateEventRecipientRule::repository");
 
@@ -69,7 +69,7 @@ export const multiCreateUpdateEventRecipientRule = async (
             updatedBy: currentUser,
           }),
         });
-      })
+      }),
     );
 
     await tx.eventRecipientRule.updateMany({
@@ -88,17 +88,17 @@ export const multiCreateUpdateEventRecipientRule = async (
 };
 
 export const getEventRecipientRulesByEventConfigIdFromDb = async (
-  eventConfigId: number
+  eventConfigId: number,
 ): Promise<EventRecipientRule[]> => {
   logger.info(
-    "entering::getEventRecipientRulesByEventConfigIdFromDb::repository"
+    "entering::getEventRecipientRulesByEventConfigIdFromDb::repository",
   );
   const rules = await db.eventRecipientRule.findMany({
     where: { eventConfigId, isActive: true },
     orderBy: { sortOrder: "asc" },
   });
   logger.info(
-    "exiting::getEventRecipientRulesByEventConfigIdFromDb::repository"
+    "exiting::getEventRecipientRulesByEventConfigIdFromDb::repository",
   );
   return rules;
 };
@@ -116,7 +116,7 @@ export const getEventRecipientRulesByEventConfigs = async (): Promise<
 };
 
 export const getEventRecipientRuleByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<EventRecipientRule | null> => {
   logger.info("entering::getEventRecipientRuleByIdFromDb::repository");
   const rule = await db.eventRecipientRule.findFirst({
@@ -128,10 +128,10 @@ export const getEventRecipientRuleByIdFromDb = async (
 
 export const getEventRecipientRulesByEventConfigIdOnlyFromDb = async (
   eventConfigId: number,
-  templateType?: TemplateType
+  templateType?: TemplateType,
 ): Promise<EventRecipientRule[]> => {
   logger.info(
-    "entering::getEventRecipientRulesByEventConfigIdOnlyFromDb::repository"
+    "entering::getEventRecipientRulesByEventConfigIdOnlyFromDb::repository",
   );
   const rules = await db.eventRecipientRule.findMany({
     where: {
@@ -142,13 +142,13 @@ export const getEventRecipientRulesByEventConfigIdOnlyFromDb = async (
     orderBy: { sortOrder: "asc" },
   });
   logger.info(
-    "exiting::getEventRecipientRulesByEventConfigIdOnlyFromDb::repository"
+    "exiting::getEventRecipientRulesByEventConfigIdOnlyFromDb::repository",
   );
   return rules;
 };
 
 export const updateEventRecipientRuleInDb = async (
-  rule: CreateOrUpdateEventRecipients
+  rule: CreateOrUpdateEventRecipients,
 ) => {
   logger.info("entering::updateEventRecipientRuleInDb::repository");
   const omittedData = customOmit(rule, ["id"]);

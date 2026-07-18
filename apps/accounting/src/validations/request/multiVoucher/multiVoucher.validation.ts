@@ -37,13 +37,13 @@ export const createMultiVoucherDetailsSchema = Joi.object({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Amount",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Details Amount",
-        "0"
+        "0",
       ),
     }),
   narration: strOptional("Narration"),
@@ -92,19 +92,19 @@ export const createMultiVoucherSchema = Joi.object({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Amount",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Header Amount",
-        "0"
+        "0",
       ),
     }),
   multiVoucherDetails: arrayRequired(
     "Multi Voucher Details",
     createMultiVoucherDetailsSchema,
-    1
+    1,
   ),
 })
   .custom((value, helpers) => {
@@ -114,7 +114,7 @@ export const createMultiVoucherSchema = Joi.object({
      * Unique lineNo validation
      */
     const lineNos = multiVoucherDetails.map(
-      (detail: { lineNo: number }) => detail.lineNo
+      (detail: { lineNo: number }) => detail.lineNo,
     );
     const uniqueLineNos = new Set(lineNos);
     if (uniqueLineNos.size !== lineNos.length) {
@@ -138,7 +138,7 @@ export const createMultiVoucherSchema = Joi.object({
      * Detail ledger cannot be same as header ledger
      */
     const hasSameLedger = multiVoucherDetails.some(
-      (detail: { ledgerId: number }) => detail.ledgerId === ledgerId
+      (detail: { ledgerId: number }) => detail.ledgerId === ledgerId,
     );
 
     if (hasSameLedger) {
@@ -171,7 +171,7 @@ export const updateMultiVoucherSchema = createMultiVoucherSchema.keys({
   multiVoucherDetails: arrayRequired(
     "Multi Voucher Details",
     updateMultiVoucherDetailsSchema,
-    1
+    1,
   ),
 });
 
@@ -180,7 +180,7 @@ export const updatePostedMultiVoucherSchema = createMultiVoucherSchema.keys({
   multiVoucherDetails: arrayRequired(
     "Multi Voucher Details",
     updatePostedMultiVoucherDetailsSchema,
-    1
+    1,
   ),
 });
 export const validateCreateMultiVoucher = validationHandler({

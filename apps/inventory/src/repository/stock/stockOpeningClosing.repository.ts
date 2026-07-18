@@ -21,7 +21,7 @@ const formatDateOnly = (value: string | Date): string => {
 };
 
 const toNumber = (
-  value: Prisma.Decimal | number | string | bigint | null | undefined
+  value: Prisma.Decimal | number | string | bigint | null | undefined,
 ): number => {
   if (value === null || value === undefined) return 0;
 
@@ -31,7 +31,7 @@ const toNumber = (
 const getNumberFilter = (
   column: Prisma.Sql,
   value?: number,
-  values?: number[]
+  values?: number[],
 ) => {
   if (value !== undefined && value !== null) {
     return Prisma.sql`AND ${column} = ${value}`;
@@ -47,7 +47,7 @@ const getNumberFilter = (
 const getStringFilter = (
   column: Prisma.Sql,
   value?: string,
-  values?: string[]
+  values?: string[],
 ) => {
   if (value !== undefined && value !== null && value !== "") {
     return Prisma.sql`AND ${column} = ${value}`;
@@ -196,7 +196,7 @@ const STOCK_OPENING_CLOSING_ALLOWED_SORT_COLUMNS = {
 } as const;
 
 export const getOpeningClosingStock = async (
-  filters: StockOpeningClosingFilter
+  filters: StockOpeningClosingFilter,
 ): Promise<StockOpeningClosingResponse> => {
   logger.info("entering::getOpeningClosingStock::repository");
 
@@ -230,43 +230,43 @@ export const getOpeningClosingStock = async (
   const itemFilter = getNumberFilter(
     Prisma.sql`s.item_id`,
     filters.itemId,
-    filters.itemIds
+    filters.itemIds,
   );
 
   const categoryFilter = getNumberFilter(
     Prisma.sql`im.item_category_id`,
     filters.categoryId,
-    filters.categoryIds
+    filters.categoryIds,
   );
 
   const ccFilter = getNumberFilter(
     Prisma.sql`s.cc_id`,
     filters.ccId,
-    filters.ccIds
+    filters.ccIds,
   );
 
   const fromCcFilter = getNumberFilter(
     Prisma.sql`s.from_cc_id`,
     filters.fromCcId,
-    filters.fromCcIds
+    filters.fromCcIds,
   );
 
   const toCcFilter = getNumberFilter(
     Prisma.sql`s.to_cc_id`,
     filters.toCcId,
-    filters.toCcIds
+    filters.toCcIds,
   );
 
   const userFilter = getNumberFilter(
     Prisma.sql`s.user_id`,
     filters.userId,
-    filters.userIds
+    filters.userIds,
   );
 
   const batchFilter = getStringFilter(
     Prisma.sql`s.batch_no`,
     filters.batchNo,
-    filters.batchNos
+    filters.batchNos,
   );
 
   const expiryFilter = filters.expiryDate

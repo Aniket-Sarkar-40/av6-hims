@@ -28,7 +28,7 @@ export const validIdEventConfig = async (id: number): Promise<EventConfig> => {
   if (!row)
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Event Config")
+      generateErrorMessage("NOT_FOUND", "Event Config"),
     );
 
   logger.info("exiting::validIdEventConfig::service::validation");
@@ -36,7 +36,7 @@ export const validIdEventConfig = async (id: number): Promise<EventConfig> => {
 };
 
 export const validIdEventConfigKey = async (
-  id: number
+  id: number,
 ): Promise<EventConfigKey> => {
   logger.info("entering::validIdEventConfigKey::service::validation");
 
@@ -46,7 +46,7 @@ export const validIdEventConfigKey = async (
   if (!row)
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Event Config Key")
+      generateErrorMessage("NOT_FOUND", "Event Config Key"),
     );
 
   logger.info("exiting::validIdEventConfigKey::service::validation");
@@ -54,10 +54,10 @@ export const validIdEventConfigKey = async (
 };
 
 export const validateAndPrepareEventConfigUpsert = async (
-  input: UpsertEventConfigWithKeysInput
+  input: UpsertEventConfigWithKeysInput,
 ): Promise<void> => {
   logger.info(
-    "entering::validateAndPrepareEventConfigUpsert::service::validation"
+    "entering::validateAndPrepareEventConfigUpsert::service::validation",
   );
 
   const { eventConfig } = input;
@@ -73,15 +73,15 @@ export const validateAndPrepareEventConfigUpsert = async (
 
   const duplicate = await getEventConfigByEventConfigNameAndTypeFromDb(
     eventConfig.serviceEventId,
-    eventConfig.eventName
+    eventConfig.eventName,
   );
   if (duplicate && duplicate.id !== eventConfig.id) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "DUPLICATE_ITEM",
-        `Duplicate Event Config with serviceEventId "${eventConfig.serviceEventId}" and eventName "${eventConfig.eventName}"`
-      )
+        `Duplicate Event Config with serviceEventId "${eventConfig.serviceEventId}" and eventName "${eventConfig.eventName}"`,
+      ),
     );
   }
   if (eventConfig.id) {
@@ -109,19 +109,19 @@ export const validateAndPrepareEventConfigUpsert = async (
     if (!exKey) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Given Key: ${key.key}`)
+        generateErrorMessage("NOT_FOUND", `Given Key: ${key.key}`),
       );
     }
   }
 
   logger.info(
-    "exiting::validateAndPrepareEventConfigUpsert::service::validation"
+    "exiting::validateAndPrepareEventConfigUpsert::service::validation",
   );
 };
 
 export const markReadNotificationServiceValidation = async (ids: number[]) => {
   logger.info(
-    "entering::markReadNotificationServiceValidation::serviceValidation"
+    "entering::markReadNotificationServiceValidation::serviceValidation",
   );
 
   const notifications = await getAll({
@@ -139,11 +139,11 @@ export const markReadNotificationServiceValidation = async (ids: number[]) => {
     if (!notification)
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Notification`)
+        generateErrorMessage("NOT_FOUND", `Notification`),
       );
   }
 
   logger.info(
-    "exiting::markReadNotificationServiceValidation::serviceValidation"
+    "exiting::markReadNotificationServiceValidation::serviceValidation",
   );
 };

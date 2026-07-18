@@ -42,7 +42,7 @@ export const CreateDoctorScheduleSchema = Joi.object<
     .messages({
       "any.invalid": generateValidationErrorMessage(
         "END_BEFORE_START",
-        "End Time"
+        "End Time",
       ),
     }),
   firstVisitPrice: priceOptional("First Visit Price").default(0.0),
@@ -50,7 +50,7 @@ export const CreateDoctorScheduleSchema = Joi.object<
   vipFirstVisitPrice: priceOptional("Vip First Visit Price").default(0.0),
   vipFollowUpPrice: priceOptional("Vip Follow Up Price").default(0.0),
   specialFirstVisitPrice: priceOptional("Special First Visit Price").default(
-    0.0
+    0.0,
   ),
   specialFollowUpPrice: priceOptional("Special Follow Up Price").default(0.0),
 });
@@ -78,7 +78,7 @@ export const CreateDoctorSchema = Joi.object<
   doctorScheduleDetails: arrayRequired(
     "Doctor Schedule Details",
     CreateDoctorScheduleSchema,
-    1
+    1,
   ),
 });
 
@@ -95,7 +95,7 @@ export const UpdateDoctorSchema = CreateDoctorSchema.keys({
   doctorScheduleDetails: arrayRequired(
     "Doctor Schedule Details",
     UpdateDoctorScheduleSchema,
-    1
+    1,
   ),
 });
 

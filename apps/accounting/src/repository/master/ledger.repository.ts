@@ -93,7 +93,7 @@ export const patchLedgerInDb = async (
   input: Pick<
     CreateOrUpdateLedgerInput,
     "id" | "currencyId" | "creditPeriodInDays"
-  >
+  >,
 ) => {
   logger.info("entering::patchLedgerInDb::repository");
   const { id, currencyId, creditPeriodInDays } = input;
@@ -152,7 +152,7 @@ export const getLedgersByCompanyIdAndLedgerIds = async (params: {
 };
 
 export const getAllLedgersByCompanyId = async (
-  companyId: number
+  companyId: number,
 ): Promise<Ledger[]> => {
   logger.info("entering::getAllLedgersByCompanyId::repository");
   return await db.ledger.findMany({
@@ -164,7 +164,7 @@ export const getAllLedgersByCompanyId = async (
 };
 
 export const getLedgersByGroupId = async (
-  groupId: number
+  groupId: number,
 ): Promise<Ledger[]> => {
   logger.info("entering::getLedgersByGroupId::repository");
   return await db.ledger.findMany({
@@ -177,7 +177,7 @@ export const getLedgersByGroupId = async (
 
 export const createLedgerFromExcelInDb = async (
   tx: Tx,
-  input: CreateOrUpdateLedger
+  input: CreateOrUpdateLedger,
 ) => {
   logger.info("entering::createLedgerFromExcelInDb::repository");
   const store = requestStorage.getStore();
@@ -192,11 +192,11 @@ export const createLedgerFromExcelInDb = async (
 };
 
 export const createLedgerExcelInDb = async (
-  input: CreateOrUpdateLedgerExcelInput[]
+  input: CreateOrUpdateLedgerExcelInput[],
 ) => {
   logger.info("entering::createLedgerExcelInDb::repository");
   const batchUin = await uinServiceFactory.generateUIN(
-    AccUinShortCode.BATCH_JOB
+    AccUinShortCode.BATCH_JOB,
   );
   return await db.$transaction(
     async (tx) => {
@@ -216,7 +216,7 @@ export const createLedgerExcelInDb = async (
 
       return batch;
     },
-    { timeout: API_TIMEOUT }
+    { timeout: API_TIMEOUT },
   );
 };
 
@@ -239,7 +239,7 @@ export async function ledgerExcelBatchJob(params: {
 
   const states = await stateService.getAllStates();
   const stateMap = new Map<string, number>(
-    states.map((state) => [state.name, state.id])
+    states.map((state) => [state.name, state.id]),
   );
   while (!isDone) {
     const batchRows = await db.ledgerExcel.findMany({
@@ -286,21 +286,21 @@ export async function ledgerExcelBatchJob(params: {
               },
             });
           },
-          { timeout: API_TIMEOUT }
+          { timeout: API_TIMEOUT },
         );
       } catch (error) {
         logger.error(
           `❌ Error processing ledger row ${item.rowNo}: ${JSON.stringify(
-            error
-          )}`
+            error,
+          )}`,
         );
 
         const errorMessage =
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
 
         await db.batchJobDetails.create({
           data: {

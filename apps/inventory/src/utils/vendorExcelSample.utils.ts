@@ -178,7 +178,7 @@ export const addVendorHeaderStarAndNotes = (ws: ExcelJs.Worksheet) => {
     }
 
     (cell as ExcelJs.Cell).note = `${getVendorHeaderStatusLabel(
-      guide.status
+      guide.status,
     )}\n\n${guide.note}`;
   });
 };

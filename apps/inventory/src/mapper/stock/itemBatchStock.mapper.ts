@@ -7,14 +7,14 @@ import {
 import { InvItemStock } from "@repo/db/generated/prisma/client";
 
 export const toItemBatchStockCacheDTO = async (
-  data: InvItemStock
+  data: InvItemStock,
 ): Promise<ItemBatchStockCacheDTO> => {
   const [dto] = await toItemBatchStockCacheDTOList([data]);
   return dto;
 };
 
 export const toItemBatchStockCacheDTOList = async (
-  data: InvItemStock[]
+  data: InvItemStock[],
 ): Promise<ItemBatchStockCacheDTO[]> => {
   if (data.length === 0) return [];
 
@@ -33,7 +33,7 @@ export const toItemBatchStockCacheDTOList = async (
 
 export const toAvailableItemBatchStockDTOList = (
   data: ItemBatchStockCacheDTO[],
-  input: ItemBatchStockLookupInput
+  input: ItemBatchStockLookupInput,
 ): ItemBatchStockDTO[] => {
   const searchBatchNo = input.batchNo.trim().toLowerCase();
   const seen = new Set<string>();

@@ -79,7 +79,7 @@ const statementOfAccountsRequestInputSchema =
             to: Joi.number().integer().min(0).required().messages({
               "number.min": "To must be greater than or equal to 0",
             }),
-          })
+          }),
         )
         .min(1)
         .required()

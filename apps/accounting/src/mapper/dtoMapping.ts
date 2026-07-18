@@ -71,7 +71,7 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toNarrationDto(data as Narration[]),
   [SHORT_CODE.INTEGRATION_CONFIG]: (data: unknown) =>
     toAccountingIntegrationConfigDTO(
-      data as AccountingIntegrationConfigResponse[]
+      data as AccountingIntegrationConfigResponse[],
     ),
   [SHORT_CODE.BANK_STATEMENT_ROW]: (data: unknown) =>
     toBankStatementRowDTO(data as BankStatementRowResponse[]),

@@ -4,7 +4,7 @@ import { customOmit } from "av6-core-v2";
 import { logger } from "@repo/platform/logging/logger.js";
 import { Patient, Prisma } from "@repo/db/generated/prisma/client";
 export const createPatientInDb = async (
-  input: PatientReq
+  input: PatientReq,
 ): Promise<Patient> => {
   logger.info("Entering::createPatientInDb::repository");
 
@@ -32,7 +32,7 @@ export const createPatientInDb = async (
 };
 export const updatePatientInDb = async (
   id: number,
-  input: PatientReq
+  input: PatientReq,
 ): Promise<Patient> => {
   logger.info("Entering::updatePatientInDb::repository");
 
@@ -68,7 +68,7 @@ export const getAllPatientsFromDb = async (): Promise<Patient[]> => {
 };
 
 export const getPatientsByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Patient | null> => {
   logger.info(`entering::getPatientsByIdFromDb::repository id=${id}`);
 
@@ -81,7 +81,7 @@ export const getPatientsByIdFromDb = async (
 };
 
 export const getPatientsByUniqueIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Patient | null> => {
   logger.info(`entering::getPatientsByIdFromDb::repository id=${id}`);
 
@@ -94,10 +94,10 @@ export const getPatientsByUniqueIdFromDb = async (
 };
 
 export const getPatientsNameByNameFromDb = async (
-  patientName: string | null
+  patientName: string | null,
 ): Promise<Patient | null> => {
   logger.info(
-    `entering::getPatientsNameByNameFromDb::repository patientName=${patientName}`
+    `entering::getPatientsNameByNameFromDb::repository patientName=${patientName}`,
   );
 
   const patientsDetails = await db.patient.findFirst({
@@ -105,16 +105,16 @@ export const getPatientsNameByNameFromDb = async (
   });
 
   logger.info(
-    `exiting::getPatientsNameByNameFromDb::repository patientName=${patientName}`
+    `exiting::getPatientsNameByNameFromDb::repository patientName=${patientName}`,
   );
   return patientsDetails;
 };
 
 export const getPatientsMobileNoByMobileNoFromDb = async (
-  mobileNo: string | null
+  mobileNo: string | null,
 ): Promise<Patient | null> => {
   logger.info(
-    `entering::getPatientsNameByNameFromDb::repository patientName=${mobileNo}`
+    `entering::getPatientsNameByNameFromDb::repository patientName=${mobileNo}`,
   );
 
   const patientsDetails = await db.patient.findFirst({
@@ -122,16 +122,16 @@ export const getPatientsMobileNoByMobileNoFromDb = async (
   });
 
   logger.info(
-    `exiting::getPatientsNameByNameFromDb::repository patientName=${mobileNo}`
+    `exiting::getPatientsNameByNameFromDb::repository patientName=${mobileNo}`,
   );
   return patientsDetails;
 };
 
 export const getPatientsEmailByMobileNoFromDb = async (
-  email: string | null
+  email: string | null,
 ): Promise<Patient | null> => {
   logger.info(
-    `entering::getPatientsNameByNameFromDb::repository patientName=${email}`
+    `entering::getPatientsNameByNameFromDb::repository patientName=${email}`,
   );
 
   const patientsDetails = await db.patient.findFirst({
@@ -139,7 +139,7 @@ export const getPatientsEmailByMobileNoFromDb = async (
   });
 
   logger.info(
-    `exiting::getPatientsNameByNameFromDb::repository patientName=${email}`
+    `exiting::getPatientsNameByNameFromDb::repository patientName=${email}`,
   );
   return patientsDetails;
 };

@@ -13,15 +13,14 @@ export const authorizeCommonSearch =
       if (!shortCode) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "shortCode")
+          generateErrorMessage("FIELD_REQUIRED", "shortCode"),
         );
       }
 
       logger.info("entering::authorizeCommonSearch ::middleware");
 
-      const tableMetaData = await shortCodeService.getShortCodeByCode(
-        shortCode
-      );
+      const tableMetaData =
+        await shortCodeService.getShortCodeByCode(shortCode);
 
       if (!req.perms) {
         throw new ErrorHandler(500, "Permission set missing.");
@@ -29,7 +28,7 @@ export const authorizeCommonSearch =
 
       const isSuper = req.perms.has("SUPER_ADMIN");
       const hasPerm = Boolean(
-        tableMetaData?.permission && req.perms.has(tableMetaData.permission)
+        tableMetaData?.permission && req.perms.has(tableMetaData.permission),
       );
 
       if (!isSuper && !hasPerm) {

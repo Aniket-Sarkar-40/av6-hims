@@ -14,14 +14,18 @@ export type VoucherLineResponseForLedgerBook = Prisma.VoucherLineGetPayload<{
   };
 }>;
 
-export interface voucherHeadResponseForLedgerBook
-  extends Omit<Voucher, BaseModelAttrWoCancel | "voucherTypeId"> {
+export interface voucherHeadResponseForLedgerBook extends Omit<
+  Voucher,
+  BaseModelAttrWoCancel | "voucherTypeId"
+> {
   voucherType: IdValue | null;
   createdBy: IdValue | null;
   updatedBy: IdValue | null;
 }
-export interface LedgerBookRow
-  extends Omit<VoucherLineResponseForLedgerBook, "voucher"> {
+export interface LedgerBookRow extends Omit<
+  VoucherLineResponseForLedgerBook,
+  "voucher"
+> {
   voucher: voucherHeadResponseForLedgerBook;
   currency: Currency | null;
   runningBalance: DrCrAmt; //the balance of the ledger after applying this line

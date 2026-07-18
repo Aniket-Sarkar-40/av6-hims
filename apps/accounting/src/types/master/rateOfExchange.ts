@@ -17,18 +17,17 @@ export type RateOfExchangeResponse = Prisma.RateOfExchangeGetPayload<{
   };
 }>;
 
-export interface RateOfExchangeDTO
-  extends Omit<
-    RateOfExchangeResponse,
-    | BaseModelAttrWoCancelAndCreated
-    | "createdBy"
-    | "company"
-    | "financialYear"
-    | "currencyId"
-    | "currency"
-    | "companyId"
-    | "financialYearId"
-  > {
+export interface RateOfExchangeDTO extends Omit<
+  RateOfExchangeResponse,
+  | BaseModelAttrWoCancelAndCreated
+  | "createdBy"
+  | "company"
+  | "financialYear"
+  | "currencyId"
+  | "currency"
+  | "companyId"
+  | "financialYearId"
+> {
   lastVoucherSellingRate: number | null;
   lastVoucherBuyingRate: number | null;
   currency: IdValue | null;

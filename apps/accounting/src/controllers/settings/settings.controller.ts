@@ -17,7 +17,7 @@ export const upsertSettings = TryCatch(async (req: Request, res: Response) => {
       data: setting,
       type: body.id ? "UPDATED" : "CREATED",
     },
-    "settings"
+    "settings",
   );
 
   logger.info("exiting::upsertSettings::controller");
@@ -42,7 +42,7 @@ export const getSettings = TryCatch(async (req: Request, res: Response) => {
       data: setting,
       type: "FETCHED",
     },
-    "settings"
+    "settings",
   );
 
   logger.info("exiting::getSettings::controller");

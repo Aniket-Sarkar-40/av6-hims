@@ -13,5 +13,5 @@ chequeMasterRouter.patch(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "CHEQUE_MASTER", "UPDATE")),
-  toggleStatusChequeMaster
+  toggleStatusChequeMaster,
 );

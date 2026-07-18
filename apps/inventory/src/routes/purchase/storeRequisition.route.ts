@@ -54,7 +54,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "CREATE")),
   validateStoreRequisition,
-  createStoreRequisition
+  createStoreRequisition,
 );
 
 /**
@@ -70,7 +70,7 @@ storeRequisitionRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisition
+  getAllStoreRequisition,
 );
 
 /**
@@ -91,7 +91,7 @@ storeRequisitionRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionById
+  getstoreRequisitionById,
 );
 
 /**
@@ -121,10 +121,10 @@ storeRequisitionRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STORE_REQUISITION", "VIEW"),
-    getPermission("INV", "STORE_REQUISITION", "UPDATE")
+    getPermission("INV", "STORE_REQUISITION", "UPDATE"),
   ),
   validateStoreRequisitionUpdate,
-  updateStoreRequisition
+  updateStoreRequisition,
 );
 
 /**
@@ -151,7 +151,7 @@ storeRequisitionRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "DELETE")),
-  deleteStoreRequisition
+  deleteStoreRequisition,
 );
 
 /**
@@ -174,7 +174,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_REJECT", "CREATE")),
   validateStoreRequisitionReject,
-  rejectStoreRequisition
+  rejectStoreRequisition,
 );
 
 /**
@@ -197,7 +197,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_APPROVE", "CREATE")),
   validateSentStoreRequisition,
-  approveStoreRequisition
+  approveStoreRequisition,
 );
 
 /**
@@ -220,7 +220,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeStoreRequisition,
-  acknowledgeStoreRequisition
+  acknowledgeStoreRequisition,
 );
 
 /**
@@ -241,7 +241,7 @@ storeRequisitionRouter.get(
   "/batch-wise-by-id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionBatchWiseById
+  getstoreRequisitionBatchWiseById,
 );
 
 /**
@@ -285,5 +285,5 @@ storeRequisitionRouter.get(
   "/batch-wise",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisitionBatchWiseById
+  getAllStoreRequisitionBatchWiseById,
 );

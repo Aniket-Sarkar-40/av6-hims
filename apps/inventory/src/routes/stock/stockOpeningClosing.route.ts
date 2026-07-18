@@ -38,14 +38,14 @@ stockOpeningClosingRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_OPENING_CLOSING", "VIEW")),
   validateStockOpeningClosingFilter,
-  getOpeningClosingStockById
+  getOpeningClosingStockById,
 );
 
 stockOpeningClosingRouter.post(
   "/ext",
   authorizeExternal(),
   validateStockOpeningClosingFilter,
-  getOpeningClosingStockById
+  getOpeningClosingStockById,
 );
 
 export default stockOpeningClosingRouter;

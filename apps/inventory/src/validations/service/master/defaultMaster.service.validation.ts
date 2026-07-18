@@ -7,7 +7,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdDefaultUnitMaster = async (
-  defaultUnitMasterId: number
+  defaultUnitMasterId: number,
 ) => {
   logger.info("entering::validateIdDefaultUnitMaster::service::validation");
 
@@ -16,12 +16,12 @@ export const validateIdDefaultUnitMaster = async (
   const defaultUnitMaster =
     await defaultUnitMasterService.getDefaultUnitMasterById(
       defaultUnitMasterId,
-      true
+      true,
     );
   if (!defaultUnitMaster) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Default Unit Master")
+      generateErrorMessage("NOT_FOUND", "Default Unit Master"),
     );
   }
   logger.info("exiting::validateIdDefaultUnitMaster::service::validation");
@@ -30,7 +30,7 @@ export const validateIdDefaultUnitMaster = async (
 };
 
 export const updateIdDefaultUnitMasterServiceValidation = async (
-  input: DefaultUnitMasterReq
+  input: DefaultUnitMasterReq,
 ): Promise<void> => {
   logger.info("entering::updateIdDefaultUnitMaster::service::validation");
   if (input.id) {
@@ -38,12 +38,12 @@ export const updateIdDefaultUnitMasterServiceValidation = async (
   }
 
   const defaultUnitMasterByName = await getDefaultUnitMasterByNameFromDb(
-    input.name
+    input.name,
   );
   if (defaultUnitMasterByName && defaultUnitMasterByName.id !== input.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Default Unit Master Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Default Unit Master Name"),
     );
   }
 
@@ -52,16 +52,16 @@ export const updateIdDefaultUnitMasterServiceValidation = async (
 };
 
 export const createDefaultUnitMasterServiceValidation = async (
-  body: DefaultUnitMasterReq
+  body: DefaultUnitMasterReq,
 ): Promise<void> => {
   logger.info("entering::createDefaultUnitMaster::service::validation");
   const defaultUnitMasterName = await getDefaultUnitMasterByNameFromDb(
-    body.name
+    body.name,
   );
   if (defaultUnitMasterName) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Default Unit Master Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Default Unit Master Name"),
     );
   }
   logger.info("exiting::createDefaultUnitMaster::service::validation");

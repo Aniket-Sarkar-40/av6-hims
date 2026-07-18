@@ -27,7 +27,7 @@ const sourcePathSchema = Joi.string()
     "string.pattern.base": generateValidationErrorMessage(
       "INVALID_FORMAT",
       "Source Path",
-      "body.* | vars.* | ctx.*"
+      "body.* | vars.* | ctx.*",
     ),
   });
 
@@ -38,16 +38,16 @@ const presenceByOpSchema = Joi.object({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Presence (create)"
+        "Presence (create)",
       ),
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Presence (create)",
-        PresenceEnum.join(", ")
+        PresenceEnum.join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Presence (create)"
+        "Presence (create)",
       ),
     }),
   update: Joi.string()
@@ -56,16 +56,16 @@ const presenceByOpSchema = Joi.object({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Presence (update)"
+        "Presence (update)",
       ),
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Presence (update)",
-        PresenceEnum.join(", ")
+        PresenceEnum.join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Presence (update)"
+        "Presence (update)",
       ),
     }),
 })
@@ -108,9 +108,9 @@ const fieldRulesSchema = Joi.object({
           "string.base": generateValidationErrorMessage("STRING", "Enum value"),
           "any.required": generateValidationErrorMessage(
             "REQUIRED",
-            "Enum value"
+            "Enum value",
           ),
-        })
+        }),
     )
     .optional()
     .messages({
@@ -163,7 +163,7 @@ const fieldConfigSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Field type",
-        FieldTypeEnum.join(", ")
+        FieldTypeEnum.join(", "),
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Field type"),
     }),
@@ -204,16 +204,16 @@ const relationWriteConfigSchema = Joi.object({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Relation strategy"
+        "Relation strategy",
       ),
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Relation strategy",
-        RelationStrategyEnum.join(", ")
+        RelationStrategyEnum.join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Relation strategy"
+        "Relation strategy",
       ),
     }),
 
@@ -229,7 +229,7 @@ const relationWriteConfigSchema = Joi.object({
   .messages({
     "object.base": generateValidationErrorMessage(
       "JSON_OBJECT",
-      "RelationWriteConfig"
+      "RelationWriteConfig",
     ),
   });
 
@@ -242,7 +242,7 @@ const relationConfigSchema = Joi.object({
       "string.empty": generateValidationErrorMessage("EMPTY", "Relation name"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Relation name"
+        "Relation name",
       ),
     }),
 
@@ -263,11 +263,11 @@ const relationConfigSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Relation kind",
-        RelationKindEnum.join(", ")
+        RelationKindEnum.join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Relation kind"
+        "Relation kind",
       ),
     }),
 
@@ -277,13 +277,13 @@ const relationConfigSchema = Joi.object({
     create: relationWriteConfigSchema.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "write.create"
+        "write.create",
       ),
     }),
     update: relationWriteConfigSchema.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "write.update"
+        "write.update",
       ),
     }),
   })
@@ -302,16 +302,16 @@ const relationConfigSchema = Joi.object({
       .messages({
         "array.base": generateValidationErrorMessage(
           "ARRAY",
-          "Relation fields"
+          "Relation fields",
         ),
         "array.min": generateValidationErrorMessage(
           "ARRAY_MIN_LENGTH",
           "Relation fields",
-          "1"
+          "1",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Relation fields"
+          "Relation fields",
         ),
       }),
 
@@ -324,7 +324,7 @@ const relationConfigSchema = Joi.object({
       .messages({
         "object.base": generateValidationErrorMessage(
           "JSON_OBJECT",
-          "Relation audit"
+          "Relation audit",
         ),
       }),
   })
@@ -340,7 +340,7 @@ const relationConfigSchema = Joi.object({
   .messages({
     "object.base": generateValidationErrorMessage(
       "JSON_OBJECT",
-      "RelationConfig"
+      "RelationConfig",
     ),
   });
 
@@ -353,7 +353,7 @@ const uniqueWhereItemSchema = Joi.object({
       "string.empty": generateValidationErrorMessage("EMPTY", "Unique field"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Unique field"
+        "Unique field",
       ),
     }),
   src: sourcePathSchema.required().messages({
@@ -365,7 +365,7 @@ const uniqueWhereItemSchema = Joi.object({
   .messages({
     "object.base": generateValidationErrorMessage(
       "JSON_OBJECT",
-      "Unique where"
+      "Unique where",
     ),
   });
 
@@ -389,13 +389,13 @@ const uniqueConfigSchema = Joi.object({
           "any.only": generateValidationErrorMessage(
             "VALID_ENUM",
             "Unique op",
-            OpEnum.join(", ")
+            OpEnum.join(", "),
           ),
           "any.required": generateValidationErrorMessage(
             "REQUIRED",
-            "Unique op"
+            "Unique op",
           ),
-        })
+        }),
     )
     .min(1)
     .required()
@@ -404,7 +404,7 @@ const uniqueConfigSchema = Joi.object({
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Unique op",
-        "1"
+        "1",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Unique op"),
     }),
@@ -418,11 +418,11 @@ const uniqueConfigSchema = Joi.object({
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Unique where",
-        "1"
+        "1",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Unique where"
+        "Unique where",
       ),
     }),
 
@@ -434,7 +434,7 @@ const uniqueConfigSchema = Joi.object({
       "string.empty": generateValidationErrorMessage("EMPTY", "Unique message"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Unique message"
+        "Unique message",
       ),
     }),
 })
@@ -443,7 +443,7 @@ const uniqueConfigSchema = Joi.object({
   .messages({
     "object.base": generateValidationErrorMessage(
       "JSON_OBJECT",
-      "UniqueConfig"
+      "UniqueConfig",
     ),
   });
 
@@ -453,7 +453,7 @@ const includeOrSelectSchema = Joi.object()
   .messages({
     "object.base": generateValidationErrorMessage(
       "JSON_OBJECT",
-      "include/select"
+      "include/select",
     ),
   });
 
@@ -483,7 +483,7 @@ export const dynamicCrudConfigSchema = Joi.object({
         "boolean.base": generateValidationErrorMessage("BOOLEAN", "abortEarly"),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "abortEarly"
+          "abortEarly",
         ),
       }),
     allowUnknown: Joi.boolean()
@@ -491,11 +491,11 @@ export const dynamicCrudConfigSchema = Joi.object({
       .messages({
         "boolean.base": generateValidationErrorMessage(
           "BOOLEAN",
-          "allowUnknown"
+          "allowUnknown",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "allowUnknown"
+          "allowUnknown",
         ),
       }),
     stripUnknown: Joi.boolean()
@@ -503,11 +503,11 @@ export const dynamicCrudConfigSchema = Joi.object({
       .messages({
         "boolean.base": generateValidationErrorMessage(
           "BOOLEAN",
-          "stripUnknown"
+          "stripUnknown",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "stripUnknown"
+          "stripUnknown",
         ),
       }),
     convert: Joi.boolean()
@@ -522,7 +522,7 @@ export const dynamicCrudConfigSchema = Joi.object({
     .messages({
       "object.base": generateValidationErrorMessage(
         "JSON_OBJECT",
-        "validation"
+        "validation",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "validation"),
     }),
@@ -534,7 +534,7 @@ export const dynamicCrudConfigSchema = Joi.object({
       .messages({
         "string.base": generateValidationErrorMessage(
           "STRING",
-          "createdByField"
+          "createdByField",
         ),
       }),
     updatedByField: Joi.string()
@@ -543,7 +543,7 @@ export const dynamicCrudConfigSchema = Joi.object({
       .messages({
         "string.base": generateValidationErrorMessage(
           "STRING",
-          "updatedByField"
+          "updatedByField",
         ),
       }),
   })
@@ -560,11 +560,11 @@ export const dynamicCrudConfigSchema = Joi.object({
         .messages({
           "boolean.base": generateValidationErrorMessage(
             "BOOLEAN",
-            "requirePrimaryKey"
+            "requirePrimaryKey",
           ),
           "any.required": generateValidationErrorMessage(
             "REQUIRED",
-            "requirePrimaryKey"
+            "requirePrimaryKey",
           ),
         }),
     })
@@ -573,11 +573,11 @@ export const dynamicCrudConfigSchema = Joi.object({
       .messages({
         "object.base": generateValidationErrorMessage(
           "JSON_OBJECT",
-          "operations.create"
+          "operations.create",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "operations.create"
+          "operations.create",
         ),
       }),
 
@@ -587,11 +587,11 @@ export const dynamicCrudConfigSchema = Joi.object({
         .messages({
           "boolean.base": generateValidationErrorMessage(
             "BOOLEAN",
-            "requirePrimaryKey"
+            "requirePrimaryKey",
           ),
           "any.required": generateValidationErrorMessage(
             "REQUIRED",
-            "requirePrimaryKey"
+            "requirePrimaryKey",
           ),
         }),
       primaryKeyFrom: Joi.string()
@@ -600,16 +600,16 @@ export const dynamicCrudConfigSchema = Joi.object({
         .messages({
           "string.base": generateValidationErrorMessage(
             "STRING",
-            "primaryKeyFrom"
+            "primaryKeyFrom",
           ),
           "any.only": generateValidationErrorMessage(
             "VALID_ENUM",
             "primaryKeyFrom",
-            "params, body, query"
+            "params, body, query",
           ),
           "any.required": generateValidationErrorMessage(
             "REQUIRED",
-            "primaryKeyFrom"
+            "primaryKeyFrom",
           ),
         }),
     })
@@ -618,11 +618,11 @@ export const dynamicCrudConfigSchema = Joi.object({
       .messages({
         "object.base": generateValidationErrorMessage(
           "JSON_OBJECT",
-          "operations.update"
+          "operations.update",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "operations.update"
+          "operations.update",
         ),
       }),
   })
@@ -631,7 +631,7 @@ export const dynamicCrudConfigSchema = Joi.object({
     .messages({
       "object.base": generateValidationErrorMessage(
         "JSON_OBJECT",
-        "operations"
+        "operations",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "operations"),
     }),
@@ -652,7 +652,7 @@ export const dynamicCrudConfigSchema = Joi.object({
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "fields",
-        "1"
+        "1",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "fields"),
     }),
@@ -696,7 +696,7 @@ export const updateConfigByCodeSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "short Code",
-        Object.values(SHORT_CODE).join(", ")
+        Object.values(SHORT_CODE).join(", "),
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "short Code"),
     }),

@@ -38,7 +38,7 @@ export const getContractKeys = TryCatch(
         position: contract.position,
         key: contract.key,
         keyType: contract.keyType,
-      })
+      }),
     );
     logger.info("exiting::getContractKeys::controller");
     return res.status(200).json(
@@ -47,10 +47,10 @@ export const getContractKeys = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Contract keys"),
         },
-        keys
-      )
+        keys,
+      ),
     );
-  }
+  },
 );
 
 export const createPdfTemplate = TryCatch(
@@ -60,17 +60,17 @@ export const createPdfTemplate = TryCatch(
     const pdfTemplate = await pdfTemplateService.createPdfTemplate(input);
 
     const doc = structuredClone(
-      input.bodyJson
+      input.bodyJson,
     ) as unknown as CustomDocDefinition;
     pdfTemplateService.createAndUpdatePdfThumbnail(doc, pdfTemplate.id);
 
     const response = BaseResponse.success(
       { type: "CREATED", data: pdfTemplate },
-      "Pdf Template"
+      "Pdf Template",
     );
     logger.info("exiting::createPdfTemplate::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updatePdfTemplate = TryCatch(
@@ -80,21 +80,21 @@ export const updatePdfTemplate = TryCatch(
     const pdfTemplate = await pdfTemplateService.updatePdfTemplate(input);
 
     const doc = structuredClone(
-      input.bodyJson
+      input.bodyJson,
     ) as unknown as CustomDocDefinition;
     pdfTemplateService.createAndUpdatePdfThumbnail(
       doc,
       pdfTemplate.id,
-      pdfTemplate.sampleImageUrl
+      pdfTemplate.sampleImageUrl,
     );
 
     const response = BaseResponse.success(
       { type: "UPDATED", data: pdfTemplate },
-      "Pdf Template"
+      "Pdf Template",
     );
     logger.info("exiting::updatePdfTemplate::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deletePdfTemplate = TryCatch(
@@ -102,15 +102,15 @@ export const deletePdfTemplate = TryCatch(
     logger.info("entering::deletePdfTemplate::controller");
     const { pdfTemplateId } = req.query as { pdfTemplateId: string };
     const pdfTemplate = await pdfTemplateService.deletePdfTemplate(
-      Number(pdfTemplateId)
+      Number(pdfTemplateId),
     );
     const response = BaseResponse.success(
       { type: "DELETED", data: pdfTemplate },
-      "Pdf Template"
+      "Pdf Template",
     );
     logger.info("exiting::deletePdfTemplate::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const makeDefaultPdfTemplate = TryCatch(
@@ -121,21 +121,20 @@ export const makeDefaultPdfTemplate = TryCatch(
     const response = BaseResponse.success({ type: "UPDATED" }, "Pdf Template");
     logger.info("exiting::makeDefaultPdfTemplate::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getPdfTemplateByModuleAndType = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::getPdfTemplateByModuleAndType::controller");
     const input = req.query as unknown as GetPdfTemplateByModuleAndTypeInput;
-    const pdfTemplate = await pdfTemplateService.getPdfTemplateByModuleAndType(
-      input
-    );
+    const pdfTemplate =
+      await pdfTemplateService.getPdfTemplateByModuleAndType(input);
     const response = BaseResponse.success(
       { type: "FETCHED", data: pdfTemplate },
-      "Pdf Template"
+      "Pdf Template",
     );
     logger.info("exiting::getPdfTemplateByModuleAndType::controller");
     return res.status(200).json(response);
-  }
+  },
 );

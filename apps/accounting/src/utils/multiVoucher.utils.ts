@@ -18,7 +18,7 @@ import { DEFAULT_COMPANY_ID } from "@repo/shared";
 import { Prisma } from "@repo/db/generated/prisma/client";
 
 export const prepareVoucherInputForMultiVoucher = async (
-  input: CreateOrUpdateMultiVoucherInput
+  input: CreateOrUpdateMultiVoucherInput,
 ): Promise<PreparedVoucherInputForMultiVoucher[]> => {
   const {
     companyId,
@@ -54,15 +54,15 @@ export const prepareVoucherInputForMultiVoucher = async (
         });
 
       const voucherTypes = allVoucherTypes.filter(
-        (voucherType) => voucherType.companyId === DEFAULT_COMPANY_ID
+        (voucherType) => voucherType.companyId === DEFAULT_COMPANY_ID,
       );
       const voucherType = voucherTypes.find(
-        (voucherType) => voucherType.nature === VoucherTypeNature.JOURNAL
+        (voucherType) => voucherType.nature === VoucherTypeNature.JOURNAL,
       );
       if (!voucherType) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", "Voucher Type")
+          generateErrorMessage("NOT_FOUND", "Voucher Type"),
         );
       }
       effectVoucherTypeId = voucherType.id;
@@ -125,7 +125,7 @@ const buildVoucherForMultiVoucher = (
     createdBy?: number;
     status?: VoucherStatus;
     voucherLines: VoucherLineSeed[];
-  }
+  },
 ): PreparedVoucherInputForMultiVoucher => {
   const settings = requestStorage.getStore()?.settings;
   if (!settings) {
@@ -138,7 +138,7 @@ const buildVoucherForMultiVoucher = (
     (line, index) => ({
       ...line,
       lineNo: index + 1,
-    })
+    }),
   );
 
   const totalDebit = voucherLines
@@ -158,8 +158,8 @@ const buildVoucherForMultiVoucher = (
       generateErrorMessage(
         "MISMATCH",
         `Total Debit: ${totalDebitRounded}`,
-        `Total Credit: ${totalCreditRounded}`
-      )
+        `Total Credit: ${totalCreditRounded}`,
+      ),
     );
   }
 

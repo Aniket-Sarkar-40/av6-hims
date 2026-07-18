@@ -217,7 +217,7 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
   goodReceiveReturnDetails: arrayRequired(
     "Good Receive Return Details",
     grnReturnDetailSchema,
-    1
+    1,
   ),
 });
 
@@ -244,7 +244,7 @@ export const grnReturnSchemaUpdate = grnReturnSchema.keys({
     grnReturnDetailSchema.keys({
       id: idOptional("Id"),
       grnDetailsId: idOptional("GRN Details Id"),
-    })
+    }),
   ),
 });
 

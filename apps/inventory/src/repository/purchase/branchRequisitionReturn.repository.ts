@@ -26,7 +26,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 
 export const createBranchRequisitionReturnInDb = async (
-  input: CreateBranchRequisitionReturnInput
+  input: CreateBranchRequisitionReturnInput,
 ) => {
   logger.info("entering::createBranchRequisitionReturnInDb::repository");
 
@@ -52,7 +52,7 @@ export const createBranchRequisitionReturnInDb = async (
           create: input.returnItems.map((ri) => {
             const omittedReturnItem = customOmit<BranchReturnItem, "itemBatch">(
               ri,
-              ["itemBatch"]
+              ["itemBatch"],
             );
 
             return {
@@ -86,7 +86,7 @@ export const createBranchRequisitionReturnInDb = async (
 };
 
 export const updateBranchRequisitionReturnInDb = async (
-  input: CreateBranchRequisitionReturnInput
+  input: CreateBranchRequisitionReturnInput,
 ) => {
   logger.info("entering::updateBranchRequisitionReturnInDb::repository");
 
@@ -139,7 +139,7 @@ export const updateBranchRequisitionReturnInDb = async (
           create: input.returnItems.map((ri) => {
             const omittedReturnItem = customOmit<BranchReturnItem, "itemBatch">(
               ri,
-              ["itemBatch"]
+              ["itemBatch"],
             );
 
             return {
@@ -173,10 +173,10 @@ export const updateBranchRequisitionReturnInDb = async (
 };
 
 export const getBranchRequisitionReturnByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<GetBranchRequisitionReturnResponse | null> => {
   logger.info(
-    `entering::getBranchRequisitionReturnByIdFromDb::repository id=${id}`
+    `entering::getBranchRequisitionReturnByIdFromDb::repository id=${id}`,
   );
 
   const brr = await db.branchRequisitionReturn.findFirst({
@@ -194,7 +194,7 @@ export const getBranchRequisitionReturnByIdFromDb = async (
   });
 
   logger.info(
-    `exiting::getBranchRequisitionReturnByIdFromDb::repository id=${id}`
+    `exiting::getBranchRequisitionReturnByIdFromDb::repository id=${id}`,
   );
   return brr;
 };
@@ -223,10 +223,10 @@ export const getAllBranchRequisitionReturnFromDb = async (): Promise<
 };
 
 export const getPendingBRRFromBRId = async (
-  branchRequisitionId: number
+  branchRequisitionId: number,
 ): Promise<BranchRequisitionReturn[]> => {
   logger.info(
-    `entering::getPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`
+    `entering::getPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`,
   );
 
   const brrs = await db.branchRequisitionReturn.findMany({
@@ -238,16 +238,16 @@ export const getPendingBRRFromBRId = async (
   });
 
   logger.info(
-    `exiting::getPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`
+    `exiting::getPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`,
   );
   return brrs;
 };
 
 export const getApprovedPendingBRRFromBRId = async (
-  branchRequisitionId: number
+  branchRequisitionId: number,
 ) => {
   logger.info(
-    `entering::getApprovedPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`
+    `entering::getApprovedPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`,
   );
 
   const brrs = await db.branchRequisitionReturn.findMany({
@@ -264,14 +264,14 @@ export const getApprovedPendingBRRFromBRId = async (
   });
 
   logger.info(
-    `exiting::getApprovedPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`
+    `exiting::getApprovedPendingBRRFromBRId::repository branchRequisitionId=${branchRequisitionId}`,
   );
   return brrs;
 };
 
 export const deleteBranchRequisitionReturnFromDb = async (id: number) => {
   logger.info(
-    `entering::deleteBranchRequisitionReturnFromDb::repository id=${id}`
+    `entering::deleteBranchRequisitionReturnFromDb::repository id=${id}`,
   );
 
   const store = requestStorage.getStore();
@@ -314,15 +314,15 @@ export const deleteBranchRequisitionReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteBranchRequisitionReturnFromDb::repository id=${id}`
+    `exiting::deleteBranchRequisitionReturnFromDb::repository id=${id}`,
   );
 };
 
 export const rejectBranchRequisitionReturn = async (
-  inp: RejectBranchRequisitionReturnInput
+  inp: RejectBranchRequisitionReturnInput,
 ) => {
   logger.info(
-    `entering::rejectBranchRequisitionReturn::repository id=${inp.id}`
+    `entering::rejectBranchRequisitionReturn::repository id=${inp.id}`,
   );
 
   const store = requestStorage.getStore();
@@ -338,15 +338,15 @@ export const rejectBranchRequisitionReturn = async (
   });
 
   logger.info(
-    `exiting::rejectBranchRequisitionReturn::repository id=${inp.id}`
+    `exiting::rejectBranchRequisitionReturn::repository id=${inp.id}`,
   );
 };
 
 export const approveBranchRequisitionReturn = async (
-  inp: ApproveBranchReqReturnInput
+  inp: ApproveBranchReqReturnInput,
 ) => {
   logger.info(
-    `entering::approveBranchRequisitionReturn::repository id=${inp.id}`
+    `entering::approveBranchRequisitionReturn::repository id=${inp.id}`,
   );
 
   const store = requestStorage.getStore();
@@ -386,12 +386,12 @@ export const approveBranchRequisitionReturn = async (
 
     for (const det of inp.returnItems) {
       const brrDetail = inp.branchReqReturn.branchRequisitionReturnDetails.find(
-        (d) => d.id === det.id
+        (d) => d.id === det.id,
       );
 
       for (const item of det.itemBatch) {
         const rrItem = brrDetail?.branchReturnItemDetails.find(
-          (r) => r.id === item.id
+          (r) => r.id === item.id,
         );
 
         if (rrItem?.branchItemDetailsId) {
@@ -425,7 +425,7 @@ export const approveBranchRequisitionReturn = async (
             refId: inp.id,
             refNo: inp.branchReqReturn.brrNumber,
             refApprovedAt: now,
-          }
+          },
         );
 
         await addInTransitStock(
@@ -450,7 +450,7 @@ export const approveBranchRequisitionReturn = async (
             refId: inp.id,
             refNo: inp.branchReqReturn.brrNumber,
             refApprovedAt: now,
-          }
+          },
         );
       }
 
@@ -466,16 +466,16 @@ export const approveBranchRequisitionReturn = async (
     }
 
     logger.info(
-      `exiting::approveBranchRequisitionReturn::repository id=${inp.id}`
+      `exiting::approveBranchRequisitionReturn::repository id=${inp.id}`,
     );
   });
 };
 
 export const acknowledgeBranchRequisitionReturn = async (
-  inp: AcknowledgeBranchRequisitionReturn
+  inp: AcknowledgeBranchRequisitionReturn,
 ) => {
   logger.info(
-    `entering::acknowledgeBranchRequisitionReturn::repository id=${inp.id}`
+    `entering::acknowledgeBranchRequisitionReturn::repository id=${inp.id}`,
   );
 
   const store = requestStorage.getStore();
@@ -513,7 +513,7 @@ export const acknowledgeBranchRequisitionReturn = async (
             refDetailsId: detail.id,
             refId: inp.id,
             refNo: inp.branchReqReturn.brrNumber,
-          }
+          },
         );
 
         await subInTransitStock(
@@ -536,7 +536,7 @@ export const acknowledgeBranchRequisitionReturn = async (
             refDetailsId: detail.id,
             refId: inp.id,
             refNo: inp.branchReqReturn.brrNumber,
-          }
+          },
         );
       }
 
@@ -560,6 +560,6 @@ export const acknowledgeBranchRequisitionReturn = async (
   });
 
   logger.info(
-    `exiting::acknowledgeBranchRequisitionReturn::repository id=${inp.id}`
+    `exiting::acknowledgeBranchRequisitionReturn::repository id=${inp.id}`,
   );
 };

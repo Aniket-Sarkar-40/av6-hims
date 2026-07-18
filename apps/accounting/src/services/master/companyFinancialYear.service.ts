@@ -17,18 +17,16 @@ const CompanyFinancialYearServiceRaw = {
   async createCompanyFinancialYear(input: CreateOrUpdateCompanyFinancialYear) {
     logger.info("entering::createCompanyFinancialYear::service");
     await createOrUpdateCompanyFinancialYearServiceValidation(input);
-    const createdCompanyFinancialYear = await createCompanyFinancialYearInDb(
-      input
-    );
+    const createdCompanyFinancialYear =
+      await createCompanyFinancialYearInDb(input);
     logger.info("exiting::createCompanyFinancialYear::service");
     return createdCompanyFinancialYear;
   },
   async updateCompanyFinancialYear(input: CreateOrUpdateCompanyFinancialYear) {
     logger.info("entering::updateCompanyFinancialYear::service");
     await createOrUpdateCompanyFinancialYearServiceValidation(input);
-    const updatedCompanyFinancialYear = await updateCompanyFinancialYearInDb(
-      input
-    );
+    const updatedCompanyFinancialYear =
+      await updateCompanyFinancialYearInDb(input);
     logger.info("exiting::updateCompanyFinancialYear::service");
     return updatedCompanyFinancialYear;
   },
@@ -50,5 +48,5 @@ const CompanyFinancialYearServiceRaw = {
 
 export const companyFinancialYearService = auditProxy.createAuditedService(
   "companyFinancialYear",
-  CompanyFinancialYearServiceRaw
+  CompanyFinancialYearServiceRaw,
 );

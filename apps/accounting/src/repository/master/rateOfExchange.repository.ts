@@ -4,7 +4,7 @@ import { db } from "@repo/db/client";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const createRateOfExchangeInDb = async (
-  input: CreateRateOfExchangeInput
+  input: CreateRateOfExchangeInput,
 ) => {
   logger.info("entering::createRateOfExchangeInDb::repository");
   const store = requestStorage.getStore();

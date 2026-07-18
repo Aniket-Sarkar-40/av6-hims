@@ -69,7 +69,7 @@ export const manualBankReconcileWithBankStatementInputSchema =
     rows: arrayRequired(
       "Rows",
       manualBankReconcileWithBankStatementRowSchema,
-      1
+      1,
     )
       .custom((value, helpers) => {
         const rows = value as ManualBankReconcileWithBankStatementRow[];

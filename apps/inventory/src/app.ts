@@ -47,7 +47,7 @@ inventoryRouter.use("/master/item-store", itemStoreRouter);
 inventoryRouter.use("/master/item-unit", unitMasterRouter);
 inventoryRouter.use(
   "/api/v1/master/default-unit-master",
-  defaultUnitMasterRouter
+  defaultUnitMasterRouter,
 );
 inventoryRouter.use("/common", commonRouter);
 inventoryRouter.use("/master/item-supplier", itemSupplierRouter);
@@ -69,7 +69,7 @@ inventoryRouter.use("/master/tax-details", taxDetailsRouter);
 //uploads
 inventoryRouter.use(
   "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
+  express.static(path.join(process.cwd(), "uploads")),
 );
 
 // Purchase Order
@@ -90,7 +90,7 @@ inventoryRouter.use("/stock-transfer", stockTransferRouter);
 inventoryRouter.use("/branch-requisition", branchRequisitionRouter);
 inventoryRouter.use(
   "/branch-requisition-return",
-  branchRequisitionReturnRouter
+  branchRequisitionReturnRouter,
 );
 
 //Store requisition return

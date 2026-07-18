@@ -5,7 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { toDepartmentCreateData } from "@/mapper/staff/department.mapper.js";
 
 export const createDepartmentInDb = async (
-  department: CreateDepartmentInput
+  department: CreateDepartmentInput,
 ): Promise<Department> => {
   logger.info("entering::createDepartment::repository");
 
@@ -24,7 +24,7 @@ export const getAllDepartmentsFromDb = async (): Promise<Department[]> => {
 };
 
 export const getDepartmentByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Department | null> => {
   logger.info("entering::getDepartmentById::repository");
   return db.department.findUnique({
@@ -33,7 +33,7 @@ export const getDepartmentByIdFromDb = async (
 };
 
 export const getDepartmentByDepartmentNameFromDb = async (
-  departmentName: string
+  departmentName: string,
 ): Promise<Department | null> => {
   logger.info("entering::getDepartmentById::repository");
   return db.department.findFirst({
@@ -43,7 +43,7 @@ export const getDepartmentByDepartmentNameFromDb = async (
 
 export const updateDepartmentInDb = async (
   id: number,
-  department: CreateDepartmentInput
+  department: CreateDepartmentInput,
 ): Promise<Department> => {
   logger.info("entering::updateDepartment::repository");
 

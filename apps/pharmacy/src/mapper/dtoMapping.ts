@@ -105,7 +105,7 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toPurchaseOrderDTO(
       data as PmsPurchaseOrder & {
         purchaseOrderDetails: PmsPurchaseOrderDetails[];
-      }
+      },
     ),
   [SHORT_CODE.DISTRIBUTOR]: (data: unknown) =>
     toDistributorDto(data as Distributor),
@@ -126,7 +126,7 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
     toStockTransferDTO(
       data as PmsStockTransfer & {
         stockTransferDetails: PmsStockTransferDetails[];
-      }
+      },
     ),
   [SHORT_CODE.STORE]: (data: unknown) => toStoreDTO(data as Store),
   [SHORT_CODE.MED_DOSAGE_MAP]: (data: unknown) =>

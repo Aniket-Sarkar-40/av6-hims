@@ -17,12 +17,11 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 
 const clientLedgerMappingServiceRaw = {
   async createExternalClientLedgerMapping(
-    input: CreateExternalClientLedgerMappingInput
+    input: CreateExternalClientLedgerMappingInput,
   ): Promise<ClientLedgerMapping> {
     logger.info("entering::createExternalClientLedgerMapping::service");
-    const ledgerId = await createExternalClientLedgerMappingServiceValidation(
-      input
-    );
+    const ledgerId =
+      await createExternalClientLedgerMappingServiceValidation(input);
     const mapping = await createClientLedgerMapping({
       clientId: input.clientId,
       clientType: input.clientType,
@@ -34,7 +33,7 @@ const clientLedgerMappingServiceRaw = {
   },
   async fetchClientLedgerMapping(
     input: FetchClientLedgerMappingInput,
-    canNullReturnable: boolean = true
+    canNullReturnable: boolean = true,
   ): Promise<ClientLedgerMappingDTO | null> {
     logger.info("entering::fetchClientLedgerMapping::service");
     const { clientType, clientId } = input;
@@ -45,7 +44,7 @@ const clientLedgerMappingServiceRaw = {
     if (!mapping && !canNullReturnable) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Client Ledger Mapping")
+        generateErrorMessage("NOT_FOUND", "Client Ledger Mapping"),
       );
     }
     logger.info("exiting::fetchClientLedgerMapping::service");
@@ -55,5 +54,5 @@ const clientLedgerMappingServiceRaw = {
 
 export const clientLedgerMappingService = auditProxy.createAuditedService(
   "clientLedgerMapping",
-  clientLedgerMappingServiceRaw
+  clientLedgerMappingServiceRaw,
 );

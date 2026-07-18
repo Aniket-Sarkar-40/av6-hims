@@ -23,7 +23,7 @@ export function validateBankStatementExcelHeaders(params: {
   const requiredHeaders = Object.values(config.columns);
 
   const normalizedExcelHeaders = new Set(
-    headers.map((header) => normalizeHeader(header))
+    headers.map((header) => normalizeHeader(header)),
   );
 
   const missingHeaders = requiredHeaders.filter((requiredHeader) => {
@@ -33,7 +33,7 @@ export function validateBankStatementExcelHeaders(params: {
   if (missingHeaders.length > 0) {
     throw new ErrorHandler(
       400,
-      `Missing required columns: ${missingHeaders.join(", ")}`
+      `Missing required columns: ${missingHeaders.join(", ")}`,
     );
   }
 }
@@ -41,13 +41,13 @@ export function validateBankStatementExcelHeaders(params: {
 export type BankMovement = "IN" | "OUT";
 
 export const getBankMovementFromVoucherLineDrCr = (
-  drCr: "DR" | "CR"
+  drCr: "DR" | "CR",
 ): BankMovement => {
   return drCr === "DR" ? "IN" : "OUT";
 };
 
 export const getBankMovementFromStatementRowDrCr = (
-  drCr: "DR" | "CR"
+  drCr: "DR" | "CR",
 ): BankMovement => {
   return drCr === "CR" ? "IN" : "OUT";
 };
@@ -91,12 +91,12 @@ export const normalizeHeader = (value: string): string => {
 };
 
 export const getExcelFormatConfig = (
-  excelFormat: unknown
+  excelFormat: unknown,
 ): BankStatementExcelFormatConfig => {
   if (!isRecord(excelFormat)) {
     throw new ErrorHandler(
       400,
-      "Invalid bank statement excel format configuration"
+      "Invalid bank statement excel format configuration",
     );
   }
 
@@ -105,7 +105,7 @@ export const getExcelFormatConfig = (
   if (!config.columns || !isRecord(config.columns)) {
     throw new ErrorHandler(
       400,
-      "Invalid bank statement excel columns configuration"
+      "Invalid bank statement excel columns configuration",
     );
   }
 
@@ -114,7 +114,7 @@ export const getExcelFormatConfig = (
 
 export const getRowValueByHeader = (
   row: ExcelRow,
-  headerName?: string | null
+  headerName?: string | null,
 ): unknown => {
   if (!headerName) return null;
 
@@ -134,7 +134,7 @@ export const getRowValueByHeader = (
 export const getMappedValue = (
   row: ExcelRow,
   config: BankStatementExcelFormatConfig,
-  field: BankStatementExcelImportField
+  field: BankStatementExcelImportField,
 ): unknown => {
   return getRowValueByHeader(row, config.columns[field]);
 };
@@ -151,7 +151,7 @@ export const getRequiredMappedValue = (params: {
   if (isBlank(value)) {
     throw new ErrorHandler(
       400,
-      `Row ${params.rowNo}: ${params.label} is required`
+      `Row ${params.rowNo}: ${params.label} is required`,
     );
   }
 
@@ -198,7 +198,7 @@ export const parseDateOrNull = (params: {
 
   if (typeof value === "number") {
     const parsedDate = dayjs(
-      new Date(Math.round((value - 25569) * 86400 * 1000))
+      new Date(Math.round((value - 25569) * 86400 * 1000)),
     );
 
     if (!parsedDate.isValid()) {
@@ -279,11 +279,11 @@ export const parseDrCr = (params: {
     .toUpperCase();
 
   const drValues = [...DEFAULT_DR_VALUES, ...(config.drCrValues?.DR ?? [])].map(
-    (item) => item.toUpperCase()
+    (item) => item.toUpperCase(),
   );
 
   const crValues = [...DEFAULT_CR_VALUES, ...(config.drCrValues?.CR ?? [])].map(
-    (item) => item.toUpperCase()
+    (item) => item.toUpperCase(),
   );
 
   if (drValues.includes(normalizedValue)) {
@@ -336,14 +336,14 @@ export const getAmountAndDrCr = (params: {
     if (hasDebitAmount && hasCreditAmount) {
       throw new ErrorHandler(
         400,
-        `Row ${rowNo}: Both debit and credit amount cannot be present`
+        `Row ${rowNo}: Both debit and credit amount cannot be present`,
       );
     }
 
     if (!hasDebitAmount && !hasCreditAmount) {
       throw new ErrorHandler(
         400,
-        `Row ${rowNo}: Either debit or credit amount is required`
+        `Row ${rowNo}: Either debit or credit amount is required`,
       );
     }
 

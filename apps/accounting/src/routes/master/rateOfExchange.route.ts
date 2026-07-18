@@ -19,7 +19,7 @@ rateOfExchangeRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "RATE_OF_EXCHANGE", "CREATE")),
   validateCreateRateOfExchange,
-  createRateOfExchange
+  createRateOfExchange,
 );
 
 rateOfExchangeRouter.post(
@@ -27,5 +27,5 @@ rateOfExchangeRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "RATE_OF_EXCHANGE", "VIEW")),
   validateFetchRateOfExchange,
-  fetchRateOfExchange
+  fetchRateOfExchange,
 );

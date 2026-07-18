@@ -33,7 +33,7 @@ const LedgerOpeningBalanceCreateSchema = Joi.object({
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
   }),
@@ -46,21 +46,21 @@ const LedgerOpeningBalanceCreateSchema = Joi.object({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Currency Conversion Rate",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Currency Conversion Rate"
+        "Currency Conversion Rate",
       ),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Currency Conversion Rate",
-        "0"
+        "0",
       ),
     }),
   source: strOptional("Source"),
@@ -129,13 +129,13 @@ export const LedgerCreateSchema = Joi.object({
     then: Joi.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Place of Supply State"
+        "Place of Supply State",
       ),
     }),
     otherwise: Joi.forbidden().messages({
       "any.unknown": generateValidationErrorMessage(
         "FORBIDDEN",
-        "Place of Supply State"
+        "Place of Supply State",
       ),
     }),
   }),
@@ -153,17 +153,17 @@ export const LedgerCreateSchema = Joi.object({
     .messages({
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Credit Period In Days"
+        "Credit Period In Days",
       ),
       "number.min": generateValidationErrorMessage(
         "NUMBER_MIN",
         "Credit Period In Days",
-        "0"
+        "0",
       ),
       "number.max": generateValidationErrorMessage(
         "NUMBER_MAX",
         "Credit Period In Days",
-        "365"
+        "365",
       ),
     }),
   ledgerOpeningBalance: LedgerOpeningBalanceCreateSchema.optional(),

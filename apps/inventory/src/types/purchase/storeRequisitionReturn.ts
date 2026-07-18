@@ -53,32 +53,34 @@ export interface ItemBatch {
   comment?: string | null;
 }
 
-export interface ApproveReturnItemBatch
-  extends Omit<ItemBatch, "requisitionItemDetailsId" | "itemId"> {
+export interface ApproveReturnItemBatch extends Omit<
+  ItemBatch,
+  "requisitionItemDetailsId" | "itemId"
+> {
   id: number;
 }
 
-export interface AcknowledgeReturnItemBatch
-  extends Omit<
-    ItemBatch,
-    "requisitionItemDetailsId" | "itemId" | "returnQty" | "comment"
-  > {
+export interface AcknowledgeReturnItemBatch extends Omit<
+  ItemBatch,
+  "requisitionItemDetailsId" | "itemId" | "returnQty" | "comment"
+> {
   id: number;
   acknowledgedQty: number;
   isCompleted: boolean;
 }
 
-export interface ApproveReturnItem
-  extends Omit<ReturnItem, "itemBatch" | "storeRequisitionDetailsId"> {
+export interface ApproveReturnItem extends Omit<
+  ReturnItem,
+  "itemBatch" | "storeRequisitionDetailsId"
+> {
   id: number;
   itemBatch: ApproveReturnItemBatch[];
 }
 
-export interface AcknowledgeReturnItem
-  extends Omit<
-    ReturnItem,
-    "itemBatch" | "storeRequisitionDetailsId" | "requestedReturnQty"
-  > {
+export interface AcknowledgeReturnItem extends Omit<
+  ReturnItem,
+  "itemBatch" | "storeRequisitionDetailsId" | "requestedReturnQty"
+> {
   id: number;
   acknowledgedReturnQty: number;
   itemBatch: AcknowledgeReturnItemBatch[];
@@ -113,8 +115,10 @@ export type GetStoreRequisitionReturnResponse =
     };
   }>;
 
-export interface StoreRequisitionReturnDetailDTO
-  extends Omit<RequisitionReturnItemDetails, "createdBy" | "updatedBy"> {
+export interface StoreRequisitionReturnDetailDTO extends Omit<
+  RequisitionReturnItemDetails,
+  "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
 
   physicalInTransitQty: number | null;
@@ -135,11 +139,10 @@ export interface StoreRequisitionReturnDetailDTO
   availableQtyToReturn: number | null;
 }
 
-export interface StoreRequisitionReturnDTO
-  extends Omit<
-    StoreRequisitionReturn,
-    "requisitionFrom" | "ccId" | "approvedBy" | "rejectBy" | "acknowledgementBy"
-  > {
+export interface StoreRequisitionReturnDTO extends Omit<
+  StoreRequisitionReturn,
+  "requisitionFrom" | "ccId" | "approvedBy" | "rejectBy" | "acknowledgementBy"
+> {
   requisitionFrom: IdValue | null;
   branch: IdValue | null;
   cc: IdValue | null;
@@ -177,11 +180,10 @@ export interface AcknowledgeRequisitionReturn {
   storeReqReturn: GetStoreRequisitionReturnResponse;
 }
 
-export interface StrReturnDetailDTO
-  extends Omit<
-    StoreRequisitionReturnDetails,
-    "itemId" | "createdBy" | "updatedBy"
-  > {
+export interface StrReturnDetailDTO extends Omit<
+  StoreRequisitionReturnDetails,
+  "itemId" | "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;

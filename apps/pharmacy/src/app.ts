@@ -162,5 +162,5 @@ pharmacyRouter.use("/migration", migrationRouter);
 // Uploads
 pharmacyRouter.use(
   "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
+  express.static(path.join(process.cwd(), "uploads")),
 );

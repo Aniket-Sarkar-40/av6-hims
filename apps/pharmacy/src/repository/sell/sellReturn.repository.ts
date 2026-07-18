@@ -53,7 +53,7 @@ export const createSellReturnInDb = async (input: SellReturnInput) => {
   return await db.$transaction(
     async (tx) => {
       const sellReturnUin = await uinServiceFactory.generateUIN(
-        PmsUinShortCode.SELL_RETURN
+        PmsUinShortCode.SELL_RETURN,
       );
       const createdSellReturn = await tx.pmsSellReturn.create({
         data: {
@@ -89,7 +89,7 @@ export const createSellReturnInDb = async (input: SellReturnInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -129,7 +129,7 @@ export const updateSellReturnInDb = async (input: SellReturnInput) => {
   const toUpdate = sellReturnDetails.filter((d) => typeof d.id === "number");
   const toCreate = sellReturnDetails.filter((d) => typeof d.id !== "number");
   const toDelete = existingSellReturn.sellReturnDetails.filter(
-    (d) => !sellReturnDetails.some((item) => item.id === d.id)
+    (d) => !sellReturnDetails.some((item) => item.id === d.id),
   );
 
   return await db.$transaction(
@@ -144,7 +144,7 @@ export const updateSellReturnInDb = async (input: SellReturnInput) => {
             update: toUpdate.map((detail) => {
               const omittedDetails = customOmit<SellReturnDetailInput, "id">(
                 detail,
-                ["id"]
+                ["id"],
               );
               return {
                 where: { id: omittedDetails.omitted.id },
@@ -158,7 +158,7 @@ export const updateSellReturnInDb = async (input: SellReturnInput) => {
             create: toCreate.map((detail) => {
               const omittedDetails = customOmit<SellReturnDetailInput, "id">(
                 detail,
-                ["id"]
+                ["id"],
               );
               return {
                 ...omittedDetails.rest,
@@ -193,7 +193,7 @@ export const updateSellReturnInDb = async (input: SellReturnInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -281,7 +281,7 @@ export const approvedSellReturnInDb = async (input: SellReturnInput) => {
               refDetailsId: detail.id!,
               refId: id,
               refNo: input.sellNumber,
-            }
+            },
           );
         }
       }
@@ -301,7 +301,7 @@ export const approvedSellReturnInDb = async (input: SellReturnInput) => {
               updatedBy: currentUser,
             },
           });
-        })
+        }),
       );
 
       const sell = omittedSellReturn.omitted.sell;
@@ -334,7 +334,7 @@ export const approvedSellReturnInDb = async (input: SellReturnInput) => {
             ? 0
             : Math.max(
                 0,
-                sell.customerPayAmount.toNumber() - totalCustomerPayAmount
+                sell.customerPayAmount.toNumber() - totalCustomerPayAmount,
               ),
           insurerId: input.insuranceId,
         });
@@ -356,7 +356,7 @@ export const approvedSellReturnInDb = async (input: SellReturnInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -435,7 +435,7 @@ export const getSellReturnFromDb = async (): Promise<SellReturnResponse[]> => {
 };
 
 export const getSellReturnByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<SellReturnResponse | null> => {
   logger.info("entering::getSellReturnByIdFromDb::repository");
   return db.pmsSellReturn.findFirst({
@@ -477,7 +477,7 @@ export const getSellReturnByIdFromDb = async (
 
 export const getCountSellReturnDetailsFromDb = async (
   detailIds: number[],
-  sellReturnId: number
+  sellReturnId: number,
 ): Promise<number> => {
   return db.pmsSellReturnDetails.count({
     where: {
@@ -489,7 +489,7 @@ export const getCountSellReturnDetailsFromDb = async (
 };
 
 export const getSellReturnBySellIdFromDb = async (
-  sellId: number
+  sellId: number,
 ): Promise<ValSellReturnResponse[]> => {
   logger.info("entering::getSellReturnBySellIdFromDb::repository");
   return db.pmsSellReturn.findMany({
@@ -509,7 +509,7 @@ export const getSellReturnBySellIdFromDb = async (
 };
 
 export const getSellReturnExcelFromDb = async (
-  input: SellReturnExcelFilter
+  input: SellReturnExcelFilter,
 ): Promise<SellReturnResponse[]> => {
   logger.info("entering::getSellReturnExcelFromDb::repository");
   return db.pmsSellReturn.findMany({
@@ -594,7 +594,7 @@ export const deleteSellReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteSellReturnFromDb::repository id=${id} (deletedBy=${currentUser})`
+    `exiting::deleteSellReturnFromDb::repository id=${id} (deletedBy=${currentUser})`,
   );
 };
 
@@ -622,7 +622,7 @@ export async function getSellReturnTotalsBySellId(sellId: number) {
 }
 
 export async function getSellReturnTotalsBySellDetailsId(
-  sellDetailsId: number
+  sellDetailsId: number,
 ) {
   const agg = await db.pmsSellReturnDetails.aggregate({
     where: {

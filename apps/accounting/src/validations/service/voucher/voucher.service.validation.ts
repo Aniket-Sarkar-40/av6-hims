@@ -45,7 +45,7 @@ import {
 } from "@repo/db/generated/prisma/client";
 
 export const validateIdVoucher = async (
-  id: number
+  id: number,
 ): Promise<VoucherResponse> => {
   logger.info("entering::validateIdVoucher::service::validation");
 
@@ -62,7 +62,7 @@ export const validateIdVoucher = async (
 };
 
 export const validateIdVoucherLine = async (
-  id: number
+  id: number,
 ): Promise<VoucherLineResponseForLedgerBook> => {
   logger.info("entering::validateIdVoucherLine::service::validation");
   validIdCheck(id);
@@ -81,7 +81,7 @@ export const validateIdVoucherLine = async (
   if (!voucherLine) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Voucher Line")
+      generateErrorMessage("NOT_FOUND", "Voucher Line"),
     );
   }
   logger.info("exiting::validateIdVoucherLine::service::validation");
@@ -106,7 +106,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
     if (existingVoucher.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        "You can't change company for existing voucher"
+        "You can't change company for existing voucher",
       );
     }
 
@@ -122,7 +122,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
     if (currency.id !== company.currencyId && !input.currencyConversionRate) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Currency Conversion Rate")
+        generateErrorMessage("FIELD_REQUIRED", "Currency Conversion Rate"),
       );
     }
     currencyConversionRate = isCurrencyConversionRequired
@@ -142,13 +142,13 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
   if (fy.isLocked) {
     throw new ErrorHandler(
       400,
-      "Financial Year is locked, cannot create voucher"
+      "Financial Year is locked, cannot create voucher",
     );
   }
   if (fy.isClosed) {
     throw new ErrorHandler(
       400,
-      "Financial Year is closed, cannot create voucher"
+      "Financial Year is closed, cannot create voucher",
     );
   }
 
@@ -158,8 +158,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       generateErrorMessage(
         "MUST_GREATER_THEN",
         "Voucher Date",
-        `As per Financial Year books begin from ${fy.booksBeginFrom.toDateString()}`
-      )
+        `As per Financial Year books begin from ${fy.booksBeginFrom.toDateString()}`,
+      ),
     );
   }
 
@@ -170,15 +170,15 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         "MUST_BETWEEN",
         "Voucher Date",
         `Financial Year start date ${fy.startDate.toDateString()}`,
-        `Financial Year end date ${fy.endDate.toDateString()}`
-      )
+        `Financial Year end date ${fy.endDate.toDateString()}`,
+      ),
     );
   }
 
   if (fy.companyId !== input.companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
 
@@ -192,8 +192,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       generateErrorMessage(
         "INVALID_ASSOCIATION",
         "Collection Center",
-        "Company"
-      )
+        "Company",
+      ),
     );
   }
 
@@ -201,14 +201,14 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
   if (voucherType.companyId !== input.companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Voucher Type", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Voucher Type", "Company"),
     );
   }
 
   if (voucherType.isNarrationMandatory && !input.narration) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Narration")
+      generateErrorMessage("FIELD_REQUIRED", "Narration"),
     );
   }
 
@@ -218,14 +218,14 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Voucher Number")
+      generateErrorMessage("FIELD_REQUIRED", "Voucher Number"),
     );
   }
 
   if (input.voucherLines.length < 2) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("ARRAY_LENGTH", "Voucher Line", "2")
+      generateErrorMessage("ARRAY_LENGTH", "Voucher Line", "2"),
     );
   }
 
@@ -260,7 +260,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
     if (seenLineNos.has(voucherLine.lineNo)) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Voucher Line No")
+        generateErrorMessage("DUPLICATE_ITEM", "Voucher Line No"),
       );
     }
     seenLineNos.add(voucherLine.lineNo);
@@ -272,7 +272,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
     if (ledger.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company")
+        generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company"),
       );
     }
 
@@ -285,8 +285,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         generateErrorMessage(
           "INVALID_ASSOCIATION",
           `Ledger ${ledger.name}`,
-          "Contra Voucher (Bank/Cash only)"
-        )
+          "Contra Voucher (Bank/Cash only)",
+        ),
       );
     }
 
@@ -295,19 +295,19 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       if (!voucherLine.transactionType) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Transaction Type")
+          generateErrorMessage("FIELD_REQUIRED", "Transaction Type"),
         );
       }
       if (!voucherLine.instrumentNo) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Instrument No")
+          generateErrorMessage("FIELD_REQUIRED", "Instrument No"),
         );
       }
       if (!voucherLine.instrumentDate) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Instrument Date")
+          generateErrorMessage("FIELD_REQUIRED", "Instrument Date"),
         );
       }
       if (voucherLine.transactionType === BankTransactionType.CHEQUE) {
@@ -323,31 +323,31 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           })) as ChequeMaster[];
 
         const chequeMaster = allChequeMasters.filter(
-          (cm) => cm.bankLedgerId === ledger.id && cm.status === Status.ACTIVE
+          (cm) => cm.bankLedgerId === ledger.id && cm.status === Status.ACTIVE,
         );
 
         if (!chequeMaster) {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Cheque Master")
+            generateErrorMessage("NOT_FOUND", "Cheque Master"),
           );
         }
         // Check that the provided chequeNo exists in any ChequeMaster range
         // If not, throw an error
         // const checkNumberExists = chequeMaster.some((cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo);
         const matchingChequeMaster = chequeMaster.find(
-          (cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo
+          (cm) => chequeNo >= cm.startChequeNo && chequeNo <= cm.endChequeNo,
         );
 
         if (!matchingChequeMaster) {
           throw new ErrorHandler(
             404,
-            `Cheque No ${chequeNo} does not exist in any Cheque Master range for bank ${ledger.name}`
+            `Cheque No ${chequeNo} does not exist in any Cheque Master range for bank ${ledger.name}`,
           );
         }
         const checkNumberIsUsed = await checkChequeNumberIsUsed(
           matchingChequeMaster.id,
-          chequeNo
+          chequeNo,
         );
         if (
           checkNumberIsUsed &&
@@ -362,19 +362,19 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       if (voucherLine.transactionType) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_NOT_ALLOWED", "Transaction Type")
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Transaction Type"),
         );
       }
       if (voucherLine.instrumentDate) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument Date")
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument Date"),
         );
       }
       if (voucherLine.instrumentNo) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument No")
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument No"),
         );
       }
     }
@@ -382,19 +382,19 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       if (voucherLine.transactionType) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_NOT_ALLOWED", "Transaction Type")
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Transaction Type"),
         );
       }
       if (voucherLine.instrumentDate) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument Date")
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument Date"),
         );
       }
       if (voucherLine.instrumentNo) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument No")
+          generateErrorMessage("FIELD_NOT_ALLOWED", "Instrument No"),
         );
       }
     }
@@ -402,7 +402,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
     if (amt <= 0)
       throw new ErrorHandler(
         400,
-        generateErrorMessage("MUST_GREATER_THEN", "Amount", "0")
+        generateErrorMessage("MUST_GREATER_THEN", "Amount", "0"),
       );
 
     voucherLine.currencyAmount =
@@ -430,7 +430,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
     voucherLine.amount = applyRound(
       amt * currencyConversionRate,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     voucherLine.currencyId = input.currencyId;
     voucherLine.currencyConversionRate = input.currencyConversionRate;
@@ -441,12 +441,12 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
   const totalDebit: number = applyRound(
     Number(input.totalDebit ?? 0) * currencyConversionRate,
     roundingMethod,
-    roundingPrecision
+    roundingPrecision,
   );
   const totalCredit: number = applyRound(
     Number(input.totalCredit ?? 0) * currencyConversionRate,
     roundingMethod,
-    roundingPrecision
+    roundingPrecision,
   );
   input.totalDebit = totalDebit;
   input.totalCredit = totalCredit;
@@ -454,7 +454,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
   if (Number(input.totalDebit) <= 0 || Number(input.totalCredit) <= 0) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("MUST_GREATER_THEN", "Total Debit/Credit", "0")
+      generateErrorMessage("MUST_GREATER_THEN", "Total Debit/Credit", "0"),
     );
   }
   if (voucherType.requireBankOrCash && !hasBankOrCashLedger) {
@@ -463,21 +463,21 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       generateErrorMessage(
         "INVALID_ASSOCIATION",
         "At least one Bank/Cash Ledger",
-        "Voucher Type"
-      )
+        "Voucher Type",
+      ),
     );
   }
 
   if (voucherLineTotalCrCurrencyAmount !== voucherLineTotalDrCurrencyAmount) {
     throw new ErrorHandler(
       400,
-      "Total CR and DR amount before currency conversion should be equal for voucher lines"
+      "Total CR and DR amount before currency conversion should be equal for voucher lines",
     );
   }
   if (voucherLineTotalCr !== voucherLineTotalDr) {
     throw new ErrorHandler(
       400,
-      "Total CR and DR should be equal for voucher lines"
+      "Total CR and DR should be equal for voucher lines",
     );
   }
 
@@ -490,8 +490,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       generateErrorMessage(
         "MISMATCH",
         "Total Credit",
-        "Voucher Lines total credit"
-      )
+        "Voucher Lines total credit",
+      ),
     );
   }
 
@@ -504,8 +504,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       generateErrorMessage(
         "MISMATCH",
         "Total Debit",
-        "Voucher Lines total debit"
-      )
+        "Voucher Lines total debit",
+      ),
     );
   }
 
@@ -528,8 +528,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           generateErrorMessage(
             "INVALID_ASSOCIATION",
             "Cost Center Allocation",
-            "Voucher Line"
-          )
+            "Voucher Line",
+          ),
         );
       }
 
@@ -540,8 +540,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           generateErrorMessage(
             "MISMATCH",
             "Dr Cr",
-            `Voucher Line ${a.lineNo} DrCr`
-          )
+            `Voucher Line ${a.lineNo} DrCr`,
+          ),
         );
       }
 
@@ -569,8 +569,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           400,
           generateErrorMessage(
             "FIELD_REQUIRED",
-            `Cost Center Allocation for lineNo ${line.lineNo}`
-          )
+            `Cost Center Allocation for lineNo ${line.lineNo}`,
+          ),
         );
       }
 
@@ -583,8 +583,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
             400,
             generateErrorMessage(
               "DUPLICATE_ITEM",
-              `Cost Center in lineNo ${line.lineNo}`
-            )
+              `Cost Center in lineNo ${line.lineNo}`,
+            ),
           );
         }
         seenCC.add(a.costCenterId);
@@ -593,7 +593,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         if (!ccItem)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Cost Center")
+            generateErrorMessage("NOT_FOUND", "Cost Center"),
           );
         if (ccItem.companyId !== input.companyId) {
           throw new ErrorHandler(
@@ -601,8 +601,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
             generateErrorMessage(
               "INVALID_ASSOCIATION",
               "Cost Center",
-              "Company"
-            )
+              "Company",
+            ),
           );
         }
         if (ccItem.isActive === false || ccItem.status === "INACTIVE") {
@@ -613,7 +613,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         if (amt <= 0)
           throw new ErrorHandler(
             400,
-            generateErrorMessage("MUST_GREATER_THEN", "Amount", "0")
+            generateErrorMessage("MUST_GREATER_THEN", "Amount", "0"),
           );
         sumAlloc += amt;
       }
@@ -627,8 +627,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           generateErrorMessage(
             "MISMATCH",
             `Cost Center Allocation total for lineNo ${line.lineNo}`,
-            "Voucher Line amount"
-          )
+            "Voucher Line amount",
+          ),
         );
       }
     }
@@ -652,8 +652,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           generateErrorMessage(
             "INVALID_ASSOCIATION",
             "Bill Allocation",
-            "Voucher Line"
-          )
+            "Voucher Line",
+          ),
         );
       }
 
@@ -664,8 +664,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           generateErrorMessage(
             "INVALID_ASSOCIATION",
             "Party Ledger",
-            `Voucher Line ${a.lineNo}`
-          )
+            `Voucher Line ${a.lineNo}`,
+          ),
         );
       }
 
@@ -676,8 +676,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           generateErrorMessage(
             "MISMATCH",
             "Dr Cr",
-            `Voucher Line ${a.lineNo} DrCr`
-          )
+            `Voucher Line ${a.lineNo} DrCr`,
+          ),
         );
       }
 
@@ -686,17 +686,17 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         if (!a.refNo)
           throw new ErrorHandler(
             400,
-            generateErrorMessage("FIELD_REQUIRED", "Reference No")
+            generateErrorMessage("FIELD_REQUIRED", "Reference No"),
           );
         if (!a.refDate)
           throw new ErrorHandler(
             400,
-            generateErrorMessage("FIELD_REQUIRED", "Reference Date")
+            generateErrorMessage("FIELD_REQUIRED", "Reference Date"),
           );
         if (a.billDocumentId)
           throw new ErrorHandler(
             400,
-            "Bill Document Id must be null for NEW_REF"
+            "Bill Document Id must be null for NEW_REF",
           );
       }
 
@@ -704,7 +704,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         if (!a.billDocumentId)
           throw new ErrorHandler(
             400,
-            generateErrorMessage("FIELD_REQUIRED", "Bill Document Id")
+            generateErrorMessage("FIELD_REQUIRED", "Bill Document Id"),
           );
         againstRefIds.add(a.billDocumentId);
       }
@@ -713,7 +713,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         if (a.billDocumentId)
           throw new ErrorHandler(
             400,
-            "Bill Document Id must be null for ON_ACCOUNT"
+            "Bill Document Id must be null for ON_ACCOUNT",
           );
       }
 
@@ -721,7 +721,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
       if (amt <= 0)
         throw new ErrorHandler(
           400,
-          generateErrorMessage("MUST_GREATER_THEN", "Amount", "0")
+          generateErrorMessage("MUST_GREATER_THEN", "Amount", "0"),
         );
 
       (
@@ -747,8 +747,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           400,
           generateErrorMessage(
             "FIELD_REQUIRED",
-            `Bill Allocations for lineNo ${line.lineNo}`
-          )
+            `Bill Allocations for lineNo ${line.lineNo}`,
+          ),
         );
       }
 
@@ -762,8 +762,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
           generateErrorMessage(
             "MISMATCH",
             `Bill Allocation total for lineNo ${line.lineNo}`,
-            "Voucher Line amount"
-          )
+            "Voucher Line amount",
+          ),
         );
       }
 
@@ -774,7 +774,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
         if (!bill)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Bill Document")
+            generateErrorMessage("NOT_FOUND", "Bill Document"),
           );
 
         // ownership & association checks
@@ -784,8 +784,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
             generateErrorMessage(
               "INVALID_ASSOCIATION",
               "Bill Document",
-              "Company"
-            )
+              "Company",
+            ),
           );
         }
         if (bill.financialYearId !== input.financialYearId) {
@@ -794,8 +794,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
             generateErrorMessage(
               "INVALID_ASSOCIATION",
               "Bill Document",
-              "Financial Year"
-            )
+              "Financial Year",
+            ),
           );
         }
         if (bill.partyLedgerId !== a.partyLedgerId) {
@@ -804,8 +804,8 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
             generateErrorMessage(
               "INVALID_ASSOCIATION",
               "Bill Document",
-              "Party Ledger"
-            )
+              "Party Ledger",
+            ),
           );
         }
         const allowed: BillStatus[] = [BillStatus.OPEN, BillStatus.PARTIAL];
@@ -827,7 +827,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
     !input.voucherNo
   ) {
     input.voucherNo = await uinServiceFactory.generateUIN(
-      AccUinShortCode.VOUCHER
+      AccUinShortCode.VOUCHER,
     );
   } else if (
     voucherType.numberingMode === VoucherNumberingMode.CUSTOM_AUTO &&
@@ -835,7 +835,7 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
   ) {
     input.voucherNo = await voucherUINConfigService.generateUIN(
       input.voucherTypeId,
-      new Date(input.voucherDate)
+      new Date(input.voucherDate),
     );
   }
   logger.info("exiting::createOrUpdateVoucher::service::validation");
@@ -843,28 +843,28 @@ export const createOrUpdateVoucherServiceValidation = async (params: {
 };
 
 export const deleteVoucherServiceValidation = async (
-  id: number
+  id: number,
 ): Promise<void> => {
   logger.info("entering::deleteVoucher::service::validation");
   const voucher = await validateIdVoucher(id);
   if (voucher.status !== VoucherStatus.DRAFT) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Voucher")
+      generateErrorMessage("INVALID_STATUS", "Voucher"),
     );
   }
   logger.info("exiting::deleteVoucher::service::validation");
 };
 
 export const cancelVoucherServiceValidation = async (
-  id: number
+  id: number,
 ): Promise<void> => {
   logger.info("entering::cancelVoucher::service::validation");
   const voucher = await validateIdVoucher(id);
   if (voucher.status !== VoucherStatus.POSTED) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Voucher")
+      generateErrorMessage("INVALID_STATUS", "Voucher"),
     );
   }
   logger.info("exiting::cancelVoucher::service::validation");
@@ -876,7 +876,7 @@ export const createVoucherFromExcelServiceValidation = async (params: {
   voucherTypeId: number;
 }) => {
   logger.info(
-    "entering::createVoucherFromExcelServiceValidation::service::validation"
+    "entering::createVoucherFromExcelServiceValidation::service::validation",
   );
   if (!params.filePath) {
     throw new ErrorHandler(400, "No file path provided");
@@ -889,6 +889,6 @@ export const createVoucherFromExcelServiceValidation = async (params: {
 
   await validateIdVoucherType(params.voucherTypeId);
   logger.info(
-    "exiting::createVoucherFromExcelServiceValidation::service::validation"
+    "exiting::createVoucherFromExcelServiceValidation::service::validation",
   );
 };

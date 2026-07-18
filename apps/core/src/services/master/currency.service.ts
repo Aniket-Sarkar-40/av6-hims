@@ -61,7 +61,7 @@ const currencyServiceRaw = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "currency")
+          generateErrorMessage("NOT_FOUND", "currency"),
         );
       }
     } else {
@@ -69,7 +69,7 @@ const currencyServiceRaw = {
       if (currency.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "currency")
+          generateErrorMessage("NOT_FOUND", "currency"),
         );
       }
       logger.info("exiting::getAllCurrency::service");
@@ -79,7 +79,7 @@ const currencyServiceRaw = {
 
   async getCurrencyById(
     currencyId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<Currency | null> {
     logger.info("entering::getCurrencyById::service");
     validIdCheck(currencyId);
@@ -97,7 +97,7 @@ const currencyServiceRaw = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "currency")
+          generateErrorMessage("NOT_FOUND", "currency"),
         );
       else return null;
     }
@@ -107,7 +107,7 @@ const currencyServiceRaw = {
   },
   async updateCurrency(
     currencyId: number,
-    input: CurrencyReq
+    input: CurrencyReq,
   ): Promise<Currency> {
     logger.info("entering::updateCurrency::service");
 
@@ -144,5 +144,5 @@ const currencyServiceRaw = {
 
 export const currencyService = auditProxy.createAuditedService(
   "currency",
-  currencyServiceRaw
+  currencyServiceRaw,
 );

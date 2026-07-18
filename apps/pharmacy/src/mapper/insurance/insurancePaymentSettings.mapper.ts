@@ -2,17 +2,32 @@ import { insuranceService } from "@/services/insurance/insurance.service.js";
 import { itemService } from "@/services/item/item.service.js";
 import { branchService } from "@/services/master/branch.service.js";
 import { employeeService } from "@/services/staff/employee.service.js";
-import { InsurancePaymentSettings, InsurancePaymentSettingsDTO } from "@/types/insurance/insurancePaymentSettings.js";
+import {
+  InsurancePaymentSettings,
+  InsurancePaymentSettingsDTO,
+} from "@/types/insurance/insurancePaymentSettings.js";
 
 export const toInsurancePaymentSettingsDto = async (
-  insurancePaymentSettings: InsurancePaymentSettings
+  insurancePaymentSettings: InsurancePaymentSettings,
 ): Promise<InsurancePaymentSettingsDTO> => {
-  const insurer = await insuranceService.getInsuranceById(insurancePaymentSettings.insuranceId, true);
+  const insurer = await insuranceService.getInsuranceById(
+    insurancePaymentSettings.insuranceId,
+    true,
+  );
 
-  const branch = await branchService.getBranchById(insurancePaymentSettings.ccId, true);
-  const medicine = await itemService.getItemByIdWoDTO(insurancePaymentSettings.medId, true);
+  const branch = await branchService.getBranchById(
+    insurancePaymentSettings.ccId,
+    true,
+  );
+  const medicine = await itemService.getItemByIdWoDTO(
+    insurancePaymentSettings.medId,
+    true,
+  );
   const createdBy = insurancePaymentSettings.createdBy
-    ? await employeeService.getEmployeeByIdFrmCacheOrDb(insurancePaymentSettings.createdBy, true)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+        insurancePaymentSettings.createdBy,
+        true,
+      )
     : null;
 
   return {

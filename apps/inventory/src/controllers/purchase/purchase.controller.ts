@@ -15,7 +15,7 @@ export const createPurchase = TryCatch(async (req: Request, res: Response) => {
   const purchase = await purchaseService.createPurchaseOrder(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: purchase },
-    "Purchase Order"
+    "Purchase Order",
   );
   logger.info("exiting::createPurchase::controller");
   return res.status(201).json(response);
@@ -30,7 +30,7 @@ export const updatePurchase = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::updatePurchase::controller");
   const response = BaseResponse.success(
     { type: "UPDATED", data: updated },
-    "Purchase Order"
+    "Purchase Order",
   );
   return res.status(200).json(response);
 });
@@ -42,7 +42,7 @@ export const getAllPurchase = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "FETCHED", data: purchase },
-    "Purchase Order"
+    "Purchase Order",
   );
   return res.status(200).json(response);
 });
@@ -57,12 +57,12 @@ export const getPurchaseById = TryCatch(async (req: Request, res: Response) => {
     return res.status(400).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
   const response = BaseResponse.success(
     { type: "FETCHED", data: purchase },
-    "Purchase Order"
+    "Purchase Order",
   );
   logger.info("exiting::getPurchaseById::controller");
   return res.status(200).json(response);
@@ -89,7 +89,7 @@ export const purchaseApproval = TryCatch(
 
     const approvalPo = await purchaseService.updatePurchaseOrderStatus(
       purchaseId,
-      PO_STATUS.APPROVED
+      PO_STATUS.APPROVED,
     );
 
     const response = new BaseResponse(
@@ -97,12 +97,12 @@ export const purchaseApproval = TryCatch(
         success: true,
         message: generateSuccessMessage("APPROVED", "Purchase Order"),
       },
-      approvalPo
+      approvalPo,
     );
 
     logger.info("exiting::purchaseApproval::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const purchasePartialApproval = TryCatch(
@@ -113,7 +113,7 @@ export const purchasePartialApproval = TryCatch(
 
     const approvalPo = await purchaseService.updatePurchaseOrderStatus(
       purchaseId,
-      PO_STATUS.PARTIALLY_APPROVED
+      PO_STATUS.PARTIALLY_APPROVED,
     );
 
     const response = new BaseResponse(
@@ -121,12 +121,12 @@ export const purchasePartialApproval = TryCatch(
         success: true,
         message: generateSuccessMessage("APPROVED", "Purchase Order"),
       },
-      approvalPo
+      approvalPo,
     );
 
     logger.info("exiting::purchasePartialApproval::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const purchaseRejection = TryCatch(
@@ -137,7 +137,7 @@ export const purchaseRejection = TryCatch(
 
     const approvalPo = await purchaseService.updatePurchaseOrderStatus(
       purchaseId,
-      PO_STATUS.REJECTED
+      PO_STATUS.REJECTED,
     );
 
     const response = new BaseResponse(
@@ -145,12 +145,12 @@ export const purchaseRejection = TryCatch(
         success: true,
         message: generateSuccessMessage("REJECTED", "Purchase Order"),
       },
-      approvalPo
+      approvalPo,
     );
 
     logger.info("exiting::purchaseRejection::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const generatePurchaseOrderPdf = TryCatch(
@@ -161,9 +161,9 @@ export const generatePurchaseOrderPdf = TryCatch(
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `inline; filename="purchase-order-${input}.pdf"`
+      `inline; filename="purchase-order-${input}.pdf"`,
     );
     res.send(pdfBuffer);
     logger.info("exiting::generatePurchaseOrderPdf::controller");
-  }
+  },
 );

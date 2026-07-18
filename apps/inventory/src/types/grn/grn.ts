@@ -40,17 +40,16 @@ export type CreateGrnInput = Omit<
   supplier: ItemSupplierDTO;
 };
 
-export interface GrnDTO
-  extends Omit<
-    GrnResponse,
-    | BaseModelAttr
-    | "goodReceiveDetails"
-    | "supplierId"
-    | "poId"
-    | "ccId"
-    | "storeId"
-    | "currencyId"
-  > {
+export interface GrnDTO extends Omit<
+  GrnResponse,
+  | BaseModelAttr
+  | "goodReceiveDetails"
+  | "supplierId"
+  | "poId"
+  | "ccId"
+  | "storeId"
+  | "currencyId"
+> {
   currency: IdValue | null;
   supplier: IdValue | null;
   warehouse: IdValue | null;
@@ -60,18 +59,24 @@ export interface GrnDTO
   goodReceiveDetails: GrnDetailDTO[];
 }
 
-export interface GoodReceiveDetailPdfDTO
-  extends Omit<InvGoodReceiveDetails, "itemId"> {
+export interface GoodReceiveDetailPdfDTO extends Omit<
+  InvGoodReceiveDetails,
+  "itemId"
+> {
   item: InvItem | null;
 }
-export interface GoodReceiveDetailDTO
-  extends Omit<InvGoodReceiveDetails, "itemId" | "createdBy" | "updatedBy"> {
+export interface GoodReceiveDetailDTO extends Omit<
+  InvGoodReceiveDetails,
+  "itemId" | "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
 }
-export interface GrnDetailDTO
-  extends Omit<InvGoodReceiveDetails, "createdBy" | "updatedBy"> {
+export interface GrnDetailDTO extends Omit<
+  InvGoodReceiveDetails,
+  "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   inHandQty: number | null;
   grnQty: number | null;
@@ -139,23 +144,24 @@ export interface ItemCommon {
   itemCategory: number;
 }
 
-export interface GoodReceiveDetailDTO
-  extends Omit<InvGoodReceiveDetails, "itemId" | "createdBy" | "updatedBy"> {
+export interface GoodReceiveDetailDTO extends Omit<
+  InvGoodReceiveDetails,
+  "itemId" | "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
 }
 
-export interface GrnPdfDTO
-  extends Omit<
-    GrnDTO,
-    | "warehouse"
-    | "branch"
-    | "location"
-    | "supplier"
-    | "date"
-    | "goodReceiveDetails"
-  > {
+export interface GrnPdfDTO extends Omit<
+  GrnDTO,
+  | "warehouse"
+  | "branch"
+  | "location"
+  | "supplier"
+  | "date"
+  | "goodReceiveDetails"
+> {
   cc: InvBranch | InvWarehouse | null;
   supplier: InvItemSupplier | null;
   date: string;
@@ -164,7 +170,9 @@ export interface GrnPdfDTO
   goodReceiveDetails: GoodReceiveDetailPdfDTO[];
 }
 
-export interface GoodReceiveDetailPdfDTO
-  extends Omit<InvGoodReceiveDetails, "itemId"> {
+export interface GoodReceiveDetailPdfDTO extends Omit<
+  InvGoodReceiveDetails,
+  "itemId"
+> {
   item: InvItem | null;
 }

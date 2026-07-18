@@ -43,7 +43,7 @@ autoAlertRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "AUTO_ALERT", "CREATE")),
   validateCreateAutoAlertEmail,
-  createAutoAlertEmail
+  createAutoAlertEmail,
 );
 
 /**
@@ -66,10 +66,10 @@ autoAlertRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "AUTO_ALERT", "UPDATE"),
-    getPermission("INV", "AUTO_ALERT", "VIEW")
+    getPermission("INV", "AUTO_ALERT", "VIEW"),
   ),
   validateUpdateAutoAlertEmail,
-  updateAutoAlertEmail
+  updateAutoAlertEmail,
 );
 
 /**
@@ -93,7 +93,7 @@ autoAlertRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "AUTO_ALERT", "UPDATE"),
-    getPermission("INV", "AUTO_ALERT", "VIEW")
+    getPermission("INV", "AUTO_ALERT", "VIEW"),
   ),
-  resendAutoAlertEmail
+  resendAutoAlertEmail,
 );

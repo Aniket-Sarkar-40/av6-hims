@@ -7,12 +7,16 @@ export type UnitMasterReq = Omit<
   "id"
 >;
 
-export interface UnitMasterUpdate
-  extends Omit<Prisma.InvUnitMasterUncheckedCreateInput, "id"> {
+export interface UnitMasterUpdate extends Omit<
+  Prisma.InvUnitMasterUncheckedCreateInput,
+  "id"
+> {
   id: number;
 }
 
-export interface UnitMasterDTO
-  extends Omit<InvUnitMaster, BaseModelAttr | "defaultUnitMasterId"> {
+export interface UnitMasterDTO extends Omit<
+  InvUnitMaster,
+  BaseModelAttr | "defaultUnitMasterId"
+> {
   defaultUnitMaster: IdValue | null;
 }

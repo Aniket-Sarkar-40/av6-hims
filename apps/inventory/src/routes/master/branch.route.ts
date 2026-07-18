@@ -44,7 +44,7 @@ branchRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH", "CREATE")),
   validateBranch,
-  createBranch
+  createBranch,
 );
 
 /**
@@ -60,7 +60,7 @@ branchRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH", "VIEW")),
-  getAllBranch
+  getAllBranch,
 );
 
 /**
@@ -81,7 +81,7 @@ branchRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH", "VIEW")),
-  getBranchById
+  getBranchById,
 );
 
 /**
@@ -104,10 +104,10 @@ branchRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH", "VIEW"),
-    getPermission("INV", "BRANCH", "UPDATE")
+    getPermission("INV", "BRANCH", "UPDATE"),
   ),
   validateToggleActive,
-  toggleActiveBranch
+  toggleActiveBranch,
 );
 
 /**
@@ -137,8 +137,8 @@ branchRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH", "VIEW"),
-    getPermission("INV", "BRANCH", "UPDATE")
+    getPermission("INV", "BRANCH", "UPDATE"),
   ),
   validateBranch,
-  updateBranch
+  updateBranch,
 );

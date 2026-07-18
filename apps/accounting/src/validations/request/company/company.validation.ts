@@ -49,7 +49,7 @@ const CompanyStatutoryCreateSchema = Joi.object({
       .messages({
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "GST Registration Type"
+          "GST Registration Type",
         ),
       }),
     otherwise: Joi.string().default(GstRegistrationType.UNREGISTERED),
@@ -76,7 +76,7 @@ const CompanyStatutoryCreateSchema = Joi.object({
     then: Joi.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "GST State Code"
+        "GST State Code",
       ),
     }),
     otherwise: Joi.valid(null, "").messages({
@@ -92,13 +92,13 @@ const CompanyStatutoryCreateSchema = Joi.object({
     then: Joi.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "GST Effective From"
+        "GST Effective From",
       ),
     }),
     otherwise: Joi.valid(null, "").messages({
       "any.only": generateValidationErrorMessage(
         "ONLY_NULL",
-        "GST Effective From"
+        "GST Effective From",
       ),
     }),
   }),
@@ -160,7 +160,7 @@ export const CompanyCreateSchema = Joi.object({
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Addresses",
-        "1"
+        "1",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Addresses"),
       "array.duplicateAddressType":
@@ -196,7 +196,7 @@ export const CompanyUpdateSchema = CompanyCreateSchema.keys({
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Addresses",
-        "1"
+        "1",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Addresses"),
       "array.duplicateAddressType":

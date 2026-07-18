@@ -12,11 +12,10 @@ export type GroupResponse = Prisma.GroupGetPayload<{
     company: true;
   };
 }>;
-export interface GroupDTO
-  extends Omit<
-    GroupResponse,
-    BaseModelAttrWoCancel | "company" | "companyId" | "parentId"
-  > {
+export interface GroupDTO extends Omit<
+  GroupResponse,
+  BaseModelAttrWoCancel | "company" | "companyId" | "parentId"
+> {
   company: IdValue | null;
   parent: IdValue | null;
 }

@@ -37,7 +37,7 @@ export class BaseResponse<T> {
   ): BaseResponse<T> {
     return new BaseResponse<T>(
       { success: true, message: generateSuccessMessage(type, ...variables) },
-      data
+      data,
     );
   }
 

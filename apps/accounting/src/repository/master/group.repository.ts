@@ -35,7 +35,7 @@ export const deleteGroupFromDb = async (id: number) => {
 
 export const createGroupFromExcelInDb = async (
   tx: Tx,
-  input: CreateOrUpdateGroupInput
+  input: CreateOrUpdateGroupInput,
 ) => {
   logger.info("entering::createGroupFromExcelInDb::repository");
   const store = requestStorage.getStore();
@@ -50,11 +50,11 @@ export const createGroupFromExcelInDb = async (
 };
 
 export const createGroupExcelInDb = async (
-  input: CreateOrUpdateGroupExcelInput[]
+  input: CreateOrUpdateGroupExcelInput[],
 ) => {
   logger.info("entering::createGroupExcelInDb::repository");
   const batchUin = await uinServiceFactory.generateUIN(
-    AccUinShortCode.BATCH_JOB
+    AccUinShortCode.BATCH_JOB,
   );
   return await db.$transaction(
     async (tx) => {
@@ -74,7 +74,7 @@ export const createGroupExcelInDb = async (
 
       return batch;
     },
-    { timeout: API_TIMEOUT }
+    { timeout: API_TIMEOUT },
   );
 };
 
@@ -139,21 +139,21 @@ export async function groupExcelBatchJob(params: {
               },
             });
           },
-          { timeout: API_TIMEOUT }
+          { timeout: API_TIMEOUT },
         );
       } catch (error) {
         logger.error(
           `❌ Error processing group row ${item.rowNo}: ${JSON.stringify(
-            error
-          )}`
+            error,
+          )}`,
         );
 
         const errorMessage =
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
 
         await db.batchJobDetails.create({
           data: {

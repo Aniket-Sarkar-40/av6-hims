@@ -33,7 +33,7 @@ export const validateIdLedger = async (id: number): Promise<Ledger> => {
 };
 
 export const createOrUpdateLedgerServiceValidation = async (
-  input: CreateOrUpdateLedgerInput
+  input: CreateOrUpdateLedgerInput,
 ) => {
   logger.info("entering::createOrUpdateLedger::service::validation");
   const { ledgerOpeningBalance } = input;
@@ -48,7 +48,7 @@ export const createOrUpdateLedgerServiceValidation = async (
     if (ledger.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company")
+        generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company"),
       );
     }
   }
@@ -63,14 +63,14 @@ export const createOrUpdateLedgerServiceValidation = async (
   if (group.companyId !== input.companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Group", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Group", "Company"),
     );
   }
 
   if (input.isBankAccount && input.isCashAccount) {
     throw new ErrorHandler(
       400,
-      "Bank Account and Cash Account cannot be true at the same time"
+      "Bank Account and Cash Account cannot be true at the same time",
     );
   }
 
@@ -78,19 +78,19 @@ export const createOrUpdateLedgerServiceValidation = async (
     if (!input.bankName) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Bank Name")
+        generateErrorMessage("FIELD_REQUIRED", "Bank Name"),
       );
     }
     if (!input.bankIfsc) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Bank IFSC")
+        generateErrorMessage("FIELD_REQUIRED", "Bank IFSC"),
       );
     }
     if (!input.bankAccountNo) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Bank Account No")
+        generateErrorMessage("FIELD_REQUIRED", "Bank Account No"),
       );
     }
   }
@@ -105,19 +105,19 @@ export const createOrUpdateLedgerServiceValidation = async (
   if (ledger) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", `Ledger with name ${input.name}`)
+      generateErrorMessage("DUPLICATE_ITEM", `Ledger with name ${input.name}`),
     );
   }
 
   if (ledgerOpeningBalance) {
     const fy = await getCompanyFYByCompanyIdAndFyIdFromDb(
       input.companyId,
-      ledgerOpeningBalance.financialYearId
+      ledgerOpeningBalance.financialYearId,
     );
     if (!fy) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Financial Year")
+        generateErrorMessage("NOT_FOUND", "Financial Year"),
       );
     }
     if (!fy.isCurrent) {
@@ -127,7 +127,7 @@ export const createOrUpdateLedgerServiceValidation = async (
     if (asOnDate.toDateString() !== fy.booksBeginFrom.toDateString()) {
       throw new ErrorHandler(
         400,
-        "Please provide as on date as per current financial year"
+        "Please provide as on date as per current financial year",
       );
     }
     if (input.currencyId) {
@@ -138,7 +138,7 @@ export const createOrUpdateLedgerServiceValidation = async (
       ) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Currency Conversion Rate")
+          generateErrorMessage("FIELD_REQUIRED", "Currency Conversion Rate"),
         );
       }
 
@@ -147,7 +147,7 @@ export const createOrUpdateLedgerServiceValidation = async (
         Number(ledgerOpeningBalance.amount) *
           Number(ledgerOpeningBalance.currencyConversionRate ?? 1),
         roundingMethod,
-        roundingPrecision
+        roundingPrecision,
       );
 
       ledgerOpeningBalance.currencyId = input.currencyId;
@@ -161,7 +161,7 @@ export const createLedgerExcelServiceValidation = async (params: {
   filePath?: string;
 }): Promise<void> => {
   logger.info(
-    "entering::createLedgerExcelServiceValidation::service::validation"
+    "entering::createLedgerExcelServiceValidation::service::validation",
   );
   const { companyId, filePath } = params;
 
@@ -172,7 +172,7 @@ export const createLedgerExcelServiceValidation = async (params: {
   }
 
   logger.info(
-    "exiting::createLedgerExcelServiceValidation::service::validation"
+    "exiting::createLedgerExcelServiceValidation::service::validation",
   );
 };
 
@@ -183,7 +183,7 @@ export const validateDeleteLedgerServiceValidation = async (id: number) => {
   if (ledger.isReserved) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("RESERVED_ITEM", "Ledger")
+      generateErrorMessage("RESERVED_ITEM", "Ledger"),
     );
   }
 
@@ -197,7 +197,7 @@ export const validateDeleteLedgerServiceValidation = async (id: number) => {
   if (voucherLine) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("ASSOCIATED_ITEM_EXIST", "Ledger", "Voucher")
+      generateErrorMessage("ASSOCIATED_ITEM_EXIST", "Ledger", "Voucher"),
     );
   }
 
@@ -208,7 +208,7 @@ export const patchLedgerServiceValidation = async (
   input: Pick<
     CreateOrUpdateLedgerInput,
     "id" | "currencyId" | "creditPeriodInDays"
-  >
+  >,
 ) => {
   logger.info("entering::patchLedgerServiceValidation::service::validation");
   await validateIdLedger(input.id!);

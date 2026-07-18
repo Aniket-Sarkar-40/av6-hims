@@ -14,40 +14,40 @@ import { toIdValue } from "av6-utils";
 import { PmsStoreRequisitionReturn } from "@repo/db/generated/prisma/client";
 
 export const toStoreRequisitionReturnDTO = async (
-  storeRequisitionReturn: GetStoreRequisitionReturnResponse
+  storeRequisitionReturn: GetStoreRequisitionReturnResponse,
 ): Promise<StoreRequisitionReturnDTO> => {
   const branchDTO = await branchService.getBranchById(
     storeRequisitionReturn.branchId,
-    true
+    true,
   );
   const warehouseDTO = await warehouseService.getWarehouseById(
     storeRequisitionReturn.warehouseId,
-    true
+    true,
   );
 
   const approvedBy = storeRequisitionReturn.approvedBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisitionReturn.approvedBy,
-        true
+        true,
       )
     : null;
   const rejectBy = storeRequisitionReturn.rejectBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisitionReturn.rejectBy,
-        true
+        true,
       )
     : null;
   const acknowledgementBy = storeRequisitionReturn.acknowledgementBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisitionReturn.acknowledgementBy,
-        true
+        true,
       )
     : null;
 
   const requisitionFrom = storeRequisitionReturn.requisitionFrom
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisitionReturn.requisitionFrom,
-        true
+        true,
       )
     : null;
 
@@ -57,7 +57,7 @@ export const toStoreRequisitionReturnDTO = async (
       detail.requisitionReturnItemDetails.map(async (itemDetail) => {
         const item = await itemService.getItemById(
           { id: detail.itemId, isZeroQty: false, isCustomPricing: false },
-          true
+          true,
         );
 
         const inHandBranchQty = await getItemStockQtyByBatchWise(
@@ -65,7 +65,7 @@ export const toStoreRequisitionReturnDTO = async (
           { branchId: storeRequisitionReturn.branchId },
           itemDetail.batchNo,
           itemDetail.expiryDate,
-          itemDetail.isFoc
+          itemDetail.isFoc,
         );
 
         const inHandWarehouseQty = await getItemStockQtyByBatchWise(
@@ -73,11 +73,11 @@ export const toStoreRequisitionReturnDTO = async (
           { warehouseId: storeRequisitionReturn.warehouseId },
           itemDetail.batchNo,
           itemDetail.expiryDate,
-          itemDetail.isFoc
+          itemDetail.isFoc,
         );
 
         const reqItem = await getRequisitionItemDetailsFromDb(
-          itemDetail.requisitionItemDetailsId
+          itemDetail.requisitionItemDetailsId,
         );
 
         return {
@@ -91,8 +91,8 @@ export const toStoreRequisitionReturnDTO = async (
           warehouseInHandStock: inHandWarehouseQty,
           branchInHandStock: inHandBranchQty,
         };
-      })
-    )
+      }),
+    ),
   );
 
   const omittedSRR = customOmit<

@@ -158,7 +158,7 @@ export const fetchSellInformationWithPagination = async (
   filters: SellInformationFilters = {
     pageNo: 1,
     pageSize: Number.MAX_SAFE_INTEGER,
-  }
+  },
 ): Promise<PaginatedResponse<SellInformation>> => {
   const {
     pageNo = 1,
@@ -225,7 +225,7 @@ export const fetchSellInformationWithPagination = async (
       searchPattern,
       searchPattern,
       searchPattern,
-      searchPattern
+      searchPattern,
     );
   }
 
@@ -279,7 +279,7 @@ export const fetchSellInformationWithPagination = async (
 
   const countResult = await db.$queryRawUnsafe<[{ total: bigint }]>(
     countQuery,
-    ...params
+    ...params,
   );
   const total = Number(countResult[0]?.total || 0);
 
@@ -348,7 +348,7 @@ export const fetchSellInformationWithPagination = async (
 
   const sellData = await db.$queryRawUnsafe<SellInformation[]>(
     dataQuery,
-    ...params
+    ...params,
   );
 
   return {

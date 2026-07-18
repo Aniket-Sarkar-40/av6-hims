@@ -54,7 +54,7 @@ export const branchRequisitionSchema = Joi.object<CreateBranchRequisitionInput>(
 
     branchReqAckStatus: enumOptional(
       "Branch Req Acknowledgement Status",
-      STORE_REQ_ACK_STATUS
+      STORE_REQ_ACK_STATUS,
     ),
 
     branchReqDetails: strOptional("Branch Req Details"),
@@ -62,9 +62,9 @@ export const branchRequisitionSchema = Joi.object<CreateBranchRequisitionInput>(
     branchRequisitionDetails: arrayRequired(
       "Branch Requisition Details",
       branchRequisitionDetailSchema,
-      1
+      1,
     ),
-  }
+  },
 );
 
 export const branchRequisitionSchemaUpdate = branchRequisitionSchema.keys({
@@ -160,7 +160,7 @@ export const acknowledgeBranchRequisitionSchema =
     acknowledgeItems: arrayRequired(
       "Acknowledge Items",
       acknowledgeBranchItemSchema,
-      1
+      1,
     ),
   });
 

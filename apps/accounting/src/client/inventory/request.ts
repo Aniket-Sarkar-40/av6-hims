@@ -8,7 +8,7 @@ import { INVENTORY_SERVICE_URL } from "@repo/shared";
 
 export const inventoryRequests = {
   async getOpeningAndClosingStock(
-    input: InventoryOpeningAndClosingStockRequest
+    input: InventoryOpeningAndClosingStockRequest,
   ): Promise<StockOpeningClosingResponse | null> {
     logger.info("entering::getOpeningAndClosingStock::service");
 
@@ -21,7 +21,7 @@ export const inventoryRequests = {
       });
       if (!res.data.success || res.status === 404) {
         logger.info(
-          "exiting::getOpeningAndClosingStock::service (404 -> null)"
+          "exiting::getOpeningAndClosingStock::service (404 -> null)",
         );
         return null;
       }

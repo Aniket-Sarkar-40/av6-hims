@@ -37,7 +37,7 @@ const cacheKey = getRedisKey("AUTO_ALERT_EMAIL", "all");
 
 export const autoAlertService = {
   async createAutoAlertEmail(
-    input: CreateAutoAlertEmailInput
+    input: CreateAutoAlertEmailInput,
   ): Promise<PmsAutoAlertEmail> {
     logger.info("entering::createAutoAlertEmail::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.AUTO_ALERT_EMAIL);
@@ -51,7 +51,7 @@ export const autoAlertService = {
   },
 
   async updateAutoAlertEmail(
-    input: UpdateAutoAlertEmailInput
+    input: UpdateAutoAlertEmailInput,
   ): Promise<PmsAutoAlertEmail> {
     logger.info("entering::updateAutoAlertEmail::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.AUTO_ALERT_EMAIL);
@@ -66,7 +66,7 @@ export const autoAlertService = {
 
   async getAutoAlertEmailById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<PmsAutoAlertEmail | null> {
     logger.info("entering::getAutoAlertEmailById::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.AUTO_ALERT_EMAIL);
@@ -76,7 +76,7 @@ export const autoAlertService = {
     if (isCacheable) {
       autoAlertEmail = (await getCacheById(
         cacheKey,
-        id
+        id,
       )) as PmsAutoAlertEmail | null;
     } else {
       autoAlertEmail = await getAutoAlertEmailByIdFromDb(id);
@@ -87,7 +87,7 @@ export const autoAlertService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Auto Alert Email")
+          generateErrorMessage("NOT_FOUND", "Auto Alert Email"),
         );
       return null;
     }

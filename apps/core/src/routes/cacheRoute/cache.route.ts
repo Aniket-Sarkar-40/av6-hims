@@ -33,7 +33,7 @@ cacheRouter.post(
   "/load",
   verifyToken(),
   authorize(getPermission("CORE", "CACHE", "VIEW")),
-  getAllCacheController
+  getAllCacheController,
 );
 /**
  * @swagger
@@ -55,13 +55,13 @@ cacheRouter.delete(
   "/delete",
   verifyToken(),
   authorize(getPermission("CORE", "CACHE", "DELETE")),
-  clearCacheController
+  clearCacheController,
 );
 cacheRouter.delete(
   "/all",
   verifyToken(),
   authorize(getPermission("CORE", "CACHE", "DELETE")),
-  clearAllCacheController
+  clearAllCacheController,
 );
 
 export default cacheRouter;

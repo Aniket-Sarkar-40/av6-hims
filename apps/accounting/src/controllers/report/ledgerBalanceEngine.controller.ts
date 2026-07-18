@@ -9,14 +9,13 @@ export const getLedgerBalance = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::getLedgerBalance::report::controller");
     const input = req.body as LedgerBalanceEngineInput;
-    const ledgerBalance = await ledgerBalanceService.getLedgerBalanceNumber(
-      input
-    );
+    const ledgerBalance =
+      await ledgerBalanceService.getLedgerBalanceNumber(input);
     const response = BaseResponse.success(
       { data: ledgerBalance, type: "FETCHED" },
-      "Ledger Balance"
+      "Ledger Balance",
     );
     logger.info("exiting::getLedgerBalance::report::controller");
     return res.status(200).json(response);
-  }
+  },
 );

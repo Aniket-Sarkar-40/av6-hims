@@ -40,7 +40,7 @@ patientAdviceDetailsRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_ADVICE_DETAILS", "CREATE")),
   validatePatientAdviceDetailsCreate,
-  createPatientAdviceDetails
+  createPatientAdviceDetails,
 );
 
 /**
@@ -70,5 +70,5 @@ patientAdviceDetailsRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_ADVICE_DETAILS", "VIEW")),
-  getPatientAdviceDetailsByAppointmentId
+  getPatientAdviceDetailsByAppointmentId,
 );

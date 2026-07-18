@@ -25,7 +25,7 @@ export const CreateReferToDoctorSchema = Joi.object<
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Description",
-        "3"
+        "3",
       ),
     }),
 

@@ -43,7 +43,7 @@ const settingsServiceRaw = {
 
   async getSettingsById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<SettingsDTO | null> {
     logger.info("entering::getSettingsById::service");
 
@@ -63,7 +63,7 @@ const settingsServiceRaw = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Settings")
+          generateErrorMessage("NOT_FOUND", "Settings"),
         );
     }
 
@@ -111,5 +111,5 @@ const settingsServiceRaw = {
 
 export const settingsService = auditProxy.createAuditedService(
   "settings",
-  settingsServiceRaw
+  settingsServiceRaw,
 );

@@ -5,10 +5,10 @@ import { AccSettings } from "@repo/db/generated/prisma/client";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toSettingsDto = async (
-  data: AccSettings
+  data: AccSettings,
 ): Promise<SettingsDTO> => {
   const collectionCenter = await getCollectionCenterByIdFromDb(
-    data.mainBranchId
+    data.mainBranchId,
   );
   return {
     ...customOmit(data, [

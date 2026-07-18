@@ -29,9 +29,9 @@ export const createOrUpdateModuleConfig = TryCatch(
         success: true,
         message: generateSuccessMessage("UPDATED", "Module Config"),
       },
-      { token: token }
+      { token: token },
     );
     logger.info("exiting::createOrUpdateModuleConfig::controller");
     return res.status(201).json(response);
-  }
+  },
 );

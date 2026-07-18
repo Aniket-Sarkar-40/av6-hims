@@ -3,13 +3,27 @@ import { distributorService } from "@/services/distributor/distributor.service.j
 import { itemService } from "@/services/item/item.service.js";
 import { warehouseService } from "@/services/master/warehouse.service.js";
 import { employeeService } from "@/services/staff/employee.service.js";
-import { GrnDetailDTO, GrnDetailsResponse, GrnDetailsResponseBase, GrnDTO, GrnResponse } from "@/types/grn/grn.js";
+import {
+  GrnDetailDTO,
+  GrnDetailsResponse,
+  GrnDetailsResponseBase,
+  GrnDTO,
+  GrnResponse,
+} from "@/types/grn/grn.js";
 
 export const toGrnDTO = async (grn: GrnResponse): Promise<GrnDTO> => {
-  const distributorDTO = await distributorService.getDistributorByIdWoDto(grn.distributorId, true);
-  const warehouseDTO = await warehouseService.getWarehouseById(grn.warehouseId, true);
+  const distributorDTO = await distributorService.getDistributorByIdWoDto(
+    grn.distributorId,
+    true,
+  );
+  const warehouseDTO = await warehouseService.getWarehouseById(
+    grn.warehouseId,
+    true,
+  );
 
-  const createdBy = grn.createdBy ? await employeeService.getEmployeeByIdFrmCacheOrDb(grn.createdBy, true) : null;
+  const createdBy = grn.createdBy
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(grn.createdBy, true)
+    : null;
 
   const detailDTO: GrnDetailDTO[] = await Promise.all(
     grn.goodReceiveDetails.map(async (detail) => {
@@ -21,7 +35,7 @@ export const toGrnDTO = async (grn: GrnResponse): Promise<GrnDTO> => {
             warehouseId: grn.warehouseId,
           },
           detail.batchNo,
-          detail.expiryDate
+          detail.expiryDate,
         )) || null;
 
       return {
@@ -29,7 +43,7 @@ export const toGrnDTO = async (grn: GrnResponse): Promise<GrnDTO> => {
         item: item,
         inHandQty: inHandQty ? inHandQty : 0,
       };
-    })
+    }),
   );
 
   return {
@@ -41,7 +55,9 @@ export const toGrnDTO = async (grn: GrnResponse): Promise<GrnDTO> => {
   };
 };
 
-export const toGrnDetailsDTO = async (grnDetailsInput: GrnDetailsResponseBase[]): Promise<GrnDetailsResponse[]> => {
+export const toGrnDetailsDTO = async (
+  grnDetailsInput: GrnDetailsResponseBase[],
+): Promise<GrnDetailsResponse[]> => {
   const items = await itemService.getAllItemWoDto();
   const distributors = await distributorService.getDistributorWoDto(true);
   const warehouses = await warehouseService.getAllWarehouseWoDTO();
@@ -49,12 +65,18 @@ export const toGrnDetailsDTO = async (grnDetailsInput: GrnDetailsResponseBase[])
 
   return Promise.all(
     grnDetailsInput.map(async (grnDetail) => {
-      const warehouse = warehouses.find((w) => w.id === grnDetail.goodReceive.warehouseId) ?? null;
+      const warehouse =
+        warehouses.find((w) => w.id === grnDetail.goodReceive.warehouseId) ??
+        null;
       const item = items.find((item) => item.id === grnDetail.itemId);
-      const distributor = distributors.find((d) => d.id === grnDetail.goodReceive.distributorId);
+      const distributor = distributors.find(
+        (d) => d.id === grnDetail.goodReceive.distributorId,
+      );
       const createdBy = grnDetail.createdBy
         ? (staffs.find((st) => st.id === grnDetail.createdBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(grnDetail.createdBy)) ??
+          (await employeeService.getEmployeeByIdFrmCacheOrDb(
+            grnDetail.createdBy,
+          )) ??
           null)
         : null;
 
@@ -65,6 +87,6 @@ export const toGrnDetailsDTO = async (grnDetailsInput: GrnDetailsResponseBase[])
         warehouse,
         createdBy,
       };
-    })
+    }),
   );
 };

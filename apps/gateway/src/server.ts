@@ -63,7 +63,7 @@ const MODULE_REGISTRY: ModuleDefinition[] = [
 
 // Empty ENABLED_APPS => enable everything (dev convenience).
 const enabledCodes = new Set(
-  ENABLED_APPS.length ? ENABLED_APPS : MODULE_REGISTRY.map((m) => m.code)
+  ENABLED_APPS.length ? ENABLED_APPS : MODULE_REGISTRY.map((m) => m.code),
 );
 const enabledModules = MODULE_REGISTRY.filter((m) => enabledCodes.has(m.code));
 

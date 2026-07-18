@@ -30,7 +30,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 
 export const branchRequisitionReturnService = {
   async createBranchRequisitionReturn(
-    input: CreateBranchRequisitionReturnInput
+    input: CreateBranchRequisitionReturnInput,
   ) {
     logger.info("entering::createBranchRequisitionReturn::service");
 
@@ -43,7 +43,7 @@ export const branchRequisitionReturnService = {
   },
 
   async updateBranchRequisitionReturn(
-    input: CreateBranchRequisitionReturnInput
+    input: CreateBranchRequisitionReturnInput,
   ) {
     logger.info("entering::updateBranchRequisitionReturn::service");
 
@@ -63,12 +63,12 @@ export const branchRequisitionReturnService = {
     if (records.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Branch Requisition Return")
+        generateErrorMessage("NOT_FOUND", "Branch Requisition Return"),
       );
     }
 
     const dto = await Promise.all(
-      records.map((brr) => toBranchRequisitionReturnDTO(brr))
+      records.map((brr) => toBranchRequisitionReturnDTO(brr)),
     );
 
     logger.info("exiting::getAllBranchRequisitionReturn::service");
@@ -84,7 +84,7 @@ export const branchRequisitionReturnService = {
     if (!brr) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Branch Requisition Return")
+        generateErrorMessage("NOT_FOUND", "Branch Requisition Return"),
       );
     }
 
@@ -105,10 +105,10 @@ export const branchRequisitionReturnService = {
   },
 
   async rejectBranchRequisitionReturn(
-    input: RejectBranchRequisitionReturnInput
+    input: RejectBranchRequisitionReturnInput,
   ): Promise<void> {
     logger.info(
-      `entering::rejectBranchRequisitionReturn::service id=${input.id}`
+      `entering::rejectBranchRequisitionReturn::service id=${input.id}`,
     );
 
     await rejectBranchRequisitionReturnServiceValidation(input);
@@ -116,15 +116,15 @@ export const branchRequisitionReturnService = {
     await rejectBranchRequisitionReturnInDb(input);
 
     logger.info(
-      `exiting::rejectBranchRequisitionReturn::service id=${input.id}`
+      `exiting::rejectBranchRequisitionReturn::service id=${input.id}`,
     );
   },
 
   async approveBranchRequisitionReturn(
-    input: ApproveBranchReqReturnInput
+    input: ApproveBranchReqReturnInput,
   ): Promise<void> {
     logger.info(
-      `entering::approveBranchRequisitionReturn::service id=${input.id}`
+      `entering::approveBranchRequisitionReturn::service id=${input.id}`,
     );
 
     await approveBranchRequisitionReturnServiceValidation(input);
@@ -132,15 +132,15 @@ export const branchRequisitionReturnService = {
     await approveBranchRequisitionReturnInDb(input);
 
     logger.info(
-      `exiting::approveBranchRequisitionReturn::service id=${input.id}`
+      `exiting::approveBranchRequisitionReturn::service id=${input.id}`,
     );
   },
 
   async acknowledgeBranchRequisitionReturn(
-    input: AcknowledgeBranchRequisitionReturn
+    input: AcknowledgeBranchRequisitionReturn,
   ): Promise<void> {
     logger.info(
-      `entering::acknowledgeBranchRequisitionReturn::service id=${input.id}`
+      `entering::acknowledgeBranchRequisitionReturn::service id=${input.id}`,
     );
 
     await acknowledgeBranchRequisitionReturnServiceValidation(input);
@@ -148,7 +148,7 @@ export const branchRequisitionReturnService = {
     await acknowledgeBranchRequisitionReturnInDb(input);
 
     logger.info(
-      `exiting::acknowledgeBranchRequisitionReturn::service id=${input.id}`
+      `exiting::acknowledgeBranchRequisitionReturn::service id=${input.id}`,
     );
   },
 };

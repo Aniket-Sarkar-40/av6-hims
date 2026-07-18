@@ -25,8 +25,7 @@ export type CreateAutoAlertAuditInput = Omit<
   Prisma.InvAutoAlertAuditUncheckedCreateInput,
   "id" | "isActive" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
 >;
-export interface UpdateAutoAlertAuditInput
-  extends Partial<CreateAutoAlertAuditInput> {
+export interface UpdateAutoAlertAuditInput extends Partial<CreateAutoAlertAuditInput> {
   id: number;
 }
 
@@ -41,8 +40,10 @@ export type AutoAlertEmailDTO = Omit<
   | "deletedAt"
 >;
 
-export interface AutoAlertAuditDTO
-  extends Omit<InvAutoAlertAudit, "createdBy" | "updatedBy" | "recipientId"> {
+export interface AutoAlertAuditDTO extends Omit<
+  InvAutoAlertAudit,
+  "createdBy" | "updatedBy" | "recipientId"
+> {
   createdBy: IdValue | null;
   updatedBy: IdValue | null;
   recipient: AutoAlertEmailDTO | null;

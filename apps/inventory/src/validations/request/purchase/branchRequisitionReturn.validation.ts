@@ -135,7 +135,7 @@ export const approveBranchReqReturnSchema =
     returnItems: arrayRequired(
       "Return Items",
       approveBranchReturnItemSchema,
-      1
+      1,
     ),
   });
 
@@ -175,7 +175,7 @@ const acknowledgeBranchReturnItemSchema =
     itemBatch: arrayRequired(
       "Item Batch",
       acknowledgeBranchReturnItemBatchSchema,
-      1
+      1,
     ),
   });
 
@@ -188,7 +188,7 @@ export const acknowledgeBranchRequisitionReturnSchema =
     acknowledgeItems: arrayRequired(
       "Acknowledge Items",
       acknowledgeBranchReturnItemSchema,
-      1
+      1,
     ),
   });
 

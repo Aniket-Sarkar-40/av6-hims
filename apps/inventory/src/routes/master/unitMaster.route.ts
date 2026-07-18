@@ -45,7 +45,7 @@ unitMasterRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UNIT_MASTER", "CREATE")),
   validateUnitMasterCreate,
-  createUnitMaster
+  createUnitMaster,
 );
 
 /**
@@ -61,7 +61,7 @@ unitMasterRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UNIT_MASTER", "VIEW")),
-  getAllUnitMaster
+  getAllUnitMaster,
 );
 
 /**
@@ -82,7 +82,7 @@ unitMasterRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "UNIT_MASTER", "VIEW")),
-  getUnitMasterById
+  getUnitMasterById,
 );
 
 /**
@@ -112,8 +112,8 @@ unitMasterRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "UNIT_MASTER", "VIEW"),
-    getPermission("INV", "UNIT_MASTER", "UPDATE")
+    getPermission("INV", "UNIT_MASTER", "UPDATE"),
   ),
   validateUnitMasterUpdate,
-  updateUnitMaster
+  updateUnitMaster,
 );

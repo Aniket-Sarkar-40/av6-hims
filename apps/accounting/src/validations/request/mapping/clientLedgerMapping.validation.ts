@@ -39,23 +39,23 @@ export const createExternalClientLedgerMappingSchema =
       .messages({
         "number.base": generateValidationErrorMessage(
           "NUMBER",
-          "Credit Period In Days"
+          "Credit Period In Days",
         ),
         "number.min": generateValidationErrorMessage(
           "NUMBER_MIN",
           "Credit Period In Days",
-          "0"
+          "0",
         ),
         "number.max": generateValidationErrorMessage(
           "NUMBER_MAX",
           "Credit Period In Days",
-          "365"
+          "365",
         ),
       }),
     createdBy: idRequired("Created By"),
     mappingStatus: enumRequired("Mapping Status", MAPPING_STATUS),
     overrideExistingLedger: boolOptional("Override Existing Ledger").allow(
-      null
+      null,
     ),
   });
 

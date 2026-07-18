@@ -39,7 +39,7 @@ export const templateService = {
   },
 
   async getAllTemplates(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<Template[]> {
     logger.info("entering::getAllTemplates::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.TEMPLATE);
@@ -56,7 +56,7 @@ export const templateService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Service Event")
+          generateErrorMessage("NOT_FOUND", "Service Event"),
         );
       }
     }
@@ -65,7 +65,7 @@ export const templateService = {
 
   async getTemplateById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<Template | null> {
     logger.info("entering::getTemplateById::service");
     validIdCheck(id);
@@ -82,7 +82,7 @@ export const templateService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Service Event")
+          generateErrorMessage("NOT_FOUND", "Service Event"),
         );
       }
     }

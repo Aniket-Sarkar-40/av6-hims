@@ -6,7 +6,7 @@ import {
 import { Country } from "@repo/db/generated/prisma/client";
 
 export const toExcelFromCountry = (
-  country: CreateCountryInput | null
+  country: CreateCountryInput | null,
 ): ExcelCountryRow => {
   return {
     alpha2Code: country?.alpha2Code ?? "",
@@ -17,7 +17,7 @@ export const toExcelFromCountry = (
 };
 
 export const toCountryFromExcel = (
-  row: ExcelCountryRow
+  row: ExcelCountryRow,
 ): CreateCountryInput => {
   return {
     alpha2Code: row.alpha2Code,

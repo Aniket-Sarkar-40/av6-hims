@@ -30,7 +30,7 @@ export const validateIdGrnReturn = async (id: number) => {
   if (!grnReturn) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Good Receive Note Return")
+      generateErrorMessage("NOT_FOUND", "Good Receive Note Return"),
     );
   }
   logger.info("exiting::validateIdGrnReturn::service::validation");
@@ -39,7 +39,7 @@ export const validateIdGrnReturn = async (id: number) => {
 };
 
 export const validateGrnReturnCommon = async (
-  body: CreateGrnReturnInput
+  body: CreateGrnReturnInput,
 ): Promise<void> => {
   logger.info("entering::validateGrnReturnCommon::service::validation");
 
@@ -61,7 +61,7 @@ export const validateGrnReturnCommon = async (
   if (!grn) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Good Receive Note")
+      generateErrorMessage("NOT_FOUND", "Good Receive Note"),
     );
   }
 
@@ -71,22 +71,22 @@ export const validateGrnReturnCommon = async (
       generateErrorMessage(
         "MISMATCH",
         "Purchase Number",
-        "Sending purchase number"
-      )
+        "Sending purchase number",
+      ),
     );
   }
 
   if (grn.poId !== body.poId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("MISMATCH", "Purchase Id", "Sending purchase id")
+      generateErrorMessage("MISMATCH", "Purchase Id", "Sending purchase id"),
     );
   }
 
   if (grn.grnNumber !== body.grnNumber) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("MISMATCH", "Grn Number", "Sending grn number")
+      generateErrorMessage("MISMATCH", "Grn Number", "Sending grn number"),
     );
   }
 
@@ -96,8 +96,8 @@ export const validateGrnReturnCommon = async (
       400,
       generateErrorMessage(
         "INVALID_VALUE",
-        "Total Discount cannot exceed Total Amount"
-      )
+        "Total Discount cannot exceed Total Amount",
+      ),
     );
   }
 
@@ -107,22 +107,22 @@ export const validateGrnReturnCommon = async (
       400,
       generateErrorMessage(
         "INVALID_VALUE",
-        "Paid Amount cannot exceed total amount"
-      )
+        "Paid Amount cannot exceed total amount",
+      ),
     );
   }
 
   const itemIds: Set<number> = new Set(
     body.goodReceiveReturnDetails.map(
-      (d: CreateGrnReturnDetailsInput) => d.itemId
-    )
+      (d: CreateGrnReturnDetailsInput) => d.itemId,
+    ),
   );
   const grnDetailsItemIds = new Set(
-    grn.goodReceiveDetails.map((d) => d.itemId)
+    grn.goodReceiveDetails.map((d) => d.itemId),
   );
 
   const invalidGrnIds = Array.from(itemIds).filter(
-    (id) => !grnDetailsItemIds.has(id)
+    (id) => !grnDetailsItemIds.has(id),
   );
   if (invalidGrnIds.length > 0) {
     throw new ErrorHandler(
@@ -130,9 +130,9 @@ export const validateGrnReturnCommon = async (
       generateErrorMessage(
         "INVALID_VALUE",
         `Item ID${invalidGrnIds.length > 1 ? "s" : ""} [${invalidGrnIds.join(
-          ", "
-        )}] not found in Good Receive Note details`
-      )
+          ", ",
+        )}] not found in Good Receive Note details`,
+      ),
     );
   }
   const existingItems = await getCountItemsFromDb(Array.from(itemIds));
@@ -144,23 +144,23 @@ export const validateGrnReturnCommon = async (
 
   for (const detail of body.goodReceiveReturnDetails) {
     const existingItem = existingItems.find(
-      (item) => item.id === detail.itemId
+      (item) => item.id === detail.itemId,
     );
     if (!existingItem) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Item with id ${detail.itemId}`)
+        generateErrorMessage("NOT_FOUND", `Item with id ${detail.itemId}`),
       );
     }
     if (!body.isApproval) {
       const grnDetail = grn.goodReceiveDetails.find(
-        (grnItem) => grnItem.id === detail.grnDetailsId
+        (grnItem) => grnItem.id === detail.grnDetailsId,
       );
 
       if (!grnDetail) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Good Receive Note Details")
+          generateErrorMessage("NOT_FOUND", "Good Receive Note Details"),
         );
       }
 
@@ -169,8 +169,8 @@ export const validateGrnReturnCommon = async (
           400,
           generateErrorMessage(
             "VALUE_MISMATCH",
-            `Item ${existingItem.medicineName}: GRN Quantity (${detail.grnQty}) does not match GRN quantity (${grnDetail.quantity})`
-          )
+            `Item ${existingItem.medicineName}: GRN Quantity (${detail.grnQty}) does not match GRN quantity (${grnDetail.quantity})`,
+          ),
         );
       }
 
@@ -179,8 +179,8 @@ export const validateGrnReturnCommon = async (
           400,
           generateErrorMessage(
             "VALUE_MISMATCH",
-            `Item ${existingItem.medicineName}: Ordered Quantity (${detail.orderQty}) does not match ordered quantity (${grnDetail.orderQuantity})`
-          )
+            `Item ${existingItem.medicineName}: Ordered Quantity (${detail.orderQty}) does not match ordered quantity (${grnDetail.orderQuantity})`,
+          ),
         );
       }
 
@@ -192,7 +192,7 @@ export const validateGrnReturnCommon = async (
           warehouseId: grn.warehouseId,
         },
         detail.batchNo,
-        detail.expiryDate
+        detail.expiryDate,
       );
 
       if (inHandQty !== detail.inHandQty) {
@@ -200,8 +200,8 @@ export const validateGrnReturnCommon = async (
           400,
           generateErrorMessage(
             "VALUE_MISMATCH",
-            `Item ${existingItem.medicineName}: In Hand Quantity (${detail.inHandQty}) does not match calculated in hand quantity (${inHandQty})`
-          )
+            `Item ${existingItem.medicineName}: In Hand Quantity (${detail.inHandQty}) does not match calculated in hand quantity (${inHandQty})`,
+          ),
         );
       }
 
@@ -217,9 +217,9 @@ export const validateGrnReturnCommon = async (
               detail.quantity
             }) exceeds return quantity (${Math.min(
               finalQuantity,
-              inHandQty
-            )}) in Good Receive Note Return`
-          )
+              inHandQty,
+            )}) in Good Receive Note Return`,
+          ),
         );
       }
 
@@ -228,8 +228,8 @@ export const validateGrnReturnCommon = async (
           400,
           generateErrorMessage(
             "MISMATCH",
-            `Item ${existingItem.medicineName}: Purchased Price (${detail.purchasedPrice}) does not match Good Receive Note Detail (${grnDetail.purchasedPrice})`
-          )
+            `Item ${existingItem.medicineName}: Purchased Price (${detail.purchasedPrice}) does not match Good Receive Note Detail (${grnDetail.purchasedPrice})`,
+          ),
         );
       }
 
@@ -249,9 +249,9 @@ export const validateGrnReturnCommon = async (
             }) does not match calculated amount (${applyRound(
               itemAmount,
               roundFormat,
-              precision
-            )})`
-          )
+              precision,
+            )})`,
+          ),
         );
       }
     }
@@ -261,8 +261,8 @@ export const validateGrnReturnCommon = async (
         400,
         generateErrorMessage(
           "INVALID_VALUE",
-          `Detail discount (${discountAmount}) cannot exceed detail netAmount (${detail.netAmount})`
-        )
+          `Detail discount (${discountAmount}) cannot exceed detail netAmount (${detail.netAmount})`,
+        ),
       );
     }
 
@@ -280,7 +280,7 @@ export const validateGrnReturnCommon = async (
     const formattedTotalAmount = applyRound(
       totalAmount,
       roundFormat,
-      precision
+      precision,
     );
 
     if (detail.totalAmount !== formattedTotalAmount) {
@@ -293,9 +293,9 @@ export const validateGrnReturnCommon = async (
           }) does not match calculated net (${applyRound(
             totalAmount,
             roundFormat,
-            precision
-          )})`
-        )
+            precision,
+          )})`,
+        ),
       );
     }
 
@@ -309,9 +309,9 @@ export const validateGrnReturnCommon = async (
           }) does not match calculated net (${applyRound(
             netTax,
             roundFormat,
-            precision
-          )})`
-        )
+            precision,
+          )})`,
+        ),
       );
     }
 
@@ -327,9 +327,9 @@ export const validateGrnReturnCommon = async (
           }) does not match calculated net (${applyRound(
             netDiscount,
             roundFormat,
-            precision
-          )})`
-        )
+            precision,
+          )})`,
+        ),
       );
     }
 
@@ -343,8 +343,8 @@ export const validateGrnReturnCommon = async (
       400,
       generateErrorMessage(
         "VALUE_MISMATCH",
-        `Net Amount (${body.netTotal}) does not match sum of detail totalAmounts (${totalDetailAmounts})`
-      )
+        `Net Amount (${body.netTotal}) does not match sum of detail totalAmounts (${totalDetailAmounts})`,
+      ),
     );
   }
 
@@ -367,9 +367,9 @@ export const validateGrnReturnCommon = async (
         `Net Tax (${body.netTax}) does not match calculated tax (${applyRound(
           netTax,
           roundFormat,
-          precision
-        )})`
-      )
+          precision,
+        )})`,
+      ),
     );
   }
 
@@ -383,9 +383,9 @@ export const validateGrnReturnCommon = async (
         }) does not match calculated discount (${applyRound(
           netDiscount,
           roundFormat,
-          precision
-        )})`
-      )
+          precision,
+        )})`,
+      ),
     );
   }
 
@@ -399,9 +399,9 @@ export const validateGrnReturnCommon = async (
         }) does not match calculated net total (${applyRound(
           totalAmount,
           roundFormat,
-          precision
-        )})`
-      )
+          precision,
+        )})`,
+      ),
     );
   }
 
@@ -409,10 +409,10 @@ export const validateGrnReturnCommon = async (
 };
 
 export const createGrnReturnServiceValidation = async (
-  body: CreateGrnReturnInput
+  body: CreateGrnReturnInput,
 ) => {
   logger.info(
-    "entering::createGrnReturnServiceValidation::service::validation"
+    "entering::createGrnReturnServiceValidation::service::validation",
   );
 
   await validateGrnReturnCommon(body);
@@ -421,17 +421,17 @@ export const createGrnReturnServiceValidation = async (
 };
 
 export const updateGrnReturnServiceValidation = async (
-  body: CreateGrnReturnInput
+  body: CreateGrnReturnInput,
 ) => {
   logger.info(
-    "entering::updateGrnReturnServiceValidation::service::validation"
+    "entering::updateGrnReturnServiceValidation::service::validation",
   );
 
   if (body.id == null) {
     logger.error("missing grnReturn id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Good Receive Note Return id")
+      generateErrorMessage("NOT_FOUND", "Good Receive Note Return id"),
     );
   }
   logger.info(`validating existence of grnReturn id=${body.id}`);
@@ -446,15 +446,15 @@ export const updateGrnReturnServiceValidation = async (
   const existingIds = grnReturn.goodReceiveReturnDetails.map((item) => item.id);
   // check if any item is not in stock transfer details
   const notInStockTransferDetails = updatedIds.filter(
-    (id) => !existingIds.includes(id)
+    (id) => !existingIds.includes(id),
   );
   if (notInStockTransferDetails.length > 0) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "INVALID_FIELD",
-        `Id ${notInStockTransferDetails.join(", ")} of Stock Transfer Details`
-      )
+        `Id ${notInStockTransferDetails.join(", ")} of Stock Transfer Details`,
+      ),
     );
   }
 
@@ -464,17 +464,17 @@ export const updateGrnReturnServiceValidation = async (
 };
 
 export const approveGrnReturnServiceValidation = async (
-  body: CreateGrnReturnInput
+  body: CreateGrnReturnInput,
 ) => {
   logger.info(
-    "entering::approveGrnReturnServiceValidation::service::validation"
+    "entering::approveGrnReturnServiceValidation::service::validation",
   );
 
   if (body.id == null) {
     logger.error("missing grnReturn id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Good Receive Note Return id")
+      generateErrorMessage("NOT_FOUND", "Good Receive Note Return id"),
     );
   }
   logger.info(`validating existence of grnReturn id=${body.id}`);
@@ -485,7 +485,7 @@ export const approveGrnReturnServiceValidation = async (
   if (grnReturn.warehouseId !== body.ccId && warehouse.isMain === false) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("MISMATCH", "Warehouse Id", "CC Id")
+      generateErrorMessage("MISMATCH", "Warehouse Id", "CC Id"),
     );
   }
 
@@ -494,8 +494,8 @@ export const approveGrnReturnServiceValidation = async (
     new Set(
       body.goodReceiveReturnDetails
         .map((d) => d.id)
-        .filter((id): id is number => id != null)
-    )
+        .filter((id): id is number => id != null),
+    ),
   );
 
   if (detailIds.length > 0) {
@@ -503,7 +503,7 @@ export const approveGrnReturnServiceValidation = async (
     if (count !== detailIds.length) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Good Receive Note Return details")
+        generateErrorMessage("NOT_FOUND", "Good Receive Note Return details"),
       );
     }
   }
@@ -512,14 +512,14 @@ export const approveGrnReturnServiceValidation = async (
   if (grnReturn.status !== "PENDING") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Good Receive Note Return")
+      generateErrorMessage("INVALID_STATUS", "Good Receive Note Return"),
     );
   }
 
   await validateGrnReturnCommon(body);
 
   logger.info(
-    "exiting::approveGrnReturnServiceValidation::service::validation"
+    "exiting::approveGrnReturnServiceValidation::service::validation",
   );
 };
 
@@ -529,14 +529,14 @@ export const rejectGrnReturnServiceValidation = async (body: {
   ccId?: number;
 }) => {
   logger.info(
-    "entering::rejectGrnReturnServiceValidation::service::validation"
+    "entering::rejectGrnReturnServiceValidation::service::validation",
   );
 
   if (body.id == null) {
     logger.error("missing grnReturn id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Good Receive Note Return id")
+      generateErrorMessage("NOT_FOUND", "Good Receive Note Return id"),
     );
   }
   logger.info(`validating existence of grnReturn id=${body.id}`);
@@ -548,7 +548,7 @@ export const rejectGrnReturnServiceValidation = async (body: {
   if (grnReturn.warehouseId !== body.ccId && warehouse.isMain === false) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("MISMATCH", "Warehouse Id", "Cc Id")
+      generateErrorMessage("MISMATCH", "Warehouse Id", "Cc Id"),
     );
   }
 
@@ -558,15 +558,15 @@ export const rejectGrnReturnServiceValidation = async (body: {
       generateErrorMessage(
         "MISMATCH",
         "Good Receive Note Id",
-        "Sending Good Receive Note Id"
-      )
+        "Sending Good Receive Note Id",
+      ),
     );
   }
 
   if (grnReturn.status !== "PENDING") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Good Receive Note Return")
+      generateErrorMessage("INVALID_STATUS", "Good Receive Note Return"),
     );
   }
 
@@ -580,11 +580,11 @@ export const deleteGrnReturnServiceValidation = async (id: number) => {
 
   if (grnReturn.status !== RETURN_STS.PENDING) {
     logger.error(
-      `Cannot delete Good Receive Note Return with id=${id} in status=${grnReturn.status}`
+      `Cannot delete Good Receive Note Return with id=${id} in status=${grnReturn.status}`,
     );
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Good Receive Note Return")
+      generateErrorMessage("INVALID_STATUS", "Good Receive Note Return"),
     );
   }
 

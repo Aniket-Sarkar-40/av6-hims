@@ -28,7 +28,9 @@ export type EventRecipientRuleInput = Prisma.EventRecipientRuleGetPayload<{
   };
 }>;
 
-export interface EventRecipientRuleDTO
-  extends Omit<EventRecipientRule, BaseModelAttr | "eventConfigId"> {
+export interface EventRecipientRuleDTO extends Omit<
+  EventRecipientRule,
+  BaseModelAttr | "eventConfigId"
+> {
   eventConfig: IdValue | null;
 }

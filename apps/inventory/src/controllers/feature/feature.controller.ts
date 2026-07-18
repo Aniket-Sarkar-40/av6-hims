@@ -15,12 +15,12 @@ export const createFeatureFlag = TryCatch(
     const feature = await featureFlagService.createFeatureFlag(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: feature },
-      "Feature Flag"
+      "Feature Flag",
     );
 
     logger.info("exiting::createFeatureFlag::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateFeatureFlag = TryCatch(
@@ -32,9 +32,12 @@ export const updateFeatureFlag = TryCatch(
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "UPDATED", data: updated }, "Feature Flag")
+        BaseResponse.success(
+          { type: "UPDATED", data: updated },
+          "Feature Flag",
+        ),
       );
-  }
+  },
 );
 
 export const getAllFeatureFlags = TryCatch(
@@ -47,26 +50,28 @@ export const getAllFeatureFlags = TryCatch(
       .json(
         BaseResponse.success(
           { type: "FETCHED", data: features },
-          "Feature Flags"
-        )
+          "Feature Flags",
+        ),
       );
-  }
+  },
 );
 
 export const getFeatureFlagByShortCode = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::getFeatureFlagByShortCode::controller");
     const { shortCode } = req.query as { shortCode: string };
-    const feature = await featureFlagService.getFeatureFlagByShortCode(
-      shortCode
-    );
+    const feature =
+      await featureFlagService.getFeatureFlagByShortCode(shortCode);
     logger.info("exiting::getFeatureFlagByShortCode::controller");
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "FETCHED", data: feature }, "Feature Flag")
+        BaseResponse.success(
+          { type: "FETCHED", data: feature },
+          "Feature Flag",
+        ),
       );
-  }
+  },
 );
 
 export const toggleFeatureFlag = TryCatch(
@@ -74,15 +79,18 @@ export const toggleFeatureFlag = TryCatch(
     logger.info("entering::toggleFeatureFlag::controller");
     const { featureFlagId } = req.query as { featureFlagId: string };
     const updated = await featureFlagService.toggleEnabled(
-      Number(featureFlagId)
+      Number(featureFlagId),
     );
     logger.info("exiting::toggleFeatureFlag::controller");
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "UPDATED", data: updated }, "Feature Flag")
+        BaseResponse.success(
+          { type: "UPDATED", data: updated },
+          "Feature Flag",
+        ),
       );
-  }
+  },
 );
 
 export const deleteFeatureFlag = TryCatch(
@@ -90,7 +98,7 @@ export const deleteFeatureFlag = TryCatch(
     logger.info("entering::deleteFeatureFlag::controller");
     const { featureFlagId } = req.query as { featureFlagId: string };
     const isDeleted = await featureFlagService.deleteFeatureFlag(
-      Number(featureFlagId)
+      Number(featureFlagId),
     );
     if (!isDeleted) {
       return res
@@ -101,5 +109,5 @@ export const deleteFeatureFlag = TryCatch(
     return res
       .status(200)
       .json(BaseResponse.success({ type: "DELETED" }, "Feature Flag"));
-  }
+  },
 );

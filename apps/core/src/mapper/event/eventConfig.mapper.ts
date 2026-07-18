@@ -6,7 +6,7 @@ import { customOmit } from "av6-core-v2";
 import { toIdValue } from "av6-utils";
 
 export const toEventConfigDTO = async (
-  data: EventConfig[]
+  data: EventConfig[],
 ): Promise<EventConfigDTO[]> => {
   const serviceEvents = await serviceEventService.getAllServiceEvents();
   const templates = await templateService.getAllTemplates();
@@ -19,34 +19,34 @@ export const toEventConfigDTO = async (
       >(eventConfig, ["createdBy", "updatedBy", "createdAt", "updatedAt"]);
 
       const serviceEvent = serviceEvents.find(
-        (e) => e.id === eventConfig.serviceEventId
+        (e) => e.id === eventConfig.serviceEventId,
       );
       const emailTemplate =
         templates.find(
           (t) =>
-            t.eventConfigId === eventConfig.id && t.templateType === "EMAIL"
+            t.eventConfigId === eventConfig.id && t.templateType === "EMAIL",
         ) ?? null;
 
       const smsTemplate =
         templates.find(
-          (t) => t.eventConfigId === eventConfig.id && t.templateType === "SMS"
+          (t) => t.eventConfigId === eventConfig.id && t.templateType === "SMS",
         ) ?? null;
       const wpTemplate =
         templates.find(
           (t) =>
-            t.eventConfigId === eventConfig.id && t.templateType === "WHATSAPP"
+            t.eventConfigId === eventConfig.id && t.templateType === "WHATSAPP",
         ) ?? null;
       const appNotificationTemplate =
         templates.find(
           (t) =>
             t.eventConfigId === eventConfig.id &&
-            t.templateType === "APP_NOTIFICATION"
+            t.templateType === "APP_NOTIFICATION",
         ) ?? null;
       const webNotificationTemplate =
         templates.find(
           (t) =>
             t.eventConfigId === eventConfig.id &&
-            t.templateType === "WEB_NOTIFICATION"
+            t.templateType === "WEB_NOTIFICATION",
         ) ?? null;
 
       return {
@@ -57,13 +57,13 @@ export const toEventConfigDTO = async (
         wpTemplate: toIdValue(wpTemplate, "templateName"),
         appNotificationTemplate: toIdValue(
           appNotificationTemplate,
-          "templateName"
+          "templateName",
         ),
         webNotificationTemplate: toIdValue(
           webNotificationTemplate,
-          "templateName"
+          "templateName",
         ),
       };
-    })
+    }),
   );
 };

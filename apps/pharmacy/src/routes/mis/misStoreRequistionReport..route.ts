@@ -38,11 +38,11 @@ misStoreRequisitionRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_STORE_REQUISITION", "VIEW")),
-  misStoreRequisitionList
+  misStoreRequisitionList,
 );
 misStoreRequisitionRouter.post(
   "/excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_STORE_REQUISITION", "VIEW")),
-  excelMisStoreRequisition
+  excelMisStoreRequisition,
 );

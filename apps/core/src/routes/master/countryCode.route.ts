@@ -46,7 +46,7 @@ countryCodeRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY_CODE", "CREATE")),
   validateCountryCodeCreate,
-  createCountryCode
+  createCountryCode,
 );
 
 /**
@@ -69,10 +69,10 @@ countryCodeRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "COUNTRY_CODE", "VIEW"),
-    getPermission("CORE", "COUNTRY_CODE", "UPDATE")
+    getPermission("CORE", "COUNTRY_CODE", "UPDATE"),
   ),
   validateCountryCodeUpdate,
-  updateCountryCode
+  updateCountryCode,
 );
 
 /**
@@ -88,7 +88,7 @@ countryCodeRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY_CODE", "VIEW")),
-  getAllCountryCode
+  getAllCountryCode,
 );
 
 /**
@@ -111,7 +111,7 @@ countryCodeRouter.get(
   "/id",
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY_CODE", "VIEW")),
-  getCountryCodeById
+  getCountryCodeById,
 );
 
 /**
@@ -134,7 +134,7 @@ countryCodeRouter.delete(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY_CODE", "DELETE")),
-  deleteCountryCodeById
+  deleteCountryCodeById,
 );
 
 export default countryCodeRouter;

@@ -44,7 +44,7 @@ staffCollectionCenterRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "CREATE")),
   validateStaffCollectionCenter,
-  createStaffCollectionCenter
+  createStaffCollectionCenter,
 );
 
 /**
@@ -68,7 +68,7 @@ staffCollectionCenterRouter.get(
   "/:staffCollectionCenterId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "VIEW")),
-  getStaffCollectionCenterById
+  getStaffCollectionCenterById,
 );
 
 /**
@@ -92,7 +92,7 @@ staffCollectionCenterRouter.get(
   "/id/:staffId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "VIEW")),
-  getStaffCollectionCenterMapById
+  getStaffCollectionCenterMapById,
 );
 
 /**
@@ -123,10 +123,10 @@ staffCollectionCenterRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STAFF_COLLECTION_CENTER", "VIEW"),
-    getPermission("PMS", "STAFF_COLLECTION_CENTER", "UPDATE")
+    getPermission("PMS", "STAFF_COLLECTION_CENTER", "UPDATE"),
   ),
   validateStaffCollectionCenter,
-  updateStaffCollectionCenter
+  updateStaffCollectionCenter,
 );
 
 /**
@@ -150,5 +150,5 @@ staffCollectionCenterRouter.delete(
   "/:staffCollectionCenterId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_COLLECTION_CENTER", "DELETE")),
-  deleteStaffCollectionCenter
+  deleteStaffCollectionCenter,
 );

@@ -32,7 +32,7 @@ import { customOmit, toIdValue } from "av6-utils";
 
 export const mapRowToLedgerExcelCreateInput = (
   row: LedgerExcelRow,
-  rowNo: number
+  rowNo: number,
 ): CreateOrUpdateLedgerExcelInput => {
   const name = parseOptionalString(row.Name);
   if (!name) {
@@ -43,7 +43,7 @@ export const mapRowToLedgerExcelCreateInput = (
   if (!groupName) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Group Name")
+      generateErrorMessage("FIELD_REQUIRED", "Group Name"),
     );
   }
 
@@ -92,7 +92,7 @@ export const buildLedgerInputFromExcel = async (params: {
   const group = allGroups.find(
     (g) =>
       g.name.toLowerCase() === item.groupName.toLowerCase() &&
-      g.companyId === companyId
+      g.companyId === companyId,
   );
   if (!group) {
     throw new ErrorHandler(400, generateErrorMessage("NOT_FOUND", "Group"));
@@ -109,19 +109,19 @@ export const buildLedgerInputFromExcel = async (params: {
   const existingLedger = allLedgers.find(
     (l) =>
       l.name.toLowerCase() === item.name.toLowerCase() &&
-      l.companyId === companyId
+      l.companyId === companyId,
   );
   if (existingLedger) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", `Ledger with name ${item.name}`)
+      generateErrorMessage("DUPLICATE_ITEM", `Ledger with name ${item.name}`),
     );
   }
 
   if (item.isBankAccount && item.isCashAccount) {
     throw new ErrorHandler(
       400,
-      "Bank Account and Cash Account cannot be true at the same time"
+      "Bank Account and Cash Account cannot be true at the same time",
     );
   }
 
@@ -129,13 +129,13 @@ export const buildLedgerInputFromExcel = async (params: {
     if (!item.bankName) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Bank Name")
+        generateErrorMessage("FIELD_REQUIRED", "Bank Name"),
       );
     }
     if (!item.bankAccountNo) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Bank Account No")
+        generateErrorMessage("FIELD_REQUIRED", "Bank Account No"),
       );
     }
   }
@@ -149,13 +149,13 @@ export const buildLedgerInputFromExcel = async (params: {
     if (!item.gstin) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "TIN Number")
+        generateErrorMessage("FIELD_REQUIRED", "TIN Number"),
       );
     }
     if (!item.placeOfSupplyStateName) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Place of Supply State")
+        generateErrorMessage("FIELD_REQUIRED", "Place of Supply State"),
       );
     }
   }
@@ -166,7 +166,7 @@ export const buildLedgerInputFromExcel = async (params: {
     if (!stateId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Place of Supply State")
+        generateErrorMessage("NOT_FOUND", "Place of Supply State"),
       );
     }
     placeOfSupplyStateId = stateId;
@@ -179,7 +179,7 @@ export const buildLedgerInputFromExcel = async (params: {
     if (!currency) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Currency")
+        generateErrorMessage("NOT_FOUND", "Currency"),
       );
     }
     currencyId = currency.id;
@@ -188,7 +188,7 @@ export const buildLedgerInputFromExcel = async (params: {
   if (item.isBankAccount && !currencyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Currency Code")
+      generateErrorMessage("FIELD_REQUIRED", "Currency Code"),
     );
   }
 
@@ -218,7 +218,7 @@ export const buildLedgerInputFromExcel = async (params: {
 };
 
 export const toLedgerDto = async (
-  input: LedgerResponse[]
+  input: LedgerResponse[],
 ): Promise<LedgerDTO[]> => {
   const groups = await commonGetService.getAllElements<"Group">({
     cacheCode: "GROUP",
@@ -247,7 +247,7 @@ export const toLedgerDto = async (
       company: toIdValue(ledger.company, "name"),
       group: toIdValue(
         groups.find((g) => g.id === ledger.groupId),
-        "name"
+        "name",
       ),
       currency: toIdValue(currency, "code"),
     };
@@ -256,7 +256,7 @@ export const toLedgerDto = async (
 };
 
 export const toLedgerDtoForTrialBalance = async (
-  input: Ledger[]
+  input: Ledger[],
 ): Promise<LedgerDTOForTrialBalance[]> => {
   const groups = await commonGetService.getAllElements<"Group">({
     cacheCode: "GROUP",
@@ -285,7 +285,7 @@ export const toLedgerDtoForTrialBalance = async (
       group: toIdValue(group, "name"),
       parentGroup: toIdValue(
         groups.find((g) => g.id === group?.parentId),
-        "name"
+        "name",
       ),
     };
   });
@@ -293,7 +293,7 @@ export const toLedgerDtoForTrialBalance = async (
 };
 
 export const toFetchLedgerForExternalMappingDto = async (
-  input: FetchLedgerForExternalMappingInput
+  input: FetchLedgerForExternalMappingInput,
 ): Promise<IdValue[]> => {
   const { clientType } = input;
   const groupName =
@@ -309,7 +309,7 @@ export const toFetchLedgerForExternalMappingDto = async (
     useActiveFlag: true,
   });
   const ledgers = allLedgers.filter(
-    (ledger) => ledger.companyId === DEFAULT_COMPANY_ID
+    (ledger) => ledger.companyId === DEFAULT_COMPANY_ID,
   );
 
   const allGroups = await commonGetService.getAllElements<"Group">({
@@ -320,7 +320,7 @@ export const toFetchLedgerForExternalMappingDto = async (
     useActiveFlag: true,
   });
   const groups = allGroups.filter(
-    (group) => group.companyId === DEFAULT_COMPANY_ID
+    (group) => group.companyId === DEFAULT_COMPANY_ID,
   );
 
   const group = groups.find((group) => group.name === groupName);
@@ -338,8 +338,8 @@ export const toFetchLedgerForExternalMappingDto = async (
     .filter(
       (ledger) =>
         !mappedLedgers.some(
-          (mappedLedger) => mappedLedger.ledgerId === ledger.id
-        )
+          (mappedLedger) => mappedLedger.ledgerId === ledger.id,
+        ),
     );
 
   return filteredLedgers

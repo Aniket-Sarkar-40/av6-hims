@@ -20,16 +20,16 @@ export const createRateOfExchangeSchema = Joi.object({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Standard Rate",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Standard Rate"
+        "Standard Rate",
       ),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Standard Rate",
-        "0"
+        "0",
       ),
     }),
   sellingRate: joiDecimalFromSettings({
@@ -42,16 +42,16 @@ export const createRateOfExchangeSchema = Joi.object({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Selling Rate",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Selling Rate"
+        "Selling Rate",
       ),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Selling Rate",
-        "0"
+        "0",
       ),
     }),
   buyingRate: joiDecimalFromSettings({
@@ -64,13 +64,13 @@ export const createRateOfExchangeSchema = Joi.object({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Buying Rate",
-        "{{#limit}}"
+        "{{#limit}}",
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Buying Rate"),
       "number.greater": generateValidationErrorMessage(
         "MUST_GREATER_THAN",
         "Buying Rate",
-        "0"
+        "0",
       ),
     }),
 });

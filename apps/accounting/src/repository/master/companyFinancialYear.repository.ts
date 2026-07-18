@@ -5,7 +5,7 @@ import { CompanyFinancialYear } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const createCompanyFinancialYearInDb = async (
-  input: CreateOrUpdateCompanyFinancialYear
+  input: CreateOrUpdateCompanyFinancialYear,
 ) => {
   logger.info("entering::createCompanyFinancialYearInDb::repository");
   const store = requestStorage.getStore();
@@ -30,7 +30,7 @@ export const createCompanyFinancialYearInDb = async (
 };
 
 export const updateCompanyFinancialYearInDb = async (
-  input: CreateOrUpdateCompanyFinancialYear
+  input: CreateOrUpdateCompanyFinancialYear,
 ) => {
   logger.info("entering::updateCompanyFinancialYearInDb::repository");
   const store = requestStorage.getStore();
@@ -61,10 +61,10 @@ export const updateCompanyFinancialYearInDb = async (
 };
 
 export const getAllCompanyFinancialYearsByCompanyIdFromDb = async (
-  companyId: number
+  companyId: number,
 ): Promise<CompanyFinancialYear[]> => {
   logger.info(
-    "entering::getAllCompanyFinancialYearsByCompanyIdFromDb::repository"
+    "entering::getAllCompanyFinancialYearsByCompanyIdFromDb::repository",
   );
   return await db.companyFinancialYear.findMany({
     where: { companyId, isActive: true },
@@ -73,7 +73,7 @@ export const getAllCompanyFinancialYearsByCompanyIdFromDb = async (
 };
 
 export const getCompanyFinancialYearByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<CompanyFinancialYear | null> => {
   logger.info("entering::getCompanyFinancialYearByIdFromDb::repository");
   return await db.companyFinancialYear.findFirst({
@@ -82,10 +82,10 @@ export const getCompanyFinancialYearByIdFromDb = async (
 };
 
 export const getCompanyFinancialYearByCompanyIdAndIsCurrentFromDb = async (
-  companyId: number
+  companyId: number,
 ): Promise<CompanyFinancialYear | null> => {
   logger.info(
-    "entering::getCompanyFinancialYearByCompanyIdAndIsCurrentFromDb::repository"
+    "entering::getCompanyFinancialYearByCompanyIdAndIsCurrentFromDb::repository",
   );
   return await db.companyFinancialYear.findFirst({
     where: { companyId, isCurrent: true, isActive: true },

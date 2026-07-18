@@ -84,7 +84,7 @@ insurancePaymentSettingsRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "INSURANCE_PAYMENT_SETINGS", "VIEW")),
-  getAllInsurancePaymentSettings
+  getAllInsurancePaymentSettings,
 );
 
 /**

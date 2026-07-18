@@ -22,10 +22,10 @@ export const validateWarehouseId = async (warehouseId: number) => {
 };
 
 export const deleteWarehouseServiceValidation = async (
-  warehouseId: number
+  warehouseId: number,
 ): Promise<void> => {
   logger.info(
-    "entering::deleteWarehouseServiceValidation::service::validation"
+    "entering::deleteWarehouseServiceValidation::service::validation",
   );
 
   await validateWarehouseId(warehouseId);
@@ -35,7 +35,7 @@ export const deleteWarehouseServiceValidation = async (
 };
 
 export const getIdWarehouseServiceValidation = async (
-  warehouseId: number
+  warehouseId: number,
 ): Promise<void> => {
   logger.info("entering::getIdWarehouseServiceValidation::service::validation");
 
@@ -46,10 +46,10 @@ export const getIdWarehouseServiceValidation = async (
 };
 
 export const updateIdWarehouseServiceValidation = async (
-  body: WarehouseReq
+  body: WarehouseReq,
 ): Promise<void> => {
   logger.info(
-    "entering::updateIdWarehouseServiceValidation::service::validation"
+    "entering::updateIdWarehouseServiceValidation::service::validation",
   );
   await validateWarehouseId(body.id);
 
@@ -57,25 +57,25 @@ export const updateIdWarehouseServiceValidation = async (
   if (warehouseByName && warehouseByName.id !== body.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name"),
     );
   }
   logger.info(
-    "exiting::updateIdWarehouseServiceValidation::service::validation"
+    "exiting::updateIdWarehouseServiceValidation::service::validation",
   );
   return;
 };
 
 export const createWarehouseServiceValidation = async (
-  body: WarehouseReq
+  body: WarehouseReq,
 ): Promise<void> => {
   logger.info(
-    "entering::createWarehouseServiceValidation::service::validation"
+    "entering::createWarehouseServiceValidation::service::validation",
   );
   // await validateWarehouseForeignKeys(body);
   const alreadyExistsWarehouse = await warehouseService.getWarehouseById(
     body.id,
-    true
+    true,
   );
   const alreadyExistsBranch = await branchService.getBranchById(body.id, true);
   if (alreadyExistsWarehouse || alreadyExistsBranch) {
@@ -86,7 +86,7 @@ export const createWarehouseServiceValidation = async (
   if (warehouse) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Warehouse Name"),
     );
   }
   logger.info("exiting::createWarehouseServiceValidation::service::validation");

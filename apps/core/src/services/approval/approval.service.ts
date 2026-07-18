@@ -12,7 +12,7 @@ const approvalServiceRaw = {
     const instance = await getInstance(
       input.id,
       input.subjectType,
-      input.service
+      input.service,
     );
 
     await approvalServiceFactory.act({
@@ -28,9 +28,8 @@ const approvalServiceRaw = {
   async getStaffPendingApproval(input: GetMyApprovalFlow) {
     logger.info("entering::getStaffPendingApproval::service");
 
-    const pendingApprovalInst = await approvalServiceFactory.getAllApprovalFlow(
-      input
-    );
+    const pendingApprovalInst =
+      await approvalServiceFactory.getAllApprovalFlow(input);
 
     pendingApprovalInst.data = pendingApprovalInst.data.map((inst) => ({
       ...inst,
@@ -53,5 +52,5 @@ const approvalServiceRaw = {
 
 export const approvalService = auditProxy.createAuditedService(
   "approval",
-  approvalServiceRaw
+  approvalServiceRaw,
 );

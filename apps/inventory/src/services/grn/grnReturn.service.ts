@@ -72,7 +72,7 @@ export const grnReturnService = {
     if (records.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "grnReturn Order")
+        generateErrorMessage("NOT_FOUND", "grnReturn Order"),
       );
     }
 
@@ -84,7 +84,7 @@ export const grnReturnService = {
             goodReceiveReturnDetails: sr.goodReceiveReturnDetails,
           },
         ]);
-      })
+      }),
     );
 
     logger.info("exiting::getAllGrnReturn::service");
@@ -93,7 +93,7 @@ export const grnReturnService = {
 
   async getGrnReturnById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<GoodReceiveReturnDTO | null> {
     logger.info("entering::getGrnReturnById::service id=" + id);
 
@@ -105,11 +105,11 @@ export const grnReturnService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Good Receive Note")
+          generateErrorMessage("NOT_FOUND", "Good Receive Note"),
         );
       } else {
         logger.warn(
-          `GRN with id=${id} not found, returning null as requested.`
+          `GRN with id=${id} not found, returning null as requested.`,
         );
         return null;
       }

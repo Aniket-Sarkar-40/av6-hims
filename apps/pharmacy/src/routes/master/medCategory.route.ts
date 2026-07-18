@@ -45,7 +45,7 @@ medCategoryRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_CATEGORY", "CREATE")),
   validateMedCategoryInput,
-  createMedCategory
+  createMedCategory,
 );
 
 /**
@@ -61,7 +61,7 @@ medCategoryRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_CATEGORY", "VIEW")),
-  getAllMedCategory
+  getAllMedCategory,
 );
 
 /**
@@ -84,7 +84,7 @@ medCategoryRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_CATEGORY", "VIEW")),
-  getMedCategoryById
+  getMedCategoryById,
 );
 
 /**
@@ -114,10 +114,10 @@ medCategoryRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_CATEGORY", "VIEW"),
-    getPermission("PMS", "MEDICINE_CATEGORY", "UPDATE")
+    getPermission("PMS", "MEDICINE_CATEGORY", "UPDATE"),
   ),
   validateMedCategoryInputUpdate,
-  updateMedCategory
+  updateMedCategory,
 );
 
 export default medCategoryRouter;

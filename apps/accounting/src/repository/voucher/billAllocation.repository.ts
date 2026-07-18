@@ -19,7 +19,7 @@ export const processBillAllocationsTx = async (
     voucherLines: { id: number; lineNo: number; drCr: DrCr }[];
     allocations: PostVoucherBillAllocationInput[];
     createdBy: number | null;
-  }
+  },
 ): Promise<{ ok: boolean; error?: string }> => {
   const {
     companyId,
@@ -32,7 +32,7 @@ export const processBillAllocationsTx = async (
 
   const byLineNo = new Map<number, { id: number; drCr: DrCr }>();
   voucherLines.forEach((l) =>
-    byLineNo.set(l.lineNo, { id: l.id, drCr: l.drCr })
+    byLineNo.set(l.lineNo, { id: l.id, drCr: l.drCr }),
   );
 
   for (const alloc of allocations) {

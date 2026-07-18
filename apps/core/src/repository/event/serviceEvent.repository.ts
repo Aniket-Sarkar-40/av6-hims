@@ -6,7 +6,7 @@ import { ServiceCode, ServiceEvent } from "@repo/db/generated/prisma/client";
 import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export const createServiceEventInDb = async (
-  serviceEvent: CreateServiceEvent
+  serviceEvent: CreateServiceEvent,
 ): Promise<ServiceEvent> => {
   logger.info("entering::createServiceEvent::repository");
   const store = requestStorage.getStore();
@@ -21,7 +21,7 @@ export const getAllServiceEventFromDb = async (): Promise<ServiceEvent[]> => {
 };
 
 export const getServiceEventByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<ServiceEvent | null> => {
   logger.info("entering::getServiceEventById::repository");
   return db.serviceEvent.findUnique({
@@ -30,7 +30,7 @@ export const getServiceEventByIdFromDb = async (
 };
 
 export const getServiceEventByServiceEventNameFromDb = async (
-  service: ServiceCode
+  service: ServiceCode,
 ): Promise<ServiceEvent | null> => {
   logger.info("entering::getServiceEventByServiceEventName::repository");
   return db.serviceEvent.findFirst({
@@ -39,7 +39,7 @@ export const getServiceEventByServiceEventNameFromDb = async (
 };
 
 export const updateServiceEventInDb = async (
-  serviceEvents: CreateServiceEvent[]
+  serviceEvents: CreateServiceEvent[],
 ): Promise<ServiceEvent[]> => {
   logger.info("entering::updateServiceEventInDb::repository");
 
@@ -56,6 +56,6 @@ export const updateServiceEventInDb = async (
           updatedBy: userId ?? null,
         }),
       });
-    })
+    }),
   );
 };

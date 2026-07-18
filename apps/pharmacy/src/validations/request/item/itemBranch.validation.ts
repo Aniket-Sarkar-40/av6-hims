@@ -161,7 +161,7 @@ export const InputExcelItemBranchMapSchema = Joi.object({
     .messages({
       "string.base": "Tax Method must be a string",
       "any.only": `Tax Method must be one of [${Object.values(TAX_METHOD).join(
-        ", "
+        ", ",
       )}]`,
     }),
 });
@@ -194,7 +194,7 @@ export const ItemWiseUpdateDetailSchema = Joi.object({
       "number.base": "Sale Amount must be a number",
       "number.min": "Sale Amount cannot be less than 0",
       "number.precision": "Sale Amount must have {{#limit}} decimal places",
-    }
+    },
   ),
 })
   .or("insurancePercentage", "walkInPercentage", "saleAmount")
@@ -233,7 +233,7 @@ export const ItemBranchMapCopySchema = Joi.object({
 export function validateCreateItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = createItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -250,7 +250,7 @@ export function validateCreateItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -260,7 +260,7 @@ export function validateCreateItemBranchMap(
 export function validateGetItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = getItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -277,7 +277,7 @@ export function validateGetItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -287,7 +287,7 @@ export function validateGetItemBranchMap(
 export function validateUpdateItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = updateItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -304,7 +304,7 @@ export function validateUpdateItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -314,7 +314,7 @@ export function validateUpdateItemBranchMap(
 export function validateInputExcelItemBranchMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = InputExcelItemBranchMapSchema.validate(req.body, {
     abortEarly: false,
@@ -331,7 +331,7 @@ export function validateInputExcelItemBranchMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -341,7 +341,7 @@ export function validateInputExcelItemBranchMap(
 export function validateItemWiseItemBranchMapUpdate(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = ItemWiseItemBranchMapUpdateSchema.validate(req.body, {
     abortEarly: false,
@@ -358,7 +358,7 @@ export function validateItemWiseItemBranchMapUpdate(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -368,7 +368,7 @@ export function validateItemWiseItemBranchMapUpdate(
 export function validateItemBranchMapCopy(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = ItemBranchMapCopySchema.validate(req.body, {
     abortEarly: false,
@@ -385,7 +385,7 @@ export function validateItemBranchMapCopy(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 

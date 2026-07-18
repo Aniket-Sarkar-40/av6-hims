@@ -27,7 +27,7 @@ import Joi from "joi";
 
 const uniqueBatchNoValidation = (
   details: GrnDetailInput[],
-  helpers: Joi.CustomHelpers
+  helpers: Joi.CustomHelpers,
 ) => {
   const batchNoMap = new Map<
     string,
@@ -74,7 +74,7 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
   poDetailsId: idRequired("PO details Id"),
 
   purchasedPrice: priceRequired("purchasedPrice", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   focQuantity: intRequired("FOC Quantity"),
@@ -106,10 +106,10 @@ export const grnDetailSchema = Joi.object<GrnDetailInput>({
   quantity: intRequired("Quantity"),
 
   discount: numberWithMaxDecimalsOptional("Discount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
   netDiscount: numberWithMaxDecimalsOptional("Net Discount amount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
@@ -127,7 +127,7 @@ export const grnSchema = Joi.object<CreateGrnInput>({
   conversionRate: Joi.when("currencyId", {
     is: Joi.exist().not(null),
     then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
-      getSchemaPrecision("grn")
+      getSchemaPrecision("grn"),
     ),
     otherwise: Joi.allow(null).messages({
       "any.unknown":
@@ -144,13 +144,13 @@ export const grnSchema = Joi.object<CreateGrnInput>({
   totalAmount: priceRequired("totalAmount", () => getSchemaPrecision("grn")),
 
   discount: numberWithMaxDecimalsOptional("Discount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
   netDiscount: numberWithMaxDecimalsOptional("Net Discount amount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   netTotal: priceRequired("netTotal", () => getSchemaPrecision("grn")),
@@ -169,7 +169,7 @@ export const grnSchema = Joi.object<CreateGrnInput>({
 
   tax: idOptional("Tax"),
   returnedAmount: priceOptional("Returned amount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   goodReceiveDetails: arrayRequired("Good Receive Details", grnDetailSchema, 1)

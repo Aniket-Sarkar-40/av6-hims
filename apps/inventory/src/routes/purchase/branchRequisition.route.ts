@@ -52,7 +52,7 @@ branchRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "CREATE")),
   validateBranchRequisition,
-  createBranchRequisition
+  createBranchRequisition,
 );
 
 /**
@@ -75,10 +75,10 @@ branchRequisitionRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH_REQUISITION", "VIEW"),
-    getPermission("INV", "BRANCH_REQUISITION", "UPDATE")
+    getPermission("INV", "BRANCH_REQUISITION", "UPDATE"),
   ),
   validateBranchRequisitionUpdate,
-  updateBranchRequisition
+  updateBranchRequisition,
 );
 
 /**
@@ -101,7 +101,7 @@ branchRequisitionRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "DELETE")),
-  deleteBranchRequisition
+  deleteBranchRequisition,
 );
 
 /**
@@ -124,7 +124,7 @@ branchRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_REJECT", "CREATE")),
   validateBranchRequisitionReject,
-  rejectBranchRequisition
+  rejectBranchRequisition,
 );
 
 /**
@@ -147,7 +147,7 @@ branchRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_APPROVE", "CREATE")),
   validateApproveBranchRequisition,
-  approveBranchRequisition
+  approveBranchRequisition,
 );
 
 /**
@@ -170,7 +170,7 @@ branchRequisitionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeBranchRequisition,
-  acknowledgeBranchRequisition
+  acknowledgeBranchRequisition,
 );
 
 /**
@@ -191,7 +191,7 @@ branchRequisitionRouter.get(
   "/batch-wise-by-id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "VIEW")),
-  getBranchRequisitionBatchWiseById
+  getBranchRequisitionBatchWiseById,
 );
 
 /**
@@ -212,5 +212,5 @@ branchRequisitionRouter.get(
   "/batch-wise",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION", "VIEW")),
-  getAllBranchRequisitionBatchWiseById
+  getAllBranchRequisitionBatchWiseById,
 );

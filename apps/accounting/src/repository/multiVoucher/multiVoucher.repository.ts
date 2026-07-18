@@ -59,13 +59,13 @@ export const createMultiVoucherInDb = async (params: {
       for (const voucher of voucherInput) {
         const createdVoucher = await createVoucherFromMultiVoucherInDb(
           tx,
-          voucher
+          voucher,
         );
 
         await tx.multiVoucherDetails.update({
           where: {
             id: createdMultiVoucher.multiVoucherDetails.find(
-              (detail) => detail.lineNo === voucher.lineNo
+              (detail) => detail.lineNo === voucher.lineNo,
             )?.id,
           },
           data: {
@@ -93,14 +93,14 @@ export const updateMultiVoucherInDb = async (params: {
   >(input, ["id", "multiVoucherDetails", "existing"]);
 
   const multiVoucherDetailsToCreate = input.multiVoucherDetails.filter(
-    (detail) => !detail.id
+    (detail) => !detail.id,
   );
   const multiVoucherDetailsToUpdate = input.multiVoucherDetails.filter(
-    (detail) => detail.id
+    (detail) => detail.id,
   );
   const multiVoucherDetailsToDelete = input.existing.multiVoucherDetails
     .filter(
-      (detail) => !input.multiVoucherDetails.some((d) => d.id === detail.id)
+      (detail) => !input.multiVoucherDetails.some((d) => d.id === detail.id),
     )
     .map((detail) => detail.id);
 
@@ -152,12 +152,12 @@ export const updateMultiVoucherInDb = async (params: {
       for (const voucher of voucherInput) {
         const createdVoucher = await createVoucherFromMultiVoucherInDb(
           tx,
-          voucher
+          voucher,
         );
         await tx.multiVoucherDetails.update({
           where: {
             id: updatedMultiVoucher.multiVoucherDetails.find(
-              (detail) => detail.lineNo === voucher.lineNo
+              (detail) => detail.lineNo === voucher.lineNo,
             )?.id,
           },
           data: {
@@ -209,17 +209,17 @@ export const updatePostedMultiVoucherInDb = async (params: {
   >(input, ["id", "multiVoucherDetails", "existing"]);
 
   const multiVoucherDetailsToCreate = input.multiVoucherDetails.filter(
-    (detail) => !detail.id
+    (detail) => !detail.id,
   );
   const multiVoucherDetailsToUpdate = input.multiVoucherDetails.filter(
-    (detail) => detail.id
+    (detail) => detail.id,
   );
   const multiVoucherDetailsToDeleteData =
     input.existing.multiVoucherDetails.filter(
-      (detail) => !input.multiVoucherDetails.some((d) => d.id === detail.id)
+      (detail) => !input.multiVoucherDetails.some((d) => d.id === detail.id),
     );
   const multiVoucherDetailsToDelete = multiVoucherDetailsToDeleteData.map(
-    (detail) => detail.id
+    (detail) => detail.id,
   );
 
   return await db.$transaction(async (tx) => {
@@ -274,7 +274,7 @@ export const updatePostedMultiVoucherInDb = async (params: {
 };
 
 export const getMultiVoucherDataForInvoice = async (
-  multiVoucherId: number
+  multiVoucherId: number,
 ): Promise<MultiVoucherResponseForDTO | null> => {
   logger.info("entering::getMultiVoucherDataForInvoice::repository");
   const data = await db.multiVoucher.findUnique({

@@ -5,7 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 
 export const toggleStatusChequeMasterByIdFromDb = async (
   id: number,
-  status: Status
+  status: Status,
 ) => {
   logger.info("entering::toggleStatusChequeMasterByIdFromDb::repository");
   const store = requestStorage.getStore();
@@ -19,7 +19,7 @@ export const toggleStatusChequeMasterByIdFromDb = async (
 
 export const checkChequeNumberIsUsed = async (
   chequeMasterId: number,
-  chequeNo: number
+  chequeNo: number,
 ) => {
   logger.info("entering::checkChequeNumberIsUsed::repository");
   return await db.usedChequeNumber.findFirst({

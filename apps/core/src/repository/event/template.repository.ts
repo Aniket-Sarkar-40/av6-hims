@@ -13,7 +13,7 @@ import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 import { uinServiceFactory } from "@/config/core.config.js";
 
 export const createTemplateInDb = async (
-  template: CreateOrUpdateTemplate
+  template: CreateOrUpdateTemplate,
 ): Promise<Template> => {
   logger.info("entering::createTemplateInDb::repository");
   const store = requestStorage.getStore();
@@ -43,7 +43,7 @@ export const getAllTemplateFromDb = async (): Promise<Template[]> => {
 };
 
 export const getTemplateByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Template | null> => {
   logger.info("entering::getTemplateById::repository");
   return db.template.findFirst({
@@ -52,7 +52,7 @@ export const getTemplateByIdFromDb = async (
 };
 
 export const updateTemplateInDb = async (
-  template: CreateOrUpdateTemplate
+  template: CreateOrUpdateTemplate,
 ): Promise<Template> => {
   const store = requestStorage.getStore();
   const userId = store?.user?.id;

@@ -20,7 +20,7 @@ export const createGrn = TryCatch(async (req: Request, res: Response) => {
   const grn = await grnService.createGrn(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: grn },
-    "Good Receive Note"
+    "Good Receive Note",
   );
   logger.info("exiting::createGrn::controller");
   return res.status(201).json(response);
@@ -40,8 +40,8 @@ export const updateGrn = TryCatch(async (req: Request, res: Response) => {
     .json(
       BaseResponse.success(
         { type: "UPDATED", data: updated },
-        "Good Receive Note"
-      )
+        "Good Receive Note",
+      ),
     );
 });
 
@@ -52,7 +52,7 @@ export const getAllGrn = TryCatch(async (req: Request, res: Response) => {
   return res
     .status(200)
     .json(
-      BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note")
+      BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note"),
     );
 });
 
@@ -66,7 +66,7 @@ export const getGrnById = TryCatch(async (req: Request, res: Response) => {
     return res.status(404).json(
       BaseResponse.error({
         message: generateErrorMessage("NOT_FOUND", "Good Receive Note"),
-      })
+      }),
     );
   }
 
@@ -74,7 +74,7 @@ export const getGrnById = TryCatch(async (req: Request, res: Response) => {
   return res
     .status(200)
     .json(
-      BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note")
+      BaseResponse.success({ type: "FETCHED", data: grn }, "Good Receive Note"),
     );
 });
 
@@ -108,7 +108,7 @@ export const generateGrnPdf = TryCatch(async (req: Request, res: Response) => {
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
     "Content-Disposition",
-    `inline; filename="good-receive-note-${input}.pdf"`
+    `inline; filename="good-receive-note-${input}.pdf"`,
   );
   res.send(pdfBuffer);
   logger.info("exiting::generateGrnPdf::controller");

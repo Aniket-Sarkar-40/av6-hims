@@ -20,11 +20,11 @@ export const createStoreRequisition = TryCatch(
       await storeRequisitionService.createStoreRequisition(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: storeRequisition },
-      "Store Requisition"
+      "Store Requisition",
     );
     logger.info("exiting::createStoreRequisition::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateStoreRequisition = TryCatch(
@@ -39,10 +39,10 @@ export const updateStoreRequisition = TryCatch(
 
     const response = BaseResponse.success(
       { type: "UPDATED", data: updated },
-      "Store Requisition"
+      "Store Requisition",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getAllStoreRequisition = TryCatch(
@@ -56,7 +56,7 @@ export const getAllStoreRequisition = TryCatch(
     });
     logger.info("exiting::getAllStoreRequisition::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getstoreRequisitionById = TryCatch(
@@ -66,14 +66,14 @@ export const getstoreRequisitionById = TryCatch(
 
     const storeRequisition =
       await storeRequisitionService.getStoreRequisitionById(
-        Number(storeRequisitionId)
+        Number(storeRequisitionId),
       );
 
     if (!storeRequisition) {
       return res.status(400).json(
         new BaseResponse({
           success: false,
-        })
+        }),
       );
     }
 
@@ -83,7 +83,7 @@ export const getstoreRequisitionById = TryCatch(
     });
     logger.info("exiting::getstoreRequisitionById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteStoreRequisition = TryCatch(async (req, res) => {
@@ -145,7 +145,7 @@ export const getstoreRequisitionBatchWiseById = TryCatch(
 
     const storeRequisition =
       await storeRequisitionService.getStoreRequisitionBatchWiseById(
-        Number(storeRequisitionId)
+        Number(storeRequisitionId),
       );
 
     logger.info("exiting::getstoreRequisitionBatchWiseById::controller");
@@ -154,10 +154,10 @@ export const getstoreRequisitionBatchWiseById = TryCatch(
       .json(
         BaseResponse.success(
           { type: "FETCHED", data: storeRequisition },
-          "Batch Wise"
-        )
+          "Batch Wise",
+        ),
       );
-  }
+  },
 );
 
 export const getAllStoreRequisitionBatchWiseById = TryCatch(
@@ -167,7 +167,7 @@ export const getAllStoreRequisitionBatchWiseById = TryCatch(
 
     const storeRequisition =
       await storeRequisitionService.getAllStoreRequisitionBatchWiseById(
-        Number(storeRequisitionId)
+        Number(storeRequisitionId),
       );
 
     logger.info("exiting::getAllStoreRequisitionBatchWiseById::controller");
@@ -176,8 +176,8 @@ export const getAllStoreRequisitionBatchWiseById = TryCatch(
       .json(
         BaseResponse.success(
           { type: "FETCHED", data: storeRequisition },
-          "Batch Wise"
-        )
+          "Batch Wise",
+        ),
       );
-  }
+  },
 );

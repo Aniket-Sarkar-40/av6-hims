@@ -54,7 +54,7 @@ const cacheKey = getRedisKey("ITEM_SUPPLIER", "all");
 
 export const itemSupplierService = {
   async createItemSupplier(
-    input: ItemSupplierCreateInput
+    input: ItemSupplierCreateInput,
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::createItemSupplier::service");
 
@@ -76,7 +76,7 @@ export const itemSupplierService = {
   },
 
   async updateItemSupplier(
-    input: ItemSupplierUpdateInput
+    input: ItemSupplierUpdateInput,
   ): Promise<ItemSupplierDTO> {
     logger.info("entering::updateItemSupplier::service");
 
@@ -98,7 +98,7 @@ export const itemSupplierService = {
   },
 
   async searchItemSupplier(
-    input: ItemSupplierLookupInput
+    input: ItemSupplierLookupInput,
   ): Promise<ItemSupplierLookupDTO[]> {
     logger.info("entering::searchItemSupplier::service");
 
@@ -112,20 +112,20 @@ export const itemSupplierService = {
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
 
     const itemSuppliers = isCacheable
-      ? ((await getAllCache(cacheKey)) as ItemSupplierResponse[]) ?? []
+      ? (((await getAllCache(cacheKey)) as ItemSupplierResponse[]) ?? [])
       : await searchItemSuppliersFromDb(input.type, searchText);
 
     const result = toItemSupplierLookupDTO(
       itemSuppliers,
       input.type,
-      searchText
+      searchText,
     );
 
     logger.info("exiting::searchItemSupplier::service");
     return result;
   },
   async getAllItemSupplier(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemSupplierDTO[]> {
     logger.info("entering::getAllItemSupplier::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
@@ -140,7 +140,7 @@ export const itemSupplierService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier")
+          generateErrorMessage("NOT_FOUND", "Item Supplier"),
         );
       else return [];
     }
@@ -148,7 +148,7 @@ export const itemSupplierService = {
   },
   async getItemSupplierById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemSupplierDTO | null> {
     logger.info("entering::getItemSupplierById::service");
 
@@ -157,7 +157,7 @@ export const itemSupplierService = {
     if (isCacheable) {
       itemSupplier = (await getCacheById(
         cacheKey,
-        id
+        id,
       )) as ItemSupplierResponse | null;
     } else {
       itemSupplier = await getItemSupplierByIdFromDb(id);
@@ -167,7 +167,7 @@ export const itemSupplierService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier")
+          generateErrorMessage("NOT_FOUND", "Item Supplier"),
         );
       } else return null;
     }
@@ -187,7 +187,7 @@ export const itemSupplierService = {
     logger.info("exiting::deleteItemSupplierById::service");
   },
   async getAllItemSupplierWoDto(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvItemSupplier[]> {
     logger.info("entering::getAllItemSupplierWoDto::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM_SUPPLIER);
@@ -202,7 +202,7 @@ export const itemSupplierService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier")
+          generateErrorMessage("NOT_FOUND", "Item Supplier"),
         );
       else return [];
     }
@@ -407,11 +407,11 @@ export const itemSupplierService = {
     });
 
     const data = rawData.map(
-      normalizeVendorExcelRowHeaders
+      normalizeVendorExcelRowHeaders,
     ) as ItemSupplierExcelRow[];
 
     const convertedData = data.map((elem, ind) =>
-      mapRowToItemSupplierExcelCreateInput(elem, ind + 1)
+      mapRowToItemSupplierExcelCreateInput(elem, ind + 1),
     );
 
     const { value } = validateItemSupplierExcelArray(convertedData);
@@ -429,7 +429,7 @@ export const itemSupplierService = {
   },
   async getItemSupplierWoDtoById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvItemSupplier | null> {
     logger.info("entering::getItemSupplierWoDtoById::service");
 
@@ -438,7 +438,7 @@ export const itemSupplierService = {
     if (isCacheable) {
       itemSupplier = (await getCacheById(
         cacheKey,
-        id
+        id,
       )) as ItemSupplierResponse | null;
     } else {
       itemSupplier = await getItemSupplierByIdFromDb(id);
@@ -448,7 +448,7 @@ export const itemSupplierService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier")
+          generateErrorMessage("NOT_FOUND", "Item Supplier"),
         );
       } else return null;
     }

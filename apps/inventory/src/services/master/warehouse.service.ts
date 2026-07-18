@@ -69,7 +69,7 @@ export const warehouseService = {
   },
 
   async getAllWarehouse(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<WarehouseDTO[]> {
     logger.info("entering::getAllWarehouse::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.WAREHOUSE);
@@ -83,7 +83,7 @@ export const warehouseService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Warehouse")
+          generateErrorMessage("NOT_FOUND", "Warehouse"),
         );
       else return [];
     }
@@ -94,7 +94,7 @@ export const warehouseService = {
 
   async getWarehouseById(
     warehouseId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<WarehouseDTO | null> {
     logger.info("entering::getWarehouseById::service");
     validIdCheck(warehouseId);
@@ -105,7 +105,7 @@ export const warehouseService = {
     if (isCacheable) {
       warehouse = (await getCacheById(
         cacheKey,
-        warehouseId
+        warehouseId,
       )) as WarehouseResponse | null;
 
       if (warehouse !== null) {
@@ -123,7 +123,7 @@ export const warehouseService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Warehouse")
+          generateErrorMessage("NOT_FOUND", "Warehouse"),
         );
       else return null;
     }
@@ -134,7 +134,7 @@ export const warehouseService = {
 
   async getWarehouseByIdWoDTO(
     warehouseId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvWarehouse | null> {
     logger.info("entering::getWarehouseById::service");
     validIdCheck(warehouseId);
@@ -144,7 +144,7 @@ export const warehouseService = {
     if (isCacheable) {
       warehouse = (await getCacheById(
         cacheKey,
-        warehouseId
+        warehouseId,
       )) as InvWarehouse | null;
     } else {
       warehouse = await getWarehouseByIdFromDb(warehouseId);
@@ -154,7 +154,7 @@ export const warehouseService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Warehouse")
+          generateErrorMessage("NOT_FOUND", "Warehouse"),
         );
       else return null;
     }
@@ -190,14 +190,14 @@ export const warehouseService = {
   },
 
   async getWarehousesByCcIdsAsLocation(
-    ccIds: number[]
+    ccIds: number[],
   ): Promise<WarehouseDTOLocation[]> {
     logger.info("entering::getWarehousesByCcIdsAsLocation::service");
     if (!ccIds.length) return [];
 
     const warehouses = await getWarehousesByCcIdsFromDb(ccIds);
     const dtos = await Promise.all(
-      warehouses.map((w) => toWarehouseDTOLocation(w))
+      warehouses.map((w) => toWarehouseDTOLocation(w)),
     );
 
     logger.info("exiting::getWarehousesByCcIdsAsLocation::service");
@@ -205,7 +205,7 @@ export const warehouseService = {
   },
 
   async getAllWarehouseWoDto(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvWarehouse[]> {
     logger.info("entering::getAllWarehouse::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.WAREHOUSE);
@@ -219,7 +219,7 @@ export const warehouseService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Warehouse")
+          generateErrorMessage("NOT_FOUND", "Warehouse"),
         );
       else return [];
     }

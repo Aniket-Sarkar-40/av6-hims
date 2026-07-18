@@ -7,8 +7,10 @@ export type CreateOrUpdateCity = Omit<
   BaseModelAttr
 >;
 
-export interface CityDTO
-  extends Omit<City, BaseModelAttr | "stateId" | "countryId"> {
+export interface CityDTO extends Omit<
+  City,
+  BaseModelAttr | "stateId" | "countryId"
+> {
   state: IdValue | null;
   country: IdValue | null;
 }

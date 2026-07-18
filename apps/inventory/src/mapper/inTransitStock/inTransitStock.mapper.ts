@@ -9,7 +9,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 
 export const toInTransitStockDTO = async (
-  data: InvInTransitStock[]
+  data: InvInTransitStock[],
 ): Promise<inTransitStockDTO[]> => {
   const warehouses = await warehouseService.getAllWarehouse(true);
   const branches = await branchService.getAllBranch(true);
@@ -59,6 +59,6 @@ export const toInTransitStockDTO = async (
         toCc: toIdValue(toCcDTO, "name"),
         item: toIdValue(item, "item"),
       };
-    })
+    }),
   );
 };

@@ -15,7 +15,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.number().messages({
             "number.base": "Each value in the fixed field must be a number.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -33,7 +33,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.string().messages({
             "string.base": "Each value in the fixed field must be a string.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -51,7 +51,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.boolean().messages({
             "boolean.base": "Each value in the fixed field must be a boolean.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -69,7 +69,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.string().messages({
             "string.base": "Each value in the fixed field must be a string.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -87,7 +87,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.string().messages({
             "string.base": "Each value in the fixed field must be a string.",
-          })
+          }),
         )
         .length(2)
         .required()
@@ -111,8 +111,8 @@ export const fixedFieldSchema = Joi.alternatives()
             }),
             Joi.number().messages({
               "number.base": "Each value in the fixed field must be a number.",
-            })
-          )
+            }),
+          ),
         )
         .length(1)
         .required()
@@ -121,7 +121,7 @@ export const fixedFieldSchema = Joi.alternatives()
           "any.required": "Fixed field value is required.",
           "array.length": "Fixed field value must contain exactly 1 element.",
         }),
-    })
+    }),
   )
   .messages({
     "alternatives.match": "Fixed field does not match any allowed schema.",
@@ -144,7 +144,7 @@ export const fixedSearchSchema = Joi.object({
     .messages({
       "string.base": "Short code must be a string.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
       "any.required": "Short code is required.",
     }),
@@ -163,7 +163,7 @@ export const fixedSearchSchema = Joi.object({
               "Search column type must be either 'string', 'number', or 'boolean'.",
             "any.required": "Search column type is required.",
           }),
-      })
+      }),
     )
     .required()
     .messages({
@@ -257,7 +257,7 @@ export const fixedSearchWoPaginationSchema = Joi.object({
     .messages({
       "string.base": "Short code must be a string.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
       "any.required": "Short code is required.",
     }),
@@ -276,7 +276,7 @@ export const fixedSearchWoPaginationSchema = Joi.object({
               "Search column type must be either 'string', 'number', or 'boolean'.",
             "any.required": "Search column type is required.",
           }),
-      })
+      }),
     )
     .required()
     .messages({
@@ -436,7 +436,7 @@ export const dropdownSchema = Joi.object({
       "string.base": "Short code must be a string.",
       "any.required": "Short code is required.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
     }),
 
@@ -444,7 +444,7 @@ export const dropdownSchema = Joi.object({
     .items(
       Joi.string().messages({
         "string.base": "Each search column must be a string.",
-      })
+      }),
     )
     .required()
     .messages({
@@ -511,7 +511,7 @@ export const searchRequestSchema = Joi.object({
     .messages({
       "string.base": "Short code must be a string.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
       "any.required": "Short code is required.",
     }),
@@ -520,7 +520,7 @@ export const searchRequestSchema = Joi.object({
     .items(
       Joi.string().messages({
         "string.base": "Each search column must be a string.",
-      })
+      }),
     )
     .required()
     .messages({

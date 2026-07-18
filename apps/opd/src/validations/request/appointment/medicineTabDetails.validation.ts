@@ -40,7 +40,7 @@ export const medicineTabDetailsItemSchema = Joi.object({
     "any.custom": generateValidationErrorMessage(
       "EMPTY",
       "Dose",
-      "Please enter at least one dose"
+      "Please enter at least one dose",
     ),
   });
 
@@ -63,7 +63,7 @@ export const updateMedicineTabDetailsSchema =
     data: arrayRequired(
       "Medicine Tab Details",
       medicineTabDetailsItemUpdateSchema,
-      1
+      1,
     ),
   });
 

@@ -12,10 +12,10 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { RateOfExchange } from "@repo/db/generated/prisma/client";
 
 export const createRateOfExchangeServiceValidation = async (
-  input: CreateRateOfExchangeInput
+  input: CreateRateOfExchangeInput,
 ): Promise<CreateRateOfExchangeInput> => {
   logger.info(
-    "entering::createRateOfExchangeServiceValidation::service::validation"
+    "entering::createRateOfExchangeServiceValidation::service::validation",
   );
   const { companyId, currencyId, date } = input;
   const formattedDate = dayjs(date).format("YYYY-MM-DD");
@@ -25,7 +25,7 @@ export const createRateOfExchangeServiceValidation = async (
   if (!fy) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("NOT_FOUND", "Financial Year")
+      generateErrorMessage("NOT_FOUND", "Financial Year"),
     );
   }
   input.financialYearId = fy.id;
@@ -34,7 +34,7 @@ export const createRateOfExchangeServiceValidation = async (
   if (currency.id === company.currencyId) {
     throw new ErrorHandler(
       400,
-      "Base currency is not allowed for configuring rate of exchange"
+      "Base currency is not allowed for configuring rate of exchange",
     );
   }
 
@@ -51,32 +51,32 @@ export const createRateOfExchangeServiceValidation = async (
     (roe) =>
       roe.companyId === companyId &&
       roe.currencyId === currencyId &&
-      roe.financialYearId === fy.id
+      roe.financialYearId === fy.id,
   );
 
   const existingRecordForDate = existingRateOfExchanges.find((roe) =>
-    dayjs(roe.date).isSame(date, "day")
+    dayjs(roe.date).isSame(date, "day"),
   );
   if (existingRecordForDate) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "DUPLICATE_ITEM",
-        `Rate of Exchange for ${currency.code} on ${formattedDate}`
-      )
+        `Rate of Exchange for ${currency.code} on ${formattedDate}`,
+      ),
     );
   }
   logger.info(
-    "exiting::createRateOfExchangeServiceValidation::service::validation"
+    "exiting::createRateOfExchangeServiceValidation::service::validation",
   );
   return input;
 };
 
 export const fetchRateOfExchangeServiceValidation = async (
-  input: FetchRateOfExchangeInput
+  input: FetchRateOfExchangeInput,
 ) => {
   logger.info(
-    "entering::fetchRateOfExchangeServiceValidation::service::validation"
+    "entering::fetchRateOfExchangeServiceValidation::service::validation",
   );
   const { companyId, currencyId, date } = input;
   const company = await validateIdCompany(companyId);
@@ -85,7 +85,7 @@ export const fetchRateOfExchangeServiceValidation = async (
   if (currency.id === company.currencyId) {
     throw new ErrorHandler(
       400,
-      "Base currency is not allowed for fetching rate of exchange"
+      "Base currency is not allowed for fetching rate of exchange",
     );
   }
 
@@ -93,7 +93,7 @@ export const fetchRateOfExchangeServiceValidation = async (
   if (!fy) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("NOT_FOUND", "Financial Year")
+      generateErrorMessage("NOT_FOUND", "Financial Year"),
     );
   }
 
@@ -107,8 +107,8 @@ export const fetchRateOfExchangeServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Financial Year",
         `From Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
 
@@ -118,6 +118,6 @@ export const fetchRateOfExchangeServiceValidation = async (
 
   input.financialYearId = fy.id;
   logger.info(
-    "exiting::fetchRateOfExchangeServiceValidation::service::validation"
+    "exiting::fetchRateOfExchangeServiceValidation::service::validation",
   );
 };

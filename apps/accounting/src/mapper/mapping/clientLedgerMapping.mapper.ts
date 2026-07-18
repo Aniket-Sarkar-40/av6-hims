@@ -15,7 +15,7 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { getCashAndBankHeadByIdFromDb } from "@/repository/master/cashAndBankHead.repository.js";
 
 export const toClientLedgerMappingDto = async (
-  input: ClientLedgerMapping[]
+  input: ClientLedgerMapping[],
 ): Promise<ClientLedgerMappingDTO[]> => {
   const ledgers = await commonGetService.getAllElements<"Ledger">({
     cacheCode: "LEDGER",
@@ -43,35 +43,35 @@ export const toClientLedgerMappingDto = async (
       switch (clientLedgerMapping.clientType) {
         case ClientType.CORPORATE: {
           const client = await getCorporateByIdFromDb(
-            clientLedgerMapping.clientId
+            clientLedgerMapping.clientId,
           );
           clientDto = toIdValue(client, "customerName");
           break;
         }
         case ClientType.INSURANCE: {
           const client = await getInsuranceByIdFromDb(
-            clientLedgerMapping.clientId
+            clientLedgerMapping.clientId,
           );
           clientDto = toIdValue(client, "customerName");
           break;
         }
         case ClientType.PMS_DISTRIBUTOR: {
           const client = await getPmsDistributorById(
-            clientLedgerMapping.clientId
+            clientLedgerMapping.clientId,
           );
           clientDto = toIdValue(client, "proInName");
           break;
         }
         case ClientType.INV_ITEM_SUPPLIER: {
           const client = await getInventorySupplierByIdFromDb(
-            clientLedgerMapping.clientId
+            clientLedgerMapping.clientId,
           );
           clientDto = toIdValue(client, "vendorCompanyName");
           break;
         }
         case ClientType.BANK_OR_CASH: {
           const client = await getCashAndBankHeadByIdFromDb(
-            clientLedgerMapping.clientId
+            clientLedgerMapping.clientId,
           );
           clientDto = toIdValue(client, "name");
           break;
@@ -79,7 +79,7 @@ export const toClientLedgerMappingDto = async (
         default: {
           throw new ErrorHandler(
             400,
-            generateErrorMessage("NOT_FOUND", "Client Type")
+            generateErrorMessage("NOT_FOUND", "Client Type"),
           );
         }
       }
@@ -88,17 +88,17 @@ export const toClientLedgerMappingDto = async (
         ...omittedData.rest,
         ledger: toIdValue(
           ledgers.find((ledger) => ledger.id === clientLedgerMapping.ledgerId),
-          "name"
+          "name",
         ),
         client: clientDto,
       };
-    })
+    }),
   );
   return response;
 };
 
 export const toClientLedgerMappingSingleDto = async (
-  input: ClientLedgerMapping
+  input: ClientLedgerMapping,
 ): Promise<ClientLedgerMappingDTO> => {
   const ledgers = await commonGetService.getAllElements<"Ledger">({
     cacheCode: "LEDGER",
@@ -149,7 +149,7 @@ export const toClientLedgerMappingSingleDto = async (
     default: {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("NOT_FOUND", "Client Type")
+        generateErrorMessage("NOT_FOUND", "Client Type"),
       );
     }
   }
@@ -158,7 +158,7 @@ export const toClientLedgerMappingSingleDto = async (
     ...omittedData.rest,
     ledger: toIdValue(
       ledgers.find((ledger) => ledger.id === input.ledgerId),
-      "name"
+      "name",
     ),
     client: clientDto,
   };

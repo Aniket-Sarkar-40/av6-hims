@@ -47,7 +47,7 @@ const doctorServiceRaw = {
 
   async getDoctorById(
     doctorId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<DoctorDTO | null> {
     logger.info("entering::getDoctorById::service");
 
@@ -57,7 +57,7 @@ const doctorServiceRaw = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "doctor")
+          generateErrorMessage("NOT_FOUND", "doctor"),
         );
       }
       return null;
@@ -88,5 +88,5 @@ const doctorServiceRaw = {
 
 export const doctorService = auditProxy.createAuditedService(
   "doctor",
-  doctorServiceRaw
+  doctorServiceRaw,
 );

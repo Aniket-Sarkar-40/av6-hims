@@ -53,7 +53,7 @@ itemSupplierRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "CREATE")),
   validateCreateItemSupplier,
-  createItemSupplier
+  createItemSupplier,
 );
 
 /**
@@ -76,7 +76,7 @@ itemSupplierRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "UPDATE")),
   validateUpdateItemSupplier,
-  updateItemSupplier
+  updateItemSupplier,
 );
 
 /**
@@ -92,7 +92,7 @@ itemSupplierRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
-  getAllItemSupplier
+  getAllItemSupplier,
 );
 
 /**
@@ -116,7 +116,7 @@ itemSupplierRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
-  getItemSupplierById
+  getItemSupplierById,
 );
 
 /**
@@ -140,7 +140,7 @@ itemSupplierRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "DELETE")),
-  deleteItemSupplierById
+  deleteItemSupplierById,
 );
 
 /**
@@ -156,7 +156,7 @@ itemSupplierRouter.get(
   "/excel-sample-export",
   verifyToken,
   authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
-  itemSupplierExcelSampleExport
+  itemSupplierExcelSampleExport,
 );
 
 itemSupplierRouter.post(
@@ -165,7 +165,7 @@ itemSupplierRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "CREATE")),
-  itemSupplierExcelImport
+  itemSupplierExcelImport,
 );
 
 /**
@@ -197,5 +197,5 @@ itemSupplierRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_SUPPLIER", "VIEW")),
   validateItemSupplierLookup,
-  searchItemSupplier
+  searchItemSupplier,
 );

@@ -2,7 +2,8 @@ import { logger } from "@/logging/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 
-const isProduction = process.env.NODE_ENV?.trim().toUpperCase() === "PRODUCTION";
+const isProduction =
+  process.env.NODE_ENV?.trim().toUpperCase() === "PRODUCTION";
 
 const SENSITIVE_KEYS = new Set([
   "password",
@@ -41,7 +42,7 @@ export const requestLogger = morgan(
       write: (message: string) => logger.http(`Request::${message.trim()}`),
     },
     skip: () => process.env.NODE_ENV === "test",
-  }
+  },
 );
 
 export const requestDetailsLogger = morgan(
@@ -73,13 +74,13 @@ export const requestDetailsLogger = morgan(
   {
     stream: { write: (msg) => logger.debug(`RequestDetails::${msg.trim()}`) },
     skip: () => process.env.NODE_ENV === "test",
-  }
+  },
 ) as any;
 
 export function responseBodyLogger(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   // Never log response payloads in production - they may contain PII/PHI.
   if (isProduction) {
@@ -101,7 +102,7 @@ export function responseBodyLogger(
     }
 
     logger.debug(
-      `↪️ ${req.method} ${req.originalUrl} → ${res.statusCode} | Response::body:: ${payload}`
+      `↪️ ${req.method} ${req.originalUrl} → ${res.statusCode} | Response::body:: ${payload}`,
     );
 
     return originalJson(body);

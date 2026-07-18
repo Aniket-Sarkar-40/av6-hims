@@ -43,7 +43,7 @@ doctorRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "CREATE")),
   validateDoctor,
-  createDoctor
+  createDoctor,
 );
 
 /**
@@ -60,7 +60,7 @@ doctorRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "VIEW")),
-  getAllDoctors
+  getAllDoctors,
 );
 
 /**
@@ -84,7 +84,7 @@ doctorRouter.get(
   "/:doctorId",
   verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "VIEW")),
-  getDoctorById
+  getDoctorById,
 );
 
 /**
@@ -115,10 +115,10 @@ doctorRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "DOCTOR", "VIEW"),
-    getPermission("CORE", "DOCTOR", "UPDATE")
+    getPermission("CORE", "DOCTOR", "UPDATE"),
   ),
   validateDoctor,
-  updateDoctor
+  updateDoctor,
 );
 
 /**
@@ -142,7 +142,7 @@ doctorRouter.delete(
   "/:doctorId",
   verifyToken(),
   authorize(getPermission("CORE", "DOCTOR", "DELETE")),
-  deleteDoctor
+  deleteDoctor,
 );
 
 export default doctorRouter;

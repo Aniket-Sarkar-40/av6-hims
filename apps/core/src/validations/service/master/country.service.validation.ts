@@ -30,7 +30,7 @@ export const validIdCountry = async (countryId: number) => {
 };
 
 export const deleteCountryServiceValidation = async (
-  countryId: number
+  countryId: number,
 ): Promise<void> => {
   logger.info("entering::deleteCountryServiceValidation::service::validation");
   await validIdCountry(Number(countryId));
@@ -41,7 +41,7 @@ export const deleteCountryServiceValidation = async (
 };
 
 export const getIdCountryServiceValidation = async (
-  countryId: number
+  countryId: number,
 ): Promise<void> => {
   logger.info("entering::getIdCountryServiceValidation::service::validation");
   await validIdCountry(countryId);
@@ -51,10 +51,10 @@ export const getIdCountryServiceValidation = async (
 };
 
 export const updateIdCountryServiceValidation = async (
-  body: UpdateCountryInput
+  body: UpdateCountryInput,
 ): Promise<Country | null> => {
   logger.info(
-    "entering::updateIdCountryServiceValidation::service::validation"
+    "entering::updateIdCountryServiceValidation::service::validation",
   );
   validIdCheck(body.id);
 
@@ -64,38 +64,38 @@ export const updateIdCountryServiceValidation = async (
   }
 
   const countryWithSameNationality = await getCountryByCountryNameFromDb(
-    body.nationality
+    body.nationality,
   );
   if (countryWithSameNationality) {
     if (countryWithSameNationality.id !== body.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Country nationality")
+        generateErrorMessage("DUPLICATE_ITEM", "Country nationality"),
       );
     }
   }
 
   const countryWithSameShortName = await getCountryByCountryShortNameFromDb(
-    body.enShortName
+    body.enShortName,
   );
   if (countryWithSameShortName) {
     if (countryWithSameShortName.id !== body.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Country Short Name")
+        generateErrorMessage("DUPLICATE_ITEM", "Country Short Name"),
       );
     }
   }
 
   if (body.alpha2Code) {
     const countryWithSameAlpha2Code = await getCountryByCountryAlpha2CodeFromDb(
-      body.alpha2Code
+      body.alpha2Code,
     );
     if (countryWithSameAlpha2Code) {
       if (countryWithSameAlpha2Code.id !== body.id) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("DUPLICATE_ITEM", "Country Alpha2 Code")
+          generateErrorMessage("DUPLICATE_ITEM", "Country Alpha2 Code"),
         );
       }
     }
@@ -103,13 +103,13 @@ export const updateIdCountryServiceValidation = async (
 
   if (body.alpha3Code) {
     const countryWithSameAlpha3Code = await getCountryByCountryAlpha3CodeFromDb(
-      body.alpha3Code
+      body.alpha3Code,
     );
     if (countryWithSameAlpha3Code) {
       if (countryWithSameAlpha3Code.id !== body.id) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("DUPLICATE_ITEM", "Country Alpha3 Code")
+          generateErrorMessage("DUPLICATE_ITEM", "Country Alpha3 Code"),
         );
       }
     }
@@ -119,14 +119,14 @@ export const updateIdCountryServiceValidation = async (
 };
 
 export const nameCountryServiceValidation = async (
-  name: string
+  name: string,
 ): Promise<void> => {
   logger.info("entering::nameCountryServiceValidation::service::validation");
   const country = await getCountryByCountryNameFromDb(name);
   if (country) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Country")
+      generateErrorMessage("DUPLICATE_ITEM", "Country"),
     );
   }
   logger.info("exiting::nameCountryServiceValidation::service::validation");
@@ -134,48 +134,48 @@ export const nameCountryServiceValidation = async (
 };
 
 export const createCountryServiceValidation = async (
-  body: CreateCountryInput
+  body: CreateCountryInput,
 ) => {
   logger.info(
-    "entering::createCountryServiceValidation::serviceVal::validation"
+    "entering::createCountryServiceValidation::serviceVal::validation",
   );
   const countryNational = await getCountryByCountryNameFromDb(body.nationality);
   if (countryNational) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Country nationality")
+      generateErrorMessage("DUPLICATE_ITEM", "Country nationality"),
     );
   }
 
   const countryShortName = await getCountryByCountryShortNameFromDb(
-    body.enShortName
+    body.enShortName,
   );
   if (countryShortName) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Country Short Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Country Short Name"),
     );
   }
 
   if (body.alpha2Code) {
     const countryAlpha2Code = await getCountryByCountryAlpha2CodeFromDb(
-      body.alpha2Code
+      body.alpha2Code,
     );
     if (countryAlpha2Code) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Country Alpha2 Code")
+        generateErrorMessage("DUPLICATE_ITEM", "Country Alpha2 Code"),
       );
     }
   }
   if (body.alpha3Code) {
     const countryAlpha3Code = await getCountryByCountryAlpha3CodeFromDb(
-      body.alpha3Code
+      body.alpha3Code,
     );
     if (countryAlpha3Code) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Country Alpha3 Code")
+        generateErrorMessage("DUPLICATE_ITEM", "Country Alpha3 Code"),
       );
     }
   }

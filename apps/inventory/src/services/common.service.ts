@@ -32,7 +32,7 @@ export const commonService = {
 
     const shortCodeData = await commonLockUnlockValidation(
       lockParams.shortCode,
-      lockParams.id
+      lockParams.id,
     );
 
     const lockResult = await commonLockUnlock({ ...lockParams, shortCodeData });
@@ -41,7 +41,7 @@ export const commonService = {
       await updateCache(
         `inv:${shortCodeData.tableName}:all`,
         lockParams.id,
-        lockResult
+        lockResult,
       );
     }
 
@@ -51,7 +51,7 @@ export const commonService = {
   },
 
   async getElementById<M extends ModelName>(
-    input: CommonGetByIdInput
+    input: CommonGetByIdInput,
   ): Promise<FullRow<M> | null> {
     logger.info("entering::getCommonById::service");
     const cacheKey = getRedisKey(input.cacheCode, "all");
@@ -75,7 +75,7 @@ export const commonService = {
       if (!input.canNullReturnable)
         throw new ErrorHandler(
           404,
-          SHORT_CODE[input.shortCode].replace("_", " ")
+          SHORT_CODE[input.shortCode].replace("_", " "),
         );
     }
 
@@ -84,7 +84,7 @@ export const commonService = {
   },
 
   async getAllElements<M extends ModelName>(
-    input: CommonGetAllInput
+    input: CommonGetAllInput,
   ): Promise<FullRow<M>[]> {
     logger.info("entering::getCommons::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE[input.shortCode]);
@@ -112,7 +112,7 @@ export const commonService = {
         activeInactiveParams.shortCode,
         activeInactiveParams.id,
         activeInactiveParams.field,
-        activeInactiveParams.value
+        activeInactiveParams.value,
       );
 
     const result = await commonActiveInactive({
@@ -125,7 +125,7 @@ export const commonService = {
       await updateCache(
         `inv:${shortCodeData.tableName}:all`,
         activeInactiveParams.id,
-        result
+        result,
       );
     }
 

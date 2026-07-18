@@ -17,18 +17,18 @@ import { customOmit, toIdValue } from "av6-utils";
 import dayjs from "dayjs";
 
 export const toRateOfExchangeDto = async (
-  input: RateOfExchangeResponse[]
+  input: RateOfExchangeResponse[],
 ): Promise<RateOfExchangeDTO[]> => {
   const currencies = await currencyService.getAllCurrency();
 
   const response: RateOfExchangeDTO[] = await Promise.all(
     input.map(async (rateOfExchange) => {
       const currency = currencies.find(
-        (currency) => currency.id === rateOfExchange.currencyId
+        (currency) => currency.id === rateOfExchange.currencyId,
       );
       const createdBy = rateOfExchange.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            rateOfExchange.createdBy
+            rateOfExchange.createdBy,
           )
         : null;
       const lastSellingRate = await getLastSellingRateByCurrencyId({
@@ -74,13 +74,13 @@ export const toRateOfExchangeDto = async (
           "deletedAt",
         ]).rest,
       };
-    })
+    }),
   );
   return response;
 };
 
 export const toFetchRateOfExchangeDto = async (
-  input: FetchRateOfExchangeInput
+  input: FetchRateOfExchangeInput,
 ) => {
   const { companyId, currencyId, financialYearId, date, type } = input;
   const allRateOfExchanges =
@@ -97,7 +97,7 @@ export const toFetchRateOfExchangeDto = async (
       (rateOfExchange) =>
         rateOfExchange.companyId === companyId &&
         rateOfExchange.currencyId === currencyId &&
-        rateOfExchange.financialYearId === financialYearId
+        rateOfExchange.financialYearId === financialYearId,
     )
     .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
 
@@ -105,14 +105,14 @@ export const toFetchRateOfExchangeDto = async (
 
   effectiveRateOfExchangeRecord =
     rateOfExchanges.find((rate) =>
-      dayjs(rate.date).isSame(dayjs(date), "day")
+      dayjs(rate.date).isSame(dayjs(date), "day"),
     ) ?? null;
 
   if (!effectiveRateOfExchangeRecord && rateOfExchanges.length > 0) {
     const pastRates = rateOfExchanges.filter(
       (rate) =>
         dayjs(rate.date).isBefore(dayjs(date), "day") ||
-        dayjs(rate.date).isSame(dayjs(date), "day")
+        dayjs(rate.date).isSame(dayjs(date), "day"),
     );
     if (pastRates.length > 0) {
       effectiveRateOfExchangeRecord = pastRates[pastRates.length - 1];

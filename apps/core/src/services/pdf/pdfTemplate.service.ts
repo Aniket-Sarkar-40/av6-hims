@@ -67,7 +67,7 @@ export const pdfTemplateService = {
 
   async getPdfTemplate(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<PdfTemplate | null> {
     logger.info("entering::getPdfTemplate::service");
     validIdCheck(id);
@@ -82,7 +82,7 @@ export const pdfTemplateService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Pdf Template")
+          generateErrorMessage("NOT_FOUND", "Pdf Template"),
         );
       } else {
         return null;
@@ -113,7 +113,7 @@ export const pdfTemplateService = {
   async createAndUpdatePdfThumbnail(
     doc: CustomDocDefinition,
     id: number,
-    previousImageUrl?: string | null
+    previousImageUrl?: string | null,
   ) {
     logger.info("entering::createAndUpdatePdfThumbnail::service");
     const baseFolder = path.join(process.cwd(), "uploads");
@@ -132,7 +132,7 @@ export const pdfTemplateService = {
 
     await fs.promises.writeFile(
       absoluteImagePath,
-      imageBuffer as Buffer<ArrayBufferLike>
+      imageBuffer as Buffer<ArrayBufferLike>,
     );
 
     await updatePdfTemplateImageUrl(relativeImagePath, id);
@@ -144,7 +144,7 @@ export const pdfTemplateService = {
   },
 
   async getPdfTemplateByModuleAndType(
-    input: GetPdfTemplateByModuleAndTypeInput
+    input: GetPdfTemplateByModuleAndTypeInput,
   ): Promise<PdfTemplate> {
     logger.info("entering::getPdfTemplateByModuleAndType::service");
 
@@ -155,7 +155,7 @@ export const pdfTemplateService = {
       const filteredPdfTemplate = pdfTemplates.find(
         (pdfTemplate) =>
           pdfTemplate.module === input.module &&
-          pdfTemplate.templateType === input.type
+          pdfTemplate.templateType === input.type,
       );
 
       if (filteredPdfTemplate) {
@@ -163,7 +163,7 @@ export const pdfTemplateService = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Pdf Template")
+          generateErrorMessage("NOT_FOUND", "Pdf Template"),
         );
       }
     } else {
@@ -173,7 +173,7 @@ export const pdfTemplateService = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Pdf Template")
+          generateErrorMessage("NOT_FOUND", "Pdf Template"),
         );
       }
     }

@@ -41,5 +41,5 @@ documentRouter.post(
   createUploadMiddleware("filePath"),
   uploadToHetzner("Document"),
   validateDocumentCreate,
-  createDocument
+  createDocument,
 );

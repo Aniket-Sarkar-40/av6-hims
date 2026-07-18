@@ -12,18 +12,35 @@ import {
   GrnReturnResponse,
 } from "@/types/grn/grnReturn.js";
 
-export const toGrnReturnDTO = async (grnReturn: GrnReturnResponse): Promise<GoodReceiveReturnDTO> => {
-  const distributor = await distributorService.getDistributorByIdWoDto(grnReturn.distributorId, true);
-  const warehouse = await warehouseService.getWarehouseByIdWoDTO(grnReturn.warehouseId, true);
+export const toGrnReturnDTO = async (
+  grnReturn: GrnReturnResponse,
+): Promise<GoodReceiveReturnDTO> => {
+  const distributor = await distributorService.getDistributorByIdWoDto(
+    grnReturn.distributorId,
+    true,
+  );
+  const warehouse = await warehouseService.getWarehouseByIdWoDTO(
+    grnReturn.warehouseId,
+    true,
+  );
 
   const createdBy = grnReturn.createdBy
-    ? await employeeService.getEmployeeByIdFrmCacheOrDb(grnReturn.createdBy, true)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+        grnReturn.createdBy,
+        true,
+      )
     : null;
   const approvedBy = grnReturn.approvedBy
-    ? await employeeService.getEmployeeByIdFrmCacheOrDb(grnReturn.approvedBy, true)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+        grnReturn.approvedBy,
+        true,
+      )
     : null;
   const rejectedBy = grnReturn.rejectedBy
-    ? await employeeService.getEmployeeByIdFrmCacheOrDb(grnReturn.rejectedBy, true)
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(
+        grnReturn.rejectedBy,
+        true,
+      )
     : null;
 
   const detailDTO: GoodReceiveReturnDetailDTO[] = await Promise.all(
@@ -36,7 +53,7 @@ export const toGrnReturnDTO = async (grnReturn: GrnReturnResponse): Promise<Good
             warehouseId: grnReturn.warehouseId,
           },
           detail.batchNo,
-          detail.expiryDate
+          detail.expiryDate,
         )) || null;
 
       const grnDetails = await getGrnDetailsByIdFromDb(detail.grnDetailId);
@@ -47,7 +64,7 @@ export const toGrnReturnDTO = async (grnReturn: GrnReturnResponse): Promise<Good
         returnedQty: grnDetails?.returnQuantity ?? 0,
         item: item,
       };
-    })
+    }),
   );
 
   return {
@@ -62,7 +79,7 @@ export const toGrnReturnDTO = async (grnReturn: GrnReturnResponse): Promise<Good
 };
 
 export const toGrnReturnDetailsDTO = async (
-  grnReturnDetailsInput: GrnReturnDetailsResponseBase[]
+  grnReturnDetailsInput: GrnReturnDetailsResponseBase[],
 ): Promise<GrnReturnDetailsResponse[]> => {
   const items = await itemService.getAllItemWoDto();
   const distributors = await distributorService.getDistributorWoDto(true);
@@ -72,17 +89,28 @@ export const toGrnReturnDetailsDTO = async (
   return Promise.all(
     grnReturnDetailsInput.map(async (grnReturnDetail) => {
       const item = items.find((item) => item.id === grnReturnDetail.itemId);
-      const warehouse = warehouses.find((w) => w.id === grnReturnDetail.goodReceiveReturn.warehouseId) ?? null;
-      const distributor = distributors.find((d) => d.id === grnReturnDetail.goodReceiveReturn.distributorId);
+      const warehouse =
+        warehouses.find(
+          (w) => w.id === grnReturnDetail.goodReceiveReturn.warehouseId,
+        ) ?? null;
+      const distributor = distributors.find(
+        (d) => d.id === grnReturnDetail.goodReceiveReturn.distributorId,
+      );
       const createdBy = grnReturnDetail.createdBy
         ? (staffs.find((st) => st.id === grnReturnDetail.createdBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(grnReturnDetail.createdBy)) ??
+          (await employeeService.getEmployeeByIdFrmCacheOrDb(
+            grnReturnDetail.createdBy,
+          )) ??
           null)
         : null;
 
       const approvedBy = grnReturnDetail.goodReceiveReturn.approvedBy
-        ? (staffs.find((st) => st.id === grnReturnDetail.goodReceiveReturn.approvedBy) ??
-          (await employeeService.getEmployeeByIdFrmCacheOrDb(grnReturnDetail.goodReceiveReturn.approvedBy)) ??
+        ? (staffs.find(
+            (st) => st.id === grnReturnDetail.goodReceiveReturn.approvedBy,
+          ) ??
+          (await employeeService.getEmployeeByIdFrmCacheOrDb(
+            grnReturnDetail.goodReceiveReturn.approvedBy,
+          )) ??
           null)
         : null;
 
@@ -94,6 +122,6 @@ export const toGrnReturnDetailsDTO = async (
         createdBy,
         approvedBy,
       };
-    })
+    }),
   );
 };

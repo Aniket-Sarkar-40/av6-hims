@@ -3,7 +3,7 @@ import { InsuranceMaster } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const getInsuranceByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<InsuranceMaster | null> => {
   logger.info("entering::getInsuranceByIdFromDb::repository");
 

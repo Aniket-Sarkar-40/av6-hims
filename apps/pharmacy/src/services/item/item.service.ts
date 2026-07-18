@@ -107,7 +107,7 @@ export const itemService = {
       const cachedItems = (await getAllCache(cacheKey)) as PmsItem[] | null;
       if (cachedItems && cachedItems.length > 0) {
         return Promise.all(
-          cachedItems.map((item) => toItemDto({ ...item, itemImages: [] }))
+          cachedItems.map((item) => toItemDto({ ...item, itemImages: [] })),
         );
       }
       throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item"));
@@ -119,12 +119,12 @@ export const itemService = {
     }
     logger.info("exiting::getAllItem::service");
     return Promise.all(
-      items.map((item) => toItemDto({ ...item, itemImages: [] }))
+      items.map((item) => toItemDto({ ...item, itemImages: [] })),
     );
   },
 
   async getAllItemWoDto(
-    categoryId?: number
+    categoryId?: number,
   ): Promise<DecimalToNumber<PmsItem>[]> {
     logger.info("entering::getAllItem::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
@@ -134,12 +134,12 @@ export const itemService = {
       if (cachedItems && cachedItems.length > 0) {
         if (categoryId) {
           const filteredCachedItems = cachedItems.filter(
-            (item) => item.medCategoryId == categoryId
+            (item) => item.medCategoryId == categoryId,
           );
           if (filteredCachedItems.length === 0) {
             throw new ErrorHandler(
               404,
-              generateErrorMessage("NOT_FOUND", "Item")
+              generateErrorMessage("NOT_FOUND", "Item"),
             );
           }
           return filteredCachedItems.map((item) => toNumberDeep(item));
@@ -159,7 +159,7 @@ export const itemService = {
 
   async getItemById(
     itemReq: GetItemReq,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemDTO | null> {
     logger.info("entering::getItemById::service");
     validIdCheck(itemReq.id);
@@ -176,7 +176,7 @@ export const itemService = {
       if (!itemBranchPricing) {
         const item = (await getCacheById(
           cacheKey,
-          itemReq.id
+          itemReq.id,
         )) as PmsItem | null;
         const errorMessage = `Item branch mapping not found for ${
           item?.medicineName ?? "this item"
@@ -260,42 +260,42 @@ export const itemService = {
           .includes(input.searchText.toLowerCase().trim()) ||
         item.itemNumber
           ?.toLowerCase()
-          .includes(input.searchText.toLowerCase().trim())
+          .includes(input.searchText.toLowerCase().trim()),
     );
 
     if (input.medCompId) {
       filteredItems = filteredItems.filter(
-        (item) => item.medCompId === input.medCompId
+        (item) => item.medCompId === input.medCompId,
       );
     }
 
     if (input.drugType) {
       filteredItems = filteredItems.filter(
-        (item) => item.drugType === input.drugType
+        (item) => item.drugType === input.drugType,
       );
     }
 
     if (input.medManufacturer) {
       filteredItems = filteredItems.filter(
-        (item) => item.medManufacturer === input.medManufacturer
+        (item) => item.medManufacturer === input.medManufacturer,
       );
     }
 
     if (input.medTypeId) {
       filteredItems = filteredItems.filter(
-        (item) => item.medTypeId === input.medTypeId
+        (item) => item.medTypeId === input.medTypeId,
       );
     }
 
     if (input.medUnitId) {
       filteredItems = filteredItems.filter(
-        (item) => item.medUnitId === input.medUnitId
+        (item) => item.medUnitId === input.medUnitId,
       );
     }
 
     if (input.medCategoryId) {
       filteredItems = filteredItems.filter(
-        (item) => item.medCategoryId === input.medCategoryId
+        (item) => item.medCategoryId === input.medCategoryId,
       );
     }
     if (categoryIds.length > 0) {
@@ -306,27 +306,27 @@ export const itemService = {
       filteredItems = filteredItems.filter(
         (selectedItem) =>
           !selectedItem.medCategoryId ||
-          categoryIds.includes(selectedItem.medCategoryId)
+          categoryIds.includes(selectedItem.medCategoryId),
       );
     }
 
     if (input.packSize) {
       filteredItems = filteredItems.filter(
-        (item) => item.packSize === input.packSize
+        (item) => item.packSize === input.packSize,
       );
     }
 
     if (input.status) {
       filteredItems = filteredItems.filter(
-        (item) => item.status === input.status
+        (item) => item.status === input.status,
       );
     }
 
     const categories = (await getAllCache(
-      getRedisKey("MED_CATEGORY", "all")
+      getRedisKey("MED_CATEGORY", "all"),
     )) as MedCategory[] | null;
     const manufacturer = (await getAllCache(
-      getRedisKey("MANUFACTURE", "all")
+      getRedisKey("MANUFACTURE", "all"),
     )) as Manufacture[] | null;
     const units = (await getAllCache(getRedisKey("MEDICINE_UNIT", "all"))) as
       | MedicineUnit[]
@@ -340,8 +340,8 @@ export const itemService = {
           categories,
           manufacturer,
           units,
-        })
-      )
+        }),
+      ),
     );
   },
 
@@ -369,7 +369,7 @@ export const itemService = {
   async getItemByIdWoDTO(
     itemId: number,
     canNullReturnable: boolean = false,
-    branchId?: number
+    branchId?: number,
   ): Promise<DecimalToNumber<PmsItem> | null> {
     logger.info("entering::getItemByIdWoDTO::service");
     validIdCheck(itemId);
@@ -378,11 +378,11 @@ export const itemService = {
     if (isCacheable) {
       item = (await getCacheById(
         cacheKey,
-        itemId
+        itemId,
       )) as DecimalToNumber<PmsItem> | null;
     } else {
       item = toNumberDeep(
-        await getItemByIdFromDb(itemId)
+        await getItemByIdFromDb(itemId),
       ) as DecimalToNumber<PmsItem>;
     }
     if (!item) {
@@ -428,7 +428,7 @@ export const itemService = {
     const data = XLSX.utils.sheet_to_json(sheet) as ItemExcelRow[];
 
     const convertedData = data.map((elem, ind) =>
-      mapRowToItemExcelCreateInput(elem, ind + 1)
+      mapRowToItemExcelCreateInput(elem, ind + 1),
     );
 
     // Final check which can result from bad parsing
@@ -562,7 +562,7 @@ export const itemService = {
   },
 
   async getItemsByIdsForAppointment(
-    itemIds: number[]
+    itemIds: number[],
   ): Promise<ItemAppointmentDTO[]> {
     logger.info("entering::getItemsByIdsForAppointment::service");
 
@@ -577,18 +577,18 @@ export const itemService = {
 
       if (cachedItems && cachedItems.length > 0) {
         const filteredItems = cachedItems.filter((item) =>
-          itemIds.includes(item.id)
+          itemIds.includes(item.id),
         );
 
         if (filteredItems.length === 0) {
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Items")
+            generateErrorMessage("NOT_FOUND", "Items"),
           );
         }
 
         return Promise.all(
-          filteredItems.map((item) => toItemAppointmentDto(item))
+          filteredItems.map((item) => toItemAppointmentDto(item)),
         );
       }
 
@@ -622,7 +622,7 @@ export const itemService = {
     }
 
     const list: ItemDTO[] = await Promise.all(
-      rawLists.map(async (rawList) => toItemDto(rawList))
+      rawLists.map(async (rawList) => toItemDto(rawList)),
     );
 
     const wb = new ExcelJs.Workbook();
@@ -759,8 +759,8 @@ export const itemService = {
           branchId: input.branchId,
           insuranceId: input.insurerId,
           corporateClientId: input.corporateClientId,
-        })
-      )
+        }),
+      ),
     );
 
     logger.info("exiting::getItemSellPricing::service");

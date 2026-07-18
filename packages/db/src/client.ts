@@ -2,7 +2,8 @@ import "dotenv/config";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient, Prisma } from "../generated/prisma/client.js";
 
-const isProduction = process.env.NODE_ENV?.trim().toUpperCase() === "PRODUCTION";
+const isProduction =
+  process.env.NODE_ENV?.trim().toUpperCase() === "PRODUCTION";
 
 const adapter = new PrismaMariaDb({
   host: process.env.DATABASE_HOST!,

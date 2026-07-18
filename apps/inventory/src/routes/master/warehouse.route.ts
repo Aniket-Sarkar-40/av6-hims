@@ -44,7 +44,7 @@ warehouseRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "WAREHOUSE", "CREATE")),
   validateWarehouse,
-  createWarehouse
+  createWarehouse,
 );
 
 /**
@@ -60,7 +60,7 @@ warehouseRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "WAREHOUSE", "VIEW")),
-  getAllWarehouse
+  getAllWarehouse,
 );
 
 /**
@@ -81,7 +81,7 @@ warehouseRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "WAREHOUSE", "VIEW")),
-  getWarehouseById
+  getWarehouseById,
 );
 
 /**
@@ -111,10 +111,10 @@ warehouseRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "WAREHOUSE", "VIEW"),
-    getPermission("INV", "WAREHOUSE", "UPDATE")
+    getPermission("INV", "WAREHOUSE", "UPDATE"),
   ),
   validateWarehouse,
-  updateWarehouse
+  updateWarehouse,
 );
 
 /**
@@ -137,10 +137,10 @@ warehouseRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "WAREHOUSE", "VIEW"),
-    getPermission("INV", "WAREHOUSE", "UPDATE")
+    getPermission("INV", "WAREHOUSE", "UPDATE"),
   ),
   validateToggleActive,
-  toggleActiveWarehouse
+  toggleActiveWarehouse,
 );
 
 export default warehouseRouter;

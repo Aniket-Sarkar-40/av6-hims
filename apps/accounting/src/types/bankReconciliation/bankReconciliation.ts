@@ -34,8 +34,10 @@ export type VoucherLineResponseForBankLedgerBook =
     };
   }>;
 
-export interface BankLedgerBookRow
-  extends Omit<VoucherLineResponseForBankLedgerBook, "voucher"> {
+export interface BankLedgerBookRow extends Omit<
+  VoucherLineResponseForBankLedgerBook,
+  "voucher"
+> {
   voucher: voucherHeadResponseForLedgerBook;
   runningBalance: DrCrAmt;
 }
@@ -97,8 +99,10 @@ export type CreateOrUpdateBankStatementRowInput = Omit<
   BaseModelAttrWoCancel | "bankStatementId"
 >;
 
-export interface CreateOrUpdateBankStatementInput
-  extends Omit<Prisma.BankStatementCreateManyInput, BaseModelAttrWoCancel> {
+export interface CreateOrUpdateBankStatementInput extends Omit<
+  Prisma.BankStatementCreateManyInput,
+  BaseModelAttrWoCancel
+> {
   statementRows: CreateOrUpdateBankStatementRowInput[];
 }
 
@@ -157,8 +161,10 @@ export type BankStatementRowDTO = Omit<
 };
 
 //-----------------------------
-export interface BankStatementDTO
-  extends Omit<BankStatement, BaseModelAttrWoCancel | "ledgerId"> {
+export interface BankStatementDTO extends Omit<
+  BankStatement,
+  BaseModelAttrWoCancel | "ledgerId"
+> {
   ledger: IdValue | null;
 }
 

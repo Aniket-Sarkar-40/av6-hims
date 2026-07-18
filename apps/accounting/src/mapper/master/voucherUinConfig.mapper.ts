@@ -6,7 +6,7 @@ import { UINSegment } from "av6-core-v2";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toVoucherUINConfigDTO = async (
-  data: VoucherUINConfig[]
+  data: VoucherUINConfig[],
 ): Promise<VoucherUINConfigDTO[]> => {
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
     cacheCode: "VOUCHER_TYPE",
@@ -17,7 +17,7 @@ export const toVoucherUINConfigDTO = async (
   });
   const response = data.map((voucherUINConfig) => {
     const voucherType = voucherTypes?.find(
-      (voucherType) => voucherType.id === voucherUINConfig.voucherTypeId
+      (voucherType) => voucherType.id === voucherUINConfig.voucherTypeId,
     );
     const uinSegments =
       typeof voucherUINConfig.uinSegments === "string"

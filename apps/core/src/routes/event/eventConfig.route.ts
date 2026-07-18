@@ -42,7 +42,7 @@ eventConfigRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "EVENT_CONFIG", "CREATE")),
   validateUpsertEventConfigWithKeys,
-  createEventConfig
+  createEventConfig,
 );
 
 /**
@@ -65,7 +65,7 @@ eventConfigRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "NOTIFICATION", "VIEW")),
   validateMarkReadNotifications,
-  markReadNotifications
+  markReadNotifications,
 );
 
 export default eventConfigRouter;

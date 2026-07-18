@@ -28,19 +28,17 @@ type VoucherInput = Omit<
   BaseModelAttrWoCancelAndCreated
 >;
 
-export interface PostVoucherBillAllocationInput
-  extends Omit<
-    CreateOrUpdateBillAllocationInput,
-    "id" | "companyId" | "financialYearId" | "voucherId" | "voucherLineId"
-  > {
+export interface PostVoucherBillAllocationInput extends Omit<
+  CreateOrUpdateBillAllocationInput,
+  "id" | "companyId" | "financialYearId" | "voucherId" | "voucherLineId"
+> {
   lineNo: number;
 }
 
-export interface PostVoucherCostCenterAllocationInput
-  extends Omit<
-    CreateOrUpdateCostCenterAllocationInput,
-    "companyId" | "voucherId" | "voucherLineId"
-  > {
+export interface PostVoucherCostCenterAllocationInput extends Omit<
+  CreateOrUpdateCostCenterAllocationInput,
+  "companyId" | "voucherId" | "voucherLineId"
+> {
   lineNo: number;
 }
 export interface CreateOrUpdateVoucherInput extends VoucherInput {
@@ -93,42 +91,41 @@ export type LedgerResponseForVoucherDTO = {
   isCashAccount: boolean;
 };
 
-export interface VoucherLineDTO
-  extends Omit<VoucherLine, BaseModelAttrWoCancel | "ledgerId"> {
+export interface VoucherLineDTO extends Omit<
+  VoucherLine,
+  BaseModelAttrWoCancel | "ledgerId"
+> {
   ledger: LedgerResponseForVoucherDTO | null;
 }
 
-export interface BillAllocationDTO
-  extends Omit<
-    BillAllocation,
-    BaseModelAttrWoCancel | "companyId" | "partyLedgerId" | "financialYearId"
-  > {
+export interface BillAllocationDTO extends Omit<
+  BillAllocation,
+  BaseModelAttrWoCancel | "companyId" | "partyLedgerId" | "financialYearId"
+> {
   partyLedger: IdValue | null;
 }
-export interface CostCenterAllocationDTO
-  extends Omit<
-    CostCenterAllocation,
-    BaseModelAttrWoCancel | "companyId" | "costCenterId"
-  > {
+export interface CostCenterAllocationDTO extends Omit<
+  CostCenterAllocation,
+  BaseModelAttrWoCancel | "companyId" | "costCenterId"
+> {
   costCenter: IdValue | null;
 }
-export interface VoucherDTO
-  extends Omit<
-    VoucherResponseForDTO,
-    | BaseModelAttrWoCancelAndCreated
-    | "company"
-    | "voucherLines"
-    | "financialYear"
-    | "companyId"
-    | "ccId"
-    | "voucherTypeId"
-    | "financialYearId"
-    | "costCenterAllocations"
-    | "billAllocations"
-    | "createdBy"
-    | "approvedBy"
-    | "currencyId"
-  > {
+export interface VoucherDTO extends Omit<
+  VoucherResponseForDTO,
+  | BaseModelAttrWoCancelAndCreated
+  | "company"
+  | "voucherLines"
+  | "financialYear"
+  | "companyId"
+  | "ccId"
+  | "voucherTypeId"
+  | "financialYearId"
+  | "costCenterAllocations"
+  | "billAllocations"
+  | "createdBy"
+  | "approvedBy"
+  | "currencyId"
+> {
   createdBy: IdValue | null;
   approvedBy: IdValue | null;
   company: Pick<Company, "id" | "name" | "currencyId"> | null;
@@ -178,11 +175,10 @@ export type ExternalPostVoucherInput = {
   payments?: paymentInput[];
 };
 
-export interface preparedVoucherInput
-  extends Omit<
-    CreateOrUpdateVoucherInput,
-    "existing" | "billAllocations" | "costCenterAllocations" | "voucherNo"
-  > {
+export interface preparedVoucherInput extends Omit<
+  CreateOrUpdateVoucherInput,
+  "existing" | "billAllocations" | "costCenterAllocations" | "voucherNo"
+> {
   createdBy?: number;
 }
 export type IntegrationConfigKeys = Pick<
@@ -269,11 +265,10 @@ export type topLedgerData = {
 
 /* voucher pdf dto type */
 
-export interface VoucherPdfDTO
-  extends Omit<
-    VoucherDTO,
-    "voucherLines" | "costCenterAllocations" | "billAllocations"
-  > {
+export interface VoucherPdfDTO extends Omit<
+  VoucherDTO,
+  "voucherLines" | "costCenterAllocations" | "billAllocations"
+> {
   amountInWords: string;
   transactionType: string | null;
   instrumentNo: string | null;

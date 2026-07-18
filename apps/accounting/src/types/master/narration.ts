@@ -7,7 +7,9 @@ export type CreateOrUpdateNarrationInput = Omit<
   BaseModelAttr
 >;
 
-export interface NarrationDTO
-  extends Omit<Narration, BaseModelAttrWoCancel | "voucherTypeId"> {
+export interface NarrationDTO extends Omit<
+  Narration,
+  BaseModelAttrWoCancel | "voucherTypeId"
+> {
   voucherType: IdValue | null;
 }

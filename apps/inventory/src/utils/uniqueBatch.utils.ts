@@ -12,22 +12,22 @@ const normalizeBatchNo = (batchNo?: string | null): string | null => {
 const throwBatchItemConflict = (
   batchNo: string,
   existingItemId: number,
-  requestedItemId: number
+  requestedItemId: number,
 ) => {
   throw new ErrorHandler(
     400,
     generateErrorMessage(
       "INVALID_VALUE",
-      `Batch No ${batchNo} is already used for Item ID ${existingItemId}. It cannot be used for Item ID ${requestedItemId}`
-    )
+      `Batch No ${batchNo} is already used for Item ID ${existingItemId}. It cannot be used for Item ID ${requestedItemId}`,
+    ),
   );
 };
 
 export const validateBatchNoBelongsToSameItem = async (
-  body: CreateGrnInput
+  body: CreateGrnInput,
 ): Promise<void> => {
   logger.info(
-    "entering::validateBatchNoBelongsToSameItem::service::validation"
+    "entering::validateBatchNoBelongsToSameItem::service::validation",
   );
 
   const batchMap = new Map<string, number>();
@@ -46,7 +46,7 @@ export const validateBatchNoBelongsToSameItem = async (
 
   if (!batchMap.size) {
     logger.info(
-      "exiting::validateBatchNoBelongsToSameItem::service::validation"
+      "exiting::validateBatchNoBelongsToSameItem::service::validation",
     );
     return;
   }
@@ -60,7 +60,7 @@ export const validateBatchNoBelongsToSameItem = async (
       batchNo,
       itemId,
     })),
-    excludeDetailIds
+    excludeDetailIds,
   );
 
   for (const row of existingBatchRows) {

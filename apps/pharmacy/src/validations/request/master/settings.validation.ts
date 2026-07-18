@@ -32,18 +32,18 @@ export const createOrUpdateSettingsSchema = Joi.object<CreateOrUpdateSettings>({
 
   grnCalculationMethod: enumOptional(
     "GRN calculation method",
-    CalculationMethod
+    CalculationMethod,
   ),
   sellCalculationMethod: enumOptional(
     "Sell calculation method",
-    CalculationMethod
+    CalculationMethod,
   ),
   grnRoundedFormat: enumOptional("GRN rounded format", RoundFormat),
   sellRoundedFormat: enumOptional("Sell rounded format", RoundFormat),
   grnFinalRoundedFormat: enumOptional("GRN final rounded format", RoundFormat),
   sellFinalRoundedFormat: enumOptional(
     "Sell final rounded format",
-    RoundFormat
+    RoundFormat,
   ),
   batchSize: intOptional("Batch size"),
   defaultEmailPostfix: strOptional("Default email postfix"),

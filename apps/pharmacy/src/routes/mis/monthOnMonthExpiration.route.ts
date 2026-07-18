@@ -38,7 +38,7 @@ monthOnMonthExpirationRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_MONTH_ON_MONTH", "VIEW")),
-  getMisMonthOnMonthExpirationController
+  getMisMonthOnMonthExpirationController,
 );
 
 monthOnMonthExpirationRouter.get(
@@ -46,7 +46,7 @@ monthOnMonthExpirationRouter.get(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_MONTH_ON_MONTH", "VIEW")),
   //   validateGatePassFilter,
-  excelMonthOnMonthExpirationReport
+  excelMonthOnMonthExpirationReport,
 );
 
 export default monthOnMonthExpirationRouter;

@@ -132,12 +132,10 @@ export interface CommonActiveInactiveParams {
   value: CommonFieldScalarValue;
 }
 
-export interface CommonActiveInactiveValidated
-  extends CommonActiveInactiveParams {
+export interface CommonActiveInactiveValidated extends CommonActiveInactiveParams {
   normalizedValue: CommonFieldScalarValue | Date;
 }
 
-export interface CommonActiveInactiveRequestRepository
-  extends CommonActiveInactiveParams {
+export interface CommonActiveInactiveRequestRepository extends CommonActiveInactiveParams {
   shortCodeData: InvDynamicShortCode;
 }

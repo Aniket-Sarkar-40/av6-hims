@@ -11,15 +11,15 @@ export const fetchChartOfAccounts = TryCatch(
     logger.info("entering::fetchChartOfAccounts::controller");
     const { companyId } = req.query as { companyId: string };
     const fetchedData = await chartOfAccountsService.fetchChartOfAccounts(
-      Number(companyId)
+      Number(companyId),
     );
     const response = BaseResponse.success(
       { type: "FETCHED", data: fetchedData },
-      "Chart Of Accounts"
+      "Chart Of Accounts",
     );
     logger.info("exiting::fetchChartOfAccounts::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const exportChartOfAccountsExcel = TryCatch(
@@ -28,18 +28,18 @@ export const exportChartOfAccountsExcel = TryCatch(
     const { companyId } = req.query as { companyId: string };
     const wb: Workbook =
       await chartOfAccountsService.exportChartOfAccountsExcel(
-        Number(companyId)
+        Number(companyId),
       );
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      'attachment; filename="chart_of_accounts.xlsx"'
+      'attachment; filename="chart_of_accounts.xlsx"',
     );
     await wb.xlsx.write(res);
     res.end();
     logger.info("exiting::exportChartOfAccountsExcel::controller");
-  }
+  },
 );

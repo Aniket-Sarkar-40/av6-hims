@@ -10,7 +10,7 @@ const models = Array.isArray(runtimeDataModel.models)
       ([name, model]: [string, any]) => ({
         name,
         ...model,
-      })
+      }),
     );
 
 const enums = Array.isArray(runtimeDataModel.enums)
@@ -54,23 +54,23 @@ const BLOCKED_FIELDS = new Set([
 ]);
 
 const MODEL_BY_NAME = new Map<string, PrismaModelMeta>(
-  models.map((model: any) => [model.name, model])
+  models.map((model: any) => [model.name, model]),
 );
 
 const MODEL_BY_DELEGATE = new Map<string, PrismaModelMeta>(
   models.map((model: any) => [
     model.name.charAt(0).toLowerCase() + model.name.slice(1),
     model,
-  ])
+  ]),
 );
 
 const ENUM_VALUES_BY_NAME = new Map<string, string[]>(
   enums.map((enumMeta: any) => [
     enumMeta.name,
     (enumMeta.values ?? []).map((value: any) =>
-      typeof value === "string" ? value : value.name
+      typeof value === "string" ? value : value.name,
     ),
-  ])
+  ]),
 );
 
 const toModelName = (delegateKey: string) =>
@@ -79,7 +79,7 @@ const toModelName = (delegateKey: string) =>
 const invalidField = (field?: string): never => {
   throw new ErrorHandler(
     400,
-    generateErrorMessage("INVALID_FIELD", field ?? "")
+    generateErrorMessage("INVALID_FIELD", field ?? ""),
   );
 };
 
@@ -90,14 +90,14 @@ const invalidTable = (): never => {
 const invalidValue = (field: string, expected: string): never => {
   throw new ErrorHandler(
     400,
-    generateErrorMessage("INVALID_VALUE", `${field} (expected ${expected})`)
+    generateErrorMessage("INVALID_VALUE", `${field} (expected ${expected})`),
   );
 };
 
 export const delegateKeyToModelName = toModelName;
 
 export const getPrismaModelMeta = (
-  delegateKey: string
+  delegateKey: string,
 ): PrismaModelMeta | null => {
   return (
     MODEL_BY_DELEGATE.get(delegateKey) ??
@@ -121,14 +121,14 @@ export const getModelScalarFieldNames = (delegateKey: string): string[] => {
   return getModelMeta(delegateKey)
     .fields.filter(
       (field) =>
-        (field.kind === "scalar" || field.kind === "enum") && !field.isList
+        (field.kind === "scalar" || field.kind === "enum") && !field.isList,
     )
     .map((field) => field.name);
 };
 
 export const assertModelScalarField = (
   delegateKey: string,
-  fieldName: string
+  fieldName: string,
 ): PrismaFieldMeta => {
   if (BLOCKED_FIELDS.has(fieldName)) {
     return invalidField(fieldName);
@@ -138,7 +138,7 @@ export const assertModelScalarField = (
     (item) =>
       item.name === fieldName &&
       (item.kind === "scalar" || item.kind === "enum") &&
-      !item.isList
+      !item.isList,
   );
 
   if (!field) {
@@ -151,7 +151,7 @@ export const assertModelScalarField = (
 const isValidDate = (value: Date) => !Number.isNaN(value.getTime());
 
 const isJsonObjectOrArray = (
-  value: unknown
+  value: unknown,
 ): value is Record<string, unknown> | unknown[] => {
   if (value === null || value === undefined) return false;
   if (typeof value === "function") return false;
@@ -168,7 +168,7 @@ const isJsonObjectOrArray = (
 
 const normalizeEnumValue = (
   field: PrismaFieldMeta,
-  value: unknown
+  value: unknown,
 ): CommonFieldScalarValue => {
   const allowedValues = ENUM_VALUES_BY_NAME.get(String(field.type));
 
@@ -189,7 +189,7 @@ const normalizeEnumValue = (
 
 const normalizeScalarValue = (
   field: PrismaFieldMeta,
-  value: unknown
+  value: unknown,
 ): CommonFieldScalarValue | Date => {
   if (value === undefined) {
     return invalidValue(field.name, "a value");
@@ -295,7 +295,7 @@ const normalizeScalarValue = (
 
 export const assertScalarFieldValue = (
   fieldMeta: PrismaFieldMeta,
-  value: unknown
+  value: unknown,
 ): CommonFieldScalarValue | Date => {
   if (fieldMeta.kind === "enum") {
     return normalizeEnumValue(fieldMeta, value);
@@ -307,7 +307,7 @@ export const assertScalarFieldValue = (
 export const validateModelFieldUpdate = (
   delegateKey: string,
   field: string,
-  value: unknown
+  value: unknown,
 ): {
   fieldMeta: PrismaFieldMeta;
   normalizedValue: CommonFieldScalarValue | Date;

@@ -47,7 +47,7 @@ featureRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "CREATE")),
   validateCreateFeatureFlag,
-  createFeatureFlag
+  createFeatureFlag,
 );
 
 /**
@@ -70,10 +70,10 @@ featureRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "FEATURE_FLAG", "VIEW"),
-    getPermission("PMS", "FEATURE_FLAG", "UPDATE")
+    getPermission("PMS", "FEATURE_FLAG", "UPDATE"),
   ),
   validateUpdateFeatureFlag,
-  updateFeatureFlag
+  updateFeatureFlag,
 );
 
 /**
@@ -89,7 +89,7 @@ featureRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "VIEW")),
-  getAllFeatureFlags
+  getAllFeatureFlags,
 );
 
 /**
@@ -111,7 +111,7 @@ featureRouter.get(
   "/shortCode",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "VIEW")),
-  getFeatureFlagByShortCode
+  getFeatureFlagByShortCode,
 );
 
 /**
@@ -134,9 +134,9 @@ featureRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "FEATURE_FLAG", "VIEW"),
-    getPermission("PMS", "FEATURE_FLAG", "UPDATE")
+    getPermission("PMS", "FEATURE_FLAG", "UPDATE"),
   ),
-  toggleFeatureFlag
+  toggleFeatureFlag,
 );
 
 /**
@@ -158,7 +158,7 @@ featureRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "FEATURE_FLAG", "DELETE")),
-  deleteFeatureFlag
+  deleteFeatureFlag,
 );
 
 export default featureRouter;

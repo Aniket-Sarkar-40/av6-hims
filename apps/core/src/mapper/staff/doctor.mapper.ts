@@ -10,7 +10,7 @@ import { isValidDate } from "@repo/shared/utils/date.utils.js";
 import dayjs from "dayjs";
 
 export const toDoctorFromExcel = (
-  row: ExcelDoctorRow
+  row: ExcelDoctorRow,
 ): CreateOrUpdateDoctor => {
   return {
     name: row.Name,
@@ -37,7 +37,7 @@ export const toDoctorFromExcel = (
 };
 
 export const toExcelFromDoctor = (
-  doctor: CreateOrUpdateDoctor | null
+  doctor: CreateOrUpdateDoctor | null,
 ): ExcelDoctorRow => {
   return {
     Name: doctor ? doctor.name : "",
@@ -56,7 +56,7 @@ export const toExcelFromDoctor = (
 };
 
 export const toStaffEntity = (
-  staff: CreateOrUpdateDoctor
+  staff: CreateOrUpdateDoctor,
 ): CreateStaffInput => ({
   employeeId: staff.employeeId,
   qualification: "",
@@ -97,19 +97,19 @@ export const toStaffEntity = (
 });
 
 export const toDoctorDTO = async (
-  employee: StaffEntity
+  employee: StaffEntity,
 ): Promise<DoctorDTO> => {
   const department = employee.employee?.departmentId
     ? await departmentService.getDepartmentById(
         employee.employee.departmentId,
-        true
+        true,
       )
     : null;
 
   const designation = employee.employee?.designationId
     ? await staffDesignationService.getStaffDesignationById(
         employee.employee?.designationId,
-        true
+        true,
       )
     : null;
 

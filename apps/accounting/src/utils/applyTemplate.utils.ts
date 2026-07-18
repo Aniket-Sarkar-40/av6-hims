@@ -40,7 +40,7 @@ function resolveString(str: string, scope: Data): string {
 
 function resolveTableRowContent(
   content: TableCell[],
-  scope: Data
+  scope: Data,
 ): TableCell[] {
   return content.map((cell) => deepResolve(cell, scope));
 }
@@ -86,7 +86,7 @@ function processTableBody(body: TableBlock["body"], data: Data): TableCell[][] {
             };
 
         result.push(
-          resolveTableRowContent(rowContent as TableCell[], itemScope)
+          resolveTableRowContent(rowContent as TableCell[], itemScope),
         );
       }
 
@@ -136,7 +136,7 @@ function deepResolve<T>(input: T, scope: Data): T {
 
 export async function resolvePdfTemplate<T, D extends object>(
   template: T,
-  data: D
+  data: D,
 ): Promise<T> {
   const companySettings = (await getCompanySettings()) ?? null;
   if (companySettings)
@@ -146,6 +146,6 @@ export async function resolvePdfTemplate<T, D extends object>(
     convertDatesToYMD({
       ...data,
       companySettings,
-    })
+    }),
   );
 }

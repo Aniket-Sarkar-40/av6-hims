@@ -44,12 +44,12 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
               purchasedPrice: applyRound(
                 Number(detail.purchasedPrice),
                 RoundFormat.TO_FIXED,
-                precision
+                precision,
               ),
               totalAmount: applyRound(
                 Number(detail.totalAmount),
                 RoundFormat.TO_FIXED,
-                precision
+                precision,
               ),
               createdBy: currentUser,
             })),
@@ -70,7 +70,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
           data: {
             lastPurchasedPrice: detail.purchasedPrice,
           },
-        })
+        }),
       ),
     ]);
 
@@ -137,13 +137,13 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
 
   const existingIds = new Set(existingDetails.map((d) => d.id));
   const toUpdate = incomingDetails.filter(
-    (d) => d.id != null && existingIds.has(d.id)
+    (d) => d.id != null && existingIds.has(d.id),
   );
   const toCreate = incomingDetails.filter(
-    (d) => d.id == null || !existingIds.has(d.id)
+    (d) => d.id == null || !existingIds.has(d.id),
   );
   const toDelete = omittedPO.omitted.po.purchaseOrderDetails.filter(
-    (d) => !incomingDetails.some((detail) => detail.id === d.id)
+    (d) => !incomingDetails.some((detail) => detail.id === d.id),
   );
 
   const toDeleteIds = toDelete
@@ -164,12 +164,12 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
             purchasedPrice: applyRound(
               Number(d.purchasedPrice),
               RoundFormat.TO_FIXED,
-              precision
+              precision,
             ),
             totalAmount: applyRound(
               Number(d.totalAmount),
               RoundFormat.TO_FIXED,
-              precision
+              precision,
             ),
             updatedBy: store?.user?.id,
           },
@@ -179,7 +179,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           purchasedPrice: applyRound(
             Number(d.purchasedPrice),
             RoundFormat.TO_FIXED,
-            precision
+            precision,
           ),
           packingQty: d.packingQty,
           quantity: d.quantity,
@@ -187,7 +187,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
           totalAmount: applyRound(
             Number(d.totalAmount),
             RoundFormat.TO_FIXED,
-            precision
+            precision,
           ),
           createdBy: store?.user?.id,
         })),
@@ -238,7 +238,7 @@ export const updatePurchaseOrderInDb = async (input: UpdatePurchaseOrder) => {
 
 export const getCountPODetailsFromDb = async (
   detailIds: number[],
-  purchaseOrderId: number
+  purchaseOrderId: number,
 ): Promise<number> => {
   return db.invPurchaseOrderDetails.count({
     where: {
@@ -274,7 +274,7 @@ export const getAllPurchaseFromDb = async (): Promise<
 };
 
 export const getPurchaseByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<PurchaseOrderWithDetails | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository id=${id}`);
 
@@ -325,7 +325,7 @@ export const deletePurchaseOrderFromDb = async (id: number): Promise<void> => {
   });
 
   logger.info(
-    `exiting::deletePurchaseOrderFromDb::repository id=${id} (deletedBy=${currentUser})`
+    `exiting::deletePurchaseOrderFromDb::repository id=${id} (deletedBy=${currentUser})`,
   );
 };
 
@@ -347,7 +347,7 @@ export const deletePurchaseOrderFromDb = async (id: number): Promise<void> => {
 // }
 
 export const getPOByNumberFromDb = async (
-  poNumber: string
+  poNumber: string,
 ): Promise<
   | (InvPurchaseOrder & { purchaseOrderDetails: InvPurchaseOrderDetails[] })
   | null
@@ -371,10 +371,10 @@ export const getPOByNumberFromDb = async (
 
 export const updatePurchaseOrderStatusFromDb = async (
   id: number,
-  status: PO_STATUS
+  status: PO_STATUS,
 ): Promise<void> => {
   logger.info(
-    `entering::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`
+    `entering::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`,
   );
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
@@ -384,6 +384,6 @@ export const updatePurchaseOrderStatusFromDb = async (
   });
 
   logger.info(
-    `exiting::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`
+    `exiting::updatePurchaseOrderStatusFromDb::repository id=${id} status=${status}`,
   );
 };

@@ -28,7 +28,7 @@ const redisPrefix = process.env.REDIS_PREFIX || "";
 const DYNAMIC_SC_CACHE_KEY = `${redisPrefix}accounting:dynamicShortCode:all`;
 
 async function updateDynamicShortCodeConfigsByShortCode(
-  input: Record<string, Prisma.InputJsonObject>
+  input: Record<string, Prisma.InputJsonObject>,
 ) {
   const mapping = Object.entries(input);
 
@@ -37,8 +37,8 @@ async function updateDynamicShortCodeConfigsByShortCode(
       db.accDynamicShortCode.updateMany({
         where: { shortCode },
         data: { config },
-      })
-    )
+      }),
+    ),
   );
 }
 

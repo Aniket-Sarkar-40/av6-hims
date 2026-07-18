@@ -45,7 +45,7 @@ itemStoreRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STORE", "CREATE")),
   validateItemStoreCreate,
-  createItemStore
+  createItemStore,
 );
 
 /**
@@ -61,7 +61,7 @@ itemStoreRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STORE", "VIEW")),
-  getAllItemStore
+  getAllItemStore,
 );
 
 /**
@@ -82,7 +82,7 @@ itemStoreRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_STORE", "VIEW")),
-  getItemStoreById
+  getItemStoreById,
 );
 
 /**
@@ -112,8 +112,8 @@ itemStoreRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "ITEM_STORE", "VIEW"),
-    getPermission("INV", "ITEM_STORE", "UPDATE")
+    getPermission("INV", "ITEM_STORE", "UPDATE"),
   ),
   validateItemStoreUpdate,
-  updateItemStore
+  updateItemStore,
 );

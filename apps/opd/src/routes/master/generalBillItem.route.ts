@@ -43,7 +43,7 @@ generalBillItemRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILL_ITEM", "CREATE")),
   validateCreateGeneralBillItemSchema,
-  createGeneralBillItem
+  createGeneralBillItem,
 );
 
 /**
@@ -66,8 +66,8 @@ generalBillItemRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "GENERAL_BILL_ITEM", "VIEW"),
-    getPermission("OPD", "GENERAL_BILL_ITEM", "UPDATE")
+    getPermission("OPD", "GENERAL_BILL_ITEM", "UPDATE"),
   ),
   validateUpdateGeneralBillItemSchema,
-  updateGeneralBillItem
+  updateGeneralBillItem,
 );

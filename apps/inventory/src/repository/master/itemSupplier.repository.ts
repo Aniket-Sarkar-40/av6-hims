@@ -25,7 +25,7 @@ import { API_TIMEOUT } from "@repo/shared/config/index.js";
 import { customOmit } from "av6-utils";
 
 export async function createItemSupplierInDb(
-  data: ItemSupplierCreateInput
+  data: ItemSupplierCreateInput,
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::createItemSupplierInDb::repository");
   //const settings = await settingsService.getSettings();
@@ -61,7 +61,7 @@ export async function createItemSupplierInDb(
                         taxIdentificationValue: tid.taxIdentificationValue,
                         taxIdentificationNumber: tid.taxIdentificationNumber,
                         createdBy: store?.user?.id,
-                      })
+                      }),
                     ),
                 }
               : undefined,
@@ -108,12 +108,12 @@ export async function createItemSupplierInDb(
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 }
 
 export async function updateItemSupplierInDb(
-  data: ItemSupplierUpdateInput
+  data: ItemSupplierUpdateInput,
 ): Promise<ItemSupplierResponse> {
   logger.info("entering::updateItemSupplierInDb::repository");
   //const settings = await settingsService.getSettings();
@@ -136,8 +136,8 @@ export async function updateItemSupplierInDb(
       ?.filter(
         (existingDetail) =>
           !taxIdentificationDetails?.some(
-            (updatedDetail) => updatedDetail.id === existingDetail.id
-          )
+            (updatedDetail) => updatedDetail.id === existingDetail.id,
+          ),
       )
       .map((detail) => detail.id) || [];
 
@@ -146,8 +146,8 @@ export async function updateItemSupplierInDb(
       ?.filter(
         (existingDetail) =>
           !bankDetails?.some(
-            (updatedDetail) => updatedDetail.id === existingDetail.id
-          )
+            (updatedDetail) => updatedDetail.id === existingDetail.id,
+          ),
       )
       .map((detail) => detail.id) || [];
 
@@ -258,7 +258,7 @@ export async function updateItemSupplierInDb(
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 }
 
@@ -290,7 +290,7 @@ export async function getAllItemSupplierFromDb(): Promise<
 }
 
 export async function getItemSupplierByIdFromDb(
-  itemSupplierId: number
+  itemSupplierId: number,
 ): Promise<ItemSupplierResponse | null> {
   logger.info("entering::getItemSupplierByIdFromDb::repository");
 
@@ -317,7 +317,7 @@ export async function getItemSupplierByIdFromDb(
 }
 
 export async function deleteItemSupplierByIdFromDb(
-  itemSupplierId: number
+  itemSupplierId: number,
 ): Promise<void> {
   logger.info("entering::deleteItemSupplierByIdFromDb::repository");
   const store = requestStorage.getStore();
@@ -378,7 +378,7 @@ export async function deleteItemSupplierByIdFromDb(
 }
 
 export async function getItemSupplierBySupplierCodeFromDb(
-  supplierCode: string
+  supplierCode: string,
 ): Promise<InvItemSupplier | null> {
   logger.info("entering::getItemSupplierBySupplierCodeFromDb::repository");
 
@@ -405,7 +405,7 @@ export async function getItemSupplierBySupplierCodeFromDb(
 }
 
 export async function getItemSupplierByNameFromDb(
-  name: string
+  name: string,
 ): Promise<InvItemSupplier | null> {
   logger.info("entering::getItemSupplierByNameFromDb::repository");
 
@@ -456,12 +456,12 @@ export const getEmailFromDb = async (email: string) => {
 };
 
 export const createItemSupplierExcelInDb = async (
-  inp: ItemSupplierExcelStagingRow[]
+  inp: ItemSupplierExcelStagingRow[],
 ) => {
   logger.info("entering::createItemSupplierExcelInDb::repository");
 
   const batchJobNo = await uinServiceFactory.generateUIN(
-    InvUinShortCode.BATCH_JOB
+    InvUinShortCode.BATCH_JOB,
   );
 
   return await db.$transaction(
@@ -519,7 +519,7 @@ export const createItemSupplierExcelInDb = async (
           isReturnSms: record.isReturnSms ?? false,
 
           batchJobId: batchJob.id,
-        })
+        }),
       );
 
       await tx.invItemSupplierExcel.createMany({
@@ -532,7 +532,7 @@ export const createItemSupplierExcelInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -595,8 +595,8 @@ export async function ItemSupplierBatchJob(input: ItemSupplierBatchJobInput) {
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
 
         await db.batchJobDetails.create({
           data: {
@@ -642,7 +642,7 @@ export async function ItemSupplierBatchJob(input: ItemSupplierBatchJobInput) {
 
 export async function searchItemSuppliersFromDb(
   type: ItemSupplierSearchType,
-  searchText: string
+  searchText: string,
 ): Promise<ItemSupplierLookupRow[]> {
   logger.info("entering::searchItemSuppliersFromDb::repository");
 

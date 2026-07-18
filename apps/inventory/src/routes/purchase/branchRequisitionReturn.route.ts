@@ -46,7 +46,7 @@ branchRequisitionReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "CREATE")),
   validateBranchRequisitionReturn,
-  createBranchRequisitionReturn
+  createBranchRequisitionReturn,
 );
 
 /**
@@ -62,7 +62,7 @@ branchRequisitionReturnRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "VIEW")),
-  getAllBranchRequisitionReturn
+  getAllBranchRequisitionReturn,
 );
 
 /**
@@ -85,7 +85,7 @@ branchRequisitionReturnRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "VIEW")),
-  getBranchRequisitionReturnById
+  getBranchRequisitionReturnById,
 );
 
 /**
@@ -102,10 +102,10 @@ branchRequisitionReturnRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "BRANCH_REQUISITION_RETURN", "VIEW"),
-    getPermission("INV", "BRANCH_REQUISITION_RETURN", "UPDATE")
+    getPermission("INV", "BRANCH_REQUISITION_RETURN", "UPDATE"),
   ),
   validateBranchRequisitionReturnUpdate,
-  updateBranchRequisitionReturn
+  updateBranchRequisitionReturn,
 );
 
 /**
@@ -127,7 +127,7 @@ branchRequisitionReturnRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN", "DELETE")),
-  deleteBranchRequisitionReturn
+  deleteBranchRequisitionReturn,
 );
 
 /**
@@ -144,7 +144,7 @@ branchRequisitionReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN_REJECT", "CREATE")),
   validateBranchRequisitionReturnReject,
-  rejectBranchRequisitionReturn
+  rejectBranchRequisitionReturn,
 );
 
 /**
@@ -160,10 +160,10 @@ branchRequisitionReturnRouter.post(
   "/approve",
   verifyToken(ServiceCode.INVENTORY),
   authorize(
-    getPermission("INV", "BRANCH_REQUISITION_RETURN_APPROVE", "CREATE")
+    getPermission("INV", "BRANCH_REQUISITION_RETURN_APPROVE", "CREATE"),
   ),
   validateApproveBranchRequisitionReturn,
-  approveBranchRequisitionReturn
+  approveBranchRequisitionReturn,
 );
 
 /**
@@ -180,5 +180,5 @@ branchRequisitionReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "BRANCH_REQUISITION_RETURN_ACK", "CREATE")),
   validateAcknowledgeBranchRequisitionReturn,
-  acknowledgeBranchRequisitionReturn
+  acknowledgeBranchRequisitionReturn,
 );

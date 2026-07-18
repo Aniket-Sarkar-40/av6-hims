@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.4.0",
+    "eslint": "^9.15.0",
     "mariadb": "^3.4.0",
     "prisma": "^7.0.0",
     "tsx": "^4.20.0",
@@ -41,6 +42,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.generated.json",
+    "lint": "eslint .",
     "p:deploy": "prisma migrate deploy",
     "p:gen": "prisma generate",
     "p:mig": "prisma migrate dev",

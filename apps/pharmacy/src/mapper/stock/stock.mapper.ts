@@ -11,12 +11,12 @@ import { customOmit } from "av6-core-v2";
 import { PmsItemStock } from "@repo/db/generated/prisma/client";
 
 export const toStockAuditDTO = async (
-  stockAudit: ItemStockAuditDetails
+  stockAudit: ItemStockAuditDetails,
 ): Promise<StockAuditDTO> => {
   const createdBy = stockAudit.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         stockAudit.createdBy,
-        true
+        true,
       )
     : null;
 
@@ -31,13 +31,13 @@ export const toStockAuditDTO = async (
     branch: stockAudit.itemStock.branchId
       ? await branchService.getBranchByIdWoDTO(
           stockAudit.itemStock.branchId,
-          true
+          true,
         )
       : null,
     warehouse: stockAudit.itemStock.warehouseId
       ? await warehouseService.getWarehouseByIdWoDTO(
           stockAudit.itemStock.warehouseId,
-          true
+          true,
         )
       : null,
   };

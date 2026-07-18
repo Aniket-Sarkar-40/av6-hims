@@ -42,7 +42,7 @@ const isZeroDrCr = (amt: DrCrAmt) => amt.dr === 0 && amt.cr === 0;
 const roundDrCr = (
   amt: DrCrAmt,
   method: RoundFormat,
-  precision: number
+  precision: number,
 ): DrCrAmt => ({
   dr: applyRound(amt.dr, method, precision),
   cr: applyRound(amt.cr, method, precision),
@@ -58,7 +58,7 @@ const getMonthRange = (month: string) => ({
 
 const getSignedAmount = (
   amt: DrCrAmt,
-  primaryCategory: AccountingPrimaryCategory
+  primaryCategory: AccountingPrimaryCategory,
 ): number => {
   if (primaryCategory === AccountingPrimaryCategory.ASSET) {
     return amt.dr - amt.cr;
@@ -85,7 +85,7 @@ const toLiabilityDrCr = (value: number): DrCrAmt => {
 const classifyMovement = (
   opening: DrCrAmt,
   closing: DrCrAmt,
-  primaryCategory: AccountingPrimaryCategory
+  primaryCategory: AccountingPrimaryCategory,
 ) => {
   const openingSigned = getSignedAmount(opening, primaryCategory);
   const closingSigned = getSignedAmount(closing, primaryCategory);
@@ -156,7 +156,7 @@ const getLedgerRowsForPeriod = async (params: {
 };
 
 const buildLedgerBalanceMap = (
-  rows: Awaited<ReturnType<typeof getLedgerRowsAsOnDate>>
+  rows: Awaited<ReturnType<typeof getLedgerRowsAsOnDate>>,
 ): Map<number, (typeof rows)[number]> => {
   const map = new Map<number, (typeof rows)[number]>();
   for (const row of rows) {
@@ -297,11 +297,11 @@ const getWorkingCapitalSnapshot = async (params: {
 
   const currentAssets = assetRows.reduce(
     (sum, row) => sum + (row.closing.dr - row.closing.cr),
-    0
+    0,
   );
   const currentLiabilities = liabilityRows.reduce(
     (sum, row) => sum + (row.closing.cr - row.closing.dr),
-    0
+    0,
   );
 
   return {
@@ -365,7 +365,7 @@ const buildMonthlyRows = async (params: {
         currentLiabilityLedgerIds: params.currentLiabilityLedgerIds,
         includeZero: params.includeZero,
       });
-    })
+    }),
   );
 
   cursor = dayjs(params.fromDate).startOf("month");
@@ -385,17 +385,17 @@ const buildMonthlyRows = async (params: {
       openingWorkingCapital: applyRound(
         opening.workingCapital,
         params.roundingMethod,
-        params.roundingPrecision
+        params.roundingPrecision,
       ),
       closingWorkingCapital: applyRound(
         closing.workingCapital,
         params.roundingMethod,
-        params.roundingPrecision
+        params.roundingPrecision,
       ),
       fundFlow: applyRound(
         closing.workingCapital - opening.workingCapital,
         params.roundingMethod,
-        params.roundingPrecision
+        params.roundingPrecision,
       ),
     });
 
@@ -458,7 +458,7 @@ const buildGroupMovementRows = async (params: {
     const classified = classifyMovement(
       opening,
       closing,
-      group.primaryCategory
+      group.primaryCategory,
     );
 
     let currentGroupId: number | null = group.id;
@@ -495,7 +495,7 @@ const buildGroupMovementRows = async (params: {
   }
 
   const rows = Array.from(grouped.values()).sort(
-    (a, b) => a.groupId - b.groupId
+    (a, b) => a.groupId - b.groupId,
   );
 
   if (params.includeZero) return rows;
@@ -505,7 +505,7 @@ const buildGroupMovementRows = async (params: {
       row.source !== 0 ||
       row.application !== 0 ||
       !isZeroDrCr(row.opening) ||
-      !isZeroDrCr(row.closing)
+      !isZeroDrCr(row.closing),
   );
 };
 
@@ -540,7 +540,7 @@ const buildGroupDetailTree = async (params: {
 
   const descendantGroupIds = getDescendantGroupIds(
     params.groupId,
-    params.groups
+    params.groups,
   );
   const descendantGroupIdSet = new Set(descendantGroupIds);
 
@@ -589,22 +589,22 @@ const buildGroupDetailTree = async (params: {
             opening: roundDrCr(
               opening,
               params.roundingMethod,
-              params.roundingPrecision
+              params.roundingPrecision,
             ),
             debit: applyRound(
               period.dr,
               params.roundingMethod,
-              params.roundingPrecision
+              params.roundingPrecision,
             ),
             credit: applyRound(
               period.cr,
               params.roundingMethod,
-              params.roundingPrecision
+              params.roundingPrecision,
             ),
             closing: roundDrCr(
               closing,
               params.roundingMethod,
-              params.roundingPrecision
+              params.roundingPrecision,
             ),
           },
         };
@@ -615,7 +615,7 @@ const buildGroupDetailTree = async (params: {
           !isZeroDrCr(row.amount.opening) ||
           row.amount.debit !== 0 ||
           row.amount.credit !== 0 ||
-          !isZeroDrCr(row.amount.closing)
+          !isZeroDrCr(row.amount.closing),
       );
 
     const children = (childMap.get(groupId) ?? [])
@@ -624,16 +624,16 @@ const buildGroupDetailTree = async (params: {
 
     const totalOpening = ledgers.reduce(
       (acc, row) => addDrCr(acc, row.amount.opening),
-      zeroDrCr()
+      zeroDrCr(),
     );
     const totalClosing = ledgers.reduce(
       (acc, row) => addDrCr(acc, row.amount.closing),
-      zeroDrCr()
+      zeroDrCr(),
     );
     const totalDebit = ledgers.reduce((sum, row) => sum + row.amount.debit, 0);
     const totalCredit = ledgers.reduce(
       (sum, row) => sum + row.amount.credit,
-      0
+      0,
     );
 
     for (const child of children) {
@@ -654,24 +654,24 @@ const buildGroupDetailTree = async (params: {
         opening: roundDrCr(
           totalOpening,
           params.roundingMethod,
-          params.roundingPrecision
+          params.roundingPrecision,
         ),
         debit: applyRound(
           totalDebit +
             children.reduce((sum, item) => sum + item.amount.debit, 0),
           params.roundingMethod,
-          params.roundingPrecision
+          params.roundingPrecision,
         ),
         credit: applyRound(
           totalCredit +
             children.reduce((sum, item) => sum + item.amount.credit, 0),
           params.roundingMethod,
-          params.roundingPrecision
+          params.roundingPrecision,
         ),
         closing: roundDrCr(
           totalClosing,
           params.roundingMethod,
-          params.roundingPrecision
+          params.roundingPrecision,
         ),
       },
       ledgers,
@@ -730,7 +730,7 @@ export const fundFlowEngineService = {
     const groups = allGroups.filter(
       (g) =>
         g.companyId === input.companyId &&
-        g.reportType === AccountingReportType.BALANCE_SHEET
+        g.reportType === AccountingReportType.BALANCE_SHEET,
     );
     const ledgers = allLedgers.filter((l) => l.companyId === input.companyId);
 
@@ -738,10 +738,10 @@ export const fundFlowEngineService = {
     const ancestorMap = buildGroupAncestorsMap(groups);
 
     const currentAssetRootGroup = groups.find(
-      (g) => g.name === "Current Assets"
+      (g) => g.name === "Current Assets",
     );
     const currentLiabilityRootGroup = groups.find(
-      (g) => g.name === "Current Liabilities"
+      (g) => g.name === "Current Liabilities",
     );
     const currentAssetRootIds = currentAssetRootGroup
       ? [currentAssetRootGroup.id]
@@ -788,11 +788,11 @@ export const fundFlowEngineService = {
 
       const openingWorkingCapital = months.reduce(
         (acc, month) => acc + month.openingWorkingCapital,
-        0
+        0,
       );
       const closingWorkingCapital = months.reduce(
         (acc, month) => acc + month.closingWorkingCapital,
-        0
+        0,
       );
       const fundFlow = months.reduce((acc, month) => acc + month.fundFlow, 0);
 
@@ -864,7 +864,7 @@ export const fundFlowEngineService = {
         (row) =>
           !isUnderRoot(row.groupId, currentAssetRootIds) &&
           !isUnderRoot(row.groupId, currentLiabilityRootIds) &&
-          (includeZero || row.source !== 0 || row.application !== 0)
+          (includeZero || row.source !== 0 || row.application !== 0),
       );
 
       const hasChildInEligibleRows = (groupId: number) =>
@@ -891,7 +891,7 @@ export const fundFlowEngineService = {
             amount: applyRound(
               row.application,
               roundingMethod,
-              roundingPrecision
+              roundingPrecision,
             ),
           });
         }
@@ -909,7 +909,7 @@ export const fundFlowEngineService = {
       const netProfit = applyRound(
         pl.totals.netProfit,
         roundingMethod,
-        roundingPrecision
+        roundingPrecision,
       );
 
       if (netProfit > 0) {
@@ -929,7 +929,7 @@ export const fundFlowEngineService = {
       const sourceTotal = sourceRows.reduce((sum, row) => sum + row.amount, 0);
       const applicationTotal = applicationRows.reduce(
         (sum, row) => sum + row.amount,
-        0
+        0,
       );
 
       const workingCapital = {
@@ -939,12 +939,12 @@ export const fundFlowEngineService = {
             opening: roundDrCr(
               toAssetDrCr(openingWc.currentAssets),
               roundingMethod,
-              roundingPrecision
+              roundingPrecision,
             ),
             closing: roundDrCr(
               toAssetDrCr(closingWc.currentAssets),
               roundingMethod,
-              roundingPrecision
+              roundingPrecision,
             ),
           },
           {
@@ -952,24 +952,24 @@ export const fundFlowEngineService = {
             opening: roundDrCr(
               toLiabilityDrCr(openingWc.currentLiabilities),
               roundingMethod,
-              roundingPrecision
+              roundingPrecision,
             ),
             closing: roundDrCr(
               toLiabilityDrCr(closingWc.currentLiabilities),
               roundingMethod,
-              roundingPrecision
+              roundingPrecision,
             ),
           },
         ],
         openingWorkingCapital: roundDrCr(
           toAssetDrCr(openingWc.workingCapital),
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         closingWorkingCapital: roundDrCr(
           toAssetDrCr(closingWc.workingCapital),
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         increase:
           diffWc > 0
@@ -992,12 +992,12 @@ export const fundFlowEngineService = {
           applications: applyRound(
             applicationTotal,
             roundingMethod,
-            roundingPrecision
+            roundingPrecision,
           ),
           difference: applyRound(
             sourceTotal - applicationTotal,
             roundingMethod,
-            roundingPrecision
+            roundingPrecision,
           ),
         },
       };

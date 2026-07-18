@@ -36,7 +36,7 @@ export const cronDetailsService = {
 
     await updateCronMessageById(
       ctx.id,
-      withAttemptPrefix(validation.attempt, CRON_MAX_RETRIES, "in_progress")
+      withAttemptPrefix(validation.attempt, CRON_MAX_RETRIES, "in_progress"),
     );
 
     logger.info("exiting::start::cronDetailsService::run", {
@@ -100,7 +100,7 @@ export type CronTaskOutcome<T> =
  * decisions are intentionally left to the caller via the returned outcome.
  */
 export const runCronTask = async <T>(
-  options: RunCronTaskOptions<T>
+  options: RunCronTaskOptions<T>,
 ): Promise<CronTaskOutcome<T>> => {
   const { cronName, runKey, task, buildMessage } = options;
   const runDate = options.runDate ?? new Date();
@@ -139,7 +139,7 @@ export const runCronTask = async <T>(
       message: withAttemptPrefix(
         attempt,
         CRON_MAX_RETRIES,
-        buildMessage?.(result)
+        buildMessage?.(result),
       ),
     });
 
@@ -152,8 +152,8 @@ export const runCronTask = async <T>(
         withAttemptPrefix(
           attempt,
           CRON_MAX_RETRIES,
-          err instanceof Error ? err.message : String(err)
-        )
+          err instanceof Error ? err.message : String(err),
+        ),
       ),
     });
 

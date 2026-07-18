@@ -51,7 +51,7 @@ sellReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "CREATE")),
   validateSellReturnInput,
-  createSellReturn
+  createSellReturn,
 );
 
 /**
@@ -81,10 +81,10 @@ sellReturnRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "SELL_RETURN", "VIEW"),
-    getPermission("PMS", "SELL_RETURN", "UPDATE")
+    getPermission("PMS", "SELL_RETURN", "UPDATE"),
   ),
   validateSellReturnUpdate,
-  updateSellReturn
+  updateSellReturn,
 );
 
 /**
@@ -103,7 +103,7 @@ sellReturnRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "VIEW")),
-  getSellReturnById
+  getSellReturnById,
 );
 
 /**
@@ -120,7 +120,7 @@ sellReturnRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "VIEW")),
-  getAllSellReturn
+  getAllSellReturn,
 );
 
 /**
@@ -134,7 +134,7 @@ sellReturnRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN", "DELETE")),
-  deleteSellReturn
+  deleteSellReturn,
 );
 
 /**
@@ -158,7 +158,7 @@ sellReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_APPROVE", "CREATE")),
   validateSellReturnUpdate,
-  approveSellReturn
+  approveSellReturn,
 );
 /**
  * @swagger
@@ -180,7 +180,7 @@ sellReturnRouter.post(
   "/rejected",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_REJECTED", "CREATE")),
-  rejectedSellReturn
+  rejectedSellReturn,
 );
 
 /**
@@ -203,7 +203,7 @@ sellReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_EXCEL", "VIEW")),
   validateSellReturnExcelFilter,
-  excelSellReturnReport
+  excelSellReturnReport,
 );
 /**
  * @swagger
@@ -225,6 +225,6 @@ sellReturnRouter.post(
   "/pdf",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_RETURN_PDF", "VIEW")),
-  getSellReturnPdfById
+  getSellReturnPdfById,
 );
 export default sellReturnRouter;

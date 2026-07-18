@@ -42,7 +42,7 @@ export const createGroupExcelImport = TryCatch(
 
     logger.info("exiting::createGroupExcelImport::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const exportGroupExcel = TryCatch(
@@ -55,16 +55,16 @@ export const exportGroupExcel = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="group_sample_excel.xlsx"`
+      `attachment; filename="group_sample_excel.xlsx"`,
     );
 
     await wb.xlsx.write(res);
     res.end();
 
     logger.info("exiting::exportGroupExcel::controller");
-  }
+  },
 );

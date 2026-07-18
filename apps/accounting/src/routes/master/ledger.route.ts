@@ -29,7 +29,7 @@ ledgerRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "LEDGER", "CREATE")),
   validateCreateLedger,
-  createLedger
+  createLedger,
 );
 
 ledgerRouter.put(
@@ -37,27 +37,27 @@ ledgerRouter.put(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "LEDGER", "UPDATE")),
   validateUpdateLedger,
-  updateLedger
+  updateLedger,
 );
 
 ledgerRouter.delete(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "LEDGER", "DELETE")),
-  deleteLedger
+  deleteLedger,
 );
 
 ledgerRouter.get(
   "/external-fetch",
   authorizeExternalRequest(),
-  fetchLedgerForExternalMapping
+  fetchLedgerForExternalMapping,
 );
 
 ledgerRouter.get(
   "/fetch",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "LEDGER", "VIEW")),
-  fetchLedgerForExternalMapping
+  fetchLedgerForExternalMapping,
 );
 
 ledgerRouter.post(
@@ -67,12 +67,12 @@ ledgerRouter.post(
   uploadToHetzner("excel"),
   authorize(getPermission("ACC", "LEDGER_EXCEL_IMPORT", "CREATE")),
   validateCreateLedgerExcel,
-  createLedgerExcelImport
+  createLedgerExcelImport,
 );
 
 ledgerRouter.get(
   "/excel-export",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "LEDGER_EXCEL_EXPORT", "CREATE")),
-  exportLedgerExcel
+  exportLedgerExcel,
 );

@@ -43,7 +43,7 @@ departmentRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "CREATE")),
   validateDepartment,
-  createDepartment
+  createDepartment,
 );
 
 /**
@@ -59,7 +59,7 @@ departmentRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "VIEW")),
-  getAllDepartments
+  getAllDepartments,
 );
 
 /**
@@ -82,7 +82,7 @@ departmentRouter.get(
   "/:departmentId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "VIEW")),
-  getDepartmentById
+  getDepartmentById,
 );
 
 /**
@@ -112,10 +112,10 @@ departmentRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "DEPARTMENT", "VIEW"),
-    getPermission("PMS", "DEPARTMENT", "UPDATE")
+    getPermission("PMS", "DEPARTMENT", "UPDATE"),
   ),
   validateDepartment,
-  updateDepartment
+  updateDepartment,
 );
 
 /**
@@ -138,5 +138,5 @@ departmentRouter.delete(
   "/:departmentId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DEPARTMENT", "DELETE")),
-  deleteDepartment
+  deleteDepartment,
 );

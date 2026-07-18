@@ -47,7 +47,7 @@ collectionCenterRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "CREATE")),
   validateCollectionCenter,
-  createCollectionCenter
+  createCollectionCenter,
 );
 
 /**
@@ -63,7 +63,7 @@ collectionCenterRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "VIEW")),
-  getAllCollectionCenter
+  getAllCollectionCenter,
 );
 
 /**
@@ -79,7 +79,7 @@ collectionCenterRouter.get(
   "/avl",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "VIEW")),
-  getAvailableCollectionCenter
+  getAvailableCollectionCenter,
 );
 
 /**
@@ -100,7 +100,7 @@ collectionCenterRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "COLLECTION_CENTER", "VIEW")),
-  getCollectionCenterById
+  getCollectionCenterById,
 );
 
 /**
@@ -130,10 +130,10 @@ collectionCenterRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "COLLECTION_CENTER", "VIEW"),
-    getPermission("PMS", "COLLECTION_CENTER", "UPDATE")
+    getPermission("PMS", "COLLECTION_CENTER", "UPDATE"),
   ),
   validateCollectionCenterUpdate,
-  updateCollectionCenter
+  updateCollectionCenter,
 );
 
 /**
@@ -149,6 +149,6 @@ collectionCenterRouter.get(
   "/staffId",
   verifyToken(ServiceCode.PHARMACY),
   // authorize(getPermission("COLLECTION_CENTER", "VIEW")),
-  getBranchOrWarehouse
+  getBranchOrWarehouse,
 );
 export default collectionCenterRouter;

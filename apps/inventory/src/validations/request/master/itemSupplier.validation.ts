@@ -64,7 +64,7 @@ export const itemSupplierCreateSchema = Joi.object({
   isLock: boolOptional("Is Lock"),
   taxIdentificationDetails: arrayOptional(
     "Tax Identification Details",
-    taxIdentificationDetailSchema
+    taxIdentificationDetailSchema,
   ),
 
   bankDetails: arrayOptional("Bank Details", bankDetailsSchema),

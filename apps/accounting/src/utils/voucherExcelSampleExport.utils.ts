@@ -6,7 +6,7 @@ type VoucherExcelSampleRow = Record<string, string | number>;
 
 const pickEnumValue = (
   enumObj: object,
-  preferredValues: string[] = []
+  preferredValues: string[] = [],
 ): string => {
   const values = Object.values(enumObj)
     .filter((value) => typeof value === "string" || typeof value === "number")
@@ -14,7 +14,7 @@ const pickEnumValue = (
 
   for (const preferredValue of preferredValues) {
     const matchedValue = values.find(
-      (value) => value.toUpperCase() === preferredValue.toUpperCase()
+      (value) => value.toUpperCase() === preferredValue.toUpperCase(),
     );
 
     if (matchedValue) return matchedValue;
@@ -24,7 +24,7 @@ const pickEnumValue = (
 };
 
 export const buildVoucherExcelSampleRow = (
-  voucherTypeName: string
+  voucherTypeName: string,
 ): VoucherExcelSampleRow => {
   const status = pickEnumValue(VoucherStatusForExcel, ["POSTED", "DRAFT"]);
   const dr = pickEnumValue(DrCr, ["DR", "DEBIT"]);

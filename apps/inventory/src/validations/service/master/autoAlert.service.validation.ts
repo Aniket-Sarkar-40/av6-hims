@@ -19,7 +19,7 @@ export const validateIdAutoAlertEmail = async (id: number) => {
   if (!record) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Auto alert email")
+      generateErrorMessage("NOT_FOUND", "Auto alert email"),
     );
   }
   logger.info("exiting::validateIdAutoAlertEmail::service::validation");
@@ -33,7 +33,7 @@ export const validateIdAutoAlertAudit = async (id: number) => {
   if (!record) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Auto alert audit")
+      generateErrorMessage("NOT_FOUND", "Auto alert audit"),
     );
   }
   logger.info("exiting::validateIdAutoAlertAudit::service::validation");
@@ -41,21 +41,21 @@ export const validateIdAutoAlertAudit = async (id: number) => {
 };
 
 export const createAutoAlertEmailServiceValidation = async (
-  input: CreateAutoAlertEmailInput
+  input: CreateAutoAlertEmailInput,
 ) => {
   logger.info("entering::createAutoAlertEmail::service::validation");
   const existing = await getAutoAlertEmailByShortCodeFromDb(input.shortCode);
   if (existing) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Auto alert email")
+      generateErrorMessage("DUPLICATE_ITEM", "Auto alert email"),
     );
   }
   logger.info("exiting::createAutoAlertEmail::service::validation");
 };
 
 export const updateAutoAlertEmailServiceValidation = async (
-  input: UpdateAutoAlertEmailInput
+  input: UpdateAutoAlertEmailInput,
 ) => {
   logger.info("entering::updateAutoAlertEmail::service::validation");
   await validateIdAutoAlertEmail(input.id);
@@ -63,14 +63,14 @@ export const updateAutoAlertEmailServiceValidation = async (
   if (existing && existing.id !== input.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Auto alert email")
+      generateErrorMessage("DUPLICATE_ITEM", "Auto alert email"),
     );
   }
   logger.info("exiting::updateAutoAlertEmail::service::validation");
 };
 
 export const resendAutoAlertEmailServiceValidation = async (
-  auditId: number
+  auditId: number,
 ) => {
   logger.info("entering::resendAutoAlertEmail::service::validation");
   const audit = await validateIdAutoAlertAudit(auditId);

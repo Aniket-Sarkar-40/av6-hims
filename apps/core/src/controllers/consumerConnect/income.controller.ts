@@ -20,7 +20,7 @@ export const createIncome = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Income"),
     },
-    newIncome
+    newIncome,
   );
 
   logger.info("exiting::createIncome::controller");
@@ -76,8 +76,8 @@ export const updateIncome = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Income"),
       },
-      updatedIncome
-    )
+      updatedIncome,
+    ),
   );
 });
 export const getIncomeId = TryCatch(async (req: Request, res: Response) => {
@@ -91,7 +91,7 @@ export const getIncomeId = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Income"),
     },
-    allIncomeById
+    allIncomeById,
   );
 
   logger.info("exiting::getIncomeId::controller");
@@ -108,7 +108,7 @@ export const getAllIncome = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("FETCHED", "Income "),
     },
-    allIncome
+    allIncome,
   );
 
   logger.info("exiting::getAllIncome::controller");
@@ -151,6 +151,6 @@ export const deleteIncome = TryCatch(async (req: Request, res: Response) => {
     new BaseResponse({
       success: true,
       message: generateSuccessMessage("DELETED", "Income"),
-    })
+    }),
   );
 });

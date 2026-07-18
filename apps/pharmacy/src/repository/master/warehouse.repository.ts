@@ -6,7 +6,7 @@ import { PmsWarehouse } from "@repo/db/generated/prisma/client";
 import { ToggleActive } from "av6-core-v2";
 
 export const createWarehouseInDb = async (
-  warehouse: WarehouseReq
+  warehouse: WarehouseReq,
 ): Promise<PmsWarehouse> => {
   logger.info("entering::createWarehouseInDb::repository");
   const store = requestStorage.getStore();
@@ -23,7 +23,7 @@ export const createWarehouseInDb = async (
 };
 
 export const updateWarehouseInDb = async (
-  warehouse: WarehouseReq
+  warehouse: WarehouseReq,
 ): Promise<PmsWarehouse> => {
   logger.info("entering::updateWarehouseInDb::repository");
   const store = requestStorage.getStore();
@@ -34,7 +34,7 @@ export const updateWarehouseInDb = async (
 };
 
 export const getWarehouseByWarehouseNameFromDb = async (
-  name: string
+  name: string,
 ): Promise<PmsWarehouse | null> => {
   logger.info("entering::getWarehouseByWarehouseNameFromDb::repository");
   return db.pmsWarehouse.findFirst({
@@ -43,7 +43,7 @@ export const getWarehouseByWarehouseNameFromDb = async (
 };
 
 export const getWarehouseByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<PmsWarehouse | null> => {
   logger.info("entering::getWarehouseByIdFromDb::repository");
   return db.pmsWarehouse.findUnique({
@@ -57,7 +57,7 @@ export const getAllWarehouseFromDb = async (): Promise<PmsWarehouse[]> => {
 };
 
 export const toggleActiveWarehouse = async (
-  input: ToggleActive
+  input: ToggleActive,
 ): Promise<PmsWarehouse> => {
   logger.info("entering::toggleActiveWarehouse::repository");
   const store = requestStorage.getStore();

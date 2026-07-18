@@ -15,7 +15,7 @@ export const validateIdStaffDesignation = async (id: number) => {
   if (!staffDesignation || staffDesignation.isActive === "no") {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Staff Designation")
+      generateErrorMessage("NOT_FOUND", "Staff Designation"),
     );
   }
   logger.info("exiting::validateIdStaffDesignation::service::validation");
@@ -23,31 +23,31 @@ export const validateIdStaffDesignation = async (id: number) => {
   return staffDesignation;
 };
 export const createStaffDesignationServiceValidation = async (
-  body: CreateStaffDesignationInput
+  body: CreateStaffDesignationInput,
 ): Promise<void> => {
   logger.info(
-    "entering::createStaffDesignationServiceValidation service::validation"
+    "entering::createStaffDesignationServiceValidation service::validation",
   );
   const staffDesignation =
     await getStaffDesignationByStaffDesignationNameFromDb(body.designation);
   if (staffDesignation) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("DUPLICATE_ITEM", "Staff Designation Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Staff Designation Name"),
     );
   }
   logger.info(
-    "exiting::createStaffDesignationServiceValidation service::validation"
+    "exiting::createStaffDesignationServiceValidation service::validation",
   );
   return;
 };
 
 export const updateStaffDesignationServiceValidation = async (
   body: CreateStaffDesignationInput,
-  staffDesignationId: number
+  staffDesignationId: number,
 ): Promise<void> => {
   logger.info(
-    "entering::updateStaffDesignationServiceValidation service::validation"
+    "entering::updateStaffDesignationServiceValidation service::validation",
   );
   await validateIdStaffDesignation(staffDesignationId);
   const staffDesignation =
@@ -55,11 +55,11 @@ export const updateStaffDesignationServiceValidation = async (
   if (staffDesignation && staffDesignation.id !== staffDesignationId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Staff Designation Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Staff Designation Name"),
     );
   }
   logger.info(
-    "exiting::updateStaffDesignationServiceValidation service::validation"
+    "exiting::updateStaffDesignationServiceValidation service::validation",
   );
   return;
 };

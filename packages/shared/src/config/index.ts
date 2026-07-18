@@ -153,7 +153,7 @@ const envSchema = Joi.object<RawEnv>({
   EXT_PHARMACY_ITEM_URL: Joi.string().allow("").default(""),
   MASTER_SERVICE_URL: Joi.string().default("http://127.0.0.1:4002"),
   INVENTORY_SERVICE_URL: Joi.string().default(
-    "http://127.0.0.1:4507/api/v1/inv"
+    "http://127.0.0.1:4507/api/v1/inv",
   ),
 
   // --- Storage (Hetzner S3) ---
@@ -183,7 +183,7 @@ if (error) {
     .join("\n");
   throw new Error(
     `Invalid / missing environment configuration:\n${details}\n` +
-      `Set the above variable(s) in your .env file (see .env.example).`
+      `Set the above variable(s) in your .env file (see .env.example).`,
   );
 }
 

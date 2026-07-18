@@ -50,7 +50,7 @@ grnReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "CREATE")),
   validateGrnReturn,
-  createGrnReturn
+  createGrnReturn,
 );
 
 /**
@@ -66,7 +66,7 @@ grnReturnRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "VIEW")),
-  getAllGrnReturn
+  getAllGrnReturn,
 );
 
 /**
@@ -87,7 +87,7 @@ grnReturnRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "VIEW")),
-  getGrnReturnById
+  getGrnReturnById,
 );
 
 /**
@@ -117,10 +117,10 @@ grnReturnRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "GRN_RETURN", "VIEW"),
-    getPermission("INV", "GRN_RETURN", "UPDATE")
+    getPermission("INV", "GRN_RETURN", "UPDATE"),
   ),
   validateGrnReturnUpdate,
-  updateGrnReturn
+  updateGrnReturn,
 );
 
 /**
@@ -147,7 +147,7 @@ grnReturnRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN", "DELETE")),
-  deleteGrnReturn
+  deleteGrnReturn,
 );
 
 /**
@@ -170,7 +170,7 @@ grnReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN_APPROVE", "CREATE")),
   validateGrnReturnApprove,
-  approveGrnReturn
+  approveGrnReturn,
 );
 
 /**
@@ -192,7 +192,7 @@ grnReturnRouter.post(
   "/rejected",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_RETURN_REJECTED", "CREATE")),
-  rejectedGrnReturn
+  rejectedGrnReturn,
 );
 
 /**

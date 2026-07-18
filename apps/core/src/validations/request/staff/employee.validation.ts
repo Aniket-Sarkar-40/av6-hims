@@ -108,7 +108,7 @@ export const employeeSchema = Joi.object<CreateOrUpdateEmployee>({
 export const validateEmployee = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = employeeSchema.validate(req.body, { abortEarly: false });
 
@@ -119,7 +119,7 @@ export const validateEmployee = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

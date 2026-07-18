@@ -172,7 +172,7 @@ export const updateCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
             data: {
               ...customOmit<CompanyFinancialYearCreateInput, "id">(
                 financialYears,
-                ["id"]
+                ["id"],
               ).rest,
               updatedBy: currentUser,
             },
@@ -196,7 +196,7 @@ export const updateCompanyInDb = async (input: CreateOrUpdateCompanyInput) => {
 };
 
 export const getCompanyById = async (
-  id: number
+  id: number,
 ): Promise<CompanyResponse | null> => {
   logger.info("entering::getCompanyById::repository");
   return db.company.findFirst({
@@ -223,7 +223,7 @@ export const getCompanyById = async (
 
 export const getCompanyByCode = async (
   code: string,
-  companyId?: number
+  companyId?: number,
 ): Promise<Company | null> => {
   logger.info("entering::getCompanyByCode::repository");
   return db.company.findFirst({
@@ -238,7 +238,7 @@ export const getCompanyByCode = async (
 export const getCompanyFYByCompanyAndDateRange = async (
   companyId: number,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): Promise<CompanyFinancialYear | null> => {
   logger.info("entering::getCompanyFYByCompanyAndDateRange::repository");
   return db.companyFinancialYear.findFirst({
@@ -257,7 +257,7 @@ export const getCompanyFYByCompanyAndDateRange = async (
 
 export const getCompanyFYByCompanyIdAndFyIdFromDb = async (
   companyId: number,
-  fyId: number
+  fyId: number,
 ): Promise<CompanyFinancialYear | null> => {
   logger.info("entering::getCompanyFYByCompanyIdAndFyIdFromDb::repository");
   return db.companyFinancialYear.findFirst({
@@ -270,7 +270,7 @@ export const getCompanyFYByCompanyIdAndFyIdFromDb = async (
 };
 
 export const getFyByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<CompanyFinancialYear | null> => {
   logger.info("entering::getFyByIdFromDb::repository");
   return db.companyFinancialYear.findFirst({
@@ -282,7 +282,7 @@ export const getFyByIdFromDb = async (
 };
 
 export const getCompanyByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Company | null> => {
   logger.info("entering::getCompanyByIdFromDb::repository");
   return db.company.findFirst({

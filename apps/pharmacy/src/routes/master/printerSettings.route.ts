@@ -45,7 +45,7 @@ printerSettingsRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PRINTER_SETTINGS", "CREATE")),
   validatePrinterSettings,
-  createPrinterSettings
+  createPrinterSettings,
 );
 /**
  * @swagger
@@ -67,10 +67,10 @@ printerSettingsRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "PRINTER_SETTINGS", "UPDATE"),
-    getPermission("PMS", "PRINTER_SETTINGS", "VIEW")
+    getPermission("PMS", "PRINTER_SETTINGS", "VIEW"),
   ),
   validateUpdatePrinterSettings,
-  updatePrinterSettings
+  updatePrinterSettings,
 );
 
 /**
@@ -86,7 +86,7 @@ printerSettingsRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PRINTER_SETTINGS", "VIEW")),
-  getPrinterSettings
+  getPrinterSettings,
 );
 
 /**
@@ -102,7 +102,7 @@ printerSettingsRouter.get(
   "/cc-type",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PRINTER_SETTINGS", "VIEW")),
-  getPrinterSettingsByCCAndType
+  getPrinterSettingsByCCAndType,
 );
 
 export default printerSettingsRouter;

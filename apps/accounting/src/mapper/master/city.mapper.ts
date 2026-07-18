@@ -49,6 +49,6 @@ export const toCityDTO = async (data: City[]): Promise<CityDTO[]> => {
         state: toIdValue(state, "name"),
         country: toIdValueCountry(country, "enShortName"),
       };
-    })
+    }),
   );
 };

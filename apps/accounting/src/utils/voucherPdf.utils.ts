@@ -10,7 +10,7 @@ export const getTopLedger = (
   voucherTypeNature: VoucherTypeNature,
   voucherLines: VoucherLine[],
   ledgers: Ledger[],
-  groups: Group[]
+  groups: Group[],
 ): { line: VoucherLine; ledger: Ledger } | undefined | null => {
   const ledgerMap = new Map(ledgers.map((l) => [l.id, l]));
   const groupMap = new Map(groups.map((g) => [g.id, g]));
@@ -163,7 +163,7 @@ export const getTopLedger = (
 };
 
 export const generateVoucherInvoice = async (
-  data: VoucherPdfDTO
+  data: VoucherPdfDTO,
 ): Promise<CustomDocDefinition> => {
   logger.info("entering::generateStudentCard::utils");
 

@@ -46,7 +46,7 @@ export const parseOptionalBoolean = (value: unknown): boolean | null => {
 export const parseEnum = <T extends string>(
   value: unknown,
   allowed: Set<string>,
-  fieldName: string
+  fieldName: string,
 ): T | null => {
   const parsed = parseOptionalString(value);
   if (!parsed) return null;
@@ -54,7 +54,7 @@ export const parseEnum = <T extends string>(
   if (!allowed.has(normalized)) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_VALUE", fieldName)
+      generateErrorMessage("INVALID_VALUE", fieldName),
     );
   }
   return normalized as T;
@@ -62,7 +62,7 @@ export const parseEnum = <T extends string>(
 
 export const parseOptionalDecimal = (
   value: unknown,
-  fieldName = "Amount"
+  fieldName = "Amount",
 ): number | null => {
   const parsed = parseOptionalString(value);
   if (!parsed) return null;
@@ -70,7 +70,7 @@ export const parseOptionalDecimal = (
   if (Number.isNaN(num)) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_VALUE", fieldName)
+      generateErrorMessage("INVALID_VALUE", fieldName),
     );
   }
   return num;

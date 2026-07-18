@@ -37,5 +37,5 @@ followUpRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "FOLLOW_UP", "CREATE")),
   validateCreateFollowUp,
-  createFollowUp
+  createFollowUp,
 );

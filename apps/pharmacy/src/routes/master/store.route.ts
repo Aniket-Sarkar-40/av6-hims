@@ -44,7 +44,7 @@ storeRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE", "CREATE")),
   validateCreateStore,
-  createStore
+  createStore,
 );
 
 /**
@@ -60,7 +60,7 @@ storeRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE", "VIEW")),
-  getAllStore
+  getAllStore,
 );
 
 /**
@@ -90,8 +90,8 @@ storeRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORE", "VIEW"),
-    getPermission("PMS", "STORE", "UPDATE")
+    getPermission("PMS", "STORE", "UPDATE"),
   ),
   validateUpdateStore,
-  updateStore
+  updateStore,
 );

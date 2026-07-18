@@ -27,7 +27,7 @@ const rateOfExchangeServiceRaw = {
       await addToCache(
         cacheKey,
         createdRateOfExchange.id,
-        createdRateOfExchange
+        createdRateOfExchange,
       );
     }
     logger.info("exiting::createRateOfExchange::service");
@@ -40,7 +40,7 @@ const rateOfExchangeServiceRaw = {
     if (!rate) {
       throw new ErrorHandler(
         400,
-        "Please configure the rate of exchange for the currency"
+        "Please configure the rate of exchange for the currency",
       );
     }
     logger.info("exiting::fetchRateOfExchange::service");
@@ -50,5 +50,5 @@ const rateOfExchangeServiceRaw = {
 
 export const rateOfExchangeService = auditProxy.createAuditedService(
   "rateOfExchange",
-  rateOfExchangeServiceRaw
+  rateOfExchangeServiceRaw,
 );

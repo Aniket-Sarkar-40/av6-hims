@@ -29,7 +29,7 @@ export const validateIdGroup = async (id: number): Promise<Group> => {
 };
 
 export const createOrUpdateGroupServiceValidation = async (
-  input: CreateOrUpdateGroupInput
+  input: CreateOrUpdateGroupInput,
 ): Promise<void> => {
   logger.info("entering::createOrUpdateGroup::service::validation");
 
@@ -38,7 +38,7 @@ export const createOrUpdateGroupServiceValidation = async (
     if (existingGroup.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        "You can't change company for existing group"
+        "You can't change company for existing group",
       );
     }
   }
@@ -48,13 +48,13 @@ export const createOrUpdateGroupServiceValidation = async (
   if (input.isPrimaryGroup && input.parentId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_NOT_ALLOWED", "Parent Group")
+      generateErrorMessage("FIELD_NOT_ALLOWED", "Parent Group"),
     );
   }
   if (!input.isPrimaryGroup && !input.parentId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Parent Group")
+      generateErrorMessage("FIELD_REQUIRED", "Parent Group"),
     );
   }
 
@@ -66,7 +66,7 @@ export const createOrUpdateGroupServiceValidation = async (
     ) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Affects Gross Profit")
+        generateErrorMessage("FIELD_REQUIRED", "Affects Gross Profit"),
       );
     }
   }
@@ -74,7 +74,7 @@ export const createOrUpdateGroupServiceValidation = async (
     if (input.affectsGrossProfit) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_NOT_ALLOWED", "Affects Gross Profit")
+        generateErrorMessage("FIELD_NOT_ALLOWED", "Affects Gross Profit"),
       );
     }
   }
@@ -95,7 +95,7 @@ export const createGroupExcelServiceValidation = async (params: {
   filePath?: string;
 }): Promise<void> => {
   logger.info(
-    "entering::createGroupExcelServiceValidation::service::validation"
+    "entering::createGroupExcelServiceValidation::service::validation",
   );
   const { companyId, filePath } = params;
 
@@ -106,12 +106,12 @@ export const createGroupExcelServiceValidation = async (params: {
   }
 
   logger.info(
-    "exiting::createGroupExcelServiceValidation::service::validation"
+    "exiting::createGroupExcelServiceValidation::service::validation",
   );
 };
 
 export const validateDeleteGroupServiceValidation = async (
-  id: number
+  id: number,
 ): Promise<void> => {
   logger.info("entering::validateDeleteGroup::service::validation");
   const group = await validateIdGroup(id);
@@ -124,7 +124,7 @@ export const validateDeleteGroupServiceValidation = async (
   if (ledgers.length > 0) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("ASSOCIATED_ITEM_EXIST", "Group", "Ledger")
+      generateErrorMessage("ASSOCIATED_ITEM_EXIST", "Group", "Ledger"),
     );
   }
   logger.info("exiting::validateDeleteGroup::service::validation");

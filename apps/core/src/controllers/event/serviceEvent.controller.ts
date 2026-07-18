@@ -13,25 +13,24 @@ export const createServiceEvent = TryCatch(
     const serviceEvent = await serviceEventService.createServiceEvent(data);
     const response = BaseResponse.success(
       { type: "CREATED", data: serviceEvent },
-      "ServiceEvent"
+      "ServiceEvent",
     );
     logger.info("exiting::createServiceEvent::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateServiceEvent = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::updateServiceEvent::controller");
     const data = req.body;
-    const updatedServiceEvent = await serviceEventService.updateServiceEvent(
-      data
-    );
+    const updatedServiceEvent =
+      await serviceEventService.updateServiceEvent(data);
     logger.info("exiting::updateServiceEvent::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedServiceEvent },
-      "ServiceEvent"
+      "ServiceEvent",
     );
     return res.status(200).json(response);
-  }
+  },
 );

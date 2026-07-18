@@ -160,7 +160,7 @@ export const searchStockTransferSchema = Joi.object({
     .valid(...Object.values(PMS_STR_STATUS))
     .messages({
       "any.only": `status must be one of ${Object.values(PMS_STR_STATUS).join(
-        ", "
+        ", ",
       )}`,
       "string.base": "status must be a string",
     }),
@@ -168,7 +168,7 @@ export const searchStockTransferSchema = Joi.object({
     .valid(...Object.values(PMS_STR_RETURN_STATUS))
     .messages({
       "any.only": `returnStatus must be one of ${Object.values(
-        PMS_STR_RETURN_STATUS
+        PMS_STR_RETURN_STATUS,
       ).join(", ")}`,
       "string.base": "returnStatus must be a string",
     }),

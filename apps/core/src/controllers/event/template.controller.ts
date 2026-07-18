@@ -11,7 +11,7 @@ export const createTemplate = TryCatch(async (req: Request, res: Response) => {
   const template = await templateService.createTemplate(data);
   const response = BaseResponse.success(
     { type: "CREATED", data: template },
-    "Template"
+    "Template",
   );
   logger.info("exiting::createTemplate::controller");
   return res.status(201).json(response);
@@ -24,7 +24,7 @@ export const updateTemplate = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::updateTemplate::controller");
   const response = BaseResponse.success(
     { type: "UPDATED", data: updatedTemplate },
-    "Template"
+    "Template",
   );
   return res.status(200).json(response);
 });

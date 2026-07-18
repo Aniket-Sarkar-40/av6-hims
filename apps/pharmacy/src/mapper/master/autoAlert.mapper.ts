@@ -9,7 +9,7 @@ import { customOmit } from "av6-core-v2";
 import { toIdValue } from "av6-utils";
 
 export const toAutoAlertAuditDTO = async (
-  input: PmsAutoAlertAudit
+  input: PmsAutoAlertAudit,
 ): Promise<AutoAlertAuditDTO> => {
   const createdBy = input.createdBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(input.createdBy, true)

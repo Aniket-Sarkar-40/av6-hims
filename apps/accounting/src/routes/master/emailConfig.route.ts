@@ -42,5 +42,5 @@ emailConfigRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "EMAIL_CONFIG", "CREATE")),
   validateEmailConfig,
-  upsertEmailConfig
+  upsertEmailConfig,
 );

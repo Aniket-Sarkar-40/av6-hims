@@ -8,7 +8,7 @@ export const getClientLedgerMappingByClientIdAndClientType = async (params: {
   clientType: ClientType;
 }): Promise<ClientLedgerMapping | null> => {
   logger.info(
-    "entering::getClientLedgerMappingByClientIdAndClientType::repository"
+    "entering::getClientLedgerMappingByClientIdAndClientType::repository",
   );
   const { clientId, clientType } = params;
   return await db.clientLedgerMapping.findFirst({

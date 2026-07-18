@@ -62,7 +62,7 @@ const stateServiceRaw = {
       const cachedStates = (await getAllCache(cacheKey)) as State[] | null;
       if (cachedStates && cachedStates.length > 0) {
         const stateDTOS = await Promise.all(
-          cachedStates.map((state) => toStateDTOForState(state))
+          cachedStates.map((state) => toStateDTOForState(state)),
         );
 
         return stateDTOS;
@@ -74,12 +74,12 @@ const stateServiceRaw = {
       if (states.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "States")
+          generateErrorMessage("NOT_FOUND", "States"),
         );
       }
 
       const stateDTOS = await Promise.all(
-        states.map((state) => toStateDTOForState(state))
+        states.map((state) => toStateDTOForState(state)),
       );
       logger.info("exiting::getAllStates::service");
       return stateDTOS;
@@ -88,7 +88,7 @@ const stateServiceRaw = {
 
   async getStateById(
     stateId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<StateDTO | null> {
     logger.info("entering::getStateById::service");
     validIdCheck(stateId);
@@ -147,5 +147,5 @@ const stateServiceRaw = {
 
 export const stateService = auditProxy.createAuditedService(
   "state",
-  stateServiceRaw
+  stateServiceRaw,
 );

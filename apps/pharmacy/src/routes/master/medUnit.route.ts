@@ -50,7 +50,7 @@ medUnitRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_UNIT", "CREATE")),
   validateDropDownName,
-  unitCreate
+  unitCreate,
 );
 
 /**
@@ -69,7 +69,7 @@ medUnitRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_UNIT", "VIEW")),
-  medUnitGet
+  medUnitGet,
 );
 
 /**
@@ -90,7 +90,7 @@ medUnitRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_UNIT", "VIEW")),
-  getMedUnitById
+  getMedUnitById,
 );
 
 /**
@@ -120,10 +120,10 @@ medUnitRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_UNIT", "VIEW"),
-    getPermission("PMS", "MEDICINE_UNIT", "UPDATE")
+    getPermission("PMS", "MEDICINE_UNIT", "UPDATE"),
   ),
   validateDropDownNameUpdate,
-  updateMedUnit
+  updateMedUnit,
 );
 
 export default medUnitRouter;

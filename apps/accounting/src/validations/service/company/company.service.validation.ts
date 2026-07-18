@@ -20,7 +20,7 @@ import {
 } from "@repo/db/generated/prisma/client";
 
 export const validateIdCompany = async (
-  id: number
+  id: number,
 ): Promise<CompanyResponse> => {
   logger.info("entering::validateIdCompany::service::validation");
   validIdCheck(id);
@@ -33,7 +33,7 @@ export const validateIdCompany = async (
   return company;
 };
 export const validateIdFinancialYear = async (
-  id: number
+  id: number,
 ): Promise<CompanyFinancialYear> => {
   logger.info("entering::validateIdFinancialYear::service::validation");
   validIdCheck(id);
@@ -42,7 +42,7 @@ export const validateIdFinancialYear = async (
   if (!fy) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Financial Year")
+      generateErrorMessage("NOT_FOUND", "Financial Year"),
     );
   }
   logger.info("exiting::validateIdFinancialYear::service::validation");
@@ -50,7 +50,7 @@ export const validateIdFinancialYear = async (
 };
 
 export const createOrUpdateCompanyServiceValidation = async (
-  input: CreateOrUpdateCompanyInput
+  input: CreateOrUpdateCompanyInput,
 ) => {
   logger.info("entering::createOrUpdateCompany::service::validation");
   const { addresses, statutory, financialYears, features } = input;
@@ -60,44 +60,48 @@ export const createOrUpdateCompanyServiceValidation = async (
     const companyFy = await getCompanyFYByCompanyAndDateRange(
       input.id,
       new Date(financialYears.startDate),
-      new Date(financialYears.endDate)
+      new Date(financialYears.endDate),
     );
     if (companyFy) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Company Financial Year")
+        generateErrorMessage("DUPLICATE_ITEM", "Company Financial Year"),
       );
     }
     for (const address of addresses) {
       const compId = company.companyAddresses.find(
-        (a) => a.id === address.id
+        (a) => a.id === address.id,
       )?.companyId;
       if (compId !== input.id) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_ASSOCIATION", "Address", "Company")
+          generateErrorMessage("INVALID_ASSOCIATION", "Address", "Company"),
         );
       }
     }
     if (company.companyStatutory?.id !== statutory.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "Statutory", "Company")
+        generateErrorMessage("INVALID_ASSOCIATION", "Statutory", "Company"),
       );
     }
     const fyCompId = company.companyFinancialYears?.find(
-      (fy) => fy.id === financialYears.id
+      (fy) => fy.id === financialYears.id,
     )?.companyId;
     if (fyCompId !== input.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+        generateErrorMessage(
+          "INVALID_ASSOCIATION",
+          "Financial Year",
+          "Company",
+        ),
       );
     }
     if (company.companyFeatures?.id !== features.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "Features", "Company")
+        generateErrorMessage("INVALID_ASSOCIATION", "Features", "Company"),
       );
     }
   }
@@ -110,7 +114,7 @@ export const createOrUpdateCompanyServiceValidation = async (
   if (sameCode) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Company Code")
+      generateErrorMessage("DUPLICATE_ITEM", "Company Code"),
     );
   }
 
@@ -130,13 +134,13 @@ export const createOrUpdateCompanyServiceValidation = async (
     if (city.stateId !== address.stateId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "City", "State")
+        generateErrorMessage("INVALID_ASSOCIATION", "City", "State"),
       );
     }
     if (city.countryId !== address.countryId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_ASSOCIATION", "City", "Country")
+        generateErrorMessage("INVALID_ASSOCIATION", "City", "Country"),
       );
     }
   }
@@ -150,26 +154,26 @@ export const createOrUpdateCompanyServiceValidation = async (
     if (!statutory.gstRegistrationType) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Gst Registration Type")
+        generateErrorMessage("FIELD_REQUIRED", "Gst Registration Type"),
       );
     }
     if (allowedGstRegType.has(statutory.gstRegistrationType)) {
       if (!statutory.gstin) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Gst In")
+          generateErrorMessage("FIELD_REQUIRED", "Gst In"),
         );
       }
       if (!statutory.gstStateCode) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Gst State Code")
+          generateErrorMessage("FIELD_REQUIRED", "Gst State Code"),
         );
       }
       if (!statutory.gstEffectiveFrom) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("FIELD_REQUIRED", "Gst Effective From")
+          generateErrorMessage("FIELD_REQUIRED", "Gst Effective From"),
         );
       }
     }

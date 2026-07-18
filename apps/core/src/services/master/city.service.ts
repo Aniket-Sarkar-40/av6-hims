@@ -59,7 +59,7 @@ const cityServiceRaw = {
       const cachedCities = (await getAllCache(cacheKey)) as City[] | null;
       if (cachedCities && cachedCities.length > 0) {
         const cityDTOS = await Promise.all(
-          cachedCities.map((city) => toCityDTOOnlyForCity(city))
+          cachedCities.map((city) => toCityDTOOnlyForCity(city)),
         );
         return cityDTOS;
       }
@@ -70,11 +70,11 @@ const cityServiceRaw = {
       if (cities.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Cities")
+          generateErrorMessage("NOT_FOUND", "Cities"),
         );
       }
       const cityDTOS = await Promise.all(
-        cities.map((city) => toCityDTOOnlyForCity(city))
+        cities.map((city) => toCityDTOOnlyForCity(city)),
       );
       logger.info("exiting::getAllCities::service");
       return cityDTOS;
@@ -83,7 +83,7 @@ const cityServiceRaw = {
 
   async getCityById(
     cityId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<CityDTO | null> {
     logger.info("entering::getCityById::service");
     validIdCheck(cityId);
@@ -132,5 +132,5 @@ const cityServiceRaw = {
 
 export const cityService = auditProxy.createAuditedService(
   "city",
-  cityServiceRaw
+  cityServiceRaw,
 );

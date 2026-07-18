@@ -20,11 +20,11 @@ export const getUnReconciledBankLedgerBookController = TryCatch(
       await bankReconciliationService.getUnReconciledBankLedgerBook(input);
     const response = BaseResponse.success(
       { type: "FETCHED", data: responseData },
-      "Un-Reconciled Bank Voucher Lines"
+      "Un-Reconciled Bank Voucher Lines",
     );
     logger.info("exiting::getUnReconciledBankLedgerBook::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const manualReconcileVoucherLinesController = TryCatch(
@@ -34,11 +34,11 @@ export const manualReconcileVoucherLinesController = TryCatch(
     await bankReconciliationService.manualReconcileVoucherLines(input);
     const response = BaseResponse.success(
       { type: "UPDATED" },
-      "Manual Reconciled Voucher Lines"
+      "Manual Reconciled Voucher Lines",
     );
     logger.info("exiting::manualReconcileVoucherLines::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const uploadBankStatementExcelController = TryCatch(
@@ -64,7 +64,7 @@ export const uploadBankStatementExcelController = TryCatch(
 
     logger.info("exiting::uploadBankStatementExcel::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const manualBankReconcileWithBankStatementController = TryCatch(
@@ -74,11 +74,11 @@ export const manualBankReconcileWithBankStatementController = TryCatch(
     await bankReconciliationService.manualBankReconcileWithBankStatement(input);
     const response = BaseResponse.success(
       { type: "UPDATED" },
-      "Manual Bank Reconcile with Bank Statement"
+      "Manual Bank Reconcile with Bank Statement",
     );
     logger.info("exiting::manualBankReconcileWithBankStatement::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getBankReconciliationSummaryController = TryCatch(
@@ -89,25 +89,24 @@ export const getBankReconciliationSummaryController = TryCatch(
       await bankReconciliationService.getBankReconciliationSummary(input);
     const response = BaseResponse.success(
       { data: summary, type: "FETCHED" },
-      "Bank Reconciliation Summary"
+      "Bank Reconciliation Summary",
     );
     logger.info("exiting::getBankReconciliationSummary::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getBankAutoSuggestionsController = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::getBankAutoSuggestions::controller");
     const input = req.body as AutoMatchSuggestionInput;
-    const suggestions = await bankReconciliationService.getBankAutoSuggestions(
-      input
-    );
+    const suggestions =
+      await bankReconciliationService.getBankAutoSuggestions(input);
     const response = BaseResponse.success(
       { data: suggestions, type: "FETCHED" },
-      "Bank Auto Suggestions"
+      "Bank Auto Suggestions",
     );
     logger.info("exiting::getBankAutoSuggestions::controller");
     return res.status(200).json(response);
-  }
+  },
 );

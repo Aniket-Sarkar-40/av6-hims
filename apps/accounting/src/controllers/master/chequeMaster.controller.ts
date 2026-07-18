@@ -10,13 +10,13 @@ export const toggleStatusChequeMaster = TryCatch(
     const { chequeMasterId } = req.query as { chequeMasterId: string };
     const updatedChequeMaster =
       await chequeMasterService.toggleStatusChequeMaster(
-        Number(chequeMasterId)
+        Number(chequeMasterId),
       );
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedChequeMaster },
-      "Cheque Master"
+      "Cheque Master",
     );
     logger.info("exiting::toggleStatusChequeMaster::controller");
     return res.status(200).json(response);
-  }
+  },
 );

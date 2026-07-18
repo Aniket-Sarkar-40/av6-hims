@@ -58,7 +58,7 @@ export const expenseHeadService = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Expense Heads")
+          generateErrorMessage("NOT_FOUND", "Expense Heads"),
         );
       }
     } else {
@@ -66,7 +66,7 @@ export const expenseHeadService = {
       if (expenseHeads.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Expense Heads")
+          generateErrorMessage("NOT_FOUND", "Expense Heads"),
         );
       }
       logger.info("exiting::getAllExpenseHeads::service");
@@ -76,7 +76,7 @@ export const expenseHeadService = {
 
   async getExpenseHeadById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ExpenseHead | null> {
     logger.info("entering::getExpenseHeadById::service");
     validIdCheck(id);
@@ -84,7 +84,7 @@ export const expenseHeadService = {
     if (isCacheable) {
       const cachedExpenseHead = (await getCacheById(
         cacheKey,
-        id
+        id,
       )) as ExpenseHead | null;
 
       if (cachedExpenseHead) {
@@ -93,7 +93,7 @@ export const expenseHeadService = {
         if (!canNullReturnable)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Expense Head")
+            generateErrorMessage("NOT_FOUND", "Expense Head"),
           );
         else return null;
       }
@@ -103,7 +103,7 @@ export const expenseHeadService = {
         if (!canNullReturnable)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Expense Head")
+            generateErrorMessage("NOT_FOUND", "Expense Head"),
           );
         else return null;
       }

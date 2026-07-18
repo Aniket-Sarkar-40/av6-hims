@@ -23,19 +23,19 @@ groupRouter.post(
   uploadToHetzner("excel"),
   authorize(getPermission("ACC", "GROUP_EXCEL_IMPORT", "CREATE")),
   validateCreateGroupExcel,
-  createGroupExcelImport
+  createGroupExcelImport,
 );
 
 groupRouter.get(
   "/excel-export",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "GROUP_EXCEL_EXPORT", "CREATE")),
-  exportGroupExcel
+  exportGroupExcel,
 );
 
 groupRouter.delete(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "GROUP", "DELETE")),
-  deleteGroup
+  deleteGroup,
 );

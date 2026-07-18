@@ -3,7 +3,7 @@ import { InvItemSupplier } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export async function getInventorySupplierByIdFromDb(
-  itemSupplierId: number
+  itemSupplierId: number,
 ): Promise<InvItemSupplier | null> {
   logger.info("entering::getInventorySupplierByIdFromDb::repository");
 

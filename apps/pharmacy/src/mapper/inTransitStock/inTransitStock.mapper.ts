@@ -6,7 +6,7 @@ import { PmsInTransitStock } from "@repo/db/generated/prisma/client";
 import { customOmit } from "av6-core-v2";
 
 export const toInTransitStockDTO = async (
-  inStock: PmsInTransitStock
+  inStock: PmsInTransitStock,
 ): Promise<inTransitStockDTO> => {
   const omitted = customOmit<
     PmsInTransitStock,
@@ -14,11 +14,11 @@ export const toInTransitStockDTO = async (
   >(inStock, ["fromId", "toId", "itemId", "isActive"]);
   const formWarehouse = await warehouseService.getWarehouseById(
     inStock.fromId,
-    true
+    true,
   );
   const toWarehouse = await warehouseService.getWarehouseById(
     inStock.toId,
-    true
+    true,
   );
   const fromBranch = await branchService.getBranchById(inStock.fromId, true);
   const toBranch = await branchService.getBranchById(inStock.toId, true);

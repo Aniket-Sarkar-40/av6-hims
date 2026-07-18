@@ -21,7 +21,7 @@ import { ItemStockType } from "@repo/db/generated/prisma/enums.js";
 import { InvGoodReceiveReturnDetails } from "@repo/db/generated/prisma/client";
 
 export const toGrnReturnDTO = async (
-  data: GrnReturnResponse[]
+  data: GrnReturnResponse[],
 ): Promise<GoodReceiveReturnDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
   const settings = await settingsService.getSettings(true);
@@ -50,18 +50,18 @@ export const toGrnReturnDTO = async (
       ]);
 
       const supplierDTO = suppliers.find(
-        (supplier) => supplier.id === grnReturn.supplierId
+        (supplier) => supplier.id === grnReturn.supplierId,
       );
       const currency = grnReturn.currencyId
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            grnReturn.currencyId
+            grnReturn.currencyId,
           )
         : null;
       let warehouseDTO, branchDTO;
       if (ccSettingsId) {
         warehouseDTO = await warehouseService.getWarehouseById(
           grnReturn.ccId,
-          true
+          true,
         );
       } else {
         branchDTO = await branchService.getBranchById(grnReturn.ccId, true);
@@ -72,12 +72,12 @@ export const toGrnReturnDTO = async (
         : null;
       const approvedBy = grnReturn.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            grnReturn.approvedBy
+            grnReturn.approvedBy,
           )
         : null;
       const rejectedBy = grnReturn.rejectedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            grnReturn.rejectedBy
+            grnReturn.rejectedBy,
           )
         : null;
 
@@ -89,7 +89,7 @@ export const toGrnReturnDTO = async (
           >(detail, ["createdBy", "updatedBy"]);
           const item = await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           );
           const inHandQty =
             (await getItemStockQtyByBatchWise({
@@ -103,12 +103,12 @@ export const toGrnReturnDTO = async (
 
           const createdBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.createdBy
+                detail.createdBy,
               )
             : null;
           const updatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.updatedBy
+                detail.updatedBy,
               )
             : null;
 
@@ -126,7 +126,7 @@ export const toGrnReturnDTO = async (
           const grnRemainingQty = Math.max(totalGrnQty - alreadyReturnedQty, 0);
           const availableTotalQtyToReturn = Math.min(
             grnRemainingQty,
-            stockQtyForReturn
+            stockQtyForReturn,
           );
 
           return {
@@ -143,7 +143,7 @@ export const toGrnReturnDTO = async (
             createdBy: omitAudit(createdBy),
             updatedBy: omitAudit(updatedBy),
           };
-        })
+        }),
       );
 
       const location = warehouseDTO
@@ -162,12 +162,12 @@ export const toGrnReturnDTO = async (
         approvedBy: approvedBy,
         rejectedBy: rejectedBy,
       };
-    })
+    }),
   );
 };
 
 export const toGrnReturnDetailsDto = async (
-  grnReturnDetails: InvGoodReceiveReturnDetails[]
+  grnReturnDetails: InvGoodReceiveReturnDetails[],
 ): Promise<GrnReturnDetailDTO[]> => {
   return Promise.all(
     grnReturnDetails.map(async (detail) => {
@@ -178,7 +178,7 @@ export const toGrnReturnDetailsDto = async (
       const itemDTO = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           )
         : null;
       const createdBy = detail.createdBy
@@ -194,6 +194,6 @@ export const toGrnReturnDetailsDto = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

@@ -5,7 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { StaffDesignation } from "@repo/db/generated/prisma/client";
 
 export const createStaffDesignationInDb = async (
-  staffDesignation: CreateStaffDesignationInput
+  staffDesignation: CreateStaffDesignationInput,
 ): Promise<StaffDesignation> => {
   logger.info("entering::createStaffDesignationInDb::repository");
   return db.staffDesignation.create({
@@ -25,7 +25,7 @@ export const getAllDesignationsFromDb = async (): Promise<
 };
 
 export const getStaffDesignationByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<StaffDesignation | null> => {
   logger.info("entering::getStaffDesignationByIdFromDb::repository");
   return db.staffDesignation.findUnique({
@@ -33,10 +33,10 @@ export const getStaffDesignationByIdFromDb = async (
   });
 };
 export const getStaffDesignationByStaffDesignationNameFromDb = async (
-  name: string
+  name: string,
 ): Promise<StaffDesignation | null> => {
   logger.info(
-    "entering::getStaffDesignationByStaffDesignationNameFromDb::repository"
+    "entering::getStaffDesignationByStaffDesignationNameFromDb::repository",
   );
   return db.staffDesignation.findFirst({
     where: { designation: name, isActive: "yes" },
@@ -45,7 +45,7 @@ export const getStaffDesignationByStaffDesignationNameFromDb = async (
 
 export const updateStaffDesignationInDb = async (
   id: number,
-  staffDesignation: CreateStaffDesignationInput
+  staffDesignation: CreateStaffDesignationInput,
 ): Promise<StaffDesignation> => {
   logger.info("entering::updateStaffDesignationInDb::repository");
 
@@ -56,7 +56,7 @@ export const updateStaffDesignationInDb = async (
 };
 
 export const deleteStaffDesignationInDb = async (
-  id: number
+  id: number,
 ): Promise<StaffDesignation> => {
   logger.info("entering::deleteStaffDesignationInDb::repository");
   return db.staffDesignation.update({

@@ -14,7 +14,7 @@ import Joi from "joi";
 export function applyRound(
   value: number,
   format: RoundFormat,
-  precision = 2
+  precision = 2,
 ): number {
   switch (format) {
     case RoundFormat.NONE:

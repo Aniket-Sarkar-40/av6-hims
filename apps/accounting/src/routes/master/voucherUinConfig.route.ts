@@ -23,18 +23,18 @@ voucherUINConfigRouter.post(
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_UIN_CONFIG", "CREATE")),
   validateCreateVoucherUINConfig,
-  createVoucherUINConfig
+  createVoucherUINConfig,
 );
 voucherUINConfigRouter.put(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_UIN_CONFIG", "UPDATE")),
   validateUpdateVoucherUINConfig,
-  updateVoucherUINConfig
+  updateVoucherUINConfig,
 );
 voucherUINConfigRouter.delete(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_UIN_CONFIG", "DELETE")),
-  deleteVoucherUINConfig
+  deleteVoucherUINConfig,
 );

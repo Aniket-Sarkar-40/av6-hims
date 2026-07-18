@@ -26,7 +26,7 @@ export const validIdCurrency = async (currencyId: number) => {
 };
 
 export const deleteCurrencyServiceValidation = async (
-  currencyId: number
+  currencyId: number,
 ): Promise<void> => {
   logger.info("entering::deleteCurrencyServiceValidation::service::validation");
   await validIdCurrency(currencyId);
@@ -37,7 +37,7 @@ export const deleteCurrencyServiceValidation = async (
 };
 
 export const getIdCurrencyServiceValidation = async (
-  currencyId: number
+  currencyId: number,
 ): Promise<void> => {
   logger.info("entering::getIdCurrencyServiceValidation::service::validation");
   await validIdCurrency(currencyId);
@@ -48,10 +48,10 @@ export const getIdCurrencyServiceValidation = async (
 
 export const updateIdCurrencyServiceValidation = async (
   currencyId: number,
-  body: CurrencyReq
+  body: CurrencyReq,
 ): Promise<Currency | null> => {
   logger.info(
-    "entering::updateIdCurrencyServiceValidation::service::validation"
+    "entering::updateIdCurrencyServiceValidation::service::validation",
   );
   validIdCheck(currencyId);
 
@@ -65,37 +65,37 @@ export const updateIdCurrencyServiceValidation = async (
     if (currencyWithSameName.id !== currencyId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Currency name")
+        generateErrorMessage("DUPLICATE_ITEM", "Currency name"),
       );
     }
   }
 
   const currencyWithSameCodeName = await getCurrencyByCurrencyCodeNameFromDb(
-    body.code
+    body.code,
   );
   if (currencyWithSameCodeName && currencyWithSameCodeName.isActive) {
     if (currencyWithSameCodeName.id !== currencyId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Currency code Name")
+        generateErrorMessage("DUPLICATE_ITEM", "Currency code Name"),
       );
     }
   }
   logger.info(
-    "exiting::updateIdCurrencyServiceValidation::service::validation"
+    "exiting::updateIdCurrencyServiceValidation::service::validation",
   );
   return null;
 };
 
 export const nameCurrencyServiceValidation = async (
-  name: string
+  name: string,
 ): Promise<void> => {
   logger.info("entering::nameCurrencyServiceValidation::service::validation");
   const currency = await getCurrencyByCurrencyNameFromDb(name);
   if (currency && currency.isActive) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "currency")
+      generateErrorMessage("DUPLICATE_ITEM", "currency"),
     );
   }
   logger.info("exiting::nameCurrencyServiceValidation::service::validation");
@@ -103,14 +103,14 @@ export const nameCurrencyServiceValidation = async (
 };
 
 export const createCurrencyServiceValidation = async (
-  body: CurrencyReq
+  body: CurrencyReq,
 ): Promise<Currency | null> => {
   logger.info("entering::createCurrencyServiceValidation::service::validation");
   const currencyName = await getCurrencyByCurrencyNameFromDb(body.name);
   if (currencyName && currencyName.isActive) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Currency name")
+      generateErrorMessage("DUPLICATE_ITEM", "Currency name"),
     );
   }
 
@@ -118,7 +118,7 @@ export const createCurrencyServiceValidation = async (
   if (currencyCodeName && currencyCodeName.isActive) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Currency code Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Currency code Name"),
     );
   }
 

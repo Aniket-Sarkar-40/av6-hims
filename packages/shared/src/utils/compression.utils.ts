@@ -5,7 +5,7 @@ const MAX_WIDTH = 2000;
 
 export async function optimizeImageSmart(
   buffer: Buffer,
-  mimetype: string
+  mimetype: string,
 ): Promise<Buffer> {
   const image = sharp(buffer).rotate(); // auto-rotate based on EXIF
 

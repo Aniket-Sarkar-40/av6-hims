@@ -37,14 +37,14 @@ const validateWarehouseModeEnabled = async (): Promise<void> => {
   if (!isWarehouseModeEnabled) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Warehouse mode is not enabled")
+      generateErrorMessage("INVALID_STATUS", "Warehouse mode is not enabled"),
     );
   }
 };
 
 export const validateIdBranchRequisitionReturn = async (id: number) => {
   logger.info(
-    "entering::validateIdBranchRequisitionReturn::service::validation"
+    "entering::validateIdBranchRequisitionReturn::service::validation",
   );
 
   validIdCheck(id);
@@ -54,21 +54,21 @@ export const validateIdBranchRequisitionReturn = async (id: number) => {
   if (!brr) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Branch Requisition Return")
+      generateErrorMessage("NOT_FOUND", "Branch Requisition Return"),
     );
   }
 
   logger.info(
-    "exiting::validateIdBranchRequisitionReturn::service::validation"
+    "exiting::validateIdBranchRequisitionReturn::service::validation",
   );
   return brr;
 };
 
 export const validateBranchRequisitionReturnCommon = async (
-  body: CreateBranchRequisitionReturnInput
+  body: CreateBranchRequisitionReturnInput,
 ) => {
   logger.info(
-    "entering::validateBranchRequisitionReturnCommon::service::validation"
+    "entering::validateBranchRequisitionReturnCommon::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -76,7 +76,7 @@ export const validateBranchRequisitionReturnCommon = async (
   await validateIdBranch(body.branchId);
 
   const user = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    body.requisitionFrom
+    body.requisitionFrom,
   );
   if (!user) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Employee"));
@@ -87,14 +87,14 @@ export const validateBranchRequisitionReturnCommon = async (
     if (!body.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+        generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
       );
     }
     const isAnyPendingReturn = pendingBRR.some((brr) => brr.id !== body.id);
     if (isAnyPendingReturn) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+        generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
       );
     }
   }
@@ -102,7 +102,7 @@ export const validateBranchRequisitionReturnCommon = async (
   if (body.returnStatus && body.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
     );
   }
 
@@ -113,12 +113,12 @@ export const validateBranchRequisitionReturnCommon = async (
   }
 
   const branchReq = await validateBranchRequisitionByIdFromDb(
-    body.branchRequisitionId
+    body.branchRequisitionId,
   );
   if (!branchReq) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Branch Requisition")
+      generateErrorMessage("NOT_FOUND", "Branch Requisition"),
     );
   }
 
@@ -128,7 +128,7 @@ export const validateBranchRequisitionReturnCommon = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition"),
     );
   }
 
@@ -138,20 +138,20 @@ export const validateBranchRequisitionReturnCommon = async (
     let totalReturnQty = 0;
 
     const brDetails = branchReq.branchRequisitionDetails.find(
-      (d) => d.id === element.branchRequisitionDetailsId
+      (d) => d.id === element.branchRequisitionDetailsId,
     );
 
     if (!brDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Branch Requisition Details")
+        generateErrorMessage("NOT_FOUND", "Branch Requisition Details"),
       );
     }
 
     if (brDetails.itemId !== element.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item")
+        generateErrorMessage("INVALID_FIELD", "Item"),
       );
     }
 
@@ -159,7 +159,7 @@ export const validateBranchRequisitionReturnCommon = async (
       totalReturnQty += item.returnQty;
 
       const branchItem = await getBranchItemDetailsFromDb(
-        item.branchItemDetailsId
+        item.branchItemDetailsId,
       );
 
       if (!branchItem) {
@@ -168,8 +168,8 @@ export const validateBranchRequisitionReturnCommon = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.isBatch && item.batchNo ? item.batchNo : "-"}`,
-            "Branch Requisition"
-          )
+            "Branch Requisition",
+          ),
         );
       }
 
@@ -179,14 +179,14 @@ export const validateBranchRequisitionReturnCommon = async (
       ) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_FIELD", "Branch Requisition details")
+          generateErrorMessage("INVALID_FIELD", "Branch Requisition details"),
         );
       }
 
       if (branchItem.itemId !== element.itemId) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_FIELD", "Item")
+          generateErrorMessage("INVALID_FIELD", "Item"),
         );
       }
 
@@ -199,8 +199,8 @@ export const validateBranchRequisitionReturnCommon = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.isBatch && item.batchNo ? item.batchNo : "-"}`,
-            "Branch Requisition"
-          )
+            "Branch Requisition",
+          ),
         );
       }
 
@@ -220,8 +220,8 @@ export const validateBranchRequisitionReturnCommon = async (
             "NOT_FOUND",
             `Item Stock for Batch no : ${
               item.isBatch && item.batchNo ? item.batchNo : "-"
-            }`
-          )
+            }`,
+          ),
         );
       }
 
@@ -230,8 +230,8 @@ export const validateBranchRequisitionReturnCommon = async (
           400,
           generateErrorMessage(
             "INSUFFICIENT_STOCK",
-            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`
-          )
+            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`,
+          ),
         );
       }
     }
@@ -240,34 +240,34 @@ export const validateBranchRequisitionReturnCommon = async (
       totalReturnQty,
       element.requestedReturnQty,
       "Returned Qty",
-      "Requested Qty"
+      "Requested Qty",
     );
   }
 
   logger.info(
-    "exiting::validateBranchRequisitionReturnCommon::service::validation"
+    "exiting::validateBranchRequisitionReturnCommon::service::validation",
   );
 };
 
 export const createBranchRequisitionReturnServiceValidation = async (
-  body: CreateBranchRequisitionReturnInput
+  body: CreateBranchRequisitionReturnInput,
 ) => {
   logger.info(
-    "entering::createBranchRequisitionReturnServiceValidation::service::validation"
+    "entering::createBranchRequisitionReturnServiceValidation::service::validation",
   );
 
   await validateBranchRequisitionReturnCommon(body);
 
   logger.info(
-    "exiting::createBranchRequisitionReturnServiceValidation::service::validation"
+    "exiting::createBranchRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const updateBranchRequisitionReturnServiceValidation = async (
-  body: CreateBranchRequisitionReturnInput
+  body: CreateBranchRequisitionReturnInput,
 ) => {
   logger.info(
-    "entering::updateBranchRequisitionReturnServiceValidation::service::validation"
+    "entering::updateBranchRequisitionReturnServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -276,7 +276,7 @@ export const updateBranchRequisitionReturnServiceValidation = async (
     logger.error("missing branch requisition return id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Branch Requisition Return id")
+      generateErrorMessage("NOT_FOUND", "Branch Requisition Return id"),
     );
   }
 
@@ -286,22 +286,22 @@ export const updateBranchRequisitionReturnServiceValidation = async (
   if (currBRR.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
     );
   }
 
   await validateBranchRequisitionReturnCommon(body);
 
   logger.info(
-    "exiting::updateBranchRequisitionReturnServiceValidation::service::validation"
+    "exiting::updateBranchRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const rejectBranchRequisitionReturnServiceValidation = async (
-  body: RejectBranchRequisitionReturnInput
+  body: RejectBranchRequisitionReturnInput,
 ) => {
   logger.info(
-    "entering::rejectBranchRequisitionReturnServiceValidation::service::validation"
+    "entering::rejectBranchRequisitionReturnServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -313,27 +313,27 @@ export const rejectBranchRequisitionReturnServiceValidation = async (
   if (currBRR.branchId !== body.branchId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Location")
+      generateErrorMessage("ACCESS_FAIL", "Correct Location"),
     );
   }
 
   if (currBRR.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
     );
   }
 
   logger.info(
-    "exiting::rejectBranchRequisitionReturnServiceValidation::service::validation"
+    "exiting::rejectBranchRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const approveBranchRequisitionReturnServiceValidation = async (
-  body: ApproveBranchReqReturnInput
+  body: ApproveBranchReqReturnInput,
 ) => {
   logger.info(
-    "entering::approveBranchRequisitionReturnServiceValidation::service::validation"
+    "entering::approveBranchRequisitionReturnServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -346,17 +346,17 @@ export const approveBranchRequisitionReturnServiceValidation = async (
   if (currBRR.branchId !== body.branchId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Branch")
+      generateErrorMessage("ACCESS_FAIL", "Correct Branch"),
     );
   }
 
   const branchReq = await getBranchRequisitionBatchWiseFromDb(
-    currBRR.branchRequisitionId
+    currBRR.branchRequisitionId,
   );
   if (!branchReq) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Branch Requisition")
+      generateErrorMessage("NOT_FOUND", "Branch Requisition"),
     );
   }
 
@@ -366,7 +366,7 @@ export const approveBranchRequisitionReturnServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition"),
     );
   }
 
@@ -375,26 +375,26 @@ export const approveBranchRequisitionReturnServiceValidation = async (
   if (currBRR.returnStatus !== "Pending") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
     );
   }
 
   for (const detail of body.returnItems) {
     const brrDetails = currBRR.branchRequisitionReturnDetails.find(
-      (elem) => elem.id === detail.id
+      (elem) => elem.id === detail.id,
     );
 
     if (!brrDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Branch Requisition Return details")
+        generateErrorMessage("NOT_FOUND", "Branch Requisition Return details"),
       );
     }
 
     if (brrDetails.itemId !== detail.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item")
+        generateErrorMessage("INVALID_FIELD", "Item"),
       );
     }
 
@@ -404,7 +404,7 @@ export const approveBranchRequisitionReturnServiceValidation = async (
       totalReturnQty += item.returnQty;
 
       const branchReturnItem = brrDetails.branchReturnItemDetails.find(
-        (det) => det.id === item.id
+        (det) => det.id === item.id,
       );
 
       if (!branchReturnItem) {
@@ -412,13 +412,13 @@ export const approveBranchRequisitionReturnServiceValidation = async (
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Branch Requisition Return batch details"
-          )
+            "Branch Requisition Return batch details",
+          ),
         );
       }
 
       const branchItem = branchReq.branchItemDetails.find(
-        (d) => d.id === branchReturnItem.branchItemDetailsId
+        (d) => d.id === branchReturnItem.branchItemDetailsId,
       );
 
       if (!branchItem) {
@@ -427,8 +427,8 @@ export const approveBranchRequisitionReturnServiceValidation = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.batchNo ?? "-"}`,
-            "Branch Requisition"
-          )
+            "Branch Requisition",
+          ),
         );
       }
 
@@ -441,8 +441,8 @@ export const approveBranchRequisitionReturnServiceValidation = async (
           generateErrorMessage(
             "INVALID_RETURN",
             `Batch: ${item.batchNo ?? "-"}`,
-            "Branch Requisition"
-          )
+            "Branch Requisition",
+          ),
         );
       }
 
@@ -462,8 +462,8 @@ export const approveBranchRequisitionReturnServiceValidation = async (
             "NOT_FOUND",
             `Item Stock for Batch no : ${
               item.isBatch && item.batchNo ? item.batchNo : "-"
-            }`
-          )
+            }`,
+          ),
         );
       }
 
@@ -472,8 +472,8 @@ export const approveBranchRequisitionReturnServiceValidation = async (
           400,
           generateErrorMessage(
             "INSUFFICIENT_STOCK",
-            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`
-          )
+            `Batch no : ${item.isBatch && item.batchNo ? item.batchNo : "-"}`,
+          ),
         );
       }
     }
@@ -482,20 +482,20 @@ export const approveBranchRequisitionReturnServiceValidation = async (
       totalReturnQty,
       detail.requestedReturnQty,
       "Returned Qty",
-      "Requested Qty"
+      "Requested Qty",
     );
   }
 
   logger.info(
-    "exiting::approveBranchRequisitionReturnServiceValidation::service::validation"
+    "exiting::approveBranchRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const acknowledgeBranchRequisitionReturnServiceValidation = async (
-  body: AcknowledgeBranchRequisitionReturn
+  body: AcknowledgeBranchRequisitionReturn,
 ) => {
   logger.info(
-    "entering::acknowledgeBranchRequisitionReturnServiceValidation::service::validation"
+    "entering::acknowledgeBranchRequisitionReturnServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -506,7 +506,7 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
   if (currBRR.ccId !== body.ccId) {
     throw new ErrorHandler(
       403,
-      generateErrorMessage("ACCESS_FAIL", "Correct Warehouse")
+      generateErrorMessage("ACCESS_FAIL", "Correct Warehouse"),
     );
   }
 
@@ -518,7 +518,7 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
     );
   }
 
@@ -527,8 +527,8 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
       400,
       generateErrorMessage(
         "INVALID_STATUS",
-        "Branch Requisition Return Acknowledge"
-      )
+        "Branch Requisition Return Acknowledge",
+      ),
     );
   }
 
@@ -538,20 +538,20 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
     currTotalAckQty += detail.acknowledgedReturnQty;
 
     const brrDetails = currBRR.branchRequisitionReturnDetails.find(
-      (elem) => elem.id === detail.id
+      (elem) => elem.id === detail.id,
     );
 
     if (!brrDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Branch Requisition Return details")
+        generateErrorMessage("NOT_FOUND", "Branch Requisition Return details"),
       );
     }
 
     if (brrDetails.itemId !== detail.itemId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Item")
+        generateErrorMessage("INVALID_FIELD", "Item"),
       );
     }
 
@@ -559,7 +559,7 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
 
     for (const item of detail.itemBatch) {
       const branchReturnItem = brrDetails.branchReturnItemDetails.find(
-        (itemDet) => itemDet.id === item.id
+        (itemDet) => itemDet.id === item.id,
       );
 
       if (!branchReturnItem) {
@@ -567,8 +567,8 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
           404,
           generateErrorMessage(
             "NOT_FOUND",
-            "Branch Requisition Return batch details"
-          )
+            "Branch Requisition Return batch details",
+          ),
         );
       }
 
@@ -580,8 +580,8 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
           400,
           generateErrorMessage(
             "INVALID_FIELD",
-            `Acknowledge quantity for Batch no : ${item.batchNo ?? "-"}`
-          )
+            `Acknowledge quantity for Batch no : ${item.batchNo ?? "-"}`,
+          ),
         );
       }
 
@@ -594,24 +594,24 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
       totalAckQty,
       detail.acknowledgedReturnQty,
       "Total Acknowledge Quantity",
-      "Acknowledged Return Quantity"
+      "Acknowledged Return Quantity",
     );
   }
 
   const totalAckQtyTill = currBRR.branchRequisitionReturnDetails.reduce(
     (acc, details) => acc + details.acknowledgedReturnQty,
-    0
+    0,
   );
 
   const totalReturnQty = currBRR.branchRequisitionReturnDetails.reduce(
     (acc, details) => acc + details.requestedReturnQty,
-    0
+    0,
   );
 
   if (totalReturnQty < totalAckQtyTill + currTotalAckQty) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", "Item Total quantity")
+      generateErrorMessage("INVALID_FIELD", "Item Total quantity"),
     );
   }
 
@@ -622,15 +622,15 @@ export const acknowledgeBranchRequisitionReturnServiceValidation = async (
   }
 
   logger.info(
-    "exiting::acknowledgeBranchRequisitionReturnServiceValidation::service::validation"
+    "exiting::acknowledgeBranchRequisitionReturnServiceValidation::service::validation",
   );
 };
 
 export const deleteBranchRequisitionReturnServiceValidation = async (
-  id: number
+  id: number,
 ) => {
   logger.info(
-    "entering::deleteBranchRequisitionReturnServiceValidation::service::validation"
+    "entering::deleteBranchRequisitionReturnServiceValidation::service::validation",
   );
 
   validateWarehouseModeEnabled();
@@ -640,11 +640,11 @@ export const deleteBranchRequisitionReturnServiceValidation = async (
   if (brr.returnStatus !== STORE_REQ_STATUS.Pending) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return")
+      generateErrorMessage("INVALID_STATUS", "Branch Requisition Return"),
     );
   }
 
   logger.info(
-    "exiting::deleteBranchRequisitionReturnServiceValidation::service::validation"
+    "exiting::deleteBranchRequisitionReturnServiceValidation::service::validation",
   );
 };

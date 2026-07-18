@@ -59,7 +59,7 @@ export const commonDistributorSchema = Joi.object({
 
   taxIdentificationDetails: arrayOptional(
     "Tax Identification Details",
-    taxIdentificationDetailSchema
+    taxIdentificationDetailSchema,
   ),
   dueDate: intRequired("Due Date"),
 });

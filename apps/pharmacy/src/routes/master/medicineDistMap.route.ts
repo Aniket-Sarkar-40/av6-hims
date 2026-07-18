@@ -44,7 +44,7 @@ medicineDistMapRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_DIST_MAP", "CREATE")),
   validateMedicineDistMap,
-  createMedicineDistMap
+  createMedicineDistMap,
 );
 
 /**
@@ -74,10 +74,10 @@ medicineDistMapRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_DIST_MAP", "VIEW"),
-    getPermission("PMS", "MEDICINE_DIST_MAP", "UPDATE")
+    getPermission("PMS", "MEDICINE_DIST_MAP", "UPDATE"),
   ),
   validateMedicineDistMapUpdate,
-  updateMedicineDistMap
+  updateMedicineDistMap,
 );
 
 export default medicineDistMapRouter;

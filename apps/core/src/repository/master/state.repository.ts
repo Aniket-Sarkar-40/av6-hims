@@ -7,7 +7,7 @@ import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 import { customOmit } from "av6-utils";
 
 export const createStateInDb = async (
-  state: CreateStateInput
+  state: CreateStateInput,
 ): Promise<State> => {
   logger.info("entering::createState::repository");
   const store = requestStorage.getStore();
@@ -32,7 +32,7 @@ export const getStateByIdFromDb = async (id: number): Promise<State | null> => {
 
 export const getStateByNameFromDb = async (
   name: string,
-  countryId: number
+  countryId: number,
 ): Promise<State | null> => {
   logger.info("entering::getStateByNameFromDb::repository");
   return db.state.findFirst({
@@ -45,7 +45,7 @@ export const getStateByNameFromDb = async (
 };
 
 export const updateStateInDb = async (
-  state: UpdateStateInput
+  state: UpdateStateInput,
 ): Promise<State> => {
   logger.info("entering::updateState::repository");
   const store = requestStorage.getStore();

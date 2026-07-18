@@ -14,12 +14,12 @@ export const createDepartment = TryCatch(
 
     const response = BaseResponse.success(
       { type: "CREATED", data: department },
-      "Department"
+      "Department",
     );
 
     logger.info("exiting::createDepartment::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const getAllDepartments = TryCatch(
@@ -29,12 +29,12 @@ export const getAllDepartments = TryCatch(
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: departments },
-      "Department"
+      "Department",
     );
 
     logger.info("exiting::getAllDepartments::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getDepartmentById = TryCatch(
@@ -42,24 +42,24 @@ export const getDepartmentById = TryCatch(
     logger.info("entering::getDepartmentById::controller");
     const { departmentId } = req.params;
     const department = await departmentService.getDepartmentById(
-      Number(departmentId)
+      Number(departmentId),
     );
 
     if (!department) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Department")
+        generateErrorMessage("NOT_FOUND", "Department"),
       );
     }
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: department },
-      "Department"
+      "Department",
     );
 
     logger.info("exiting::getDepartmentById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const updateDepartment = TryCatch(
@@ -69,17 +69,17 @@ export const updateDepartment = TryCatch(
     const name = req.body;
     const updatedDepartment = await departmentService.updateDepartment(
       Number(departmentId),
-      name
+      name,
     );
 
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedDepartment },
-      "Department"
+      "Department",
     );
 
     logger.info("exiting::updateDepartment::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteDepartment = TryCatch(
@@ -92,5 +92,5 @@ export const deleteDepartment = TryCatch(
 
     logger.info("exiting::deleteDepartment::controller");
     return res.status(200).json(response);
-  }
+  },
 );

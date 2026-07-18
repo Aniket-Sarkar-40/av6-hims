@@ -27,7 +27,7 @@ import { SHORT_CODE } from "@repo/shared/utils/shortCode/accounting.shortCode.ut
 import dayjs, { Dayjs } from "dayjs";
 
 export function getLedgerColumnMeta(
-  row: VoucherEntryExcelRow
+  row: VoucherEntryExcelRow,
 ): LedgerColumnMeta[] {
   const keys = Object.keys(row);
   const ledgerIndexes = new Set<number>();
@@ -74,7 +74,7 @@ export function validateVoucherExcelHeaders(row: VoucherEntryExcelRow) {
   if (ledgerMeta.length === 0) {
     throw new ErrorHandler(
       400,
-      "No ledger columns found (Ledger 1, Ledger 2, ...)"
+      "No ledger columns found (Ledger 1, Ledger 2, ...)",
     );
   }
 
@@ -87,7 +87,7 @@ export function validateVoucherExcelHeaders(row: VoucherEntryExcelRow) {
 
 export function extractOtherLedgersWithMeta(
   row: VoucherEntryExcelRow,
-  meta: LedgerColumnMeta[]
+  meta: LedgerColumnMeta[],
 ): OtherLedger[] {
   const ledgers: OtherLedger[] = [];
 
@@ -102,7 +102,7 @@ export function extractOtherLedgersWithMeta(
       instrumentDate = dayjs(col.instrumentDate, "DD-MM-YYYY", true); // strict parsing
       if (!instrumentDate.isValid()) {
         throw new Error(
-          `Invalid Instrument Date at row ${col.index}: ${col.instrumentDate}`
+          `Invalid Instrument Date at row ${col.index}: ${col.instrumentDate}`,
         );
       }
     }
@@ -144,7 +144,7 @@ export async function buildVoucherInputFromExcel(params: {
   if (!otherLedgers || otherLedgers.length === 0) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("NOT_FOUND", "Ledger Entries")
+      generateErrorMessage("NOT_FOUND", "Ledger Entries"),
     );
   }
 
@@ -156,19 +156,19 @@ export async function buildVoucherInputFromExcel(params: {
   if (!financialYear) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("NOT_FOUND", "Financial Year")
+      generateErrorMessage("NOT_FOUND", "Financial Year"),
     );
   }
   if (financialYear.isLocked) {
     throw new ErrorHandler(
       400,
-      "Financial Year is locked, cannot create voucher"
+      "Financial Year is locked, cannot create voucher",
     );
   }
   if (financialYear.isClosed) {
     throw new ErrorHandler(
       400,
-      "Financial Year is closed, cannot create voucher"
+      "Financial Year is closed, cannot create voucher",
     );
   }
   const lines: VoucherLineSeed[] = [];
@@ -199,7 +199,7 @@ export async function buildVoucherInputFromExcel(params: {
     if (totalAmount <= 0) {
       throw new ErrorHandler(
         400,
-        `Invalid total amount: ${totalAmount} for row: ${item.rowNo}`
+        `Invalid total amount: ${totalAmount} for row: ${item.rowNo}`,
       );
     }
 
@@ -217,8 +217,8 @@ export async function buildVoucherInputFromExcel(params: {
           400,
           generateErrorMessage(
             "NOT_FOUND",
-            `Group for party ledger: ${item.partyLedger}`
-          )
+            `Group for party ledger: ${item.partyLedger}`,
+          ),
         );
       }
       const partyLedgerGroupId = group.id;
@@ -258,7 +258,10 @@ export async function buildVoucherInputFromExcel(params: {
       if (!group) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("NOT_FOUND", `Group for ledger: ${l.ledgerName}`)
+          generateErrorMessage(
+            "NOT_FOUND",
+            `Group for ledger: ${l.ledgerName}`,
+          ),
         );
       }
       let isBankAccount = false;
@@ -291,12 +294,12 @@ export async function buildVoucherInputFromExcel(params: {
       if (otherLedgers.length !== 2) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("ARRAY_LENGTH", "Ledger Entries", "2")
+          generateErrorMessage("ARRAY_LENGTH", "Ledger Entries", "2"),
         );
       }
     }
     const drCr = allowedVoucherTypes.includes(
-      item.voucherType.trim().toUpperCase()
+      item.voucherType.trim().toUpperCase(),
     )
       ? (l.drCr as DrCr)
       : resolveDrCr({

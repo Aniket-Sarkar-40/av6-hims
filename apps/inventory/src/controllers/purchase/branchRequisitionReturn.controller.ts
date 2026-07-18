@@ -25,10 +25,10 @@ export const createBranchRequisitionReturn = TryCatch(
       .json(
         BaseResponse.success(
           { type: "CREATED", data: created },
-          "Branch Requisition Return"
-        )
+          "Branch Requisition Return",
+        ),
       );
-  }
+  },
 );
 
 export const updateBranchRequisitionReturn = TryCatch(
@@ -46,10 +46,10 @@ export const updateBranchRequisitionReturn = TryCatch(
       .json(
         BaseResponse.success(
           { type: "UPDATED", data: updated },
-          "Branch Requisition Return"
-        )
+          "Branch Requisition Return",
+        ),
       );
-  }
+  },
 );
 
 export const getAllBranchRequisitionReturn = TryCatch(
@@ -65,10 +65,10 @@ export const getAllBranchRequisitionReturn = TryCatch(
       .json(
         BaseResponse.success(
           { type: "FETCHED", data },
-          "Branch Requisition Return"
-        )
+          "Branch Requisition Return",
+        ),
       );
-  }
+  },
 );
 
 export const getBranchRequisitionReturnById = TryCatch(
@@ -81,7 +81,7 @@ export const getBranchRequisitionReturnById = TryCatch(
 
     const data =
       await branchRequisitionReturnService.getBranchRequisitionReturnById(
-        Number(branchRequisitionReturnId)
+        Number(branchRequisitionReturnId),
       );
 
     logger.info("exiting::getBranchRequisitionReturnById::controller");
@@ -90,10 +90,10 @@ export const getBranchRequisitionReturnById = TryCatch(
       .json(
         BaseResponse.success(
           { type: "FETCHED", data },
-          "Branch Requisition Return"
-        )
+          "Branch Requisition Return",
+        ),
       );
-  }
+  },
 );
 
 export const deleteBranchRequisitionReturn = TryCatch(
@@ -103,16 +103,16 @@ export const deleteBranchRequisitionReturn = TryCatch(
     const { id } = req.query as { id: string };
 
     await branchRequisitionReturnService.deleteBranchRequisitionReturn(
-      Number(id)
+      Number(id),
     );
 
     logger.info("exiting::deleteBranchRequisitionReturn::controller");
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "DELETED" }, "Branch Requisition Return")
+        BaseResponse.success({ type: "DELETED" }, "Branch Requisition Return"),
       );
-  }
+  },
 );
 
 export const rejectBranchRequisitionReturn = TryCatch(
@@ -127,9 +127,9 @@ export const rejectBranchRequisitionReturn = TryCatch(
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "REJECTED" }, "Branch Requisition Return")
+        BaseResponse.success({ type: "REJECTED" }, "Branch Requisition Return"),
       );
-  }
+  },
 );
 
 export const approveBranchRequisitionReturn = TryCatch(
@@ -144,9 +144,9 @@ export const approveBranchRequisitionReturn = TryCatch(
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "APPROVED" }, "Branch Requisition Return")
+        BaseResponse.success({ type: "APPROVED" }, "Branch Requisition Return"),
       );
-  }
+  },
 );
 
 export const acknowledgeBranchRequisitionReturn = TryCatch(
@@ -156,7 +156,7 @@ export const acknowledgeBranchRequisitionReturn = TryCatch(
     const body = req.body as AcknowledgeBranchRequisitionReturn;
 
     await branchRequisitionReturnService.acknowledgeBranchRequisitionReturn(
-      body
+      body,
     );
 
     logger.info("exiting::acknowledgeBranchRequisitionReturn::controller");
@@ -165,8 +165,8 @@ export const acknowledgeBranchRequisitionReturn = TryCatch(
       .json(
         BaseResponse.success(
           { type: "ACKNOWLEDGED" },
-          "Branch Requisition Return"
-        )
+          "Branch Requisition Return",
+        ),
       );
-  }
+  },
 );

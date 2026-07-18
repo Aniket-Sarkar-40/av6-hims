@@ -101,7 +101,7 @@ export const acknowledgeRequisitionReturnSchema = Joi.object({
               isFoc: boolRequired("isFoc"),
 
               acknowledgeQty: intRequired("Acknowledge Quantity", 0),
-            })
+            }),
           )
           .min(1)
           .required()
@@ -111,7 +111,7 @@ export const acknowledgeRequisitionReturnSchema = Joi.object({
             "array.base": "Item batch must be an array",
             "array.min": "Item batch must contain at least one batch entry",
           }),
-      })
+      }),
     )
     .min(1)
     .required()

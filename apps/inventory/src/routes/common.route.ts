@@ -50,7 +50,7 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonLock,
-  commonLockUnlock
+  commonLockUnlock,
 );
 
 commonRouter.post(
@@ -58,14 +58,14 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonCreate,
-  commonCreate
+  commonCreate,
 );
 commonRouter.put(
   "/update",
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonUpdate,
-  commonUpdate
+  commonUpdate,
 );
 
 /**
@@ -87,7 +87,7 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch
+  fixedSearch,
 );
 
 /**
@@ -109,7 +109,7 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch
+  commonSearch,
 );
 
 /**
@@ -131,7 +131,7 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch
+  commonDropdownSearch,
 );
 
 /**
@@ -153,7 +153,7 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController
+  fixedSearchWoPaginationController,
 );
 
 /**
@@ -175,7 +175,7 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport
+  commonFSExcelExport,
 );
 
 /**
@@ -197,7 +197,7 @@ commonRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch
+  commonFetch,
 );
 
 /**
@@ -219,7 +219,7 @@ commonRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport
+  commonExcelImport,
 );
 
 /**
@@ -251,7 +251,7 @@ commonRouter.delete(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete
+  commonDelete,
 );
 
 /**
@@ -273,7 +273,7 @@ commonRouter.patch(
   verifyToken(ServiceCode.INVENTORY),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus
+  commonUpdateStatus,
 );
 
 // /**
@@ -297,5 +297,5 @@ commonRouter.put(
   verifyToken,
   authorizeCommonSearch(),
   validateCommonActiveInactive,
-  commonActiveInactive
+  commonActiveInactive,
 );

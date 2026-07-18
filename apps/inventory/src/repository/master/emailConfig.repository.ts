@@ -19,7 +19,7 @@ export const getEventEmailFromDb = async (): Promise<EventEmail | null> => {
 };
 
 export const getEventEmailByEmailType = async (
-  input: EMAIL_TYPE
+  input: EMAIL_TYPE,
 ): Promise<EventEmail | null> => {
   logger.info("entering::getEventEmailByEmailType::repository");
   return db.eventEmail.findFirst({

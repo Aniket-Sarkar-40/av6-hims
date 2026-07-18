@@ -13,7 +13,7 @@ export async function getIncomeById(id: number): Promise<Income | null> {
 }
 
 export const createIncomeInDb = async (
-  income: CreateIncomeInput
+  income: CreateIncomeInput,
 ): Promise<Income> => {
   logger.info("entering::createIncomeInDb::repository");
   // Exclude 'id' from the data object if present
@@ -36,7 +36,7 @@ export const createIncomeInDb = async (
 
 export const updateIncomeInDb = async (
   id: number,
-  income: CreateIncomeInput
+  income: CreateIncomeInput,
 ): Promise<Income> => {
   logger.info("entering::updateIncomeInDb::repository");
   const store = requestStorage.getStore();
@@ -59,7 +59,7 @@ export const updateIncomeInDb = async (
 };
 
 export const getIncomeByInvoiceNoFromDb = async (
-  invoiceNo: string
+  invoiceNo: string,
 ): Promise<Income | null> => {
   logger.info("entering:: getIncomeByInvoiceNoFromDb::repository");
   return db.income.findFirst({
@@ -75,7 +75,7 @@ export const getAllIncomeFromDb = async (): Promise<Income[]> => {
 };
 
 export const getIncomeByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Income | null> => {
   logger.info("entering::getIncomeByIdFromDb::repository");
   return db.income.findUnique({

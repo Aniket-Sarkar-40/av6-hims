@@ -44,7 +44,7 @@ stockAdjustmentRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_ADJUSTMENT", "CREATE")),
   validateStockAdjustment,
-  createStockAdjustment
+  createStockAdjustment,
 );
 
 stockAdjustmentRouter.put(
@@ -52,10 +52,10 @@ stockAdjustmentRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STOCK_ADJUSTMENT", "UPDATE"),
-    getPermission("INV", "STOCK_ADJUSTMENT", "VIEW")
+    getPermission("INV", "STOCK_ADJUSTMENT", "VIEW"),
   ),
   validateUpdateStockAdjustment,
-  updateStockAdjustment
+  updateStockAdjustment,
 );
 
 /**
@@ -78,7 +78,7 @@ stockAdjustmentRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_ADJUSTMENT", "VIEW")),
-  getStockAdjustmentById
+  getStockAdjustmentById,
 );
 
 export default stockAdjustmentRouter;

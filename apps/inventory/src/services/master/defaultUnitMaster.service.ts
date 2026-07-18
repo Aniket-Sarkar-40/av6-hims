@@ -27,7 +27,7 @@ const cacheKey = getRedisKey("DEFAULT_UNIT_MASTER", "all");
 
 export const defaultUnitMasterService = {
   async createDefaultUnitMaster(
-    input: DefaultUnitMasterReq
+    input: DefaultUnitMasterReq,
   ): Promise<InvDefaultUnitMaster> {
     logger.info("entering::createDefaultUnitMaster::service");
     await createDefaultUnitMasterServiceValidation(input);
@@ -41,7 +41,7 @@ export const defaultUnitMasterService = {
   },
 
   async updateDefaultUnitMaster(
-    input: DefaultUnitMasterReq
+    input: DefaultUnitMasterReq,
   ): Promise<InvDefaultUnitMaster> {
     logger.info("entering::updateDefaultUnitMaster::service");
     await updateIdDefaultUnitMasterServiceValidation(input);
@@ -52,7 +52,7 @@ export const defaultUnitMasterService = {
       await updateCache(
         cacheKey,
         updatedDefaultUnitMaster.id,
-        updatedDefaultUnitMaster
+        updatedDefaultUnitMaster,
       );
     }
 
@@ -61,14 +61,14 @@ export const defaultUnitMasterService = {
   },
 
   async getAllDefaultUnitMaster(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvDefaultUnitMaster[]> {
     logger.info("entering::getAllDefaultUnitMaster::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.DEFAULT_UNIT_MASTER);
     let defaultUnitMaster: InvDefaultUnitMaster[];
     if (isCacheable) {
       defaultUnitMaster = (await getAllCache(
-        cacheKey
+        cacheKey,
       )) as InvDefaultUnitMaster[];
     } else {
       defaultUnitMaster = await getAllDefaultUnitMasterFromDb();
@@ -77,7 +77,7 @@ export const defaultUnitMasterService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Default Unit Master")
+          generateErrorMessage("NOT_FOUND", "Default Unit Master"),
         );
       else return [];
     }
@@ -87,7 +87,7 @@ export const defaultUnitMasterService = {
 
   async getDefaultUnitMasterById(
     defaultUnitMasterId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvDefaultUnitMaster | null> {
     logger.info("entering::getDefaultUnitMasterById::service");
     validIdCheck(defaultUnitMasterId);
@@ -96,18 +96,17 @@ export const defaultUnitMasterService = {
     if (isCacheable) {
       defaultUnitMaster = (await getCacheById(
         cacheKey,
-        defaultUnitMasterId
+        defaultUnitMasterId,
       )) as InvDefaultUnitMaster | null;
     } else {
-      defaultUnitMaster = await getDefaultUnitMasterByIdFromDb(
-        defaultUnitMasterId
-      );
+      defaultUnitMaster =
+        await getDefaultUnitMasterByIdFromDb(defaultUnitMasterId);
     }
     if (!defaultUnitMaster) {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Default Unit Master")
+          generateErrorMessage("NOT_FOUND", "Default Unit Master"),
         );
       else return null;
     }

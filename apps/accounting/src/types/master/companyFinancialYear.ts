@@ -14,10 +14,9 @@ export type CompanyFinancialYearResponse =
     };
   }>;
 
-export interface CompanyFinancialYearDTO
-  extends Omit<
-    CompanyFinancialYearResponse,
-    BaseModelAttrWoCancel | "company" | "companyId"
-  > {
+export interface CompanyFinancialYearDTO extends Omit<
+  CompanyFinancialYearResponse,
+  BaseModelAttrWoCancel | "company" | "companyId"
+> {
   company: IdValue | null;
 }

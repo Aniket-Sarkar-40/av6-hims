@@ -29,8 +29,10 @@ export type CompanyFeaturesCreateInput = Omit<
   BaseModelAttrWoCancel
 >;
 
-export interface CreateOrUpdateCompanyInput
-  extends Omit<Prisma.CompanyUncheckedCreateInput, BaseModelAttrWoCancel> {
+export interface CreateOrUpdateCompanyInput extends Omit<
+  Prisma.CompanyUncheckedCreateInput,
+  BaseModelAttrWoCancel
+> {
   addresses: CompanyAddressCreateInput[];
   statutory: CompanyStatutoryCreateInput;
   financialYears: CompanyFinancialYearCreateInput;
@@ -56,11 +58,10 @@ export type CompanyResponse = Prisma.CompanyGetPayload<{
   };
 }>;
 
-export interface CompanyAddressDTO
-  extends Omit<
-    CompanyAddress,
-    BaseModelAttrWoCancel | "cityId" | "stateId" | "countryId"
-  > {
+export interface CompanyAddressDTO extends Omit<
+  CompanyAddress,
+  BaseModelAttrWoCancel | "cityId" | "stateId" | "countryId"
+> {
   city: IdValue | null;
   state: IdValue | null;
   country: IdValue | null;
@@ -71,16 +72,15 @@ export type CompanyFinancialYearDTO = Omit<
   BaseModelAttrWoCancel
 >;
 
-export interface CompanyDTO
-  extends Omit<
-    CompanyResponse,
-    | BaseModelAttrWoCancel
-    | "companyAddresses"
-    | "companyStatutory"
-    | "companyFinancialYears"
-    | "companyFeatures"
-    | "currencyId"
-  > {
+export interface CompanyDTO extends Omit<
+  CompanyResponse,
+  | BaseModelAttrWoCancel
+  | "companyAddresses"
+  | "companyStatutory"
+  | "companyFinancialYears"
+  | "companyFeatures"
+  | "currencyId"
+> {
   currency: Omit<Currency, BaseModelAttrWoCancel> | null;
   companyAddresses: CompanyAddressDTO[];
   companyStatutory: Omit<CompanyStatutory, BaseModelAttrWoCancel> | null;

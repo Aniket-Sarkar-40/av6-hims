@@ -38,5 +38,5 @@ migrationRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIGRATION", "CREATE")),
   validateCreateMigration,
-  createMigration
+  createMigration,
 );

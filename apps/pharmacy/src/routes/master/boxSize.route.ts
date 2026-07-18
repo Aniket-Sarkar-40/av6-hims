@@ -50,7 +50,7 @@ boxSizeRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BOX_SIZE", "CREATE")),
   validateDropDownName,
-  boxSizeCreate
+  boxSizeCreate,
 );
 
 /**
@@ -69,7 +69,7 @@ boxSizeRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BOX_SIZE", "VIEW")),
-  boxSizeGet
+  boxSizeGet,
 );
 
 /**
@@ -90,7 +90,7 @@ boxSizeRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BOX_SIZE", "VIEW")),
-  getBoxSizeById
+  getBoxSizeById,
 );
 
 /**
@@ -120,8 +120,8 @@ boxSizeRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "BOX_SIZE", "VIEW"),
-    getPermission("PMS", "BOX_SIZE", "UPDATE")
+    getPermission("PMS", "BOX_SIZE", "UPDATE"),
   ),
   validateDropDownNameUpdate,
-  updateBoxSize
+  updateBoxSize,
 );

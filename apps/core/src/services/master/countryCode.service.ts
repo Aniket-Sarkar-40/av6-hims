@@ -65,12 +65,12 @@ const countryCodeServiceRaw = {
         | null;
       if (cachedCountryCode && cachedCountryCode.length > 0) {
         return Promise.all(
-          cachedCountryCode.map((countryCode) => toCountryCodeDTO(countryCode))
+          cachedCountryCode.map((countryCode) => toCountryCodeDTO(countryCode)),
         );
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Country Code")
+          generateErrorMessage("NOT_FOUND", "Country Code"),
         );
       }
     } else {
@@ -78,18 +78,18 @@ const countryCodeServiceRaw = {
       if (countryCode.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Country Code")
+          generateErrorMessage("NOT_FOUND", "Country Code"),
         );
       }
       logger.info("exiting::getAllCountryCode::service");
       return Promise.all(
-        countryCode.map((countryCode) => toCountryCodeDTO(countryCode))
+        countryCode.map((countryCode) => toCountryCodeDTO(countryCode)),
       );
     }
   },
   async getCountryCodeById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<CountryCodeDTO | null> {
     logger.info("entering::getCountryCodeById::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.COUNTRY_CODE);
@@ -103,7 +103,7 @@ const countryCodeServiceRaw = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Country Code")
+          generateErrorMessage("NOT_FOUND", "Country Code"),
         );
       } else return null;
     }
@@ -121,5 +121,5 @@ const countryCodeServiceRaw = {
 
 export const countryCodeService = auditProxy.createAuditedService(
   "countryCode",
-  countryCodeServiceRaw
+  countryCodeServiceRaw,
 );

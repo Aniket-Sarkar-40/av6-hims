@@ -8,7 +8,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdAuditConfig = async (
-  id: number
+  id: number,
 ): Promise<AuditConfig> => {
   logger.info("entering::validateIdAuditConfig::service::validation");
   validIdCheck(id);
@@ -24,7 +24,7 @@ export const validateIdAuditConfig = async (
   if (!auditConfig) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Audit Config")
+      generateErrorMessage("NOT_FOUND", "Audit Config"),
     );
   }
   logger.info("exiting::validateIdAuditConfig::service::validation");
@@ -32,10 +32,10 @@ export const validateIdAuditConfig = async (
 };
 
 export const createOrUpdateAuditConfigServiceValidation = async (
-  body: CreateOrUpdateAuditConfig
+  body: CreateOrUpdateAuditConfig,
 ) => {
   logger.info(
-    "entering::createOrUpdateAuditConfigServiceValidation::service::validation"
+    "entering::createOrUpdateAuditConfigServiceValidation::service::validation",
   );
 
   const duplicate = await checkAuditConfigFieldDuplicate(body);
@@ -46,7 +46,7 @@ export const createOrUpdateAuditConfigServiceValidation = async (
       const fields = duplicate.duplicateFields.join(", ");
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", `Audit Config with ${fields}`)
+        generateErrorMessage("DUPLICATE_ITEM", `Audit Config with ${fields}`),
       );
     }
   }
@@ -55,10 +55,10 @@ export const createOrUpdateAuditConfigServiceValidation = async (
     const fields = duplicate.duplicateFields.join(", ");
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", `Audit Config with ${fields}`)
+      generateErrorMessage("DUPLICATE_ITEM", `Audit Config with ${fields}`),
     );
   }
   logger.info(
-    "exiting::createOrUpdateAuditConfigServiceValidation::service::validation"
+    "exiting::createOrUpdateAuditConfigServiceValidation::service::validation",
   );
 };

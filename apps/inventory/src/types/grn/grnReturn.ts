@@ -21,11 +21,10 @@ export interface GrnReturnDetailInput
   stockQuantity?: number;
 }
 
-export interface CreateGrnReturnInput
-  extends Omit<
-    Prisma.InvGoodReceiveReturnUncheckedCreateInput,
-    "goodReceiveReturnDetails" | BaseModelAttr
-  > {
+export interface CreateGrnReturnInput extends Omit<
+  Prisma.InvGoodReceiveReturnUncheckedCreateInput,
+  "goodReceiveReturnDetails" | BaseModelAttr
+> {
   goodReceiveReturnDetails: GrnReturnDetailInput[];
   grnReturn: GoodReceivedReturnResponse;
   supplier: ItemSupplierDTO;
@@ -40,20 +39,19 @@ export type GoodReceivedReturnResponse = Prisma.InvGoodReceiveReturnGetPayload<{
   };
 }>;
 
-export interface GoodReceiveReturnDTO
-  extends Omit<
-    GrnReturnResponse,
-    | BaseModelAttr
-    | "createdBy"
-    | "goodReceiveReturnDetails"
-    | "rejectedBy"
-    | "approvedBy"
-    | "grnId"
-    | "poId"
-    | "ccId"
-    | "supplierId"
-    | "currencyId"
-  > {
+export interface GoodReceiveReturnDTO extends Omit<
+  GrnReturnResponse,
+  | BaseModelAttr
+  | "createdBy"
+  | "goodReceiveReturnDetails"
+  | "rejectedBy"
+  | "approvedBy"
+  | "grnId"
+  | "poId"
+  | "ccId"
+  | "supplierId"
+  | "currencyId"
+> {
   goodReceiveReturnDetails: GoodReceiveReturnDetailDTO[];
   supplier: IdValue | null;
   currency: IdValue | null;
@@ -65,17 +63,18 @@ export interface GoodReceiveReturnDTO
   rejectedBy: EmployeeCache | null;
 }
 
-export interface GrnReturnDetailDTO
-  extends Omit<
-    InvGoodReceiveReturnDetails,
-    "itemId" | "createdBy" | "updatedBy"
-  > {
+export interface GrnReturnDetailDTO extends Omit<
+  InvGoodReceiveReturnDetails,
+  "itemId" | "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
 }
-export interface GoodReceiveReturnDetailDTO
-  extends Omit<InvGoodReceiveReturnDetails, "createdBy" | "updatedBy"> {
+export interface GoodReceiveReturnDetailDTO extends Omit<
+  InvGoodReceiveReturnDetails,
+  "createdBy" | "updatedBy"
+> {
   inHandQty: number | null;
   returnedQty: number | null;
   availableTotalQtyToReturn: number | null;

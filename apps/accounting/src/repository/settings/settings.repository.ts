@@ -6,7 +6,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 
 export const upsertSettingsInDb = async (
-  data: CreateOrUpdateSettings
+  data: CreateOrUpdateSettings,
 ): Promise<AccSettings> => {
   logger.info("entering::upsertSettingsInDb::repository");
 
@@ -35,7 +35,7 @@ export const upsertSettingsInDb = async (
 };
 
 export const getSettingsByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<AccSettings | null> => {
   logger.info("entering::getSettingsByIdFromDb::repository");
   return db.accSettings.findFirst({

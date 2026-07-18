@@ -22,7 +22,7 @@ export const validateIdConsumption = async (consumptionId: number) => {
   if (!consumption) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Consumption")
+      generateErrorMessage("NOT_FOUND", "Consumption"),
     );
   }
   logger.info("exiting::validateIdConsumption::service::validation");
@@ -30,7 +30,7 @@ export const validateIdConsumption = async (consumptionId: number) => {
 };
 
 export const createConsumptionServiceValidation = async (
-  input: ConsumptionCreateInput
+  input: ConsumptionCreateInput,
 ) => {
   logger.info("entering::createConsumption::service::validation");
 
@@ -40,7 +40,7 @@ export const createConsumptionServiceValidation = async (
 
   const consumer = await employeeService.getEmployeeByIdFrmCacheOrDb(
     input.requestedBy,
-    true
+    true,
   );
   if (!consumer) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Requester"));
@@ -61,8 +61,8 @@ export const createConsumptionServiceValidation = async (
         400,
         generateErrorMessage(
           "INVALID_VALUE",
-          `Approved qty ${consumedQty} is greater than requested qty ${detail.requestedQty}`
-        )
+          `Approved qty ${consumedQty} is greater than requested qty ${detail.requestedQty}`,
+        ),
       );
     }
 
@@ -83,7 +83,7 @@ export const createConsumptionServiceValidation = async (
     if (!stock || stock < consumedQty) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`)
+        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`),
       );
     }
   }
@@ -91,7 +91,7 @@ export const createConsumptionServiceValidation = async (
 };
 
 export const updateConsumptionServiceValidation = async (
-  input: ConsumptionUpdateInput
+  input: ConsumptionUpdateInput,
 ) => {
   logger.info("entering::updateConsumption::service::validation");
   const existing = await validateIdConsumption(input.id);
@@ -100,7 +100,7 @@ export const updateConsumptionServiceValidation = async (
   if (existing.status !== "DRAFT") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption")
+      generateErrorMessage("INVALID_STATUS", "Consumption"),
     );
   }
 
@@ -108,7 +108,7 @@ export const updateConsumptionServiceValidation = async (
 };
 
 export const approveConsumptionServiceValidation = async (
-  input: ConsumptionApproveInput
+  input: ConsumptionApproveInput,
 ) => {
   logger.info("entering::approveConsumption::service::validation");
   const existing = await validateIdConsumption(input.id);
@@ -117,14 +117,14 @@ export const approveConsumptionServiceValidation = async (
   if (existing.status !== "SENT_FOR_APPROVAL") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption")
+      generateErrorMessage("INVALID_STATUS", "Consumption"),
     );
   }
 
   await validateBranchOrWarehouse(input.ccId);
 
   const consumer = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    input.requestedBy
+    input.requestedBy,
   );
   if (!consumer) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Requester"));
@@ -153,7 +153,7 @@ export const approveConsumptionServiceValidation = async (
     if (stock === undefined || stock < detail.consumedQty) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`)
+        generateErrorMessage("INSUFFICIENT_STOCK", `Item :${name}`),
       );
     }
 
@@ -162,8 +162,8 @@ export const approveConsumptionServiceValidation = async (
         400,
         generateErrorMessage(
           "INVALID_VALUE",
-          `Approved qty ${detail.consumedQty} is greater than requested qty ${detail.requestedQty}`
-        )
+          `Approved qty ${detail.consumedQty} is greater than requested qty ${detail.requestedQty}`,
+        ),
       );
     }
   }
@@ -172,7 +172,7 @@ export const approveConsumptionServiceValidation = async (
 };
 
 export const rejectConsumptionServiceValidation = async (
-  input: CommonConsumptionInput
+  input: CommonConsumptionInput,
 ) => {
   logger.info("entering::rejectConsumption::service::validation");
 
@@ -181,7 +181,7 @@ export const rejectConsumptionServiceValidation = async (
   if (existing.status === "REJECTED" || existing.status === "APPROVED") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption")
+      generateErrorMessage("INVALID_STATUS", "Consumption"),
     );
   }
 
@@ -189,7 +189,7 @@ export const rejectConsumptionServiceValidation = async (
 };
 
 export const deleteConsumptionServiceValidation = async (
-  input: CommonConsumptionInput
+  input: CommonConsumptionInput,
 ) => {
   logger.info("entering::deleteConsumption::service::validation");
 
@@ -200,7 +200,7 @@ export const deleteConsumptionServiceValidation = async (
   if (existing.status !== "DRAFT") {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Consumption")
+      generateErrorMessage("INVALID_STATUS", "Consumption"),
     );
   }
 
@@ -208,7 +208,7 @@ export const deleteConsumptionServiceValidation = async (
 };
 
 export const getConsumptionByUserIdServiceValidation = async (
-  userId: number
+  userId: number,
 ) => {
   logger.info("entering::getConsumptionByUserId::service::validation");
   const user = await employeeService.getEmployeeByIdFrmCacheOrDb(userId, true);

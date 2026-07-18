@@ -70,7 +70,7 @@ itemRouter.post(
     "rightSideImage",
   ]),
   validateCreateItem,
-  itemCreate
+  itemCreate,
 );
 
 /**
@@ -93,7 +93,7 @@ itemRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM", "VIEW"),
-    getPermission("PMS", "ITEM", "UPDATE")
+    getPermission("PMS", "ITEM", "UPDATE"),
   ),
   createUploadFieldsMiddleware("item", [
     "barcode",
@@ -103,7 +103,7 @@ itemRouter.put(
     "rightSideImage",
   ]),
   validateUpdateItem,
-  updateItem
+  updateItem,
 );
 
 /**
@@ -119,7 +119,7 @@ itemRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
-  allItemGet
+  allItemGet,
 );
 
 /**
@@ -135,7 +135,7 @@ itemRouter.post(
   "/after-pricing",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
-  getItemSellPricing
+  getItemSellPricing,
 );
 
 /**
@@ -158,7 +158,7 @@ itemRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
   validateItemStock,
-  getItemById
+  getItemById,
 );
 
 /**
@@ -174,7 +174,7 @@ itemRouter.delete(
   "/:id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "DELETE")),
-  deleteItem
+  deleteItem,
 );
 
 /**
@@ -197,7 +197,7 @@ itemRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_SEARCH", "CREATE")),
   validateItemSearch,
-  itemSearch
+  itemSearch,
 );
 
 /**
@@ -220,7 +220,7 @@ itemRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_BATCHES", "VIEW")),
   validateItemStock,
-  getItemStocksByItemId
+  getItemStocksByItemId,
 );
 
 /**
@@ -236,7 +236,7 @@ itemRouter.get(
   "/slowMoving",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_SLOW_MOVING", "VIEW")),
-  getSlowMovingItem
+  getSlowMovingItem,
 );
 
 /**
@@ -253,7 +253,7 @@ itemRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
-  itemExcelImport
+  itemExcelImport,
 );
 
 /**
@@ -268,7 +268,7 @@ itemRouter.post(
   "/export",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
-  itemExcelSampleExport
+  itemExcelSampleExport,
 );
 
 /**
@@ -284,7 +284,7 @@ itemRouter.put(
   "/active/:id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "CREATE")),
-  ActiveItem
+  ActiveItem,
 );
 
 /**
@@ -302,5 +302,5 @@ itemRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM", "VIEW")),
   validateItemExcelFilter,
-  excelItemReport
+  excelItemReport,
 );

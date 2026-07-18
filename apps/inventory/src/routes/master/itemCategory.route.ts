@@ -45,7 +45,7 @@ itemCategoryRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_CATEGORY", "CREATE")),
   validateItemCategoryCreate,
-  createItemCategory
+  createItemCategory,
 );
 
 /**
@@ -61,7 +61,7 @@ itemCategoryRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_CATEGORY", "VIEW")),
-  getAllItemCategory
+  getAllItemCategory,
 );
 
 /**
@@ -82,7 +82,7 @@ itemCategoryRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "ITEM_CATEGORY", "VIEW")),
-  getItemCategoryById
+  getItemCategoryById,
 );
 
 /**
@@ -112,8 +112,8 @@ itemCategoryRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "ITEM_CATEGORY", "VIEW"),
-    getPermission("INV", "ITEM_CATEGORY", "UPDATE")
+    getPermission("INV", "ITEM_CATEGORY", "UPDATE"),
   ),
   validateItemCategoryUpdate,
-  updateItemCategory
+  updateItemCategory,
 );

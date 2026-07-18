@@ -14,15 +14,15 @@ export const getItemStockSummary = TryCatch(
     logger.info("entering::getItemStockSummary::controller");
     const { ccId } = req.query as { ccId: string };
     const itemStock = await itemStockService.getAllItemStockSummary(
-      Number(ccId)
+      Number(ccId),
     );
     logger.info("exiting::getItemStockSummary::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: itemStock },
-      "Item Stock Summary"
+      "Item Stock Summary",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getItemStock = TryCatch(async (req: Request, res: Response) => {
@@ -32,7 +32,7 @@ export const getItemStock = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::getItemStock::controller");
   const response = BaseResponse.success(
     { type: "FETCHED", data: itemStock },
-    "Item Stock"
+    "Item Stock",
   );
   return res.status(200).json(response);
 });
@@ -45,17 +45,17 @@ export const exportItemStockExcel = TryCatch(
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=item-stock-export-${input.ccId}.xlsx`
+      `attachment; filename=item-stock-export-${input.ccId}.xlsx`,
     );
 
     await workbook.xlsx.write(res);
     res.end();
     logger.info("exiting::exportItemStockExcel::controller");
-  }
+  },
 );
 
 export const getAllItemBatchStock = TryCatch(
@@ -64,13 +64,13 @@ export const getAllItemBatchStock = TryCatch(
     const body = req.body as ItemBatchStockLookupInput;
     const itemBatchStock = await itemStockService.getAllItemBatchStock(
       body,
-      true
+      true,
     );
     logger.info("exiting::getAllItemBatchStock::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: itemBatchStock },
-      "Item Batch Stock"
+      "Item Batch Stock",
     );
     return res.status(200).json(response);
-  }
+  },
 );

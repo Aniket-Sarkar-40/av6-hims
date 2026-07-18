@@ -63,16 +63,15 @@ import { employeeService } from "@apps/core/services/staff/employee.service.js";
 
 const bankReconciliationRaw = {
   async getUnReconciledBankLedgerBook(
-    input: BankLedgerBookRequestInput
+    input: BankLedgerBookRequestInput,
   ): Promise<BankLedgerBookResponse> {
     logger.info("entering::getUnReconciledBankLedgerBook::service");
     const store = requestStorage.getStore();
     const settings = store?.settings;
     const roundingPrecision = settings?.roundingPrecision ?? 2;
     const roundingMethod = settings?.roundingMethod ?? RoundFormat.TO_FIXED;
-    const ledger = await validateBankReconciliationCommonServiceValidation(
-      input
-    );
+    const ledger =
+      await validateBankReconciliationCommonServiceValidation(input);
 
     const { companyId, financialYearId, ledgerId, fromDate, toDate, ccId } =
       input;
@@ -97,7 +96,7 @@ const bankReconciliationRaw = {
     if (!group) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`)
+        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`),
       );
     }
 
@@ -143,7 +142,7 @@ const bankReconciliationRaw = {
             bankOrUnreconciledTotalCr: totals.bankOrUnreconciledTotalCr + cr,
           };
         },
-        { bankOrUnreconciledTotalDr: 0, bankOrUnreconciledTotalCr: 0 }
+        { bankOrUnreconciledTotalDr: 0, bankOrUnreconciledTotalCr: 0 },
       );
 
     let totalDr = 0;
@@ -162,7 +161,7 @@ const bankReconciliationRaw = {
       runningSigned = addSigned(runningSigned, dr, cr);
 
       const voucherType = voucherTypes.find(
-        (v) => v.id === l.voucher.voucherTypeId
+        (v) => v.id === l.voucher.voucherTypeId,
       );
       const createdBy = l.voucher.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.createdBy)
@@ -209,7 +208,7 @@ const bankReconciliationRaw = {
     const amt = applyRound(
       totalDr - totalCr,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     ); // amount not reflected in bank
     const amountNotReflectedInBank =
       input.status === BankReconcileStatus.UNRECONCILED
@@ -218,8 +217,8 @@ const bankReconciliationRaw = {
             applyRound(
               bankOrUnreconciledTotalDr - bankOrUnreconciledTotalCr,
               roundingMethod,
-              roundingPrecision
-            )
+              roundingPrecision,
+            ),
           );
     const balanceAsPerBank =
       input.status === BankReconcileStatus.UNRECONCILED
@@ -227,8 +226,8 @@ const bankReconciliationRaw = {
             applyRound(
               bankOrUnreconciledTotalDr - bankOrUnreconciledTotalCr,
               roundingMethod,
-              roundingPrecision
-            )
+              roundingPrecision,
+            ),
           )
         : toDrCr(amt);
     return {
@@ -246,7 +245,7 @@ const bankReconciliationRaw = {
     };
   },
   async manualReconcileVoucherLines(
-    input: ManualReconcileRequestInput
+    input: ManualReconcileRequestInput,
   ): Promise<void> {
     logger.info("entering::manualReconcileVoucherLines::service");
     await validateManualReconcileVoucherLinesServiceValidation(input);
@@ -299,21 +298,21 @@ const bankReconciliationRaw = {
         row,
         rowNo: index + 1,
         statementFormat,
-      })
+      }),
     );
 
     const batch = await createBankStatementExcelInDb(convertedData);
 
     bankStatementExcelBatchJob({ batchJobId: batch.id, baseInput })
       .then(() =>
-        logger.info("Bank Statement Excel Batch Processing Completed")
+        logger.info("Bank Statement Excel Batch Processing Completed"),
       )
       .catch((e) => logger.error(JSON.stringify(e)));
 
     logger.info("exiting::createBankStatementExcel::service");
   },
   async manualBankReconcileWithBankStatement(
-    input: ManualBankReconcileWithBankStatementInput
+    input: ManualBankReconcileWithBankStatementInput,
   ): Promise<void> {
     logger.info("entering::manualBankReconcileWithBankStatement::service");
     await validateManualBankReconcileWithBankStatementServiceValidation(input);
@@ -322,7 +321,7 @@ const bankReconciliationRaw = {
   },
 
   async getBankReconciliationSummary(
-    input: BankReconciliationSummaryRequestInput
+    input: BankReconciliationSummaryRequestInput,
   ): Promise<BankReconciliationSummaryResponse> {
     logger.info("entering::getBankReconciliationSummary::service");
 
@@ -414,12 +413,12 @@ const bankReconciliationRaw = {
     const bankBookBalance = applyRound(
       bankBookIn - bankBookOut,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const statementBalance = applyRound(
       statementIn - statementOut,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     /**
@@ -436,35 +435,35 @@ const bankReconciliationRaw = {
     const availableOnlyInBooksAddWithdrawals = applyRound(
       unreconciledBookOut,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const availableOnlyInBooksLessDeposits = applyRound(
       unreconciledBookIn,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const availableOnlyInBankAddDeposits = applyRound(
       statementUnreconciledIn,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const availableOnlyInBankLessWithdrawals = applyRound(
       statementUnreconciledOut,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const availableOnlyInBooksNetEffect = applyRound(
       availableOnlyInBooksAddWithdrawals - availableOnlyInBooksLessDeposits,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const availableOnlyInBankNetEffect = applyRound(
       availableOnlyInBankAddDeposits - availableOnlyInBankLessWithdrawals,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const expectedBankBalance = applyRound(
@@ -474,13 +473,13 @@ const bankReconciliationRaw = {
         availableOnlyInBankAddDeposits -
         availableOnlyInBankLessWithdrawals,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const difference = applyRound(
       expectedBankBalance - statementBalance,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const response: BankReconciliationSummaryResponse = {
@@ -537,7 +536,7 @@ const bankReconciliationRaw = {
     return response;
   },
   async getBankAutoSuggestions(
-    input: AutoMatchSuggestionInput
+    input: AutoMatchSuggestionInput,
   ): Promise<AutoMatchSuggestionResponse> {
     logger.info("entering::getBankAutoSuggestions::service");
 
@@ -584,7 +583,7 @@ const bankReconciliationRaw = {
       const vDate = dayjs(voucherDate);
 
       const transactionDateDiff = Math.abs(
-        vDate.diff(dayjs(row.transactionDate), "day")
+        vDate.diff(dayjs(row.transactionDate), "day"),
       );
       const valueDateDiff = row.valueDate
         ? Math.abs(vDate.diff(dayjs(row.valueDate), "day"))
@@ -597,7 +596,7 @@ const bankReconciliationRaw = {
       const vDate = dayjs(voucherDate);
 
       const transactionDateDiff = Math.abs(
-        vDate.diff(dayjs(row.transactionDate), "day")
+        vDate.diff(dayjs(row.transactionDate), "day"),
       );
       const valueDateDiff = row.valueDate
         ? Math.abs(vDate.diff(dayjs(row.valueDate), "day"))
@@ -615,7 +614,7 @@ const bankReconciliationRaw = {
     const addToMap = (
       map: Map<string, BankStatementRow[]>,
       key: string,
-      row: BankStatementRow
+      row: BankStatementRow,
     ) => {
       if (!key) return;
 
@@ -676,7 +675,7 @@ const bankReconciliationRaw = {
             voucherLine.instrumentNo || "",
             voucherLine.voucher.voucherNo || "",
             voucherTypeName,
-          ].join(" ")
+          ].join(" "),
         );
 
         const scoredCandidates = candidates
@@ -698,11 +697,11 @@ const bankReconciliationRaw = {
                 row.voucherType || "",
                 row.ledgerName || "",
                 row.bankName || "",
-              ].join(" ")
+              ].join(" "),
             );
 
             const statementDescriptionNumbers = getNumberTokens(
-              row.description
+              row.description,
             );
 
             if (voucherLine.instrumentNo) {
@@ -746,7 +745,7 @@ const bankReconciliationRaw = {
             if (row.voucherType && voucherTypeName) {
               if (
                 normalizeText(row.voucherType).includes(
-                  normalizeText(voucherTypeName)
+                  normalizeText(voucherTypeName),
                 )
               ) {
                 score += 10;
@@ -821,9 +820,9 @@ const bankReconciliationRaw = {
               normalizeText(r.voucherType).includes(
                 normalizeText(
                   voucherTypes.find(
-                    (vt) => vt.id === voucherLine.voucher.voucherTypeId
-                  )?.name || ""
-                )
+                    (vt) => vt.id === voucherLine.voucher.voucherTypeId,
+                  )?.name || "",
+                ),
               ))
           );
         });
@@ -839,7 +838,7 @@ const bankReconciliationRaw = {
         const text = normalizeText(
           (voucherLine.description || "") +
             " " +
-            (voucherLine.voucher.narration || "")
+            (voucherLine.voucher.narration || ""),
         );
 
         for (const [txnId, rows] of mapTxnId.entries()) {
@@ -883,7 +882,7 @@ const bankReconciliationRaw = {
           const vText = normalizeText(
             (voucherLine.description || "") +
               " " +
-              (voucherLine.voucher.narration || "")
+              (voucherLine.voucher.narration || ""),
           );
           const sText = normalizeText(row.description || "");
 
@@ -914,13 +913,13 @@ const bankReconciliationRaw = {
           voucherId: voucherLine.voucherId,
           voucherNo: voucherLine.voucher.voucherNo,
           voucherDate: dayjs(voucherLine.voucher.voucherDate).format(
-            "DD-MM-YYYY"
+            "DD-MM-YYYY",
           ),
           drCr: voucherLine.drCr,
           voucherType: voucherLine.voucher.voucherTypeId
-            ? voucherTypes.find(
-                (vt) => vt.id === voucherLine.voucher.voucherTypeId
-              )?.name ?? null
+            ? (voucherTypes.find(
+                (vt) => vt.id === voucherLine.voucher.voucherTypeId,
+              )?.name ?? null)
             : null,
           amount,
           transactionType: voucherLine.transactionType,
@@ -935,7 +934,7 @@ const bankReconciliationRaw = {
         bankStatementRow: {
           id: matchedRow.id,
           transactionDate: dayjs(matchedRow.transactionDate).format(
-            "DD-MM-YYYY"
+            "DD-MM-YYYY",
           ),
           valueDate: matchedRow.valueDate
             ? dayjs(matchedRow.valueDate).format("DD-MM-YYYY")
@@ -962,5 +961,5 @@ const bankReconciliationRaw = {
 
 export const bankReconciliationService = auditProxy.createAuditedService(
   "bankReconciliation",
-  bankReconciliationRaw
+  bankReconciliationRaw,
 );

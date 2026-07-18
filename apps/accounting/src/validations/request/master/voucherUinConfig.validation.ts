@@ -59,26 +59,26 @@ const UINSegmentSchema = Joi.object<UINSegment>({
       .messages({
         "number.base": generateValidationErrorMessage(
           "NUMBER",
-          "Min Sequence Length"
+          "Min Sequence Length",
         ),
         "number.integer": generateValidationErrorMessage(
           "INTEGER",
-          "Min Sequence Length"
+          "Min Sequence Length",
         ),
         "number.min": generateValidationErrorMessage(
           "MIN",
           "Min Sequence Length",
-          "1"
+          "1",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Min Sequence Length"
+          "Min Sequence Length",
         ),
       }),
     otherwise: Joi.forbidden().messages({
       "any.unknown": generateValidationErrorMessage(
         "FORBIDDEN",
-        "Min Sequence Length"
+        "Min Sequence Length",
       ),
     }),
   }),
@@ -94,14 +94,14 @@ export const createVoucherUINConfigSchema =
       .messages({
         "string.base": generateValidationErrorMessage(
           "STRING",
-          "Sequence Reset Policy"
+          "Sequence Reset Policy",
         ),
         "any.only": `Sequence Reset Policy must be one of [${Object.values(
-          UIN_RESET_POLICY
+          UIN_RESET_POLICY,
         ).join(", ")}]`,
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Sequence Reset Policy"
+          "Sequence Reset Policy",
         ),
       }),
 
@@ -122,7 +122,7 @@ export const createVoucherUINConfigSchema =
         "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "UIN Segments"
+          "UIN Segments",
         ),
       }),
   });
@@ -144,7 +144,7 @@ export const previewConfigSchema = Joi.object<UINPreviewRequest>({
       "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "UIN Segments"
+        "UIN Segments",
       ),
     }),
 });
@@ -162,7 +162,7 @@ export const uinShortCodeSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Short Code",
-        Object.values(AccUinShortCode).join(", ")
+        Object.values(AccUinShortCode).join(", "),
       ),
     }),
 });

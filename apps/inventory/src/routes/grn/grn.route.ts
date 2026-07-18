@@ -47,7 +47,7 @@ grnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "CREATE")),
   validateGrn,
-  createGrn
+  createGrn,
 );
 
 /**
@@ -63,7 +63,7 @@ grnRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "VIEW")),
-  getAllGrn
+  getAllGrn,
 );
 
 /**
@@ -84,7 +84,7 @@ grnRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "VIEW")),
-  getGrnById
+  getGrnById,
 );
 
 /**
@@ -114,10 +114,10 @@ grnRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "GRN", "VIEW"),
-    getPermission("INV", "GRN", "UPDATE")
+    getPermission("INV", "GRN", "UPDATE"),
   ),
   validateGrnUpdate,
-  updateGrn
+  updateGrn,
 );
 
 /**
@@ -144,7 +144,7 @@ grnRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN", "DELETE")),
-  deleteGrn
+  deleteGrn,
 );
 
 /**
@@ -160,5 +160,5 @@ grnRouter.post(
   "/pdf",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "GRN_PDF", "VIEW")),
-  generateGrnPdf
+  generateGrnPdf,
 );

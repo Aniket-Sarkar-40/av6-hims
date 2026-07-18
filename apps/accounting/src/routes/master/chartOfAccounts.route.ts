@@ -16,12 +16,12 @@ chartOfAccountsRouter.get(
   "/",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "CHART_OF_ACCOUNTS", "VIEW")),
-  fetchChartOfAccounts
+  fetchChartOfAccounts,
 );
 
 chartOfAccountsRouter.get(
   "/export-excel",
   verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "CHART_OF_ACCOUNTS", "VIEW")),
-  exportChartOfAccountsExcel
+  exportChartOfAccountsExcel,
 );

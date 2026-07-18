@@ -50,7 +50,7 @@ chipsButtonMappingRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CHIPS_BUTTON_MAPPING", "CREATE")),
   validateChipsButtonMappingCreate,
-  createChipsButtonMapping
+  createChipsButtonMapping,
 );
 
 /**
@@ -82,5 +82,5 @@ chipsButtonMappingRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CHIPS_BUTTON_MAPPING", "UPDATE")),
   validateChipsButtonMappingUpdate,
-  updateChipsButtonMapping
+  updateChipsButtonMapping,
 );

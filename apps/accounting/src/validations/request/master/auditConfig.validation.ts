@@ -16,7 +16,7 @@ export const auditConfigCreateSchema = Joi.object<CreateOrUpdateAuditConfig>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Module",
-        Object.values(ServiceCode).join(", ")
+        Object.values(ServiceCode).join(", "),
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Module"),
     }),

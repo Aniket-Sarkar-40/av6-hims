@@ -26,18 +26,19 @@ export type LedgerResponse = Prisma.LedgerGetPayload<{
   };
 }>;
 
-export interface LedgerDTO
-  extends Omit<
-    LedgerResponse,
-    BaseModelAttrWoCancel | "company" | "companyId" | "groupId" | "currencyId"
-  > {
+export interface LedgerDTO extends Omit<
+  LedgerResponse,
+  BaseModelAttrWoCancel | "company" | "companyId" | "groupId" | "currencyId"
+> {
   company: IdValue | null;
   group: IdValue | null;
   currency: IdValue | null;
 }
 
-export interface LedgerDTOForTrialBalance
-  extends Omit<Ledger, BaseModelAttrWoCancel | "companyId" | "groupId"> {
+export interface LedgerDTOForTrialBalance extends Omit<
+  Ledger,
+  BaseModelAttrWoCancel | "companyId" | "groupId"
+> {
   group: IdValue | null;
   parentGroup: IdValue | null;
 }

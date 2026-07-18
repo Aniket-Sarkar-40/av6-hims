@@ -16,7 +16,7 @@ const hasValue = (value: unknown) => {
 };
 
 export const validateItemSupplierExcelArray = (
-  rows: ItemSupplierExcelStagingRow[]
+  rows: ItemSupplierExcelStagingRow[],
 ) => {
   const errors: string[] = [];
 
@@ -51,7 +51,7 @@ export const validateItemSupplierExcelArray = (
 
     const validatePhoneField = (
       value: string | null | undefined,
-      label: string
+      label: string,
     ) => {
       if (value == null || String(value).trim() === "") return;
       if (
@@ -128,7 +128,7 @@ export const validateItemSupplierExcelArray = (
         pushRowError(
           errors,
           rowNo,
-          "Bank Account No is required and must be a positive integer when bank details are provided"
+          "Bank Account No is required and must be a positive integer when bank details are provided",
         );
       }
 
@@ -136,7 +136,7 @@ export const validateItemSupplierExcelArray = (
         pushRowError(
           errors,
           rowNo,
-          "IFSC Code is required when bank details are provided"
+          "IFSC Code is required when bank details are provided",
         );
       }
 
@@ -144,7 +144,7 @@ export const validateItemSupplierExcelArray = (
         pushRowError(
           errors,
           rowNo,
-          "Bank Name is required when bank details are provided"
+          "Bank Name is required when bank details are provided",
         );
       }
     }
@@ -159,7 +159,7 @@ export const validateItemSupplierExcelArray = (
         pushRowError(
           errors,
           rowNo,
-          "Tax Identification Name is required when tax details are provided"
+          "Tax Identification Name is required when tax details are provided",
         );
       }
 
@@ -171,7 +171,7 @@ export const validateItemSupplierExcelArray = (
         pushRowError(
           errors,
           rowNo,
-          "Tax Identification Value is required and must be a positive integer when tax details are provided"
+          "Tax Identification Value is required and must be a positive integer when tax details are provided",
         );
       }
     }

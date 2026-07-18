@@ -3,11 +3,11 @@ import { CountryCodeDTO } from "@/types/master/countryCode.js";
 import { CountryCode } from "@repo/db/generated/prisma/client";
 
 export const toCountryCodeDTO = async (
-  countryCode: CountryCode
+  countryCode: CountryCode,
 ): Promise<CountryCodeDTO> => {
   const country = await countryService.getCountryById(
     countryCode.countryId,
-    true
+    true,
   );
   return {
     id: countryCode.id,

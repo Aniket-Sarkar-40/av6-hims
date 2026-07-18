@@ -46,7 +46,7 @@ storeRequisitionReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "CREATE")),
   validateStoreRequisitionReturn,
-  createStoreRequisitionReturn
+  createStoreRequisitionReturn,
 );
 
 /**
@@ -62,7 +62,7 @@ storeRequisitionReturnRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "VIEW")),
-  getAllStoreRequisitionReturn
+  getAllStoreRequisitionReturn,
 );
 
 /**
@@ -78,7 +78,7 @@ storeRequisitionReturnRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "VIEW")),
-  getStoreRequisitionReturnById
+  getStoreRequisitionReturnById,
 );
 
 /**
@@ -95,10 +95,10 @@ storeRequisitionReturnRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STORE_REQUISITION_RETURN", "VIEW"),
-    getPermission("INV", "STORE_REQUISITION_RETURN", "UPDATE")
+    getPermission("INV", "STORE_REQUISITION_RETURN", "UPDATE"),
   ),
   validateStoreRequisitionReturnUpdate,
-  updateStoreRequisitionReturn
+  updateStoreRequisitionReturn,
 );
 
 /**
@@ -114,7 +114,7 @@ storeRequisitionReturnRouter.delete(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN", "DELETE")),
-  deleteStoreRequisitionReturn
+  deleteStoreRequisitionReturn,
 );
 
 /**
@@ -131,7 +131,7 @@ storeRequisitionReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN_REJECT", "CREATE")),
   validateStoreRequisitionReturnReject,
-  rejectStoreRequisitionReturn
+  rejectStoreRequisitionReturn,
 );
 
 /**
@@ -148,7 +148,7 @@ storeRequisitionReturnRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STORE_REQUISITION_RETURN_APPROVE", "CREATE")),
   validateApproveStoreRequisitionReturn,
-  approveStoreRequisitionReturn
+  approveStoreRequisitionReturn,
 );
 
 /**
@@ -166,8 +166,8 @@ storeRequisitionReturnRouter.post(
   "/acknowledge",
   verifyToken(ServiceCode.INVENTORY),
   authorize(
-    getPermission("INV", "STORE_REQUISITION_RETURN_ACKNOWLEDGE", "CREATE")
+    getPermission("INV", "STORE_REQUISITION_RETURN_ACKNOWLEDGE", "CREATE"),
   ),
   validateAcknowledgeStoreRequisitionReturn,
-  acknowledgeStoreRequisitionReturn
+  acknowledgeStoreRequisitionReturn,
 );

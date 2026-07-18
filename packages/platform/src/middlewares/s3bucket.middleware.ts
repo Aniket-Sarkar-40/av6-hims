@@ -21,7 +21,7 @@ export const uploadToHetzner =
       if (req.file.mimetype.startsWith("image/")) {
         const optimizedBuffer = await optimizeImageSmart(
           req.file.buffer,
-          req.file.mimetype
+          req.file.mimetype,
         );
 
         fileToUpload = {
@@ -68,7 +68,7 @@ export const uploadMultiToHetzner =
         if (file.mimetype.startsWith("image/")) {
           const optimizedBuffer = await optimizeImageSmart(
             file.buffer,
-            file.mimetype
+            file.mimetype,
           );
 
           fileToUpload = {

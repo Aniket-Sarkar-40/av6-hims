@@ -14,7 +14,7 @@ import { AuthRequest } from "@repo/shared/types/request.type.js";
 
 export async function deleteFileByEnv(
   bucket: string | undefined,
-  keyOrPath: string
+  keyOrPath: string,
 ) {
   try {
     if (envMode.toUpperCase() === "DEVELOPMENT") {
@@ -35,7 +35,7 @@ export async function deleteFileByEnv(
         new DeleteObjectCommand({
           Bucket: bucket,
           Key: keyOrPath,
-        })
+        }),
       );
 
       logger.info(`Deleted S3 file: ${keyOrPath}`);
@@ -54,7 +54,10 @@ function mapPrismaError(err: unknown): ErrorHandler | null {
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     switch (err.code) {
       case "P2002":
-        return new ErrorHandler(409, "A record with these values already exists.");
+        return new ErrorHandler(
+          409,
+          "A record with these values already exists.",
+        );
       case "P2025":
         return new ErrorHandler(404, "The requested record was not found.");
       case "P2003":
@@ -88,7 +91,7 @@ export const errorMiddleware = async (
   err: Error,
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (res.headersSent) {
     return next(err);
@@ -126,7 +129,7 @@ export const errorMiddleware = async (
   // client sees.
   logger.error(
     `[${req.traceId ?? "-"}] ${req.method} ${req.originalUrl} -> ${handler.statusCode}`,
-    err instanceof Error ? err.stack ?? err.message : err
+    err instanceof Error ? (err.stack ?? err.message) : err,
   );
 
   const response: ApiResponse = {
@@ -148,7 +151,7 @@ export const errorMiddleware = async (
 type ControllerType = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => Promise<void | Response<unknown, Record<string, unknown>>>;
 
 export const TryCatch =

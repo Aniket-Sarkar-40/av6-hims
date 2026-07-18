@@ -23,12 +23,12 @@ export const validateIdItemSupplier = async (itemSupplierId: number) => {
 
   const itemSupplier = await itemSupplierService.getItemSupplierById(
     itemSupplierId,
-    true
+    true,
   );
   if (!itemSupplier) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Item Supplier")
+      generateErrorMessage("NOT_FOUND", "Item Supplier"),
     );
   }
   logger.info("exiting::validateIdItemSupplier::service::validation");
@@ -37,7 +37,7 @@ export const validateIdItemSupplier = async (itemSupplierId: number) => {
 };
 
 export const createItemSupplierServiceValidation = async (
-  input: ItemSupplierCreateInput
+  input: ItemSupplierCreateInput,
 ): Promise<void> => {
   logger.info("entering::createItemSupplier::service::validation");
 
@@ -48,7 +48,7 @@ export const createItemSupplierServiceValidation = async (
     if (input.ledgerId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_FIELD", "Ledger ID")
+        generateErrorMessage("INVALID_FIELD", "Ledger ID"),
       );
     }
   }
@@ -58,7 +58,7 @@ export const createItemSupplierServiceValidation = async (
     if (code) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code"),
       );
     }
   }
@@ -66,7 +66,7 @@ export const createItemSupplierServiceValidation = async (
   if (name) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name"),
     );
   }
 
@@ -75,7 +75,7 @@ export const createItemSupplierServiceValidation = async (
     if (phone) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Phone Number")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Phone Number"),
       );
     }
   }
@@ -84,7 +84,7 @@ export const createItemSupplierServiceValidation = async (
     if (email) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Email")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Email"),
       );
     }
   }
@@ -93,7 +93,7 @@ export const createItemSupplierServiceValidation = async (
 };
 
 export const updateItemSupplierServiceValidation = async (
-  input: ItemSupplierUpdateInput
+  input: ItemSupplierUpdateInput,
 ) => {
   logger.info("entering::updateItemSupplier::service::validation");
 
@@ -117,7 +117,7 @@ export const updateItemSupplierServiceValidation = async (
     if (code && code.id !== input.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Code"),
       );
     }
   }
@@ -127,7 +127,7 @@ export const updateItemSupplierServiceValidation = async (
   if (name && name.id !== input.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Name"),
     );
   }
 
@@ -137,7 +137,7 @@ export const updateItemSupplierServiceValidation = async (
     if (phone && phone.id !== input.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Phone Number")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Phone Number"),
       );
     }
   }
@@ -148,7 +148,7 @@ export const updateItemSupplierServiceValidation = async (
     if (email && email.id !== input.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Email")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Supplier Email"),
       );
     }
   }
@@ -157,7 +157,7 @@ export const updateItemSupplierServiceValidation = async (
 };
 
 export const deleteItemSupplierServiceValidation = async (
-  id: number
+  id: number,
 ): Promise<void> => {
   logger.info("entering::deleteItemSupplier::service::validation");
   await validateIdItemSupplier(id);

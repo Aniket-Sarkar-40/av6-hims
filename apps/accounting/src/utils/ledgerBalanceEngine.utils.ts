@@ -69,7 +69,7 @@ export const toDrCr = (signed: number) => {
 };
 export const addDrCr = (
   a: { dr: number; cr: number },
-  b: { dr: number; cr: number }
+  b: { dr: number; cr: number },
 ) => {
   return { dr: a.dr + b.dr, cr: a.cr + b.cr };
 };

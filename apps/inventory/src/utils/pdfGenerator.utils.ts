@@ -7,7 +7,7 @@ import * as puppeteer from "puppeteer";
 
 export const generatePDF = async (
   templatePath: string,
-  data: Record<string, any>
+  data: Record<string, any>,
 ): Promise<Buffer> => {
   const tpl = fs.readFileSync(templatePath, "utf8");
   const tplDir = path.join(
@@ -15,11 +15,11 @@ export const generatePDF = async (
     "src",
     "templates",
     "pdf",
-    "reports-pdf"
+    "reports-pdf",
   );
 
   Handlebars.registerHelper("formatDate", (date) =>
-    date ? dayjs(date).format(DATE_MONTH_YEAR_FORMAT) : ""
+    date ? dayjs(date).format(DATE_MONTH_YEAR_FORMAT) : "",
   );
 
   const template = Handlebars.compile(tpl);
