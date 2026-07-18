@@ -15,7 +15,8 @@
     "mariadb": "^3.4.0",
     "prisma": "^7.0.0",
     "tsx": "^4.20.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "catalog:"
   },
   "exports": {
     ".": {
@@ -50,7 +51,8 @@
     "p:studio": "prisma studio",
     "p:validate": "prisma validate",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "test": "vitest run"
   },
   "type": "module",
   "types": "./dist/src/index.d.ts"

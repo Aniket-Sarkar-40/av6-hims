@@ -213,7 +213,7 @@ Generated client output is under `packages/db/generated` (ignored by ESLint / Pr
 | `pnpm check:repo` | `syncpack format` + `syncpack lint` + `sherif` |
 | `pnpm deps:check` / `deps:fix` | Dependency version consistency |
 | `pnpm clean` | Remove `dist/` folders |
-| `pnpm test` | `turbo run test` |
+| `pnpm test` | `turbo run test` (Vitest; depends on Prisma generate) |
 
 Filter a workspace:
 
@@ -233,6 +233,27 @@ pnpm exec turbo build --filter=@apps/acc
 ```bash
 pnpm lint
 pnpm format
+```
+
+---
+
+## Testing
+
+Vitest is wired in every workspace (`vitest run`, `passWithNoTests` for packages without suites yet). Shared config lives in `tooling/vitest/` (env setup + monorepo `@/` alias resolution).
+
+Priority suites today:
+
+| Area | Location |
+| --- | --- |
+| Auth hash / client-key | `packages/shared` + `apps/core` middleware |
+| `authorize` / V2 `verifyToken` (expired token) | `packages/platform` |
+| Approval status map + Joi approve schema | `apps/core` |
+| Ledger DR/CR math + bank recon helpers | `apps/accounting` |
+
+```bash
+pnpm test
+pnpm --filter @apps/acc test
+pnpm --filter @repo/platform exec vitest run --watch
 ```
 
 ---

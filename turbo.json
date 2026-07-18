@@ -15,7 +15,7 @@
     },
     "lint": {},
     "test": {
-      "dependsOn": ["^test"]
+      "dependsOn": ["@repo/db#prisma:generate"]
     },
     "prisma:generate": {
       "cache": false,

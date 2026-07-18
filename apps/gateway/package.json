@@ -17,7 +17,8 @@
     "@types/express": "^5.0.6",
     "eslint": "^9.15.0",
     "tsx": "^4.20.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "catalog:"
   },
   "private": true,
   "scripts": {
@@ -25,7 +26,7 @@
     "dev": "node --conditions=development --enable-source-maps --import tsx --import ../../tooling/register-dev-hooks.mjs --watch src/server.ts",
     "lint": "eslint .",
     "start": "node dist/server.js",
-    "test": "echo test gateway"
+    "test": "vitest run"
   },
   "type": "module"
 }

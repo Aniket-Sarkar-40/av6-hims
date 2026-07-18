@@ -24,7 +24,8 @@
     "@types/node": "^25.4.0",
     "eslint": "^9.15.0",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "catalog:"
   },
   "exports": {
     ".": {
@@ -40,7 +41,8 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "type": "module",
   "types": "./dist/index.d.ts"

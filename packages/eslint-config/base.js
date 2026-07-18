@@ -20,6 +20,7 @@ export default tseslint.config(
       "**/coverage/**",
       "**/logs/**",
       "**/*.log",
+      "**/vitest.config.ts",
     ],
   },
   js.configs.recommended,
