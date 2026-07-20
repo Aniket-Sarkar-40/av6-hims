@@ -4,7 +4,7 @@ import {
   createEmailConfigInDb,
   getEmailConfigFromDb,
   deleteEmailConfigInDb,
-} from "@/repository/master/emailConfig.repository.js";
+} from "@/repository/event/emailConfig.repository.js";
 import { CreateOrUpdateEmailConfig } from "@/types/master/emailConfig.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import {

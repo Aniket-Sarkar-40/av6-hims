@@ -27,6 +27,7 @@ import { approvalRouter } from "@/routes/approval/approval.routes.js";
 import { registerPharmacyApprovalCallbacks } from "@/modules/callbacks/approvalCallback.js";
 import { companySettingsRouter } from "@/routes/companySettings.route.js";
 import { moduleConfigRouter } from "@/routes/moduleConfig.route.js";
+import { emailConfigRouter } from "@/routes/event/emailConfig.route.js";
 
 registerPharmacyApprovalCallbacks(); // stock updates
 
@@ -60,6 +61,7 @@ coreRouter.use("/event/service-event", serviceEventRouter);
 coreRouter.use("/event/event-config", eventConfigRouter);
 coreRouter.use("/event/template", templateRouter);
 coreRouter.use("/event/rule", eventRecipientRuleRouter);
+coreRouter.use("/event/email-config", emailConfigRouter);
 coreRouter.use("/master/income-head", incomeHeadRouter);
 coreRouter.use("/master/expense-head", expenseHeadRouter);
 

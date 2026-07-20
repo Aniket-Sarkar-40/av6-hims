@@ -1384,3 +1384,16 @@ model CronDetails {
     @@index([cronName, runDate, runKey], name: "cron_find_latest_idx")
     @@map("core_cron_details")
 }
+
+model Role {
+    id           Int      @id @default(autoincrement())
+    name         String?  @db.VarChar(100)
+    slug         String?  @db.VarChar(150)
+    isActive     Boolean  @default(true) @map("is_active")
+    isSystem     Int      @default(0) @map("is_system") @db.TinyInt
+    isSuperadmin Int      @default(0) @map("is_superadmin")
+    createdAt    DateTime @default(now()) @updatedAt @map("created_at")
+    ccId         String?  @default("1") @map("cc_id") @db.VarChar(100)
+
+    @@map("roles")
+}

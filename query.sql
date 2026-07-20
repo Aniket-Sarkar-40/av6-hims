@@ -2465,3 +2465,85 @@ CREATE TABLE `accounting_feature_flag` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AlterTable
+ALTER TABLE `accounting_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `accounting_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_audit_config` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_common_audit` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_event_delivery` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_mono_repo_modules` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_pdf_template` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `core_service_event` MODIFY `service` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL DEFAULT 'OPD';
+
+-- AlterTable
+ALTER TABLE `nopd_payment_transactions` MODIFY `module` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `notifications` MODIFY `source` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `pathology_b2b_invoice_amount_summary` MODIFY `service_type` ENUM('PATHOLOGY', 'OPD', 'PHARMACY', 'INVENTORY', 'CORE', 'GENERAL_BILL', 'PROCEDURE', 'RADIOLOGY', 'FIXUJI', 'STARTER', 'AMS', 'ACCOUNTING', 'BLOOD_BANK') NOT NULL DEFAULT 'PATHOLOGY';
+
+-- CreateTable
+CREATE TABLE `core_template` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `template_code` VARCHAR(191) NOT NULL,
+    `template_name` VARCHAR(191) NOT NULL,
+    `template_type` ENUM('EMAIL', 'SMS', 'WHATSAPP', 'APP_NOTIFICATION', 'WEB_NOTIFICATION') NOT NULL,
+    `url` VARCHAR(191) NULL,
+    `subject` VARCHAR(191) NULL,
+    `body_html` TEXT NULL,
+    `body_text` TEXT NULL,
+    `extra` JSON NULL,
+    `event_config_id` INTEGER NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    UNIQUE INDEX `core_template_template_code_key`(`template_code`),
+    INDEX `template_event_config_id_idx`(`event_config_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+-- CreateTable
+CREATE TABLE `core_event_recipient_rule` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `event_config_id` INTEGER NOT NULL,
+    `template_type` ENUM('EMAIL', 'SMS', 'WHATSAPP', 'APP_NOTIFICATION', 'WEB_NOTIFICATION') NOT NULL,
+    `source_type` ENUM('HARDCODE', 'ROLES', 'STAFFS', 'KEY_VALUE') NOT NULL,
+    `config` JSON NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `sort_order` INTEGER NOT NULL DEFAULT 0,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `deleted_by` INTEGER NULL,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+
+    INDEX `core_event_recipient_rule_event_config_id_template_type_idx`(`event_config_id`, `template_type`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `core_event_recipient_rule` ADD CONSTRAINT `core_event_recipient_rule_event_config_id_fkey` FOREIGN KEY (`event_config_id`) REFERENCES `core_service_event_config`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
