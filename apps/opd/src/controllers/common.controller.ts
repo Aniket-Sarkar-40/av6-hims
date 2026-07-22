@@ -5,6 +5,7 @@ import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateSuccessMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
+  CommonExcelRequest,
   DeleteParams,
   DropdownRequest,
   ExportExcel,
@@ -16,6 +17,7 @@ import {
 } from "av6-core-v2";
 import { Workbook } from "exceljs";
 import { Request, Response } from "express";
+import { OpdDynamicShortCode } from "@repo/db/generated/prisma/client";
 
 export const fixedSearch = TryCatch(async (req: Request, res: Response) => {
   logger.info("entering::fixedSearch::controller");
@@ -378,5 +380,43 @@ export const commonUpdateStatus = TryCatch(
     );
     logger.info("exiting::commonUpdateStatus::controller");
     return res.status(200).json(response);
+  },
+);
+
+export const commonFSExcelExport = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::commonExcelExport::controller");
+
+    const inp = req.body as CommonExcelRequest<OpdDynamicShortCode>;
+    const shortCodeData = await shortCodeService.getShortCodeByCode(
+      inp.shortCode,
+    );
+
+    if (!shortCodeData) {
+      return res.status(404).json(
+        new BaseResponse({
+          success: false,
+          message: "Short code not found.",
+          errorCode: "NOT_FOUND",
+          errorMessage: "Short code not found.",
+        }),
+      );
+    }
+
+    const wb: Workbook = await commonServiceFactory.commonExcelService({
+      ...inp,
+      shortCodeData,
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${inp.sheetName}.xlsx"`,
+    );
+    await wb.xlsx.write(res);
+    res.end();
   },
 );

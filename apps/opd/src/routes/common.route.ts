@@ -4,6 +4,7 @@ import {
   commonExcelExport,
   commonExcelImport,
   commonFetch,
+  commonFSExcelExport,
   commonSearch,
   commonUpdateStatus,
   fixedSearch,
@@ -22,7 +23,6 @@ import {
   validateFixedSearchWoPagination,
   validateSearchRequest,
 } from "@/validations/request/common.validation.js";
-import { commonFSExcelExport } from "@apps/core/controllers/common.controller.js";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
@@ -230,7 +230,7 @@ commonRouter.patch(
 // POST /fixedSearch
 commonRouter.post(
   "/excel-export-fs",
-  verifyToken,
+  verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateCommonExcelExport,
   commonFSExcelExport,
