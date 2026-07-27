@@ -294,7 +294,6 @@ export enum PermissionResource {
   // =========== client ledger mapping group resource start ===========
   CLIENT_LEDGER_MAPPING = "client-ledger-mapping",
   // =========== client ledger mapping group resource end ===========
-  SETTINGS = "settings",
 
   //Blood Bank
   HOSPITAL = "hospital",
