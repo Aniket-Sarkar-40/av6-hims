@@ -12,7 +12,7 @@ export const createCostCenterAllocations = async (
     lineNoToId: Map<number, number>;
     allocations: PostVoucherCostCenterAllocationInput[];
     createdBy: number | null;
-  }
+  },
 ) => {
   const { companyId, voucherId, lineNoToId, allocations, createdBy } = params;
   const data = allocations

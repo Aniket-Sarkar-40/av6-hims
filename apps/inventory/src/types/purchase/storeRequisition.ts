@@ -46,19 +46,18 @@ export type StoreRequisitionResponse = Prisma.InvStoreRequisitionGetPayload<{
   include: BaseInclude;
 }>;
 
-export interface StoreRequisitionDTO
-  extends Omit<
-    ValStoreRequisitionResponse,
-    | BaseModelAttrWoCancel
-    | "ccId"
-    | "createdBy"
-    | "storeRequisitionDetails"
-    | "approvedBy"
-    | "rejectBy"
-    | "acknowledgementBy"
-    | "updatedBy"
-    | "requisitionFrom"
-  > {
+export interface StoreRequisitionDTO extends Omit<
+  ValStoreRequisitionResponse,
+  | BaseModelAttrWoCancel
+  | "ccId"
+  | "createdBy"
+  | "storeRequisitionDetails"
+  | "approvedBy"
+  | "rejectBy"
+  | "acknowledgementBy"
+  | "updatedBy"
+  | "requisitionFrom"
+> {
   isAnyPendingReturn: boolean;
   branch: IdValue | null;
   createdBy: EmployeeCache | null;
@@ -74,11 +73,10 @@ export interface StoreRequisitionDTO
 export type StoreRequisitionDetails =
   Prisma.InvStoreRequisitionDetailsGetPayload<Record<string, never>>;
 
-export interface StoreRequisitionBatchWiseDTO
-  extends Omit<
-    StoreReqBatchWiseResponse,
-    "requisitionFrom" | "requisitionItemDetails"
-  > {
+export interface StoreRequisitionBatchWiseDTO extends Omit<
+  StoreReqBatchWiseResponse,
+  "requisitionFrom" | "requisitionItemDetails"
+> {
   branch: IdValue | null;
   requisitionFrom: IdValue | null;
   requisitionItemDetails: RequisitionItemDetailDTO[];
@@ -89,8 +87,10 @@ export interface StoreRequisitionDetailDTO extends StoreRequisitionDetails {
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
 }
-export interface StoreRequisitionDetailDTOBranch
-  extends Omit<StoreRequisitionDetails, "createdBy" | "updatedBy"> {
+export interface StoreRequisitionDetailDTOBranch extends Omit<
+  StoreRequisitionDetails,
+  "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   warehouseInHandStock: number | null;
   branchInHandStock: number | null;
@@ -100,8 +100,7 @@ export interface StoreRequisitionDetailDTOBranch
   updatedBy: EmployeeCache | null;
 }
 
-export interface RequisitionItemDetailDTO
-  extends RequisitionItemDetailResponse {
+export interface RequisitionItemDetailDTO extends RequisitionItemDetailResponse {
   storeRequisitionDetails: StoreRequisitionDetailDTO;
   availableQtyToReturn: number;
 }
@@ -202,11 +201,10 @@ export type StoreReqValResponse = Prisma.InvStoreRequisitionGetPayload<{
   };
 }>;
 
-export interface StrDetailDTO
-  extends Omit<
-    StoreRequisitionDetails,
-    "item" | BaseModelAttr | "itemId" | "createdBy" | "updatedBy"
-  > {
+export interface StrDetailDTO extends Omit<
+  StoreRequisitionDetails,
+  "item" | BaseModelAttr | "itemId" | "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;

@@ -65,16 +65,16 @@ const AccountingIntegrationConfigCreateSchema = Joi.object({
     .messages({
       "array.base": generateValidationErrorMessage(
         "INVALID",
-        "Accounting Integration Config Details"
+        "Accounting Integration Config Details",
       ),
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Accounting Integration Config Details",
-        "1"
+        "1",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Accounting Integration Config Details"
+        "Accounting Integration Config Details",
       ),
     }),
 });
@@ -89,16 +89,16 @@ const AccountingIntegrationConfigUpdateSchema =
       .messages({
         "array.base": generateValidationErrorMessage(
           "INVALID",
-          "Accounting Integration Config Details"
+          "Accounting Integration Config Details",
         ),
         "array.min": generateValidationErrorMessage(
           "ARRAY_MIN_LENGTH",
           "Accounting Integration Config Details",
-          "1"
+          "1",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Accounting Integration Config Details"
+          "Accounting Integration Config Details",
         ),
       }),
   });

@@ -5,12 +5,16 @@ import { DrCrAmt } from "./ledgerBalanceEngine.js";
 export type BsNode = {
   group: IdValue | null;
   parent: IdValue | null;
+  openingBalance: DrCrAmt;
+  periodBalance: DrCrAmt;
   amount: DrCrAmt;
   children: BsNode[];
   isSystem?: boolean; // for P&L A/c virtual node
 };
 
 export type BalanceSheetResponse = {
+  periodStart: Date;
+  periodEnd: Date;
   liabilities: BsNode[];
   assets: BsNode[];
 
@@ -46,6 +50,8 @@ export type GroupMetaForBalanceSheet = {
 };
 
 export type InternalNodeForBalanceSheet = GroupMetaForBalanceSheet & {
+  openingBalance: DrCrAmt;
+  periodBalance: DrCrAmt;
   amount: DrCrAmt;
   children: InternalNodeForBalanceSheet[];
 };

@@ -35,5 +35,5 @@ icdTenRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "ICD_TEN", "VIEW")),
-  getICDTenById
+  getICDTenById,
 );

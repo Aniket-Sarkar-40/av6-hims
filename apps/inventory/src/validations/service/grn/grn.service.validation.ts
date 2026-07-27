@@ -35,7 +35,7 @@ export const validateIdGrn = async (id: number) => {
   if (!po) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Good Receive Note")
+      generateErrorMessage("NOT_FOUND", "Good Receive Note"),
     );
   }
   logger.info("exiting::validateIdGrn::service::validation");
@@ -44,7 +44,7 @@ export const validateIdGrn = async (id: number) => {
 };
 
 export const validateGrnCommon = async (
-  body: CreateGrnInput
+  body: CreateGrnInput,
 ): Promise<void> => {
   logger.info("entering::validateGrnCommon::service::validation");
 
@@ -53,7 +53,7 @@ export const validateGrnCommon = async (
     if (!currency) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Currency")
+        generateErrorMessage("NOT_FOUND", "Currency"),
       );
     }
   }
@@ -62,7 +62,7 @@ export const validateGrnCommon = async (
 
   const itemSupplier = await itemSupplierService.getItemSupplierById(
     body.supplierId,
-    true
+    true,
   );
   if (!itemSupplier) {
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Supplier"));
@@ -76,7 +76,7 @@ export const validateGrnCommon = async (
     if (!warehouse) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Warehouse")
+        generateErrorMessage("NOT_FOUND", "Warehouse"),
       );
     }
   } else {
@@ -87,7 +87,7 @@ export const validateGrnCommon = async (
     if (!branch.isMain) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("ACCESS_FAIL", "Branch is not main")
+        generateErrorMessage("ACCESS_FAIL", "Branch is not main"),
       );
     }
   }
@@ -105,7 +105,7 @@ export const validateGrnCommon = async (
   if (!existingPO) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Purchase Order")
+      generateErrorMessage("NOT_FOUND", "Purchase Order"),
     );
   }
 
@@ -115,15 +115,15 @@ export const validateGrnCommon = async (
       generateErrorMessage(
         "MISMATCH",
         "Purchase Order ID and Number",
-        " Sending PO Number"
-      )
+        " Sending PO Number",
+      ),
     );
   }
 
   if (existingPO.supplierId !== body.supplierId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("MISMATCH", "Supplier ID", "Sending Supplier ID")
+      generateErrorMessage("MISMATCH", "Supplier ID", "Sending Supplier ID"),
     );
   }
 
@@ -131,14 +131,18 @@ export const validateGrnCommon = async (
     if (existingPO.ccId !== body.ccId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("MISMATCH", "Warehouse ID", "Sending Warehouse ID")
+        generateErrorMessage(
+          "MISMATCH",
+          "Warehouse ID",
+          "Sending Warehouse ID",
+        ),
       );
     }
   } else {
     if (existingPO.ccId !== body.ccId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("MISMATCH", "Branch ID", "Sending Branch ID")
+        generateErrorMessage("MISMATCH", "Branch ID", "Sending Branch ID"),
       );
     }
   }
@@ -150,15 +154,15 @@ export const validateGrnCommon = async (
       400,
       generateErrorMessage(
         "INVALID_VALUE",
-        "Total Discount cannot exceed Total Amount"
-      )
+        "Total Discount cannot exceed Total Amount",
+      ),
     );
   }
 
   // Validate Item IDs between GRN and PO
   const grnItemIds = new Set(body.goodReceiveDetails.map((d) => d.itemId));
   const poItemIds = new Set(
-    existingPO.purchaseOrderDetails.map((d) => d.itemId)
+    existingPO.purchaseOrderDetails.map((d) => d.itemId),
   );
   const invalidIds = Array.from(grnItemIds).filter((id) => !poItemIds.has(id));
 
@@ -168,9 +172,9 @@ export const validateGrnCommon = async (
       generateErrorMessage(
         "INVALID_VALUE",
         `Item ID${invalidIds.length > 1 ? "s" : ""} [${invalidIds.join(
-          ", "
-        )}] not found in Purchase Order details`
-      )
+          ", ",
+        )}] not found in Purchase Order details`,
+      ),
     );
   }
 
@@ -179,8 +183,8 @@ export const validateGrnCommon = async (
       400,
       generateErrorMessage(
         "INVALID_VALUE",
-        `GRN contains ${grnItemIds.size} items but PO only has ${poItemIds.size}`
-      )
+        `GRN contains ${grnItemIds.size} items but PO only has ${poItemIds.size}`,
+      ),
     );
   }
 
@@ -196,7 +200,7 @@ export const validateGrnCommon = async (
 
     grnQuantityByPoDetailId.set(
       poDetailsId,
-      (grnQuantityByPoDetailId.get(poDetailsId) ?? 0) + quantity
+      (grnQuantityByPoDetailId.get(poDetailsId) ?? 0) + quantity,
     );
   }
 
@@ -205,7 +209,7 @@ export const validateGrnCommon = async (
   // Validate each GRN item against PO details
   for (const detail of body.goodReceiveDetails) {
     const poDetail = existingPO.purchaseOrderDetails.find(
-      (poItem) => poItem.id === detail.poDetailsId
+      (poItem) => poItem.id === detail.poDetailsId,
     );
 
     if (poDetail) {
@@ -222,8 +226,8 @@ export const validateGrnCommon = async (
             400,
             generateErrorMessage(
               "INVALID_VALUE",
-              `Item ${itemLabel}: Total GRN quantity (${totalReceiveQuantityForPoDetail}) exceeds remaining order quantity (${finalQuantity}) in Purchase Order`
-            )
+              `Item ${itemLabel}: Total GRN quantity (${totalReceiveQuantityForPoDetail}) exceeds remaining order quantity (${finalQuantity}) in Purchase Order`,
+            ),
           );
         }
 
@@ -234,7 +238,7 @@ export const validateGrnCommon = async (
     } else {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Purchase Order Details")
+        generateErrorMessage("NOT_FOUND", "Purchase Order Details"),
       );
     }
 
@@ -260,11 +264,11 @@ export const validateGrnCommon = async (
           `Item ${
             poDetail?.item?.item ?? `ID ${detail.itemId}`
           }: Purchased Price (${Number(
-            detail.purchasedPrice
+            detail.purchasedPrice,
           )}) does not match Purchase Order Price (${Number(
-            poDetail.purchasedPrice
-          )})`
-        )
+            poDetail.purchasedPrice,
+          )})`,
+        ),
       );
     }
 
@@ -282,7 +286,7 @@ export const validateGrnCommon = async (
     const roundedDetailNetAmount = applyRound(
       Number(detail.netAmount),
       roundFormat,
-      precision
+      precision,
     );
 
     if (roundedItemAmount !== roundedDetailNetAmount) {
@@ -292,8 +296,8 @@ export const validateGrnCommon = async (
           "VALUE_MISMATCH",
           `Item ${
             poDetail?.item?.item ?? `ID ${detail.itemId}`
-          }: Net Amount (${roundedDetailNetAmount}) does not match calculated item amount (${roundedItemAmount})`
-        )
+          }: Net Amount (${roundedDetailNetAmount}) does not match calculated item amount (${roundedItemAmount})`,
+        ),
       );
     }
 
@@ -311,7 +315,7 @@ export const validateGrnCommon = async (
     const formattedTotalAmount = applyRound(
       totalAmount,
       roundFormat,
-      precision
+      precision,
     );
 
     if (detail.totalAmount !== formattedTotalAmount) {
@@ -323,8 +327,8 @@ export const validateGrnCommon = async (
             poDetail?.item?.item ?? `ID ${detail.itemId}`
           }: Total Amount (${
             detail.totalAmount
-          }) does not match calculated total amount (${formattedTotalAmount})`
-        )
+          }) does not match calculated total amount (${formattedTotalAmount})`,
+        ),
       );
     }
 
@@ -338,9 +342,9 @@ export const validateGrnCommon = async (
           }) does not match calculated net tax (${applyRound(
             netTax,
             roundFormat,
-            precision
-          )})`
-        )
+            precision,
+          )})`,
+        ),
       );
     }
 
@@ -358,9 +362,9 @@ export const validateGrnCommon = async (
           }) does not match calculated net discount (${applyRound(
             netDiscount,
             roundFormat,
-            precision
-          )})`
-        )
+            precision,
+          )})`,
+        ),
       );
     }
 
@@ -380,9 +384,9 @@ export const validateGrnCommon = async (
         }) does not match sum of detail total amounts (${applyRound(
           totalDetailAmounts,
           roundFormat,
-          precision
-        )})`
-      )
+          precision,
+        )})`,
+      ),
     );
   }
 
@@ -407,9 +411,9 @@ export const validateGrnCommon = async (
         `Net Tax (${body.netTax}) does not match calculated tax (${applyRound(
           netTax,
           roundFormat,
-          precision
-        )})`
-      )
+          precision,
+        )})`,
+      ),
     );
   }
 
@@ -423,9 +427,9 @@ export const validateGrnCommon = async (
         }) does not match calculated discount (${applyRound(
           netDiscount,
           roundFormat,
-          precision
-        )})`
-      )
+          precision,
+        )})`,
+      ),
     );
   }
 
@@ -439,9 +443,9 @@ export const validateGrnCommon = async (
         }) does not match calculated net total (${applyRound(
           totalAmount,
           roundFormat,
-          precision
-        )})`
-      )
+          precision,
+        )})`,
+      ),
     );
   }
 
@@ -452,25 +456,25 @@ export const validateGrnCommon = async (
       400,
       generateErrorMessage(
         "INVALID_VALUE",
-        "Paid Amount cannot exceed Total Amount"
-      )
+        "Paid Amount cannot exceed Total Amount",
+      ),
     );
   }
 
   // Validate quantity matches remaining PO quantity
   const remainingTotalPOQty = existingPO.purchaseOrderDetails.reduce(
     (acc, curr) => (acc += curr.quantity - (curr.receivedQty ?? 0)),
-    0
+    0,
   );
   const totalGRNQty = body.goodReceiveDetails.reduce(
     (acc, curr) => (acc += curr.quantity ?? 0),
-    0
+    0,
   );
 
   if (remainingTotalPOQty < totalGRNQty) {
     throw new ErrorHandler(
       400,
-      "Total Quantity of GRN items must be less than or equal to the total quantity of PO."
+      "Total Quantity of GRN items must be less than or equal to the total quantity of PO.",
     );
   } else if (remainingTotalPOQty > totalGRNQty) {
     body.poStatus = PO_STATUS.PARTIALLY_RECEIVED;
@@ -501,7 +505,7 @@ export const updateGrnServiceValidation = async (body: CreateGrnInput) => {
     logger.error("missing grn id in update request");
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Good Receive Note id")
+      generateErrorMessage("NOT_FOUND", "Good Receive Note id"),
     );
   }
   logger.info(`validating existence of grn id=${body.id}`);
@@ -516,7 +520,7 @@ export const updateGrnServiceValidation = async (body: CreateGrnInput) => {
     if (count !== detailIds.length) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Good Receive Note details")
+        generateErrorMessage("NOT_FOUND", "Good Receive Note details"),
       );
     }
   }
@@ -533,11 +537,11 @@ export const deleteGrnServiceValidation = async (id: number) => {
 
   if (grn.status !== GRN_STATUS.DRAFT) {
     logger.error(
-      `Cannot delete Good Receive Note with id=${id} in status=${grn.status}`
+      `Cannot delete Good Receive Note with id=${id} in status=${grn.status}`,
     );
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Good Receive Note")
+      generateErrorMessage("INVALID_STATUS", "Good Receive Note"),
     );
   }
   logger.info("exiting::deleteGrnServiceValidation::service::validation");

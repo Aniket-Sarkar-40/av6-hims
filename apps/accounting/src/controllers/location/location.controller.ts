@@ -11,13 +11,13 @@ export const getCollectionCenter = TryCatch(
 
     const collectionCenter =
       await collectionCenterService.getCollectionCentersForStaff(
-        Number(staffId)
+        Number(staffId),
       );
     logger.info("exiting::getCollectionCenter::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: collectionCenter },
-      "Collection Center"
+      "Collection Center",
     );
     return res.status(200).json(response);
-  }
+  },
 );

@@ -87,7 +87,7 @@ export const departmentSchema = Joi.object({
 export const validateDepartment = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = departmentSchema.validate(req.body, { abortEarly: false });
 
@@ -98,7 +98,7 @@ export const validateDepartment = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

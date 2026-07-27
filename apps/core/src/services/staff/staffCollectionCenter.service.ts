@@ -22,7 +22,7 @@ import { auditProxy } from "@/config/audit.config.js";
 
 const staffCollectionCenterServiceRaw = {
   async createStaffCollectionCenter(
-    input: CreateOrUpdateStaffCollectionCenter
+    input: CreateOrUpdateStaffCollectionCenter,
   ) {
     logger.info("entering::createStaffCollectionCenter::service");
 
@@ -34,19 +34,19 @@ const staffCollectionCenterServiceRaw = {
 
   async getStaffCollectionCenterById(
     staffCollectionCenterId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<StaffCollectionCenterDTO | null> {
     logger.info("entering::getStaffCollectionCenterById::service");
 
     const staffCollectionCenter = await getStaffCollectionCenterByIdFromDb(
-      staffCollectionCenterId
+      staffCollectionCenterId,
     );
 
     if (!staffCollectionCenter) {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "staffCollectionCenter")
+          generateErrorMessage("NOT_FOUND", "staffCollectionCenter"),
         );
       }
       return null;
@@ -66,7 +66,7 @@ const staffCollectionCenterServiceRaw = {
     if (!staffCollectionCenterIds || staffCollectionCenterIds.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "staffCollectionCenter")
+        generateErrorMessage("NOT_FOUND", "staffCollectionCenter"),
       );
     }
 
@@ -76,12 +76,12 @@ const staffCollectionCenterServiceRaw = {
 
   async updateStaffCollectionCenter(
     staffCollectionCenterId: number,
-    input: CreateOrUpdateStaffCollectionCenter
+    input: CreateOrUpdateStaffCollectionCenter,
   ): Promise<void> {
     logger.info("entering::updateStaffCollectionCenter::service");
     await updateStaffCollectionCenterServiceValidation(
       input,
-      staffCollectionCenterId
+      staffCollectionCenterId,
     );
 
     await updateStaffCollectionCenterInDb(staffCollectionCenterId, input);
@@ -90,7 +90,7 @@ const staffCollectionCenterServiceRaw = {
   },
 
   async deleteStaffCollectionCenter(
-    staffCollectionCenterId: number
+    staffCollectionCenterId: number,
   ): Promise<void> {
     logger.info("entering::deleteStaffCollectionCenter::service");
     await validateStaffCollectionCenterById(staffCollectionCenterId);
@@ -103,5 +103,5 @@ const staffCollectionCenterServiceRaw = {
 
 export const staffCollectionCenterService = auditProxy.createAuditedService(
   "staffCollectionCenter",
-  staffCollectionCenterServiceRaw
+  staffCollectionCenterServiceRaw,
 );

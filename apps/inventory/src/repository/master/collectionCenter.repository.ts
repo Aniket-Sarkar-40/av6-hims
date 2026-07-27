@@ -11,7 +11,7 @@ export const getCollectionCenterByIdFromDb = async (id: number) => {
 
 export const getStaffCollectionCenterFromDb = async (
   staffId: number,
-  ccId: number
+  ccId: number,
 ): Promise<StaffCollectionCenter | null> => {
   logger.info(`entering::getStaffCollectionCenterFromDb::repository`);
   const staffCollectionCenter = await db.staffCollectionCenter.findFirst({

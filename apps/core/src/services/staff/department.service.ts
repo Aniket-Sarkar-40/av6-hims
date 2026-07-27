@@ -54,7 +54,7 @@ const departmentServiceRaw = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Departments")
+          generateErrorMessage("NOT_FOUND", "Departments"),
         );
       }
     } else {
@@ -62,7 +62,7 @@ const departmentServiceRaw = {
       if (departments.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Departments")
+          generateErrorMessage("NOT_FOUND", "Departments"),
         );
       }
       logger.info("exiting::getAllDepartments::service");
@@ -72,7 +72,7 @@ const departmentServiceRaw = {
 
   async getDepartmentById(
     departmentId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<Department | null> {
     logger.info("entering::getDepartmentById::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.DEPARTMENT);
@@ -81,7 +81,7 @@ const departmentServiceRaw = {
     if (isCacheable) {
       department = (await getCacheById(
         cacheKey,
-        departmentId
+        departmentId,
       )) as Department | null;
     } else {
       department = await getDepartmentByIdFromDb(departmentId);
@@ -90,7 +90,7 @@ const departmentServiceRaw = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Department")
+          generateErrorMessage("NOT_FOUND", "Department"),
         );
       else return null;
     }
@@ -100,7 +100,7 @@ const departmentServiceRaw = {
 
   async updateDepartment(
     departmentId: number,
-    input: CreateDepartmentInput
+    input: CreateDepartmentInput,
   ): Promise<Department> {
     logger.info("entering::updateDepartment::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.DEPARTMENT);
@@ -128,5 +128,5 @@ const departmentServiceRaw = {
 
 export const departmentService = auditProxy.createAuditedService(
   "department",
-  departmentServiceRaw
+  departmentServiceRaw,
 );

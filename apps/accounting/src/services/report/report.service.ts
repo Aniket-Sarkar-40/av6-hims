@@ -10,20 +10,22 @@ import {
   BsNode,
   InternalNodeForBalanceSheet,
 } from "@/types/reports/balanceSheet.js";
+import type {
+  AgeingBucketAmount,
+  AgeingSummaryResponse,
+} from "@/types/reports/groupSummary.js";
 import {
   GroupSummaryNode,
   GroupSummaryRequestInput,
   GroupSummaryTreeResponse,
 } from "@/types/reports/groupSummary.js";
-import type {
-  AgeingBucketAmount,
-  AgeingSummaryResponse,
-} from "@/types/reports/groupSummary.js";
 import { DrCrAmt } from "@/types/reports/ledgerBalanceEngine.js";
 import {
+  LedgerBookExcelRequestInput,
   LedgerBookRequestInput,
   LedgerBookResponse,
   LedgerBookRow,
+  VirtualRow,
   voucherHeadResponseForLedgerBook,
 } from "@/types/reports/ledgerBook.js";
 import {
@@ -32,14 +34,32 @@ import {
   PlNode,
   ProfitLossResponse,
 } from "@/types/reports/profitLoss.js";
-import { ReportCommonRequestInput } from "@/types/reports/report.js";
 import type { AgeingBucketInput } from "@/types/reports/report.js";
+import { ReportCommonRequestInput } from "@/types/reports/report.js";
 import {
   TrialBalanceRequestInput,
   TrialBalanceResponse,
   TrialBalanceRow,
 } from "@/types/reports/trialBalance.js";
 
+import { IdValue } from "@/types/global.js";
+import {
+  CashFlowGroupRecursiveRow,
+  CashFlowLedgerRow,
+  CashFlowMonthRow,
+  CashFlowNode,
+  CashFlowRequestInput,
+  CashFlowResponse,
+} from "@/types/reports/cashFlow.js";
+import {
+  FundFlowGroupRecursiveRow,
+  FundFlowLedgerRow,
+  FundFlowMonthlyRow,
+  FundFlowRequestInput,
+  FundFlowResponse,
+  FundFlowSummaryRow,
+} from "@/types/reports/fundFlow.js";
+import { toPickFieldsWithoutNull } from "@/utils/helper.utils.js";
 import {
   addDifferenceNodeAdvanced,
   addDrCr,
@@ -62,56 +82,55 @@ import {
   validateFundFlowServiceValidation,
   validateLedgerBookServiceValidation,
   validateReportCommonServiceValidation,
-  validatetrialBalanceServiceValidation,
+  validateTrialBalanceServiceValidation,
 } from "@/validations/service/report/report.service.validation.js";
 import {
-  applyRound,
-  customOmit,
-  RoundFormat,
-  toIdValue,
-  toPickFields,
-} from "av6-utils";
-import { commonGetService } from "../common.service.js";
-import { getLedgerBalancesNumber } from "./ledgerBalanceEngine.service.js";
-import { IdValue } from "@/types/global.js";
-import {
-  CashFlowGroupRecursiveRow,
-  CashFlowLedgerRow,
-  CashFlowMonthRow,
-  CashFlowNode,
-  CashFlowRequestInput,
-  CashFlowResponse,
-} from "@/types/reports/cashFlow.js";
-import { cashFlowEngineService } from "./cashFlowEngine.service.js";
-import {
-  FundFlowGroupRecursiveRow,
-  FundFlowLedgerRow,
-  FundFlowMonthlyRow,
-  FundFlowRequestInput,
-  FundFlowResponse,
-  FundFlowSummaryRow,
-} from "@/types/reports/fundFlow.js";
-import { fundFlowEngineService } from "./fundFlowEngine.service.js";
-import ExcelJs from "exceljs";
-import dayjs from "dayjs";
-import PDFDocument from "pdfkit";
-import {
   AccountingReportType,
+  Currency,
   DrCr,
   Group,
   Ledger,
 } from "@repo/db/generated/prisma/client";
-import { toPickFieldsWithoutNull } from "@/utils/helper.utils.js";
-import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
-import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   CASH_BANK_GROUPS,
   PAYABLE_GROUPS,
   RECEIVABLE_GROUPS,
 } from "@repo/shared";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+import { applyRound, customOmit, RoundFormat, toIdValue } from "av6-utils";
+import dayjs from "dayjs";
+import ExcelJs from "exceljs";
+import PDFDocument from "pdfkit";
+import { commonGetService } from "../common.service.js";
+import { cashFlowEngineService } from "./cashFlowEngine.service.js";
+import { fundFlowEngineService } from "./fundFlowEngine.service.js";
+import { getLedgerBalancesNumber } from "./ledgerBalanceEngine.service.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { getLedgerForexGainLossEngine } from "@/services/report/ledgerForexEngine.service.js";
+import { forexAmtToSigned, isRoundedZero } from "@/utils/forexReport.utils.js";
+import {
+  ForexDrCrAmt,
+  ForexGainLossNode,
+  ForexGainLossStatementInput,
+  ForexGainLossStatementResult,
+  LedgerForexGainLossEngineResult,
+  LedgerForexGainLossRow,
+  LedgerForexReportInput,
+} from "@/types/reports/forexReport.js";
+import { featureFlagService } from "@/services/feature/feature.service.js";
+import { validateLedgerBalanceEngineServiceValidation } from "@/validations/service/report/ledgerBalanceEngine.service.validation.js";
+import { inventoryRequests } from "@/client/inventory/request.js";
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
+
+const UNADJUSTED_FOREX_GAIN_LOSS_LABEL = "Unadjusted Forex Gain/Loss";
+const FOREX_GAIN_LOSS_VIRTUAL_ID = -10;
+const CLOSING_STOCK_VIRTUAL_ID = -2;
+const CLOSING_STOCK_LABEL = "Closing Stock";
+const CURRENT_ASSETS_GROUP_NAME = "Current Assets";
 
 const toStartOfDay = (date: Date): Date => {
   const normalized = new Date(date);
@@ -149,17 +168,17 @@ const collectLedgersFromGroupTree = (roots: GroupSummaryNode[]): IdValue[] => {
 
 const findAgeingBucketIndex = (
   ageDays: number,
-  buckets: AgeingBucketInput[]
+  buckets: AgeingBucketInput[],
 ): number => {
   return buckets.findIndex(
     (bucket) =>
-      ageDays >= bucket.from && (bucket.to === 0 || ageDays <= bucket.to)
+      ageDays >= bucket.from && (bucket.to === 0 || ageDays <= bucket.to),
   );
 };
 
 const toAgeingBucketAmounts = (
   bucketDefinitions: AgeingBucketInput[],
-  amounts: number[]
+  amounts: number[],
 ): AgeingBucketAmount[] => {
   return bucketDefinitions.map((bucket, index) => ({
     from: bucket.from,
@@ -232,8 +251,8 @@ const buildAgeingSummary = async (params: {
             ? amount
             : -amount
           : line.drCr === DrCr.CR
-          ? amount
-          : -amount;
+            ? amount
+            : -amount;
 
       if (!signedAmount) continue;
 
@@ -242,7 +261,7 @@ const buildAgeingSummary = async (params: {
       if (bucketIndex < 0) continue;
 
       bucketValues[bucketIndex] = roundValue(
-        bucketValues[bucketIndex] + signedAmount
+        bucketValues[bucketIndex] + signedAmount,
       );
       pending = roundValue(pending + signedAmount);
     }
@@ -254,7 +273,7 @@ const buildAgeingSummary = async (params: {
 
     for (let i = 0; i < roundedBucketValues.length; i++) {
       totals.bucketAmounts[i] = roundValue(
-        totals.bucketAmounts[i] + roundedBucketValues[i]
+        totals.bucketAmounts[i] + roundedBucketValues[i],
       );
     }
 
@@ -275,7 +294,7 @@ const buildAgeingSummary = async (params: {
       pending: roundValue(totals.pending),
       bucketAmounts: toAgeingBucketAmounts(
         buckets,
-        totals.bucketAmounts.map((value) => roundValue(value))
+        totals.bucketAmounts.map((value) => roundValue(value)),
       ),
     },
   };
@@ -284,7 +303,7 @@ const buildAgeingSummary = async (params: {
 const getPendingAdvance = (
   dr: number,
   cr: number,
-  type: "payable" | "receivable"
+  type: "payable" | "receivable",
 ) => {
   const diff = Number(type === "receivable" ? dr - cr : cr - dr);
   return {
@@ -303,11 +322,11 @@ const fmtPdfAmt = (value: number | string | null | undefined): string => {
 
 const reportServiceRaw = {
   async getTrialBalance(
-    input: TrialBalanceRequestInput
+    input: TrialBalanceRequestInput,
   ): Promise<TrialBalanceResponse> {
     logger.info("entering::getTrialBalance::report::service");
 
-    await validatetrialBalanceServiceValidation(input);
+    await validateTrialBalanceServiceValidation(input);
     const { companyId, ledgerIds, includeZero = false } = input;
 
     // const store = requestStorage.getStore();
@@ -334,7 +353,7 @@ const reportServiceRaw = {
     const ledgerMaster = allLedgers.filter(
       (l) =>
         l.companyId === companyId &&
-        (ledgerIds?.length ? ledgerIds.includes(l.id) : true)
+        (ledgerIds?.length ? ledgerIds.includes(l.id) : true),
     ) as Ledger[];
 
     const ledgerDtos = await toLedgerDtoForTrialBalance(ledgerMaster);
@@ -390,7 +409,7 @@ const reportServiceRaw = {
     rows.sort(
       (a, b) =>
         (a.group?.id ?? 0) - (b.group?.id ?? 0) ||
-        (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0)
+        (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0),
     );
 
     //Opening balance difference in opening and closing balance check
@@ -428,6 +447,28 @@ const reportServiceRaw = {
       closingDr += Math.abs(openingDiff);
     }
 
+    // Unadjusted forex gain/loss: foreign-currency ledgers are revalued at the closing
+    // rate inside getLedgerBalancesNumber, so add the contra entry that balances the
+    // revalued closing figures.
+    const forexResult = await getLedgerForexGainLossEngine(input);
+    const forexGainLoss = forexResult.totals.forexGainLossAmount;
+    if (forexGainLoss.drCr && forexGainLoss.amount !== 0) {
+      const forexClosing = toDrCr(forexAmtToSigned(forexGainLoss));
+      rows.push({
+        ledger: {
+          id: FOREX_GAIN_LOSS_VIRTUAL_ID,
+          value: UNADJUSTED_FOREX_GAIN_LOSS_LABEL,
+        },
+        group: null,
+        parentGroup: null,
+        opening: zero(),
+        period: zero(),
+        closing: forexClosing,
+      });
+      closingDr += forexClosing.dr;
+      closingCr += forexClosing.cr;
+    }
+
     const finalTotals = {
       opening: { dr: openingDr, cr: openingCr },
       period: { dr: periodDr, cr: periodCr },
@@ -449,7 +490,7 @@ const reportServiceRaw = {
   },
 
   async getLedgerBook(
-    input: LedgerBookRequestInput
+    input: LedgerBookRequestInput,
   ): Promise<LedgerBookResponse> {
     logger.info("entering::getLedgerBook::report::service");
     const { companyId, financialYearId, ledgerId, fromDate, toDate, ccId } =
@@ -481,8 +522,14 @@ const reportServiceRaw = {
     if (!group) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`)
+        generateErrorMessage("NOT_FOUND", `Group for ledger ${ledger.name}`),
       );
+    }
+
+    const currencies = await currencyService.getAllCurrency();
+    const currencyMap = new Map<number, Currency>();
+    for (const currency of currencies) {
+      currencyMap.set(currency.id, currency);
     }
 
     const [balance] = await getLedgerBalancesNumber({
@@ -512,7 +559,7 @@ const reportServiceRaw = {
     let totalCr = 0;
 
     const rows: LedgerBookRow[] = [];
-
+    let virtualRow: VirtualRow | null = null;
     for (const l of lines) {
       const amt = decToNum(l.amount);
       const dr = l.drCr === DrCr.DR ? amt : 0;
@@ -524,8 +571,14 @@ const reportServiceRaw = {
       runningSigned = addSigned(runningSigned, dr, cr);
 
       const voucherType = voucherTypes.find(
-        (v) => v.id === l.voucher.voucherTypeId
+        (v) => v.id === l.voucher.voucherTypeId,
       );
+      const createdBy = l.voucher.createdBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.createdBy)
+        : null;
+      const updatedBy = l.voucher.updatedBy
+        ? await employeeService.getEmployeeByIdFrmCacheOrDb(l.voucher.updatedBy)
+        : null;
       const voucherHeadResponse: voucherHeadResponseForLedgerBook = {
         ...customOmit(l.voucher, [
           "voucherTypeId",
@@ -538,22 +591,86 @@ const reportServiceRaw = {
           "deletedAt",
         ]).rest,
         voucherType: voucherType ? toIdValue(voucherType, "name") : null,
+        createdBy: toIdValue(createdBy, "name"),
+        updatedBy: toIdValue(updatedBy, "name"),
       };
+
+      const currency = voucherHeadResponse.currencyId
+        ? (currencyMap.get(voucherHeadResponse.currencyId) ?? null)
+        : null;
+      //const createdBy
 
       rows.push({
         ...l,
         voucher: voucherHeadResponse,
+        currency,
         runningBalance: toDrCr(runningSigned),
       });
+    }
+    // Add unadjusted forex row after normal voucher rows
+    const forexEngineResult = await getLedgerForexGainLossEngine({
+      companyId,
+      financialYearId,
+      fromDate,
+      toDate,
+      ccId,
+      ledgerIds: [ledgerId],
+      includeZero: false,
+    });
+
+    const ledgerForexRow = forexEngineResult.rows.find(
+      (row) => row.ledger?.id === ledgerId,
+    );
+
+    if (ledgerForexRow) {
+      const ledgerRevaluationSigned = applyRound(
+        forexAmtToSigned(ledgerForexRow.ledgerRevaluationAmount),
+        roundingMethod,
+        roundingPrecision,
+      );
+
+      if (
+        !isRoundedZero(
+          ledgerRevaluationSigned,
+          roundingMethod,
+          roundingPrecision,
+        )
+      ) {
+        const forexDr =
+          ledgerRevaluationSigned > 0 ? Math.abs(ledgerRevaluationSigned) : 0;
+        const forexCr =
+          ledgerRevaluationSigned < 0 ? Math.abs(ledgerRevaluationSigned) : 0;
+
+        totalDr += forexDr;
+        totalCr += forexCr;
+
+        runningSigned = addSigned(runningSigned, forexDr, forexCr);
+
+        // Add the virtual forex gain/loss row
+
+        virtualRow =
+          ledgerRevaluationSigned !== 0
+            ? {
+                id: 999,
+                value: "Unadjusted Forex Gain/Loss",
+                amount: toDrCr(ledgerRevaluationSigned),
+              }
+            : null;
+      }
     }
 
     const closing = toDrCr(runningSigned);
 
     logger.info("exiting::getLedgerBook::report::service");
     return {
-      ledger: toIdValue(ledger, "name"),
+      ledger: {
+        id: ledger.id,
+        name: ledger.name,
+        isBankAccount: ledger.isBankAccount,
+      },
       openingBalance: opening,
       rows,
+      virtualRow,
       totals: {
         dr: applyRound(totalDr, roundingMethod, roundingPrecision),
         cr: applyRound(totalCr, roundingMethod, roundingPrecision),
@@ -563,7 +680,7 @@ const reportServiceRaw = {
   },
 
   async getGroupSummaryTree(
-    input: GroupSummaryRequestInput
+    input: GroupSummaryRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getGroupSummaryTree::report::service");
 
@@ -584,7 +701,7 @@ const reportServiceRaw = {
 
     const selectedGroupIds = [
       ...new Set(
-        groupIds && groupIds.length ? groupIds : groupId ? [groupId] : []
+        groupIds && groupIds.length ? groupIds : groupId ? [groupId] : [],
       ),
     ];
 
@@ -628,7 +745,7 @@ const reportServiceRaw = {
       if (!groupMap.has(id)) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", `Group ${id} not found`)
+          generateErrorMessage("NOT_FOUND", `Group ${id} not found`),
         );
       }
     }
@@ -653,7 +770,7 @@ const reportServiceRaw = {
           throw new ErrorHandler(
             400,
 
-            `Overlapping groups are not allowed: group ${selectedGroupIds[i]} is ancestor of ${selectedGroupIds[j]}`
+            `Overlapping groups are not allowed: group ${selectedGroupIds[i]} is ancestor of ${selectedGroupIds[j]}`,
           );
         }
       }
@@ -711,7 +828,7 @@ const reportServiceRaw = {
 
       if (!node) {
         logger.warn(
-          `Ledger ${ledger.id} has invalid groupId ${ledger.groupId}`
+          `Ledger ${ledger.id} has invalid groupId ${ledger.groupId}`,
         );
         continue;
       }
@@ -733,7 +850,7 @@ const reportServiceRaw = {
       while (parentId) {
         if (visited.has(parentId)) {
           logger.error(
-            `Cycle detected in group hierarchy at group ${parentId}`
+            `Cycle detected in group hierarchy at group ${parentId}`,
           );
           break;
         }
@@ -762,6 +879,45 @@ const reportServiceRaw = {
       }
     }
 
+    /** add closing stock node if it exists */
+    // if (
+    //   groupId &&
+    //   groups.find((g) => g.id === groupId)?.name === CURRENT_ASSETS_GROUP_NAME
+    // ) {
+    //   //:TODO
+    //   // const stockSummary = await inventoryRequests.getOpeningAndClosingStock({
+    //   //   financialYearId,
+    //   //   fromDate,
+    //   //   toDate,
+    //   //   ccId,
+    //   // });
+
+    //   const closingStockNode: GroupSummaryNode = {
+    //     group: {
+    //       id: CLOSING_STOCK_VIRTUAL_ID,
+    //       value: CLOSING_STOCK_LABEL,
+    //     },
+    //     parent: {
+    //       id: groupId,
+    //       value: CURRENT_ASSETS_GROUP_NAME,
+    //     },
+    //     opening: toDrCr(stockSummary?.totals.openingAmount ?? 0),
+    //     period: {
+    //       dr: stockSummary?.totals.inAmount ?? 0,
+    //       cr: stockSummary?.totals.outAmount ?? 0,
+    //     },
+    //     closing: toDrCr(stockSummary?.totals.closingAmount ?? 0),
+    //     children: [],
+    //     ledger: [],
+    //   };
+    //   const node = nodeMap.get(groupId);
+    //   if (node) {
+    //     node.children.push(closingStockNode);
+    //     node.closing = addDrCr(node.closing, closingStockNode.closing);
+    //     node.period = addDrCr(node.period, closingStockNode.period);
+    //     node.opening = addDrCr(node.opening, closingStockNode.opening);
+    //   }
+    // }
     /* ---------------- FILTER ZERO ---------------- */
 
     const hasValue = (n: GroupSummaryNode) =>
@@ -793,7 +949,7 @@ const reportServiceRaw = {
           l.period.dr ||
           l.period.cr ||
           l.closing.dr ||
-          l.closing.cr
+          l.closing.cr,
       );
 
       return newNode;
@@ -830,12 +986,12 @@ const reportServiceRaw = {
 
     const sortTree = (node: GroupSummaryNode) => {
       node.children.sort((a, b) =>
-        (a.group?.value ?? "").localeCompare(b.group?.value ?? "")
+        (a.group?.value ?? "").localeCompare(b.group?.value ?? ""),
       );
       node.ledger.sort(
         (a, b) =>
           (a.ledger?.value ?? "").localeCompare(b.ledger?.value ?? "") ||
-          (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0)
+          (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0),
       );
       node.children.forEach(sortTree);
     };
@@ -860,12 +1016,15 @@ const reportServiceRaw = {
       totals,
     };
   },
+
   async getProfitLoss(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
+    includeOpeningInPL: boolean = true,
   ): Promise<ProfitLossResponse> {
     logger.info("entering::getProfitLoss::report::service");
 
     await validateReportCommonServiceValidation(input);
+
     const {
       companyId,
       financialYearId,
@@ -874,11 +1033,17 @@ const reportServiceRaw = {
       ccId,
       includeZero = false,
     } = input;
+
     const store = requestStorage.getStore();
     const settings = store?.settings;
     const roundingPrecision = settings?.roundingPrecision ?? 2;
     const roundingMethod = settings?.roundingMethod ?? RoundFormat.TO_FIXED;
-    // 1) Get all groups
+
+    const featureFlag = await featureFlagService.getFeatureFlagByShortCode(
+      "PROFIT_LOSS_REPORT_ADD_OPENING",
+      true,
+    );
+
     const allGroups: Group[] = await commonGetService.getAllElements<"Group">({
       cacheCode: "GROUP",
       canNullReturnable: true,
@@ -890,7 +1055,7 @@ const reportServiceRaw = {
     const filteredGroups = allGroups.filter(
       (g) =>
         g.companyId === companyId &&
-        g.reportType === AccountingReportType.PROFIT_LOSS
+        g.reportType === AccountingReportType.PROFIT_LOSS,
     );
 
     const groups: GroupMeta[] = filteredGroups.map((g) => ({
@@ -901,7 +1066,6 @@ const reportServiceRaw = {
       affectsGrossProfit: Boolean(g.affectsGrossProfit),
     }));
 
-    // 2) Get ledger balances for period (use engine; period only matters for P&L)
     const ledgerBalances = await getLedgerBalancesNumber({
       companyId,
       financialYearId,
@@ -915,131 +1079,250 @@ const reportServiceRaw = {
       .map((x) => x.ledger?.id)
       .filter((id) => id !== undefined);
 
-    // 3) Get ledger -> group mapping for those ledgers
-
     const ledgers = await getLedgersByCompanyIdAndLedgerIds({
       companyId,
       ledgerIds,
     });
 
     const ledgerToGroup = new Map<number, number>();
-    for (const l of ledgers) ledgerToGroup.set(l.id, l.groupId);
-
-    // 4) Build internal node map for groups
-    const nodeMap = new Map<number, InternalNode>();
-    for (const g of groups) {
-      nodeMap.set(g.id, { ...g, amount: zero(), children: [] });
+    for (const l of ledgers) {
+      ledgerToGroup.set(l.id, l.groupId);
     }
 
-    // 5) Add each ledger's PERIOD amount into its group
+    const nodeMap = new Map<number, InternalNode>();
+    const ownAmountByGroup = new Map<number, DrCrAmt>();
+
+    for (const g of groups) {
+      nodeMap.set(g.id, {
+        ...g,
+        amount: zero(),
+        children: [],
+      });
+
+      ownAmountByGroup.set(g.id, zero());
+    }
+
     for (const lb of ledgerBalances) {
-      const groupId = ledgerToGroup.get(lb.ledger?.id ?? 0);
+      const ledgerId = lb.ledger?.id;
+      if (!ledgerId) continue;
+
+      const groupId = ledgerToGroup.get(ledgerId);
       if (!groupId) continue;
+
       const node = nodeMap.get(groupId);
       if (!node) continue;
-      const total = addDrCr(lb.opening, lb.period);
-      node.amount = addDrCr(node.amount, total);
-      // node.amount = addDrCr(node.amount, lb.period);
+
+      const amountToAdd =
+        featureFlag?.isEnabled && includeOpeningInPL
+          ? addDrCr(lb.opening, lb.period)
+          : lb.period;
+
+      node.amount = addDrCr(node.amount, amountToAdd);
+
+      ownAmountByGroup.set(
+        groupId,
+        addDrCr(ownAmountByGroup.get(groupId) ?? zero(), amountToAdd),
+      );
     }
 
-    // 6) Link parent/children
     const roots: InternalNode[] = [];
+
     for (const n of nodeMap.values()) {
-      if (n.parentId && nodeMap.has(n.parentId))
+      if (n.parentId && nodeMap.has(n.parentId)) {
         nodeMap.get(n.parentId)!.children.push(n);
-      else roots.push(n);
+      } else {
+        roots.push(n);
+      }
     }
 
-    // 7) Roll up child amounts into parents (post-order)
     const rollup = (n: InternalNode) => {
       n.children.sort(
         (a, b) =>
           (a.id ?? 0) - (b.id ?? 0) ||
-          (a.name ?? "").localeCompare(b.name ?? "")
+          (a.name ?? "").localeCompare(b.name ?? ""),
       );
+
       for (const c of n.children) {
         rollup(c);
         n.amount = addDrCr(n.amount, c.amount);
       }
     };
+
     roots.sort(
       (a, b) =>
-        (a.id ?? 0) - (b.id ?? 0) || (a.name ?? "").localeCompare(b.name ?? "")
+        (a.id ?? 0) - (b.id ?? 0) || (a.name ?? "").localeCompare(b.name ?? ""),
     );
-    for (const r of roots) rollup(r);
 
-    // 8) Split income vs expense roots (by primaryCategory)
+    for (const r of roots) {
+      rollup(r);
+    }
+
     const incomeRoots = roots.filter((r) => r.primaryCategory === "INCOME");
     const expenseRoots = roots.filter((r) => r.primaryCategory === "EXPENSE");
 
-    // 9) Optional filter zero nodes (keep non-empty parents)
     const isZero = (amt: DrCrAmt) => amt.dr === 0 && amt.cr === 0;
 
     const filterTree = (nodes: InternalNode[]): InternalNode[] =>
       nodes
-        .map((n) => ({ ...n, children: filterTree(n.children) }))
+        .map((n) => ({
+          ...n,
+          children: filterTree(n.children),
+        }))
         .filter(
-          (n) => includeZero || !isZero(n.amount) || n.children.length > 0
+          (n) => includeZero || !isZero(n.amount) || n.children.length > 0,
         );
 
     const incomeFiltered = filterTree(incomeRoots);
     const expenseFiltered = filterTree(expenseRoots);
 
-    // 10) Totals (direct vs indirect)
-    // directOnly=true => affectsGrossProfit=true
+    const stockSummary = await inventoryRequests.getOpeningAndClosingStock({
+      financialYearId,
+      fromDate,
+      toDate,
+      ccId,
+    });
+
+    const openingStockAmount = stockSummary?.totals.openingAmount ?? 0;
+    const closingStockAmount = stockSummary?.totals.closingAmount ?? 0;
+
+    const getEffectiveAffectsGrossProfit = (groupId: number): boolean => {
+      let currentNode = nodeMap.get(groupId);
+      let effectiveValue = Boolean(currentNode?.affectsGrossProfit);
+      const visited = new Set<number>();
+
+      while (
+        currentNode?.parentId &&
+        nodeMap.has(currentNode.parentId) &&
+        !visited.has(currentNode.parentId)
+      ) {
+        visited.add(currentNode.parentId);
+        currentNode = nodeMap.get(currentNode.parentId);
+        effectiveValue = Boolean(currentNode?.affectsGrossProfit);
+      }
+
+      return effectiveValue;
+    };
+
     const sumIncome = (nodes: InternalNode[], directOnly: boolean) => {
       let total = 0;
+
       const walk = (n: InternalNode) => {
-        if (n.affectsGrossProfit === directOnly) total += netIncome(n.amount);
+        const ownAmount = ownAmountByGroup.get(n.id) ?? zero();
+
+        if (getEffectiveAffectsGrossProfit(n.id) === directOnly) {
+          total += netIncome(ownAmount);
+        }
+
         n.children.forEach(walk);
       };
+
       nodes.forEach(walk);
+
       return applyRound(total, roundingMethod, roundingPrecision);
     };
 
     const sumExpense = (nodes: InternalNode[], directOnly: boolean) => {
       let total = 0;
+
       const walk = (n: InternalNode) => {
-        if (n.affectsGrossProfit === directOnly) total += netExpense(n.amount);
+        const ownAmount = ownAmountByGroup.get(n.id) ?? zero();
+
+        if (getEffectiveAffectsGrossProfit(n.id) === directOnly) {
+          total += netExpense(ownAmount);
+        }
+
         n.children.forEach(walk);
       };
+
       nodes.forEach(walk);
+
       return applyRound(total, roundingMethod, roundingPrecision);
     };
 
-    const directIncome = sumIncome(incomeFiltered, true);
-    const directExpense = sumExpense(expenseFiltered, true);
+    const directIncomeBase = sumIncome(incomeRoots, true);
+    const directExpenseBase = sumExpense(expenseRoots, true);
+    const directIncome = applyRound(
+      directIncomeBase + closingStockAmount,
+      roundingMethod,
+      roundingPrecision,
+    );
+    const directExpense = applyRound(
+      directExpenseBase + openingStockAmount,
+      roundingMethod,
+      roundingPrecision,
+    );
     const grossProfit = applyRound(
       directIncome - directExpense,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
-    const indirectIncome = sumIncome(incomeFiltered, false);
-    const indirectExpense = sumExpense(expenseFiltered, false);
+    const indirectIncome = sumIncome(incomeRoots, false);
+    const indirectExpense = sumExpense(expenseRoots, false);
     const netProfit = applyRound(
       grossProfit + indirectIncome - indirectExpense,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
-    const toPlNode = (n: InternalNode): PlNode => ({
-      group: toPickFieldsWithoutNull(n, "id", "name", "affectsGrossProfit"),
-      parent: n.parentId
-        ? toPickFields(
-            nodeMap.get(n.parentId),
-            "id",
-            "name",
-            "affectsGrossProfit"
-          )
-        : null,
-      amount: n.amount,
-      children: n.children.map(toPlNode),
-    });
+    const toPlNode = (n: InternalNode): PlNode => {
+      const parent = n.parentId ? nodeMap.get(n.parentId) : null;
+      return {
+        group: toPickFieldsWithoutNull(n, "id", "name", "affectsGrossProfit"),
+        parent: parent
+          ? {
+              id: parent.id,
+              name: parent.name,
+              affectsGrossProfit: parent.affectsGrossProfit,
+            }
+          : null,
+        amount: n.amount,
+        children: n.children.map(toPlNode),
+      };
+    };
+
+    const openingStockNode: PlNode = {
+      group: {
+        id: -1,
+        name: "Opening Stock",
+        affectsGrossProfit: true,
+      },
+      parent: null,
+      amount: {
+        dr: openingStockAmount,
+        cr: 0,
+      },
+      children: [],
+    };
+
+    const closingStockNode: PlNode = {
+      group: {
+        id: -2,
+        name: "Closing Stock",
+        affectsGrossProfit: true,
+      },
+      parent: null,
+      amount: {
+        dr: 0,
+        cr: closingStockAmount,
+      },
+      children: [],
+    };
+
+    const mappedIncomeNodes = incomeFiltered.map(toPlNode);
+    const mappedExpenseNodes = expenseFiltered.map(toPlNode);
+
+    if (includeZero || closingStockAmount !== 0) {
+      mappedIncomeNodes.push(closingStockNode);
+    }
+
+    if (includeZero || openingStockAmount !== 0) {
+      mappedExpenseNodes.push(openingStockNode);
+    }
 
     const response: ProfitLossResponse = {
-      income: incomeFiltered.map(toPlNode),
-      expense: expenseFiltered.map(toPlNode),
+      income: mappedIncomeNodes,
+      expense: mappedExpenseNodes,
       totals: {
         directIncome,
         directExpense,
@@ -1054,7 +1337,7 @@ const reportServiceRaw = {
   },
 
   async getBalanceSheet(
-    input: BalanceSheetRequestInput
+    input: BalanceSheetRequestInput,
   ): Promise<BalanceSheetResponse> {
     logger.info("entering::getBalanceSheet::report::service");
 
@@ -1080,7 +1363,7 @@ const reportServiceRaw = {
       .filter(
         (g) =>
           g.companyId === companyId &&
-          g.reportType === AccountingReportType.BALANCE_SHEET
+          g.reportType === AccountingReportType.BALANCE_SHEET,
       )
       .map((g) => ({
         id: g.id,
@@ -1096,7 +1379,9 @@ const reportServiceRaw = {
     for (const g of groups) {
       nodeMap.set(g.id, {
         ...g,
-        amount: { dr: 0, cr: 0 },
+        openingBalance: zero(),
+        periodBalance: zero(),
+        amount: zero(),
         children: [],
       });
     }
@@ -1147,18 +1432,96 @@ const reportServiceRaw = {
       while (groupId) {
         const node = nodeMap.get(groupId);
         if (!node) break;
-
-        node.amount.dr += lb.closing.dr;
-        node.amount.cr += lb.closing.cr;
+        node.openingBalance = addDrCr(node.openingBalance, lb.opening);
+        node.periodBalance = addDrCr(node.periodBalance, lb.period);
+        node.amount = addDrCr(node.amount, lb.closing);
+        // node.amount.dr += lb.closing.dr;
+        // node.amount.cr += lb.closing.cr;
 
         groupId = node.parentId ?? undefined;
       }
     }
 
+    /* ---------------- PROFIT & LOSS ---------------- */
+
+    const pl = await reportServiceRaw.getProfitLoss(
+      {
+        companyId,
+        financialYearId: fyMeta.id,
+        fromDate: fyMeta.booksBeginFrom,
+        toDate: asOnDate,
+        ccId,
+        includeZero: true,
+      },
+      false,
+    );
+
+    /* ---------------- CLOSING STOCK (FROM P&L) ---------------- */
+    // if (featureFlagForAddOpeningAndClosingStockInPL?.isEnabled) {
+    const findPlNodeByGroupId = (
+      nodes: PlNode[],
+      groupId: number,
+    ): PlNode | undefined => {
+      for (const node of nodes) {
+        if (node.group.id === groupId) return node;
+        const found = findPlNodeByGroupId(node.children, groupId);
+        if (found) return found;
+      }
+      return undefined;
+    };
+
+    const closingStockAmountFromPlCr = (closingStockCr: number): DrCrAmt => {
+      if (closingStockCr < 0) {
+        return { dr: 0, cr: Math.abs(closingStockCr) };
+      }
+      return { dr: closingStockCr, cr: 0 };
+    };
+
+    const closingStockPlNode = findPlNodeByGroupId(
+      pl.income,
+      CLOSING_STOCK_VIRTUAL_ID,
+    );
+    if (closingStockPlNode) {
+      const closingStockCr = closingStockPlNode.amount.cr;
+      const closingStockAmount = closingStockAmountFromPlCr(closingStockCr);
+
+      if (
+        includeZero ||
+        closingStockAmount.dr !== 0 ||
+        closingStockAmount.cr !== 0
+      ) {
+        const currentAssetsGroup = [...nodeMap.values()].find(
+          (g) => g.name === CURRENT_ASSETS_GROUP_NAME,
+        );
+
+        if (currentAssetsGroup) {
+          currentAssetsGroup.children.push({
+            id: CLOSING_STOCK_VIRTUAL_ID,
+            name: CLOSING_STOCK_LABEL,
+            parentId: currentAssetsGroup.id,
+            primaryCategory: "ASSET",
+            openingBalance: zero(),
+            periodBalance: zero(),
+            amount: closingStockAmount,
+            children: [],
+          });
+
+          let groupId: number | undefined = currentAssetsGroup.id;
+          while (groupId) {
+            const node = nodeMap.get(groupId);
+            if (!node) break;
+            node.amount = addDrCr(node.amount, closingStockAmount);
+            groupId = node.parentId ?? undefined;
+          }
+        }
+      }
+    }
+    // }
+
     /* ---------------- REMOVE ZERO NODES ---------------- */
 
     const prune = (
-      nodes: InternalNodeForBalanceSheet[]
+      nodes: InternalNodeForBalanceSheet[],
     ): InternalNodeForBalanceSheet[] =>
       nodes
         .map((n) => ({ ...n, children: prune(n.children) }))
@@ -1167,32 +1530,21 @@ const reportServiceRaw = {
             includeZero ||
             n.amount.dr !== 0 ||
             n.amount.cr !== 0 ||
-            n.children.length
+            n.children.length,
         );
 
     const filteredRoots = prune(roots);
-
-    /* ---------------- PROFIT & LOSS ---------------- */
-
-    const pl = await reportServiceRaw.getProfitLoss({
-      companyId,
-      financialYearId: fyMeta.id,
-      fromDate: fyMeta.startDate,
-      toDate: asOnDate,
-      ccId,
-      includeZero: true,
-    });
 
     const openingPL = 0;
     const currentPL = applyRound(
       pl.totals.netProfit,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     const totalPL = applyRound(
       openingPL + currentPL,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
 
     const plSide: "LIABILITIES" | "ASSETS" =
@@ -1205,6 +1557,8 @@ const reportServiceRaw = {
       parent: node.parentId
         ? toIdValue(nodeMap.get(node.parentId)!, "name")
         : null,
+      openingBalance: node.openingBalance,
+      periodBalance: node.periodBalance,
       amount: node.amount,
       children: node.children.map(toBsNode),
     });
@@ -1234,31 +1588,126 @@ const reportServiceRaw = {
     /* ---------------- TOTALS ---------------- */
 
     let assetsTotal = 0;
+    let assetsOpeningBalanceTotal = 0;
     let liabilitiesTotal = 0;
+    let liabilitiesOpeningBalanceTotal = 0;
 
-    for (const a of assets) assetsTotal += Math.abs(a.amount.dr - a.amount.cr);
+    for (const a of assets) {
+      assetsTotal += Math.abs(a.amount.dr - a.amount.cr);
+      assetsOpeningBalanceTotal += Math.abs(
+        a.openingBalance.dr - a.openingBalance.cr,
+      );
+    }
 
-    for (const l of liabilities)
+    for (const l of liabilities) {
       liabilitiesTotal += Math.abs(l.amount.cr - l.amount.dr);
+      liabilitiesOpeningBalanceTotal += Math.abs(
+        l.openingBalance.cr - l.openingBalance.dr,
+      );
+    }
 
-    if (plSide === "LIABILITIES") liabilitiesTotal += currentPL;
-    else assetsTotal += Math.abs(currentPL);
+    if (plSide === "LIABILITIES") liabilitiesTotal += totalPL;
+    else assetsTotal += Math.abs(totalPL);
 
+    /* ---------------- UNADJUSTED FOREX GAIN/LOSS ---------------- */
+    // Foreign-currency ledgers are revalued at the closing rate inside
+    // getLedgerBalancesNumber; the contra forex gain/loss must appear so the revalued
+    // assets/liabilities still balance (a gain sits on liabilities, a loss on assets).
+    const forexResult = await getLedgerForexGainLossEngine({
+      companyId,
+      financialYearId: fyMeta.id,
+      fromDate: fyMeta.booksBeginFrom,
+      toDate: asOnDate,
+      ccId,
+      includeZero: true,
+    });
+    const forexGainLoss = forexResult.totals.forexGainLossAmount;
+    if (forexGainLoss.drCr && forexGainLoss.amount !== 0) {
+      const forexNode: BsNode = {
+        group: {
+          id: FOREX_GAIN_LOSS_VIRTUAL_ID,
+          value: UNADJUSTED_FOREX_GAIN_LOSS_LABEL,
+        },
+        parent: null,
+        openingBalance: zero(),
+        periodBalance: zero(),
+        amount:
+          forexGainLoss.drCr === DrCr.DR
+            ? { dr: forexGainLoss.amount, cr: 0 }
+            : { dr: 0, cr: forexGainLoss.amount },
+        children: [],
+      };
+
+      if (forexGainLoss.drCr === DrCr.DR) {
+        assets.push(forexNode);
+        assetsTotal = applyRound(
+          assetsTotal + forexGainLoss.amount,
+          roundingMethod,
+          roundingPrecision,
+        );
+      } else {
+        liabilities.push(forexNode);
+        liabilitiesTotal = applyRound(
+          liabilitiesTotal + forexGainLoss.amount,
+          roundingMethod,
+          roundingPrecision,
+        );
+      }
+    }
+
+    /* ---------------- DIFFERENCE ---------------- */
+    // Opening balance difference
+
+    const openingBalanceDifference = applyRound(
+      assetsOpeningBalanceTotal - liabilitiesOpeningBalanceTotal,
+      roundingMethod,
+      roundingPrecision,
+    );
+    if (openingBalanceDifference > 0) {
+      const openingDifferenceNode: BsNode = {
+        group: { id: -1, value: getDifferenceLabel("OPENING") },
+        parent: null,
+        openingBalance: zero(),
+        periodBalance: zero(),
+        amount:
+          openingBalanceDifference > 0
+            ? { dr: 0, cr: Math.abs(openingBalanceDifference) }
+            : { dr: Math.abs(openingBalanceDifference), cr: 0 },
+        children: [],
+      };
+
+      if (openingBalanceDifference > 0) {
+        liabilities.push(openingDifferenceNode);
+        liabilitiesTotal = applyRound(
+          liabilitiesTotal + Math.abs(openingBalanceDifference),
+          roundingMethod,
+          roundingPrecision,
+        );
+      } else {
+        assets.push(openingDifferenceNode);
+        assetsTotal = applyRound(
+          assetsTotal + Math.abs(openingBalanceDifference),
+          roundingMethod,
+          roundingPrecision,
+        );
+      }
+    }
+    //CLOSING balance difference in assets and liabilities check
     const difference = applyRound(
       assetsTotal - liabilitiesTotal,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
-
-    //Opening balance difference in assets and liabilities check
     const bsResult = addDifferenceNodeAdvanced<BsNode>({
       items: difference > 0 ? liabilities : assets,
       drTotal: assetsTotal,
       crTotal: liabilitiesTotal,
-      type: "OPENING",
+      type: "CLOSING",
       createNode: (diff: number, type: DifferenceType) => ({
         group: { id: -1, value: getDifferenceLabel(type) },
         parent: null,
+        openingBalance: zero(),
+        periodBalance: zero(),
         amount:
           diff > 0
             ? { dr: 0, cr: Math.abs(diff) }
@@ -1272,18 +1721,20 @@ const reportServiceRaw = {
     const resTotal = applyRound(
       assetsTotal - liabilitiesTotal,
       roundingMethod,
-      roundingPrecision
+      roundingPrecision,
     );
     logger.info("exiting::getBalanceSheet::report::service");
 
     return {
+      periodStart: fyMeta.startDate,
+      periodEnd: fyMeta.endDate,
       liabilities,
       assets,
       totals: {
         liabilities: applyRound(
           liabilitiesTotal,
           roundingMethod,
-          roundingPrecision
+          roundingPrecision,
         ),
         assets: applyRound(assetsTotal, roundingMethod, roundingPrecision),
         difference: resTotal,
@@ -1298,7 +1749,7 @@ const reportServiceRaw = {
   },
 
   async getCashBankSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getCashBankSummary::report::service");
     const {
@@ -1317,7 +1768,7 @@ const reportServiceRaw = {
       useActiveFlag: true,
     });
     const cashBankGroups = allGroups.filter(
-      (g) => CASH_BANK_GROUPS.includes(g.name) && g.companyId === companyId
+      (g) => CASH_BANK_GROUPS.includes(g.name) && g.companyId === companyId,
     );
     const groupIds = cashBankGroups.map((g) => g.id);
     const cashBankSummary = await reportServiceRaw.getGroupSummaryTree({
@@ -1334,7 +1785,7 @@ const reportServiceRaw = {
   },
 
   async getReceivableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getReceivableSummary::report::service");
     const {
@@ -1356,7 +1807,7 @@ const reportServiceRaw = {
     });
 
     const receivableGroups = allGroups.filter(
-      (g) => RECEIVABLE_GROUPS.includes(g.name) && g.companyId === companyId
+      (g) => RECEIVABLE_GROUPS.includes(g.name) && g.companyId === companyId,
     );
     const groupIds = receivableGroups.map((g) => g.id);
 
@@ -1388,7 +1839,7 @@ const reportServiceRaw = {
   },
 
   async getPayableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<GroupSummaryTreeResponse> {
     logger.info("entering::getPayableSummary::report::service");
     const {
@@ -1410,7 +1861,7 @@ const reportServiceRaw = {
     });
 
     const payableGroups = allGroups.filter(
-      (g) => PAYABLE_GROUPS.includes(g.name) && g.companyId === companyId
+      (g) => PAYABLE_GROUPS.includes(g.name) && g.companyId === companyId,
     );
     const groupIds = payableGroups.map((g) => g.id);
 
@@ -1454,11 +1905,279 @@ const reportServiceRaw = {
     logger.info("exiting::getFundFlow::report::service");
     return fundFlow;
   },
+  async getLedgerForexGainLoss(
+    input: LedgerForexReportInput,
+  ): Promise<LedgerForexGainLossEngineResult> {
+    logger.info("entering::getLedgerForexGainLoss::report::service");
+    await validateLedgerBalanceEngineServiceValidation(input);
+    const forexGainLoss = await getLedgerForexGainLossEngine(input);
+    logger.info("exiting::getLedgerForexGainLoss::report::service");
+    return forexGainLoss;
+  },
+  async getForexGainLossStatement(
+    input: ForexGainLossStatementInput,
+  ): Promise<ForexGainLossStatementResult> {
+    logger.info("entering::getForexGainLossStatement::report::service");
 
+    await validateReportCommonServiceValidation(input);
+
+    const {
+      companyId,
+      financialYearId,
+      fromDate,
+      toDate,
+      ccId,
+      includeZero = false,
+      groupId,
+    } = input;
+
+    /* ---------------- SETTINGS ---------------- */
+
+    const store = requestStorage.getStore();
+    const settings = store?.settings;
+    const roundingPrecision = settings?.roundingPrecision ?? 2;
+    const roundingMethod = settings?.roundingMethod ?? RoundFormat.TO_FIXED;
+    const round = (value: number) =>
+      applyRound(value, roundingMethod, roundingPrecision);
+
+    const toForexAmt = (signed: number): ForexDrCrAmt => ({
+      amount: Math.abs(signed),
+      drCr: signed > 0 ? DrCr.DR : signed < 0 ? DrCr.CR : null,
+    });
+
+    const toSigned = (amt: ForexDrCrAmt): number =>
+      amt.drCr === DrCr.DR
+        ? amt.amount
+        : amt.drCr === DrCr.CR
+          ? -amt.amount
+          : 0;
+
+    /* ---------------- GET GROUPS ---------------- */
+
+    const allGroups: Group[] = await commonGetService.getAllElements<"Group">({
+      cacheCode: "GROUP",
+      canNullReturnable: true,
+      modelName: "Group",
+      shortCode: "GROUP",
+      useActiveFlag: true,
+    });
+
+    const groups = allGroups.filter((g) => g.companyId === companyId);
+
+    /* ---------------- MAPS ---------------- */
+
+    type ForexBuildNode = {
+      group: IdValue | null;
+      parent: IdValue | null;
+      transactedBaseSigned: number;
+      currentBaseSigned: number;
+      forexGainLossSigned: number;
+      children: ForexBuildNode[];
+      ledger: LedgerForexGainLossRow[];
+    };
+
+    const groupMap = new Map<number, Group>();
+    const parentMap = new Map<number, number | null>();
+    const nodeMap = new Map<number, ForexBuildNode>();
+
+    for (const g of groups) {
+      groupMap.set(g.id, g);
+      parentMap.set(g.id, g.parentId ?? null);
+    }
+
+    /* ---------------- SELECT ROOT GROUP IDS ---------------- */
+
+    // When a groupId is provided it is used as the single root; otherwise every
+    // top-level group (no parent within the company) is treated as a root.
+    if (groupId && !groupMap.has(groupId)) {
+      throw new ErrorHandler(
+        404,
+        generateErrorMessage("NOT_FOUND", `Group ${groupId} not found`),
+      );
+    }
+
+    const selectedGroupIds = groupId
+      ? [groupId]
+      : groups
+          .filter((g) => !g.parentId || !groupMap.has(g.parentId))
+          .map((g) => g.id);
+
+    for (const g of groups) {
+      nodeMap.set(g.id, {
+        group: toIdValue(g, "name"),
+        parent:
+          g.parentId && groupMap.has(g.parentId)
+            ? toIdValue(groupMap.get(g.parentId)!, "name")
+            : null,
+        transactedBaseSigned: 0,
+        currentBaseSigned: 0,
+        forexGainLossSigned: 0,
+        children: [],
+        ledger: [],
+      });
+    }
+
+    /* ---------------- FOREX PER LEDGER (FLAT ENGINE) ---------------- */
+
+    const flat = await getLedgerForexGainLossEngine({
+      companyId,
+      financialYearId,
+      fromDate,
+      toDate,
+      ccId,
+      includeZero: true,
+    });
+
+    /* ---------------- AGGREGATE INTO GROUP TREE ---------------- */
+
+    for (const row of flat.rows) {
+      const groupIdForLedger = row.group?.id;
+      if (!groupIdForLedger) continue;
+
+      const node = nodeMap.get(groupIdForLedger);
+      if (!node) {
+        logger.warn(
+          `Ledger ${row.ledger?.id} has invalid groupId ${groupIdForLedger}`,
+        );
+        continue;
+      }
+
+      const transactedBaseSigned = toSigned(row.transactedBaseAmount);
+      const currentBaseSigned = toSigned(row.currentBaseAmount);
+      const forexGainLossSigned = toSigned(row.forexGainLossAmount);
+
+      node.ledger.push(row);
+      node.transactedBaseSigned += transactedBaseSigned;
+      node.currentBaseSigned += currentBaseSigned;
+      node.forexGainLossSigned += forexGainLossSigned;
+
+      let parentId = parentMap.get(groupIdForLedger) ?? null;
+      const visited = new Set<number>();
+
+      while (parentId) {
+        if (visited.has(parentId)) {
+          logger.error(
+            `Cycle detected in group hierarchy at group ${parentId}`,
+          );
+          break;
+        }
+
+        visited.add(parentId);
+
+        const parentNode = nodeMap.get(parentId);
+        if (!parentNode) break;
+
+        parentNode.transactedBaseSigned += transactedBaseSigned;
+        parentNode.currentBaseSigned += currentBaseSigned;
+        parentNode.forexGainLossSigned += forexGainLossSigned;
+
+        parentId = parentMap.get(parentId) ?? null;
+      }
+    }
+
+    /* ---------------- BUILD TREE ---------------- */
+
+    for (const g of groups) {
+      const node = nodeMap.get(g.id)!;
+      const parentId = parentMap.get(g.id);
+
+      if (parentId && nodeMap.has(parentId)) {
+        nodeMap.get(parentId)!.children.push(node);
+      }
+    }
+
+    /* ---------------- FINALIZE (filter zero + round + sort) ---------------- */
+
+    const rowHasValue = (row: LedgerForexGainLossRow): boolean =>
+      row.transactedBaseAmount.amount !== 0 ||
+      row.currentBaseAmount.amount !== 0 ||
+      row.forexGainLossAmount.amount !== 0;
+
+    const finalize = (node: ForexBuildNode): ForexGainLossNode | null => {
+      const children = node.children
+        .map(finalize)
+        .filter((c): c is ForexGainLossNode => c !== null)
+        .sort((a, b) =>
+          (a.group?.value ?? "").localeCompare(b.group?.value ?? ""),
+        );
+
+      const ledger = node.ledger
+        .filter((l) => includeZero || rowHasValue(l))
+        .sort(
+          (a, b) =>
+            (a.ledger?.value ?? "").localeCompare(b.ledger?.value ?? "") ||
+            (a.ledger?.id ?? 0) - (b.ledger?.id ?? 0),
+        );
+
+      const transactedBaseSigned = round(node.transactedBaseSigned);
+      const currentBaseSigned = round(node.currentBaseSigned);
+      const forexGainLossSigned = round(node.forexGainLossSigned);
+
+      const nodeHasValue =
+        transactedBaseSigned !== 0 ||
+        currentBaseSigned !== 0 ||
+        forexGainLossSigned !== 0;
+
+      if (
+        !includeZero &&
+        !nodeHasValue &&
+        children.length === 0 &&
+        ledger.length === 0
+      ) {
+        return null;
+      }
+
+      return {
+        group: node.group,
+        parent: node.parent,
+        transactedBaseAmount: toForexAmt(transactedBaseSigned),
+        currentBaseAmount: toForexAmt(currentBaseSigned),
+        forexGainLossAmount: toForexAmt(forexGainLossSigned),
+        children,
+        ledger,
+      };
+    };
+
+    /* ---------------- ROOTS + TOTALS ---------------- */
+
+    const roots: ForexGainLossNode[] = [];
+
+    let totalTransactedBaseSigned = 0;
+    let totalCurrentBaseSigned = 0;
+    let totalForexGainLossSigned = 0;
+
+    for (const id of selectedGroupIds) {
+      const node = nodeMap.get(id)!;
+
+      totalTransactedBaseSigned += node.transactedBaseSigned;
+      totalCurrentBaseSigned += node.currentBaseSigned;
+      totalForexGainLossSigned += node.forexGainLossSigned;
+
+      const finalized = finalize(node);
+      if (finalized) {
+        roots.push(finalized);
+      }
+    }
+
+    logger.info("exiting::getForexGainLossStatement::report::service");
+
+    return {
+      asOfDate: flat.asOfDate,
+      baseCurrency: flat.baseCurrency,
+      roots,
+      totals: {
+        transactedBaseAmount: toForexAmt(round(totalTransactedBaseSigned)),
+        currentBaseAmount: toForexAmt(round(totalCurrentBaseSigned)),
+        forexGainLossAmount: toForexAmt(round(totalForexGainLossSigned)),
+      },
+    };
+  },
+
+  // All Excel Reports
   async buildExcelForBalanceSheet(input: BalanceSheetRequestInput) {
     logger.info("entering::buildExcelForBalanceSheet::service");
 
-    const { liabilities, assets, totals, profitLoss } =
+    const { periodStart, periodEnd, liabilities, assets, totals, profitLoss } =
       await this.getBalanceSheet(input);
 
     const wb = new ExcelJs.Workbook();
@@ -1496,7 +2215,9 @@ const reportServiceRaw = {
 
     ws.mergeCells(rowIndex, FIRST_COL, rowIndex, LAST_COL);
     const dateCell = ws.getCell(rowIndex, FIRST_COL);
-    dateCell.value = `As on: ${dayjs(input.asOnDate).format("DD MMM YYYY")}`;
+    dateCell.value = `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(
+      periodEnd,
+    ).format("DD MMM YYYY")}`;
     dateCell.font = { italic: true, size: 10 };
     dateCell.alignment = {
       horizontal: "center",
@@ -1677,23 +2398,23 @@ const reportServiceRaw = {
               isFirstRow || isLastRow
                 ? { style: "thin" }
                 : isHeaderRow
-                ? { style: "thin" }
-                : undefined,
+                  ? { style: "thin" }
+                  : undefined,
             bottom: isLastRow
               ? { style: "thin" }
               : isHeaderRow
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
             left: isFirstCol
               ? { style: "thin" }
               : isGapCol
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
             right: isLastCol
               ? { style: "thin" }
               : c === 2
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
           };
         }
       }
@@ -1716,7 +2437,7 @@ const reportServiceRaw = {
 
   async buildExcelForBalanceSheetWithChildren(input: BalanceSheetRequestInput) {
     logger.info("entering::buildExcelForBalanceSheetWithChildren::service");
-    const { liabilities, assets, totals, profitLoss } =
+    const { periodStart, periodEnd, liabilities, assets, totals, profitLoss } =
       await this.getBalanceSheet(input);
 
     const wb = new ExcelJs.Workbook();
@@ -1750,7 +2471,9 @@ const reportServiceRaw = {
 
     ws.mergeCells(rowIndex, FIRST_COL, rowIndex, LAST_COL);
     const dateCell = ws.getCell(rowIndex, FIRST_COL);
-    dateCell.value = `As on: ${dayjs(input.asOnDate).format("DD MMM YYYY")}`;
+    dateCell.value = `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(
+      periodEnd,
+    ).format("DD MMM YYYY")}`;
     dateCell.font = { italic: true, size: 10 };
     dateCell.alignment = { horizontal: "center", vertical: "middle" };
     rowIndex++;
@@ -1765,7 +2488,7 @@ const reportServiceRaw = {
 
     const flatten = (
       nodes: BsNode[],
-      side: "liability" | "asset"
+      side: "liability" | "asset",
     ): {
       name: string;
       id: number;
@@ -1965,23 +2688,23 @@ const reportServiceRaw = {
             isFirstRow || isLastRow
               ? { style: "thin" }
               : isHeaderRow
-              ? { style: "thin" }
-              : undefined,
+                ? { style: "thin" }
+                : undefined,
           bottom: isLastRow
             ? { style: "thin" }
             : isHeaderRow
-            ? { style: "thin" }
-            : undefined,
+              ? { style: "thin" }
+              : undefined,
           left: isFirstCol
             ? { style: "thin" }
             : isGapCol
-            ? { style: "thin" }
-            : undefined,
+              ? { style: "thin" }
+              : undefined,
           right: isLastCol
             ? { style: "thin" }
             : c === 2
-            ? { style: "thin" }
-            : undefined,
+              ? { style: "thin" }
+              : undefined,
         };
       }
     }
@@ -2001,95 +2724,137 @@ const reportServiceRaw = {
     return wb;
   },
 
-  async buildExcelForLedgerBookReport(input: LedgerBookRequestInput) {
+  async buildExcelForLedgerBookReport(input: LedgerBookExcelRequestInput) {
     logger.info("entering::buildExcelForLedgerBookReport::service");
     const { closingBalance, ledger, openingBalance, rows, totals } =
       await this.getLedgerBook(input);
+
+    const showNarration = input.showNarration;
+    const showCreatedBy = input.showCreatedBy;
+    const showUpdatedBy = input.showUpdatedBy;
 
     const wb = new ExcelJs.Workbook();
     const ws = wb.addWorksheet("Ledger Book");
 
     ws.properties.defaultRowHeight = 18;
 
-    // Columns
-    ws.getColumn(1).width = 18; // Date
-    ws.getColumn(2).width = 28; // Voucher No
-    ws.getColumn(3).width = 20; // Voucher Type
-    ws.getColumn(4).width = 15; // DR
-    ws.getColumn(5).width = 15; // CR
+    // ============================================================
+    // DYNAMIC COLUMN MAP
+    // ============================================================
+    let colIndex = 1;
+    const COL = {
+      DATE: colIndex++, // always col 1
+      VOUCHER_NO: colIndex++, // always col 2
+      VOUCHER_TYPE: colIndex++, // always col 3
+      NARRATION: showNarration ? colIndex++ : null,
+      CREATED_BY: showCreatedBy ? colIndex++ : null,
+      UPDATED_BY: showUpdatedBy ? colIndex++ : null,
+      DR: colIndex++,
+      CR: colIndex++,
+    };
+    const TOTAL_COLS = colIndex - 1;
+
+    // ============================================================
+    // COLUMN WIDTHS
+    // ============================================================
+    ws.getColumn(COL.DATE).width = 18;
+    ws.getColumn(COL.VOUCHER_NO).width = 28;
+    ws.getColumn(COL.VOUCHER_TYPE).width = 20;
+    if (COL.NARRATION) ws.getColumn(COL.NARRATION).width = 30;
+    if (COL.CREATED_BY) ws.getColumn(COL.CREATED_BY).width = 20;
+    if (COL.UPDATED_BY) ws.getColumn(COL.UPDATED_BY).width = 20;
+    ws.getColumn(COL.DR).width = 15;
+    ws.getColumn(COL.CR).width = 15;
 
     let rowIndex = 1;
 
+    // ============================================================
     // TITLE SECTION
+    // ============================================================
     const titleStart = rowIndex;
 
     // Title
-    ws.mergeCells(rowIndex, 1, rowIndex, 5);
+    ws.mergeCells(rowIndex, 1, rowIndex, TOTAL_COLS);
     ws.getCell(rowIndex, 1).value = "Ledger Book";
     ws.getCell(rowIndex, 1).font = { bold: true, size: 16 };
     ws.getCell(rowIndex, 1).alignment = { horizontal: "center" };
     rowIndex++;
 
     // Ledger Name
-    ws.mergeCells(rowIndex, 1, rowIndex, 5);
-    ws.getCell(rowIndex, 1).value = ledger?.value;
+    ws.mergeCells(rowIndex, 1, rowIndex, TOTAL_COLS);
+    ws.getCell(rowIndex, 1).value = ledger?.name;
     ws.getCell(rowIndex, 1).font = { bold: true, size: 12 };
     ws.getCell(rowIndex, 1).alignment = { horizontal: "center" };
     rowIndex++;
 
     // Date Range
-    ws.mergeCells(rowIndex, 1, rowIndex, 5);
+    ws.mergeCells(rowIndex, 1, rowIndex, TOTAL_COLS);
     ws.getCell(rowIndex, 1).value = `(${dayjs(input.fromDate).format(
-      "DD MMM YYYY"
+      "DD MMM YYYY",
     )} – ${dayjs(input.toDate).format("DD MMM YYYY")})`;
     ws.getCell(rowIndex, 1).alignment = { horizontal: "center" };
     ws.getCell(rowIndex, 1).font = { size: 10 };
     rowIndex++;
 
-    // HEADER
+    // ============================================================
+    // HEADER ROW
+    // ============================================================
     const headerRowIndex = rowIndex;
 
-    ws.getCell(rowIndex, 1).value = "DATE";
-    ws.getCell(rowIndex, 2).value = "VOUCHER NO";
-    ws.getCell(rowIndex, 3).value = "VOUCHER TYPE";
-    ws.getCell(rowIndex, 4).value = "DR";
-    ws.getCell(rowIndex, 5).value = "CR";
+    ws.getCell(rowIndex, COL.DATE).value = "DATE";
+    ws.getCell(rowIndex, COL.VOUCHER_NO).value = "VOUCHER NO";
+    ws.getCell(rowIndex, COL.VOUCHER_TYPE).value = "VOUCHER TYPE";
+    if (COL.NARRATION) ws.getCell(rowIndex, COL.NARRATION).value = "NARRATION";
+    if (COL.CREATED_BY)
+      ws.getCell(rowIndex, COL.CREATED_BY).value = "CREATED BY";
+    if (COL.UPDATED_BY)
+      ws.getCell(rowIndex, COL.UPDATED_BY).value = "UPDATED BY";
+    ws.getCell(rowIndex, COL.DR).value = "DR";
+    ws.getCell(rowIndex, COL.CR).value = "CR";
 
-    for (let c = 1; c <= 5; c++) {
+    for (let c = 1; c <= TOTAL_COLS; c++) {
       ws.getCell(rowIndex, c).font = { bold: true };
       ws.getCell(rowIndex, c).alignment = { horizontal: "center" };
     }
     rowIndex++;
 
+    // ============================================================
     // DATA ROWS
+    // ============================================================
     rows.forEach((r) => {
       const isDr = r.drCr === "DR";
 
-      ws.getCell(rowIndex, 1).value = dayjs(r.voucher.voucherDate).format(
-        "DD MMM YYYY"
-      );
-      ws.getCell(rowIndex, 2).value = r.voucher.voucherNo;
-      ws.getCell(rowIndex, 3).value = r.voucher.voucherType?.value;
-      ws.getCell(rowIndex, 4).value = isDr ? Number(r.amount) : "";
-      ws.getCell(rowIndex, 5).value = !isDr ? Number(r.amount) : "";
-      ws.getCell(rowIndex, 1).alignment = { horizontal: "center" };
-      ws.getCell(rowIndex, 2).alignment = { horizontal: "center" };
-      ws.getCell(rowIndex, 3).alignment = { horizontal: "center" };
-      ws.getCell(rowIndex, 4).alignment = { horizontal: "center" };
-      ws.getCell(rowIndex, 5).alignment = { horizontal: "center" };
+      ws.getCell(rowIndex, COL.DATE).value = dayjs(
+        r.voucher.voucherDate,
+      ).format("DD MMM YYYY");
+      ws.getCell(rowIndex, COL.VOUCHER_NO).value = r.voucher.voucherNo;
+      ws.getCell(rowIndex, COL.VOUCHER_TYPE).value =
+        r.voucher.voucherType?.value;
+      if (COL.NARRATION)
+        ws.getCell(rowIndex, COL.NARRATION).value = r.voucher.narration;
+      if (COL.CREATED_BY)
+        ws.getCell(rowIndex, COL.CREATED_BY).value = r.voucher.createdBy?.value;
+      if (COL.UPDATED_BY)
+        ws.getCell(rowIndex, COL.UPDATED_BY).value = r.voucher.updatedBy?.value;
+      ws.getCell(rowIndex, COL.DR).value = isDr ? Number(r.amount) : "";
+      ws.getCell(rowIndex, COL.CR).value = !isDr ? Number(r.amount) : "";
+
+      for (let c = 1; c <= TOTAL_COLS; c++) {
+        ws.getCell(rowIndex, c).alignment = { horizontal: "center" };
+      }
 
       rowIndex++;
     });
 
     rowIndex++; // blank separator row before summary
 
+    // ============================================================
     // SUMMARY SECTION
+    // ============================================================
     const summaryStart = rowIndex;
 
     const formatDrCr = (dr: number, cr: number) => {
-      if (dr === 0 && cr === 0) {
-        return { dr: 0, cr: 0 };
-      }
+      if (dr === 0 && cr === 0) return { dr: 0, cr: 0 };
       return {
         dr: dr === 0 ? "" : dr,
         cr: cr === 0 ? "" : cr,
@@ -2097,75 +2862,87 @@ const reportServiceRaw = {
     };
 
     const opening = formatDrCr(openingBalance.dr || 0, openingBalance.cr || 0);
-    ws.getCell(rowIndex, 3).value = "Opening Balance";
-    ws.getCell(rowIndex, 4).value = opening.dr;
-    ws.getCell(rowIndex, 5).value = opening.cr;
+    ws.mergeCells(rowIndex, COL.DATE, rowIndex, COL.DR - 1); // merge DATE to col before DR
+    ws.getCell(rowIndex, COL.DATE).value = "Opening Balance";
+    ws.getCell(rowIndex, COL.DR).value = opening.dr;
+    ws.getCell(rowIndex, COL.CR).value = opening.cr;
     rowIndex++;
 
     const current = formatDrCr(totals.dr || 0, totals.cr || 0);
-    ws.getCell(rowIndex, 3).value = "Current Total";
-    ws.getCell(rowIndex, 4).value = current.dr;
-    ws.getCell(rowIndex, 5).value = current.cr;
+    ws.mergeCells(rowIndex, COL.DATE, rowIndex, COL.DR - 1);
+    ws.getCell(rowIndex, COL.DATE).value = "Current Total";
+    ws.getCell(rowIndex, COL.DR).value = current.dr;
+    ws.getCell(rowIndex, COL.CR).value = current.cr;
     rowIndex++;
 
     const closing = formatDrCr(closingBalance.dr || 0, closingBalance.cr || 0);
-    ws.getCell(rowIndex, 3).value = "Closing Balance";
-    ws.getCell(rowIndex, 4).value = closing.dr;
-    ws.getCell(rowIndex, 5).value = closing.cr;
+    ws.mergeCells(rowIndex, COL.DATE, rowIndex, COL.DR - 1);
+    ws.getCell(rowIndex, COL.DATE).value = "Closing Balance";
+    ws.getCell(rowIndex, COL.DR).value = closing.dr;
+    ws.getCell(rowIndex, COL.CR).value = closing.cr;
 
     const summaryEnd = rowIndex;
 
     // SUMMARY STYLING
     for (let r = summaryStart; r <= summaryEnd; r++) {
-      ws.getCell(r, 3).font = { bold: true };
-      ws.getCell(r, 4).font = { bold: true };
-      ws.getCell(r, 5).font = { bold: true };
-      ws.getCell(r, 4).alignment = { horizontal: "right" };
-      ws.getCell(r, 5).alignment = { horizontal: "right" };
+      ws.getCell(r, COL.DATE).font = { bold: true };
+      ws.getCell(r, COL.DATE).alignment = { horizontal: "right" }; // right-aligned label
+      ws.getCell(r, COL.DR).font = { bold: true };
+      ws.getCell(r, COL.CR).font = { bold: true };
+      ws.getCell(r, COL.DR).alignment = { horizontal: "right" };
+      ws.getCell(r, COL.CR).alignment = { horizontal: "right" };
+    }
+
+    // SUMMARY STYLING
+    for (let r = summaryStart; r <= summaryEnd; r++) {
+      ws.getCell(r, COL.VOUCHER_TYPE).font = { bold: true };
+      ws.getCell(r, COL.DR).font = { bold: true };
+      ws.getCell(r, COL.CR).font = { bold: true };
+      ws.getCell(r, COL.DR).alignment = { horizontal: "right" };
+      ws.getCell(r, COL.CR).alignment = { horizontal: "right" };
     }
 
     // ============================================================
     // BORDERS
     // ============================================================
-
     const blockStart = headerRowIndex;
     const blockEnd = summaryEnd;
 
     // Unified LEFT and RIGHT border — continuous from titleStart to blockEnd
     for (let r = titleStart; r <= blockEnd; r++) {
-      const cell1 = ws.getCell(r, 1);
-      const cell5 = ws.getCell(r, 5);
-      cell1.border = { ...cell1.border, left: { style: "thin" } };
-      cell5.border = { ...cell5.border, right: { style: "thin" } };
+      const cellL = ws.getCell(r, 1);
+      const cellR = ws.getCell(r, TOTAL_COLS);
+      cellL.border = { ...cellL.border, left: { style: "thin" } };
+      cellR.border = { ...cellR.border, right: { style: "thin" } };
     }
 
     // TOP border on title row
-    for (let c = 1; c <= 5; c++) {
+    for (let c = 1; c <= TOTAL_COLS; c++) {
       const cell = ws.getCell(titleStart, c);
       cell.border = { ...cell.border, top: { style: "thin" } };
     }
 
-    // TOP border on header row (separator between title block and table)
-    for (let c = 1; c <= 5; c++) {
+    // TOP border on header row
+    for (let c = 1; c <= TOTAL_COLS; c++) {
       const cell = ws.getCell(blockStart, c);
       cell.border = { ...cell.border, top: { style: "thin" } };
     }
 
     // BOTTOM border on last row
-    for (let c = 1; c <= 5; c++) {
+    for (let c = 1; c <= TOTAL_COLS; c++) {
       const cell = ws.getCell(blockEnd, c);
       cell.border = { ...cell.border, bottom: { style: "thin" } };
     }
 
     // BOTTOM border under header row
-    for (let c = 1; c <= 5; c++) {
+    for (let c = 1; c <= TOTAL_COLS; c++) {
       const cell = ws.getCell(headerRowIndex, c);
       cell.border = { ...cell.border, bottom: { style: "thin" } };
     }
 
-    // DR column divider (col 4 left+right) — data block only
+    // DR column divider
     for (let r = blockStart; r <= blockEnd; r++) {
-      const cell = ws.getCell(r, 4);
+      const cell = ws.getCell(r, COL.DR);
       cell.border = {
         ...cell.border,
         left: { style: "thin" },
@@ -2174,7 +2951,7 @@ const reportServiceRaw = {
     }
 
     // TOP border above summary section
-    for (let c = 1; c <= 5; c++) {
+    for (let c = 1; c <= TOTAL_COLS; c++) {
       const cell = ws.getCell(summaryStart, c);
       cell.border = { ...cell.border, top: { style: "thin" } };
     }
@@ -2218,7 +2995,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -2380,10 +3157,13 @@ const reportServiceRaw = {
     ws.properties.defaultRowHeight = 18;
 
     ws.getColumn(1).width = 45; // Particulars
-    ws.getColumn(2).width = 18; // Closing DR
-    ws.getColumn(3).width = 18; // Closing CR
-
-    const COLS = 3;
+    ws.getColumn(2).width = 18; // Opening DR
+    ws.getColumn(3).width = 18; // Opening CR
+    ws.getColumn(4).width = 18; // Period DR
+    ws.getColumn(5).width = 18; // Period CR
+    ws.getColumn(6).width = 18; // Closing DR
+    ws.getColumn(7).width = 18; // Closing CR
+    const COLS = 7;
     let rowIndex = 1;
 
     const titleRowIndex = rowIndex;
@@ -2402,24 +3182,38 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
     rowIndex++;
 
-    // GROUP HEADER ROW — "Closing Balance" spanning DR+CR
+    // GROUP HEADER ROW — Opening Balance" spanning DR+CR
     ws.getCell(rowIndex, 1).value = "";
     ws.mergeCells(rowIndex, 2, rowIndex, 3);
-    ws.getCell(rowIndex, 2).value = "Closing Balance";
+    ws.getCell(rowIndex, 2).value = "Opening Balance";
     ws.getCell(rowIndex, 2).font = { bold: true };
     ws.getCell(rowIndex, 2).alignment = { horizontal: "center" };
+    //"Period Transaction" spanning DR+CR
+    ws.mergeCells(rowIndex, 4, rowIndex, 5);
+    ws.getCell(rowIndex, 4).value = "Period Transaction";
+    ws.getCell(rowIndex, 4).font = { bold: true };
+    ws.getCell(rowIndex, 4).alignment = { horizontal: "center" };
+    //"Closing Balance" spanning DR+CR
+    ws.mergeCells(rowIndex, 6, rowIndex, 7);
+    ws.getCell(rowIndex, 6).value = "Closing Balance";
+    ws.getCell(rowIndex, 6).font = { bold: true };
+    ws.getCell(rowIndex, 6).alignment = { horizontal: "center" };
     rowIndex++;
 
     // COLUMN LABELS
     ws.getCell(rowIndex, 1).value = "PARTICULARS";
     ws.getCell(rowIndex, 2).value = "DR";
     ws.getCell(rowIndex, 3).value = "CR";
+    ws.getCell(rowIndex, 4).value = "DR";
+    ws.getCell(rowIndex, 5).value = "CR";
+    ws.getCell(rowIndex, 6).value = "DR";
+    ws.getCell(rowIndex, 7).value = "CR";
     for (let c = 1; c <= COLS; c++) {
       ws.getCell(rowIndex, c).font = { bold: true };
       ws.getCell(rowIndex, c).alignment = {
@@ -2437,13 +3231,33 @@ const reportServiceRaw = {
           wrapText: true,
           vertical: "middle",
         };
-        ws.getCell(rowIndex, 2).value = l.closing?.dr || "";
-        ws.getCell(rowIndex, 3).value = l.closing?.cr || "";
+        ws.getCell(rowIndex, 2).value = l.opening?.dr || "";
+        ws.getCell(rowIndex, 3).value = l.opening?.cr || "";
+        ws.getCell(rowIndex, 4).value = l.period?.dr || "";
+        ws.getCell(rowIndex, 5).value = l.period?.cr || "";
+        ws.getCell(rowIndex, 6).value = l.closing?.dr || "";
+        ws.getCell(rowIndex, 7).value = l.closing?.cr || "";
         ws.getCell(rowIndex, 2).alignment = {
           horizontal: "right",
           vertical: "middle",
         };
         ws.getCell(rowIndex, 3).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 4).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 5).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 6).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 7).alignment = {
           horizontal: "right",
           vertical: "middle",
         };
@@ -2458,8 +3272,12 @@ const reportServiceRaw = {
           wrapText: true,
           vertical: "middle",
         };
-        ws.getCell(rowIndex, 2).value = child.closing?.dr || "";
-        ws.getCell(rowIndex, 3).value = child.closing?.cr || "";
+        ws.getCell(rowIndex, 2).value = child.opening?.dr || "";
+        ws.getCell(rowIndex, 3).value = child.opening?.cr || "";
+        ws.getCell(rowIndex, 4).value = child.period?.dr || "";
+        ws.getCell(rowIndex, 5).value = child.period?.cr || "";
+        ws.getCell(rowIndex, 6).value = child.closing?.dr || "";
+        ws.getCell(rowIndex, 7).value = child.closing?.cr || "";
         ws.getCell(rowIndex, 2).alignment = {
           horizontal: "right",
           vertical: "middle",
@@ -2468,8 +3286,28 @@ const reportServiceRaw = {
           horizontal: "right",
           vertical: "middle",
         };
+        ws.getCell(rowIndex, 4).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 5).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 6).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 7).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
         ws.getCell(rowIndex, 2).font = { bold: true };
         ws.getCell(rowIndex, 3).font = { bold: true };
+        ws.getCell(rowIndex, 4).font = { bold: true };
+        ws.getCell(rowIndex, 5).font = { bold: true };
+        ws.getCell(rowIndex, 6).font = { bold: true };
+        ws.getCell(rowIndex, 7).font = { bold: true };
         rowIndex++;
 
         // Child's ledgers (indented)
@@ -2479,13 +3317,33 @@ const reportServiceRaw = {
             wrapText: true,
             vertical: "middle",
           };
-          ws.getCell(rowIndex, 2).value = l.closing?.dr || "";
-          ws.getCell(rowIndex, 3).value = l.closing?.cr || "";
+          ws.getCell(rowIndex, 2).value = l.opening?.dr || "";
+          ws.getCell(rowIndex, 3).value = l.opening?.cr || "";
+          ws.getCell(rowIndex, 4).value = l.period?.dr || "";
+          ws.getCell(rowIndex, 5).value = l.period?.cr || "";
+          ws.getCell(rowIndex, 6).value = l.closing?.dr || "";
+          ws.getCell(rowIndex, 7).value = l.closing?.cr || "";
           ws.getCell(rowIndex, 2).alignment = {
             horizontal: "right",
             vertical: "middle",
           };
           ws.getCell(rowIndex, 3).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 4).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 5).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 6).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 7).alignment = {
             horizontal: "right",
             vertical: "middle",
           };
@@ -2501,6 +3359,10 @@ const reportServiceRaw = {
     // TOTAL ROW
     const totalRow = ws.addRow([
       "Grand Total",
+      totals.openingDr || "",
+      totals.openingCr || "",
+      totals.periodDr || "",
+      totals.periodCr || "",
       totals.closingDr || "",
       totals.closingCr || "",
     ]);
@@ -2508,6 +3370,10 @@ const reportServiceRaw = {
     totalRow.getCell(1).alignment = { vertical: "middle" };
     totalRow.getCell(2).alignment = { horizontal: "right", vertical: "middle" };
     totalRow.getCell(3).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(4).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(5).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(6).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(7).alignment = { horizontal: "right", vertical: "middle" };
     rowIndex++;
 
     const dataEndRow = totalRow.number;
@@ -2522,9 +3388,9 @@ const reportServiceRaw = {
     // Unified LEFT and RIGHT — continuous from titleStart to blockEnd
     for (let r = titleRowIndex; r <= blockEnd; r++) {
       const c1 = ws.getCell(r, 1);
-      const c3 = ws.getCell(r, COLS);
+      const c7 = ws.getCell(r, COLS);
       c1.border = { ...c1.border, left: { style: "thin" } };
-      c3.border = { ...c3.border, right: { style: "thin" } };
+      c7.border = { ...c7.border, right: { style: "thin" } };
     }
 
     // TOP border on title row
@@ -2551,15 +3417,15 @@ const reportServiceRaw = {
       cell.border = { ...cell.border, bottom: { style: "thin" } };
     }
 
-    // Column dividers — after col 1 and col 2
+    // Column dividers — after col 1 and col 6
     for (let r = blockStart; r <= blockEnd; r++) {
-      for (const c of [1, 2]) {
+      for (const c of [1, 2, 3, 4, 5, 6]) {
         const cell = ws.getCell(r, c);
         cell.border = { ...cell.border, right: { style: "thin" } };
       }
     }
 
-    // Bottom border under "Closing Balance" group span (cols 2-3 only)
+    // Bottom border under "Closing Balance" group span (cols 2-7 only)
     for (let c = 2; c <= COLS; c++) {
       const cell = ws.getCell(groupHeaderRowIndex, c);
       cell.border = { ...cell.border, bottom: { style: "thin" } };
@@ -2584,10 +3450,14 @@ const reportServiceRaw = {
     ws.properties.defaultRowHeight = 18;
 
     ws.getColumn(1).width = 45;
-    ws.getColumn(2).width = 18;
-    ws.getColumn(3).width = 18;
+    ws.getColumn(2).width = 18; // Opening DR
+    ws.getColumn(3).width = 18; // Opening CR
+    ws.getColumn(4).width = 18; // Period DR
+    ws.getColumn(5).width = 18; // Period CR
+    ws.getColumn(6).width = 18; // Closing DR
+    ws.getColumn(7).width = 18; // Closing CR
 
-    const COLS = 3;
+    const COLS = 7;
     let rowIndex = 1;
 
     const titleRowIndex = rowIndex;
@@ -2606,24 +3476,38 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
     rowIndex++;
 
-    // GROUP HEADER ROW
+    // GROUP HEADER ROW — Opening Balance" spanning DR+CR
     ws.getCell(rowIndex, 1).value = "";
     ws.mergeCells(rowIndex, 2, rowIndex, 3);
-    ws.getCell(rowIndex, 2).value = "Closing Balance";
+    ws.getCell(rowIndex, 2).value = "Opening Balance";
     ws.getCell(rowIndex, 2).font = { bold: true };
     ws.getCell(rowIndex, 2).alignment = { horizontal: "center" };
+    //"Period Transaction" spanning DR+CR
+    ws.mergeCells(rowIndex, 4, rowIndex, 5);
+    ws.getCell(rowIndex, 4).value = "Period Transaction";
+    ws.getCell(rowIndex, 4).font = { bold: true };
+    ws.getCell(rowIndex, 4).alignment = { horizontal: "center" };
+    //"Closing Balance" spanning DR+CR
+    ws.mergeCells(rowIndex, 6, rowIndex, 7);
+    ws.getCell(rowIndex, 6).value = "Closing Balance";
+    ws.getCell(rowIndex, 6).font = { bold: true };
+    ws.getCell(rowIndex, 6).alignment = { horizontal: "center" };
     rowIndex++;
 
     // COLUMN LABELS
     ws.getCell(rowIndex, 1).value = "PARTICULARS";
     ws.getCell(rowIndex, 2).value = "DR";
     ws.getCell(rowIndex, 3).value = "CR";
+    ws.getCell(rowIndex, 4).value = "DR";
+    ws.getCell(rowIndex, 5).value = "CR";
+    ws.getCell(rowIndex, 6).value = "DR";
+    ws.getCell(rowIndex, 7).value = "CR";
     for (let c = 1; c <= COLS; c++) {
       ws.getCell(rowIndex, c).font = { bold: true };
       ws.getCell(rowIndex, c).alignment = {
@@ -2649,10 +3533,12 @@ const reportServiceRaw = {
         wrapText: true,
         vertical: "middle",
       };
-      ws.getCell(rowIndex, 2).value = root.closing?.dr || "";
-      ws.getCell(rowIndex, 3).value = root.closing?.cr || "";
-      ws.getCell(rowIndex, 2).font = { bold: true };
-      ws.getCell(rowIndex, 3).font = { bold: true };
+      ws.getCell(rowIndex, 2).value = root.opening?.dr || "";
+      ws.getCell(rowIndex, 3).value = root.opening?.cr || "";
+      ws.getCell(rowIndex, 4).value = root.period?.dr || "";
+      ws.getCell(rowIndex, 5).value = root.period?.cr || "";
+      ws.getCell(rowIndex, 6).value = root.closing?.dr || "";
+      ws.getCell(rowIndex, 7).value = root.closing?.cr || "";
       ws.getCell(rowIndex, 2).alignment = {
         horizontal: "right",
         vertical: "middle",
@@ -2661,6 +3547,28 @@ const reportServiceRaw = {
         horizontal: "right",
         vertical: "middle",
       };
+      ws.getCell(rowIndex, 4).alignment = {
+        horizontal: "right",
+        vertical: "middle",
+      };
+      ws.getCell(rowIndex, 5).alignment = {
+        horizontal: "right",
+        vertical: "middle",
+      };
+      ws.getCell(rowIndex, 6).alignment = {
+        horizontal: "right",
+        vertical: "middle",
+      };
+      ws.getCell(rowIndex, 7).alignment = {
+        horizontal: "right",
+        vertical: "middle",
+      };
+      ws.getCell(rowIndex, 2).font = { bold: true };
+      ws.getCell(rowIndex, 3).font = { bold: true };
+      ws.getCell(rowIndex, 4).font = { bold: true };
+      ws.getCell(rowIndex, 5).font = { bold: true };
+      ws.getCell(rowIndex, 6).font = { bold: true };
+      ws.getCell(rowIndex, 7).font = { bold: true };
       rowIndex++;
 
       // Direct ledgers (italic + indented)
@@ -2671,13 +3579,33 @@ const reportServiceRaw = {
           wrapText: true,
           vertical: "middle",
         };
-        ws.getCell(rowIndex, 2).value = l.closing?.dr || "";
-        ws.getCell(rowIndex, 3).value = l.closing?.cr || "";
+        ws.getCell(rowIndex, 2).value = l.opening?.dr || "";
+        ws.getCell(rowIndex, 3).value = l.opening?.cr || "";
+        ws.getCell(rowIndex, 4).value = l.period?.dr || "";
+        ws.getCell(rowIndex, 5).value = l.period?.cr || "";
+        ws.getCell(rowIndex, 6).value = l.closing?.dr || "";
+        ws.getCell(rowIndex, 7).value = l.closing?.cr || "";
         ws.getCell(rowIndex, 2).alignment = {
           horizontal: "right",
           vertical: "middle",
         };
         ws.getCell(rowIndex, 3).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 4).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 5).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 6).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 7).alignment = {
           horizontal: "right",
           vertical: "middle",
         };
@@ -2692,15 +3620,39 @@ const reportServiceRaw = {
           wrapText: true,
           vertical: "middle",
         };
-        ws.getCell(rowIndex, 2).value = child.closing?.dr || "";
-        ws.getCell(rowIndex, 3).value = child.closing?.cr || "";
+        ws.getCell(rowIndex, 2).value = child.opening?.dr || "";
+        ws.getCell(rowIndex, 3).value = child.opening?.cr || "";
+        ws.getCell(rowIndex, 4).value = child.period?.dr || "";
+        ws.getCell(rowIndex, 5).value = child.period?.cr || "";
+        ws.getCell(rowIndex, 6).value = child.closing?.dr || "";
+        ws.getCell(rowIndex, 7).value = child.closing?.cr || "";
         ws.getCell(rowIndex, 2).font = { bold: true };
         ws.getCell(rowIndex, 3).font = { bold: true };
+        ws.getCell(rowIndex, 4).font = { bold: true };
+        ws.getCell(rowIndex, 5).font = { bold: true };
+        ws.getCell(rowIndex, 6).font = { bold: true };
+        ws.getCell(rowIndex, 7).font = { bold: true };
         ws.getCell(rowIndex, 2).alignment = {
           horizontal: "right",
           vertical: "middle",
         };
         ws.getCell(rowIndex, 3).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 4).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 5).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 6).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, 7).alignment = {
           horizontal: "right",
           vertical: "middle",
         };
@@ -2714,13 +3666,33 @@ const reportServiceRaw = {
             wrapText: true,
             vertical: "middle",
           };
-          ws.getCell(rowIndex, 2).value = l.closing?.dr || "";
-          ws.getCell(rowIndex, 3).value = l.closing?.cr || "";
+          ws.getCell(rowIndex, 2).value = l.opening?.dr || "";
+          ws.getCell(rowIndex, 3).value = l.opening?.cr || "";
+          ws.getCell(rowIndex, 4).value = l.period?.dr || "";
+          ws.getCell(rowIndex, 5).value = l.period?.cr || "";
+          ws.getCell(rowIndex, 6).value = l.closing?.dr || "";
+          ws.getCell(rowIndex, 7).value = l.closing?.cr || "";
           ws.getCell(rowIndex, 2).alignment = {
             horizontal: "right",
             vertical: "middle",
           };
           ws.getCell(rowIndex, 3).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 4).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 5).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 6).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, 7).alignment = {
             horizontal: "right",
             vertical: "middle",
           };
@@ -2736,6 +3708,10 @@ const reportServiceRaw = {
     // TOTAL ROW
     const totalRow = ws.addRow([
       "Grand Total",
+      totals.openingDr || "",
+      totals.openingCr || "",
+      totals.periodDr || "",
+      totals.periodCr || "",
       totals.closingDr || "",
       totals.closingCr || "",
     ]);
@@ -2743,6 +3719,11 @@ const reportServiceRaw = {
     totalRow.getCell(1).alignment = { vertical: "middle" };
     totalRow.getCell(2).alignment = { horizontal: "right", vertical: "middle" };
     totalRow.getCell(3).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(4).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(5).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(6).alignment = { horizontal: "right", vertical: "middle" };
+    totalRow.getCell(7).alignment = { horizontal: "right", vertical: "middle" };
+
     rowIndex++;
 
     const dataEndRow = totalRow.number;
@@ -2757,9 +3738,9 @@ const reportServiceRaw = {
     // Unified LEFT and RIGHT
     for (let r = titleRowIndex; r <= blockEnd; r++) {
       const c1 = ws.getCell(r, 1);
-      const c3 = ws.getCell(r, COLS);
+      const c7 = ws.getCell(r, COLS);
       c1.border = { ...c1.border, left: { style: "thin" } };
-      c3.border = { ...c3.border, right: { style: "thin" } };
+      c7.border = { ...c7.border, right: { style: "thin" } };
     }
 
     // TOP border on title row
@@ -2788,7 +3769,7 @@ const reportServiceRaw = {
 
     // Column dividers
     for (let r = blockStart; r <= blockEnd; r++) {
-      for (const c of [1, 2]) {
+      for (const c of [1, 2, 3, 4, 5, 6]) {
         const cell = ws.getCell(r, c);
         cell.border = { ...cell.border, right: { style: "thin" } };
       }
@@ -2825,8 +3806,12 @@ const reportServiceRaw = {
     const buckets = hasAgeing ? ageing.bucketDefinitions : [];
 
     const bucketCount = buckets.length;
-    const COLS = hasAgeing ? 2 + bucketCount + 2 : 3;
-    const closingPendingCol = hasAgeing ? 3 + bucketCount : 2;
+    const COLS = hasAgeing ? 2 + bucketCount + 6 : 7;
+    const openingPendingCol = hasAgeing ? 3 + bucketCount : 2;
+    const openingAdvanceCol = openingPendingCol + 1;
+    const periodPendingCol = openingAdvanceCol + 1;
+    const periodAdvanceCol = periodPendingCol + 1;
+    const closingPendingCol = periodAdvanceCol + 1;
     const closingAdvanceCol = closingPendingCol + 1;
 
     const wb = new ExcelJs.Workbook();
@@ -2841,6 +3826,10 @@ const reportServiceRaw = {
         ws.getColumn(3 + i).width = 16; // each bucket
       }
     }
+    ws.getColumn(openingPendingCol).width = 18;
+    ws.getColumn(openingAdvanceCol).width = 18;
+    ws.getColumn(periodPendingCol).width = 18;
+    ws.getColumn(periodAdvanceCol).width = 18;
     ws.getColumn(closingPendingCol).width = 18;
     ws.getColumn(closingAdvanceCol).width = 18;
 
@@ -2862,7 +3851,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -2881,6 +3870,20 @@ const reportServiceRaw = {
       ws.getCell(rowIndex, 3).font = { bold: true };
       ws.getCell(rowIndex, 3).alignment = { horizontal: "center" };
     }
+
+    // Opening Balance span
+    ws.mergeCells(rowIndex, openingPendingCol, rowIndex, openingAdvanceCol);
+    ws.getCell(rowIndex, openingPendingCol).value = "Opening Balance";
+    ws.getCell(rowIndex, openingPendingCol).font = { bold: true };
+    ws.getCell(rowIndex, openingPendingCol).alignment = {
+      horizontal: "center",
+    };
+
+    // Period Transaction span
+    ws.mergeCells(rowIndex, periodPendingCol, rowIndex, periodAdvanceCol);
+    ws.getCell(rowIndex, periodPendingCol).value = "Period Transaction";
+    ws.getCell(rowIndex, periodPendingCol).font = { bold: true };
+    ws.getCell(rowIndex, periodPendingCol).alignment = { horizontal: "center" };
 
     // Closing Balance span
     ws.mergeCells(rowIndex, closingPendingCol, rowIndex, closingAdvanceCol);
@@ -2914,6 +3917,10 @@ const reportServiceRaw = {
       });
     }
 
+    ws.getCell(rowIndex, openingPendingCol).value = "PENDING";
+    ws.getCell(rowIndex, openingAdvanceCol).value = "ADVANCE";
+    ws.getCell(rowIndex, periodPendingCol).value = "PENDING";
+    ws.getCell(rowIndex, periodAdvanceCol).value = "ADVANCE";
     ws.getCell(rowIndex, closingPendingCol).value = "PENDING";
     ws.getCell(rowIndex, closingAdvanceCol).value = "ADVANCE";
 
@@ -2952,12 +3959,21 @@ const reportServiceRaw = {
         const lPA = getPendingAdvance(
           l.closing?.dr ?? 0,
           l.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
+        );
+        const OPA = getPendingAdvance(
+          l.opening?.dr ?? 0,
+          l.opening?.cr ?? 0,
+          "receivable",
+        );
+        const PPA = getPendingAdvance(
+          l.period?.dr ?? 0,
+          l.period?.cr ?? 0,
+          "receivable",
         );
 
         ws.getCell(rowIndex, 1).value = `${l.ledger?.value ?? ""}`;
-        ws.getCell(rowIndex, 1).font = { italic: true }; // ← only col 1 stays italic
-
+        ws.getCell(rowIndex, 1).font = { italic: true };
         ws.getCell(rowIndex, 1).alignment = {
           wrapText: true,
           vertical: "middle",
@@ -2972,7 +3988,7 @@ const reportServiceRaw = {
 
           buckets.forEach((b, i) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amount = bucket?.amount ?? 0;
             ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -2983,8 +3999,28 @@ const reportServiceRaw = {
           });
         }
 
+        ws.getCell(rowIndex, openingPendingCol).value = OPA.pending;
+        ws.getCell(rowIndex, openingAdvanceCol).value = OPA.advance;
+        ws.getCell(rowIndex, periodPendingCol).value = PPA.pending;
+        ws.getCell(rowIndex, periodAdvanceCol).value = PPA.advance;
         ws.getCell(rowIndex, closingPendingCol).value = lPA.pending;
         ws.getCell(rowIndex, closingAdvanceCol).value = lPA.advance;
+        ws.getCell(rowIndex, openingPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, openingAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
         ws.getCell(rowIndex, closingPendingCol).alignment = {
           horizontal: "right",
           vertical: "middle",
@@ -3001,8 +4037,19 @@ const reportServiceRaw = {
         const childPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
         );
+        const childOPA = getPendingAdvance(
+          child.opening?.dr ?? 0,
+          child.opening?.cr ?? 0,
+          "receivable",
+        );
+        const childPPA = getPendingAdvance(
+          child.period?.dr ?? 0,
+          child.period?.cr ?? 0,
+          "receivable",
+        );
+
         ws.getCell(rowIndex, 1).value = `${child.group?.value ?? ""}`;
         ws.getCell(rowIndex, 1).font = { bold: true };
         ws.getCell(rowIndex, 1).alignment = {
@@ -3018,10 +4065,34 @@ const reportServiceRaw = {
           };
         }
 
+        ws.getCell(rowIndex, openingPendingCol).value = childOPA.pending;
+        ws.getCell(rowIndex, openingAdvanceCol).value = childOPA.advance;
+        ws.getCell(rowIndex, periodPendingCol).value = childPPA.pending;
+        ws.getCell(rowIndex, periodAdvanceCol).value = childPPA.advance;
         ws.getCell(rowIndex, closingPendingCol).value = childPA.pending;
         ws.getCell(rowIndex, closingAdvanceCol).value = childPA.advance;
+        ws.getCell(rowIndex, openingPendingCol).font = { bold: true };
+        ws.getCell(rowIndex, openingAdvanceCol).font = { bold: true };
+        ws.getCell(rowIndex, periodPendingCol).font = { bold: true };
+        ws.getCell(rowIndex, periodAdvanceCol).font = { bold: true };
         ws.getCell(rowIndex, closingPendingCol).font = { bold: true };
         ws.getCell(rowIndex, closingAdvanceCol).font = { bold: true };
+        ws.getCell(rowIndex, openingPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, openingAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
         ws.getCell(rowIndex, closingPendingCol).alignment = {
           horizontal: "right",
           vertical: "middle",
@@ -3038,7 +4109,7 @@ const reportServiceRaw = {
             : null;
 
           ws.getCell(rowIndex, 1).value = `   ${l.ledger?.value ?? ""}`;
-          ws.getCell(rowIndex, 1).font = { italic: true }; // ← only col 1 stays italic
+          ws.getCell(rowIndex, 1).font = { italic: true };
           ws.getCell(rowIndex, 1).alignment = {
             wrapText: true,
             vertical: "middle",
@@ -3053,7 +4124,7 @@ const reportServiceRaw = {
 
             buckets.forEach((b, i) => {
               const bucket = ageingRow?.bucketAmounts.find(
-                (ba) => ba.from === b.from && ba.to === b.to
+                (ba) => ba.from === b.from && ba.to === b.to,
               );
               const amount = bucket?.amount ?? 0;
               ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -3067,10 +4138,40 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "receivable"
+            "receivable",
           );
+          const OPA = getPendingAdvance(
+            l.opening?.dr ?? 0,
+            l.opening?.cr ?? 0,
+            "receivable",
+          );
+          const PPA = getPendingAdvance(
+            l.period?.dr ?? 0,
+            l.period?.cr ?? 0,
+            "receivable",
+          );
+          ws.getCell(rowIndex, openingPendingCol).value = OPA.pending;
+          ws.getCell(rowIndex, openingAdvanceCol).value = OPA.advance;
+          ws.getCell(rowIndex, periodPendingCol).value = PPA.pending;
+          ws.getCell(rowIndex, periodAdvanceCol).value = PPA.advance;
           ws.getCell(rowIndex, closingPendingCol).value = lPA.pending;
           ws.getCell(rowIndex, closingAdvanceCol).value = lPA.advance;
+          ws.getCell(rowIndex, openingPendingCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, openingAdvanceCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, periodPendingCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, periodAdvanceCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
           ws.getCell(rowIndex, closingPendingCol).alignment = {
             horizontal: "right",
             vertical: "middle",
@@ -3094,7 +4195,7 @@ const reportServiceRaw = {
       totalRowData.push(ageing.totals.pending || "");
       buckets.forEach((b) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amount = bucket?.amount ?? 0;
         totalRowData.push(amount > 0 ? amount : "");
@@ -3103,8 +4204,22 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "receivable"
+      "receivable",
     );
+    const TOPA = getPendingAdvance(
+      totals.openingDr ?? 0,
+      totals.openingCr ?? 0,
+      "receivable",
+    );
+    const TPPA = getPendingAdvance(
+      totals.periodDr ?? 0,
+      totals.periodCr ?? 0,
+      "receivable",
+    );
+    totalRowData.push(TOPA.pending || "");
+    totalRowData.push(TOPA.advance || "");
+    totalRowData.push(TPPA.pending || "");
+    totalRowData.push(TPPA.advance || "");
     totalRowData.push(TPA.pending || "");
     totalRowData.push(TPA.advance || "");
 
@@ -3183,7 +4298,7 @@ const reportServiceRaw = {
     }
 
     // Bottom under group header spans (ageing + closing balance labels)
-    for (let c = hasAgeing ? 3 : closingPendingCol; c <= COLS; c++) {
+    for (let c = hasAgeing ? 3 : openingPendingCol; c <= COLS; c++) {
       ws.getCell(groupHeaderRowIndex, c).border = {
         ...ws.getCell(groupHeaderRowIndex, c).border,
         bottom: { style: "thin" },
@@ -3219,8 +4334,12 @@ const reportServiceRaw = {
     const buckets = hasAgeing ? ageing.bucketDefinitions : [];
 
     const bucketCount = buckets.length;
-    const COLS = hasAgeing ? 2 + bucketCount + 2 : 3;
-    const closingPendingCol = hasAgeing ? 3 + bucketCount : 2;
+    const COLS = hasAgeing ? 2 + bucketCount + 6 : 7;
+    const openingPendingCol = hasAgeing ? 3 + bucketCount : 2;
+    const openingAdvanceCol = openingPendingCol + 1;
+    const periodPendingCol = openingAdvanceCol + 1;
+    const periodAdvanceCol = periodPendingCol + 1;
+    const closingPendingCol = periodAdvanceCol + 1;
     const closingAdvanceCol = closingPendingCol + 1;
 
     const wb = new ExcelJs.Workbook();
@@ -3235,6 +4354,10 @@ const reportServiceRaw = {
         ws.getColumn(3 + i).width = 16; // each bucket
       }
     }
+    ws.getColumn(openingPendingCol).width = 18;
+    ws.getColumn(openingAdvanceCol).width = 18;
+    ws.getColumn(periodPendingCol).width = 18;
+    ws.getColumn(periodAdvanceCol).width = 18;
     ws.getColumn(closingPendingCol).width = 18;
     ws.getColumn(closingAdvanceCol).width = 18;
 
@@ -3256,7 +4379,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -3275,6 +4398,20 @@ const reportServiceRaw = {
       ws.getCell(rowIndex, 3).font = { bold: true };
       ws.getCell(rowIndex, 3).alignment = { horizontal: "center" };
     }
+
+    // Opening Balance span
+    ws.mergeCells(rowIndex, openingPendingCol, rowIndex, openingAdvanceCol);
+    ws.getCell(rowIndex, openingPendingCol).value = "Opening Balance";
+    ws.getCell(rowIndex, openingPendingCol).font = { bold: true };
+    ws.getCell(rowIndex, openingPendingCol).alignment = {
+      horizontal: "center",
+    };
+
+    // Period Transaction span
+    ws.mergeCells(rowIndex, periodPendingCol, rowIndex, periodAdvanceCol);
+    ws.getCell(rowIndex, periodPendingCol).value = "Period Transaction";
+    ws.getCell(rowIndex, periodPendingCol).font = { bold: true };
+    ws.getCell(rowIndex, periodPendingCol).alignment = { horizontal: "center" };
 
     // Closing Balance span
     ws.mergeCells(rowIndex, closingPendingCol, rowIndex, closingAdvanceCol);
@@ -3308,6 +4445,10 @@ const reportServiceRaw = {
       });
     }
 
+    ws.getCell(rowIndex, openingPendingCol).value = "PENDING";
+    ws.getCell(rowIndex, openingAdvanceCol).value = "ADVANCE";
+    ws.getCell(rowIndex, periodPendingCol).value = "PENDING";
+    ws.getCell(rowIndex, periodAdvanceCol).value = "ADVANCE";
     ws.getCell(rowIndex, closingPendingCol).value = "PENDING";
     ws.getCell(rowIndex, closingAdvanceCol).value = "ADVANCE";
 
@@ -3343,9 +4484,24 @@ const reportServiceRaw = {
       root.ledger?.forEach((l) => {
         const ageingRow = hasAgeing ? ageingMap.get(l.ledger?.id ?? -1) : null;
 
-        ws.getCell(rowIndex, 1).value = `${l.ledger?.value ?? ""}`;
-        ws.getCell(rowIndex, 1).font = { italic: true }; // ← only col 1 stays italic
+        const IPA = getPendingAdvance(
+          l.closing?.dr ?? 0,
+          l.closing?.cr ?? 0,
+          "payable",
+        );
+        const OPA = getPendingAdvance(
+          l.opening?.dr ?? 0,
+          l.opening?.cr ?? 0,
+          "payable",
+        );
+        const PPA = getPendingAdvance(
+          l.period?.dr ?? 0,
+          l.period?.cr ?? 0,
+          "payable",
+        );
 
+        ws.getCell(rowIndex, 1).value = `${l.ledger?.value ?? ""}`;
+        ws.getCell(rowIndex, 1).font = { italic: true };
         ws.getCell(rowIndex, 1).alignment = {
           wrapText: true,
           vertical: "middle",
@@ -3360,7 +4516,7 @@ const reportServiceRaw = {
 
           buckets.forEach((b, i) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amount = bucket?.amount ?? 0;
             ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -3371,14 +4527,28 @@ const reportServiceRaw = {
           });
         }
 
-        const IPA = getPendingAdvance(
-          l.closing?.dr ?? 0,
-          l.closing?.cr ?? 0,
-          "payable"
-        );
-
+        ws.getCell(rowIndex, openingPendingCol).value = OPA.pending;
+        ws.getCell(rowIndex, openingAdvanceCol).value = OPA.advance;
+        ws.getCell(rowIndex, periodPendingCol).value = PPA.pending;
+        ws.getCell(rowIndex, periodAdvanceCol).value = PPA.advance;
         ws.getCell(rowIndex, closingPendingCol).value = IPA.pending;
         ws.getCell(rowIndex, closingAdvanceCol).value = IPA.advance;
+        ws.getCell(rowIndex, openingPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, openingAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
         ws.getCell(rowIndex, closingPendingCol).alignment = {
           horizontal: "right",
           vertical: "middle",
@@ -3395,8 +4565,19 @@ const reportServiceRaw = {
         const CPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "payable"
+          "payable",
         );
+        const COPA = getPendingAdvance(
+          child.opening?.dr ?? 0,
+          child.opening?.cr ?? 0,
+          "payable",
+        );
+        const CPPA = getPendingAdvance(
+          child.period?.dr ?? 0,
+          child.period?.cr ?? 0,
+          "payable",
+        );
+
         ws.getCell(rowIndex, 1).value = `${child.group?.value ?? ""}`;
         ws.getCell(rowIndex, 1).font = { bold: true };
         ws.getCell(rowIndex, 1).alignment = {
@@ -3412,10 +4593,34 @@ const reportServiceRaw = {
           };
         }
 
+        ws.getCell(rowIndex, openingPendingCol).value = COPA.pending;
+        ws.getCell(rowIndex, openingAdvanceCol).value = COPA.advance;
+        ws.getCell(rowIndex, periodPendingCol).value = CPPA.pending;
+        ws.getCell(rowIndex, periodAdvanceCol).value = CPPA.advance;
         ws.getCell(rowIndex, closingPendingCol).value = CPA.pending;
         ws.getCell(rowIndex, closingAdvanceCol).value = CPA.advance;
+        ws.getCell(rowIndex, openingPendingCol).font = { bold: true };
+        ws.getCell(rowIndex, openingAdvanceCol).font = { bold: true };
+        ws.getCell(rowIndex, periodPendingCol).font = { bold: true };
+        ws.getCell(rowIndex, periodAdvanceCol).font = { bold: true };
         ws.getCell(rowIndex, closingPendingCol).font = { bold: true };
         ws.getCell(rowIndex, closingAdvanceCol).font = { bold: true };
+        ws.getCell(rowIndex, openingPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, openingAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodPendingCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
+        ws.getCell(rowIndex, periodAdvanceCol).alignment = {
+          horizontal: "right",
+          vertical: "middle",
+        };
         ws.getCell(rowIndex, closingPendingCol).alignment = {
           horizontal: "right",
           vertical: "middle",
@@ -3432,7 +4637,7 @@ const reportServiceRaw = {
             : null;
 
           ws.getCell(rowIndex, 1).value = `    ${l.ledger?.value ?? ""}`;
-          ws.getCell(rowIndex, 1).font = { italic: true }; // ← only col 1 stays italic
+          ws.getCell(rowIndex, 1).font = { italic: true };
           ws.getCell(rowIndex, 1).alignment = {
             wrapText: true,
             vertical: "middle",
@@ -3447,7 +4652,7 @@ const reportServiceRaw = {
 
             buckets.forEach((b, i) => {
               const bucket = ageingRow?.bucketAmounts.find(
-                (ba) => ba.from === b.from && ba.to === b.to
+                (ba) => ba.from === b.from && ba.to === b.to,
               );
               const amount = bucket?.amount ?? 0;
               ws.getCell(rowIndex, 3 + i).value = amount > 0 ? amount : "";
@@ -3461,11 +4666,40 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "payable"
+            "payable",
           );
+          const OPA = getPendingAdvance(
+            l.opening?.dr ?? 0,
+            l.opening?.cr ?? 0,
+            "payable",
+          );
+          const PPA = getPendingAdvance(
+            l.period?.dr ?? 0,
+            l.period?.cr ?? 0,
+            "payable",
+          );
+          ws.getCell(rowIndex, openingPendingCol).value = OPA.pending;
+          ws.getCell(rowIndex, openingAdvanceCol).value = OPA.advance;
+          ws.getCell(rowIndex, periodPendingCol).value = PPA.pending;
+          ws.getCell(rowIndex, periodAdvanceCol).value = PPA.advance;
           ws.getCell(rowIndex, closingPendingCol).value = lPA.pending;
           ws.getCell(rowIndex, closingAdvanceCol).value = lPA.advance;
-
+          ws.getCell(rowIndex, openingPendingCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, openingAdvanceCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, periodPendingCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
+          ws.getCell(rowIndex, periodAdvanceCol).alignment = {
+            horizontal: "right",
+            vertical: "middle",
+          };
           ws.getCell(rowIndex, closingPendingCol).alignment = {
             horizontal: "right",
             vertical: "middle",
@@ -3489,7 +4723,7 @@ const reportServiceRaw = {
       totalRowData.push(ageing.totals.pending || "");
       buckets.forEach((b) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amount = bucket?.amount ?? 0;
         totalRowData.push(amount > 0 ? amount : "");
@@ -3498,8 +4732,22 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "payable"
+      "payable",
     );
+    const TOPA = getPendingAdvance(
+      totals.openingDr ?? 0,
+      totals.openingCr ?? 0,
+      "payable",
+    );
+    const TPPA = getPendingAdvance(
+      totals.periodDr ?? 0,
+      totals.periodCr ?? 0,
+      "payable",
+    );
+    totalRowData.push(TOPA.pending || "");
+    totalRowData.push(TOPA.advance || "");
+    totalRowData.push(TPPA.pending || "");
+    totalRowData.push(TPPA.advance || "");
     totalRowData.push(TPA.pending || "");
     totalRowData.push(TPA.advance || "");
 
@@ -3577,8 +4825,8 @@ const reportServiceRaw = {
       }
     }
 
-    // 7. Bottom under group header spans (ageing + closing balance labels)
-    for (let c = hasAgeing ? 3 : closingPendingCol; c <= COLS; c++) {
+    // 7. Bottom under group header spans (ageing + opening/period/closing balance labels)
+    for (let c = hasAgeing ? 3 : openingPendingCol; c <= COLS; c++) {
       ws.getCell(groupHeaderRowIndex, c).border = {
         ...ws.getCell(groupHeaderRowIndex, c).border,
         bottom: { style: "thin" },
@@ -3638,7 +4886,7 @@ const reportServiceRaw = {
     ws.mergeCells(rowIndex, 1, rowIndex, COLS);
     const date = ws.getCell(rowIndex, 1);
     date.value = `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-      input.toDate
+      input.toDate,
     ).format("MMM D, YYYY")})`;
     date.alignment = { horizontal: "center" };
     date.font = { size: 10 };
@@ -4174,7 +5422,7 @@ const reportServiceRaw = {
     ws.properties.defaultRowHeight = 18;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     // ============================================================
@@ -4377,7 +5625,7 @@ const reportServiceRaw = {
       const addGroupLines = (
         nodes: CashFlowNode[],
         lines: Line[],
-        type: string
+        type: string,
       ) => {
         nodes.forEach((node) => {
           lines.push({
@@ -4569,7 +5817,7 @@ const reportServiceRaw = {
       // Recursive renderer — typed properly
       const renderGroupNode = (
         node: CashFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         const label = `${"  ".repeat(indent)}${node.group?.value ?? ""}`;
         const row = ws.addRow([
@@ -4706,7 +5954,7 @@ const reportServiceRaw = {
     ws.properties.defaultRowHeight = 18;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     // ============================================================
@@ -5018,7 +6266,7 @@ const reportServiceRaw = {
             };
           }
           rowIndex++;
-        }
+        },
       );
 
       // Working Capital total row
@@ -5026,11 +6274,11 @@ const reportServiceRaw = {
       ws.getCell(rowIndex, 1).value = "Working Capital";
       ws.getCell(rowIndex, 2).value = fmtBal(
         workingCapital.openingWorkingCapital.dr,
-        workingCapital.openingWorkingCapital.cr
+        workingCapital.openingWorkingCapital.cr,
       );
       ws.getCell(rowIndex, 3).value = fmtBal(
         workingCapital.closingWorkingCapital.dr,
-        workingCapital.closingWorkingCapital.cr
+        workingCapital.closingWorkingCapital.cr,
       );
       ws.getCell(rowIndex, 4).value = workingCapital.increase || "";
       for (let c = 1; c <= COLS; c++) {
@@ -5212,7 +6460,7 @@ const reportServiceRaw = {
 
       const renderGroupNode = (
         node: FundFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         const label = `${"  ".repeat(indent)}${node.group?.value ?? ""}`;
         const row = ws.addRow([
@@ -5350,11 +6598,11 @@ const reportServiceRaw = {
   },
 
   async buildPdfForBalanceSheet(
-    input: BalanceSheetRequestInput
+    input: BalanceSheetRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForBalanceSheet::service");
 
-    const { liabilities, assets, totals, profitLoss } =
+    const { periodStart, periodEnd, liabilities, assets, totals, profitLoss } =
       await this.getBalanceSheet(input);
 
     const doc = new PDFDocument({ margin: 30, size: "A4", layout: "portrait" });
@@ -5415,7 +6663,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         color?: string;
         fontSize?: number;
-      } = {}
+      } = {},
     ) => {
       doc
         .font(opts.bold ? FONT_BOLD : opts.italic ? FONT_ITALIC : FONT_NORMAL)
@@ -5487,7 +6735,9 @@ const reportServiceRaw = {
     // ── DATE ──
     doc.rect(PAGE_LEFT, y, TOTAL_W, ROW_H).stroke();
     writeCell(
-      `As on: ${dayjs(input.asOnDate).format("DD MMM YYYY")}`,
+      `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(periodEnd).format(
+        "DD MMM YYYY",
+      )}`,
       PAGE_LEFT,
       y,
       TOTAL_W,
@@ -5496,7 +6746,7 @@ const reportServiceRaw = {
         italic: true,
         fontSize: 10,
         align: "center",
-      }
+      },
     );
     y += ROW_H;
 
@@ -5530,7 +6780,7 @@ const reportServiceRaw = {
           ROW_H,
           {
             align: isSpecial ? "left" : "right",
-          }
+          },
         );
       }
 
@@ -5630,11 +6880,11 @@ const reportServiceRaw = {
   },
 
   async buildPdfForBalanceSheetWithChildren(
-    input: BalanceSheetRequestInput
+    input: BalanceSheetRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForBalanceSheetWithChildren::service");
 
-    const { liabilities, assets, totals, profitLoss } =
+    const { periodStart, periodEnd, liabilities, assets, totals, profitLoss } =
       await this.getBalanceSheet(input);
 
     const doc = new PDFDocument({ margin: 30, size: "A4", layout: "portrait" });
@@ -5697,7 +6947,7 @@ const reportServiceRaw = {
         color?: string;
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -5724,7 +6974,7 @@ const reportServiceRaw = {
     // ── Flatten helper ──
     const flatten = (
       nodes: BsNode[],
-      side: "liability" | "asset"
+      side: "liability" | "asset",
     ): {
       name: string;
       id: number;
@@ -5817,7 +7067,9 @@ const reportServiceRaw = {
     // ── DATE ──
     doc.rect(PAGE_LEFT, y, TOTAL_W, ROW_H).stroke();
     writeCell(
-      `As on: ${dayjs(input.asOnDate).format("DD MMM YYYY")}`,
+      `${dayjs(periodStart).format("DD MMM YYYY")} to ${dayjs(periodEnd).format(
+        "DD MMM YYYY",
+      )}`,
       PAGE_LEFT,
       y,
       TOTAL_W,
@@ -5826,7 +7078,7 @@ const reportServiceRaw = {
         italic: true,
         fontSize: 10,
         align: "center",
-      }
+      },
     );
     y += ROW_H;
 
@@ -5957,12 +7209,16 @@ const reportServiceRaw = {
   },
 
   async buildPdfForLedgerBookReport(
-    input: LedgerBookRequestInput
+    input: LedgerBookExcelRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForLedgerBookReport::service");
 
     const { closingBalance, ledger, openingBalance, rows, totals } =
       await this.getLedgerBook(input);
+
+    const showNarration = input.showNarration;
+    const showCreatedBy = input.showCreatedBy;
+    const showUpdatedBy = input.showUpdatedBy;
 
     const doc = new PDFDocument({ margin: 30, size: "A4", layout: "portrait" });
 
@@ -5976,20 +7232,50 @@ const reportServiceRaw = {
     const PAGE_WIDTH = doc.page.width - 60;
     const PAGE_BOTTOM = doc.page.height - 30;
 
-    const TOTAL_EXCEL_W = 96;
-    const col1W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
-    const col2W = PAGE_WIDTH * (28 / TOTAL_EXCEL_W);
-    const col3W = PAGE_WIDTH * (20 / TOTAL_EXCEL_W);
-    const col4W = PAGE_WIDTH * (15 / TOTAL_EXCEL_W);
-    const col5W = PAGE_WIDTH * (15 / TOTAL_EXCEL_W);
+    // ============================================================
+    // DYNAMIC COLUMN DEFINITIONS
+    // ============================================================
+    interface ColDef {
+      key: string;
+      label: string;
+      excelW: number;
+    }
 
-    const col1X = PAGE_LEFT;
-    const col2X = col1X + col1W;
-    const col3X = col2X + col2W;
-    const col4X = col3X + col3W;
-    const col5X = col4X + col4W;
+    const columnDefs: ColDef[] = [
+      { key: "DATE", label: "DATE", excelW: 18 },
+      { key: "VOUCHER_NO", label: "VOUCHER NO", excelW: 28 },
+      { key: "VOUCHER_TYPE", label: "VOUCHER TYPE", excelW: 25 },
+      ...(showNarration
+        ? [{ key: "NARRATION", label: "NARRATION", excelW: 20 }]
+        : []),
+      ...(showCreatedBy
+        ? [{ key: "CREATED_BY", label: "CREATED BY", excelW: 20 }]
+        : []),
+      ...(showUpdatedBy
+        ? [{ key: "UPDATED_BY", label: "UPDATED BY", excelW: 20 }]
+        : []),
+      { key: "DR", label: "DR", excelW: 15 },
+      { key: "CR", label: "CR", excelW: 15 },
+    ];
 
-    const TOTAL_W = col1W + col2W + col3W + col4W + col5W;
+    const TOTAL_EXCEL_W = columnDefs.reduce((sum, c) => sum + c.excelW, 0);
+
+    const cols = columnDefs.map((c) => ({
+      ...c,
+      w: PAGE_WIDTH * (c.excelW / TOTAL_EXCEL_W),
+      x: 0,
+    }));
+
+    let runningX = PAGE_LEFT;
+    cols.forEach((c) => {
+      c.x = runningX;
+      runningX += c.w;
+    });
+
+    const TOTAL_W = PAGE_WIDTH;
+
+    const colX = (key: string) => cols.find((c) => c.key === key)!.x;
+    const colW = (key: string) => cols.find((c) => c.key === key)!.w;
 
     const ROW_H = 20;
     const FONT_SIZE = 9;
@@ -6017,6 +7303,20 @@ const reportServiceRaw = {
         .stroke("#000000");
     };
 
+    const calcCellHeight = (
+      text: string,
+      w: number,
+      opts: { fontSize?: number; bold?: boolean } = {},
+    ): number => {
+      doc
+        .font(opts.bold ? FONT_BOLD : FONT_NORMAL)
+        .fontSize(opts.fontSize ?? FONT_SIZE);
+      const textHeight = doc.heightOfString(String(text ?? ""), {
+        width: w - 6,
+      });
+      return Math.max(ROW_H, textHeight + 10);
+    };
+
     const writeCell = (
       text: string,
       x: number,
@@ -6027,7 +7327,7 @@ const reportServiceRaw = {
         bold?: boolean;
         align?: "left" | "right" | "center";
         fontSize?: number;
-      } = {}
+      } = {},
     ) => {
       doc
         .font(opts.bold ? FONT_BOLD : FONT_NORMAL)
@@ -6037,58 +7337,52 @@ const reportServiceRaw = {
           width: w - 6,
           height: h - 5,
           align: opts.align ?? "left",
-          ellipsis: true,
-          lineBreak: false,
+          lineBreak: true,
         });
     };
 
     const drawRowBorders = (rowY: number, h: number = ROW_H) => {
-      drawVLine(col1X, rowY, h);
-      drawVLine(col2X, rowY, h);
-      drawVLine(col3X, rowY, h);
-      drawVLine(col4X, rowY, h);
-      drawVLine(col5X, rowY, h);
-      drawVLine(col5X + col5W, rowY, h);
+      cols.forEach((c) => drawVLine(c.x, rowY, h));
+      drawVLine(PAGE_LEFT + TOTAL_W, rowY, h);
     };
 
-    // ── Draw table header (column labels only) ──
-    const drawHeaders = () => {
-      drawHLine(col1X, y, TOTAL_W);
-      drawRowBorders(y);
-
-      writeCell("DATE", col1X, y, col1W, ROW_H, {
-        bold: true,
-        align: "center",
-      });
-      writeCell("VOUCHER NO", col2X, y, col2W, ROW_H, {
-        bold: true,
-        align: "center",
-      });
-      writeCell("VOUCHER TYPE", col3X, y, col3W, ROW_H, {
-        bold: true,
-        align: "center",
-      });
-      writeCell("DR", col4X, y, col4W, ROW_H, { bold: true, align: "center" });
-      writeCell("CR", col5X, y, col5W, ROW_H, { bold: true, align: "center" });
-
-      drawHLine(col1X, y + ROW_H, TOTAL_W);
-      y += ROW_H;
-    };
-
-    const checkPageBreak = () => {
-      if (y + ROW_H > PAGE_BOTTOM) {
-        drawHLine(col1X, y, TOTAL_W); // close current page
+    const checkPageBreak = (rowHeight: number = ROW_H) => {
+      if (y + rowHeight > PAGE_BOTTOM) {
+        drawHLine(PAGE_LEFT, y, TOTAL_W);
         doc.addPage();
         y = 30;
         drawHeaders();
       }
     };
 
-    // ── TITLE SECTION ──
-    drawVLine(col1X, y, ROW_H + 4);
-    drawVLine(col5X + col5W, y, ROW_H + 4);
-    drawHLine(col1X, y, TOTAL_W);
-    writeCell("Ledger Book", col1X, y, TOTAL_W, ROW_H + 4, {
+    // ── Draw table header with dynamic height so labels wrap ──
+    const drawHeaders = () => {
+      // Calculate dynamic header height based on each label wrapping in its column
+      const headerH = Math.max(
+        ...cols.map((c) => calcCellHeight(c.label, c.w, { bold: true })),
+      );
+
+      drawHLine(PAGE_LEFT, y, TOTAL_W);
+      drawRowBorders(y, headerH);
+
+      cols.forEach((c) => {
+        writeCell(c.label, c.x, y, c.w, headerH, {
+          bold: true,
+          align: "center",
+        });
+      });
+
+      drawHLine(PAGE_LEFT, y + headerH, TOTAL_W);
+      y += headerH;
+    };
+
+    // ============================================================
+    // TITLE SECTION
+    // ============================================================
+    drawVLine(PAGE_LEFT, y, ROW_H + 4);
+    drawVLine(PAGE_LEFT + TOTAL_W, y, ROW_H + 4);
+    drawHLine(PAGE_LEFT, y, TOTAL_W);
+    writeCell("Ledger Book", PAGE_LEFT, y, TOTAL_W, ROW_H + 4, {
       bold: true,
       fontSize: 16,
       align: "center",
@@ -6096,9 +7390,9 @@ const reportServiceRaw = {
     y += ROW_H + 4;
 
     // Ledger Name
-    drawVLine(col1X, y, ROW_H);
-    drawVLine(col5X + col5W, y, ROW_H);
-    writeCell(ledger?.value ?? "", col1X, y, TOTAL_W, ROW_H, {
+    drawVLine(PAGE_LEFT, y, ROW_H);
+    drawVLine(PAGE_LEFT + TOTAL_W, y, ROW_H);
+    writeCell(ledger?.name ?? "", PAGE_LEFT, y, TOTAL_W, ROW_H, {
       bold: true,
       fontSize: 12,
       align: "center",
@@ -6106,53 +7400,140 @@ const reportServiceRaw = {
     y += ROW_H;
 
     // Date Range
-    drawVLine(col1X, y, ROW_H);
-    drawVLine(col5X + col5W, y, ROW_H);
+    drawVLine(PAGE_LEFT, y, ROW_H);
+    drawVLine(PAGE_LEFT + TOTAL_W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("DD MMM YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("DD MMM YYYY")})`,
-      col1X,
+      PAGE_LEFT,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
     // ── Initial header ──
     drawHeaders();
 
-    // ── DATA ROWS ──
+    // ============================================================
+    // DATA ROWS
+    // ============================================================
     rows.forEach((r) => {
-      checkPageBreak();
-
       const isDr = r.drCr === "DR";
 
-      drawRowBorders(y);
+      const cellContents: { text: string; w: number; bold?: boolean }[] = [
+        {
+          text: dayjs(r.voucher.voucherDate).format("DD MMM YYYY"),
+          w: colW("DATE"),
+        },
+        { text: r.voucher.voucherNo ?? "", w: colW("VOUCHER_NO") },
+        { text: r.voucher.voucherType?.value ?? "", w: colW("VOUCHER_TYPE") },
+        ...(showNarration
+          ? [{ text: r.voucher.narration ?? "", w: colW("NARRATION") }]
+          : []),
+        ...(showCreatedBy
+          ? [{ text: r.voucher.createdBy?.value ?? "", w: colW("CREATED_BY") }]
+          : []),
+        ...(showUpdatedBy
+          ? [{ text: r.voucher.updatedBy?.value ?? "", w: colW("UPDATED_BY") }]
+          : []),
+        { text: isDr ? fmtAmt(Number(r.amount)) : "", w: colW("DR") },
+        { text: !isDr ? fmtAmt(Number(r.amount)) : "", w: colW("CR") },
+      ];
+
+      const dynamicH = Math.max(
+        ...cellContents.map((c) =>
+          calcCellHeight(c.text, c.w, { bold: c.bold }),
+        ),
+      );
+
+      checkPageBreak(dynamicH);
+      drawRowBorders(y, dynamicH);
 
       writeCell(
         dayjs(r.voucher.voucherDate).format("DD MMM YYYY"),
-        col1X,
+        colX("DATE"),
         y,
-        col1W,
-        ROW_H,
-        { align: "center" }
+        colW("DATE"),
+        dynamicH,
+        {
+          align: "center",
+        },
       );
-      writeCell(r.voucher.voucherNo ?? "", col2X, y, col2W, ROW_H, {
-        align: "center",
-      });
-      writeCell(r.voucher.voucherType?.value ?? "", col3X, y, col3W, ROW_H, {
-        align: "center",
-      });
-      writeCell(isDr ? fmtAmt(Number(r.amount)) : "", col4X, y, col4W, ROW_H, {
-        align: "center",
-      });
-      writeCell(!isDr ? fmtAmt(Number(r.amount)) : "", col5X, y, col5W, ROW_H, {
-        align: "center",
-      });
+      writeCell(
+        r.voucher.voucherNo ?? "",
+        colX("VOUCHER_NO"),
+        y,
+        colW("VOUCHER_NO"),
+        dynamicH,
+        { align: "center" },
+      );
+      writeCell(
+        r.voucher.voucherType?.value ?? "",
+        colX("VOUCHER_TYPE"),
+        y,
+        colW("VOUCHER_TYPE"),
+        dynamicH,
+        {
+          align: "center",
+        },
+      );
 
-      y += ROW_H;
+      if (showNarration) {
+        writeCell(
+          r.voucher.narration ?? "",
+          colX("NARRATION"),
+          y,
+          colW("NARRATION"),
+          dynamicH,
+          { align: "center" },
+        );
+      }
+      if (showCreatedBy) {
+        writeCell(
+          r.voucher.createdBy?.value ?? "",
+          colX("CREATED_BY"),
+          y,
+          colW("CREATED_BY"),
+          dynamicH,
+          {
+            align: "center",
+          },
+        );
+      }
+      if (showUpdatedBy) {
+        writeCell(
+          r.voucher.updatedBy?.value ?? "",
+          colX("UPDATED_BY"),
+          y,
+          colW("UPDATED_BY"),
+          dynamicH,
+          {
+            align: "center",
+          },
+        );
+      }
+
+      writeCell(
+        isDr ? fmtAmt(Number(r.amount)) : "",
+        colX("DR"),
+        y,
+        colW("DR"),
+        dynamicH,
+        { align: "center" },
+      );
+      writeCell(
+        !isDr ? fmtAmt(Number(r.amount)) : "",
+        colX("CR"),
+        y,
+        colW("CR"),
+        dynamicH,
+        { align: "center" },
+      );
+
+      y += dynamicH;
     });
 
     // Blank separator before summary
@@ -6160,15 +7541,27 @@ const reportServiceRaw = {
     drawRowBorders(y);
     y += ROW_H;
 
-    // ── SUMMARY SECTION ──
-    // Ensure all 3 summary rows fit on same page
+    // ============================================================
+    // SUMMARY SECTION
+    // ============================================================
     if (y + ROW_H * 3 > PAGE_BOTTOM) {
-      drawHLine(col1X, y, TOTAL_W);
+      drawHLine(PAGE_LEFT, y, TOTAL_W);
       doc.addPage();
       y = 30;
     }
 
-    drawHLine(col1X, y, TOTAL_W);
+    drawHLine(PAGE_LEFT, y, TOTAL_W);
+
+    // ============================================================
+    // SUMMARY SECTION
+    // ============================================================
+    if (y + ROW_H * 3 > PAGE_BOTTOM) {
+      drawHLine(PAGE_LEFT, y, TOTAL_W);
+      doc.addPage();
+      y = 30;
+    }
+
+    drawHLine(PAGE_LEFT, y, TOTAL_W);
 
     const formatDrCr = (dr: number, cr: number) => {
       if (dr === 0 && cr === 0) return { dr: "", cr: "" };
@@ -6187,15 +7580,43 @@ const reportServiceRaw = {
       },
     ];
 
+    // Label spans from very first col (DATE) to just before DR — full merged area
+    const drCol = cols.find((c) => c.key === "DR")!;
+    const crCol = cols.find((c) => c.key === "CR")!;
+    const firstCol = cols[0];
+    const labelW = drCol.x - firstCol.x;
+
     summaryRows.forEach((s) => {
-      drawRowBorders(y);
-      writeCell(s.label, col3X, y, col3W, ROW_H, { bold: true });
-      writeCell(s.dr, col4X, y, col4W, ROW_H, { bold: true, align: "right" });
-      writeCell(s.cr, col5X, y, col5W, ROW_H, { bold: true, align: "right" });
-      y += ROW_H;
+      const summaryH = Math.max(
+        calcCellHeight(s.label, labelW, { bold: true }),
+        calcCellHeight(s.dr, colW("DR"), { bold: true }),
+        calcCellHeight(s.cr, colW("CR"), { bold: true }),
+      );
+
+      // Only draw outer left, DR divider, CR divider, right edge — NO inner col lines, NO horizontal lines
+      drawVLine(firstCol.x, y, summaryH);
+      drawVLine(drCol.x, y, summaryH);
+      drawVLine(crCol.x, y, summaryH);
+      drawVLine(PAGE_LEFT + TOTAL_W, y, summaryH);
+
+      writeCell(s.label, firstCol.x, y, labelW, summaryH, {
+        bold: true,
+        align: "right",
+      });
+      writeCell(s.dr, drCol.x, y, colW("DR"), summaryH, {
+        bold: true,
+        align: "right",
+      });
+      writeCell(s.cr, crCol.x, y, colW("CR"), summaryH, {
+        bold: true,
+        align: "right",
+      });
+
+      y += summaryH;
     });
 
-    drawHLine(col1X, y, TOTAL_W);
+    // Only top (already drawn before loop) and bottom border
+    drawHLine(PAGE_LEFT, y, TOTAL_W);
 
     doc.end();
 
@@ -6205,7 +7626,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForTrialBalance(
-    input: TrialBalanceRequestInput
+    input: TrialBalanceRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForTrialBalance::service");
 
@@ -6245,6 +7666,14 @@ const reportServiceRaw = {
     const ROW_H = 20;
     const FONT_SIZE = 8;
 
+    const getRowHeight = (text: string, width: number) => {
+      const textHeight = doc.heightOfString(String(text ?? ""), {
+        width: width - 6,
+      });
+
+      return Math.max(20, textHeight + 10);
+    };
+
     let y = 30;
 
     const fmtAmt = (value: number | string | null | undefined): string => {
@@ -6278,7 +7707,7 @@ const reportServiceRaw = {
         bold?: boolean;
         align?: "left" | "right" | "center";
         fontSize?: number;
-      } = {}
+      } = {},
     ) => {
       doc
         .font(opts.bold ? FONT_BOLD : FONT_NORMAL)
@@ -6286,10 +7715,7 @@ const reportServiceRaw = {
         .fillColor("#000000")
         .text(String(text ?? ""), x + 3, yt + 5, {
           width: w - 6,
-          height: h - 5,
           align: opts.align ?? "left",
-          ellipsis: true,
-          lineBreak: false,
         });
     };
 
@@ -6383,13 +7809,13 @@ const reportServiceRaw = {
     drawVLine(col7X + col7W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -6399,29 +7825,32 @@ const reportServiceRaw = {
     // ── DATA ROWS ──
     rows.forEach((r) => {
       checkPageBreak();
-      drawRowBorders(y);
+      const rowHeight = getRowHeight(r.ledger?.value ?? "", col1W);
 
-      writeCell(r.ledger?.value ?? "", col1X, y, col1W, ROW_H);
-      writeCell(fmtAmt(r.opening?.dr), col2X, y, col2W, ROW_H, {
+      drawRowBorders(y, rowHeight);
+
+      writeCell(r.ledger?.value ?? "", col1X, y, col1W, rowHeight);
+
+      writeCell(fmtAmt(r.opening?.dr), col2X, y, col2W, rowHeight, {
         align: "right",
       });
-      writeCell(fmtAmt(r.opening?.cr), col3X, y, col3W, ROW_H, {
+      writeCell(fmtAmt(r.opening?.cr), col3X, y, col3W, rowHeight, {
         align: "right",
       });
-      writeCell(fmtAmt(r.closing?.dr), col4X, y, col4W, ROW_H, {
+      writeCell(fmtAmt(r.closing?.dr), col4X, y, col4W, rowHeight, {
         align: "right",
       });
-      writeCell(fmtAmt(r.closing?.cr), col5X, y, col5W, ROW_H, {
+      writeCell(fmtAmt(r.closing?.cr), col5X, y, col5W, rowHeight, {
         align: "right",
       });
-      writeCell(fmtAmt(r.closing?.dr), col6X, y, col6W, ROW_H, {
+      writeCell(fmtAmt(r.closing?.dr), col6X, y, col6W, rowHeight, {
         align: "right",
       });
-      writeCell(fmtAmt(r.closing?.cr), col7X, y, col7W, ROW_H, {
+      writeCell(fmtAmt(r.closing?.cr), col7X, y, col7W, rowHeight, {
         align: "right",
       });
 
-      y += ROW_H;
+      y += rowHeight;
     });
 
     // ── SPACER ROW ──
@@ -6471,7 +7900,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForGroupSummary(
-    input: GroupSummaryRequestInput
+    input: GroupSummaryRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForGroupSummary::service");
 
@@ -6489,19 +7918,35 @@ const reportServiceRaw = {
     const PAGE_WIDTH = doc.page.width - 60;
     const PAGE_BOTTOM = doc.page.height - 30;
 
-    const TOTAL_EXCEL_W = 81;
+    // Proportions: 45 : 18 : 18 : 18 : 18 : 18 : 18  (total = 153)
+    const TOTAL_EXCEL_W = 153;
     const col1W = PAGE_WIDTH * (45 / TOTAL_EXCEL_W);
     const col2W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
     const col3W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col4W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col5W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col6W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col7W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
 
     const col1X = PAGE_LEFT;
     const col2X = col1X + col1W;
     const col3X = col2X + col2W;
+    const col4X = col3X + col3W;
+    const col5X = col4X + col4W;
+    const col6X = col5X + col5W;
+    const col7X = col6X + col6W;
 
-    const TOTAL_W = col1W + col2W + col3W;
+    const TOTAL_W = col1W + col2W + col3W + col4W + col5W + col6W + col7W;
 
     const ROW_H = 20;
-    const FONT_SIZE = 9;
+    const FONT_SIZE = 8;
+    const getRowHeight = (text: string, width: number) => {
+      const textHeight = doc.heightOfString(String(text ?? ""), {
+        width: width - 6,
+      });
+
+      return Math.max(20, textHeight + 10);
+    };
 
     let y = 30;
 
@@ -6537,7 +7982,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -6548,8 +7993,6 @@ const reportServiceRaw = {
           width: w - xOffset - 3,
           height: h - 5,
           align: opts.align ?? "left",
-          ellipsis: true,
-          lineBreak: false,
         });
     };
 
@@ -6557,26 +8000,46 @@ const reportServiceRaw = {
       drawVLine(col1X, rowY, h);
       drawVLine(col2X, rowY, h);
       drawVLine(col3X, rowY, h);
-      drawVLine(col3X + col3W, rowY, h);
+      drawVLine(col4X, rowY, h);
+      drawVLine(col5X, rowY, h);
+      drawVLine(col6X, rowY, h);
+      drawVLine(col7X, rowY, h);
+      drawVLine(col7X + col7W, rowY, h);
     };
 
     // ── Draw table headers ──
     const drawHeaders = () => {
-      // Group header — "Closing Balance" spanning col2-col3
+      // Group header row:
+      // col1: empty | col2-3: "Opening Balance" | col4-5: "Period Transaction" | col6-7: "Closing Balance"
       drawHLine(col1X, y, TOTAL_W);
       drawVLine(col1X, y, ROW_H);
-      drawVLine(col2X, y, ROW_H);
-      drawVLine(col3X + col3W, y, ROW_H);
+      drawVLine(col2X, y, ROW_H); // left edge of Opening Balance span
+      drawVLine(col4X, y, ROW_H); // left edge of Period Transaction span
+      drawVLine(col6X, y, ROW_H); // left edge of Closing Balance span
+      drawVLine(col7X + col7W, y, ROW_H); // right edge
 
-      writeCell("Closing Balance", col2X, y, col2W + col3W, ROW_H, {
+      writeCell("Opening Balance", col2X, y, col2W + col3W, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("Period Transaction", col4X, y, col4W + col5W, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("Closing Balance", col6X, y, col6W + col7W, ROW_H, {
         bold: true,
         align: "center",
       });
 
-      drawHLine(col2X, y + ROW_H, col2W + col3W);
+      // Bottom border under the span labels only (col2 onwards)
+      drawHLine(
+        col2X,
+        y + ROW_H,
+        col2W + col3W + col4W + col5W + col6W + col7W,
+      );
       y += ROW_H;
 
-      // Column labels
+      // Column labels row
       drawRowBorders(y);
       writeCell("PARTICULARS", col1X, y, col1W, ROW_H, {
         bold: true,
@@ -6584,6 +8047,10 @@ const reportServiceRaw = {
       });
       writeCell("DR", col2X, y, col2W, ROW_H, { bold: true, align: "center" });
       writeCell("CR", col3X, y, col3W, ROW_H, { bold: true, align: "center" });
+      writeCell("DR", col4X, y, col4W, ROW_H, { bold: true, align: "center" });
+      writeCell("CR", col5X, y, col5W, ROW_H, { bold: true, align: "center" });
+      writeCell("DR", col6X, y, col6W, ROW_H, { bold: true, align: "center" });
+      writeCell("CR", col7X, y, col7W, ROW_H, { bold: true, align: "center" });
 
       drawHLine(col1X, y + ROW_H, TOTAL_W);
       y += ROW_H;
@@ -6598,10 +8065,10 @@ const reportServiceRaw = {
       }
     };
 
-    // ── TITLE ──
+    // ── TITLE ── (spans full width)
     const titleH = ROW_H + 4;
     drawVLine(col1X, y, titleH);
-    drawVLine(col3X + col3W, y, titleH);
+    drawVLine(col7X + col7W, y, titleH);
     drawHLine(col1X, y, TOTAL_W);
     writeCell(
       `Group Summary for - ${roots[0]?.group?.value ?? ""}`,
@@ -6613,22 +8080,22 @@ const reportServiceRaw = {
         bold: true,
         fontSize: 16,
         align: "center",
-      }
+      },
     );
     y += titleH;
 
-    // ── DATE ──
+    // ── DATE ── (spans full width)
     drawVLine(col1X, y, ROW_H);
-    drawVLine(col3X + col3W, y, ROW_H);
+    drawVLine(col7X + col7W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -6640,48 +8107,93 @@ const reportServiceRaw = {
       // Direct ledgers
       root.ledger?.forEach((l) => {
         checkPageBreak();
-        drawRowBorders(y);
-        writeCell(l.ledger?.value ?? "", col1X, y, col1W, ROW_H);
-        writeCell(fmtAmt(l.closing?.dr), col2X, y, col2W, ROW_H, {
+        const rowHeight = getRowHeight(l.ledger?.value ?? "", col1W);
+
+        drawRowBorders(y, rowHeight);
+        writeCell(l.ledger?.value ?? "", col1X, y, col1W, rowHeight);
+        writeCell(fmtAmt(l.opening?.dr), col2X, y, col2W, rowHeight, {
           align: "right",
         });
-        writeCell(fmtAmt(l.closing?.cr), col3X, y, col3W, ROW_H, {
+        writeCell(fmtAmt(l.opening?.cr), col3X, y, col3W, rowHeight, {
           align: "right",
         });
-        y += ROW_H;
+        writeCell(fmtAmt(l.period?.dr), col4X, y, col4W, rowHeight, {
+          align: "right",
+        });
+        writeCell(fmtAmt(l.period?.cr), col5X, y, col5W, rowHeight, {
+          align: "right",
+        });
+        writeCell(fmtAmt(l.closing?.dr), col6X, y, col6W, rowHeight, {
+          align: "right",
+        });
+        writeCell(fmtAmt(l.closing?.cr), col7X, y, col7W, rowHeight, {
+          align: "right",
+        });
+        y += rowHeight;
       });
 
       // First-order children groups
       root.children?.forEach((child) => {
         checkPageBreak();
-        drawRowBorders(y);
-        writeCell(child.group?.value ?? "", col1X, y, col1W, ROW_H, {
+        const rowHeight = getRowHeight(child.group?.value ?? "", col1W);
+
+        drawRowBorders(y, rowHeight);
+        writeCell(child.group?.value ?? "", col1X, y, col1W, rowHeight, {
           bold: true,
         });
-        writeCell(fmtAmt(child.closing?.dr), col2X, y, col2W, ROW_H, {
-          bold: true,
-          align: "right",
-        });
-        writeCell(fmtAmt(child.closing?.cr), col3X, y, col3W, ROW_H, {
+        writeCell(fmtAmt(child.opening?.dr), col2X, y, col2W, rowHeight, {
           bold: true,
           align: "right",
         });
-        y += ROW_H;
+        writeCell(fmtAmt(child.opening?.cr), col3X, y, col3W, rowHeight, {
+          bold: true,
+          align: "right",
+        });
+        writeCell(fmtAmt(child.period?.dr), col4X, y, col4W, rowHeight, {
+          bold: true,
+          align: "right",
+        });
+        writeCell(fmtAmt(child.period?.cr), col5X, y, col5W, rowHeight, {
+          bold: true,
+          align: "right",
+        });
+        writeCell(fmtAmt(child.closing?.dr), col6X, y, col6W, rowHeight, {
+          bold: true,
+          align: "right",
+        });
+        writeCell(fmtAmt(child.closing?.cr), col7X, y, col7W, rowHeight, {
+          bold: true,
+          align: "right",
+        });
+        y += rowHeight;
 
         // Child's ledgers (indented)
         child.ledger?.forEach((l) => {
           checkPageBreak();
-          drawRowBorders(y);
-          writeCell(l.ledger?.value ?? "", col1X, y, col1W, ROW_H, {
+          const rowHeight = getRowHeight(l.ledger?.value ?? "", col1W);
+          drawRowBorders(y, rowHeight);
+          writeCell(l.ledger?.value ?? "", col1X, y, col1W, rowHeight, {
             indent: 12,
           });
-          writeCell(fmtAmt(l.closing?.dr), col2X, y, col2W, ROW_H, {
+          writeCell(fmtAmt(l.opening?.dr), col2X, y, col2W, rowHeight, {
             align: "right",
           });
-          writeCell(fmtAmt(l.closing?.cr), col3X, y, col3W, ROW_H, {
+          writeCell(fmtAmt(l.opening?.cr), col3X, y, col3W, rowHeight, {
             align: "right",
           });
-          y += ROW_H;
+          writeCell(fmtAmt(l.period?.dr), col4X, y, col4W, rowHeight, {
+            align: "right",
+          });
+          writeCell(fmtAmt(l.period?.cr), col5X, y, col5W, rowHeight, {
+            align: "right",
+          });
+          writeCell(fmtAmt(l.closing?.dr), col6X, y, col6W, rowHeight, {
+            align: "right",
+          });
+          writeCell(fmtAmt(l.closing?.cr), col7X, y, col7W, rowHeight, {
+            align: "right",
+          });
+          y += rowHeight;
         });
       });
     });
@@ -6697,11 +8209,27 @@ const reportServiceRaw = {
     drawRowBorders(y);
 
     writeCell("Grand Total", col1X, y, col1W, ROW_H, { bold: true });
-    writeCell(fmtAmt(totals.closingDr), col2X, y, col2W, ROW_H, {
+    writeCell(fmtAmt(totals.openingDr), col2X, y, col2W, ROW_H, {
       bold: true,
       align: "right",
     });
-    writeCell(fmtAmt(totals.closingCr), col3X, y, col3W, ROW_H, {
+    writeCell(fmtAmt(totals.openingCr), col3X, y, col3W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(totals.periodDr), col4X, y, col4W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(totals.periodCr), col5X, y, col5W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(totals.closingDr), col6X, y, col6W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(totals.closingCr), col7X, y, col7W, ROW_H, {
       bold: true,
       align: "right",
     });
@@ -6717,7 +8245,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForCashBankSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForCashBankSummary::service");
 
@@ -6736,19 +8264,28 @@ const reportServiceRaw = {
     const PAGE_WIDTH = doc.page.width - 60;
     const PAGE_BOTTOM = doc.page.height - 30;
 
-    const TOTAL_EXCEL_W = 81;
+    // 45 + 6×18 = 153
+    const TOTAL_EXCEL_W = 153;
     const col1W = PAGE_WIDTH * (45 / TOTAL_EXCEL_W);
     const col2W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
     const col3W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col4W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col5W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col6W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const col7W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
 
     const col1X = PAGE_LEFT;
     const col2X = col1X + col1W;
     const col3X = col2X + col2W;
+    const col4X = col3X + col3W;
+    const col5X = col4X + col4W;
+    const col6X = col5X + col5W;
+    const col7X = col6X + col6W;
 
-    const TOTAL_W = col1W + col2W + col3W;
+    const TOTAL_W = col1W + col2W + col3W + col4W + col5W + col6W + col7W;
 
     const ROW_H = 20;
-    const FONT_SIZE = 9;
+    const FONT_SIZE = 7;
 
     let y = 30;
 
@@ -6785,7 +8322,8 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+        wrap?: boolean;
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -6796,32 +8334,77 @@ const reportServiceRaw = {
           width: w - xOffset - 3,
           height: h - 5,
           align: opts.align ?? "left",
-          ellipsis: true,
-          lineBreak: false,
+          ellipsis: !opts.wrap,
+          lineBreak: !!opts.wrap,
         });
+    };
+
+    const getRowHeight = (
+      text: string,
+      w: number,
+      opts: { bold?: boolean; italic?: boolean; indent?: number } = {},
+    ): number => {
+      const xOffset = opts.indent ?? 3;
+      doc
+        .font(opts.bold ? FONT_BOLD : opts.italic ? FONT_ITALIC : FONT_NORMAL)
+        .fontSize(FONT_SIZE);
+      const textH = doc.heightOfString(text, {
+        width: w - xOffset - 3,
+        lineBreak: true,
+      });
+      return Math.max(ROW_H, textH + 5 + 4);
     };
 
     const drawRowBorders = (rowY: number, h: number = ROW_H) => {
       drawVLine(col1X, rowY, h);
       drawVLine(col2X, rowY, h);
       drawVLine(col3X, rowY, h);
-      drawVLine(col3X + col3W, rowY, h);
+      drawVLine(col4X, rowY, h);
+      drawVLine(col5X, rowY, h);
+      drawVLine(col6X, rowY, h);
+      drawVLine(col7X, rowY, h);
+      drawVLine(col7X + col7W, rowY, h);
     };
+
+    const checkPageBreakWithHeight = (h: number = ROW_H) => {
+      if (y + h > PAGE_BOTTOM) {
+        drawHLine(col1X, y, TOTAL_W);
+        doc.addPage();
+        y = 30;
+        drawHeaders();
+      }
+    };
+
+    const checkPageBreak = () => checkPageBreakWithHeight(ROW_H);
 
     // ── Draw table headers ──
     const drawHeaders = () => {
-      // Group header — "Closing Balance" spanning col2-col3
+      // Group header row: col1 empty | col2-3: Opening Balance | col4-5: Period Transaction | col6-7: Closing Balance
       drawHLine(col1X, y, TOTAL_W);
       drawVLine(col1X, y, ROW_H);
       drawVLine(col2X, y, ROW_H);
-      drawVLine(col3X + col3W, y, ROW_H);
+      drawVLine(col4X, y, ROW_H);
+      drawVLine(col6X, y, ROW_H);
+      drawVLine(col7X + col7W, y, ROW_H);
 
-      writeCell("Closing Balance", col2X, y, col2W + col3W, ROW_H, {
+      writeCell("Opening Balance", col2X, y, col2W + col3W, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("Period Transaction", col4X, y, col4W + col5W, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("Closing Balance", col6X, y, col6W + col7W, ROW_H, {
         bold: true,
         align: "center",
       });
 
-      drawHLine(col2X, y + ROW_H, col2W + col3W);
+      drawHLine(
+        col2X,
+        y + ROW_H,
+        col2W + col3W + col4W + col5W + col6W + col7W,
+      );
       y += ROW_H;
 
       // Column labels
@@ -6832,24 +8415,19 @@ const reportServiceRaw = {
       });
       writeCell("DR", col2X, y, col2W, ROW_H, { bold: true, align: "center" });
       writeCell("CR", col3X, y, col3W, ROW_H, { bold: true, align: "center" });
+      writeCell("DR", col4X, y, col4W, ROW_H, { bold: true, align: "center" });
+      writeCell("CR", col5X, y, col5W, ROW_H, { bold: true, align: "center" });
+      writeCell("DR", col6X, y, col6W, ROW_H, { bold: true, align: "center" });
+      writeCell("CR", col7X, y, col7W, ROW_H, { bold: true, align: "center" });
 
       drawHLine(col1X, y + ROW_H, TOTAL_W);
       y += ROW_H;
     };
 
-    const checkPageBreak = () => {
-      if (y + ROW_H > PAGE_BOTTOM) {
-        drawHLine(col1X, y, TOTAL_W);
-        doc.addPage();
-        y = 30;
-        drawHeaders();
-      }
-    };
-
     // ── TITLE ──
     const titleH = ROW_H + 4;
     drawVLine(col1X, y, titleH);
-    drawVLine(col3X + col3W, y, titleH);
+    drawVLine(col7X + col7W, y, titleH);
     drawHLine(col1X, y, TOTAL_W);
     writeCell("Cash Bank Summary", col1X, y, TOTAL_W, titleH, {
       bold: true,
@@ -6860,16 +8438,16 @@ const reportServiceRaw = {
 
     // ── DATE ──
     drawVLine(col1X, y, ROW_H);
-    drawVLine(col3X + col3W, y, ROW_H);
+    drawVLine(col7X + col7W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -6884,71 +8462,127 @@ const reportServiceRaw = {
       }
 
       // Root group row
-      checkPageBreak();
-      drawRowBorders(y);
-      writeCell(root.group?.value ?? "", col1X, y, col1W, ROW_H, {
-        bold: true,
-      });
-      writeCell(fmtAmt(root.closing?.dr), col2X, y, col2W, ROW_H, {
-        bold: true,
-        align: "right",
-      });
-      writeCell(fmtAmt(root.closing?.cr), col3X, y, col3W, ROW_H, {
+      const rootText = root.group?.value ?? "";
+      const rootOpts = { bold: true };
+      const rootH = getRowHeight(rootText, col1W, rootOpts);
+      checkPageBreakWithHeight(rootH);
+      drawRowBorders(y, rootH);
+      writeCell(rootText, col1X, y, col1W, rootH, { ...rootOpts, wrap: true });
+      writeCell(fmtAmt(root.opening?.dr), col2X, y, col2W, rootH, {
         bold: true,
         align: "right",
       });
-      y += ROW_H;
+      writeCell(fmtAmt(root.opening?.cr), col3X, y, col3W, rootH, {
+        bold: true,
+        align: "right",
+      });
+      writeCell(fmtAmt(root.period?.dr), col4X, y, col4W, rootH, {
+        bold: true,
+        align: "right",
+      });
+      writeCell(fmtAmt(root.period?.cr), col5X, y, col5W, rootH, {
+        bold: true,
+        align: "right",
+      });
+      writeCell(fmtAmt(root.closing?.dr), col6X, y, col6W, rootH, {
+        bold: true,
+        align: "right",
+      });
+      writeCell(fmtAmt(root.closing?.cr), col7X, y, col7W, rootH, {
+        bold: true,
+        align: "right",
+      });
+      y += rootH;
 
       // Direct ledgers (italic + indented)
       root.ledger?.forEach((l) => {
-        checkPageBreak();
-        drawRowBorders(y);
-        writeCell(l.ledger?.value ?? "", col1X, y, col1W, ROW_H, {
-          italic: true,
-          indent: 12,
-        });
-        writeCell(fmtAmt(l.closing?.dr), col2X, y, col2W, ROW_H, {
+        const text = l.ledger?.value ?? "";
+        const opts = { italic: true, indent: 12 };
+        const h = getRowHeight(text, col1W, opts);
+        checkPageBreakWithHeight(h);
+        drawRowBorders(y, h);
+        writeCell(text, col1X, y, col1W, h, { ...opts, wrap: true });
+        writeCell(fmtAmt(l.opening?.dr), col2X, y, col2W, h, {
           align: "right",
         });
-        writeCell(fmtAmt(l.closing?.cr), col3X, y, col3W, ROW_H, {
+        writeCell(fmtAmt(l.opening?.cr), col3X, y, col3W, h, {
           align: "right",
         });
-        y += ROW_H;
+        writeCell(fmtAmt(l.period?.dr), col4X, y, col4W, h, { align: "right" });
+        writeCell(fmtAmt(l.period?.cr), col5X, y, col5W, h, { align: "right" });
+        writeCell(fmtAmt(l.closing?.dr), col6X, y, col6W, h, {
+          align: "right",
+        });
+        writeCell(fmtAmt(l.closing?.cr), col7X, y, col7W, h, {
+          align: "right",
+        });
+        y += h;
       });
 
       // First-order children groups
       root.children?.forEach((child) => {
-        checkPageBreak();
-        drawRowBorders(y);
-        writeCell(child.group?.value ?? "", col1X, y, col1W, ROW_H, {
-          bold: true,
-          indent: 12,
+        const childText = child.group?.value ?? "";
+        const childOpts = { bold: true, indent: 12 };
+        const childH = getRowHeight(childText, col1W, childOpts);
+        checkPageBreakWithHeight(childH);
+        drawRowBorders(y, childH);
+        writeCell(childText, col1X, y, col1W, childH, {
+          ...childOpts,
+          wrap: true,
         });
-        writeCell(fmtAmt(child.closing?.dr), col2X, y, col2W, ROW_H, {
+        writeCell(fmtAmt(child.opening?.dr), col2X, y, col2W, childH, {
           bold: true,
           align: "right",
         });
-        writeCell(fmtAmt(child.closing?.cr), col3X, y, col3W, ROW_H, {
+        writeCell(fmtAmt(child.opening?.cr), col3X, y, col3W, childH, {
           bold: true,
           align: "right",
         });
-        y += ROW_H;
+        writeCell(fmtAmt(child.period?.dr), col4X, y, col4W, childH, {
+          bold: true,
+          align: "right",
+        });
+        writeCell(fmtAmt(child.period?.cr), col5X, y, col5W, childH, {
+          bold: true,
+          align: "right",
+        });
+        writeCell(fmtAmt(child.closing?.dr), col6X, y, col6W, childH, {
+          bold: true,
+          align: "right",
+        });
+        writeCell(fmtAmt(child.closing?.cr), col7X, y, col7W, childH, {
+          bold: true,
+          align: "right",
+        });
+        y += childH;
 
         // Child ledgers (italic + double indented)
         child.ledger?.forEach((l) => {
-          checkPageBreak();
-          drawRowBorders(y);
-          writeCell(l.ledger?.value ?? "", col1X, y, col1W, ROW_H, {
-            italic: true,
-            indent: 22,
-          });
-          writeCell(fmtAmt(l.closing?.dr), col2X, y, col2W, ROW_H, {
+          const text = l.ledger?.value ?? "";
+          const opts = { italic: true, indent: 22 };
+          const h = getRowHeight(text, col1W, opts);
+          checkPageBreakWithHeight(h);
+          drawRowBorders(y, h);
+          writeCell(text, col1X, y, col1W, h, { ...opts, wrap: true });
+          writeCell(fmtAmt(l.opening?.dr), col2X, y, col2W, h, {
             align: "right",
           });
-          writeCell(fmtAmt(l.closing?.cr), col3X, y, col3W, ROW_H, {
+          writeCell(fmtAmt(l.opening?.cr), col3X, y, col3W, h, {
             align: "right",
           });
-          y += ROW_H;
+          writeCell(fmtAmt(l.period?.dr), col4X, y, col4W, h, {
+            align: "right",
+          });
+          writeCell(fmtAmt(l.period?.cr), col5X, y, col5W, h, {
+            align: "right",
+          });
+          writeCell(fmtAmt(l.closing?.dr), col6X, y, col6W, h, {
+            align: "right",
+          });
+          writeCell(fmtAmt(l.closing?.cr), col7X, y, col7W, h, {
+            align: "right",
+          });
+          y += h;
         });
       });
     });
@@ -6962,17 +8596,31 @@ const reportServiceRaw = {
     checkPageBreak();
     drawHLine(col1X, y, TOTAL_W);
     drawRowBorders(y);
-
     writeCell("Grand Total", col1X, y, col1W, ROW_H, { bold: true });
-    writeCell(fmtAmt(totals.closingDr), col2X, y, col2W, ROW_H, {
+    writeCell(fmtAmt(totals.openingDr), col2X, y, col2W, ROW_H, {
       bold: true,
       align: "right",
     });
-    writeCell(fmtAmt(totals.closingCr), col3X, y, col3W, ROW_H, {
+    writeCell(fmtAmt(totals.openingCr), col3X, y, col3W, ROW_H, {
       bold: true,
       align: "right",
     });
-
+    writeCell(fmtAmt(totals.periodDr), col4X, y, col4W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(totals.periodCr), col5X, y, col5W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(totals.closingDr), col6X, y, col6W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(totals.closingCr), col7X, y, col7W, ROW_H, {
+      bold: true,
+      align: "right",
+    });
     drawHLine(col1X, y + ROW_H, TOTAL_W);
     y += ROW_H;
 
@@ -6984,7 +8632,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForReceivableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForReceivableSummary::service");
 
@@ -7011,13 +8659,15 @@ const reportServiceRaw = {
     const PAGE_WIDTH = doc.page.width - 60;
     const PAGE_BOTTOM = doc.page.height - 30;
 
-    const TOTAL_EXCEL_W = hasAgeing ? 45 + 18 + bucketCount * 16 + 18 + 18 : 81;
+    // Total excel column units: col1(45) + ageing cols + opening(18+18) + period(18+18) + closing(18+18)
+    const TOTAL_EXCEL_W = hasAgeing
+      ? 45 + 18 + bucketCount * 16 + 18 + 18 + 18 + 18 + 18 + 18
+      : 45 + 18 + 18 + 18 + 18 + 18 + 18;
 
     const col1W = PAGE_WIDTH * (45 / TOTAL_EXCEL_W);
     const col2W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
     const bucketWs = buckets.map(() => PAGE_WIDTH * (16 / TOTAL_EXCEL_W));
-    const pendingW = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
-    const advanceW = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const colPairW = PAGE_WIDTH * (18 / TOTAL_EXCEL_W); // width for each pending/advance col
 
     const col1X = PAGE_LEFT;
     const col2X = col1X + col1W;
@@ -7029,13 +8679,26 @@ const reportServiceRaw = {
       bx += bucketWs[i];
     });
 
-    const pendingX = hasAgeing ? bx : col2X;
-    const advanceX = pendingX + pendingW;
-    const rightEdge = advanceX + advanceW;
+    const openingPendingX = hasAgeing ? bx : col2X;
+    const openingAdvanceX = openingPendingX + colPairW;
+    const periodPendingX = openingAdvanceX + colPairW;
+    const periodAdvanceX = periodPendingX + colPairW;
+    const closingPendingX = periodAdvanceX + colPairW;
+    const closingAdvanceX = closingPendingX + colPairW;
+    const rightEdge = closingAdvanceX + colPairW;
     const TOTAL_W = rightEdge - PAGE_LEFT;
 
     const ROW_H = 18;
-    const FONT_SIZE = hasAgeing ? 7 : 9;
+    const FONT_SIZE = hasAgeing ? 5 : 7;
+
+    const getRowHeight = (text: string, width: number) => {
+      const h = doc.heightOfString(String(text ?? ""), {
+        width: width - 6,
+        align: "left",
+      });
+
+      return Math.max(18, h + 8);
+    };
 
     let y = 30;
 
@@ -7072,7 +8735,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -7080,11 +8743,8 @@ const reportServiceRaw = {
         .fontSize(opts.fontSize ?? FONT_SIZE)
         .fillColor("#000000")
         .text(String(text ?? ""), x + xOffset, yt + 4, {
-          width: w - xOffset - 3,
-          height: h - 4,
+          width: w - xOffset - 4,
           align: opts.align ?? "left",
-          ellipsis: true,
-          lineBreak: false,
         });
     };
 
@@ -7100,8 +8760,12 @@ const reportServiceRaw = {
           }
         });
       }
-      drawVLine(pendingX, rowY, h);
-      drawVLine(advanceX, rowY, h);
+      drawVLine(openingPendingX, rowY, h);
+      drawVLine(openingAdvanceX, rowY, h);
+      drawVLine(periodPendingX, rowY, h);
+      drawVLine(periodAdvanceX, rowY, h);
+      drawVLine(closingPendingX, rowY, h);
+      drawVLine(closingAdvanceX, rowY, h);
       drawVLine(rightEdge, rowY, h);
     };
 
@@ -7129,13 +8793,32 @@ const reportServiceRaw = {
         drawHLine(col2X + col2W, y + ROW_H, ageingSpanW);
       }
 
-      const closingSpanW = advanceX + advanceW - pendingX;
-      writeCell("Closing Balance", pendingX, y, closingSpanW, ROW_H, {
+      // Opening Balance span
+      const openingSpanW = colPairW * 2;
+      writeCell("Opening Balance", openingPendingX, y, openingSpanW, ROW_H, {
         bold: true,
         align: "center",
       });
-      drawVLine(pendingX, y, ROW_H);
-      drawHLine(pendingX, y + ROW_H, closingSpanW);
+      drawVLine(openingPendingX, y, ROW_H);
+      drawHLine(openingPendingX, y + ROW_H, openingSpanW);
+
+      // Period Transaction span
+      const periodSpanW = colPairW * 2;
+      writeCell("Period Transaction", periodPendingX, y, periodSpanW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      drawVLine(periodPendingX, y, ROW_H);
+      drawHLine(periodPendingX, y + ROW_H, periodSpanW);
+
+      // Closing Balance span
+      const closingSpanW = colPairW * 2;
+      writeCell("Closing Balance", closingPendingX, y, closingSpanW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      drawVLine(closingPendingX, y, ROW_H);
+      drawHLine(closingPendingX, y + ROW_H, closingSpanW);
       y += ROW_H;
 
       // Column labels row
@@ -7160,11 +8843,27 @@ const reportServiceRaw = {
         });
       }
 
-      writeCell("PENDING", pendingX, y, pendingW, ROW_H, {
+      writeCell("PENDING", openingPendingX, y, colPairW, ROW_H, {
         bold: true,
         align: "center",
       });
-      writeCell("ADVANCE", advanceX, y, advanceW, ROW_H, {
+      writeCell("ADVANCE", openingAdvanceX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("PENDING", periodPendingX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("ADVANCE", periodAdvanceX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("PENDING", closingPendingX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("ADVANCE", closingAdvanceX, y, colPairW, ROW_H, {
         bold: true,
         align: "center",
       });
@@ -7199,13 +8898,13 @@ const reportServiceRaw = {
     drawVLine(rightEdge, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -7230,20 +8929,26 @@ const reportServiceRaw = {
       label: string,
       pendingAmt: number | string,
       bucketAmounts: (number | string)[],
+      openingPending: number | string,
+      openingAdvance: number | string,
+      periodPending: number | string,
+      periodAdvance: number | string,
       closingPending: number | string,
       closingAdvance: number | string,
-      opts: { bold?: boolean; italic?: boolean; indent?: number } = {}
+      opts: { bold?: boolean; italic?: boolean; indent?: number } = {},
     ) => {
       checkPageBreak();
-      drawRowBorders(y);
-      writeCell(label, col1X, y, col1W, ROW_H, {
+      const rowHeight = getRowHeight(label, col1W);
+
+      drawRowBorders(y, rowHeight);
+      writeCell(label, col1X, y, col1W, rowHeight, {
         bold: opts.bold,
         italic: opts.italic,
         indent: opts.indent ?? 3,
       });
 
       if (hasAgeing) {
-        writeCell(fmtAmt(pendingAmt), col2X, y, col2W, ROW_H, {
+        writeCell(fmtAmt(pendingAmt), col2X, y, col2W, rowHeight, {
           bold: opts.bold,
           align: "right",
         });
@@ -7253,21 +8958,53 @@ const reportServiceRaw = {
             bucketXs[i],
             y,
             bucketWs[i],
-            ROW_H,
-            { align: "right" }
+            rowHeight,
+            { align: "right" },
           );
         });
       }
 
-      writeCell(fmtAmt(closingPending), pendingX, y, pendingW, ROW_H, {
+      writeCell(
+        fmtAmt(openingPending),
+        openingPendingX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      writeCell(
+        fmtAmt(openingAdvance),
+        openingAdvanceX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      writeCell(fmtAmt(periodPending), periodPendingX, y, colPairW, rowHeight, {
         bold: opts.bold,
         align: "right",
       });
-      writeCell(fmtAmt(closingAdvance), advanceX, y, advanceW, ROW_H, {
+      writeCell(fmtAmt(periodAdvance), periodAdvanceX, y, colPairW, rowHeight, {
         bold: opts.bold,
         align: "right",
       });
-      y += ROW_H;
+      writeCell(
+        fmtAmt(closingPending),
+        closingPendingX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      writeCell(
+        fmtAmt(closingAdvance),
+        closingAdvanceX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      y += rowHeight;
     };
 
     // ── DATA ROWS ──
@@ -7282,11 +9019,21 @@ const reportServiceRaw = {
         const lPA = getPendingAdvance(
           l.closing?.dr ?? 0,
           l.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
+        );
+        const OPA = getPendingAdvance(
+          l.opening?.dr ?? 0,
+          l.opening?.cr ?? 0,
+          "receivable",
+        );
+        const PPA = getPendingAdvance(
+          l.period?.dr ?? 0,
+          l.period?.cr ?? 0,
+          "receivable",
         );
         const bAmounts = buckets.map((b) => {
           const bucket = ageingRow?.bucketAmounts.find(
-            (ba) => ba.from === b.from && ba.to === b.to
+            (ba) => ba.from === b.from && ba.to === b.to,
           );
           const amt = bucket?.amount ?? 0;
           return amt > 0 ? amt : "";
@@ -7295,11 +9042,13 @@ const reportServiceRaw = {
           l.ledger?.value ?? "",
           ageingRow?.pending ?? "",
           bAmounts,
+          OPA.pending,
+          OPA.advance,
+          PPA.pending,
+          PPA.advance,
           lPA.pending,
           lPA.advance,
-          {
-            italic: true,
-          }
+          { italic: true },
         );
       });
 
@@ -7307,15 +9056,29 @@ const reportServiceRaw = {
         const childPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "receivable"
+          "receivable",
+        );
+        const childOPA = getPendingAdvance(
+          child.opening?.dr ?? 0,
+          child.opening?.cr ?? 0,
+          "receivable",
+        );
+        const childPPA = getPendingAdvance(
+          child.period?.dr ?? 0,
+          child.period?.cr ?? 0,
+          "receivable",
         );
         writeDataRow(
           child.group?.value ?? "",
           childPA.pending,
           buckets.map(() => ""),
+          childOPA.pending,
+          childOPA.advance,
+          childPPA.pending,
+          childPPA.advance,
           childPA.pending,
           childPA.advance,
-          { bold: true }
+          { bold: true },
         );
 
         child.ledger?.forEach((l) => {
@@ -7325,11 +9088,21 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "receivable"
+            "receivable",
+          );
+          const OPA = getPendingAdvance(
+            l.opening?.dr ?? 0,
+            l.opening?.cr ?? 0,
+            "receivable",
+          );
+          const PPA = getPendingAdvance(
+            l.period?.dr ?? 0,
+            l.period?.cr ?? 0,
+            "receivable",
           );
           const bAmounts = buckets.map((b) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amt = bucket?.amount ?? 0;
             return amt > 0 ? amt : "";
@@ -7338,12 +9111,13 @@ const reportServiceRaw = {
             l.ledger?.value ?? "",
             ageingRow?.pending ?? "",
             bAmounts,
+            OPA.pending,
+            OPA.advance,
+            PPA.pending,
+            PPA.advance,
             lPA.pending,
             lPA.advance,
-            {
-              italic: true,
-              indent: 12,
-            }
+            { italic: true, indent: 12 },
           );
         });
       });
@@ -7362,7 +9136,17 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "receivable"
+      "receivable",
+    );
+    const TOPA = getPendingAdvance(
+      totals.openingDr ?? 0,
+      totals.openingCr ?? 0,
+      "receivable",
+    );
+    const TPPA = getPendingAdvance(
+      totals.periodDr ?? 0,
+      totals.periodCr ?? 0,
+      "receivable",
     );
 
     writeCell("Grand Total", col1X, y, col1W, ROW_H, { bold: true });
@@ -7374,7 +9158,7 @@ const reportServiceRaw = {
       });
       buckets.forEach((b, i) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amt = bucket?.amount ?? 0;
         writeCell(
@@ -7383,16 +9167,32 @@ const reportServiceRaw = {
           y,
           bucketWs[i],
           ROW_H,
-          { bold: true, align: "right" }
+          { bold: true, align: "right" },
         );
       });
     }
 
-    writeCell(fmtAmt(TPA.pending), pendingX, y, pendingW, ROW_H, {
+    writeCell(fmtAmt(TOPA.pending), openingPendingX, y, colPairW, ROW_H, {
       bold: true,
       align: "right",
     });
-    writeCell(fmtAmt(TPA.advance), advanceX, y, advanceW, ROW_H, {
+    writeCell(fmtAmt(TOPA.advance), openingAdvanceX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPPA.pending), periodPendingX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPPA.advance), periodAdvanceX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPA.pending), closingPendingX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPA.advance), closingAdvanceX, y, colPairW, ROW_H, {
       bold: true,
       align: "right",
     });
@@ -7408,7 +9208,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForPayableSummary(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForPayableSummary::service");
 
@@ -7435,13 +9235,14 @@ const reportServiceRaw = {
     const PAGE_WIDTH = doc.page.width - 60;
     const PAGE_BOTTOM = doc.page.height - 30;
 
-    const TOTAL_EXCEL_W = hasAgeing ? 45 + 18 + bucketCount * 16 + 18 + 18 : 81;
+    const TOTAL_EXCEL_W = hasAgeing
+      ? 45 + 18 + bucketCount * 16 + 18 + 18 + 18 + 18 + 18 + 18
+      : 45 + 18 + 18 + 18 + 18 + 18 + 18;
 
     const col1W = PAGE_WIDTH * (45 / TOTAL_EXCEL_W);
     const col2W = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
     const bucketWs = buckets.map(() => PAGE_WIDTH * (16 / TOTAL_EXCEL_W));
-    const pendingW = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
-    const advanceW = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
+    const colPairW = PAGE_WIDTH * (18 / TOTAL_EXCEL_W);
 
     const col1X = PAGE_LEFT;
     const col2X = col1X + col1W;
@@ -7453,13 +9254,26 @@ const reportServiceRaw = {
       bx += bucketWs[i];
     });
 
-    const pendingX = hasAgeing ? bx : col2X;
-    const advanceX = pendingX + pendingW;
-    const rightEdge = advanceX + advanceW;
+    const openingPendingX = hasAgeing ? bx : col2X;
+    const openingAdvanceX = openingPendingX + colPairW;
+    const periodPendingX = openingAdvanceX + colPairW;
+    const periodAdvanceX = periodPendingX + colPairW;
+    const closingPendingX = periodAdvanceX + colPairW;
+    const closingAdvanceX = closingPendingX + colPairW;
+    const rightEdge = closingAdvanceX + colPairW;
     const TOTAL_W = rightEdge - PAGE_LEFT;
 
     const ROW_H = 18;
-    const FONT_SIZE = hasAgeing ? 7 : 9;
+    const FONT_SIZE = hasAgeing ? 5 : 7;
+
+    const getRowHeight = (text: string, width: number) => {
+      const h = doc.heightOfString(String(text ?? ""), {
+        width: width - 6,
+        align: "left",
+      });
+
+      return Math.max(18, h + 8);
+    };
 
     let y = 30;
 
@@ -7496,7 +9310,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -7504,11 +9318,8 @@ const reportServiceRaw = {
         .fontSize(opts.fontSize ?? FONT_SIZE)
         .fillColor("#000000")
         .text(String(text ?? ""), x + xOffset, yt + 4, {
-          width: w - xOffset - 3,
-          height: h - 4,
+          width: w - xOffset - 4,
           align: opts.align ?? "left",
-          ellipsis: true,
-          lineBreak: false,
         });
     };
 
@@ -7524,8 +9335,12 @@ const reportServiceRaw = {
           }
         });
       }
-      drawVLine(pendingX, rowY, h);
-      drawVLine(advanceX, rowY, h);
+      drawVLine(openingPendingX, rowY, h);
+      drawVLine(openingAdvanceX, rowY, h);
+      drawVLine(periodPendingX, rowY, h);
+      drawVLine(periodAdvanceX, rowY, h);
+      drawVLine(closingPendingX, rowY, h);
+      drawVLine(closingAdvanceX, rowY, h);
       drawVLine(rightEdge, rowY, h);
     };
 
@@ -7552,13 +9367,32 @@ const reportServiceRaw = {
         drawHLine(col2X + col2W, y + ROW_H, ageingSpanW);
       }
 
-      const closingSpanW = advanceX + advanceW - pendingX;
-      writeCell("Closing Balance", pendingX, y, closingSpanW, ROW_H, {
+      // Opening Balance span
+      const openingSpanW = colPairW * 2;
+      writeCell("Opening Balance", openingPendingX, y, openingSpanW, ROW_H, {
         bold: true,
         align: "center",
       });
-      drawVLine(pendingX, y, ROW_H);
-      drawHLine(pendingX, y + ROW_H, closingSpanW);
+      drawVLine(openingPendingX, y, ROW_H);
+      drawHLine(openingPendingX, y + ROW_H, openingSpanW);
+
+      // Period Transaction span
+      const periodSpanW = colPairW * 2;
+      writeCell("Period Transaction", periodPendingX, y, periodSpanW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      drawVLine(periodPendingX, y, ROW_H);
+      drawHLine(periodPendingX, y + ROW_H, periodSpanW);
+
+      // Closing Balance span
+      const closingSpanW = colPairW * 2;
+      writeCell("Closing Balance", closingPendingX, y, closingSpanW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      drawVLine(closingPendingX, y, ROW_H);
+      drawHLine(closingPendingX, y + ROW_H, closingSpanW);
       y += ROW_H;
 
       // Column labels row
@@ -7583,11 +9417,27 @@ const reportServiceRaw = {
         });
       }
 
-      writeCell("PENDING", pendingX, y, pendingW, ROW_H, {
+      writeCell("PENDING", openingPendingX, y, colPairW, ROW_H, {
         bold: true,
         align: "center",
       });
-      writeCell("ADVANCE", advanceX, y, advanceW, ROW_H, {
+      writeCell("ADVANCE", openingAdvanceX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("PENDING", periodPendingX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("ADVANCE", periodAdvanceX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("PENDING", closingPendingX, y, colPairW, ROW_H, {
+        bold: true,
+        align: "center",
+      });
+      writeCell("ADVANCE", closingAdvanceX, y, colPairW, ROW_H, {
         bold: true,
         align: "center",
       });
@@ -7622,13 +9472,13 @@ const reportServiceRaw = {
     drawVLine(rightEdge, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -7653,20 +9503,25 @@ const reportServiceRaw = {
       label: string,
       pendingAmt: number | string,
       bucketAmounts: (number | string)[],
+      openingPending: number | string,
+      openingAdvance: number | string,
+      periodPending: number | string,
+      periodAdvance: number | string,
       closingPending: number | string,
       closingAdvance: number | string,
-      opts: { bold?: boolean; italic?: boolean; indent?: number } = {}
+      opts: { bold?: boolean; italic?: boolean; indent?: number } = {},
     ) => {
       checkPageBreak();
-      drawRowBorders(y);
-      writeCell(label, col1X, y, col1W, ROW_H, {
+      const rowHeight = getRowHeight(label, col1W);
+      drawRowBorders(y, rowHeight);
+      writeCell(label, col1X, y, col1W, rowHeight, {
         bold: opts.bold,
         italic: opts.italic,
         indent: opts.indent ?? 3,
       });
 
       if (hasAgeing) {
-        writeCell(fmtAmt(pendingAmt), col2X, y, col2W, ROW_H, {
+        writeCell(fmtAmt(pendingAmt), col2X, y, col2W, rowHeight, {
           bold: opts.bold,
           align: "right",
         });
@@ -7676,21 +9531,53 @@ const reportServiceRaw = {
             bucketXs[i],
             y,
             bucketWs[i],
-            ROW_H,
-            { align: "right" }
+            rowHeight,
+            { align: "right" },
           );
         });
       }
 
-      writeCell(fmtAmt(closingPending), pendingX, y, pendingW, ROW_H, {
+      writeCell(
+        fmtAmt(openingPending),
+        openingPendingX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      writeCell(
+        fmtAmt(openingAdvance),
+        openingAdvanceX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      writeCell(fmtAmt(periodPending), periodPendingX, y, colPairW, rowHeight, {
         bold: opts.bold,
         align: "right",
       });
-      writeCell(fmtAmt(closingAdvance), advanceX, y, advanceW, ROW_H, {
+      writeCell(fmtAmt(periodAdvance), periodAdvanceX, y, colPairW, rowHeight, {
         bold: opts.bold,
         align: "right",
       });
-      y += ROW_H;
+      writeCell(
+        fmtAmt(closingPending),
+        closingPendingX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      writeCell(
+        fmtAmt(closingAdvance),
+        closingAdvanceX,
+        y,
+        colPairW,
+        rowHeight,
+        { bold: opts.bold, align: "right" },
+      );
+      y += rowHeight;
     };
 
     // ── DATA ROWS ──
@@ -7705,11 +9592,21 @@ const reportServiceRaw = {
         const IPA = getPendingAdvance(
           l.closing?.dr ?? 0,
           l.closing?.cr ?? 0,
-          "payable"
+          "payable",
+        );
+        const OPA = getPendingAdvance(
+          l.opening?.dr ?? 0,
+          l.opening?.cr ?? 0,
+          "payable",
+        );
+        const PPA = getPendingAdvance(
+          l.period?.dr ?? 0,
+          l.period?.cr ?? 0,
+          "payable",
         );
         const bAmounts = buckets.map((b) => {
           const bucket = ageingRow?.bucketAmounts.find(
-            (ba) => ba.from === b.from && ba.to === b.to
+            (ba) => ba.from === b.from && ba.to === b.to,
           );
           const amt = bucket?.amount ?? 0;
           return amt > 0 ? amt : "";
@@ -7718,11 +9615,13 @@ const reportServiceRaw = {
           l.ledger?.value ?? "",
           ageingRow?.pending ?? "",
           bAmounts,
+          OPA.pending,
+          OPA.advance,
+          PPA.pending,
+          PPA.advance,
           IPA.pending,
           IPA.advance,
-          {
-            italic: true,
-          }
+          { italic: true },
         );
       });
 
@@ -7730,15 +9629,29 @@ const reportServiceRaw = {
         const CPA = getPendingAdvance(
           child.closing?.dr ?? 0,
           child.closing?.cr ?? 0,
-          "payable"
+          "payable",
+        );
+        const COPA = getPendingAdvance(
+          child.opening?.dr ?? 0,
+          child.opening?.cr ?? 0,
+          "payable",
+        );
+        const CPPA = getPendingAdvance(
+          child.period?.dr ?? 0,
+          child.period?.cr ?? 0,
+          "payable",
         );
         writeDataRow(
           child.group?.value ?? "",
           CPA.pending,
           buckets.map(() => ""),
+          COPA.pending,
+          COPA.advance,
+          CPPA.pending,
+          CPPA.advance,
           CPA.pending,
           CPA.advance,
-          { bold: true }
+          { bold: true },
         );
 
         child.ledger?.forEach((l) => {
@@ -7748,11 +9661,21 @@ const reportServiceRaw = {
           const lPA = getPendingAdvance(
             l.closing?.dr ?? 0,
             l.closing?.cr ?? 0,
-            "payable"
+            "payable",
+          );
+          const OPA = getPendingAdvance(
+            l.opening?.dr ?? 0,
+            l.opening?.cr ?? 0,
+            "payable",
+          );
+          const PPA = getPendingAdvance(
+            l.period?.dr ?? 0,
+            l.period?.cr ?? 0,
+            "payable",
           );
           const bAmounts = buckets.map((b) => {
             const bucket = ageingRow?.bucketAmounts.find(
-              (ba) => ba.from === b.from && ba.to === b.to
+              (ba) => ba.from === b.from && ba.to === b.to,
             );
             const amt = bucket?.amount ?? 0;
             return amt > 0 ? amt : "";
@@ -7761,12 +9684,13 @@ const reportServiceRaw = {
             l.ledger?.value ?? "",
             ageingRow?.pending ?? "",
             bAmounts,
+            OPA.pending,
+            OPA.advance,
+            PPA.pending,
+            PPA.advance,
             lPA.pending,
             lPA.advance,
-            {
-              italic: true,
-              indent: 12,
-            }
+            { italic: true, indent: 12 },
           );
         });
       });
@@ -7785,7 +9709,17 @@ const reportServiceRaw = {
     const TPA = getPendingAdvance(
       totals.closingDr ?? 0,
       totals.closingCr ?? 0,
-      "payable"
+      "payable",
+    );
+    const TOPA = getPendingAdvance(
+      totals.openingDr ?? 0,
+      totals.openingCr ?? 0,
+      "payable",
+    );
+    const TPPA = getPendingAdvance(
+      totals.periodDr ?? 0,
+      totals.periodCr ?? 0,
+      "payable",
     );
 
     writeCell("Grand Total", col1X, y, col1W, ROW_H, { bold: true });
@@ -7797,7 +9731,7 @@ const reportServiceRaw = {
       });
       buckets.forEach((b, i) => {
         const bucket = ageing.totals.bucketAmounts.find(
-          (ba) => ba.from === b.from && ba.to === b.to
+          (ba) => ba.from === b.from && ba.to === b.to,
         );
         const amt = bucket?.amount ?? 0;
         writeCell(
@@ -7806,16 +9740,32 @@ const reportServiceRaw = {
           y,
           bucketWs[i],
           ROW_H,
-          { bold: true, align: "right" }
+          { bold: true, align: "right" },
         );
       });
     }
 
-    writeCell(fmtAmt(TPA.pending), pendingX, y, pendingW, ROW_H, {
+    writeCell(fmtAmt(TOPA.pending), openingPendingX, y, colPairW, ROW_H, {
       bold: true,
       align: "right",
     });
-    writeCell(fmtAmt(TPA.advance), advanceX, y, advanceW, ROW_H, {
+    writeCell(fmtAmt(TOPA.advance), openingAdvanceX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPPA.pending), periodPendingX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPPA.advance), periodAdvanceX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPA.pending), closingPendingX, y, colPairW, ROW_H, {
+      bold: true,
+      align: "right",
+    });
+    writeCell(fmtAmt(TPA.advance), closingAdvanceX, y, colPairW, ROW_H, {
       bold: true,
       align: "right",
     });
@@ -7831,7 +9781,7 @@ const reportServiceRaw = {
   },
 
   async buildPdfForProfitLoss(
-    input: ReportCommonRequestInput
+    input: ReportCommonRequestInput,
   ): Promise<Buffer> {
     logger.info("entering::buildPdfForProfitLoss::service");
 
@@ -7899,7 +9849,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -8283,13 +10233,13 @@ const reportServiceRaw = {
     drawVLine(col4X + col4W, y, ROW_H);
     writeCell(
       `(${dayjs(input.fromDate).format("MMM D, YYYY")} – ${dayjs(
-        input.toDate
+        input.toDate,
       ).format("MMM D, YYYY")})`,
       col1X,
       y,
       TOTAL_W,
       ROW_H,
-      { fontSize: 10, align: "center" }
+      { fontSize: 10, align: "center" },
     );
     y += ROW_H;
 
@@ -8325,7 +10275,7 @@ const reportServiceRaw = {
           {
             bold: left.bold,
             align: "right",
-          }
+          },
         );
       }
 
@@ -8342,7 +10292,7 @@ const reportServiceRaw = {
           {
             bold: right.bold,
             align: "right",
-          }
+          },
         );
       }
 
@@ -8417,7 +10367,7 @@ const reportServiceRaw = {
     const PAGE_BOTTOM = doc.page.height - 30;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     const ROW_H = 20;
@@ -8458,7 +10408,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -8843,7 +10793,7 @@ const reportServiceRaw = {
           bold: true,
           fontSize: 14,
           align: "center",
-        }
+        },
       );
       y += titleH;
 
@@ -8860,7 +10810,7 @@ const reportServiceRaw = {
 
       const renderGroupNode = (
         node: CashFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         checkPageBreak();
         drawRowBorders(y);
@@ -8955,7 +10905,7 @@ const reportServiceRaw = {
     const PAGE_BOTTOM = doc.page.height - 30;
 
     const dateRange = `(${dayjs(input.fromDate).format(
-      "MMM D, YYYY"
+      "MMM D, YYYY",
     )} – ${dayjs(input.toDate).format("MMM D, YYYY")})`;
 
     const ROW_H = 20;
@@ -9001,7 +10951,7 @@ const reportServiceRaw = {
         align?: "left" | "right" | "center";
         fontSize?: number;
         indent?: number;
-      } = {}
+      } = {},
     ) => {
       const xOffset = opts.indent ?? 3;
       doc
@@ -9351,7 +11301,7 @@ const reportServiceRaw = {
             y,
             col2W,
             ROW_H,
-            { bold: true, align: "right" }
+            { bold: true, align: "right" },
           );
           writeCell(
             fmtBal(g.closing.dr, g.closing.cr),
@@ -9359,7 +11309,7 @@ const reportServiceRaw = {
             y,
             col3W,
             ROW_H,
-            { bold: true, align: "right" }
+            { bold: true, align: "right" },
           );
           writeCell(
             increase !== 0 ? increase.toFixed(2) : "",
@@ -9367,10 +11317,10 @@ const reportServiceRaw = {
             y,
             col4W,
             ROW_H,
-            { bold: true, align: "right" }
+            { bold: true, align: "right" },
           );
           y += ROW_H;
-        }
+        },
       );
 
       checkPageBreakWc();
@@ -9380,24 +11330,24 @@ const reportServiceRaw = {
       writeCell(
         fmtBal(
           workingCapital.openingWorkingCapital.dr,
-          workingCapital.openingWorkingCapital.cr
+          workingCapital.openingWorkingCapital.cr,
         ),
         col2X,
         y,
         col2W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       writeCell(
         fmtBal(
           workingCapital.closingWorkingCapital.dr,
-          workingCapital.closingWorkingCapital.cr
+          workingCapital.closingWorkingCapital.cr,
         ),
         col3X,
         y,
         col3W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       writeCell(
         workingCapital.increase !== 0 ? workingCapital.increase.toFixed(2) : "",
@@ -9408,7 +11358,7 @@ const reportServiceRaw = {
         {
           bold: true,
           align: "right",
-        }
+        },
       );
       drawHLine(col1X, y + ROW_H, TOTAL_W);
       y += ROW_H;
@@ -9508,7 +11458,7 @@ const reportServiceRaw = {
           bold: true,
           fontSize: 13,
           align: "center",
-        }
+        },
       );
       y += titleH;
 
@@ -9535,7 +11485,7 @@ const reportServiceRaw = {
         {
           bold: true,
           align: "center",
-        }
+        },
       );
       drawHLine(col2X, y + ROW_H, col2W + col3W + col4W + col5W);
       y += ROW_H;
@@ -9556,7 +11506,7 @@ const reportServiceRaw = {
           ROW_H,
           {
             align: "right",
-          }
+          },
         );
         writeCell(fmtAmt(ledger.amount.debit), col3X, y, col3W, ROW_H, {
           align: "right",
@@ -9572,14 +11522,14 @@ const reportServiceRaw = {
           ROW_H,
           {
             align: "right",
-          }
+          },
         );
         y += ROW_H;
       };
 
       const renderGroupNode = (
         node: FundFlowGroupRecursiveRow,
-        indent: number
+        indent: number,
       ) => {
         checkPageBreak();
         drawRowBorders(y);
@@ -9596,7 +11546,7 @@ const reportServiceRaw = {
           {
             bold: indent === 0,
             align: "right",
-          }
+          },
         );
         writeCell(fmtAmt(node.amount.debit), col3X, y, col3W, ROW_H, {
           bold: indent === 0,
@@ -9615,7 +11565,7 @@ const reportServiceRaw = {
           {
             bold: indent === 0,
             align: "right",
-          }
+          },
         );
         y += ROW_H;
 
@@ -9640,7 +11590,7 @@ const reportServiceRaw = {
         y,
         col2W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       writeCell(fmtAmt(totals.debit), col3X, y, col3W, ROW_H, {
         bold: true,
@@ -9656,7 +11606,7 @@ const reportServiceRaw = {
         y,
         col5W,
         ROW_H,
-        { bold: true, align: "right" }
+        { bold: true, align: "right" },
       );
       drawHLine(col1X, y + ROW_H, TOTAL_W);
       y += ROW_H;
@@ -9672,5 +11622,5 @@ const reportServiceRaw = {
 
 export const reportService = auditProxy.createAuditedService(
   "report",
-  reportServiceRaw
+  reportServiceRaw,
 );

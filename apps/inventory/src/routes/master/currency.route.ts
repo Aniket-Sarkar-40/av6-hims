@@ -46,7 +46,7 @@ currencyRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "CREATE")),
   validateCurrency,
-  createCurrency
+  createCurrency,
 );
 
 /**
@@ -62,7 +62,7 @@ currencyRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "VIEW")),
-  getAllCurrency
+  getAllCurrency,
 );
 
 /**
@@ -85,7 +85,7 @@ currencyRouter.get(
   "/:currencyId",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "VIEW")),
-  getCurrencyById
+  getCurrencyById,
 );
 
 /**
@@ -115,10 +115,10 @@ currencyRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "CURRENCY", "VIEW"),
-    getPermission("INV", "CURRENCY", "UPDATE")
+    getPermission("INV", "CURRENCY", "UPDATE"),
   ),
   validateUpdateCurrency,
-  updateCurrency
+  updateCurrency,
 );
 
 /**
@@ -141,7 +141,7 @@ currencyRouter.delete(
   "/:currencyId",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CURRENCY", "DELETE")),
-  deleteCurrency
+  deleteCurrency,
 );
 
 export default currencyRouter;

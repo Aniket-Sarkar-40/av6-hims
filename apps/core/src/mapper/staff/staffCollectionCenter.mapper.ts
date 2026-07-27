@@ -8,7 +8,7 @@ import {
 import dayjs from "dayjs";
 
 export const toStaffCollectionCenterDTO = async (
-  staffCollectionCenter: StaffCollectionCenter
+  staffCollectionCenter: StaffCollectionCenter,
 ): Promise<StaffCollectionCenterDTO> => {
   return {
     id: staffCollectionCenter.id,
@@ -22,7 +22,7 @@ export const toStaffCollectionCenterDTO = async (
 };
 
 export const toCollectionCenterDTO = (
-  row: CollectionCenter
+  row: CollectionCenter,
 ): CollectionCenterDTO => ({
   id: row.id,
   name: row.colName, // assumes a 'name' column on collectionCenter

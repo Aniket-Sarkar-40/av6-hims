@@ -14,12 +14,12 @@ export const createStaffDesignation = TryCatch(
 
     const response = BaseResponse.success(
       { type: "CREATED", data: staffDesignation },
-      "Staff Designation"
+      "Staff Designation",
     );
 
     logger.info("exiting::createStaffDesignation::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const getAllStaffDesignations = TryCatch(
@@ -30,12 +30,12 @@ export const getAllStaffDesignations = TryCatch(
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: staffDesignations },
-      "Staff Designation"
+      "Staff Designation",
     );
 
     logger.info("exiting::getStaffDesignation::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getStaffDesignationById = TryCatch(
@@ -44,25 +44,25 @@ export const getStaffDesignationById = TryCatch(
     const { staffDesignationId } = req.params;
     const staffDesignation =
       await staffDesignationService.getStaffDesignationById(
-        Number(staffDesignationId)
+        Number(staffDesignationId),
       );
 
     if (!staffDesignation) {
       return res.status(400).json(
         BaseResponse.error({
           message: generateErrorMessage("NOT_FOUND", "Staff Designation"),
-        })
+        }),
       );
     }
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: staffDesignation },
-      "Staff Designation"
+      "Staff Designation",
     );
 
     logger.info("exiting::getStaffDesignationById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const updateStaffDesignation = TryCatch(
@@ -75,17 +75,17 @@ export const updateStaffDesignation = TryCatch(
         Number(staffDesignationId),
         {
           designation,
-        }
+        },
       );
 
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedStaffDesignation },
-      "Staff Designation"
+      "Staff Designation",
     );
 
     logger.info("exiting::updateStaffDesignation::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteStaffDesignation = TryCatch(
@@ -93,15 +93,15 @@ export const deleteStaffDesignation = TryCatch(
     logger.info("entering::deleteStaffDesignation::controller");
     const { staffDesignationId } = req.params;
     await staffDesignationService.deleteStaffDesignation(
-      Number(staffDesignationId)
+      Number(staffDesignationId),
     );
 
     const response = BaseResponse.success(
       { type: "DELETED" },
-      "Staff Designation"
+      "Staff Designation",
     );
 
     logger.info("exiting::deleteStaffDesignation::controller");
     return res.status(200).json(response);
-  }
+  },
 );

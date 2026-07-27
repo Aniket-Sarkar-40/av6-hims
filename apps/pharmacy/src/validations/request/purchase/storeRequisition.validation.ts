@@ -82,7 +82,7 @@ export const storeRequisitionSchema = Joi.object<CreateStoreRequisitionInput>({
   storeRequisitionDetails: arrayRequired(
     "Store requisition details",
     storeRequisitionDetailSchema,
-    1
+    1,
   ),
 });
 
@@ -151,7 +151,7 @@ export const acknowledgeRequisitionSchema = Joi.object({
   acknowledgeItems: arrayRequired(
     "Acknowledge Items",
     acknowledgeItemSchema,
-    1
+    1,
   ),
 });
 

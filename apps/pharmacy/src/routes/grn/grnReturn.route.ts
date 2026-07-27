@@ -53,7 +53,7 @@ grnReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "CREATE")),
   validateGrnReturn,
-  createGrnReturn
+  createGrnReturn,
 );
 
 /**
@@ -69,7 +69,7 @@ grnReturnRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "VIEW")),
-  getAllGrnReturn
+  getAllGrnReturn,
 );
 
 /**
@@ -90,7 +90,7 @@ grnReturnRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "VIEW")),
-  getGrnReturnById
+  getGrnReturnById,
 );
 
 /**
@@ -120,10 +120,10 @@ grnReturnRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "GRN_RETURN", "VIEW"),
-    getPermission("PMS", "GRN_RETURN", "UPDATE")
+    getPermission("PMS", "GRN_RETURN", "UPDATE"),
   ),
   validateGrnReturnUpdate,
-  updateGrnReturn
+  updateGrnReturn,
 );
 
 /**
@@ -150,7 +150,7 @@ grnReturnRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN", "DELETE")),
-  deleteGrnReturn
+  deleteGrnReturn,
 );
 
 /**
@@ -173,7 +173,7 @@ grnReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_APPROVE", "CREATE")),
   validateGrnReturnApprove,
-  approveGrnReturn
+  approveGrnReturn,
 );
 
 /**
@@ -195,7 +195,7 @@ grnReturnRouter.post(
   "/rejected",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_REJECTED", "CREATE")),
-  rejectedGrnReturn
+  rejectedGrnReturn,
 );
 
 /**
@@ -218,7 +218,7 @@ grnReturnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_EXCEL", "VIEW")),
   validateGrnReturnExcel,
-  excelGrnReturnReport
+  excelGrnReturnReport,
 );
 
 /**
@@ -234,5 +234,5 @@ grnReturnRouter.post(
   "/pdf",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_RETURN_PDF", "VIEW")),
-  printGrnReturnById
+  printGrnReturnById,
 );

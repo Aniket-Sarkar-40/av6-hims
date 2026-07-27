@@ -26,50 +26,50 @@ export const bankReconciliationRouter: Router = Router();
 
 bankReconciliationRouter.post(
   "/un-reconciled-bank-voucher-lines",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "UNRECONCILED_BANK_VOUCHER_LINES", "VIEW")),
   validateFetchUnReconciledBankLedgerBookRequestInput,
-  getUnReconciledBankLedgerBookController
+  getUnReconciledBankLedgerBookController,
 );
 
 bankReconciliationRouter.post(
   "/manual-reconcile",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "MANUAL_RECONCILE", "CREATE")),
   validateManualReconcileVoucherLinesRequestInput,
-  manualReconcileVoucherLinesController
+  manualReconcileVoucherLinesController,
 );
 
 bankReconciliationRouter.post(
   "/upload-bank-statement",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BANK_STATEMENT", "CREATE")),
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateBankStatementExcelBaseInput,
-  uploadBankStatementExcelController
+  uploadBankStatementExcelController,
 );
 
 bankReconciliationRouter.post(
   "/manual-bank-reconcile",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "MANUAL_BANK_RECONCILE", "CREATE")),
   validateManualBankReconcileWithBankStatementRequestInput,
-  manualBankReconcileWithBankStatementController
+  manualBankReconcileWithBankStatementController,
 );
 
 bankReconciliationRouter.post(
   "/summary",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BANK_RECONCILIATION_SUMMARY", "VIEW")),
   validateBankReconciliationSummaryRequestInput,
-  getBankReconciliationSummaryController
+  getBankReconciliationSummaryController,
 );
 
 bankReconciliationRouter.post(
   "/auto-suggestions",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "BANK_AUTO_SUGGESTIONS", "VIEW")),
   validateBankReconciliationSummaryRequestInput,
-  getBankAutoSuggestionsController
+  getBankAutoSuggestionsController,
 );

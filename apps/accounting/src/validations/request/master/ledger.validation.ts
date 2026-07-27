@@ -33,10 +33,36 @@ const LedgerOpeningBalanceCreateSchema = Joi.object({
     "number.precision": generateValidationErrorMessage(
       "PRECISION",
       "Amount",
-      "{{#limit}}"
+      "{{#limit}}",
     ),
     "any.required": generateValidationErrorMessage("REQUIRED", "Amount"),
   }),
+  currencyConversionRate: joiDecimalFromSettings({
+    key: "roundingPrecision",
+    required: false,
+  })
+    .greater(0)
+    .allow(null)
+    .messages({
+      "number.base": generateValidationErrorMessage(
+        "NUMBER",
+        "Currency Conversion Rate",
+      ),
+      "number.precision": generateValidationErrorMessage(
+        "PRECISION",
+        "Currency Conversion Rate",
+        "{{#limit}}",
+      ),
+      "any.required": generateValidationErrorMessage(
+        "REQUIRED",
+        "Currency Conversion Rate",
+      ),
+      "number.greater": generateValidationErrorMessage(
+        "MUST_GREATER_THAN",
+        "Currency Conversion Rate",
+        "0",
+      ),
+    }),
   source: strOptional("Source"),
   note: strOptional("Note"),
 });
@@ -59,46 +85,22 @@ export const LedgerCreateSchema = Joi.object({
 
   isReserved: boolRequired("Reserved"),
 
-  bankName: Joi.string().when("isBankAccount", {
+  bankName: Joi.when("isBankAccount", {
     is: true,
-    then: Joi.required().messages({
-      "any.required": generateValidationErrorMessage("REQUIRED", "Bank Name"),
-    }),
-    otherwise: Joi.forbidden().messages({
-      "any.unknown": generateValidationErrorMessage("FORBIDDEN", "Bank Name"),
-    }),
+    then: strRequired("Bank Name"),
+    otherwise: strOptional("Bank Name"),
   }),
-  bankIfsc: Joi.string().when("isBankAccount", {
+  bankIfsc: Joi.when("isBankAccount", {
     is: true,
-    then: Joi.required().messages({
-      "any.required": generateValidationErrorMessage("REQUIRED", "Bank IFSC"),
-    }),
-    otherwise: Joi.forbidden().messages({
-      "any.unknown": generateValidationErrorMessage("FORBIDDEN", "Bank IFSC"),
-    }),
+    then: strRequired("Bank IFSC"),
+    otherwise: strOptional("Bank IFSC"),
   }),
-  bankAccountNo: Joi.string().when("isBankAccount", {
+  bankAccountNo: Joi.when("isBankAccount", {
     is: true,
-    then: Joi.required().messages({
-      "any.required": generateValidationErrorMessage(
-        "REQUIRED",
-        "Bank Account No"
-      ),
-    }),
-    otherwise: Joi.forbidden().messages({
-      "any.unknown": generateValidationErrorMessage(
-        "FORBIDDEN",
-        "Bank Account No"
-      ),
-    }),
+    then: strRequired("Bank Account No"),
+    otherwise: strOptional("Bank Account No"),
   }),
-  upiId: Joi.string().when("isBankAccount", {
-    is: true,
-    then: Joi.optional(),
-    otherwise: Joi.forbidden().messages({
-      "any.unknown": generateValidationErrorMessage("FORBIDDEN", "UPI Id"),
-    }),
-  }),
+  upiId: strOptional("UPI Id"),
 
   contactName: strOptional("Contact Name"),
   phone: phoneOptional("Phone"),
@@ -127,17 +129,43 @@ export const LedgerCreateSchema = Joi.object({
     then: Joi.required().messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Place of Supply State"
+        "Place of Supply State",
       ),
     }),
     otherwise: Joi.forbidden().messages({
       "any.unknown": generateValidationErrorMessage(
         "FORBIDDEN",
-        "Place of Supply State"
+        "Place of Supply State",
       ),
     }),
   }),
 
+  currencyId: Joi.when("isBankAccount", {
+    is: true,
+    then: idRequired("Currency Id"),
+    otherwise: idOptional("Currency Id"),
+  }),
+  creditPeriodInDays: Joi.number()
+    .min(0)
+    .max(365)
+    .optional()
+    .allow(null)
+    .messages({
+      "number.base": generateValidationErrorMessage(
+        "NUMBER",
+        "Credit Period In Days",
+      ),
+      "number.min": generateValidationErrorMessage(
+        "NUMBER_MIN",
+        "Credit Period In Days",
+        "0",
+      ),
+      "number.max": generateValidationErrorMessage(
+        "NUMBER_MAX",
+        "Credit Period In Days",
+        "365",
+      ),
+    }),
   ledgerOpeningBalance: LedgerOpeningBalanceCreateSchema.optional(),
 });
 
@@ -152,4 +180,16 @@ export const validateCreateLedger = validationHandler({
 
 export const validateUpdateLedger = validationHandler({
   schema: LedgerUpdateSchema,
+});
+
+const createLedgerExcelSchema = Joi.object({
+  companyId: idRequired("Company Id"),
+  excelFile: strOptional("Excel File"),
+});
+
+export const validateCreateLedgerExcel = validationHandler({
+  schema: createLedgerExcelSchema,
+  path: "body",
+  type: "FORMDATA",
+  imgAttr: "excelFile",
 });

@@ -11,7 +11,7 @@ import { ConsumptionDetails } from "@repo/db/generated/prisma/client";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toConsumptionDTO = async (
-  consumption: ConsumptionResponse[]
+  consumption: ConsumptionResponse[],
 ): Promise<ConsumptionDTO[]> => {
   const items = await itemMasterService.getAllItemMaster(true);
 
@@ -42,36 +42,36 @@ export const toConsumptionDTO = async (
       const cc = await getBranchOrWarehouse(consumption.ccId);
       const requester = await employeeService.getEmployeeByIdFrmCacheOrDb(
         consumption.requestedBy,
-        true
+        true,
       );
       const createdBy = consumption.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.createdBy,
-            true
+            true,
           )
         : null;
       const updatedBy = consumption.updatedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.updatedBy,
-            true
+            true,
           )
         : null;
       const approvedBy = consumption.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.approvedBy,
-            true
+            true,
           )
         : null;
       const rejectedBy = consumption.rejectedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.rejectedBy,
-            true
+            true,
           )
         : null;
       const deletedBy = consumption.deletedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             consumption.deletedBy,
-            true
+            true,
           )
         : null;
       const consumptionDetails = await Promise.all(
@@ -100,12 +100,12 @@ export const toConsumptionDTO = async (
           const item = items.find((itm) => itm.id === detail.itemId);
           const createdBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.createdBy
+                detail.createdBy,
               )
             : null;
           const updatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.updatedBy
+                detail.updatedBy,
               )
             : null;
           return {
@@ -114,7 +114,7 @@ export const toConsumptionDTO = async (
             createdBy,
             updatedBy,
           };
-        })
+        }),
       );
 
       return {
@@ -128,12 +128,12 @@ export const toConsumptionDTO = async (
         consumptionDetails: consumptionDetails,
         collectionCenter: cc ? toIdValue(cc, "name") : null,
       };
-    })
+    }),
   );
 };
 
 export const toConDetailDTO = async (
-  consumptionDetail: ConsumptionDetails[]
+  consumptionDetail: ConsumptionDetails[],
 ): Promise<ConDetailDTO[]> => {
   return Promise.all(
     consumptionDetail.map(async (detail) => {
@@ -143,7 +143,7 @@ export const toConDetailDTO = async (
       >(detail, ["itemId", "createdBy", "updatedBy"]);
       const item = await itemMasterService.getItemMasterById(
         { itemId: detail.itemId },
-        true
+        true,
       );
       const createdBy = detail.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(detail.createdBy)
@@ -157,6 +157,6 @@ export const toConDetailDTO = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

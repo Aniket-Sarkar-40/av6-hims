@@ -6,7 +6,7 @@ import { PHARMACY_SHORT_CODE_TO_FILE_ATTR } from "./pharmacy.shortCode.utils.js"
 
 export const getFileAttrFromShortCode = (
   service: Service,
-  shortCode: string
+  shortCode: string,
 ): string => {
   if (service === "CORE") {
     return (

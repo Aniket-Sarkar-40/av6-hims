@@ -4,7 +4,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 export async function getInstance(
   poId: number,
   subjectType: string,
-  service: string
+  service: string,
 ) {
   const instance = await db.approvalInstance.findFirst({
     where: {

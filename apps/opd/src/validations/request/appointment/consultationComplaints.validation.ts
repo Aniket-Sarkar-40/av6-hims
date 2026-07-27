@@ -16,12 +16,12 @@ export const createConsultationComplaintsSchema =
         "array.min": generateValidationErrorMessage(
           "ARRAY_MIN_LENGTH",
           "Complaints",
-          "1"
+          "1",
         ),
         "array.unique": generateValidationErrorMessage("UNIQUE", "Complaints"),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Complaints"
+          "Complaints",
         ),
       }),
 

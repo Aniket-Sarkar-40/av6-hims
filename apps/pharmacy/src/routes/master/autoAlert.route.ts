@@ -43,7 +43,7 @@ autoAlertRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "AUTO_ALERT", "CREATE")),
   validateCreateAutoAlertEmail,
-  createAutoAlertEmail
+  createAutoAlertEmail,
 );
 
 /**
@@ -66,10 +66,10 @@ autoAlertRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "AUTO_ALERT", "UPDATE"),
-    getPermission("PMS", "AUTO_ALERT", "VIEW")
+    getPermission("PMS", "AUTO_ALERT", "VIEW"),
   ),
   validateUpdateAutoAlertEmail,
-  updateAutoAlertEmail
+  updateAutoAlertEmail,
 );
 
 /**
@@ -93,7 +93,7 @@ autoAlertRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "AUTO_ALERT", "UPDATE"),
-    getPermission("PMS", "AUTO_ALERT", "VIEW")
+    getPermission("PMS", "AUTO_ALERT", "VIEW"),
   ),
-  resendAutoAlertEmail
+  resendAutoAlertEmail,
 );

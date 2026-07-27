@@ -47,7 +47,7 @@ export const PatientProcedureCreateSchema = Joi.object({
 
   additionalDiscountMode: enumOptional(
     "Additional Discount Mode",
-    PercentageOrAmount
+    PercentageOrAmount,
   ),
 
   additionalDiscountValue: priceRequired("Additional Discount Value"),
@@ -74,16 +74,16 @@ export const PatientProcedureCreateSchema = Joi.object({
     .messages({
       "array.base": generateValidationErrorMessage(
         "ARRAY",
-        "Patient Procedure Details"
+        "Patient Procedure Details",
       ),
       "array.min": generateValidationErrorMessage(
         "ARRAY_MIN_LENGTH",
         "Patient Procedure Details",
-        "1"
+        "1",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Patient Procedure Details"
+        "Patient Procedure Details",
       ),
       "array.unique": generateValidationErrorMessage("DUPLICATE", "Procedure"),
     }),
@@ -99,7 +99,7 @@ export const PatientProcedureUpdateSchema = PatientProcedureCreateSchema.keys({
   patientProcedureDetails: arrayRequired(
     "Patient Procedure Details",
     PatientProcedureDetailsUpdateSchema,
-    1
+    1,
   ),
 });
 
@@ -109,7 +109,7 @@ export const PatientProcedureReturnSchema = Joi.object({
   detailId: arrayRequired(
     "Patient Procedure Details ID",
     idRequired("Patient Procedure Details ID"),
-    1
+    1,
   ),
 });
 export const validateCreatePatientProcedure = validationHandler({

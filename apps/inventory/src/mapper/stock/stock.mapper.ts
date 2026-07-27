@@ -15,7 +15,7 @@ import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 
 export const toStockDTO = async (
-  data: InvItemStock[]
+  data: InvItemStock[],
 ): Promise<ItemStockDTO[]> => {
   const items = await itemMasterService.getAllItemMaster(true);
 
@@ -44,7 +44,7 @@ export const toStockDTO = async (
         item: item ? await itemMasterToDto(item) : null,
         user: toIdValue(user, "name"),
       };
-    })
+    }),
   );
 };
 
@@ -65,7 +65,7 @@ const parseBatchDetails = (value: unknown): ItemStockBatchDetail[] => {
 };
 
 export const toItemStockReportRow = (
-  row: ItemStockReportRawRow
+  row: ItemStockReportRawRow,
 ): ItemStockReportRow => {
   const { rest } = customOmit(row, ["batchDetailsJson", "totalRecords"]);
   return {
@@ -75,7 +75,7 @@ export const toItemStockReportRow = (
 };
 
 export const toItemStockDtoPaginated = async (
-  repoResult: ItemStockPaginatedRes
+  repoResult: ItemStockPaginatedRes,
 ): Promise<ItemStockPaginatedDTO> => {
   const { rows, totalRecords, currentPageNumber, lastPageNumber, pageSize } =
     repoResult;
@@ -99,7 +99,7 @@ const itemStockExcelOmitKeys = [
 ] as const;
 
 export const toItemStockExcelRows = (
-  stocks: ItemStockReportRow[]
+  stocks: ItemStockReportRow[],
 ): ItemStockExcelRow[] => {
   const rows: ItemStockExcelRow[] = [];
   let sNo = 0;

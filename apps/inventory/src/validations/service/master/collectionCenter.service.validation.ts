@@ -9,19 +9,18 @@ import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import { StaffCollectionCenter } from "@repo/db/generated/prisma/client";
 
 export const validateIdCollectionCenter = async (
-  collectionCenterId: number
+  collectionCenterId: number,
 ) => {
   logger.info("entering::validateIdCollectionCenter::service::validation");
 
   validIdCheck(collectionCenterId);
 
-  const collectionCenter = await getCollectionCenterByIdFromDb(
-    collectionCenterId
-  );
+  const collectionCenter =
+    await getCollectionCenterByIdFromDb(collectionCenterId);
   if (!collectionCenter) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Collection Center")
+      generateErrorMessage("NOT_FOUND", "Collection Center"),
     );
   }
   logger.info("exiting::validateIdCollectionCenter::service::validation");
@@ -31,17 +30,17 @@ export const validateIdCollectionCenter = async (
 
 export const validateStaffCollectionCenter = async (
   staffId: number,
-  ccId: number
+  ccId: number,
 ): Promise<StaffCollectionCenter> => {
   logger.info("entering::validateStaffCollectionCenter::service::validation");
   const staffCollectionCenter = await getStaffCollectionCenterFromDb(
     staffId,
-    ccId
+    ccId,
   );
   if (!staffCollectionCenter) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Staff Collection Center Mapping")
+      generateErrorMessage("NOT_FOUND", "Staff Collection Center Mapping"),
     );
   }
   logger.info("exiting::validateStaffCollectionCenter::service::validation");

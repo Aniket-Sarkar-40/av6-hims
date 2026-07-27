@@ -14,7 +14,7 @@ import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const createAutoAlertEmailInDb = async (
-  input: CreateAutoAlertEmailInput
+  input: CreateAutoAlertEmailInput,
 ): Promise<InvAutoAlertEmail> => {
   logger.info("entering::createAutoAlertEmailInDb::repository");
   const store = requestStorage.getStore();
@@ -28,7 +28,7 @@ export const createAutoAlertEmailInDb = async (
 };
 
 export const updateAutoAlertEmailInDb = async (
-  input: UpdateAutoAlertEmailInput
+  input: UpdateAutoAlertEmailInput,
 ): Promise<InvAutoAlertEmail> => {
   logger.info("entering::updateAutoAlertEmailInDb::repository");
   const store = requestStorage.getStore();
@@ -46,7 +46,7 @@ export const updateAutoAlertEmailInDb = async (
 };
 
 export const getAutoAlertEmailByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<InvAutoAlertEmail | null> => {
   logger.info("entering::getAutoAlertEmailByIdFromDb::repository");
   return db.invAutoAlertEmail.findFirst({
@@ -58,7 +58,7 @@ export const getAutoAlertEmailByIdFromDb = async (
 };
 
 export const getAutoAlertEmailByShortCodeFromDb = async (
-  shortCode: INV_ALERT_TYPE
+  shortCode: INV_ALERT_TYPE,
 ): Promise<InvAutoAlertEmail | null> => {
   logger.info("entering::getAutoAlertEmailByIdFromDb::repository");
   return db.invAutoAlertEmail.findFirst({
@@ -70,7 +70,7 @@ export const getAutoAlertEmailByShortCodeFromDb = async (
 };
 
 export const createAutoAlertAuditInDb = async (
-  input: CreateAutoAlertAuditInput
+  input: CreateAutoAlertAuditInput,
 ): Promise<InvAutoAlertAudit> => {
   logger.info("entering::createAutoAlertAuditInDb::repository");
   const store = requestStorage.getStore();
@@ -84,7 +84,7 @@ export const createAutoAlertAuditInDb = async (
 };
 
 export const updateAutoAlertAuditInDb = async (
-  input: UpdateAutoAlertAuditInput
+  input: UpdateAutoAlertAuditInput,
 ): Promise<InvAutoAlertAudit> => {
   logger.info("entering::updateAutoAlertAuditInDb::repository");
   const store = requestStorage.getStore();
@@ -102,7 +102,7 @@ export const updateAutoAlertAuditInDb = async (
 };
 
 export const getAutoAlertAuditByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<InvAutoAlertAudit | null> => {
   logger.info("entering::getAutoAlertAuditByIdFromDb::repository");
   return db.invAutoAlertAudit.findFirst({

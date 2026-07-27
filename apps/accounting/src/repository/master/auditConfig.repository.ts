@@ -6,7 +6,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 
 export async function CreateOrUpdateAuditConfigInDb(
-  input: CreateOrUpdateAuditConfig
+  input: CreateOrUpdateAuditConfig,
 ): Promise<AccAuditConfig> {
   logger.info("entering::CreateOrUpdateAuditConfigInDb::repository");
   const store = requestStorage.getStore();
@@ -24,7 +24,7 @@ export async function CreateOrUpdateAuditConfigInDb(
 }
 
 export async function updateAuditConfigInDb(
-  input: CreateOrUpdateAuditConfig
+  input: CreateOrUpdateAuditConfig,
 ): Promise<AccAuditConfig> {
   logger.info("entering::updateAuditConfigInDb::repository");
   const store = requestStorage.getStore();
@@ -42,7 +42,7 @@ export async function updateAuditConfigInDb(
 }
 
 export const getAuditConfigByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<AccAuditConfig | null> => {
   logger.info("entering::getAuditConfigByIdFromDb::repository");
   return db.auditConfig.findFirst({
@@ -58,7 +58,7 @@ export const getAllAuditConfigFromDb = async (): Promise<AccAuditConfig[]> => {
 };
 
 export const checkAuditConfigFieldDuplicate = async (
-  input: CreateOrUpdateAuditConfig
+  input: CreateOrUpdateAuditConfig,
 ) => {
   logger.info("entering::checkAuditConfigFieldDuplicate::repository");
 
@@ -75,7 +75,7 @@ export const checkAuditConfigFieldDuplicate = async (
   if (!duplicate) return null;
 
   const duplicateFields = fields.filter(
-    (f) => input[f] && duplicate[f] === input[f]
+    (f) => input[f] && duplicate[f] === input[f],
   );
 
   return { auditConfig: duplicate, duplicateFields };

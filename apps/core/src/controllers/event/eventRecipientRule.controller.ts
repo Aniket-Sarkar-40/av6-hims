@@ -15,11 +15,11 @@ export const createEventRecipientRule = TryCatch(
     const rule = await recipientRuleService.createRecipientRule(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: rule },
-      "EventRecipientRule"
+      "EventRecipientRule",
     );
     logger.info("exiting::createEventRecipientRule::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateEventRecipientRule = TryCatch(
@@ -30,10 +30,10 @@ export const updateEventRecipientRule = TryCatch(
     logger.info("exiting::updateEventRecipientRule::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedRule },
-      "EventRecipientRule"
+      "EventRecipientRule",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const multiCreateUpdateEventRecipientRule = TryCatch(
@@ -44,8 +44,8 @@ export const multiCreateUpdateEventRecipientRule = TryCatch(
     logger.info("exiting::multiCreateUpdateEventRecipientRule::controller");
     const response = BaseResponse.success(
       { type: "UPDATED" },
-      "EventRecipientRule"
+      "EventRecipientRule",
     );
     return res.status(200).json(response);
-  }
+  },
 );

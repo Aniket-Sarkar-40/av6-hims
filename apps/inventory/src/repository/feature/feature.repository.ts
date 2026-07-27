@@ -8,7 +8,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { InvFeatureFlag } from "@repo/db/generated/prisma/client";
 
 export const createFeatureFlagInDb = async (
-  input: CreateFeatureFlagInput
+  input: CreateFeatureFlagInput,
 ): Promise<InvFeatureFlag> => {
   logger.info("entering::createFeatureFlagInDb::repository");
   const store = requestStorage.getStore();
@@ -27,7 +27,7 @@ export const createFeatureFlagInDb = async (
 };
 
 export const updateFeatureFlagInDb = async (
-  input: UpdateFeatureFlagInput
+  input: UpdateFeatureFlagInput,
 ): Promise<InvFeatureFlag> => {
   logger.info("entering::updateFeatureFlagInDb::repository");
   const store = requestStorage.getStore();
@@ -48,7 +48,7 @@ export const updateFeatureFlagInDb = async (
 };
 
 export const getFeatureFlagByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<InvFeatureFlag | null> => {
   logger.info("entering::getFeatureFlagByIdFromDb::repository");
   const record = await db.invFeatureFlag.findFirst({
@@ -74,7 +74,7 @@ export const getAllFeatureFlagsFromDb = async (): Promise<InvFeatureFlag[]> => {
 
 export const toggleFeatureFlagInDb = async (
   id: number,
-  existing: InvFeatureFlag
+  existing: InvFeatureFlag,
 ): Promise<InvFeatureFlag> => {
   logger.info("entering::toggleFeatureFlagInDb::repository");
   const store = requestStorage.getStore();
@@ -114,7 +114,7 @@ export const deleteFeatureFlagFromDb = async (id: number): Promise<boolean> => {
 };
 
 export const getFeatureFlagByShortCodeFromDb = async (
-  shortCode: string
+  shortCode: string,
 ): Promise<InvFeatureFlag | null> => {
   logger.info("entering::getFeatureFlagByShortCodeFromDb::repository");
   const record = await db.invFeatureFlag.findFirst({

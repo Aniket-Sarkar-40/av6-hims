@@ -46,7 +46,7 @@ cityRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "CITY", "CREATE")),
   validateCity,
-  createCity
+  createCity,
 );
 
 /**
@@ -62,7 +62,7 @@ cityRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "CITY", "VIEW")),
-  getAllCities
+  getAllCities,
 );
 
 /**
@@ -85,7 +85,7 @@ cityRouter.get(
   "/:cityId",
   verifyToken(),
   authorize(getPermission("CORE", "CITY", "VIEW")),
-  getCityById
+  getCityById,
 );
 
 /**
@@ -108,10 +108,10 @@ cityRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "CITY", "VIEW"),
-    getPermission("CORE", "CITY", "UPDATE")
+    getPermission("CORE", "CITY", "UPDATE"),
   ),
   validateCityUpdate,
-  updateCity
+  updateCity,
 );
 
 /**
@@ -134,7 +134,7 @@ cityRouter.delete(
   "/:cityId",
   verifyToken(),
   authorize(getPermission("CORE", "CITY", "DELETE")),
-  deleteCity
+  deleteCity,
 );
 
 export default cityRouter;

@@ -50,7 +50,7 @@ export const emailConfigSchema = Joi.object<CreateOrUpdateEmailConfig>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Config Type",
-        Object.values(EmailConfigType).join(", ")
+        Object.values(EmailConfigType).join(", "),
       ),
     }),
 });

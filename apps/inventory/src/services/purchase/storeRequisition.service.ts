@@ -62,7 +62,7 @@ export const storeRequisitionService = {
     if (records.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "storeRequisition Order")
+        generateErrorMessage("NOT_FOUND", "storeRequisition Order"),
       );
     }
 
@@ -74,7 +74,7 @@ export const storeRequisitionService = {
             storeRequisitionDetails: sr.storeRequisitionDetails,
           },
         ]);
-      })
+      }),
     );
 
     logger.info("exiting::getAllStoreRequisition::service");
@@ -89,7 +89,7 @@ export const storeRequisitionService = {
     if (!storeReq) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition")
+        generateErrorMessage("NOT_FOUND", "Store Requisition"),
       );
     }
 
@@ -108,7 +108,7 @@ export const storeRequisitionService = {
   },
 
   async rejectStoreRequisition(
-    input: RejectStoreRequisitionInput
+    input: RejectStoreRequisitionInput,
   ): Promise<void> {
     logger.info("entering::rejectStoreRequisition::service id=" + input.id);
 
@@ -128,7 +128,7 @@ export const storeRequisitionService = {
   },
 
   async acknowledgeStoreRequisition(
-    input: AcknowledgeRequisition
+    input: AcknowledgeRequisition,
   ): Promise<void> {
     logger.info("entering::acknowledgeStoreRequisition::service");
 
@@ -146,7 +146,7 @@ export const storeRequisitionService = {
     if (!storeReq) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition")
+        generateErrorMessage("NOT_FOUND", "Store Requisition"),
       );
     }
 
@@ -272,7 +272,7 @@ export const storeRequisitionService = {
 
   async getAllStoreRequisitionBatchWiseById(id: number) {
     logger.info(
-      "entering::getAllStoreRequisitionBatchWiseById::service id=" + id
+      "entering::getAllStoreRequisitionBatchWiseById::service id=" + id,
     );
 
     validIdCheck(id);
@@ -280,14 +280,14 @@ export const storeRequisitionService = {
     if (!storeReq) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition")
+        generateErrorMessage("NOT_FOUND", "Store Requisition"),
       );
     }
 
     const dto = await toStoreRequisitionBatchWiseDTO(storeReq);
 
     logger.info(
-      "exiting::getAllStoreRequisitionBatchWiseById::service id=" + id
+      "exiting::getAllStoreRequisitionBatchWiseById::service id=" + id,
     );
     return dto;
   },

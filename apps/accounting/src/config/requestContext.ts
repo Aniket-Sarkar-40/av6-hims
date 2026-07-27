@@ -1,4 +1,5 @@
 import { CurrentMapping } from "@/types/auth/auth.js";
+import { SettingsDTO } from "@/types/settings/settings.js";
 import { AccSettings } from "@repo/db/generated/prisma/client";
 import { AsyncLocalStorage } from "async_hooks";
 
@@ -13,7 +14,7 @@ type Store = {
   };
   perms?: Set<string>;
   traceId?: string;
-  settings?: AccSettings | null;
+  settings?: SettingsDTO | null;
   token?: string;
   auth?: boolean;
   level1Id?: number;

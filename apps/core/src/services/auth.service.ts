@@ -1,12 +1,4 @@
-import {
-  EXT_CHANGE_ROLE_URL,
-  EXT_LOGIN_URL,
-  EXT_ROLE_BY_CC_URL,
-  EXT_USER_DETAILS_URL,
-  EXT_UPLOAD_IMAGE,
-} from "@repo/shared/config/index.js";
-import { axiosClient, interceptor } from "@repo/shared/config/axiosClient.js";
-import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { moduleConfigService } from "@/services/moduleConfig.service.js";
 import {
   ApiLoginResponse,
   ApiRoleResponse,
@@ -19,18 +11,26 @@ import {
   UploadFilesResponse,
   UserResponse,
 } from "@/types/auth.js";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { axiosClient, interceptor } from "@repo/shared/config/axiosClient.js";
+import {
+  EXT_CHANGE_ROLE_URL,
+  EXT_LOGIN_URL,
+  EXT_ROLE_BY_CC_URL,
+  EXT_UPLOAD_IMAGE,
+  EXT_USER_DETAILS_URL,
+} from "@repo/shared/config/index.js";
+import { decodeToken, encodeToken } from "@repo/shared/utils/auth.utils.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { AxiosError } from "axios";
-import { logger } from "@repo/platform/logging/logger.js";
-import { decodeToken, encodeToken } from "@repo/shared/utils/auth.utils.js";
-import { moduleConfigService } from "@/services/moduleConfig.service.js";
 
 export const authService = {
   async loginExternal(payload: LoginPayload): Promise<ApiLoginResponse> {
     logger.info("entering::loginExternal::service");
     const { data } = await axiosClient.post<ApiLoginResponse>(
       EXT_LOGIN_URL!,
-      payload
+      payload,
     );
     logger.info("exiting::loginExternal::service");
     return {
@@ -86,7 +86,7 @@ export const authService = {
     if (!user || !permission || !token) {
       throw new ErrorHandler(
         401,
-        "User not authenticated or permissions not found"
+        "User not authenticated or permissions not found",
       );
     }
     const client = interceptor(token);
@@ -112,7 +112,7 @@ export const authService = {
   async changeRoleEXT(
     role: string,
     ccId: string,
-    shortToken: string
+    shortToken: string,
   ): Promise<ApiLoginResponse> {
     logger.info("entering::changeRoleEXT::service");
     const client = interceptor(shortToken);
@@ -121,7 +121,7 @@ export const authService = {
       {
         roleId: role,
         ccId: ccId,
-      }
+      },
     );
 
     logger.info("exiting::changeRoleEXT::service");
@@ -142,17 +142,29 @@ export const authService = {
       if (!prevToken) {
         throw new ErrorHandler(401, "User not authenticated");
       }
-      const { token, shortToken, uuid } = await this.changeRoleEXT(
+      let { token, shortToken, uuid } = await this.changeRoleEXT(
         role,
         ccId,
-        prevToken
+        prevToken,
       );
       logger.info("exiting::changeRole::service");
       if (!token || !shortToken || !uuid)
         throw new ErrorHandler(
           404,
-          "You are not authorized to change this role"
+          "You are not authorized to change this role",
         );
+      const decodedToken = decodeToken(token);
+      const decodedShortToken = decodeToken(shortToken);
+
+      const activeModules = (
+        await moduleConfigService.getEnabledModulesFromDb()
+      ).map((item) => item.module);
+
+      decodedToken.modules = activeModules;
+      decodedShortToken.modules = activeModules;
+
+      token = encodeToken(decodedToken);
+      shortToken = encodeToken(decodedShortToken);
       return { token, shortToken, uuid };
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
@@ -176,12 +188,12 @@ export const authService = {
     if (!user || !permission || !shortToken) {
       throw new ErrorHandler(
         401,
-        "User not authenticated or permissions not found"
+        "User not authenticated or permissions not found",
       );
     }
     const client = interceptor(shortToken);
     const data = await client.post<ApiRoleResponse>(
-      `${EXT_ROLE_BY_CC_URL}/${ccId}`
+      `${EXT_ROLE_BY_CC_URL}/${ccId}`,
     );
     const role = data.data.role;
     logger.info("exiting::getRoleByCcId::service");
@@ -191,7 +203,7 @@ export const authService = {
   },
 
   async uploadInsuranceImagesExt(
-    fileInfos: FileInfo[]
+    fileInfos: FileInfo[],
   ): Promise<UploadFilesResponse[] | null> {
     logger.info("entering::uploadInsuranceImagesExt::service");
     const user = requestStorage.getStore()?.user;
@@ -202,7 +214,7 @@ export const authService = {
     if (!user || !perms || !shortToken) {
       throw new ErrorHandler(
         401,
-        "User not authenticated or permissions not found"
+        "User not authenticated or permissions not found",
       );
     }
 
@@ -211,7 +223,7 @@ export const authService = {
     for (const fileInfo of fileInfos) {
       const { data, status } = await client.post<UploadFilesResponse>(
         EXT_UPLOAD_IMAGE!,
-        fileInfo
+        fileInfo,
       );
       if (status === 200 && data.success) {
         results.push(data);

@@ -39,7 +39,7 @@ export const patientMedicineDetailSchema = Joi.object({
     : h.error("any.custom", {
         message:
           "Please enter at least one dose (morning, afternoon, or night).",
-      })
+      }),
 );
 
 export const createPatientMedicineSchema = Joi.object({
@@ -83,7 +83,7 @@ export const searchMedicineSchema = Joi.object({
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Search Text",
-        "3"
+        "3",
       ),
     }),
 });

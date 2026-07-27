@@ -26,7 +26,7 @@ import { API_TIMEOUT } from "@repo/shared";
 import { Prisma } from "@repo/db/generated/prisma/client";
 
 export const createStockTransfer = async (
-  input: CreateItemStockTransferInput
+  input: CreateItemStockTransferInput,
 ) => {
   logger.info("entering::createStockTransfer::repository");
 
@@ -59,14 +59,14 @@ export const createStockTransfer = async (
         include: { stockTransferDetails: true },
       });
     },
-    { timeout: API_TIMEOUT }
+    { timeout: API_TIMEOUT },
   );
 
   return created;
 };
 
 export const updateStockTransfer = async (
-  input: UpdateItemStockTransferInput
+  input: UpdateItemStockTransferInput,
 ) => {
   logger.info("entering::createStockTransfer::repository");
 
@@ -84,7 +84,7 @@ export const updateStockTransfer = async (
   const toUpdate = stockTransferDetails.filter((d) => typeof d.id === "number");
   const toCreate = stockTransferDetails.filter((d) => typeof d.id !== "number");
   const toDelete = stockTransfer.stockTransferDetails.filter(
-    (d) => !stockTransferDetails.some((item) => item.id === d.id)
+    (d) => !stockTransferDetails.some((item) => item.id === d.id),
   );
 
   return await db.$transaction(
@@ -144,7 +144,7 @@ export const updateStockTransfer = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -216,7 +216,7 @@ export const approveStockTransfer = async (input: StockTransferUpdate) => {
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails
+          auditDetails,
         );
         // Add Stock into in-transit stock
         await addInTransitStock(
@@ -230,7 +230,7 @@ export const approveStockTransfer = async (input: StockTransferUpdate) => {
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails
+          auditDetails,
         );
       }
 
@@ -238,12 +238,12 @@ export const approveStockTransfer = async (input: StockTransferUpdate) => {
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
 export const acknowledgeStockTransfer = async (
-  input: StockTransferAcknowledgeInput
+  input: StockTransferAcknowledgeInput,
 ) => {
   logger.info("entering::acknowledgeStockTransfer::repository");
   const store = requestStorage.getStore();
@@ -299,7 +299,7 @@ export const acknowledgeStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails
+          auditDetails,
         );
         // Subtract Stock from in-transit stock
         await subInTransitStock(
@@ -313,7 +313,7 @@ export const acknowledgeStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails
+          auditDetails,
         );
       }
 
@@ -321,7 +321,7 @@ export const acknowledgeStockTransfer = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -353,7 +353,7 @@ export const getAllStockTransfer = async () => {
 };
 
 export const searchStockTransfers = async (
-  params: StockTransferSearchInput
+  params: StockTransferSearchInput,
 ) => {
   logger.info("entering::searchStockTransfers::repository");
   const {
@@ -432,7 +432,7 @@ export const searchStockTransfers = async (
 };
 
 export const approveReturnStockTransfer = async (
-  input: StockTransferUpdate
+  input: StockTransferUpdate,
 ) => {
   logger.info("entering::approveReturnStockTransfer::repository");
   const store = requestStorage.getStore();
@@ -476,7 +476,7 @@ export const approveReturnStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails
+          auditDetails,
         );
         // Subtract Stock from in-transit stock
         await subInTransitStock(
@@ -490,7 +490,7 @@ export const approveReturnStockTransfer = async (
             expiryDate: detail.expiryDate,
             isFoc: detail.isFoc,
           },
-          auditDetails
+          auditDetails,
         );
       }
 
@@ -498,6 +498,6 @@ export const approveReturnStockTransfer = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };

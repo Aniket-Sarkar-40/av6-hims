@@ -51,7 +51,7 @@ patientsInsuranceRouter.post(
     "cardBackImage",
   ]),
   validatePatientsInsurance,
-  createPatientsInsurance
+  createPatientsInsurance,
 );
 
 /**
@@ -74,14 +74,14 @@ patientsInsuranceRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "PATIENT_INSURANCE", "VIEW"),
-    getPermission("PMS", "PATIENT_INSURANCE", "UPDATE")
+    getPermission("PMS", "PATIENT_INSURANCE", "UPDATE"),
   ),
   createUploadFieldsMiddleware("patient_images/card_image", [
     "cardFrontImage",
     "cardBackImage",
   ]),
   validatePatientsInsuranceUpdate,
-  updatePatientsInsurance
+  updatePatientsInsurance,
 );
 
 /**
@@ -97,7 +97,7 @@ patientsInsuranceRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PATIENT_INSURANCE", "VIEW")),
-  getAllPatientsInsurance
+  getAllPatientsInsurance,
 );
 
 /**
@@ -119,7 +119,7 @@ patientsInsuranceRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PATIENT_INSURANCE", "VIEW")),
-  getPatientsInsuranceById
+  getPatientsInsuranceById,
 );
 
 /**
@@ -135,7 +135,7 @@ patientsInsuranceRouter.delete(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PATIENT_INSURANCE", "DELETE")),
-  deletePatientsInsurance
+  deletePatientsInsurance,
 );
 
 // /**

@@ -9,7 +9,7 @@ import { CountryCode } from "@repo/db/generated/prisma/client";
 import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export const createCountryCodeInDb = async (
-  input: CreateCountryCode
+  input: CreateCountryCode,
 ): Promise<CountryCode> => {
   logger.info("entering::createCountryCode::repository");
   const store = requestStorage.getStore();
@@ -22,7 +22,7 @@ export const createCountryCodeInDb = async (
 };
 
 export const updateCountryCodeInDb = async (
-  input: UpdateCountryCode
+  input: UpdateCountryCode,
 ): Promise<CountryCode> => {
   logger.info("entering::updateCountryCode::repository");
   const store = requestStorage.getStore();
@@ -38,7 +38,7 @@ export const updateCountryCodeInDb = async (
 };
 
 export const getCountryCodeByNameFromDb = async (
-  name: string
+  name: string,
 ): Promise<CountryCode | null> => {
   logger.info("entering::getCountryCodeByName::repository");
   return db.countryCode.findFirst({
@@ -50,7 +50,7 @@ export const getCountryCodeByNameFromDb = async (
 };
 
 export const getCountryCodeByCountryFromDb = async (
-  countryId: number
+  countryId: number,
 ): Promise<CountryCode | null> => {
   logger.info("entering::getCountryCodeByCountry::repository");
   return db.countryCode.findFirst({
@@ -62,7 +62,7 @@ export const getCountryCodeByCountryFromDb = async (
 };
 
 export const getCountryCodeByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<CountryCode | null> => {
   logger.info("entering::getCountryCodeById::repository");
   return db.countryCode.findUnique({

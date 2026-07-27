@@ -4,7 +4,7 @@ import { WithoutAudit } from "@/types/common.js";
 
 export function toPickFields<T, const K extends readonly (keyof T)[]>(
   row: T | null | undefined,
-  keys: K
+  keys: K,
 ): { [P in K[number]]: T[P] } | null {
   if (!row) return null;
 
@@ -19,7 +19,7 @@ export function toPickFields<T, const K extends readonly (keyof T)[]>(
 
 export function projectFields<T, const M extends Record<string, keyof T>>(
   row: T | null | undefined,
-  map: M
+  map: M,
 ): { [P in keyof M]: T[M[P]] } | null {
   if (!row) return null;
 
@@ -27,22 +27,22 @@ export function projectFields<T, const M extends Record<string, keyof T>>(
     (Object.keys(map) as Array<keyof M>).map((outKey) => {
       const inKey = map[outKey];
       return [outKey, row[inKey]];
-    })
+    }),
   ) as { [P in keyof M]: T[M[P]] };
 
   return out;
 }
 
 export function omitAudit<T extends object>(
-  input: T | null | undefined
+  input: T | null | undefined,
 ): WithoutAudit<T>;
 export function omitAudit<T extends object>(
-  input: Array<T | null | undefined>
+  input: Array<T | null | undefined>,
 ): Array<WithoutAudit<T>>;
 
 // Impl
 export function omitAudit<T extends object>(
-  input: T | null | undefined | Array<T | null | undefined>
+  input: T | null | undefined | Array<T | null | undefined>,
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const strip = (row: any) => {

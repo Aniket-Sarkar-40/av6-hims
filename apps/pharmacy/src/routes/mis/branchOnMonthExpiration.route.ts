@@ -43,46 +43,46 @@ branchOnMonthExpirationRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH_MONTH_EXPIRATION", "VIEW")),
-  getBranchOnMonthExpiration
+  getBranchOnMonthExpiration,
 );
 branchOnMonthExpirationRouter.post(
   "/excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH_MONTH_EXPIRATION", "VIEW")),
-  getBranchOnMonthExpirationExcel
+  getBranchOnMonthExpirationExcel,
 );
 
 branchOnMonthExpirationRouter.get(
   "/expiration-amount",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH_MONTH_EXPIRATION", "VIEW")),
-  getBranchesOnMonthExpirationAmt
+  getBranchesOnMonthExpirationAmt,
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-selling-drug",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_SELLING_DRUG", "VIEW")),
-  getHighestSellingDrugByBranch
+  getHighestSellingDrugByBranch,
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-amt-selling-drug",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_AMOUNT_SELLING_DRUG", "VIEW")),
-  getHighestAmountSellDrugByBranch
+  getHighestAmountSellDrugByBranch,
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-selling-drug-excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_SELLING_DRUG", "VIEW")),
-  getHighestSellingDrugByBranchExcel
+  getHighestSellingDrugByBranchExcel,
 );
 
 branchOnMonthExpirationRouter.post(
   "/highest-amt-selling-drug-excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "HIGHEST_AMOUNT_SELLING_DRUG", "VIEW")),
-  getHighestAmtSellingDrugByBranchExcel
+  getHighestAmtSellingDrugByBranchExcel,
 );

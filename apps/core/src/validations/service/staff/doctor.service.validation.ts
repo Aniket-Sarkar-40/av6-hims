@@ -24,7 +24,7 @@ export const validateIdDoctorBy = async (doctorId: number) => {
 };
 
 export const createDoctorServiceValidation = async (
-  body: CreateOrUpdateDoctor
+  body: CreateOrUpdateDoctor,
 ): Promise<Staff | null> => {
   logger.info("entering::createDoctorServiceValidation::service::validation");
 
@@ -43,20 +43,20 @@ const validateDuplicateDoctorId = async (employeeId: string, id?: number) => {
   if (id && doctorByDoctorId && doctorByDoctorId.id !== id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Doctor ID")
+      generateErrorMessage("DUPLICATE_ITEM", "Doctor ID"),
     );
   }
   if (!id && doctorByDoctorId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Doctor ID")
+      generateErrorMessage("DUPLICATE_ITEM", "Doctor ID"),
     );
   }
   logger.info("exiting::validateDuplicateDoctorId::service::validation");
 };
 
 export const updateDoctorServiceValidation = async (
-  body: CreateOrUpdateDoctor
+  body: CreateOrUpdateDoctor,
 ): Promise<Staff | null> => {
   logger.info("entering::updateDoctorServiceValidation::service::validation");
   if (!body.id) {
@@ -76,7 +76,7 @@ export const updateDoctorServiceValidation = async (
 
 // Validate foreign keys such as locationId, siteId, and departmentId
 export const validateDoctorForeignKeys = async (
-  input: CreateOrUpdateDoctor
+  input: CreateOrUpdateDoctor,
 ): Promise<void> => {
   logger.info("entering::validateDoctorForeignKeys::service::validation");
   // Handle departmentId validation if it's provided
@@ -85,19 +85,19 @@ export const validateDoctorForeignKeys = async (
     if (!department) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "department")
+        generateErrorMessage("NOT_FOUND", "department"),
       );
     }
   }
 
   if (input.designationId) {
     const designation = await getStaffDesignationByIdFromDb(
-      input.designationId
+      input.designationId,
     );
     if (!designation) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "designation")
+        generateErrorMessage("NOT_FOUND", "designation"),
       );
     }
   }

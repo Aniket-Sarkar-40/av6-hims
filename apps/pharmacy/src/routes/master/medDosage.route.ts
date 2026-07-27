@@ -50,7 +50,7 @@ medDosageRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_DOSAGE", "CREATE")),
   validateDropDownName,
-  dosageCreate
+  dosageCreate,
 );
 
 /**
@@ -69,7 +69,7 @@ medDosageRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_DOSAGE", "VIEW")),
-  medDosageGet
+  medDosageGet,
 );
 
 /**
@@ -90,7 +90,7 @@ medDosageRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_DOSAGE", "VIEW")),
-  getMedDosageById
+  getMedDosageById,
 );
 
 /**
@@ -120,10 +120,10 @@ medDosageRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_DOSAGE", "VIEW"),
-    getPermission("PMS", "MEDICINE_DOSAGE", "UPDATE")
+    getPermission("PMS", "MEDICINE_DOSAGE", "UPDATE"),
   ),
   validateDropDownNameUpdate,
-  updateMedDosage
+  updateMedDosage,
 );
 
 export default medDosageRouter;

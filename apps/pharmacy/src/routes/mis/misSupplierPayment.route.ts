@@ -38,7 +38,7 @@ misSupplierPaymentRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SUPPLIER_PAYMENT", "VIEW")),
-  misSupplierPaymentList
+  misSupplierPaymentList,
 );
 
 misSupplierPaymentRouter.post(
@@ -46,5 +46,5 @@ misSupplierPaymentRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SUPPLIER_PAYMENT", "VIEW")),
   //   validateGatePassFilter,
-  excelMisSupplierReport
+  excelMisSupplierReport,
 );

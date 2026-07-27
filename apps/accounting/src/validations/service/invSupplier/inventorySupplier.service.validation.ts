@@ -6,7 +6,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdInventorySupplier = async (
-  id: number
+  id: number,
 ): Promise<InvItemSupplier> => {
   logger.info("entering::validateIdInventorySupplier::service");
   validIdCheck(id);
@@ -14,7 +14,7 @@ export const validateIdInventorySupplier = async (
   if (!inventorySupplier) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Inventory Item Supplier")
+      generateErrorMessage("NOT_FOUND", "Inventory Item Supplier"),
     );
   }
   logger.info("exiting::validateIdInventorySupplier::service");

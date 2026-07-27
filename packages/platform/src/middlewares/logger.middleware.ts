@@ -2,6 +2,39 @@ import { logger } from "@/logging/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 
+const isProduction =
+  process.env.NODE_ENV?.trim().toUpperCase() === "PRODUCTION";
+
+const SENSITIVE_KEYS = new Set([
+  "password",
+  "newpassword",
+  "oldpassword",
+  "confirmpassword",
+  "token",
+  "accesstoken",
+  "refreshtoken",
+  "authorization",
+  "cookie",
+  "clientkey",
+  "client-key",
+  "secret",
+  "otp",
+]);
+
+const MAX_LOGGED_BODY = 2_000;
+
+function redact(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(redact);
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = SENSITIVE_KEYS.has(k.toLowerCase()) ? "[REDACTED]" : redact(v);
+    }
+    return out;
+  }
+  return value;
+}
+
 export const requestLogger = morgan(
   ":method :url :status :res[content-length] - :response-time ms",
   {
@@ -9,7 +42,7 @@ export const requestLogger = morgan(
       write: (message: string) => logger.http(`Request::${message.trim()}`),
     },
     skip: () => process.env.NODE_ENV === "test",
-  }
+  },
 );
 
 export const requestDetailsLogger = morgan(
@@ -33,35 +66,43 @@ export const requestDetailsLogger = morgan(
       /*  ---- extras ---- */
       query: req.query,
       params: req.params,
-      body: req.body, // will be {} for GET/HEAD
-      headers: req.headers,
+      body: redact(req.body), // will be {} for GET/HEAD
+      headers: redact(req.headers),
     };
     return JSON.stringify(entry);
   },
   {
     stream: { write: (msg) => logger.debug(`RequestDetails::${msg.trim()}`) },
     skip: () => process.env.NODE_ENV === "test",
-  }
+  },
 ) as any;
 
 export function responseBodyLogger(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
+  // Never log response payloads in production - they may contain PII/PHI.
+  if (isProduction) {
+    return next();
+  }
+
   const originalJson = res.json.bind(res);
 
   res.json = (body: unknown): Response => {
-    // stringify carefully (avoid circular structures)
+    // stringify carefully (avoid circular structures), redact + truncate
     let payload: string;
     try {
-      payload = JSON.stringify(body);
+      payload = JSON.stringify(redact(body));
+      if (payload.length > MAX_LOGGED_BODY) {
+        payload = `${payload.slice(0, MAX_LOGGED_BODY)}…[truncated]`;
+      }
     } catch {
       payload = "[unserialisable payload]";
     }
 
-    logger.warn(
-      `↪️ ${req.method} ${req.originalUrl} → ${res.statusCode} | Response::body:: ${payload}`
+    logger.debug(
+      `↪️ ${req.method} ${req.originalUrl} → ${res.statusCode} | Response::body:: ${payload}`,
     );
 
     return originalJson(body);

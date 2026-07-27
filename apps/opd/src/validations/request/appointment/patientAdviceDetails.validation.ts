@@ -22,11 +22,11 @@ export const createPatientAdviceDetailsSchema =
 
     referToMentalHealth: boolOptional("Refer to Mental Health").default(false),
     referToAntenatalCare: boolOptional("Refer to Antenatal Care").default(
-      false
+      false,
     ),
     surgeryRequest: boolOptional("Surgery Request").default(false),
     referToOutsideHospital: boolOptional("Refer to Outside Hospital").default(
-      false
+      false,
     ),
   });
 

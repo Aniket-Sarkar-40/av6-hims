@@ -39,7 +39,7 @@ export const login = TryCatch(async (req: Request, res: Response) => {
       // token: token,
       // shortToken: shortToken,
     },
-    SEVENTEEN_HOURS / 1000
+    SEVENTEEN_HOURS / 1000,
   );
 
   res.cookie("access-token-av6", shortToken, {
@@ -73,8 +73,8 @@ export const login = TryCatch(async (req: Request, res: Response) => {
       // { token }
       envMode.toUpperCase() === "TEST"
         ? { token: shortToken }
-        : { token, shortToken: shortToken }
-    )
+        : { token, shortToken: shortToken },
+    ),
   );
 });
 
@@ -102,7 +102,7 @@ export const logout = TryCatch(async (req: AuthRequest, res: Response) => {
     new BaseResponse({
       success: true,
       message: "Logged out successfully",
-    })
+    }),
   );
 });
 export const getUserDetails = TryCatch(
@@ -117,10 +117,10 @@ export const getUserDetails = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "User Details"),
         },
-        getDetailsUser
-      )
+        getDetailsUser,
+      ),
     );
-  }
+  },
 );
 
 export const changeRole = TryCatch(async (req: AuthRequest, res: Response) => {
@@ -136,7 +136,7 @@ export const changeRole = TryCatch(async (req: AuthRequest, res: Response) => {
 
   const { token, shortToken, uuid } = await authService.changeRole(
     roleId,
-    ccId
+    ccId,
   );
 
   const rolePermission = processAndRecreateJWT(token);
@@ -149,7 +149,7 @@ export const changeRole = TryCatch(async (req: AuthRequest, res: Response) => {
       roles: rolePermission.roles,
       permissions: rolePermission.permissions,
     },
-    SEVENTEEN_HOURS / 1000
+    SEVENTEEN_HOURS / 1000,
   );
 
   res.cookie("access-token-av6", shortToken, {
@@ -170,8 +170,8 @@ export const changeRole = TryCatch(async (req: AuthRequest, res: Response) => {
       },
       envMode.toUpperCase() === "TEST"
         ? { token: shortToken }
-        : { token, shortToken: shortToken }
-    )
+        : { token, shortToken: shortToken },
+    ),
   );
 });
 
@@ -189,10 +189,10 @@ export const getRoleByCcId = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Role By Cc Id"),
         },
-        getDetailsUser
-      )
+        getDetailsUser,
+      ),
     );
-  }
+  },
 );
 
 export const verifyPermission = TryCatch(
@@ -215,10 +215,10 @@ export const verifyPermission = TryCatch(
 
     const response = BaseResponse.success(
       { type: "FETCHED", data: { isAuthorized } },
-      "Permission"
+      "Permission",
     );
 
     logger.info("exiting::getPermission::controller");
     return res.status(201).json(response);
-  }
+  },
 );

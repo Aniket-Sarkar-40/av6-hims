@@ -24,7 +24,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toBranchRequisitionReturnDTO = async (
-  branchRequisitionReturn: GetBranchRequisitionReturnResponse
+  branchRequisitionReturn: GetBranchRequisitionReturnResponse,
 ): Promise<BranchRequisitionReturnDTO> => {
   logger.info("entering::toBranchRequisitionReturnDTO::mapper");
 
@@ -35,31 +35,31 @@ export const toBranchRequisitionReturnDTO = async (
   const warehouse = branchRequisitionReturn.ccId
     ? await warehouseService.getWarehouseById(
         branchRequisitionReturn.ccId,
-        true
+        true,
       )
     : null;
 
   const reqFrom = branchRequisitionReturn.requisitionFrom
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-        branchRequisitionReturn.requisitionFrom
+        branchRequisitionReturn.requisitionFrom,
       )
     : null;
 
   const approvedBy = branchRequisitionReturn.approvedBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-        branchRequisitionReturn.approvedBy
+        branchRequisitionReturn.approvedBy,
       )
     : null;
 
   const rejectBy = branchRequisitionReturn.rejectBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-        branchRequisitionReturn.rejectBy
+        branchRequisitionReturn.rejectBy,
       )
     : null;
 
   const acknowledgementBy = branchRequisitionReturn.acknowledgementBy
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-        branchRequisitionReturn.acknowledgementBy
+        branchRequisitionReturn.acknowledgementBy,
       )
     : null;
 
@@ -69,21 +69,21 @@ export const toBranchRequisitionReturnDTO = async (
         const itemDTO = detail.itemId
           ? await itemMasterService.getItemMasterById(
               { itemId: detail.itemId },
-              true
+              true,
             )
           : null;
 
         const branchInHandStock = branchRequisitionReturn.branchId
           ? await getItemStockQtyByLocation(
               detail.itemId,
-              branchRequisitionReturn.branchId
+              branchRequisitionReturn.branchId,
             )
           : null;
 
         const warehouseInHandStock = branchRequisitionReturn.ccId
           ? await getItemStockQtyByLocation(
               detail.itemId,
-              branchRequisitionReturn.ccId
+              branchRequisitionReturn.ccId,
             )
           : null;
 
@@ -141,12 +141,12 @@ export const toBranchRequisitionReturnDTO = async (
 
         const detailCreatedBy = itemDetail.createdBy
           ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-              itemDetail.createdBy
+              itemDetail.createdBy,
             )
           : null;
         const detailUpdatedBy = itemDetail.updatedBy
           ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-              itemDetail.updatedBy
+              itemDetail.updatedBy,
             )
           : null;
 
@@ -174,8 +174,8 @@ export const toBranchRequisitionReturnDTO = async (
           refInTransitQtyToAcknowledge,
           inTransitStock: inTransitQtyToAcknowledge,
         };
-      })
-    )
+      }),
+    ),
   );
 
   const omittedBRR = customOmit<
@@ -213,7 +213,7 @@ export const toBranchRequisitionReturnDTO = async (
 };
 
 export const toBranchReturnDetailDTO = async (
-  details: BranchReturnItemDetails[]
+  details: BranchReturnItemDetails[],
 ): Promise<BrReturnDetailDTO[]> => {
   return await Promise.all(
     details.map(async (detail) => {
@@ -224,7 +224,7 @@ export const toBranchReturnDetailDTO = async (
       const itemDTO = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           )
         : null;
       const createdBy = detail.createdBy
@@ -240,6 +240,6 @@ export const toBranchReturnDetailDTO = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

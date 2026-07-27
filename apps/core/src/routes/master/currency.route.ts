@@ -45,7 +45,7 @@ currencyRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "CREATE")),
   validateCurrency,
-  createCurrency
+  createCurrency,
 );
 
 /**
@@ -61,7 +61,7 @@ currencyRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "VIEW")),
-  getAllCurrency
+  getAllCurrency,
 );
 
 /**
@@ -84,7 +84,7 @@ currencyRouter.get(
   "/:currencyId",
   verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "VIEW")),
-  getCurrencyById
+  getCurrencyById,
 );
 
 /**
@@ -114,10 +114,10 @@ currencyRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "CURRENCY", "VIEW"),
-    getPermission("CORE", "CURRENCY", "UPDATE")
+    getPermission("CORE", "CURRENCY", "UPDATE"),
   ),
   validateUpdateCurrency,
-  updateCurrency
+  updateCurrency,
 );
 
 /**
@@ -140,7 +140,7 @@ currencyRouter.delete(
   "/:currencyId",
   verifyToken(),
   authorize(getPermission("CORE", "CURRENCY", "DELETE")),
-  deleteCurrency
+  deleteCurrency,
 );
 
 export default currencyRouter;

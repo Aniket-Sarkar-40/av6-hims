@@ -46,7 +46,7 @@ collectionCenterRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "CREATE")),
   validateCollectionCenter,
-  createCollectionCenter
+  createCollectionCenter,
 );
 
 /**
@@ -62,7 +62,7 @@ collectionCenterRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
-  getAllCollectionCenter
+  getAllCollectionCenter,
 );
 
 /**
@@ -78,7 +78,7 @@ collectionCenterRouter.get(
   "/avl",
   verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
-  getAvailableCollectionCenter
+  getAvailableCollectionCenter,
 );
 
 /**
@@ -99,7 +99,7 @@ collectionCenterRouter.get(
   "/id",
   verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
-  getCollectionCenterById
+  getCollectionCenterById,
 );
 
 /**
@@ -129,10 +129,10 @@ collectionCenterRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "COLLECTION_CENTER", "VIEW"),
-    getPermission("CORE", "COLLECTION_CENTER", "UPDATE")
+    getPermission("CORE", "COLLECTION_CENTER", "UPDATE"),
   ),
   validateCollectionCenterUpdate,
-  updateCollectionCenter
+  updateCollectionCenter,
 );
 
 /**
@@ -148,7 +148,7 @@ collectionCenterRouter.get(
   "/staffId",
   verifyToken(),
   authorize(getPermission("CORE", "COLLECTION_CENTER", "VIEW")),
-  getBranchOrWarehouse
+  getBranchOrWarehouse,
 );
 
 export default collectionCenterRouter;

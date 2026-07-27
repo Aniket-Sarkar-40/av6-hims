@@ -52,7 +52,7 @@ appointmentRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "CREATE")),
   validateAppointments,
-  createAppointment
+  createAppointment,
 );
 
 /**
@@ -75,10 +75,10 @@ appointmentRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "APPOINTMENT", "VIEW"),
-    getPermission("OPD", "APPOINTMENT", "UPDATE")
+    getPermission("OPD", "APPOINTMENT", "UPDATE"),
   ),
   validateAppointmentUpdate,
-  updateAppointment
+  updateAppointment,
 );
 
 /**
@@ -94,7 +94,7 @@ appointmentRouter.get(
   "/",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "VIEW")),
-  getAllAppointment
+  getAllAppointment,
 );
 
 /**
@@ -116,7 +116,7 @@ appointmentRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "VIEW")),
-  getAppointmentById
+  getAppointmentById,
 );
 
 /**
@@ -132,7 +132,7 @@ appointmentRouter.delete(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "APPOINTMENT", "DELETE")),
-  cancelAppointment
+  cancelAppointment,
 );
 
 /**
@@ -155,10 +155,10 @@ appointmentRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "APPOINTMENT", "VIEW"),
-    getPermission("OPD", "APPOINTMENT", "UPDATE")
+    getPermission("OPD", "APPOINTMENT", "UPDATE"),
   ),
   validateRescheduledAppointment,
-  rescheduleAppointment
+  rescheduleAppointment,
 );
 
 /**
@@ -181,10 +181,10 @@ appointmentRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "APPOINTMENT", "VIEW"),
-    getPermission("OPD", "APPOINTMENT", "UPDATE")
+    getPermission("OPD", "APPOINTMENT", "UPDATE"),
   ),
   validateUpgradeAppointment,
-  upgradeAppointment
+  upgradeAppointment,
 );
 /**
  * @swagger
@@ -207,5 +207,5 @@ appointmentRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "DOCTOR_FEES", "VIEW")),
   validategetAppointmentFees,
-  getAppointmentFees
+  getAppointmentFees,
 );

@@ -24,7 +24,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toBranchRequisitionDTO = async (
-  branchRequisition: BranchRequisitionResponse[]
+  branchRequisition: BranchRequisitionResponse[],
 ): Promise<BranchRequisitionDTO[]> => {
   logger.info("entering::toBranchRequisitionDTO::mapper");
 
@@ -58,37 +58,37 @@ export const toBranchRequisitionDTO = async (
 
       const requisitionFrom = requisition.requisitionFrom
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisition.requisitionFrom
+            requisition.requisitionFrom,
           )
         : null;
 
       const createdBy = requisition.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisition.createdBy
+            requisition.createdBy,
           )
         : null;
 
       const updatedBy = requisition.updatedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisition.updatedBy
+            requisition.updatedBy,
           )
         : null;
 
       const approvedBy = requisition.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisition.approvedBy
+            requisition.approvedBy,
           )
         : null;
 
       const rejectBy = requisition.rejectBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisition.rejectBy
+            requisition.rejectBy,
           )
         : null;
 
       const acknowledgementBy = requisition.acknowledgementBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-            requisition.acknowledgementBy
+            requisition.acknowledgementBy,
           )
         : null;
 
@@ -97,7 +97,7 @@ export const toBranchRequisitionDTO = async (
           const itemDTO = detail.itemId
             ? await itemMasterService.getItemMasterById(
                 { itemId: detail.itemId },
-                true
+                true,
               )
             : null;
 
@@ -117,7 +117,7 @@ export const toBranchRequisitionDTO = async (
                   });
 
                   return stockQty;
-                })
+                }),
             )
           ).reduce((total, qty) => total + qty, 0);
 
@@ -128,18 +128,18 @@ export const toBranchRequisitionDTO = async (
           const branchInHandStock = requisition.branchId
             ? await getItemStockQtyByLocation(
                 detail.itemId,
-                requisition.branchId
+                requisition.branchId,
               )
             : null;
 
           const detailCreatedBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.createdBy
+                detail.createdBy,
               )
             : null;
           const detailUpdatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.updatedBy
+                detail.updatedBy,
               )
             : null;
 
@@ -152,7 +152,7 @@ export const toBranchRequisitionDTO = async (
             createdBy: detailCreatedBy,
             updatedBy: detailUpdatedBy,
           };
-        })
+        }),
       );
 
       return {
@@ -168,7 +168,7 @@ export const toBranchRequisitionDTO = async (
         acknowledgementBy,
         isAnyPendingReturn,
       };
-    })
+    }),
   );
 
   logger.info("exiting::toBranchRequisitionDTO::mapper");
@@ -177,19 +177,19 @@ export const toBranchRequisitionDTO = async (
 
 export const toBranchItemDetailDTO = async (
   branchRequisition: BranchItemDetailResponse,
-  branchId?: number | null
+  branchId?: number | null,
 ): Promise<BranchItemDetailDTO> => {
   const itemDTO = branchRequisition.itemId
     ? await itemMasterService.getItemMasterById(
         { itemId: branchRequisition.itemId },
-        true
+        true,
       )
     : null;
 
   const inHandWarehouseQty = branchRequisition.ccId
     ? await getItemStockQtyByLocation(
         branchRequisition.itemId,
-        branchRequisition.ccId
+        branchRequisition.ccId,
       )
     : null;
 
@@ -198,7 +198,7 @@ export const toBranchItemDetailDTO = async (
   const inHandBranchQty = branchStockLocationId
     ? await getItemStockQtyByLocation(
         branchRequisition.itemId,
-        branchStockLocationId
+        branchStockLocationId,
       )
     : null;
 
@@ -217,12 +217,12 @@ export const toBranchItemDetailDTO = async (
   const maxReturnableQty = Math.max(
     Number(branchRequisition.acknowledgedQty ?? 0) -
       Number(branchRequisition.returnedQty ?? 0),
-    0
+    0,
   );
 
   const availableQtyToReturn = Math.min(
     Number(branchBatchStockQty ?? 0),
-    maxReturnableQty
+    maxReturnableQty,
   );
 
   const detailDTO: BranchRequisitionDetailDTO = {
@@ -242,7 +242,7 @@ export const toBranchItemDetailDTO = async (
 };
 
 export const toBranchRequisitionBatchWiseDTO = async (
-  branchRequisition: BranchReqBatchWiseResponse
+  branchRequisition: BranchReqBatchWiseResponse,
 ): Promise<BranchRequisitionBatchWiseDTO> => {
   const omittedBranchReq = customOmit<
     BranchReqBatchWiseResponse,
@@ -274,15 +274,15 @@ export const toBranchRequisitionBatchWiseDTO = async (
 
   const reqFrom = branchRequisition.requisitionFrom
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-        branchRequisition.requisitionFrom
+        branchRequisition.requisitionFrom,
       )
     : null;
 
   const detailDTO: BranchItemDetailDTO[] = await Promise.all(
     branchRequisition.branchItemDetails.map(
       async (detail) =>
-        await toBranchItemDetailDTO(detail, branchRequisition.branchId)
-    )
+        await toBranchItemDetailDTO(detail, branchRequisition.branchId),
+    ),
   );
 
   return {
@@ -295,7 +295,7 @@ export const toBranchRequisitionBatchWiseDTO = async (
 };
 
 export const toBranchRequisitionDetailDTO = async (
-  details: BranchRequisitionDetails[]
+  details: BranchRequisitionDetails[],
 ): Promise<BrDetailDTO[]> => {
   return await Promise.all(
     details.map(async (detail) => {
@@ -306,7 +306,7 @@ export const toBranchRequisitionDetailDTO = async (
       const itemDTO = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           )
         : null;
       const createdBy = detail.createdBy
@@ -322,6 +322,6 @@ export const toBranchRequisitionDetailDTO = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

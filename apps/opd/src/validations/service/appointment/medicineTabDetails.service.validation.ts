@@ -22,7 +22,7 @@ export const validateIdMedicineTabDetails = async (id: number) => {
   if (!record) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Medicine Tab Detail")
+      generateErrorMessage("NOT_FOUND", "Medicine Tab Detail"),
     );
   }
 
@@ -31,20 +31,20 @@ export const validateIdMedicineTabDetails = async (id: number) => {
 };
 
 export const createMedicineTabDetailsServiceValidation = async (
-  body: CreateMedicineTabDetails
+  body: CreateMedicineTabDetails,
 ) => {
   logger.info(
-    "entering::createMedicineTabDetailsServiceValidation::service::validation"
+    "entering::createMedicineTabDetailsServiceValidation::service::validation",
   );
 
   const medTabId = await medicineTabService.getMedicineTabById(
     body.medicineTabId,
-    true
+    true,
   );
   if (!medTabId) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Medicine Tab")
+      generateErrorMessage("NOT_FOUND", "Medicine Tab"),
     );
   }
 
@@ -53,37 +53,37 @@ export const createMedicineTabDetailsServiceValidation = async (
     if (!records) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Medicine")
+        generateErrorMessage("NOT_FOUND", "Medicine"),
       );
     }
 
     const exists = await getMedicineTabIdAndMedIdByIdFromDb(
       body.medicineTabId,
-      item.medId
+      item.medId,
     );
     if (exists) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Med Id And Med Tab Id")
+        generateErrorMessage("DUPLICATE_ITEM", "Med Id And Med Tab Id"),
       );
     }
   }
 };
 export const updateMedicineTabDetailsServiceValidation = async (
-  body: UpdateMedicineTabDetailsInput
+  body: UpdateMedicineTabDetailsInput,
 ) => {
   logger.info(
-    "entering::updateMedicineTabDetailsServiceValidation::service::validation"
+    "entering::updateMedicineTabDetailsServiceValidation::service::validation",
   );
 
   const medTab = await medicineTabService.getMedicineTabById(
     body.medicineTabId,
-    true
+    true,
   );
   if (!medTab) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Medicine Tab")
+      generateErrorMessage("NOT_FOUND", "Medicine Tab"),
     );
   }
 
@@ -93,13 +93,13 @@ export const updateMedicineTabDetailsServiceValidation = async (
     if (!medExists) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Medicine")
+        generateErrorMessage("NOT_FOUND", "Medicine"),
       );
     }
 
     const existing = await getMedicineTabIdAndMedIdByIdFromDb(
       body.medicineTabId,
-      item.medId
+      item.medId,
     );
 
     if (existing && existing.id !== item.id) {
@@ -107,13 +107,13 @@ export const updateMedicineTabDetailsServiceValidation = async (
         400,
         generateErrorMessage(
           "DUPLICATE_ITEM",
-          "Medicine Tab & Medicine combination"
-        )
+          "Medicine Tab & Medicine combination",
+        ),
       );
     }
   }
 
   logger.info(
-    "exiting::updateMedicineTabDetailsServiceValidation::service::validation"
+    "exiting::updateMedicineTabDetailsServiceValidation::service::validation",
   );
 };

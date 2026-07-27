@@ -70,7 +70,7 @@ export const grnService = {
     if (records.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "grn Order")
+        generateErrorMessage("NOT_FOUND", "grn Order"),
       );
     }
 
@@ -82,7 +82,7 @@ export const grnService = {
             goodReceiveDetails: sr.goodReceiveDetails,
           },
         ]);
-      })
+      }),
     );
 
     logger.info("exiting::getAllGrn::service");
@@ -91,7 +91,7 @@ export const grnService = {
 
   async getGrnById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<GrnDTO | null> {
     logger.info("entering::getGrnById::service id=" + id);
 
@@ -103,11 +103,11 @@ export const grnService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Good Receive Note")
+          generateErrorMessage("NOT_FOUND", "Good Receive Note"),
         );
       } else {
         logger.warn(
-          `GRN with id=${id} not found, returning null as requested.`
+          `GRN with id=${id} not found, returning null as requested.`,
         );
         return null;
       }
@@ -134,7 +134,7 @@ export const grnService = {
     if (!grn) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Purchase Order")
+        generateErrorMessage("NOT_FOUND", "Purchase Order"),
       );
     }
     const grnDto = await toGrnPdfDTO(grn);
@@ -142,7 +142,7 @@ export const grnService = {
     if (!grnDto) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Purchase Order")
+        generateErrorMessage("NOT_FOUND", "Purchase Order"),
       );
     }
 
@@ -154,7 +154,7 @@ export const grnService = {
     if (!pdfTemplate) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "PDF template")
+        generateErrorMessage("NOT_FOUND", "PDF template"),
       );
     }
 
@@ -164,7 +164,7 @@ export const grnService = {
 
     const filledDef = await resolvePdfTemplate(
       pdfTemplate.bodyJson as unknown as CustomDocDefinition,
-      applyGrnRateReverseConversion(grnDto, { roundFormat, precision })
+      applyGrnRateReverseConversion(grnDto, { roundFormat, precision }),
     );
     const pdfBuffer = await renderCustomPdfToBuffer(filledDef);
 

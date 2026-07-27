@@ -45,7 +45,7 @@ medTypeRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_TYPE", "CREATE")),
   validateDropDownName,
-  createMedType
+  createMedType,
 );
 
 /**
@@ -61,7 +61,7 @@ medTypeRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_TYPE", "VIEW")),
-  getAllMedType
+  getAllMedType,
 );
 
 /**
@@ -82,7 +82,7 @@ medTypeRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_TYPE", "VIEW")),
-  getMedTypeById
+  getMedTypeById,
 );
 
 /**
@@ -112,10 +112,10 @@ medTypeRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_TYPE", "VIEW"),
-    getPermission("PMS", "MEDICINE_TYPE", "UPDATE")
+    getPermission("PMS", "MEDICINE_TYPE", "UPDATE"),
   ),
   validateDropDownNameUpdate,
-  updateMedType
+  updateMedType,
 );
 
 export default medTypeRouter;

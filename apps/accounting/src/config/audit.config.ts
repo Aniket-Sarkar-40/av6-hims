@@ -21,7 +21,7 @@ const contextProvider: AuditContextProvider<ServiceCode> = () => {
 const auditCore = new AuditCore<ServiceCode>(
   db,
   contextProvider,
-  requestStorage
+  requestStorage,
 );
 const auditLogger = new AuditLogger(auditCore);
 export const auditProxy = new AuditProxy(auditLogger);

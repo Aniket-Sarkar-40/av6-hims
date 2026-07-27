@@ -37,5 +37,5 @@ pathologyMasterRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATHOLOGY_MASTER", "VIEW")),
-  getPathologyMasterById
+  getPathologyMasterById,
 );

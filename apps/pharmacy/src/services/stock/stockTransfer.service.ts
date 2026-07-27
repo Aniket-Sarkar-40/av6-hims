@@ -31,7 +31,7 @@ import { PaginatedResponse } from "av6-core-v2";
 
 export const stockTransferService = {
   async createStockTransfer(
-    input: CreateItemStockTransferInput
+    input: CreateItemStockTransferInput,
   ): Promise<StockTransferDTO> {
     logger.info("entering::createStockTransfer::service");
     await createStockTransferServiceValidation(input);
@@ -42,7 +42,7 @@ export const stockTransferService = {
   },
 
   async updateStockTransfer(
-    input: UpdateItemStockTransferInput
+    input: UpdateItemStockTransferInput,
   ): Promise<StockTransferDTO> {
     logger.info("entering::updateStockTransfer::service");
     await updateStockTransferServiceValidation(input);
@@ -60,7 +60,7 @@ export const stockTransferService = {
   },
 
   async approveStockTransfer(
-    input: StockTransferUpdate
+    input: StockTransferUpdate,
   ): Promise<StockTransferDTO> {
     logger.info("entering::approveStockTransfer::service");
     await approveStockTransferServiceValidation(input);
@@ -70,7 +70,7 @@ export const stockTransferService = {
     return stockTransferDTO;
   },
   async approveReturnStockTransfer(
-    input: StockTransferUpdate
+    input: StockTransferUpdate,
   ): Promise<StockTransferDTO> {
     logger.info("entering::approveReturnStockTransfer::service");
     await approveReturnStockTransferServiceValidation(input);
@@ -81,7 +81,7 @@ export const stockTransferService = {
   },
 
   async acknowledgeStockTransfer(
-    input: StockTransferAcknowledgeInput
+    input: StockTransferAcknowledgeInput,
   ): Promise<StockTransferDTO> {
     logger.info("entering::acknowledgeStockTransfer::service");
     await acknowledgeStockTransferServiceValidation(input);
@@ -103,13 +103,13 @@ export const stockTransferService = {
     logger.info("entering::getAllStockTransfer::service");
     const stockTransfer = await getAllStockTransfer();
     const stockTransferDTOs = await Promise.all(
-      stockTransfer.map((d) => toStockTransferDTO(d))
+      stockTransfer.map((d) => toStockTransferDTO(d)),
     );
     logger.info("exiting::getAllStockTransfer::service");
     return stockTransferDTOs;
   },
   async searchStockTransfers(
-    input: StockTransferSearchInput
+    input: StockTransferSearchInput,
   ): Promise<PaginatedResponse<StockTransferDTO>> {
     logger.info("entering::searchStockTransfers::service");
 

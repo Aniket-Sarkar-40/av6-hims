@@ -86,7 +86,7 @@ export const itemMasterService = {
     logger.info("entering::getItemStocks::service");
     if (itemStockReq.userId) {
       const user = await employeeService.getEmployeeByIdFrmCacheOrDb(
-        itemStockReq.userId
+        itemStockReq.userId,
       );
       if (!user) {
         throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "User"));
@@ -97,7 +97,7 @@ export const itemMasterService = {
       if (!cc) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Location")
+          generateErrorMessage("NOT_FOUND", "Location"),
         );
       }
     }
@@ -114,7 +114,7 @@ export const itemMasterService = {
     if (!input.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("FIELD_REQUIRED", "Item Master ID")
+        generateErrorMessage("FIELD_REQUIRED", "Item Master ID"),
       );
     }
     await updateIdItemMasterServiceValidation(input);
@@ -130,7 +130,7 @@ export const itemMasterService = {
   },
 
   async getAllItemMaster(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemMasterDto[]> {
     logger.info("entering::getAllItemMaster::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.ITEM);
@@ -144,7 +144,7 @@ export const itemMasterService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Master")
+          generateErrorMessage("NOT_FOUND", "Item Master"),
         );
       else return [];
     }
@@ -165,7 +165,7 @@ export const itemMasterService = {
     if (itemMaster.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Item Master")
+        generateErrorMessage("NOT_FOUND", "Item Master"),
       );
     }
     logger.info("exiting::getAllItemMasterWoDto::service");
@@ -174,7 +174,7 @@ export const itemMasterService = {
 
   async getItemMasterById(
     input: GetItemReq,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemMasterDtoStock | null> {
     logger.info("entering::getItemMasterById::service");
     const { itemId, ccId, supplierId } = input;
@@ -192,7 +192,7 @@ export const itemMasterService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Master")
+          generateErrorMessage("NOT_FOUND", "Item Master"),
         );
       else return null;
     }
@@ -202,7 +202,7 @@ export const itemMasterService = {
   },
   async getItemMasterByIdWoDto(
     itemId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvItem | null> {
     logger.info("entering::getItemMasterById::service");
     validIdCheck(itemId);
@@ -217,7 +217,7 @@ export const itemMasterService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Master")
+          generateErrorMessage("NOT_FOUND", "Item Master"),
         );
       else return null;
     }
@@ -242,13 +242,13 @@ export const itemMasterService = {
 
     if (input.unitId) {
       filteredItems = filteredItems.filter(
-        (item) => item.unitId === input.unitId
+        (item) => item.unitId === input.unitId,
       );
     }
 
     if (input.itemCategoryId) {
       filteredItems = filteredItems.filter(
-        (item) => item.itemCategoryId === input.itemCategoryId
+        (item) => item.itemCategoryId === input.itemCategoryId,
       );
     }
 
@@ -262,13 +262,13 @@ export const itemMasterService = {
           item,
           categories: item.itemCategoryId,
           units: item.unitId,
-        })
-      )
+        }),
+      ),
     );
   },
 
   async getItemSupplierPricesForSupplier(
-    input: getItems
+    input: getItems,
   ): Promise<ItemMasterDtoStock[]> {
     logger.info("entering::getItemSupplierPricesForSupplier::service");
     await validateBulkItemSupplierPricesService(input);
@@ -281,8 +281,8 @@ export const itemMasterService = {
           itemId: itm.id,
           supplierId: input.supplierId,
           ccId: input.ccId,
-        })
-      )
+        }),
+      ),
     );
 
     logger.info("exiting::getItemSupplierPricesForSupplier::service");
@@ -438,7 +438,7 @@ export const itemMasterService = {
     if (items.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Item Master")
+        generateErrorMessage("NOT_FOUND", "Item Master"),
       );
     }
 
@@ -511,7 +511,7 @@ export const itemMasterService = {
     const data = XLSX.utils.sheet_to_json(sheet) as ItemMasterExcelRow[];
 
     const convertedData = data.map((elem, ind) =>
-      mapRowToItemMasterExcelCreateInput(elem, ind + 1)
+      mapRowToItemMasterExcelCreateInput(elem, ind + 1),
     );
 
     const { value } = validateItemMasterExcelArray(convertedData);

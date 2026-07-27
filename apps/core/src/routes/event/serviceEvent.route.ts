@@ -42,7 +42,7 @@ serviceEventRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "SERVICE_EVENT", "CREATE")),
   validateServiceEventCreate,
-  createServiceEvent
+  createServiceEvent,
 );
 
 /**
@@ -72,7 +72,7 @@ serviceEventRouter.put(
   verifyToken(),
   authorize(getPermission("CORE", "SERVICE_EVENT", "UPDATE")),
   validateServiceEventUpdate,
-  updateServiceEvent
+  updateServiceEvent,
 );
 
 export default serviceEventRouter;

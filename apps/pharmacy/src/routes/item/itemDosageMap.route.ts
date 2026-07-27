@@ -44,7 +44,7 @@ itemDosageRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_DOSAGE_MAP", "CREATE")),
   validateCreateItemDosageMap,
-  createItemDosageMap
+  createItemDosageMap,
 );
 
 /**
@@ -67,10 +67,10 @@ itemDosageRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_DOSAGE_MAP", "VIEW"),
-    getPermission("PMS", "ITEM_DOSAGE_MAP", "UPDATE")
+    getPermission("PMS", "ITEM_DOSAGE_MAP", "UPDATE"),
   ),
   validateUpdateItemDosageMap,
-  updateItemDosageMap
+  updateItemDosageMap,
 );
 
 /**
@@ -86,5 +86,5 @@ itemDosageRouter.delete(
   "/:id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_DOSAGE_MAP", "DELETE")),
-  deleteItemDosage
+  deleteItemDosage,
 );

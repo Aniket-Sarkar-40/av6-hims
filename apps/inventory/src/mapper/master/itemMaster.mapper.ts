@@ -52,7 +52,7 @@ import {
 } from "@repo/shared/utils/excelImport.utils.js";
 
 export const toItemMasterDTO = async (
-  data: InvItem[]
+  data: InvItem[],
 ): Promise<ItemMasterDto[]> => {
   const itemCategories = await commonService.getAllElements<"InvItemCategory">({
     cacheCode: "ITEM_CATEGORY",
@@ -146,15 +146,15 @@ export const toItemMasterDTO = async (
 
 export const toItemMasterDTOForItemSupplierMap = async (
   model: InvItem,
-  itemReq?: GetItemReq
+  itemReq?: GetItemReq,
 ): Promise<ItemMasterDtoStock> => {
   const itemCategoryRow = await itemCategoryService.getItemCategoryById(
     model.itemCategoryId,
-    true
+    true,
   );
   const unitMasterRow = await unitMasterService.getUnitMasterById(
     model.unitId,
-    true
+    true,
   );
   const taxDetailsRow = model.taxDetailsId
     ? await taxDetailsService.getTaxDetailsById(model.taxDetailsId, true)
@@ -172,9 +172,8 @@ export const toItemMasterDTOForItemSupplierMap = async (
     : null;
 
   if (itemReq?.ccId && itemReq.supplierId && supplierMode) {
-    const itemSupplierMap = await itemSupplierMapService.getItemSupplierMap(
-      itemReq
-    );
+    const itemSupplierMap =
+      await itemSupplierMapService.getItemSupplierMap(itemReq);
 
     if (
       itemSupplierMap?.purchasePrice !== null &&
@@ -233,7 +232,7 @@ export const toItemMasterDTOForItemSupplierMap = async (
 };
 
 export const toItemSearchDTO = async (
-  input: ItemSearchInput
+  input: ItemSearchInput,
 ): Promise<ItemSearchDTO> => {
   const item = input.item;
 
@@ -268,11 +267,11 @@ export const toItemSearchDTO = async (
 };
 
 export const toItemStockDTO = async (
-  stock: InvItemStock
+  stock: InvItemStock,
 ): Promise<ItemStockDTO> => {
   const item = await itemMasterService.getItemMasterByIdWoDto(
     stock.itemId,
-    true
+    true,
   );
   const user = stock.userId
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(stock.userId, true)
@@ -287,7 +286,7 @@ export const toItemStockDTO = async (
 
 export const toItemEntity = (
   item: ItemMasterEntity,
-  itemImage: ItemImageFiles
+  itemImage: ItemImageFiles,
 ): ItemMasterReq => {
   return {
     item: item.item,
@@ -334,7 +333,7 @@ export const toItemEntity = (
 
 export const toItemUpdateEntity = (
   item: ItemMasterUpdateEntity,
-  itemImage: ItemImageFiles
+  itemImage: ItemImageFiles,
 ): ItemMasterUpdateReq => {
   return {
     ...toItemEntity(item, itemImage),
@@ -358,7 +357,7 @@ export const toItemUpdateEntity = (
 
 export function mapRowToItemMasterExcelCreateInput(
   row: ItemMasterExcelRow,
-  rowNo: number
+  rowNo: number,
 ): ItemMasterExcelStagingRow {
   const basePrice = toNumberOrNull(row["Base Price"]);
   const reOrderLevel = toIntOrNull(row["Re-order Level"]);
@@ -370,7 +369,7 @@ export function mapRowToItemMasterExcelCreateInput(
     itemCategory: toRequiredString(
       row["Item Category"],
       "Item Category",
-      rowNo
+      rowNo,
     ),
     storage: toStringOrNull(row.Storage),
     unit: toRequiredString(row.Unit, "Unit", rowNo),
@@ -390,7 +389,7 @@ export function mapRowToItemMasterExcelCreateInput(
 
 export const mapExcelRowToItemMasterReq = (
   row: InvItemMasterExcel,
-  resolved: ItemMasterResolvedIds
+  resolved: ItemMasterResolvedIds,
 ): ItemMasterReq => {
   return {
     item: row.item,

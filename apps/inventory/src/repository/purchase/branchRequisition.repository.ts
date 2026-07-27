@@ -30,7 +30,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-core-v2";
 
 export const createBranchRequisitionInDb = async (
-  input: CreateBranchRequisitionInput
+  input: CreateBranchRequisitionInput,
 ) => {
   logger.info("entering::createBranchRequisitionInDb::repository");
 
@@ -84,7 +84,7 @@ export const createBranchRequisitionInDb = async (
 };
 
 export const updateBranchRequisitionInDb = async (
-  input: CreateBranchRequisitionInput
+  input: CreateBranchRequisitionInput,
 ) => {
   logger.info("entering::updateBranchRequisitionInDb::repository");
 
@@ -109,19 +109,19 @@ export const updateBranchRequisitionInDb = async (
   const currentUser = store?.user?.id;
 
   const toUpdate = omittedInput.omitted.branchRequisitionDetails.filter(
-    (d) => typeof d.id === "number"
+    (d) => typeof d.id === "number",
   );
 
   const toCreate = omittedInput.omitted.branchRequisitionDetails.filter(
-    (d) => typeof d.id !== "number"
+    (d) => typeof d.id !== "number",
   );
 
   const toDelete =
     omittedInput.omitted.branchReq?.branchRequisitionDetails?.filter(
       (d) =>
         !omittedInput.omitted.branchRequisitionDetails.some(
-          (item) => item.id === d.id
-        )
+          (item) => item.id === d.id,
+        ),
     ) || [];
 
   const updated = await db.$transaction(async (tx) => {
@@ -213,7 +213,7 @@ export const updateBranchRequisitionInDb = async (
 };
 
 export const validateBranchRequisitionByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<ValBranchRequisitionResponse | null> => {
   logger.info("entering::validateBranchRequisitionByIdFromDb::repository");
 
@@ -241,7 +241,7 @@ export const validateBranchRequisitionByIdFromDb = async (
 };
 
 export const deleteBranchRequisitionFromDb = async (
-  id: number
+  id: number,
 ): Promise<void> => {
   logger.info("entering::deleteBranchRequisitionFromDb::repository");
 
@@ -277,7 +277,7 @@ export const deleteBranchRequisitionFromDb = async (
 };
 
 export const rejectBranchRequisition = async (
-  inp: RejectBranchRequisitionInput
+  inp: RejectBranchRequisitionInput,
 ): Promise<void> => {
   logger.info("entering::rejectBranchRequisition::repository");
 
@@ -300,7 +300,7 @@ export const rejectBranchRequisition = async (
 };
 
 export const approveBranchRequisition = async (
-  inp: ApproveBranchReqInput
+  inp: ApproveBranchReqInput,
 ): Promise<void> => {
   logger.info("entering::approveBranchRequisition::repository");
 
@@ -325,7 +325,7 @@ export const approveBranchRequisition = async (
     const assignItems = rawAssignItems.map((details) => {
       const omittedFlags = customOmit<AssignBranchItem, "isBatch" | "isExpiry">(
         details,
-        ["isBatch", "isExpiry"]
+        ["isBatch", "isExpiry"],
       );
 
       return {
@@ -361,7 +361,7 @@ export const approveBranchRequisition = async (
       for (const item of assignItems) {
         agg.set(
           item.branchRequisitionDetailsId,
-          (agg.get(item.branchRequisitionDetailsId) ?? 0) + item.assignedQty
+          (agg.get(item.branchRequisitionDetailsId) ?? 0) + item.assignedQty,
         );
       }
 
@@ -378,8 +378,8 @@ export const approveBranchRequisition = async (
               },
               updatedBy: currentUser,
             },
-          })
-        )
+          }),
+        ),
       );
     }
 
@@ -415,7 +415,7 @@ export const approveBranchRequisition = async (
           refId: appStr.rest.branchReqId,
           refNo: appStr.rest.brNumber,
           refApprovedAt: now,
-        }
+        },
       );
 
       await addInTransitStock(
@@ -437,7 +437,7 @@ export const approveBranchRequisition = async (
           refId: appStr.rest.branchReqId,
           refNo: appStr.rest.brNumber,
           refApprovedAt: now,
-        }
+        },
       );
     }
   });
@@ -446,7 +446,7 @@ export const approveBranchRequisition = async (
 };
 
 export const acknowledgeBranchRequisition = async (
-  inp: AcknowledgeBranchRequisition
+  inp: AcknowledgeBranchRequisition,
 ): Promise<void> => {
   logger.info("entering::acknowledgeBranchRequisition::repository");
 
@@ -497,7 +497,7 @@ export const acknowledgeBranchRequisition = async (
             refDetailsId: detail.branchRequisitionDetailsId,
             refId: ackBranch.rest.branchReqId,
             refNo: ackBranch.rest.brNumber,
-          }
+          },
         );
 
         await subInTransitStock(
@@ -517,7 +517,7 @@ export const acknowledgeBranchRequisition = async (
             refDetailsId: detail.branchRequisitionDetailsId,
             refId: ackBranch.rest.branchReqId,
             refNo: ackBranch.rest.brNumber,
-          }
+          },
         );
       }
 
@@ -552,7 +552,7 @@ export const acknowledgeBranchRequisition = async (
 };
 
 export const getBranchItemDetailsFromDb = async (
-  id: number
+  id: number,
 ): Promise<BranchItemDetails | null> => {
   logger.info("entering::getBranchItemDetailsFromDb::repository");
 
@@ -568,7 +568,7 @@ export const getBranchItemDetailsFromDb = async (
 };
 
 export const getBranchRequisitionBatchWiseFromDb = async (
-  id: number
+  id: number,
 ): Promise<BranchReqBatchWiseResponse | null> => {
   logger.info(`entering::getStoreRequisitionBatchWiseFromDb::repository`);
   const branchReq = await db.branchRequisition.findFirst({
@@ -589,10 +589,10 @@ export const getBranchRequisitionBatchWiseFromDb = async (
 };
 
 export const valBranchRequisitionBatchWiseFromDb = async (
-  id: number
+  id: number,
 ): Promise<BranchReqBatchWiseResponse | null> => {
   logger.info(
-    `entering::getBranchRequisitionBatchWiseFromDb::repository id=${id}`
+    `entering::getBranchRequisitionBatchWiseFromDb::repository id=${id}`,
   );
   const branchReq = await db.branchRequisition.findFirst({
     where: { id, isActive: true },
@@ -608,7 +608,7 @@ export const valBranchRequisitionBatchWiseFromDb = async (
     },
   });
   logger.info(
-    `exiting::getBranchRequisitionBatchWiseFromDb::repository id=${id}`
+    `exiting::getBranchRequisitionBatchWiseFromDb::repository id=${id}`,
   );
   return branchReq;
 };

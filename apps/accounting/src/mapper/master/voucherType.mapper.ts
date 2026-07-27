@@ -1,10 +1,18 @@
 import { BaseModelAttrWoCancel } from "@/types/common.js";
-import { VoucherTypeDTO, VoucherTypeResponse } from "@/types/master/voucherType.js";
+import {
+  VoucherTypeDTO,
+  VoucherTypeResponse,
+} from "@/types/master/voucherType.js";
 import { customOmit, toIdValue } from "av6-utils";
 
-export const toVoucherTypeDto = (input: VoucherTypeResponse[]): VoucherTypeDTO[] => {
+export const toVoucherTypeDto = (
+  input: VoucherTypeResponse[],
+): VoucherTypeDTO[] => {
   const response = input.map((voucherType) => {
-    const omittedData = customOmit<VoucherTypeResponse, BaseModelAttrWoCancel | "company" | "companyId">(voucherType, [
+    const omittedData = customOmit<
+      VoucherTypeResponse,
+      BaseModelAttrWoCancel | "company" | "companyId"
+    >(voucherType, [
       "isActive",
       "createdBy",
       "createdAt",

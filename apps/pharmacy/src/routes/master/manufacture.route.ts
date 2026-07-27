@@ -50,7 +50,7 @@ manufactureRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_MANUFACTURER", "CREATE")),
   validateDropDownName,
-  manufactureCreate
+  manufactureCreate,
 );
 
 /**
@@ -69,7 +69,7 @@ manufactureRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_MANUFACTURER", "VIEW")),
-  manufactureGet
+  manufactureGet,
 );
 
 /**
@@ -90,7 +90,7 @@ manufactureRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_MANUFACTURER", "VIEW")),
-  getManufactureById
+  getManufactureById,
 );
 
 /**
@@ -120,10 +120,10 @@ manufactureRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_MANUFACTURER", "VIEW"),
-    getPermission("PMS", "MEDICINE_MANUFACTURER", "UPDATE")
+    getPermission("PMS", "MEDICINE_MANUFACTURER", "UPDATE"),
   ),
   validateDropDownNameUpdate,
-  updateManufacture
+  updateManufacture,
 );
 
 export default manufactureRouter;

@@ -4,17 +4,16 @@ import { ConsumptionDetails } from "@repo/db/generated/prisma/client";
 import { EmployeeCache } from "av6-core-v2";
 import { ItemMasterToDto } from "../grn/grn.js";
 
-export interface ConsumptionCreateInput
-  extends Omit<
-    Prisma.ConsumptionUncheckedCreateInput,
-    | "id"
-    | "consumptionDetails"
-    | "approvedBy"
-    | "rejectedBy"
-    | "approvedAt"
-    | "rejectedAt"
-    | BaseModelAttr
-  > {
+export interface ConsumptionCreateInput extends Omit<
+  Prisma.ConsumptionUncheckedCreateInput,
+  | "id"
+  | "consumptionDetails"
+  | "approvedBy"
+  | "rejectedBy"
+  | "approvedAt"
+  | "rejectedAt"
+  | BaseModelAttr
+> {
   consumptionDetails: ConsumptionDetailsCreateInput[];
 }
 
@@ -30,21 +29,18 @@ export interface ConsumptionApproveInput extends ConsumptionCreateInput {
   existing: ConsumptionResponse;
 }
 
-export interface ConsumptionDetailsCreateInput
-  extends Omit<
-    Prisma.ConsumptionDetailsUncheckedCreateInput,
-    "id" | BaseModelAttr
-  > {
+export interface ConsumptionDetailsCreateInput extends Omit<
+  Prisma.ConsumptionDetailsUncheckedCreateInput,
+  "id" | BaseModelAttr
+> {
   isBatch: boolean;
   isExpiry: boolean;
 }
 
-export interface ConsumptionDetailsUpdateInput
-  extends ConsumptionDetailsCreateInput {
+export interface ConsumptionDetailsUpdateInput extends ConsumptionDetailsCreateInput {
   id: number;
 }
-export interface ConsumptionDetailsApproveInput
-  extends ConsumptionDetailsCreateInput {
+export interface ConsumptionDetailsApproveInput extends ConsumptionDetailsCreateInput {
   id: number;
   consumedQty: number;
   isBatch: boolean;
@@ -58,16 +54,15 @@ export type ConsumptionResponse = Prisma.ConsumptionGetPayload<{
   };
 }>;
 
-export interface ConsumptionDTO
-  extends Omit<
-    ConsumptionResponse,
-    | "consumptionDetails"
-    | "ccId"
-    | "requestedBy"
-    | "rejectedBy"
-    | "approvedBy"
-    | BaseModelAttr
-  > {
+export interface ConsumptionDTO extends Omit<
+  ConsumptionResponse,
+  | "consumptionDetails"
+  | "ccId"
+  | "requestedBy"
+  | "rejectedBy"
+  | "approvedBy"
+  | BaseModelAttr
+> {
   requestedBy: EmployeeCache | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
@@ -78,15 +73,19 @@ export interface ConsumptionDTO
   collectionCenter: IdValue | null;
 }
 
-export interface ConsumptionDetailsDTO
-  extends Omit<ConsumptionDetails, "itemId" | BaseModelAttr> {
+export interface ConsumptionDetailsDTO extends Omit<
+  ConsumptionDetails,
+  "itemId" | BaseModelAttr
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;
 }
 
-export interface ConDetailDTO
-  extends Omit<ConsumptionDetails, "itemId" | "createdBy" | "updatedBy"> {
+export interface ConDetailDTO extends Omit<
+  ConsumptionDetails,
+  "itemId" | "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;

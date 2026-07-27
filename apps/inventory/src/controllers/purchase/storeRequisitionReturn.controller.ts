@@ -18,11 +18,11 @@ export const createStoreRequisitionReturn = TryCatch(
       await storeRequisitionReturnService.createStoreRequisitionReturn(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: created },
-      "Store Requisition Return"
+      "Store Requisition Return",
     );
     logger.info("exiting::createStoreRequisitionReturn::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateStoreRequisitionReturn = TryCatch(
@@ -33,11 +33,11 @@ export const updateStoreRequisitionReturn = TryCatch(
       await storeRequisitionReturnService.updateStoreRequisitionReturn(input);
     const response = BaseResponse.success(
       { type: "UPDATED", data: updated },
-      "Store Requisition Return"
+      "Store Requisition Return",
     );
     logger.info("exiting::updateStoreRequisitionReturn::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getAllStoreRequisitionReturn = TryCatch(
@@ -51,7 +51,7 @@ export const getAllStoreRequisitionReturn = TryCatch(
     });
     logger.info("exiting::getAllStoreRequisitionReturn::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getStoreRequisitionReturnById = TryCatch(
@@ -63,7 +63,7 @@ export const getStoreRequisitionReturnById = TryCatch(
 
     const storeRequisitionReturn =
       await storeRequisitionReturnService.getStoreRequisitionReturnById(
-        Number(storeRequisitionReturnId)
+        Number(storeRequisitionReturnId),
       );
 
     const response = BaseResponse.success({
@@ -72,7 +72,7 @@ export const getStoreRequisitionReturnById = TryCatch(
     });
     logger.info("exiting::getStoreRequisitionReturnById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteStoreRequisitionReturn = TryCatch(
@@ -81,16 +81,16 @@ export const deleteStoreRequisitionReturn = TryCatch(
     const { id } = req.query as { id: string };
 
     await storeRequisitionReturnService.deleteStoreRequisitionReturn(
-      Number(id)
+      Number(id),
     );
 
     logger.info("exiting::deleteStoreRequisitionReturn::controller");
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "DELETED" }, "Store Requisition Return")
+        BaseResponse.success({ type: "DELETED" }, "Store Requisition Return"),
       );
-  }
+  },
 );
 
 export const rejectStoreRequisitionReturn = TryCatch(
@@ -104,9 +104,9 @@ export const rejectStoreRequisitionReturn = TryCatch(
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "REJECTED" }, "Store Requisition Return")
+        BaseResponse.success({ type: "REJECTED" }, "Store Requisition Return"),
       );
-  }
+  },
 );
 
 export const approveStoreRequisitionReturn = TryCatch(
@@ -120,9 +120,9 @@ export const approveStoreRequisitionReturn = TryCatch(
     return res
       .status(200)
       .json(
-        BaseResponse.success({ type: "APPROVED" }, "Store Requisition Return")
+        BaseResponse.success({ type: "APPROVED" }, "Store Requisition Return"),
       );
-  }
+  },
 );
 
 export const acknowledgeStoreRequisitionReturn = TryCatch(
@@ -138,8 +138,8 @@ export const acknowledgeStoreRequisitionReturn = TryCatch(
       .json(
         BaseResponse.success(
           { type: "ACKNOWLEDGED" },
-          "Store Requisition Return"
-        )
+          "Store Requisition Return",
+        ),
       );
-  }
+  },
 );

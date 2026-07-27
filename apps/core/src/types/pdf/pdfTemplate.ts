@@ -14,8 +14,10 @@ export interface UpdatePdfTemplateInput extends CreatePdfTemplateInput {
   id: number;
 }
 
-export interface PdfTemplateDTO
-  extends Omit<PdfTemplateType, "isActive" | "createdBy" | "updatedBy"> {
+export interface PdfTemplateDTO extends Omit<
+  PdfTemplateType,
+  "isActive" | "createdBy" | "updatedBy"
+> {
   createdBy: IdValue | null;
   updatedBy: IdValue | null;
 }

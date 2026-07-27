@@ -42,7 +42,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
           grandTotal: applyRound(
             omittedPO.rest.grandTotal,
             RoundFormat.TO_FIXED,
-            precision
+            precision,
           ),
           poNumber: poUin,
           createdBy: currentUser,
@@ -71,7 +71,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
               purchasedPrice: applyRound(
                 detail.purchasedPrice,
                 RoundFormat.TO_FIXED,
-                precision
+                precision,
               ),
               packingQty: detail.packingQty,
               quantity: detail.quantity,
@@ -79,7 +79,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
               totalAmount: applyRound(
                 detail.totalAmount,
                 RoundFormat.TO_FIXED,
-                precision
+                precision,
               ),
               createdBy: currentUser,
             })),
@@ -98,7 +98,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
 
       const feature = await featureFlagService.getFeatureFlagByShortCode(
         "PURCHASE_ORDER_NOTIFICATION",
-        true
+        true,
       );
       if (distributor?.posEmail && feature?.isEnabled) {
         const emailTemplate = await emailConfigService.getEventEmail();
@@ -144,7 +144,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput) => {
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -163,7 +163,7 @@ export const getPOByIdFromDb = async (id: number) => {
 };
 
 export const updatePurchaseOrderInDb = async (
-  input: CreatePurchaseOrderInput
+  input: CreatePurchaseOrderInput,
 ) => {
   logger.info("entering::updatePurchaseOrder::repository");
 
@@ -181,16 +181,16 @@ export const updatePurchaseOrderInDb = async (
   >(input, ["distributor", "purchaseOrderDetails", "id", "po", "warehouse"]);
 
   const toUpdate = omittedPO.omitted.purchaseOrderDetails.filter(
-    (d) => typeof d.id === "number"
+    (d) => typeof d.id === "number",
   );
   const toCreate = omittedPO.omitted.purchaseOrderDetails.filter(
-    (d) => typeof d.id !== "number"
+    (d) => typeof d.id !== "number",
   );
   const toDelete = omittedPO.omitted.po.purchaseOrderDetails.filter(
     (d) =>
       !omittedPO.omitted.purchaseOrderDetails.some(
-        (detail) => detail.id === d.id
-      )
+        (detail) => detail.id === d.id,
+      ),
   );
 
   return await db.$transaction(async (tx) => {
@@ -201,7 +201,7 @@ export const updatePurchaseOrderInDb = async (
         grandTotal: applyRound(
           omittedPO.rest.grandTotal,
           RoundFormat.TO_FIXED,
-          precision
+          precision,
         ),
         updatedBy: store?.user?.id,
         purchaseOrderDetails: {
@@ -218,14 +218,14 @@ export const updatePurchaseOrderInDb = async (
               purchasedPrice: applyRound(
                 d.purchasedPrice,
                 RoundFormat.TO_FIXED,
-                precision
+                precision,
               ),
               packingQty: d.packingQty,
               quantity: d.quantity,
               totalAmount: applyRound(
                 d.totalAmount,
                 RoundFormat.TO_FIXED,
-                precision
+                precision,
               ),
               updatedBy: store?.user?.id,
             },
@@ -254,7 +254,7 @@ export const updatePurchaseOrderInDb = async (
             purchasedPrice: applyRound(
               d.purchasedPrice,
               RoundFormat.TO_FIXED,
-              precision
+              precision,
             ),
             packingQty: d.packingQty,
             quantity: d.quantity,
@@ -262,7 +262,7 @@ export const updatePurchaseOrderInDb = async (
             totalAmount: applyRound(
               d.totalAmount,
               RoundFormat.TO_FIXED,
-              precision
+              precision,
             ),
             updatedBy: store?.user?.id,
           })),
@@ -295,7 +295,7 @@ export const updatePurchaseOrderInDb = async (
       const emailTemplate = await emailConfigService.getEventEmail();
       const feature = await featureFlagService.getFeatureFlagByShortCode(
         "PURCHASE_ORDER_NOTIFICATION",
-        true
+        true,
       );
       // if (emailTemplate && emailTemplate.emailBody && store?.user?.email && feature?.isEnabled) {
       //   sendTemplatedEmail({
@@ -340,7 +340,7 @@ export const updatePurchaseOrderInDb = async (
 
 export const getCountPODetailsFromDb = async (
   detailIds: number[],
-  purchaseOrderId: number
+  purchaseOrderId: number,
 ): Promise<number> => {
   return db.pmsPurchaseOrderDetails.count({
     where: {
@@ -368,7 +368,7 @@ export const getAllPurchaseFromDb = async (): Promise<
 };
 
 export const getPurchaseByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<
   | (PmsPurchaseOrder & { purchaseOrderDetails: PmsPurchaseOrderDetails[] })
   | null
@@ -414,7 +414,7 @@ export const deletePurchaseOrderFromDb = async (id: number): Promise<void> => {
   });
 
   logger.info(
-    `exiting::deletePurchaseOrderFromDb::repository id=${id} (deletedBy=${currentUser})`
+    `exiting::deletePurchaseOrderFromDb::repository id=${id} (deletedBy=${currentUser})`,
   );
 };
 
@@ -445,7 +445,7 @@ export const deletePurchaseOrderFromDb = async (id: number): Promise<void> => {
 
 export const rejectPurchaseOrderInDb = async (
   id: number,
-  approverId: number
+  approverId: number,
 ) => {
   logger.info("entering::rejectPurchaseOrderInDb::repository");
   await db.pmsPurchaseOrder.update({
@@ -460,7 +460,7 @@ export const rejectPurchaseOrderInDb = async (
 };
 
 export const getPOByNumberFromDb = async (
-  poNumber: string
+  poNumber: string,
 ): Promise<
   | (PmsPurchaseOrder & { purchaseOrderDetails: PmsPurchaseOrderDetails[] })
   | null
@@ -483,7 +483,7 @@ export const getPOByNumberFromDb = async (
 };
 
 export const getPurchasesFromDb = async (
-  input: PurchaseReqExcelFilter
+  input: PurchaseReqExcelFilter,
 ): Promise<
   (PmsPurchaseOrder & { purchaseOrderDetails: PmsPurchaseOrderDetails[] })[]
 > => {

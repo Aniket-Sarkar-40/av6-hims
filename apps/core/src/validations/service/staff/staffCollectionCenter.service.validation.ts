@@ -9,50 +9,50 @@ import { validateIdCollectionCenter } from "../master/collectionCenter.service.v
 import { validateIdEmployee } from "./employee.service.validation.js";
 
 export const validateStaffCollectionCenterById = async (
-  staffCollectionCenterId: number
+  staffCollectionCenterId: number,
 ) => {
   logger.info(
-    "entering::validateStaffCollectionCenterById::service::validation"
+    "entering::validateStaffCollectionCenterById::service::validation",
   );
   validIdCheck(staffCollectionCenterId);
   const staffCollectionCenterById = await getStaffCollectionCenterByIdFromDb(
-    staffCollectionCenterId
+    staffCollectionCenterId,
   );
   if (!staffCollectionCenterById) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "staffCollectionCenter")
+      generateErrorMessage("NOT_FOUND", "staffCollectionCenter"),
     );
   }
 
   logger.info(
-    "exiting::validateStaffCollectionCenterById::service::validation"
+    "exiting::validateStaffCollectionCenterById::service::validation",
   );
   return staffCollectionCenterById;
 };
 
 export const createStaffCollectionCenterServiceValidation = async (
-  body: CreateOrUpdateStaffCollectionCenter
+  body: CreateOrUpdateStaffCollectionCenter,
 ): Promise<Staff | null> => {
   logger.info(
-    "entering::createStaffCollectionCenterServiceValidation::service::validation"
+    "entering::createStaffCollectionCenterServiceValidation::service::validation",
   );
 
   await validateIdEmployee(body.staffId);
   await validateIdCollectionCenter(body.collectionCenterId);
 
   logger.info(
-    "exiting::createStaffCollectionCenterServiceValidation::service::validation"
+    "exiting::createStaffCollectionCenterServiceValidation::service::validation",
   );
   return null;
 };
 
 export const updateStaffCollectionCenterServiceValidation = async (
   body: CreateOrUpdateStaffCollectionCenter,
-  staffCollectionCenterId: number
+  staffCollectionCenterId: number,
 ): Promise<Staff | null> => {
   logger.info(
-    "entering::updateStaffCollectionCenterServiceValidation::service::validation"
+    "entering::updateStaffCollectionCenterServiceValidation::service::validation",
   );
 
   await validateStaffCollectionCenterById(staffCollectionCenterId);
@@ -60,7 +60,7 @@ export const updateStaffCollectionCenterServiceValidation = async (
   await validateIdCollectionCenter(body.collectionCenterId);
 
   logger.info(
-    "exiting::updateStaffCollectionCenterServiceValidation::service::validation"
+    "exiting::updateStaffCollectionCenterServiceValidation::service::validation",
   );
   return null;
 };

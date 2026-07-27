@@ -48,7 +48,7 @@ patientMedicineRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "CREATE")),
   validateCreatePatientMedicine,
-  createPatientMedicine
+  createPatientMedicine,
 );
 
 /**
@@ -71,10 +71,10 @@ patientMedicineRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_MEDICINE", "VIEW"),
-    getPermission("OPD", "PATIENT_MEDICINE", "UPDATE")
+    getPermission("OPD", "PATIENT_MEDICINE", "UPDATE"),
   ),
   validateUpdatePatientMedicine,
-  updatePatientMedicine
+  updatePatientMedicine,
 );
 
 /**
@@ -96,7 +96,7 @@ patientMedicineRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "VIEW")),
-  getPatientMedicineById
+  getPatientMedicineById,
 );
 
 /**
@@ -119,7 +119,7 @@ patientMedicineRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "CREATE")),
   validateSearchMedicine,
-  getMedicines
+  getMedicines,
 );
 
 /**
@@ -143,5 +143,5 @@ patientMedicineRouter.delete(
   "/delete",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_MEDICINE", "DELETE")),
-  deletePatientMedicine
+  deletePatientMedicine,
 );

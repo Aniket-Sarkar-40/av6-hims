@@ -49,7 +49,7 @@ consultationNotesMappingRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_NOTES_MAPPING", "CREATE")),
   validateConsultationNotesMappingCreate,
-  createConsultationNotesMapping
+  createConsultationNotesMapping,
 );
 
 /**
@@ -79,5 +79,5 @@ consultationNotesMappingRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_NOTES_MAPPING", "UPDATE")),
   validateConsultationNotesMappingUpdate,
-  updateConsultationNotesMapping
+  updateConsultationNotesMapping,
 );

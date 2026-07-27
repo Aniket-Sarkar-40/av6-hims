@@ -8,7 +8,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 
 export const getEmailConfigByTypeFromDb = async (
-  configType: EmailConfigType
+  configType: EmailConfigType,
 ) => {
   logger.info("entering::getEmailConfigByTypeFromDb::repository");
   return db.accEmailConfig.findFirst({
@@ -17,7 +17,7 @@ export const getEmailConfigByTypeFromDb = async (
 };
 
 export const upsertEmailConfigByTypeInDb = async (
-  data: CreateOrUpdateEmailConfig
+  data: CreateOrUpdateEmailConfig,
 ): Promise<AccEmailConfig> => {
   logger.info("entering::upsertEmailConfigByTypeInDb::repository");
 

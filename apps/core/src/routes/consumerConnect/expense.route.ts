@@ -48,7 +48,7 @@ expenseRouter.post(
   createUploadMiddleware("documents"),
   uploadToHetzner("Documents"),
   validateExpenseSchema,
-  createExpense
+  createExpense,
 );
 /**
  * @swagger
@@ -63,7 +63,7 @@ expenseRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "EXPENSE", "VIEW")),
-  getAllExpense
+  getAllExpense,
 );
 
 /**
@@ -90,7 +90,7 @@ expenseRouter.get(
   "/id",
   verifyToken(),
   authorize(getPermission("CORE", "EXPENSE", "VIEW")),
-  getExpenseById
+  getExpenseById,
 );
 /**
  * @swagger
@@ -119,12 +119,12 @@ expenseRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "EXPENSE", "VIEW"),
-    getPermission("CORE", "EXPENSE", "UPDATE")
+    getPermission("CORE", "EXPENSE", "UPDATE"),
   ),
   createUploadMiddleware("documents"),
   uploadToHetzner("documents"),
   validateUpdateExpenseSchema,
-  updateExpense
+  updateExpense,
 );
 /**
  * @swagger
@@ -147,7 +147,7 @@ expenseRouter.delete(
   verifyToken(),
   authorize(
     getPermission("CORE", "EXPENSE", "VIEW"),
-    getPermission("CORE", "EXPENSE", "DELETE")
+    getPermission("CORE", "EXPENSE", "DELETE"),
   ),
-  deleteExpense
+  deleteExpense,
 );

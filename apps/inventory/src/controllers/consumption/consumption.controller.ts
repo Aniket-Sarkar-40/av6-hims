@@ -8,32 +8,30 @@ export const createConsumption = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::createConsumption::controller");
     const input = req.body;
-    const createdConsumption = await consumptionService.createConsumption(
-      input
-    );
+    const createdConsumption =
+      await consumptionService.createConsumption(input);
     logger.info("exiting::createConsumption::controller");
     const response = BaseResponse.success(
       { type: "CREATED", data: createdConsumption },
-      "Consumption"
+      "Consumption",
     );
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateConsumption = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::updateConsumption::controller");
     const input = req.body;
-    const updatedConsumption = await consumptionService.updateConsumption(
-      input
-    );
+    const updatedConsumption =
+      await consumptionService.updateConsumption(input);
     logger.info("exiting::updateConsumption::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updatedConsumption },
-      "Consumption"
+      "Consumption",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getAllConsumption = TryCatch(
@@ -43,26 +41,25 @@ export const getAllConsumption = TryCatch(
     logger.info("exiting::getAllConsumption::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: consumption },
-      "Consumption"
+      "Consumption",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const approveConsumption = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::updateConsumption::controller");
     const input = req.body;
-    const approvedConsumption = await consumptionService.approveConsumption(
-      input
-    );
+    const approvedConsumption =
+      await consumptionService.approveConsumption(input);
     logger.info("exiting::updateConsumption::controller");
     const response = BaseResponse.success(
       { type: "APPROVED", data: approvedConsumption },
-      "Consumption"
+      "Consumption",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 export const rejectConsumption = TryCatch(
   async (req: Request, res: Response) => {
@@ -72,7 +69,7 @@ export const rejectConsumption = TryCatch(
     logger.info("exiting::rejectConsumption::controller");
     const response = BaseResponse.success({ type: "REJECTED" }, "Consumption");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getConsumptionById = TryCatch(
@@ -85,15 +82,15 @@ export const getConsumptionById = TryCatch(
         .json(BaseResponse.error({ message: "consumptionId is required" }));
     }
     const consumption = await consumptionService.getConsumptionById(
-      Number(consumptionId)
+      Number(consumptionId),
     );
     logger.info("exiting::getConsumptionById::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: consumption },
-      "Consumption"
+      "Consumption",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteConsumptionById = TryCatch(
@@ -104,7 +101,7 @@ export const deleteConsumptionById = TryCatch(
     logger.info("exiting::deleteConsumptionById::controller");
     const response = BaseResponse.success({ type: "DELETED" }, "Consumption");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getConsumptionByUserId = TryCatch(
@@ -117,13 +114,13 @@ export const getConsumptionByUserId = TryCatch(
         .json(BaseResponse.error({ message: "userId is required" }));
     }
     const consumption = await consumptionService.getConsumptionByUserId(
-      Number(userId)
+      Number(userId),
     );
     logger.info("exiting::getConsumptionByUserId::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: consumption },
-      "Consumption"
+      "Consumption",
     );
     return res.status(200).json(response);
-  }
+  },
 );

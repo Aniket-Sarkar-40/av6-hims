@@ -45,7 +45,7 @@ branchRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "CREATE")),
   validateBranch,
-  createBranch
+  createBranch,
 );
 
 /**
@@ -61,7 +61,7 @@ branchRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "VIEW")),
-  getAllBranch
+  getAllBranch,
 );
 
 /**
@@ -82,7 +82,7 @@ branchRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "VIEW")),
-  getBranchById
+  getBranchById,
 );
 
 /**
@@ -105,10 +105,10 @@ branchRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "BRANCH", "VIEW"),
-    getPermission("PMS", "BRANCH", "UPDATE")
+    getPermission("PMS", "BRANCH", "UPDATE"),
   ),
   validateToggleActive,
-  toggleActiveBranch
+  toggleActiveBranch,
 );
 
 /**
@@ -138,10 +138,10 @@ branchRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "BRANCH", "VIEW"),
-    getPermission("PMS", "BRANCH", "UPDATE")
+    getPermission("PMS", "BRANCH", "UPDATE"),
   ),
   validateBranch,
-  updateBranch
+  updateBranch,
 );
 
 /**
@@ -157,5 +157,5 @@ branchRouter.get(
   "/drop-down",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "BRANCH", "VIEW")),
-  getAllBranchFromItemBanchMap
+  getAllBranchFromItemBanchMap,
 );

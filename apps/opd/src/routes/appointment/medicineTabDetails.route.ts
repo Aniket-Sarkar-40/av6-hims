@@ -44,7 +44,7 @@ medicineTabDetailsRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "MEDICINE_TAB_DETAILS", "CREATE")),
   validateMedicineTabDetailsCreate,
-  createMedicineTabDetails
+  createMedicineTabDetails,
 );
 
 /**
@@ -67,10 +67,10 @@ medicineTabDetailsRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "MEDICINE_TAB_DETAILS", "VIEW"),
-    getPermission("OPD", "MEDICINE_TAB_DETAILS", "UPDATE")
+    getPermission("OPD", "MEDICINE_TAB_DETAILS", "UPDATE"),
   ),
   validateMedicineTabDetailsUpdate,
-  updateMedicineTabDetails
+  updateMedicineTabDetails,
 );
 
 /**
@@ -102,5 +102,5 @@ medicineTabDetailsRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "MEDICINE_TAB_DETAILS", "VIEW")),
-  getMedicineTabDetailsById
+  getMedicineTabDetailsById,
 );

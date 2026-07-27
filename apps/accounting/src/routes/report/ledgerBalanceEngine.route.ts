@@ -11,8 +11,8 @@ export const ledgerBalanceEngineRouter: Router = Router();
 
 ledgerBalanceEngineRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "LEDGER_BALANCE", "VIEW")),
   validateLedgerBalanceEngineRequestInput,
-  getLedgerBalance
+  getLedgerBalance,
 );

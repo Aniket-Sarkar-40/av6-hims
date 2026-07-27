@@ -2,6 +2,7 @@ import { CreateOrUpdateAuditConfig } from "@/types/master/auditConfig.js";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
+
 import Joi from "joi";
 
 export const auditConfigCreateSchema = Joi.object<CreateOrUpdateAuditConfig>({
@@ -15,7 +16,7 @@ export const auditConfigCreateSchema = Joi.object<CreateOrUpdateAuditConfig>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Module",
-        Object.values(ServiceCode).join(", ")
+        Object.values(ServiceCode).join(", "),
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Module"),
     }),

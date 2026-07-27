@@ -11,7 +11,7 @@ const pushRowError = (errors: string[], rowNo: number, message: string) => {
 };
 
 export const validateItemMasterExcelArray = (
-  rows: ItemMasterExcelStagingRow[]
+  rows: ItemMasterExcelStagingRow[],
 ) => {
   const errors: string[] = [];
 
@@ -53,16 +53,16 @@ export const validateItemMasterExcelArray = (
         typeof row.basePrice === "number"
           ? row.basePrice
           : typeof row.basePrice === "object" &&
-            row.basePrice !== null &&
-            "toNumber" in row.basePrice
-          ? (row.basePrice as { toNumber: () => number }).toNumber()
-          : Number(row.basePrice);
+              row.basePrice !== null &&
+              "toNumber" in row.basePrice
+            ? (row.basePrice as { toNumber: () => number }).toNumber()
+            : Number(row.basePrice);
 
       if (Number.isNaN(price) || price < 0) {
         pushRowError(
           errors,
           rowNo,
-          "Base Price must be a number greater than or equal to 0"
+          "Base Price must be a number greater than or equal to 0",
         );
       }
     }
@@ -74,7 +74,7 @@ export const validateItemMasterExcelArray = (
       pushRowError(
         errors,
         rowNo,
-        "Re-order Level must be an integer greater than or equal to 0"
+        "Re-order Level must be an integer greater than or equal to 0",
       );
     }
 

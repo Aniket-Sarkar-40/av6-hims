@@ -43,7 +43,7 @@ doctorRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "DOCTOR", "CREATE")),
   validateDoctorCreate,
-  createDoctor
+  createDoctor,
 );
 
 /**
@@ -66,8 +66,8 @@ doctorRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "DOCTOR", "UPDATE"),
-    getPermission("OPD", "DOCTOR", "VIEW")
+    getPermission("OPD", "DOCTOR", "VIEW"),
   ),
   validateDoctorUpdate,
-  updateDoctor
+  updateDoctor,
 );

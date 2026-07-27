@@ -24,7 +24,7 @@ export const validIdCity = async (cityId: number): Promise<void> => {
 };
 
 export const deleteCityServiceValidation = async (
-  cityId: number
+  cityId: number,
 ): Promise<void> => {
   logger.info("entering::deleteCityServiceValidation::service::validation");
 
@@ -36,7 +36,7 @@ export const deleteCityServiceValidation = async (
 };
 
 export const getIdCityServiceValidation = async (
-  cityId: number
+  cityId: number,
 ): Promise<void> => {
   logger.info("entering::getIdCityServiceValidation::service::validation");
 
@@ -48,7 +48,7 @@ export const getIdCityServiceValidation = async (
 };
 
 export const updateIdCityServiceValidation = async (
-  body: UpdateCityInput
+  body: UpdateCityInput,
 ): Promise<void> => {
   logger.info("entering::updateIdCityServiceValidation::service::validation");
   await validIdCity(body.id);
@@ -57,7 +57,7 @@ export const updateIdCityServiceValidation = async (
   if (cityByName && cityByName.id !== body.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "City Name")
+      generateErrorMessage("DUPLICATE_ITEM", "City Name"),
     );
   }
   logger.info("exiting::updateIdCityServiceValidation::service::validation");
@@ -65,7 +65,7 @@ export const updateIdCityServiceValidation = async (
 };
 
 export const createCityServiceValidation = async (
-  body: CreateCityInput
+  body: CreateCityInput,
 ): Promise<void> => {
   logger.info("entering::createCityServiceValidation::service::validation");
   await validateCityForeignKeys(body);
@@ -73,7 +73,7 @@ export const createCityServiceValidation = async (
   if (city) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "City Name")
+      generateErrorMessage("DUPLICATE_ITEM", "City Name"),
     );
   }
   logger.info("exiting::createCityServiceValidation::service::validation");
@@ -82,14 +82,14 @@ export const createCityServiceValidation = async (
 };
 
 export const validateCityForeignKeys = async (
-  input: CreateCityInput
+  input: CreateCityInput,
 ): Promise<void> => {
   logger.info("entering::validateCityForeignKeys::service::validation");
   const state = await getStateWithIncludesFromDB(input.stateId);
   if (!state || state.countryId !== input.countryId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FOREIGN_KEY", "City")
+      generateErrorMessage("INVALID_FOREIGN_KEY", "City"),
     );
   }
   logger.info("exiting::validateCityForeignKeys::service::validation");

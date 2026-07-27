@@ -12,7 +12,7 @@ export const createCity = TryCatch(async (req: Request, res: Response) => {
   const city = await cityService.createCity({ name, countryId, stateId });
   const response = new BaseResponse(
     { success: true, message: generateSuccessMessage("CREATED", "City") },
-    city
+    city,
   );
   logger.info("exiting::createCity::controller");
   return res.status(201).json(response);
@@ -27,8 +27,8 @@ export const getAllCities = TryCatch(async (req: Request, res: Response) => {
     .json(
       new BaseResponse(
         { success: true, message: generateSuccessMessage("FETCHED", "City") },
-        cities
-      )
+        cities,
+      ),
     );
 });
 
@@ -41,7 +41,7 @@ export const getCityById = TryCatch(async (req: Request, res: Response) => {
     return res.status(400).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
   logger.info("exiting::getCityById::controller");
@@ -50,8 +50,8 @@ export const getCityById = TryCatch(async (req: Request, res: Response) => {
     .json(
       new BaseResponse(
         { success: true, message: generateSuccessMessage("FETCHED", "City") },
-        city
-      )
+        city,
+      ),
     );
 });
 
@@ -65,8 +65,8 @@ export const updateCity = TryCatch(async (req: Request, res: Response) => {
     .json(
       new BaseResponse(
         { success: true, message: generateSuccessMessage("UPDATED", "City") },
-        updatedCity
-      )
+        updatedCity,
+      ),
     );
 });
 
@@ -81,6 +81,6 @@ export const deleteCity = TryCatch(async (req: Request, res: Response) => {
     new BaseResponse({
       success: true,
       message: generateSuccessMessage("DELETED", "City"),
-    })
+    }),
   );
 });

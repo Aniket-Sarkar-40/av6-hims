@@ -151,25 +151,24 @@ export type ValSellReturnResponse = Prisma.PmsSellReturnGetPayload<{
   };
 }>;
 
-export interface SellReturnDTO
-  extends Omit<
-    SellReturnResponse,
-    | "createdBy"
-    | "approvedBy"
-    | "rejectedBy"
-    | "insurance"
-    | "corporateClient"
-    | "discount"
-    | "tax"
-    | "netDiscount"
-    | "netTax"
-    | "paidAmount"
-    | "netAmount"
-    | "totalAmount"
-    | "customerPayAmount"
-    | "coPayAmount"
-    | "sellReturnDetails"
-  > {
+export interface SellReturnDTO extends Omit<
+  SellReturnResponse,
+  | "createdBy"
+  | "approvedBy"
+  | "rejectedBy"
+  | "insurance"
+  | "corporateClient"
+  | "discount"
+  | "tax"
+  | "netDiscount"
+  | "netTax"
+  | "paidAmount"
+  | "netAmount"
+  | "totalAmount"
+  | "customerPayAmount"
+  | "coPayAmount"
+  | "sellReturnDetails"
+> {
   tax: number;
   netTax: number;
   discount: number;
@@ -188,19 +187,18 @@ export interface SellReturnDTO
   sellReturnDetails: SellReturnDetailDTO[];
 }
 
-export interface SellReturnDetailDTO
-  extends Omit<
-    PmsSellReturnDetails,
-    | "mrp"
-    | "discount"
-    | "netDiscount"
-    | "tax"
-    | "netTax"
-    | "totalAmount"
-    | "coPayAmount"
-    | "customerPayAmount"
-    | "netAmount"
-  > {
+export interface SellReturnDetailDTO extends Omit<
+  PmsSellReturnDetails,
+  | "mrp"
+  | "discount"
+  | "netDiscount"
+  | "tax"
+  | "netTax"
+  | "totalAmount"
+  | "coPayAmount"
+  | "customerPayAmount"
+  | "netAmount"
+> {
   mrp: number;
   discount: number;
   netDiscount: number;

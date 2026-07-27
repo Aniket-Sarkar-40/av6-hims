@@ -20,11 +20,11 @@ export const commonCreateUpdateValidationMapping: Record<
   [SHORT_CODE.AUDIT_CONFIG]: {
     create: (data: unknown) =>
       createOrUpdateAuditConfigServiceValidation(
-        data as CreateOrUpdateAuditConfig
+        data as CreateOrUpdateAuditConfig,
       ),
     update: (data: unknown) =>
       createOrUpdateAuditConfigServiceValidation(
-        data as CreateOrUpdateAuditConfig
+        data as CreateOrUpdateAuditConfig,
       ),
   },
   [SHORT_CODE.GROUP]: {
@@ -42,31 +42,31 @@ export const commonCreateUpdateValidationMapping: Record<
   [SHORT_CODE.VOUCHER_TYPE]: {
     create: (data: unknown) =>
       createOrUpdateVoucherTypeServiceValidation(
-        data as CreateOrUpdateVoucherTypeInput
+        data as CreateOrUpdateVoucherTypeInput,
       ),
     update: (data: unknown) =>
       createOrUpdateVoucherTypeServiceValidation(
-        data as CreateOrUpdateVoucherTypeInput
+        data as CreateOrUpdateVoucherTypeInput,
       ),
   },
   [SHORT_CODE.COST_CENTER]: {
     create: (data: unknown) =>
       CreateOrUpdateCostCenterServiceValidation(
-        data as CreateOrUpdateCostCenterInput
+        data as CreateOrUpdateCostCenterInput,
       ),
     update: (data: unknown) =>
       CreateOrUpdateCostCenterServiceValidation(
-        data as CreateOrUpdateCostCenterInput
+        data as CreateOrUpdateCostCenterInput,
       ),
   },
   [SHORT_CODE.NARRATION]: {
     create: (data: unknown) =>
       createOrUpdateNarrationServiceValidation(
-        data as CreateOrUpdateNarrationInput
+        data as CreateOrUpdateNarrationInput,
       ),
     update: (data: unknown) =>
       createOrUpdateNarrationServiceValidation(
-        data as CreateOrUpdateNarrationInput
+        data as CreateOrUpdateNarrationInput,
       ),
   },
 };

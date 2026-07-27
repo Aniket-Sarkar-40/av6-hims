@@ -22,7 +22,7 @@ export const toStringOrNull = (value: unknown): string | null => {
 export const toRequiredString = (
   value: unknown,
   fieldName: string,
-  rowNo: number
+  rowNo: number,
 ): string => {
   const str = toStringOrNull(value);
   if (!str) {
@@ -75,20 +75,20 @@ export const normalizeVendorExcelHeader = (header: string) => {
     .replace(/\s*[＊*]\s*$/u, "")
     .replace(
       /\s*\((required|optional|conditional|required if section is used|required if section used)\)\s*$/i,
-      ""
+      "",
     )
     .replace(/\s+/g, " ")
     .trim();
 };
 
 export const normalizeVendorExcelRowHeaders = (
-  row: Record<string, unknown>
+  row: Record<string, unknown>,
 ) => {
   return Object.entries(row).reduce<Record<string, unknown>>(
     (acc, [key, value]) => {
       acc[normalizeVendorExcelHeader(key)] = value;
       return acc;
     },
-    {}
+    {},
   );
 };

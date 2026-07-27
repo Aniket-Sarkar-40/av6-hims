@@ -74,7 +74,7 @@ export const incomeHeadService = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Income Head")
+          generateErrorMessage("NOT_FOUND", "Income Head"),
         );
       }
     } else {
@@ -82,7 +82,7 @@ export const incomeHeadService = {
       if (all.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Income Head")
+          generateErrorMessage("NOT_FOUND", "Income Head"),
         );
       }
       logger.info("exiting::getAllIncomeHead::service");
@@ -92,7 +92,7 @@ export const incomeHeadService = {
 
   async getIncomeHeadById(
     incomeHeadId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<IncomeHead | null> {
     logger.info("entering::getIncomeHeadById::service");
     validIdCheck(incomeHeadId);
@@ -103,7 +103,7 @@ export const incomeHeadService = {
     if (isCacheable) {
       record = (await getCacheById(
         cacheKey,
-        incomeHeadId
+        incomeHeadId,
       )) as IncomeHead | null;
     } else {
       record = await getIncomeHeadByIdFromDb(incomeHeadId);
@@ -113,7 +113,7 @@ export const incomeHeadService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Income Head")
+          generateErrorMessage("NOT_FOUND", "Income Head"),
         );
       }
       return null;

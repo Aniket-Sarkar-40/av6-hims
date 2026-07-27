@@ -5,7 +5,7 @@ import {
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toEventRecipientRuleDTO = async (
-  data: EventRecipientRuleInput[]
+  data: EventRecipientRuleInput[],
 ): Promise<EventRecipientRuleDTO[]> => {
   return data.map((rule) => {
     const omittedRule = customOmit<

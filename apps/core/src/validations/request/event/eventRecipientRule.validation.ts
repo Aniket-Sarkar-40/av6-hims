@@ -142,7 +142,7 @@ export const multiCreateUpdateEventRecipientRuleSchema =
       otherwise: Joi.object({
         rules: Joi.array().items(getRuleSchema(TemplateType.EMAIL)), // Non-web fallback
       }),
-    }
+    },
   );
 
 export const recipientRuleUpdateSchema = recipientRuleCreateSchema.keys({

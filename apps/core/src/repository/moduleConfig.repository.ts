@@ -6,7 +6,7 @@ import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const createOrUpdateModuleConfigInDb = async (
-  data: CreateOrUpdateModuleConfigReq[]
+  data: CreateOrUpdateModuleConfigReq[],
 ): Promise<MonoRepoModule[]> => {
   logger.info("entering::createOrUpdateModuleConfigInDb::service");
 
@@ -15,23 +15,23 @@ export const createOrUpdateModuleConfigInDb = async (
   const existingModules = await getAllModulesFromDb();
 
   const existingModuleMap = new Map(
-    existingModules.map((item) => [item.module, item])
+    existingModules.map((item) => [item.module, item]),
   );
 
   const incomingModuleSet = new Set(
-    data.map((item) => item.module as ServiceCode)
+    data.map((item) => item.module as ServiceCode),
   );
 
   const createData = data.filter(
-    (item) => !existingModuleMap.has(item.module as ServiceCode)
+    (item) => !existingModuleMap.has(item.module as ServiceCode),
   );
 
   const updateData = data.filter((item) =>
-    existingModuleMap.has(item.module as ServiceCode)
+    existingModuleMap.has(item.module as ServiceCode),
   );
 
   const deleteData = existingModules.filter(
-    (item) => !incomingModuleSet.has(item.module)
+    (item) => !incomingModuleSet.has(item.module),
   );
 
   await db.$transaction([
@@ -43,7 +43,7 @@ export const createOrUpdateModuleConfigInDb = async (
           isActive: true,
           createdBy: store?.user?.id,
         },
-      })
+      }),
     ),
 
     ...updateData.map((item) =>
@@ -57,7 +57,7 @@ export const createOrUpdateModuleConfigInDb = async (
           updatedBy: store?.user?.id,
           updatedAt: new Date(),
         },
-      })
+      }),
     ),
 
     ...deleteData.map((item) =>
@@ -70,7 +70,7 @@ export const createOrUpdateModuleConfigInDb = async (
           deletedBy: store?.user?.id,
           deletedAt: new Date(),
         },
-      })
+      }),
     ),
   ]);
 

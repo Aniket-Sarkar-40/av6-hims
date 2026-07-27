@@ -43,7 +43,7 @@ clinicalHistoryRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CLINICAL_HISTORY", "CREATE")),
   validateClinicalHistoryCreate,
-  createClinicalHistory
+  createClinicalHistory,
 );
 
 /**
@@ -66,8 +66,8 @@ clinicalHistoryRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "CLINICAL_HISTORY", "VIEW"),
-    getPermission("OPD", "CLINICAL_HISTORY", "UPDATE")
+    getPermission("OPD", "CLINICAL_HISTORY", "UPDATE"),
   ),
   validateClinicalHistoryUpdate,
-  updateClinicalHistory
+  updateClinicalHistory,
 );

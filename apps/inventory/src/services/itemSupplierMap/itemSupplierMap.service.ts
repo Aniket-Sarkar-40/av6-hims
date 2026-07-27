@@ -35,7 +35,7 @@ import XLSX from "xlsx";
 import { itemMasterService } from "../master/itemMaster.service.js";
 export const itemSupplierMapService = {
   async createItemSupplierMap(
-    input: ItemSupplierMapCreateInput
+    input: ItemSupplierMapCreateInput,
   ): Promise<ItemSupplierMapDTO> {
     logger.info("entering::createItemSupplierMap::service");
     await createItemSupplierMapServiceValidation(input);
@@ -45,7 +45,7 @@ export const itemSupplierMapService = {
     return itemSupplierMapDTO[0];
   },
   async updateItemSupplierMap(
-    input: ItemSupplierMapUpdateInput
+    input: ItemSupplierMapUpdateInput,
   ): Promise<ItemSupplierMapDTO> {
     logger.info("entering::updateItemSupplierMap::service");
     await updateItemSupplierMapServiceValidation(input);
@@ -57,7 +57,7 @@ export const itemSupplierMapService = {
     return itemSupplierMapDTO[0];
   },
   async getAllItemSupplierMap(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemSupplierMapDTO[]> {
     logger.info("entering::getAllItemSupplierMap::service");
     const itemSupplierMap = await getAllItemSupplierMapFromDb();
@@ -66,7 +66,7 @@ export const itemSupplierMapService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier Mapping")
+          generateErrorMessage("NOT_FOUND", "Item Supplier Mapping"),
         );
       else return [];
     }
@@ -74,7 +74,7 @@ export const itemSupplierMapService = {
   },
   async getItemSupplierMapById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemSupplierMapDTO | null> {
     logger.info("entering::getItemSupplierMapById::service");
 
@@ -84,7 +84,7 @@ export const itemSupplierMapService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Supplier Mapping")
+          generateErrorMessage("NOT_FOUND", "Item Supplier Mapping"),
         );
       } else return null;
     }
@@ -106,7 +106,7 @@ export const itemSupplierMapService = {
     if (item.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Item Master")
+        generateErrorMessage("NOT_FOUND", "Item Master"),
       );
     }
     const wb = new ExcelJs.Workbook();
@@ -168,7 +168,7 @@ export const itemSupplierMapService = {
 
   async itemSupplierMapImportExcel(
     filePath: string,
-    input: ItemSupplierMapImportExcelInput
+    input: ItemSupplierMapImportExcelInput,
   ) {
     logger.info("entering::itemSupplierMapImportExcel::service");
     const { supplierId, ccId } = input;
@@ -181,7 +181,7 @@ export const itemSupplierMapService = {
     const data = XLSX.utils.sheet_to_json(sheet) as ItemSupplierMapExcelRow[];
 
     const convertedData = data.map((elem, ind) =>
-      mapRowToItemSupplierMapImportExcelInput(elem, ind + 1)
+      mapRowToItemSupplierMapImportExcelInput(elem, ind + 1),
     );
     const batch = await CreateItemSupplierMapExcelInDb(convertedData);
     const batchJobInput: ItemSupplierMapBatchJobInput = {

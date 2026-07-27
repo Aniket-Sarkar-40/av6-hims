@@ -42,7 +42,7 @@ staffDesignationRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "CREATE")),
   validateStaffDesignation,
-  createStaffDesignation
+  createStaffDesignation,
 );
 
 /**
@@ -58,7 +58,7 @@ staffDesignationRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "VIEW")),
-  getAllStaffDesignations
+  getAllStaffDesignations,
 );
 
 /**
@@ -81,7 +81,7 @@ staffDesignationRouter.get(
   "/:staffDesignationId",
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "VIEW")),
-  getStaffDesignationById
+  getStaffDesignationById,
 );
 
 /**
@@ -111,10 +111,10 @@ staffDesignationRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "STAFF_DESIGNATION", "VIEW"),
-    getPermission("CORE", "STAFF_DESIGNATION", "UPDATE")
+    getPermission("CORE", "STAFF_DESIGNATION", "UPDATE"),
   ),
   validateStaffDesignation,
-  updateStaffDesignation
+  updateStaffDesignation,
 );
 
 /**
@@ -137,7 +137,7 @@ staffDesignationRouter.delete(
   "/:staffDesignationId",
   verifyToken(),
   authorize(getPermission("CORE", "STAFF_DESIGNATION", "DELETE")),
-  deleteStaffDesignation
+  deleteStaffDesignation,
 );
 
 export default staffDesignationRouter;

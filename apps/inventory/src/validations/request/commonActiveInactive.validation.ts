@@ -15,7 +15,7 @@ export const commonActiveInactiveSchema =
       .required()
       .messages({
         "any.only": `Short code must be one of [${Object.values(
-          SHORT_CODE
+          SHORT_CODE,
         ).join(", ")}].`,
         "any.required": "Short code is required",
         "string.base": "Short code must be a string",

@@ -32,6 +32,7 @@ import { defaultUnitMasterRouter } from "@/routes/master/defaultUnitMaster.route
 import { registerCron } from "@/cron/scheduler.cron.js";
 import featureRouter from "@/routes/feature/feature.route.js";
 import { autoAlertRouter } from "@/routes/master/autoAlert.route.js";
+import stockOpeningClosingRouter from "@/routes/stock/stockOpeningClosing.route.js";
 
 registerCron();
 
@@ -46,7 +47,7 @@ inventoryRouter.use("/master/item-store", itemStoreRouter);
 inventoryRouter.use("/master/item-unit", unitMasterRouter);
 inventoryRouter.use(
   "/api/v1/master/default-unit-master",
-  defaultUnitMasterRouter
+  defaultUnitMasterRouter,
 );
 inventoryRouter.use("/common", commonRouter);
 inventoryRouter.use("/master/item-supplier", itemSupplierRouter);
@@ -68,7 +69,7 @@ inventoryRouter.use("/master/tax-details", taxDetailsRouter);
 //uploads
 inventoryRouter.use(
   "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
+  express.static(path.join(process.cwd(), "uploads")),
 );
 
 // Purchase Order
@@ -89,7 +90,7 @@ inventoryRouter.use("/stock-transfer", stockTransferRouter);
 inventoryRouter.use("/branch-requisition", branchRequisitionRouter);
 inventoryRouter.use(
   "/branch-requisition-return",
-  branchRequisitionReturnRouter
+  branchRequisitionReturnRouter,
 );
 
 //Store requisition return
@@ -97,3 +98,6 @@ inventoryRouter.use("/store-requisition-return", storeRequisitionReturnRouter);
 
 //feature-flag
 inventoryRouter.use("/feature-flag", featureRouter);
+
+// Stock Opening Closing
+inventoryRouter.use("/api/v1/stock-opening-closing", stockOpeningClosingRouter);

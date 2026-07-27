@@ -57,7 +57,7 @@ sellRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "CREATE")),
   validateSellInput,
-  createSell
+  createSell,
 );
 
 /**
@@ -77,7 +77,7 @@ sellRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "VIEW")),
-  getSellById
+  getSellById,
 );
 
 /**
@@ -94,7 +94,7 @@ sellRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "VIEW")),
-  getAllSell
+  getAllSell,
 );
 
 /**
@@ -112,10 +112,10 @@ sellRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "SELL", "VIEW"),
-    getPermission("PMS", "SELL", "UPDATE")
+    getPermission("PMS", "SELL", "UPDATE"),
   ),
   validateSellUpdate,
-  updateSellStatus
+  updateSellStatus,
 );
 
 /**
@@ -129,7 +129,7 @@ sellRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL", "DELETE")),
-  deleteSell
+  deleteSell,
 );
 
 /**
@@ -152,7 +152,7 @@ sellRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_EXCEL", "VIEW")),
   validateExcelFilterSell,
-  excelSellReport
+  excelSellReport,
 );
 /**
  * @swagger
@@ -175,7 +175,7 @@ sellRouter.post(
   "/pdf",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_PDF", "VIEW")),
-  getSellPdfById
+  getSellPdfById,
 );
 
 /**
@@ -234,7 +234,7 @@ sellRouter.post(
   "/stock-adjust",
   // authorizeCommonApproval(),
   validateSellStockAdjustmentInput,
-  adjustSellStock
+  adjustSellStock,
 );
 
 /**
@@ -257,7 +257,7 @@ sellRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_PAYMENT", "CREATE")),
   validateSellPaymentInput,
-  takeSellPayment
+  takeSellPayment,
 );
 /**
  * @swagger
@@ -279,7 +279,7 @@ sellRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_COPAY", "UPDATE")),
   validateSetSellCoPayInput,
-  setSellCoPay
+  setSellCoPay,
 );
 export default sellRouter;
 
@@ -297,7 +297,7 @@ sellRouter.get(
   "/payment-transactions",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "SELL_PAYMENT", "VIEW")),
-  getPaymentTransactions
+  getPaymentTransactions,
 );
 
 sellRouter.get("/sell-receipt/medicine", printNotCompletedMedReceiptByAptId);

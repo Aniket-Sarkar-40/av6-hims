@@ -2,7 +2,7 @@ import {
   AccUinShortCode,
   UIN_RESET_POLICY,
 } from "@repo/db/generated/prisma/enums.js";
-import { validationHandler } from "@repo/shared/utils/requestValidationHelper.js";
+import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
 import { generateValidationErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import {
   CreateUINConfigRequest,
@@ -10,6 +10,7 @@ import {
   UINSegment,
   UpdateUINConfigRequest,
 } from "av6-core-v2";
+import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
 /**
@@ -65,26 +66,26 @@ const UINSegmentSchema = Joi.object<UINSegment>({
       .messages({
         "number.base": generateValidationErrorMessage(
           "NUMBER",
-          "Min Sequence Length"
+          "Min Sequence Length",
         ),
         "number.integer": generateValidationErrorMessage(
           "INTEGER",
-          "Min Sequence Length"
+          "Min Sequence Length",
         ),
         "number.min": generateValidationErrorMessage(
           "MIN",
           "Min Sequence Length",
-          "1"
+          "1",
         ),
         "any.required": generateValidationErrorMessage(
           "REQUIRED",
-          "Min Sequence Length"
+          "Min Sequence Length",
         ),
       }),
     otherwise: Joi.forbidden().messages({
       "any.unknown": generateValidationErrorMessage(
         "FORBIDDEN",
-        "Min Sequence Length"
+        "Min Sequence Length",
       ),
     }),
   }),
@@ -106,7 +107,7 @@ export const createUINConfigSchema = Joi.object<CreateUINConfigRequest>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Short Code",
-        Object.values(AccUinShortCode).join(", ")
+        Object.values(AccUinShortCode).join(", "),
       ),
     }),
 
@@ -116,14 +117,14 @@ export const createUINConfigSchema = Joi.object<CreateUINConfigRequest>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Sequence Reset Policy"
+        "Sequence Reset Policy",
       ),
       "any.only": `Sequence Reset Policy must be one of [${Object.values(
-        UIN_RESET_POLICY
+        UIN_RESET_POLICY,
       ).join(", ")}]`,
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Sequence Reset Policy"
+        "Sequence Reset Policy",
       ),
     }),
 
@@ -144,7 +145,7 @@ export const createUINConfigSchema = Joi.object<CreateUINConfigRequest>({
       "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "UIN Segments"
+        "UIN Segments",
       ),
     }),
 });
@@ -177,7 +178,7 @@ export const updateUINConfigSchema = Joi.object<UpdateUINConfigRequest>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Short Code",
-        Object.values(AccUinShortCode).join(", ")
+        Object.values(AccUinShortCode).join(", "),
       ),
     }),
 
@@ -187,14 +188,14 @@ export const updateUINConfigSchema = Joi.object<UpdateUINConfigRequest>({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Sequence Reset Policy"
+        "Sequence Reset Policy",
       ),
       "any.only": `Sequence Reset Policy must be one of [${Object.values(
-        UIN_RESET_POLICY
+        UIN_RESET_POLICY,
       ).join(", ")}]`,
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Sequence Reset Policy"
+        "Sequence Reset Policy",
       ),
     }),
 
@@ -215,7 +216,7 @@ export const updateUINConfigSchema = Joi.object<UpdateUINConfigRequest>({
       "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "UIN Segments"
+        "UIN Segments",
       ),
     }),
 });
@@ -233,12 +234,12 @@ export const previewConfigSchema = Joi.object<UINPreviewRequest>({
       "array.min": generateValidationErrorMessage("MIN", "UIN Segments"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "UIN Segments"
+        "UIN Segments",
       ),
     }),
 });
 
-export const AccuinShortCodeSchema = Joi.object({
+export const uinShortCodeSchema = Joi.object({
   shortCode: Joi.string()
     .valid(...Object.values(AccUinShortCode))
     .trim()
@@ -251,23 +252,98 @@ export const AccuinShortCodeSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Short Code",
-        Object.values(AccUinShortCode).join(", ")
+        Object.values(AccUinShortCode).join(", "),
       ),
     }),
 });
 
-export const validateCreateConfig = validationHandler({
-  schema: createUINConfigSchema,
-});
+export const validateCreateConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { error } = createUINConfigSchema.validate(req.body, {
+    abortEarly: false,
+  });
 
-export const validateUpdateConfig = validationHandler({
-  schema: updateUINConfigSchema,
-});
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      }),
+    );
+  }
 
-export const validateGetUINConfig = validationHandler({
-  schema: AccuinShortCodeSchema,
-});
+  next();
+};
 
-export const validatePreviewCustomConfig = validationHandler({
-  schema: previewConfigSchema,
-});
+export const validateUpdateConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { error } = updateUINConfigSchema.validate(req.body, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      }),
+    );
+  }
+
+  next();
+};
+export const validateGetUINConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { error } = uinShortCodeSchema.validate(req.query, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      }),
+    );
+  }
+
+  next();
+};
+
+export const validatePreviewCustomConfig = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { error } = previewConfigSchema.validate(req.body, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    return res.status(400).json(
+      new BaseResponse({
+        success: false,
+        errorCode: "PARAMETER_INVALID",
+        errorMessage: error.message,
+        errors: error.details,
+      }),
+    );
+  }
+
+  next();
+};

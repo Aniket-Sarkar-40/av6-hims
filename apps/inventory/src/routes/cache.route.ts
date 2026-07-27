@@ -35,7 +35,7 @@ cacheRouter.post(
   "/load",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CACHE", "VIEW")),
-  getAllCacheController
+  getAllCacheController,
 );
 /**
  * @swagger
@@ -57,13 +57,13 @@ cacheRouter.delete(
   "/delete",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CACHE", "DELETE")),
-  clearCacheController
+  clearCacheController,
 );
 cacheRouter.delete(
   "/all",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CACHE", "DELETE")),
-  clearAllCacheController
+  clearAllCacheController,
 );
 
 export default cacheRouter;

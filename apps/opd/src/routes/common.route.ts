@@ -9,10 +9,10 @@ import {
   fixedSearch,
   fixedSearchWoPaginationController,
 } from "@/controllers/common.controller.js";
-import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
-import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { authorizeCommonSearch } from "@/middleware/auth.middleware.js";
 import {
   validateCommonDelete,
+  validateCommonExcelExport,
   validateCommonExportExcel,
   validateCommonFetch,
   validateCommonImportExcel,
@@ -22,10 +22,12 @@ import {
   validateFixedSearchWoPagination,
   validateSearchRequest,
 } from "@/validations/request/common.validation.js";
-import { Router } from "express";
-import { authorizeCommonSearch } from "@/middleware/auth.middleware.js";
-import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { commonFSExcelExport } from "@apps/core/controllers/common.controller.js";
 import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
+import { verifyToken } from "@repo/platform/middlewares/auth.middleware.js";
+import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
+import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
+import { Router } from "express";
 
 export const commonRouter: Router = Router();
 /**
@@ -53,7 +55,7 @@ commonRouter.post(
   verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch
+  fixedSearch,
 );
 
 /**
@@ -74,7 +76,7 @@ commonRouter.post(
   verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch
+  commonSearch,
 );
 
 /**
@@ -95,7 +97,7 @@ commonRouter.post(
   verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch
+  commonDropdownSearch,
 );
 
 /**
@@ -116,7 +118,7 @@ commonRouter.post(
   verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController
+  fixedSearchWoPaginationController,
 );
 
 /**
@@ -137,7 +139,7 @@ commonRouter.post(
   verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch
+  commonFetch,
 );
 
 /**
@@ -158,7 +160,7 @@ commonRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport
+  commonExcelImport,
 );
 
 /**
@@ -188,7 +190,7 @@ commonRouter.delete(
   verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete
+  commonDelete,
 );
 
 /**
@@ -209,5 +211,27 @@ commonRouter.patch(
   verifyToken(ServiceCode.OPD),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus
+  commonUpdateStatus,
+);
+
+/**
+ * @swagger
+ * /api/v1/common/excel-export-fs:
+ *   post:
+ *     summary: filter data
+ *     tags: [Common]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/commonExcelExportSchema'
+ */
+// POST /fixedSearch
+commonRouter.post(
+  "/excel-export-fs",
+  verifyToken,
+  authorizeCommonSearch(),
+  validateCommonExcelExport,
+  commonFSExcelExport,
 );

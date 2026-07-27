@@ -6,7 +6,7 @@ import { customOmit } from "av6-core-v2";
 import { toIdValue } from "av6-utils";
 
 export const toUnitMasterDto = async (
-  data: InvUnitMaster[]
+  data: InvUnitMaster[],
 ): Promise<UnitMasterDTO[]> => {
   const defaultUnitMaster =
     await defaultUnitMasterService.getAllDefaultUnitMaster(true);
@@ -27,7 +27,7 @@ export const toUnitMasterDto = async (
       ]);
 
       const defaultUnitMasterData = defaultUnitMaster.find(
-        (defaultUnit) => defaultUnit.id === item.defaultUnitMasterId
+        (defaultUnit) => defaultUnit.id === item.defaultUnitMasterId,
       );
 
       return {
@@ -36,7 +36,7 @@ export const toUnitMasterDto = async (
           ? toIdValue(defaultUnitMasterData, "name")
           : null,
       };
-    })
+    }),
   );
 
   return unitMasterDTO;

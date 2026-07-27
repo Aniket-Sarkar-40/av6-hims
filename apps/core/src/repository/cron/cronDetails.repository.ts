@@ -18,7 +18,7 @@ export const getLatestCronByRunKey = async (input: CronDetailsInput) => {
 
   const { name, runDate: normDate } = getNormalizedParams(
     input.cronName,
-    input.runDate
+    input.runDate,
   );
   const rk = normRunKey(input.runKey);
 
@@ -36,13 +36,13 @@ export const getLatestCronByRunKey = async (input: CronDetailsInput) => {
 };
 
 export const markCronInProgress = async (
-  input: CronDetailsInput & { attempt: number; message?: string }
+  input: CronDetailsInput & { attempt: number; message?: string },
 ): Promise<CronDetailsCtx> => {
   logger.info("repo::cronDetails::markCronInProgress");
 
   const { name, runDate: normDate } = getNormalizedParams(
     input.cronName,
-    input.runDate
+    input.runDate,
   );
   const rk = normRunKey(input.runKey);
   const startedAt = new Date();
@@ -92,7 +92,7 @@ export const updateCronMessageById = async (id: number, message: string) => {
 
 export const markCronSuccess = async (
   ctx: CronDetailsCtx,
-  message?: string
+  message?: string,
 ) => {
   logger.info("repo::cronDetails::markCronSuccess");
 

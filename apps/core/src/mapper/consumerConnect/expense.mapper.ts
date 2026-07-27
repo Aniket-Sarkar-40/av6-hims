@@ -14,7 +14,7 @@ import {
 import { BASE_URL } from "@repo/shared";
 
 export const toExpenseEntity = (
-  expenseReq: ExpenseInputRequest
+  expenseReq: ExpenseInputRequest,
 ): ExpenseInput => {
   const entity: ExpenseInput = {
     id: expenseReq.id ? Number(expenseReq.id) : undefined,
@@ -62,7 +62,7 @@ export const toExpenseDTO = async (expense: Expense): Promise<ExpenseDTO> => {
   if (expense.expenseHeadId !== null) {
     const rawHead = await expenseHeadService.getExpenseHeadById(
       expense.expenseHeadId,
-      true
+      true,
     );
     if (rawHead) {
       expenseHead = toExpenseHeadDTO(rawHead);
@@ -85,7 +85,7 @@ export const toExpenseDTO = async (expense: Expense): Promise<ExpenseDTO> => {
   };
 };
 export const toExpenseDTOs = async (
-  expenses: Expense[]
+  expenses: Expense[],
 ): Promise<ExpenseDTO[]> => {
   return Promise.all(expenses.map((expense) => toExpenseDTO(expense)));
 };

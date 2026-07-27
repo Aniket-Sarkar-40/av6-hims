@@ -3,7 +3,7 @@ import { ClientMaster } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const getCorporateByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<ClientMaster | null> => {
   logger.info("entering::getCorporateByIdFromDb::repository");
   const corporate = await db.clientMaster.findFirst({

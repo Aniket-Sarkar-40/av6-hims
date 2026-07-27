@@ -24,7 +24,7 @@ export const staffDesignationSchema = Joi.object<CreateStaffDesignationInput>({
 export const validateStaffDesignation = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = staffDesignationSchema.validate(req.body, {
     abortEarly: false,
@@ -37,7 +37,7 @@ export const validateStaffDesignation = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

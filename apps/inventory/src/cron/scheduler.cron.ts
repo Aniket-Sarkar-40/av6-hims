@@ -31,7 +31,7 @@ export function registerCron() {
     },
     {
       timezone,
-    }
+    },
   );
 
   cron.schedule(
@@ -59,7 +59,7 @@ export function registerCron() {
     },
     {
       timezone,
-    }
+    },
   );
 
   cron.schedule(
@@ -87,6 +87,6 @@ export function registerCron() {
     },
     {
       timezone,
-    }
+    },
   );
 }

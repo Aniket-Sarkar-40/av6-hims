@@ -51,7 +51,7 @@ purchaseRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER", "CREATE")),
   validatePurchase,
-  createPurchase
+  createPurchase,
 );
 
 /**
@@ -67,7 +67,7 @@ purchaseRouter.get(
   "/",
   verifyToken,
   authorize(getPermission("PMS", "PURCHASE_ORDER", "VIEW")),
-  getAllPurchase
+  getAllPurchase,
 );
 
 /**
@@ -88,7 +88,7 @@ purchaseRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER", "VIEW")),
-  getPurchaseById
+  getPurchaseById,
 );
 
 /**
@@ -118,10 +118,10 @@ purchaseRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "PURCHASE_ORDER", "VIEW"),
-    getPermission("PMS", "PURCHASE_ORDER", "UPDATE")
+    getPermission("PMS", "PURCHASE_ORDER", "UPDATE"),
   ),
   validatePurchaseUpdate,
-  updatePurchase
+  updatePurchase,
 );
 
 /**
@@ -148,7 +148,7 @@ purchaseRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER", "DELETE")),
-  deletePurchase
+  deletePurchase,
 );
 
 /**
@@ -170,7 +170,7 @@ purchaseRouter.post(
   "/:id/approval",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_APPROVAL", "CREATE")),
-  purchaseApproval
+  purchaseApproval,
 );
 
 /**
@@ -193,7 +193,7 @@ purchaseRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_EXCEL", "VIEW")),
   validateExcelFilterPurchase,
-  excelPurchaseOrderReport
+  excelPurchaseOrderReport,
 );
 
 /**
@@ -216,5 +216,5 @@ purchaseRouter.post(
   "/pdf",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "PURCHASE_ORDER_PDF", "VIEW")),
-  printPOById
+  printPOById,
 );

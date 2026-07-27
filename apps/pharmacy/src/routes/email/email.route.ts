@@ -42,7 +42,7 @@ emailConfigRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMAIL", "CREATE")),
   validateEmailConfig,
-  upsertEmailConfig
+  upsertEmailConfig,
 );
 
 /**
@@ -58,7 +58,7 @@ emailConfigRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMAIL", "VIEW")),
-  getEmailConfig
+  getEmailConfig,
 );
 
 /**
@@ -74,7 +74,7 @@ emailConfigRouter.get(
   "/event-email",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "EMAIL", "VIEW")),
-  getEventEmail
+  getEventEmail,
 );
 
 /**
@@ -91,9 +91,9 @@ emailConfigRouter.delete(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "EMAIL", "VIEW"),
-    getPermission("PMS", "EMAIL", "DELETE")
+    getPermission("PMS", "EMAIL", "DELETE"),
   ),
-  deleteEmailConfig
+  deleteEmailConfig,
 );
 
 export default emailConfigRouter;

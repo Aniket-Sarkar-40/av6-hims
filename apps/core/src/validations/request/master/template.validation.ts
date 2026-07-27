@@ -19,7 +19,7 @@ export const createTemplateSchema = Joi.object({
       "string.base": generateValidationErrorMessage("STRING", "Template Name"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Name"
+        "Template Name",
       ),
     }),
 
@@ -31,11 +31,11 @@ export const createTemplateSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Template Type",
-        Object.values(TemplateType).join(", ")
+        Object.values(TemplateType).join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Type"
+        "Template Type",
       ),
     }),
 
@@ -55,7 +55,7 @@ export const createTemplateSchema = Joi.object({
         .messages({
           "any.required": generateValidationErrorMessage(
             "REQUIRED",
-            "Body HTML for EMAIL template"
+            "Body HTML for EMAIL template",
           ),
         }),
       otherwise: Joi.optional(),
@@ -71,7 +71,7 @@ export const createTemplateSchema = Joi.object({
         .messages({
           "any.required": generateValidationErrorMessage(
             "REQUIRED",
-            "Body Text for non-EMAIL templates"
+            "Body Text for non-EMAIL templates",
           ),
         }),
     }),
@@ -91,7 +91,7 @@ export const templateUpdateSchema = createTemplateSchema.keys({
 export const validateTemplateCreate = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = createTemplateSchema.validate(req.body, {
     abortEarly: false,
@@ -108,7 +108,7 @@ export const validateTemplateCreate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -118,7 +118,7 @@ export const validateTemplateCreate = (
 export const validateTemplateUpdate = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = templateUpdateSchema.validate(req.body, {
     abortEarly: false,
@@ -135,7 +135,7 @@ export const validateTemplateUpdate = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 

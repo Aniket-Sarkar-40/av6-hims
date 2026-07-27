@@ -63,7 +63,7 @@ export const appointmentsSchema = Joi.object<CreateAppointmentsTableInput>({
 
   additionalDiscountMode: enumOptional(
     "Additional Discount Mode",
-    PercentageOrAmount
+    PercentageOrAmount,
   ),
   additionalDiscountValue: intOptional("Additional Discount Value")
     .precision(2)
@@ -71,7 +71,7 @@ export const appointmentsSchema = Joi.object<CreateAppointmentsTableInput>({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Discount value",
-        "2"
+        "2",
       ),
     }),
   discountTotalAmount: intOptional("Discount Total amount")
@@ -80,7 +80,7 @@ export const appointmentsSchema = Joi.object<CreateAppointmentsTableInput>({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Discount Total amount",
-        "2"
+        "2",
       ),
     }),
 
@@ -92,7 +92,7 @@ export const appointmentsSchema = Joi.object<CreateAppointmentsTableInput>({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Tax value",
-        "2"
+        "2",
       ),
     }),
   taxAmount: intOptional("Tax Amount")
@@ -101,7 +101,7 @@ export const appointmentsSchema = Joi.object<CreateAppointmentsTableInput>({
       "number.precision": generateValidationErrorMessage(
         "PRECISION",
         "Tax Amount",
-        "2"
+        "2",
       ),
     }),
 
@@ -164,7 +164,7 @@ export const rescheduleAppointmentSchema =
         "number.precision": generateValidationErrorMessage(
           "PRECISION",
           "Discount Total amount",
-          "2"
+          "2",
         ),
       }),
     taxAmount: intOptional("Tax Amount")
@@ -173,7 +173,7 @@ export const rescheduleAppointmentSchema =
         "number.precision": generateValidationErrorMessage(
           "PRECISION",
           "Tax Amount",
-          "2"
+          "2",
         ),
       }),
   });

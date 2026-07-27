@@ -124,25 +124,24 @@ export interface CalculationOutput {
   netTax: number;
 }
 
-export interface SellDTO
-  extends Omit<
-    SellResponse,
-    | "createdBy"
-    | "sellDetails"
-    | "insurance"
-    | "corporateClient"
-    | "coPayAmount"
-    | "customerPayAmount"
-    | "netAmount"
-    | "totalAmount"
-    | "tax"
-    | "netTax"
-    | "discount"
-    | "netDiscount"
-    | "paidAmount"
-    | "returnedAmount"
-    | "refundedAmount"
-  > {
+export interface SellDTO extends Omit<
+  SellResponse,
+  | "createdBy"
+  | "sellDetails"
+  | "insurance"
+  | "corporateClient"
+  | "coPayAmount"
+  | "customerPayAmount"
+  | "netAmount"
+  | "totalAmount"
+  | "tax"
+  | "netTax"
+  | "discount"
+  | "netDiscount"
+  | "paidAmount"
+  | "returnedAmount"
+  | "refundedAmount"
+> {
   staff?: EmployeeCache | null;
   insurance?: IdValue | null;
   corporateClient?: IdValue | null;
@@ -187,20 +186,19 @@ export interface PaymentTransaction {
   refundAmount?: number;
 }
 
-export interface SellDetailDTO
-  extends Omit<
-    PmsSellDetails,
-    | "mrp"
-    | "netAmount"
-    | "totalAmount"
-    | "coPayAmount"
-    | "customerPayAmount"
-    | "discount"
-    | "netDiscount"
-    | "tax"
-    | "netTax"
-    | "coPayPaymentValue"
-  > {
+export interface SellDetailDTO extends Omit<
+  PmsSellDetails,
+  | "mrp"
+  | "netAmount"
+  | "totalAmount"
+  | "coPayAmount"
+  | "customerPayAmount"
+  | "discount"
+  | "netDiscount"
+  | "tax"
+  | "netTax"
+  | "coPayPaymentValue"
+> {
   item: DecimalToNumber<PmsItem> | null;
   itemCategory: MedCategory | null;
   insuredCoPay: number | null;

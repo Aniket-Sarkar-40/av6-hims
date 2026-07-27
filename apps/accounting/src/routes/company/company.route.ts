@@ -17,16 +17,16 @@ export const companyRouter: Router = Router();
 
 companyRouter.post(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "COMPANY", "CREATE")),
   validateCreateCompany,
-  createCompany
+  createCompany,
 );
 
 companyRouter.put(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "COMPANY", "UPDATE")),
   validateUpdateCompany,
-  updateCompany
+  updateCompany,
 );

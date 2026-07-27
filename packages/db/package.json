@@ -5,23 +5,28 @@
     "@prisma/adapter-mariadb": "^7.0.0",
     "@prisma/client": "^7.0.0",
     "av6-core": "^2.0.6",
+    "dayjs": "catalog:",
     "dotenv": "^17.2.3",
     "redis": "^5.11.0"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",
+    "eslint": "^9.15.0",
     "mariadb": "^3.4.0",
     "prisma": "^7.0.0",
     "tsx": "^4.20.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "catalog:"
   },
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
+      "development": "./src/index.ts",
       "default": "./dist/src/index.js"
     },
     "./client": {
       "types": "./dist/src/client.d.ts",
+      "development": "./src/client.ts",
       "default": "./dist/src/client.js"
     },
     "./generated/prisma/client": {
@@ -38,13 +43,16 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.generated.json",
+    "lint": "eslint .",
     "p:deploy": "prisma migrate deploy",
     "p:gen": "prisma generate",
     "p:mig": "prisma migrate dev",
     "p:seed": "prisma db seed",
     "p:studio": "prisma studio",
     "p:validate": "prisma validate",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "test": "vitest run"
   },
   "type": "module",
   "types": "./dist/src/index.d.ts"

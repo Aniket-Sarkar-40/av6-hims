@@ -5,7 +5,7 @@ import { StaffCollectionCenter } from "@repo/db/generated/prisma/client";
 import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export async function createStaffCollectionCenterInDb(
-  input: CreateOrUpdateStaffCollectionCenter
+  input: CreateOrUpdateStaffCollectionCenter,
 ): Promise<StaffCollectionCenter> {
   logger.info("entering::createStaffCollectionCenterInDb::repository");
 
@@ -25,7 +25,7 @@ export async function createStaffCollectionCenterInDb(
 
 export async function updateStaffCollectionCenterInDb(
   id: number,
-  input: CreateOrUpdateStaffCollectionCenter
+  input: CreateOrUpdateStaffCollectionCenter,
 ): Promise<StaffCollectionCenter> {
   logger.info("entering::updateStaffCollectionCenterInDb::repository");
 
@@ -51,7 +51,7 @@ export const getStaffCollectionCenterByIdFromDb = async (id: number) => {
 };
 
 export const getStaffCollectionCenterMappingsFromDb = async (
-  staffId: number
+  staffId: number,
 ) => {
   logger.info("entering::getStaffCollectionCenterMappingsFromDb::repository");
 
@@ -64,7 +64,7 @@ export const getStaffCollectionCenterMappingsFromDb = async (
 };
 
 export const deleteStaffCollectionCenterInDb = async (
-  id: number
+  id: number,
 ): Promise<void> => {
   logger.info("entering::deleteStaffCollectionCenterInDb::repository");
 

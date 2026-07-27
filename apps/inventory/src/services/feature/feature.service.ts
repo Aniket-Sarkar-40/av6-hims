@@ -33,7 +33,7 @@ const cacheKey = getMasterRedisKey("FEATURE_FLAG", "all");
 
 export const featureFlagService = {
   async createFeatureFlag(
-    input: CreateFeatureFlagInput
+    input: CreateFeatureFlagInput,
   ): Promise<InvFeatureFlag> {
     logger.info("entering::createFeatureFlag::service");
     await validateCreateFeatureFlag(input);
@@ -47,7 +47,7 @@ export const featureFlagService = {
   },
 
   async updateFeatureFlag(
-    input: UpdateFeatureFlagInput
+    input: UpdateFeatureFlagInput,
   ): Promise<InvFeatureFlag> {
     logger.info("entering::updateFeatureFlag::service");
     await validateUpdateFeatureFlag(input);
@@ -72,14 +72,14 @@ export const featureFlagService = {
       }
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Feature Flags")
+        generateErrorMessage("NOT_FOUND", "Feature Flags"),
       );
     } else {
       const records = await getAllFeatureFlagsFromDb();
       if (!records || records.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Feature Flags")
+          generateErrorMessage("NOT_FOUND", "Feature Flags"),
         );
       }
       logger.info("exiting::getAllFeatureFlags::service");
@@ -89,7 +89,7 @@ export const featureFlagService = {
 
   async getFeatureFlagByShortCode(
     shortCode: string,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<InvFeatureFlag | null> {
     logger.info("entering::getFeatureFlagByName::service");
     let record: InvFeatureFlag | null = null;
@@ -97,7 +97,7 @@ export const featureFlagService = {
     if (isCacheable) {
       record = (await getCacheById(
         cacheKey,
-        shortCode
+        shortCode,
       )) as InvFeatureFlag | null;
     } else {
       record = await getFeatureFlagByShortCodeFromDb(shortCode);
@@ -107,7 +107,7 @@ export const featureFlagService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Feature Flags")
+          generateErrorMessage("NOT_FOUND", "Feature Flags"),
         );
       } else {
         return null;

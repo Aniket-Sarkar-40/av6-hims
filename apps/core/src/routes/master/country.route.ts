@@ -45,7 +45,7 @@ countryRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "CREATE")),
   validateCountry,
-  createCountry
+  createCountry,
 );
 
 /**
@@ -61,7 +61,7 @@ countryRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "VIEW")),
-  getAllCountries
+  getAllCountries,
 );
 
 /**
@@ -84,7 +84,7 @@ countryRouter.get(
   "/id",
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "VIEW")),
-  getCountryById
+  getCountryById,
 );
 
 /**
@@ -107,10 +107,10 @@ countryRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "COUNTRY", "VIEW"),
-    getPermission("CORE", "COUNTRY", "UPDATE")
+    getPermission("CORE", "COUNTRY", "UPDATE"),
   ),
   validateCountryUpdate,
-  updateCountry
+  updateCountry,
 );
 
 /**
@@ -133,7 +133,7 @@ countryRouter.delete(
   "/:countryId",
   verifyToken(),
   authorize(getPermission("CORE", "COUNTRY", "DELETE")),
-  deleteCountry
+  deleteCountry,
 );
 
 export default countryRouter;

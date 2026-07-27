@@ -50,7 +50,7 @@ medCompoRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_COMPOSITION", "CREATE")),
   validateDropDownName,
-  compositionNameCreate
+  compositionNameCreate,
 );
 
 /**
@@ -69,7 +69,7 @@ medCompoRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_COMPOSITION", "VIEW")),
-  compositionMedGet
+  compositionMedGet,
 );
 
 /**
@@ -90,7 +90,7 @@ medCompoRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_COMPOSITION", "VIEW")),
-  getMedCompoById
+  getMedCompoById,
 );
 
 /**
@@ -120,10 +120,10 @@ medCompoRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_COMPOSITION", "VIEW"),
-    getPermission("PMS", "MEDICINE_COMPOSITION", "UPDATE")
+    getPermission("PMS", "MEDICINE_COMPOSITION", "UPDATE"),
   ),
   validateDropDownNameUpdate,
-  updateMedCompo
+  updateMedCompo,
 );
 
 export default medCompoRouter;

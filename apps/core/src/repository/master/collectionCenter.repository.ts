@@ -5,7 +5,7 @@ import { CollectionCenter } from "@repo/db/generated/prisma/client";
 import { omitUndefined } from "@repo/shared/utils/helper.utils.js";
 
 export const createCollectionCenterInDb = async (
-  collectionCenter: CollectionCenterReq
+  collectionCenter: CollectionCenterReq,
 ): Promise<CollectionCenter> => {
   logger.info("entering::createCollectionCenterInDb::repository");
   return db.collectionCenter.create({
@@ -32,7 +32,7 @@ export const createCollectionCenterInDb = async (
 };
 
 export const updateCollectionCenterInDb = async (
-  collectionCenter: CollectionCenterReq
+  collectionCenter: CollectionCenterReq,
 ): Promise<CollectionCenter> => {
   logger.info("entering::updateCollectionCenterInDb::repository");
 
@@ -61,10 +61,10 @@ export const updateCollectionCenterInDb = async (
 };
 
 export const getCollectionCenterByCollectionCenterNameFromDb = async (
-  colName: string
+  colName: string,
 ): Promise<CollectionCenter | null> => {
   logger.info(
-    "entering::getCollectionCenterByCollectionCenterNameFromDb::repository"
+    "entering::getCollectionCenterByCollectionCenterNameFromDb::repository",
   );
   return db.collectionCenter.findFirst({
     where: { colName, isActive: "true" },
@@ -72,10 +72,10 @@ export const getCollectionCenterByCollectionCenterNameFromDb = async (
 };
 
 export const getCollectionCenterByConnectionCodeFromDb = async (
-  connCode: string
+  connCode: string,
 ): Promise<CollectionCenter | null> => {
   logger.info(
-    "entering::getCollectionCenterByConnectionCodeFromDb::repository"
+    "entering::getCollectionCenterByConnectionCodeFromDb::repository",
   );
   return db.collectionCenter.findFirst({
     where: { connectionCode: connCode, isActive: "true" },
@@ -83,7 +83,7 @@ export const getCollectionCenterByConnectionCodeFromDb = async (
 };
 
 export const getCollectionCenterByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<CollectionCenter | null> => {
   logger.info("entering::getCollectionCenterByIdFromDb::repository");
   return db.collectionCenter.findUnique({

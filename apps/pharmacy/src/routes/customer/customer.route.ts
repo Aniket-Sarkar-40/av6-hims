@@ -44,7 +44,7 @@ customerRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CUSTOMER", "CREATE")),
   validateCustomer,
-  createCustomer
+  createCustomer,
 );
 /**
  * @swagger
@@ -60,7 +60,7 @@ customerRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CUSTOMER", "VIEW")),
-  getAllCustomers
+  getAllCustomers,
 );
 
 /**
@@ -84,7 +84,7 @@ customerRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CUSTOMER", "VIEW")),
-  getCustomerById
+  getCustomerById,
 );
 
 /**
@@ -108,8 +108,8 @@ customerRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "CUSTOMER", "VIEW"),
-    getPermission("PMS", "CUSTOMER", "UPDATE")
+    getPermission("PMS", "CUSTOMER", "UPDATE"),
   ),
   validateUpdateSchema,
-  updateCustomer
+  updateCustomer,
 );

@@ -49,7 +49,7 @@ incomeRouter.post(
   createUploadMiddleware("documents"),
   uploadToHetzner("Documents"),
   validateIncome,
-  createIncome
+  createIncome,
 );
 
 /**
@@ -65,7 +65,7 @@ incomeRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "INCOME", "VIEW")),
-  getAllIncome
+  getAllIncome,
 );
 
 /**
@@ -88,7 +88,7 @@ incomeRouter.get(
   "/id",
   verifyToken(),
   authorize(getPermission("CORE", "INCOME", "VIEW")),
-  getIncomeId
+  getIncomeId,
 );
 
 /**
@@ -118,12 +118,12 @@ incomeRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "INCOME", "VIEW"),
-    getPermission("CORE", "INCOME", "UPDATE")
+    getPermission("CORE", "INCOME", "UPDATE"),
   ),
   createUploadMiddleware("documents"),
   uploadToHetzner("documents"),
   validateUpdateIncome,
-  updateIncome
+  updateIncome,
 );
 
 /**
@@ -139,7 +139,7 @@ incomeRouter.delete(
   verifyToken(),
   authorize(
     getPermission("CORE", "INCOME", "VIEW"),
-    getPermission("CORE", "INCOME", "DELETE")
+    getPermission("CORE", "INCOME", "DELETE"),
   ),
-  deleteIncome
+  deleteIncome,
 );

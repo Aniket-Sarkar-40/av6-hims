@@ -12,13 +12,13 @@ export const createPdfTemplateSchema = Joi.object({
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Template Name",
-        "3"
+        "3",
       ),
       "string.empty": generateValidationErrorMessage("EMPTY", "Template Name"),
       "string.base": generateValidationErrorMessage("STRING", "Template Name"),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Name"
+        "Template Name",
       ),
     }),
 
@@ -30,7 +30,7 @@ export const createPdfTemplateSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Module",
-        Object.values(ServiceCode).join(", ")
+        Object.values(ServiceCode).join(", "),
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Module"),
     }),
@@ -43,11 +43,11 @@ export const createPdfTemplateSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Template Type",
-        Object.values(PdfTemplateType).join(", ")
+        Object.values(PdfTemplateType).join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Type"
+        "Template Type",
       ),
     }),
 
@@ -71,7 +71,7 @@ export const createPdfTemplateSchema = Joi.object({
     .messages({
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Sample Image URL"
+        "Sample Image URL",
       ),
     }),
 });
@@ -112,7 +112,7 @@ export const getPdfTemplateByModuleAndTypeSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Module",
-        Object.values(ServiceCode).join(", ")
+        Object.values(ServiceCode).join(", "),
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", "Module"),
     }),
@@ -124,11 +124,11 @@ export const getPdfTemplateByModuleAndTypeSchema = Joi.object({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Template Type",
-        Object.values(PdfTemplateType).join(", ")
+        Object.values(PdfTemplateType).join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Type"
+        "Template Type",
       ),
     }),
 });

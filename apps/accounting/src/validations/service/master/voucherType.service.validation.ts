@@ -9,9 +9,9 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdVoucherType = async (
-  id: number
+  id: number,
 ): Promise<VoucherType> => {
-  logger.info("entering::validateIdLedger::service::validation");
+  logger.info("entering::validateIdVoucherType::service::validation");
   validIdCheck(id);
   const voucherType = await commonGetService.getElementById<"VoucherType">({
     cacheCode: "VOUCHER_TYPE",
@@ -25,15 +25,15 @@ export const validateIdVoucherType = async (
   if (!voucherType) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Voucher Type")
+      generateErrorMessage("NOT_FOUND", "Voucher Type"),
     );
   }
-  logger.info("exiting::validateIdLedger::service::validation");
+  logger.info("exiting::validateIdVoucherType::service::validation");
   return voucherType;
 };
 
 export const createOrUpdateVoucherTypeServiceValidation = async (
-  input: CreateOrUpdateVoucherTypeInput
+  input: CreateOrUpdateVoucherTypeInput,
 ): Promise<void> => {
   logger.info("entering::createOrUpdateVoucherType::service::validation");
   if (input.id) {
@@ -41,7 +41,7 @@ export const createOrUpdateVoucherTypeServiceValidation = async (
     if (existingVoucherType.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        "You can't chnage company for existing voucher type"
+        "You can't chnage company for existing voucher type",
       );
     }
   } else {
@@ -61,8 +61,8 @@ export const createOrUpdateVoucherTypeServiceValidation = async (
       400,
       generateErrorMessage(
         "DUPLICATE_ITEM",
-        `Voucher Type with name ${input.name}`
-      )
+        `Voucher Type with name ${input.name}`,
+      ),
     );
   }
   logger.info("exiting::createOrUpdateVoucherType::service::validation");

@@ -15,11 +15,10 @@ export type CreateInvStockTransferDetailsInput = Omit<
   BaseModelAttr
 >;
 
-export interface CreateItemStockTransferInput
-  extends Omit<
-    Prisma.InvStockTransferUncheckedCreateInput,
-    BaseModelAttr | "stockTransferDetails" | "id"
-  > {
+export interface CreateItemStockTransferInput extends Omit<
+  Prisma.InvStockTransferUncheckedCreateInput,
+  BaseModelAttr | "stockTransferDetails" | "id"
+> {
   stockTransferDetails: CreateInvStockTransferDetailsInput[];
 }
 
@@ -31,8 +30,7 @@ export interface StockTransferAcknowledgeInput {
   status: ST_STATUS;
   returnStatus: ST_RETURN_STATUS;
 }
-export interface UpdateItemStockTransferInput
-  extends CreateItemStockTransferInput {
+export interface UpdateItemStockTransferInput extends CreateItemStockTransferInput {
   id: number;
   stockTransfer: StockTransferResponse;
 }
@@ -50,19 +48,18 @@ export interface StockTransferUpdate {
   ccId: number;
 }
 
-export interface StockTransferDTO
-  extends Omit<
-    InvStockTransfer,
-    | BaseModelAttr
-    | "ccId"
-    | "fromId"
-    | "toId"
-    | "staffId"
-    | "createdBy"
-    | "approvedBy"
-    | "acknowledgedBy"
-    | "returnApprovedBy"
-  > {
+export interface StockTransferDTO extends Omit<
+  InvStockTransfer,
+  | BaseModelAttr
+  | "ccId"
+  | "fromId"
+  | "toId"
+  | "staffId"
+  | "createdBy"
+  | "approvedBy"
+  | "acknowledgedBy"
+  | "returnApprovedBy"
+> {
   staff: EmployeeCache | null;
   cc: IdValue | null;
   from: IdValue | null;
@@ -74,8 +71,10 @@ export interface StockTransferDTO
   stockTransferDetails: StockTransferDetailsDTO[];
 }
 
-export interface StockTransferDetailsDTO
-  extends Omit<InvStockTransferDetails, BaseModelAttr> {
+export interface StockTransferDetailsDTO extends Omit<
+  InvStockTransferDetails,
+  BaseModelAttr
+> {
   item: ItemMasterDto | null;
   fromBranchItemQty: number;
   toBranchItemQty: number;
@@ -101,11 +100,10 @@ export type StockTransferDetailsResponse = Prisma.InvStockTransferGetPayload<{
   };
 }>;
 
-export interface StockTransferDetailRowDTO
-  extends Omit<
-    InvStockTransferDetails,
-    "itemId" | "createdBy" | "updatedBy" | "deletedBy"
-  > {
+export interface StockTransferDetailRowDTO extends Omit<
+  InvStockTransferDetails,
+  "itemId" | "createdBy" | "updatedBy" | "deletedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;

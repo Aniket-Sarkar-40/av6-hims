@@ -44,13 +44,13 @@ opdListRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getPendingMedicineAppointments
+  getPendingMedicineAppointments,
 );
 opdListRouter.post(
   "/excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getPendingMedicineAppointmentsExcel
+  getPendingMedicineAppointmentsExcel,
 );
 
 opdListRouter.post(
@@ -58,33 +58,33 @@ opdListRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
   validateOPD,
-  getOpdByAppointment
+  getOpdByAppointment,
 );
 
 opdListRouter.post(
   "/med-dosage",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  printInstructionByAppointmentId
+  printInstructionByAppointmentId,
 );
 
 opdListRouter.get(
   "/med-dosage",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getMedicineInstByAppointment
+  getMedicineInstByAppointment,
 );
 
 opdListRouter.get(
   "/corporate-client",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CLIENT_MASTER", "VIEW")),
-  getCorporateClientByCcId
+  getCorporateClientByCcId,
 );
 
 opdListRouter.get(
   "/last-appointments",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "OPD_LIST", "VIEW")),
-  getLastAppointments
+  getLastAppointments,
 );

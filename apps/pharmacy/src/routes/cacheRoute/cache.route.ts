@@ -34,7 +34,7 @@ cacheRouter.post(
   "/load",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CACHE", "VIEW")),
-  getAllCacheController
+  getAllCacheController,
 );
 /**
  * @swagger
@@ -56,13 +56,13 @@ cacheRouter.delete(
   "/delete",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CACHE", "DELETE")),
-  clearCacheController
+  clearCacheController,
 );
 cacheRouter.delete(
   "/all",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "CACHE", "DELETE")),
-  clearAllCacheController
+  clearAllCacheController,
 );
 
 export default cacheRouter;

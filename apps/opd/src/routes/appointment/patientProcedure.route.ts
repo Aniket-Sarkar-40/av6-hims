@@ -46,7 +46,7 @@ patientProcedureRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_PROCEDURE", "CREATE")),
   validateCreatePatientProcedure,
-  createPatientProcedure
+  createPatientProcedure,
 );
 
 /**
@@ -70,10 +70,10 @@ patientProcedureRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_PROCEDURE", "UPDATE"),
-    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW")
+    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW"),
   ),
   validateUpdatePatientProcedure,
-  updatePatientProcedure
+  updatePatientProcedure,
 );
 
 /**
@@ -96,8 +96,8 @@ patientProcedureRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PATIENT_PROCEDURE", "UPDATE"),
-    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW")
+    getPermission("OPD", "PATIENT_PROCEDURE", "VIEW"),
   ),
   validateReturnPatientProcedure,
-  returnPatientProcedure
+  returnPatientProcedure,
 );

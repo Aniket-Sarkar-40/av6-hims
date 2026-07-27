@@ -1,22 +1,22 @@
-import { DOC_DESG_ID, DOC_ROLE_ID } from "@repo/shared/config/index.js";
 import { uinServiceFactory } from "@/config/core.config.js";
-import { requestStorage } from "@repo/platform/config/requestContext.js";
-import { db } from "@repo/db/client";
 import {
   CreateDoctorInput,
   DoctorResponse,
   UpdateDoctorInput,
 } from "@/types/doctor/doctor.js";
-import { customOmit } from "av6-utils";
-import { logger } from "@repo/platform/logging/logger.js";
+import { db } from "@repo/db/client";
 import {
   BinaryFlag,
   DoctorSchedule,
-  StaffDesignation,
   OpdUinShortCode,
+  StaffDesignation,
 } from "@repo/db/generated/prisma/client";
-import dayjs from "dayjs";
+import { requestStorage } from "@repo/platform/config/requestContext.js";
+import { logger } from "@repo/platform/logging/logger.js";
+import { DOC_DESG_ID, DOC_ROLE_ID } from "@repo/shared/config/index.js";
 import { encryptPassword } from "@repo/shared/utils/passwordHash.utils.js";
+import { customOmit } from "av6-utils";
+import dayjs from "dayjs";
 
 export const createDoctorInDb = async (
   input: CreateDoctorInput,
@@ -61,6 +61,46 @@ export const createDoctorInDb = async (
         doctorRegistrationNo: doctorRegistrationNo,
         localAddress: address,
         opdDepartmentId: opdPrimaryDepartmentId,
+        department: "",
+        qualification: "",
+        specialization: "",
+        workExp: "",
+        fatherName: "",
+        motherName: "",
+        emergencyContactName: "",
+        surname: "",
+        permanentAddress: "",
+        emergencyContactNo: "",
+        note: "",
+        image: "",
+        digitalSign: "",
+        bloodGroup: "",
+        accountTitle: "",
+        bankAccountNo: "",
+        bankName: "",
+        ifscCode: "",
+        bankBranch: "",
+        payscale: "",
+        basicSalary: "",
+        epfNo: "",
+        contractType: "",
+        shift: "",
+        location: "",
+        facebook: "",
+        twitter: "",
+        linkedin: "",
+        userId: 0,
+        holidayEntitlement: "",
+        isEligibleDiscount: BinaryFlag.false,
+        isEligibleConsumption: BinaryFlag.false,
+        nationalHealthInsuranceNo: "",
+        ssnitNo: "",
+        otherScheme: "",
+        spouseName: "",
+        spouseSex: "",
+        spouseNationality: "",
+        spousePhone: "",
+        verificationCode: "",
         prefixId: opdDepartmentPrefixId,
         licenseName: licenseType,
         isActive: 1,

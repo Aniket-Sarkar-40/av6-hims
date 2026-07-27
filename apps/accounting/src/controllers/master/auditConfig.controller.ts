@@ -12,11 +12,11 @@ export const createAuditConfig = TryCatch(
     const created = await auditConfigService.createAuditConfig(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: created },
-      "Audit Config"
+      "Audit Config",
     );
     logger.info("exiting::createAuditConfig::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateAuditConfig = TryCatch(
@@ -26,9 +26,9 @@ export const updateAuditConfig = TryCatch(
     const updated = await auditConfigService.updateAuditConfig(input);
     const response = BaseResponse.success(
       { type: "UPDATED", data: updated },
-      "Audit Config"
+      "Audit Config",
     );
     logger.info("exiting::updateAuditConfig::controller");
     return res.status(200).json(response);
-  }
+  },
 );

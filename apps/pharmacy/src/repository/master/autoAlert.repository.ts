@@ -14,7 +14,7 @@ import {
 } from "@repo/db/generated/prisma/client";
 
 export const createAutoAlertEmailInDb = async (
-  input: CreateAutoAlertEmailInput
+  input: CreateAutoAlertEmailInput,
 ): Promise<PmsAutoAlertEmail> => {
   logger.info("entering::createAutoAlertEmailInDb::repository");
   const store = requestStorage.getStore();
@@ -28,7 +28,7 @@ export const createAutoAlertEmailInDb = async (
 };
 
 export const updateAutoAlertEmailInDb = async (
-  input: UpdateAutoAlertEmailInput
+  input: UpdateAutoAlertEmailInput,
 ): Promise<PmsAutoAlertEmail> => {
   logger.info("entering::updateAutoAlertEmailInDb::repository");
   const store = requestStorage.getStore();
@@ -46,7 +46,7 @@ export const updateAutoAlertEmailInDb = async (
 };
 
 export const getAutoAlertEmailByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<PmsAutoAlertEmail | null> => {
   logger.info("entering::getAutoAlertEmailByIdFromDb::repository");
   return db.pmsAutoAlertEmail.findFirst({
@@ -58,7 +58,7 @@ export const getAutoAlertEmailByIdFromDb = async (
 };
 
 export const getAutoAlertEmailByShortCodeFromDb = async (
-  shortCode: ALERT_TYPE
+  shortCode: ALERT_TYPE,
 ): Promise<PmsAutoAlertEmail | null> => {
   logger.info("entering::getAutoAlertEmailByIdFromDb::repository");
   return db.pmsAutoAlertEmail.findFirst({
@@ -70,7 +70,7 @@ export const getAutoAlertEmailByShortCodeFromDb = async (
 };
 
 export const createAutoAlertAuditInDb = async (
-  input: CreateAutoAlertAuditInput
+  input: CreateAutoAlertAuditInput,
 ): Promise<PmsAutoAlertAudit> => {
   logger.info("entering::createAutoAlertAuditInDb::repository");
   const store = requestStorage.getStore();
@@ -84,7 +84,7 @@ export const createAutoAlertAuditInDb = async (
 };
 
 export const updateAutoAlertAuditInDb = async (
-  input: UpdateAutoAlertAuditInput
+  input: UpdateAutoAlertAuditInput,
 ): Promise<PmsAutoAlertAudit> => {
   logger.info("entering::updateAutoAlertAuditInDb::repository");
   const store = requestStorage.getStore();
@@ -102,7 +102,7 @@ export const updateAutoAlertAuditInDb = async (
 };
 
 export const getAutoAlertAuditByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<PmsAutoAlertAudit | null> => {
   logger.info("entering::getAutoAlertAuditByIdFromDb::repository");
   return db.pmsAutoAlertAudit.findFirst({

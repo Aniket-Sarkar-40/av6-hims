@@ -1,19 +1,7 @@
-import express from "express";
-import { type Application as ExpressApplication } from "express";
+import { createApp, type AppMode } from "@repo/platform";
 import { accRouter } from "@/app.js";
-import { errorMiddleware } from "@repo/platform/middlewares/error.middleware.js";
-import { setupPlatform } from "@repo/platform";
+import { type Application as ExpressApplication } from "express";
 
-export function createAccApp(
-  mode: "STANDALONE" | "GATEWAY"
-): ExpressApplication {
-  const app = express();
-  setupPlatform(app);
-  if (mode === "STANDALONE") {
-    app.use("/api/v1/acc", accRouter);
-  } else {
-    app.use("/", accRouter);
-  }
-  app.use(errorMiddleware);
-  return app;
+export function createAccApp(mode: AppMode): ExpressApplication {
+  return createApp({ router: accRouter, basePath: "/api/v1/acc", mode });
 }

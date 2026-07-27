@@ -12,8 +12,10 @@ export type NotificationInput = Prisma.NotificationGetPayload<{
   };
 }>;
 
-export interface NotificationDTO
-  extends Omit<NotificationInput, "user" | "level1"> {
+export interface NotificationDTO extends Omit<
+  NotificationInput,
+  "user" | "level1"
+> {
   level1: IdValue | null;
   user: IdValue | null;
 }

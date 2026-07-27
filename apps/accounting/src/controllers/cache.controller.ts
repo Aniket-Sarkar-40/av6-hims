@@ -13,7 +13,7 @@ export const getAllCacheController = TryCatch(
 
     if (!cacheKeys || cacheKeys.length === 0) {
       logger.info(
-        "No cacheKey name provided: reloading ALL cacheable cacheKey."
+        "No cacheKey name provided: reloading ALL cacheable cacheKey.",
       );
       await loadCache();
       const response = new BaseResponse({
@@ -32,9 +32,9 @@ export const getAllCacheController = TryCatch(
       new BaseResponse({
         success: true,
         message: generateSuccessMessage("UPDATED", "Cache"),
-      })
+      }),
     );
-  }
+  },
 );
 
 export const clearCacheController = TryCatch(
@@ -53,8 +53,8 @@ export const clearCacheController = TryCatch(
             success: false,
             message: "Missing required field: cacheKey",
           },
-          null
-        )
+          null,
+        ),
       );
     }
 
@@ -65,9 +65,9 @@ export const clearCacheController = TryCatch(
       new BaseResponse({
         success: true,
         message: generateSuccessMessage("DELETED", "Cache"),
-      })
+      }),
     );
-  }
+  },
 );
 
 export const clearAllCacheController = TryCatch(
@@ -83,8 +83,8 @@ export const clearAllCacheController = TryCatch(
           success: true,
           message: generateSuccessMessage("DELETED", "All cache"),
         },
-        null
-      )
+        null,
+      ),
     );
-  }
+  },
 );

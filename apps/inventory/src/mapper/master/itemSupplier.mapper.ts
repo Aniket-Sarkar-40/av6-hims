@@ -20,7 +20,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toItemSupplierDTO = async (
-  data: ItemSupplierResponse[]
+  data: ItemSupplierResponse[],
 ): Promise<ItemSupplierDTO[]> => {
   const settings = await settingsService.getSettings();
   const isAccounting = settings?.isAccounting;
@@ -52,7 +52,7 @@ export const toItemSupplierDTO = async (
         allTaxDetails.find((tax) => tax.id === itemSupplier.taxDetailsId) ??
         null;
 
-      let ledgerValue: IdValue | null = null;
+      const ledgerValue: IdValue | null = null;
 
       // if (isAccounting) {
       //   try {
@@ -78,7 +78,7 @@ export const toItemSupplierDTO = async (
         taxDetails: toIdValue(taxDetails, "name"),
         ledger: ledgerValue,
       };
-    })
+    }),
   );
 };
 
@@ -108,7 +108,7 @@ const getOptionalVendorType = (value: unknown): VendorType | null => {
 
 export const mapRowToItemSupplierExcelCreateInput = (
   row: ItemSupplierExcelRow,
-  rowNo: number
+  rowNo: number,
 ): ItemSupplierExcelStagingRow => {
   return {
     rowNo,
@@ -165,7 +165,7 @@ const hasTaxDetails = (row: InvItemSupplierExcel) => {
 };
 
 export const mapExcelRowToItemSupplierReq = (
-  row: InvItemSupplierExcel
+  row: InvItemSupplierExcel,
 ): ItemSupplierCreateInput => {
   return {
     supplierCode: row.supplierCode,
@@ -225,7 +225,7 @@ export const mapExcelRowToItemSupplierReq = (
 export const toItemSupplierLookupDTO = (
   data: ItemSupplierLookupRow[],
   type: ItemSupplierSearchType,
-  searchText: string
+  searchText: string,
 ): ItemSupplierLookupDTO[] => {
   const search = searchText.trim().toLowerCase();
 

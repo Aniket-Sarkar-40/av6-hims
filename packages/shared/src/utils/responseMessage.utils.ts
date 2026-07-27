@@ -47,7 +47,7 @@ export const ensureMatch = <T>(
   bodyValue: T | undefined | null,
   leadValue: T | null,
   bodyLabel: string,
-  leadLabel: string
+  leadLabel: string,
 ) => {
   if (
     bodyValue !== undefined &&
@@ -60,8 +60,8 @@ export const ensureMatch = <T>(
       generateErrorMessage(
         "VALUE_MISMATCH",
         `${bodyLabel} (${bodyValue})`,
-        `${leadLabel} (${leadValue})`
-      )
+        `${leadLabel} (${leadValue})`,
+      ),
     );
   }
 };

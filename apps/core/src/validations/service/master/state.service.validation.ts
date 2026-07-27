@@ -24,7 +24,7 @@ export const validIdState = async (stateId: number) => {
 };
 
 export const deleteStateServiceValidation = async (
-  stateId: number
+  stateId: number,
 ): Promise<void> => {
   logger.info("entering::deleteStateServiceValidation::service::validation");
 
@@ -35,7 +35,7 @@ export const deleteStateServiceValidation = async (
 };
 
 export const getIdStateServiceValidation = async (
-  stateId: number
+  stateId: number,
 ): Promise<void> => {
   logger.info("entering::getIdStateServiceValidation::service::validation");
   await validIdState(stateId);
@@ -44,7 +44,7 @@ export const getIdStateServiceValidation = async (
 };
 
 export const updateIdStateServiceValidation = async (
-  body: UpdateStateInput
+  body: UpdateStateInput,
 ): Promise<void> => {
   logger.info("entering::updateIdStateServiceValidation::service::validation");
 
@@ -60,7 +60,7 @@ export const updateIdStateServiceValidation = async (
     if (stateByName) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "State Name")
+        generateErrorMessage("DUPLICATE_ITEM", "State Name"),
       );
     }
   }
@@ -70,7 +70,7 @@ export const updateIdStateServiceValidation = async (
 };
 
 export const nameStateServiceValidation = async (
-  input: CreateStateInput
+  input: CreateStateInput,
 ): Promise<void> => {
   logger.info("entering::nameStateServiceValidation::service::validation");
   await validateStateForeignKeys(input);
@@ -78,7 +78,7 @@ export const nameStateServiceValidation = async (
   if (state && state.isActive) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "State")
+      generateErrorMessage("DUPLICATE_ITEM", "State"),
     );
   }
   logger.info("exiting::nameStateServiceValidation::service::validation");
@@ -86,14 +86,14 @@ export const nameStateServiceValidation = async (
 };
 
 export const validateStateForeignKeys = async (
-  input: CreateStateInput
+  input: CreateStateInput,
 ): Promise<void> => {
   logger.info("entering::validateStateForeignKeys::service::validation");
   const country = await getCountryByIdFromDb(input.countryId);
   if (!country) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FOREIGN_KEY", "state")
+      generateErrorMessage("INVALID_FOREIGN_KEY", "state"),
     );
   }
   logger.info("exiting::validateStateForeignKeys::service::validation");

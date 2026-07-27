@@ -31,7 +31,7 @@ const cacheKey = getRedisKey("STAFF_DESIGNATION", "all");
 
 const staffDesignationServiceRaw = {
   async createStaffDesignation(
-    input: CreateStaffDesignationInput
+    input: CreateStaffDesignationInput,
   ): Promise<StaffDesignation> {
     logger.info("entering::createDesignations::service");
     await createStaffDesignationServiceValidation(input);
@@ -56,7 +56,7 @@ const staffDesignationServiceRaw = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Designations")
+          generateErrorMessage("NOT_FOUND", "Designations"),
         );
       }
     } else {
@@ -64,7 +64,7 @@ const staffDesignationServiceRaw = {
       if (staffDesignation.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Designations")
+          generateErrorMessage("NOT_FOUND", "Designations"),
         );
       }
       logger.info("exiting::getAllDesignations::service");
@@ -74,7 +74,7 @@ const staffDesignationServiceRaw = {
 
   async getStaffDesignationById(
     staffDesignationId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<StaffDesignation | null> {
     logger.info("entering::getStaffDesignationById::service");
     validIdCheck(staffDesignationId);
@@ -84,18 +84,18 @@ const staffDesignationServiceRaw = {
     if (isCacheable) {
       staffDesignation = (await getCacheById(
         cacheKey,
-        staffDesignationId
+        staffDesignationId,
       )) as Promise<StaffDesignation | null>;
     } else {
       staffDesignation = (await getStaffDesignationByIdFromDb(
-        staffDesignationId
+        staffDesignationId,
       )) as Promise<StaffDesignation | null> | null;
     }
     if (staffDesignation === null) {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "StaffDesignation")
+          generateErrorMessage("NOT_FOUND", "StaffDesignation"),
         );
       else return null;
     }
@@ -105,14 +105,14 @@ const staffDesignationServiceRaw = {
 
   async updateStaffDesignation(
     staffDesignationId: number,
-    input: CreateStaffDesignationInput
+    input: CreateStaffDesignationInput,
   ): Promise<StaffDesignation> {
     logger.info("entering::updateStaffDesignation::service");
     await updateStaffDesignationServiceValidation(input, staffDesignationId);
     const isCacheable = await checkIsCacheable(SHORT_CODE.DESIGNATION);
     const updatedStaffDesignation = await updateStaffDesignationInDb(
       staffDesignationId,
-      input
+      input,
     );
     if (isCacheable) {
       await updateCache(cacheKey, staffDesignationId, updatedStaffDesignation);
@@ -122,7 +122,7 @@ const staffDesignationServiceRaw = {
   },
 
   async deleteStaffDesignation(
-    staffDesignationId: number
+    staffDesignationId: number,
   ): Promise<{ message: string }> {
     logger.info("entering::deleteStaffDesignation::service");
     await validateIdStaffDesignation(staffDesignationId);
@@ -138,5 +138,5 @@ const staffDesignationServiceRaw = {
 
 export const staffDesignationService = auditProxy.createAuditedService(
   "staffDesignation",
-  staffDesignationServiceRaw
+  staffDesignationServiceRaw,
 );

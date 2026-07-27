@@ -15,7 +15,7 @@ export const validateIdDepartment = async (departmentId: number) => {
   if (!department || department.isActive === YesNoFlag.no) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Department")
+      generateErrorMessage("NOT_FOUND", "Department"),
     );
   }
   logger.info("exiting::deleteDepartment::service::validation");
@@ -25,7 +25,7 @@ export const validateIdDepartment = async (departmentId: number) => {
 
 export const validateNameDepartment = async (
   departmentName: string,
-  id?: number
+  id?: number,
 ): Promise<void> => {
   logger.info("entering::validateNameDepartment::service::validation");
   if (id) validIdCheck(id);
@@ -33,13 +33,13 @@ export const validateNameDepartment = async (
   if (id && department && department.id !== id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Department")
+      generateErrorMessage("DUPLICATE_ITEM", "Department"),
     );
   }
   if (!id && department) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Department Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Department Name"),
     );
   }
   logger.info("exiting::validateNameDepartment::service::validation");
@@ -47,7 +47,7 @@ export const validateNameDepartment = async (
 };
 
 export const validateCreateDepartment = async (
-  input: CreateDepartmentInput
+  input: CreateDepartmentInput,
 ) => {
   logger.info("entering::validateCreateDepartment::service::validation");
   await validateNameDepartment(input.name);
@@ -57,7 +57,7 @@ export const validateCreateDepartment = async (
 
 export const validateUpdateDepartment = async (
   id: number,
-  input: CreateDepartmentInput
+  input: CreateDepartmentInput,
 ) => {
   logger.info("entering::validateUpdateDepartment::service::validation");
   await validateIdDepartment(id);

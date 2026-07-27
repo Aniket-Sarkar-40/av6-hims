@@ -45,7 +45,7 @@ itemInstructionRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_INST_MAP", "CREATE")),
   validateCreateItemInstructionMap,
-  createItemInstructionMap
+  createItemInstructionMap,
 );
 
 /**
@@ -68,10 +68,10 @@ itemInstructionRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "ITEM_INST_MAP", "VIEW"),
-    getPermission("PMS", "ITEM_INST_MAP", "UPDATE")
+    getPermission("PMS", "ITEM_INST_MAP", "UPDATE"),
   ),
   validateUpdateItemInstructionMap,
-  updateItemInstructionMap
+  updateItemInstructionMap,
 );
 
 /**
@@ -87,5 +87,5 @@ itemInstructionRouter.delete(
   "/:id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "ITEM_INST_MAP", "DELETE")),
-  deleteItemInstruction
+  deleteItemInstruction,
 );

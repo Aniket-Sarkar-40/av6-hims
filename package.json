@@ -2,17 +2,25 @@
   "name": "hims-backend",
   "version": "0.0.1",
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
     "@types/node": "^25.4.0",
+    "eslint": "^9.15.0",
+    "prettier": "^3.8.1",
     "sherif": "^1.10.0",
     "syncpack": "^14.2.0",
     "turbo": "^2.8.12",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "packageManager": "pnpm@10.0.0",
   "private": true,
   "scripts": {
     "build": "pnpm check:repo && turbo build",
     "check:repo": "pnpm pkg:format && pnpm deps:check && pnpm lint:monorepo",
+    "clean": "find . -type d -name dist -not -path '*/node_modules/*' -prune -exec rm -rf {} +",
     "db:deploy": "pnpm --filter @repo/db prisma:deploy",
     "db:studio": "pnpm --filter @repo/db prisma:studio",
     "db:validate": "pnpm --filter @repo/db prisma:validate",
@@ -25,9 +33,12 @@
     "dev:inv": "pnpm --filter @apps/inv dev",
     "dev:opd": "pnpm --filter @apps/opd dev",
     "dev:pms": "pnpm --filter @apps/pharmacy dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
     "lint:monorepo": "sherif",
-    "p:gen": "pnpm --filter @repo/db prisma:generate",
+    "p:gen": "pnpm --filter @repo/db p:gen",
     "p:mig": "pnpm --filter @repo/db prisma:migrate",
     "pkg:format": "syncpack format",
     "start:core": "pnpm --filter @apps/core start",

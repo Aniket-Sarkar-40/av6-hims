@@ -40,7 +40,7 @@ misSaleRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  misSaleList
+  misSaleList,
 );
 
 /**
@@ -62,7 +62,7 @@ misSaleRouter.get(
   "/excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  excelMisSaleReport
+  excelMisSaleReport,
 );
 
 /**
@@ -84,7 +84,7 @@ misSaleRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  getSellMisController
+  getSellMisController,
 );
 
 /**
@@ -106,5 +106,5 @@ misSaleRouter.post(
   "/excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_SALE", "VIEW")),
-  getSellMisExcelController
+  getSellMisExcelController,
 );

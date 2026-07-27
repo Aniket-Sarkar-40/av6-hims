@@ -6,7 +6,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { applyRound, RoundFormat } from "av6-utils";
 
 export const createExpenseInDb = async (
-  expense: ExpenseInput
+  expense: ExpenseInput,
 ): Promise<Expense> => {
   logger.info("entering:: createExpenseInDb::repository");
   const store = requestStorage.getStore();
@@ -24,7 +24,7 @@ export const createExpenseInDb = async (
 };
 export const updateExpenseInDb = async (
   id: number,
-  expense: ExpenseInput
+  expense: ExpenseInput,
 ): Promise<Expense> => {
   logger.info("entering:: updateExpenseInDb::repository");
   const setting = await requestStorage.getStore()?.settings;
@@ -41,7 +41,7 @@ export const updateExpenseInDb = async (
   });
 };
 export const getExpenseByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Expense | null> => {
   logger.info("entering:: getExpenseByIdFromDb::repository");
   return db.expense.findUnique({
@@ -49,7 +49,7 @@ export const getExpenseByIdFromDb = async (
   });
 };
 export const getExpenseByInvoiceNoFromDb = async (
-  invoiceNo: string
+  invoiceNo: string,
 ): Promise<Expense | null> => {
   logger.info("entering:: getExpenseByNameFromDb::repository");
   return db.expense.findFirst({

@@ -6,7 +6,7 @@ import {
 import { toPickFields } from "@repo/shared/utils/idValue.utils.js";
 
 export async function itemMasterToDto(
-  item: ItemMasterDto | ItemMasterDtoStock
+  item: ItemMasterDto | ItemMasterDtoStock,
 ) {
   return toPickFields(item, [
     "id",

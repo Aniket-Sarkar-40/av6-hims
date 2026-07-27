@@ -39,10 +39,10 @@ export const auditConfigRouter: Router = Router();
  */
 auditConfigRouter.post(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "AUDIT_CONFIG", "CREATE")),
   validateAuditConfigCreate,
-  createAuditConfig
+  createAuditConfig,
 );
 
 /**
@@ -62,8 +62,8 @@ auditConfigRouter.post(
  */
 auditConfigRouter.put(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "AUDIT_CONFIG", "UPDATE")),
   validateAuditConfigUpdate,
-  updateAuditConfig
+  updateAuditConfig,
 );

@@ -55,7 +55,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "CREATE")),
   validateCreateStockTransfer,
-  createStockTransfer
+  createStockTransfer,
 );
 
 /**
@@ -79,10 +79,10 @@ stockTransferRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "STOCK_TRANSFER", "VIEW"),
-    getPermission("INV", "STOCK_TRANSFER", "UPDATE")
+    getPermission("INV", "STOCK_TRANSFER", "UPDATE"),
   ),
   validateUpdateStockTransfer,
-  updateStockTransfer
+  updateStockTransfer,
 );
 
 /**
@@ -106,7 +106,7 @@ stockTransferRouter.delete(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "DELETE")),
   validateDeleteStockTransfer,
-  deleteStockTransfer
+  deleteStockTransfer,
 );
 
 /**
@@ -130,7 +130,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER_APPROVE", "CREATE")),
   validateApproveStockTransfer,
-  approveStockTransfer
+  approveStockTransfer,
 );
 /**
  * @swagger
@@ -152,10 +152,10 @@ stockTransferRouter.post(
   "/approve-return",
   verifyToken(ServiceCode.INVENTORY),
   authorize(
-    getPermission("INV", "BRANCH_STOCK_TRANSFER_APPROVE_RETURN", "CREATE")
+    getPermission("INV", "BRANCH_STOCK_TRANSFER_APPROVE_RETURN", "CREATE"),
   ),
   validateApproveReturnStockTransfer,
-  approveReturnStockTransfer
+  approveReturnStockTransfer,
 );
 
 /**
@@ -178,7 +178,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER_ACKNOWLEDGE", "CREATE")),
   validateAcknowledgeStockTransfer,
-  acknowledgeStockTransfer
+  acknowledgeStockTransfer,
 );
 
 /**
@@ -202,7 +202,7 @@ stockTransferRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "VIEW")),
-  getStockTransferById
+  getStockTransferById,
 );
 
 /**
@@ -218,7 +218,7 @@ stockTransferRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER", "VIEW")),
-  getAllStockTransfer
+  getAllStockTransfer,
 );
 
 /**
@@ -241,7 +241,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "STOCK_TRANSFER_SEARCH", "VIEW")),
   validateSearchStockTransfer,
-  searchStockTransfer
+  searchStockTransfer,
 );
 
 export default stockTransferRouter;

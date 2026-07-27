@@ -8,10 +8,10 @@ import { shortCodeService } from "@/services/shortCode.service.js";
 
 export const commonShortCodeServiceValidation = async (
   shortCode: string,
-  id: number
+  id: number,
 ) => {
   logger.info(
-    "entering::commonShortCodeServiceValidation::service::validation"
+    "entering::commonShortCodeServiceValidation::service::validation",
   );
 
   validIdCheck(id);
@@ -21,7 +21,7 @@ export const commonShortCodeServiceValidation = async (
   if (!shortCodeData) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Short Code")
+      generateErrorMessage("NOT_FOUND", "Short Code"),
     );
   }
 
@@ -30,10 +30,10 @@ export const commonShortCodeServiceValidation = async (
 };
 
 export const commonShortCodeCreateServiceValidation = async (
-  shortCode: string
+  shortCode: string,
 ) => {
   logger.info(
-    "entering::commonShortCodeServiceValidation::service::validation"
+    "entering::commonShortCodeServiceValidation::service::validation",
   );
 
   const shortCodeData = await shortCodeService.getShortCodeByCode(shortCode);
@@ -41,7 +41,7 @@ export const commonShortCodeCreateServiceValidation = async (
   if (!shortCodeData) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Short Code")
+      generateErrorMessage("NOT_FOUND", "Short Code"),
     );
   }
 
@@ -50,18 +50,18 @@ export const commonShortCodeCreateServiceValidation = async (
 };
 
 export const validateUpdateDynamicShortCodeConfig = async (
-  input: UpdateConfigByCodeInput
+  input: UpdateConfigByCodeInput,
 ) => {
   logger.info(
-    "entering::validateUpdateDynamicShortCodeConfig::service::validation"
+    "entering::validateUpdateDynamicShortCodeConfig::service::validation",
   );
 
   const existing = await commonShortCodeCreateServiceValidation(
-    input.shortCode
+    input.shortCode,
   );
 
   input.existing = existing;
   logger.info(
-    "exiting::validateUpdateDynamicShortCodeConfig::service::validation"
+    "exiting::validateUpdateDynamicShortCodeConfig::service::validation",
   );
 };

@@ -9,8 +9,10 @@ export type WarehouseReq = Prisma.InvWarehouseUncheckedCreateInput;
 export interface WarehouseDTO extends Omit<InvWarehouse, BaseModelAttr> {
   collectionCenter: CollectionCenter | null;
 }
-export interface WarehouseDTOLocation
-  extends Omit<InvWarehouse, BaseModelAttr> {
+export interface WarehouseDTOLocation extends Omit<
+  InvWarehouse,
+  BaseModelAttr
+> {
   collectionCenter: CollectionCenter | null;
 }
 

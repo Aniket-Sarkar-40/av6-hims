@@ -27,7 +27,7 @@ export const cacheKeyForItemSearch = `${REDIS_PREFIX}pms:pmsItem:search`;
 export async function createCache(
   table: string,
   data: DataType[],
-  prefixProvided: Prefix
+  prefixProvided: Prefix,
 ): Promise<void> {
   logger.info("entering:createCache");
   const prefix = MASTER_TABLES.includes(table) ? "master" : prefixProvided;
@@ -41,7 +41,7 @@ export async function createCache(
       await redisClient.hSet(
         cacheKeyForItemSearch,
         element.id.toString(),
-        JSON.stringify(itemForSearch)
+        JSON.stringify(itemForSearch),
       );
     }
     if (table === "eventEmail" && element.emailType) {
@@ -50,7 +50,7 @@ export async function createCache(
       await redisClient.hSet(
         key,
         element.emailType.toString(),
-        JSON.stringify(toCache)
+        JSON.stringify(toCache),
       );
     } else if (
       (table === "dynamicShortCode" || table === "uINConfig") &&
@@ -62,7 +62,7 @@ export async function createCache(
       await redisClient.hSet(
         key,
         element.numCode.toString(),
-        JSON.stringify(element)
+        JSON.stringify(element),
       );
     } else {
       const toCache = bigintToStringDeep(element);
@@ -70,7 +70,7 @@ export async function createCache(
       await redisClient.hSet(
         key,
         element.id.toString(),
-        JSON.stringify(toCache)
+        JSON.stringify(toCache),
       );
     }
   }
@@ -84,7 +84,7 @@ export async function createCache(
 export async function addToCache(
   key: string,
   id: number | string,
-  data: unknown
+  data: unknown,
 ): Promise<void> {
   const redisClient = getRedisClient();
   if (redisClient === null) return;
@@ -93,7 +93,7 @@ export async function addToCache(
   await redisClient.hSet(
     key,
     typeof id === "string" ? id : id.toString(),
-    JSON.stringify(toCache)
+    JSON.stringify(toCache),
   );
 }
 
@@ -101,7 +101,7 @@ export async function addToCacheForLogin(
   key: string,
   id: number | string,
   data: unknown,
-  ttl?: number
+  ttl?: number,
 ): Promise<void> {
   const redisClient = getRedisClient();
   if (redisClient === null) return;
@@ -122,7 +122,7 @@ export async function addToCacheForLogin(
 export async function updateCache(
   key: string,
   id: number | string,
-  data: DataType | unknown
+  data: DataType | unknown,
 ): Promise<void> {
   const redisClient = getRedisClient();
   if (redisClient === null) return;
@@ -131,7 +131,7 @@ export async function updateCache(
   await redisClient.hSet(
     key,
     typeof id === "string" ? id : id.toString(),
-    JSON.stringify(toCache)
+    JSON.stringify(toCache),
   );
 }
 
@@ -140,7 +140,7 @@ export async function updateCache(
  */
 export async function deleteCache(
   key: string,
-  id: number | string
+  id: number | string,
 ): Promise<void> {
   const redisClient = getRedisClient();
   if (redisClient === null) return;
@@ -152,7 +152,7 @@ export async function deleteCache(
  */
 export async function deleteCacheLogin(
   key: string,
-  id: number | string
+  id: number | string,
 ): Promise<void> {
   const redisClient = getRedisClient();
   if (redisClient === null) return;
@@ -165,13 +165,13 @@ export async function deleteCacheLogin(
  */
 export async function getCacheById(
   key: string,
-  id: number | string
+  id: number | string,
 ): Promise<unknown | null> {
   const redisClient = getRedisClient();
   if (redisClient === null) return;
   const result = await redisClient.hGet(
     key,
-    typeof id === "string" ? id : id.toString()
+    typeof id === "string" ? id : id.toString(),
   );
   return result ? JSON.parse(result) : null;
 }
@@ -181,7 +181,7 @@ export async function getCacheById(
  */
 export async function getCacheLoginById(
   key: string,
-  id: number | string
+  id: number | string,
 ): Promise<unknown | null> {
   const redisClient = getRedisClient();
   if (redisClient === null) return;

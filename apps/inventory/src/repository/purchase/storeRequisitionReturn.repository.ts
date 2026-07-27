@@ -21,7 +21,7 @@ import { StoreRequisitionReturn } from "@repo/db/generated/prisma/client";
 import { customOmit } from "av6-core-v2";
 
 export const createStoreRequisitionReturnInDb = async (
-  input: CreateStoreRequisitionReturnInput
+  input: CreateStoreRequisitionReturnInput,
 ) => {
   logger.info("entering::createStoreRequisitionReturnInDb::repository");
 
@@ -94,7 +94,7 @@ export const createStoreRequisitionReturnInDb = async (
 };
 
 export const updateStoreRequisitionReturnInDb = async (
-  input: CreateStoreRequisitionReturnInput
+  input: CreateStoreRequisitionReturnInput,
 ) => {
   logger.info("entering::updateStoreRequisitionReturnInDb::repository");
 
@@ -165,7 +165,7 @@ export const updateStoreRequisitionReturnInDb = async (
                   >(b, ["isBatch", "isExpiry"]);
                   return {
                     ...omittedFlags.rest,
-                    batchNo: b.isBatch ? b.batchNo ?? null : null,
+                    batchNo: b.isBatch ? (b.batchNo ?? null) : null,
                     expiryDate:
                       b.isExpiry && b.expiryDate
                         ? new Date(b.expiryDate)
@@ -199,10 +199,10 @@ export const updateStoreRequisitionReturnInDb = async (
 };
 
 export const getStoreRequisitionReturnByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<GetStoreRequisitionReturnResponse | null> => {
   logger.info(
-    `entering::getStoreRequisitionReturnByIdFromDb::repository id=${id}`
+    `entering::getStoreRequisitionReturnByIdFromDb::repository id=${id}`,
   );
 
   const storeReqReturn = await db.storeRequisitionReturn.findFirst({
@@ -220,7 +220,7 @@ export const getStoreRequisitionReturnByIdFromDb = async (
   });
 
   logger.info(
-    `exiting::getStoreRequisitionReturnByIdFromDb::repository id=${id}`
+    `exiting::getStoreRequisitionReturnByIdFromDb::repository id=${id}`,
   );
   return storeReqReturn;
 };
@@ -249,10 +249,10 @@ export const getAllStoreRequisitionReturnByFromDb = async (): Promise<
 };
 
 export const getPendingSRRFromSRId = async (
-  storeRequisitionId: number
+  storeRequisitionId: number,
 ): Promise<StoreRequisitionReturn[]> => {
   logger.info(
-    `entering::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
+    `entering::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`,
   );
 
   const storeReqReturns = await db.storeRequisitionReturn.findMany({
@@ -264,16 +264,16 @@ export const getPendingSRRFromSRId = async (
   });
 
   logger.info(
-    `exiting::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
+    `exiting::getPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`,
   );
   return storeReqReturns;
 };
 
 export const getApprovedPendingSRRFromSRId = async (
-  storeRequisitionId: number
+  storeRequisitionId: number,
 ) => {
   logger.info(
-    `entering::getApprovedPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
+    `entering::getApprovedPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`,
   );
 
   const storeReqReturns = await db.storeRequisitionReturn.findMany({
@@ -290,14 +290,14 @@ export const getApprovedPendingSRRFromSRId = async (
   });
 
   logger.info(
-    `exiting::getApprovedPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`
+    `exiting::getApprovedPendingSRRFromSRId::repository storeRequisitionId=${storeRequisitionId}`,
   );
   return storeReqReturns;
 };
 
 export const deleteStoreRequisitionReturnFromDb = async (id: number) => {
   logger.info(
-    `entering::deleteStoreRequisitionReturnFromDb::repository id=${id}`
+    `entering::deleteStoreRequisitionReturnFromDb::repository id=${id}`,
   );
 
   const store = requestStorage.getStore();
@@ -339,15 +339,15 @@ export const deleteStoreRequisitionReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteStoreRequisitionReturnFromDb::repository id=${id}`
+    `exiting::deleteStoreRequisitionReturnFromDb::repository id=${id}`,
   );
 };
 
 export const rejectStoreRequisitionReturn = async (
-  inp: RejectStoreRequisitionReturnInput
+  inp: RejectStoreRequisitionReturnInput,
 ) => {
   logger.info(
-    `entering::rejectStoreRequisitionReturn::repository id=${inp.id}`
+    `entering::rejectStoreRequisitionReturn::repository id=${inp.id}`,
   );
 
   const store = requestStorage.getStore();
@@ -366,10 +366,10 @@ export const rejectStoreRequisitionReturn = async (
 };
 
 export const approveStoreRequisitionReturn = async (
-  inp: ApproveStoreReqReturnInput
+  inp: ApproveStoreReqReturnInput,
 ) => {
   logger.info(
-    `entering::approveStoreRequisitionReturn::repository id=${inp.id}`
+    `entering::approveStoreRequisitionReturn::repository id=${inp.id}`,
   );
 
   const store = requestStorage.getStore();
@@ -409,12 +409,12 @@ export const approveStoreRequisitionReturn = async (
 
     for (const det of inp.returnItems) {
       const srrDetail = inp.storeReqReturn.storeRequisitionReturnDetails.find(
-        (d) => d.id === det.id
+        (d) => d.id === det.id,
       );
 
       for (const item of det.itemBatch) {
         const rrItem = srrDetail?.requisitionReturnItemDetails.find(
-          (r) => r.id === item.id
+          (r) => r.id === item.id,
         );
 
         if (rrItem?.requisitionItemDetailsId) {
@@ -445,7 +445,7 @@ export const approveStoreRequisitionReturn = async (
             refId: inp.id,
             refNo: inp.storeReqReturn.srrNumber,
             refApprovedAt: now,
-          }
+          },
         );
 
         await addInTransitStock(
@@ -467,7 +467,7 @@ export const approveStoreRequisitionReturn = async (
             refId: inp.id,
             refNo: inp.storeReqReturn.srrNumber,
             refApprovedAt: now,
-          }
+          },
         );
       }
 
@@ -483,16 +483,16 @@ export const approveStoreRequisitionReturn = async (
     }
 
     logger.info(
-      `exiting::approveStoreRequisitionReturn::repository id=${inp.id}`
+      `exiting::approveStoreRequisitionReturn::repository id=${inp.id}`,
     );
   });
 };
 
 export const acknowledgeStoreRequisitionReturn = async (
-  inp: AcknowledgeRequisitionReturn
+  inp: AcknowledgeRequisitionReturn,
 ) => {
   logger.info(
-    `entering::acknowledgeStoreRequisitionReturn::repository id=${inp.id}`
+    `entering::acknowledgeStoreRequisitionReturn::repository id=${inp.id}`,
   );
 
   const store = requestStorage.getStore();
@@ -527,7 +527,7 @@ export const acknowledgeStoreRequisitionReturn = async (
             refDetailsId: detail.id,
             refId: inp.id,
             refNo: inp.storeReqReturn.srrNumber,
-          }
+          },
         );
 
         await subInTransitStock(
@@ -547,7 +547,7 @@ export const acknowledgeStoreRequisitionReturn = async (
             refDetailsId: detail.id,
             refId: inp.id,
             refNo: inp.storeReqReturn.srrNumber,
-          }
+          },
         );
       }
 
@@ -571,6 +571,6 @@ export const acknowledgeStoreRequisitionReturn = async (
   });
 
   logger.info(
-    `exiting::acknowledgeStoreRequisitionReturn::repository id=${inp.id}`
+    `exiting::acknowledgeStoreRequisitionReturn::repository id=${inp.id}`,
   );
 };

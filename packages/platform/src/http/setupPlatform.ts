@@ -7,10 +7,14 @@ import {
 import { AuthRequest } from "@repo/shared/types/request.type.js";
 import cookieParser from "cookie-parser";
 import express, { type Express } from "express";
+import helmet from "helmet";
 import morgan from "morgan";
 import { v4 as uuidv4 } from "uuid";
 
 export function setupPlatform(app: Express) {
+  // Security headers (HSTS, X-Frame-Options, X-Content-Type-Options, etc.)
+  app.use(helmet());
+
   // Trace-ID middleware: reuse incoming header or generate a new one
   app.use((req: AuthRequest, res, next) => {
     // look for header in a case-insensitive way
@@ -31,9 +35,9 @@ export function setupPlatform(app: Express) {
     });
   });
 
-  app.use(express.json());
+  app.use(express.json({ limit: "1mb" }));
   app.use(cookieParser());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
   morgan.token("traceId", (req: AuthRequest) => req.traceId || "-");
   app.use(requestLogger);

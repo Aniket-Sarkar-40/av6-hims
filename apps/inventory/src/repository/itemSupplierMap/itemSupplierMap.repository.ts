@@ -24,7 +24,7 @@ import {
 import { createBatchJobInDb } from "../batch/batch.repository.js";
 
 export async function createItemSupplierMapInDb(
-  data: ItemSupplierMapCreateInput
+  data: ItemSupplierMapCreateInput,
 ): Promise<InvItemSupplierMapping> {
   logger.info("entering::createItemSupplierMapInDb::repository");
   const store = requestStorage.getStore();
@@ -35,7 +35,7 @@ export async function createItemSupplierMapInDb(
       purchasePrice: applyRound(
         data.purchasePrice,
         RoundFormat.TO_FIXED,
-        precision
+        precision,
       ),
       validUpto: data.validUpto ? new Date(data.validUpto) : null,
       createdBy: store?.user?.id,
@@ -46,7 +46,7 @@ export async function createItemSupplierMapInDb(
 }
 
 export async function updateItemSupplierMapInDb(
-  data: ItemSupplierMapUpdateInput
+  data: ItemSupplierMapUpdateInput,
 ): Promise<InvItemSupplierMapping> {
   logger.info("entering::updateItemSupplierMapInDb::repository");
   const store = requestStorage.getStore();
@@ -65,7 +65,7 @@ export async function updateItemSupplierMapInDb(
         purchasePrice: applyRound(
           data.purchasePrice,
           RoundFormat.TO_FIXED,
-          precision
+          precision,
         ),
         validUpto: omittedData.rest.validUpto
           ? new Date(omittedData.rest.validUpto)
@@ -124,7 +124,7 @@ export async function updateItemSupplierMapInDb(
 }
 
 export async function getItemSupplierMapByIdFromDb(
-  id: number
+  id: number,
 ): Promise<InvItemSupplierMapping | null> {
   logger.info("entering::getItemSupplierMapByIdFromDb::repository");
 
@@ -140,10 +140,10 @@ export async function getItemSupplierMapByIdFromDb(
 
 export async function getItemSupplierMapByItemAndSupplierFromDb(
   itemId: number,
-  supplierId: number
+  supplierId: number,
 ): Promise<InvItemSupplierMapping | null> {
   logger.info(
-    "entering::getItemSupplierMapByItemAndSupplierFromDb::repository"
+    "entering::getItemSupplierMapByItemAndSupplierFromDb::repository",
   );
 
   const itemSupplierMap = await db.invItemSupplierMapping.findFirst({
@@ -172,7 +172,7 @@ export async function getAllItemSupplierMapFromDb(): Promise<
 }
 
 export async function deleteItemSupplierMapByIdFromDb(
-  id: number
+  id: number,
 ): Promise<InvItemSupplierMapping | null> {
   logger.info("entering::deleteItemSupplierMapByIdFromDb::repository");
   const store = requestStorage.getStore();
@@ -190,11 +190,11 @@ export async function deleteItemSupplierMapByIdFromDb(
 }
 
 export const CreateItemSupplierMapExcelInDb = async (
-  inp: Prisma.InvItemSupplierMapExcelCreateInput[]
+  inp: Prisma.InvItemSupplierMapExcelCreateInput[],
 ) => {
   logger.info("entering::CreateItemSupplierMapExcelInDb::repository");
   const batchUin = await uinServiceFactory.generateUIN(
-    InvUinShortCode.BATCH_JOB
+    InvUinShortCode.BATCH_JOB,
   );
   const settings = requestStorage.getStore()?.settings;
   const precision = settings?.defaultPrecision || 2;
@@ -205,7 +205,7 @@ export const CreateItemSupplierMapExcelInDb = async (
         supplierPrice: applyRound(
           record.supplierPrice ?? 0,
           RoundFormat.TO_FIXED,
-          precision
+          precision,
         ),
       }));
 
@@ -222,12 +222,12 @@ export const CreateItemSupplierMapExcelInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
 export async function ItemSupplierMapBatchJob(
-  input: ItemSupplierMapBatchJobInput
+  input: ItemSupplierMapBatchJobInput,
 ) {
   const { batchJobId, supplierId, ccId } = input;
 
@@ -324,7 +324,7 @@ export async function ItemSupplierMapBatchJob(
             ]);
             const diff = findDifferences(
               omittedExisting.rest,
-              omittedChanged.rest
+              omittedChanged.rest,
             );
 
             for (const d of diff) {
@@ -379,15 +379,15 @@ export async function ItemSupplierMapBatchJob(
       } catch (error) {
         console.error(
           `❌ Error processing batchItemMapExcel ${item.itemId}:`,
-          error
+          error,
         );
 
         const errorMessage =
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
         await db.batchJobDetails.create({
           data: {
             batchId: batchJobId,
@@ -427,10 +427,10 @@ export async function ItemSupplierMapBatchJob(
 
 export async function getItemSupplierMapByItemIdAndSupplierIdFromDb(
   itemIds: number[],
-  supplierId: number
+  supplierId: number,
 ): Promise<InvItemSupplierMapping | null> {
   logger.info(
-    "entering::getItemSupplierMapByItemAndSupplierFromDb::repository"
+    "entering::getItemSupplierMapByItemAndSupplierFromDb::repository",
   );
 
   const itemSupplierMap = await db.invItemSupplierMapping.findFirst({
@@ -447,10 +447,10 @@ export async function getItemSupplierMapByItemIdAndSupplierIdFromDb(
 export async function getItemSupplierMapsByItemIdsAndSupplierIdFromDb(
   itemIds: number[],
   supplierId: number,
-  ccId?: number
+  ccId?: number,
 ): Promise<InvItemSupplierMapping[]> {
   logger.info(
-    "entering::getItemSupplierMapsByItemIdsAndSupplierIdFromDb::repository"
+    "entering::getItemSupplierMapsByItemIdsAndSupplierIdFromDb::repository",
   );
 
   const itemSupplierMaps = await db.invItemSupplierMapping.findMany({
@@ -463,13 +463,13 @@ export async function getItemSupplierMapsByItemIdsAndSupplierIdFromDb(
   });
 
   logger.info(
-    "exiting::getItemSupplierMapsByItemIdsAndSupplierIdFromDb::repository"
+    "exiting::getItemSupplierMapsByItemIdsAndSupplierIdFromDb::repository",
   );
   return itemSupplierMaps;
 }
 
 export async function getItemSupplierMapFromDb(
-  body: GetItemReq
+  body: GetItemReq,
 ): Promise<InvItemSupplierMapping | null> {
   logger.info("entering::getItemSupplierMapFromDb::repository");
   return await db.invItemSupplierMapping.findFirst({

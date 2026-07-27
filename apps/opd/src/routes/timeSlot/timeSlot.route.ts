@@ -43,7 +43,7 @@ timeSlotRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TIME_SLOT", "VIEW")),
   validateTimeSlot,
-  getAllTimeSlots
+  getAllTimeSlots,
 );
 /**
  * @swagger
@@ -65,5 +65,5 @@ timeSlotRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "TIME_SLOT", "VIEW")),
   validateWeekId,
-  getAllWeekIds
+  getAllWeekIds,
 );

@@ -57,7 +57,7 @@ export const itemMasterSchema = Joi.object<ItemMasterReq | ItemMasterUpdateReq>(
     backImage: strOptional("Back Image"),
     leftSideImage: strOptional("Left Image"),
     rightSideImage: strOptional("Right Image"),
-  }
+  },
 );
 
 const multipleDocsAttr = [

@@ -40,7 +40,7 @@ settingsRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "SETTING", "CREATE")),
   validateSettings,
-  upsertSettings
+  upsertSettings,
 );
 
 /**
@@ -56,7 +56,7 @@ settingsRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "SETTING", "VIEW")),
-  getSettings
+  getSettings,
 );
 
 export default settingsRouter;

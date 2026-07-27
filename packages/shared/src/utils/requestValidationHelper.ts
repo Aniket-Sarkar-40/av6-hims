@@ -61,7 +61,7 @@ export const validationHandler = ({
             success: false,
             errorCode: "PARAMETER_INVALID",
             errorMessage: `${jsonAttr} must be a valid JSON`,
-          })
+          }),
         );
       }
     }
@@ -82,7 +82,7 @@ export const validationHandler = ({
           errorCode: "PARAMETER_INVALID",
           errorMessage: messages,
           errors: error.details,
-        })
+        }),
       );
     }
 
@@ -109,7 +109,7 @@ export const uploadFileHandler = ({
     if (isCommonCreateUpdate) {
       imgAttr = getFileAttrFromShortCode(
         service,
-        req.query.shortCode as string
+        req.query.shortCode as string,
       );
     }
 

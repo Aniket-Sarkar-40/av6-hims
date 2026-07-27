@@ -43,7 +43,7 @@ patientConsultationRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_CONSULTATION", "CREATE")),
   validatePatientConsultationCreate,
-  createPatientConsultation
+  createPatientConsultation,
 );
 
 /**
@@ -66,5 +66,5 @@ patientConsultationRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PATIENT_CONSULTATION", "UPDATE")),
   validatePatientConsultationUpdate,
-  updatePatientConsultation
+  updatePatientConsultation,
 );

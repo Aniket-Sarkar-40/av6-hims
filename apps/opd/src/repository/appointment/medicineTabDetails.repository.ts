@@ -9,7 +9,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { MedicineTabDetails } from "@repo/db/generated/prisma/client";
 
 export const createMedicineTabDetailsInDb = async (
-  input: CreateMedicineTabDetails
+  input: CreateMedicineTabDetails,
 ): Promise<MedicineTabDetails[]> => {
   logger.info("entering::createMedicineTabDetailsInDb::repository");
   const userId = requestStorage.getStore()?.user?.id ?? null;
@@ -23,8 +23,8 @@ export const createMedicineTabDetailsInDb = async (
             medicineTabId: input.medicineTabId,
             createdBy: userId,
           },
-        })
-      )
+        }),
+      ),
     );
   });
 
@@ -33,7 +33,7 @@ export const createMedicineTabDetailsInDb = async (
 };
 
 export const updateMedicineTabDetailsInDb = async (
-  input: UpdateMedicineTabDetailsInput
+  input: UpdateMedicineTabDetailsInput,
 ): Promise<MedicineTabDetails[]> => {
   logger.info("entering::updateMedicineTabDetailsInDb::repository");
   const userId = requestStorage.getStore()?.user?.id ?? undefined;
@@ -51,8 +51,8 @@ export const updateMedicineTabDetailsInDb = async (
         tx.medicineTabDetails.update({
           where: { id },
           data: { ...rest, updatedBy: userId },
-        })
-      )
+        }),
+      ),
     );
 
     const created = await Promise.all(
@@ -63,8 +63,8 @@ export const updateMedicineTabDetailsInDb = async (
             medicineTabId,
             createdBy: userId,
           },
-        })
-      )
+        }),
+      ),
     );
 
     if (toDeleteIds.length)
@@ -97,7 +97,7 @@ export const getAllMedicineTabDetailsFromDb = async (): Promise<
 };
 
 export const getMedicineTabDetailsByMedicineTabIdFromDb = async (
-  medicineTabId: number
+  medicineTabId: number,
 ): Promise<MedicineTabDetails[] | null> => {
   logger.info(`entering::getMedicineTabDetailsByIdFromDb::repository`);
 
@@ -112,7 +112,7 @@ export const getMedicineTabDetailsByMedicineTabIdFromDb = async (
 
 export const getMedicineTabIdAndMedIdByIdFromDb = async (
   id: number,
-  medId: number
+  medId: number,
 ): Promise<MedicineTabDetails | null> => {
   logger.info(`entering::getMedicineTabIdAndMedIdByIdFromDb::repository`);
 

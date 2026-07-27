@@ -49,7 +49,7 @@ opdDepartmentPrefixRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "OPD_DEPARTMENT_PREFIX", "CREATE")),
   validateOpdDepartmentPrefixCreate,
-  createOpdDepartmentPrefix
+  createOpdDepartmentPrefix,
 );
 
 /**
@@ -80,5 +80,5 @@ opdDepartmentPrefixRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "OPD_DEPARTMENT_PREFIX", "UPDATE")),
   validateOpdDepartmentPrefixUpdate,
-  updateOpdDepartmentPreFix
+  updateOpdDepartmentPreFix,
 );

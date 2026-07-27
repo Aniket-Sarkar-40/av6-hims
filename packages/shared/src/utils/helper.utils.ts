@@ -1,4 +1,5 @@
 import { DecodedToken } from "@/types/auth.js";
+import { IdValue } from "@/types/common.js";
 import { toUTCDateOnly } from "@/utils/date.utils.js";
 import { Decimal } from "@prisma/client/runtime/client";
 import { BASE_URL, CLIENT_ID } from "@repo/shared/config/index.js";
@@ -37,11 +38,11 @@ export function toPublicImageUrl(filePath?: string | null): string | null {
 
 export const toImageApiUrl = (
   fileName: string,
-  directoryPath: string
+  directoryPath: string,
 ): string => {
   const baseUrl = BASE_URL;
   return `${baseUrl}/api/v1/common/image/${fileName}?path=${encodeURIComponent(
-    directoryPath
+    directoryPath,
   )}`;
 };
 
@@ -77,12 +78,12 @@ export type RemoveUndefined<T> = {
 
 export function omitUndefined<T extends object>(obj: T): RemoveUndefined<T> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([, v]) => v !== undefined)
+    Object.entries(obj).filter(([, v]) => v !== undefined),
   ) as RemoveUndefined<T>;
 }
 
 export const processAndRecreateJWT = (
-  token: string
+  token: string,
 ): { permissions: string[]; roles: Record<string, string>[] } => {
   try {
     // Decode the existing JWT token
@@ -153,10 +154,10 @@ export function calculateAge(dob: string | Date): number {
 export type DecimalToNumber<T> = T extends Decimal
   ? number
   : T extends (infer U)[]
-  ? DecimalToNumber<U>[]
-  : T extends object
-  ? { [K in keyof T]: DecimalToNumber<T[K]> }
-  : T;
+    ? DecimalToNumber<U>[]
+    : T extends object
+      ? { [K in keyof T]: DecimalToNumber<T[K]> }
+      : T;
 
 export function toNumberDeep<T>(val: T): DecimalToNumber<T> {
   if (val === null || val === undefined) return val as any;
@@ -190,7 +191,7 @@ export const getNormalizedParams = (cornName: string, runDate: Date) => ({
 
 export const calcDurationMs = (
   startedAt: Date | null | undefined,
-  endedAt: Date
+  endedAt: Date,
 ) =>
   Math.max(0, endedAt.getTime() - (startedAt?.getTime() ?? endedAt.getTime()));
 
@@ -224,3 +225,13 @@ export const numberToWords = new ToWords({
     },
   },
 });
+
+export function toRequiredIdValue<
+  T extends { id: number },
+  K extends keyof Omit<T, "id"> & string,
+>(row: T, valueKey: K): IdValue {
+  return {
+    id: row.id,
+    value: String(row[valueKey] ?? ""),
+  };
+}

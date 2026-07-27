@@ -12,7 +12,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdCompanyFinancialYear = async (
-  id: number
+  id: number,
 ): Promise<CompanyFinancialYear> => {
   logger.info("entering::validateIdCompanyFinancialYear::service::validation");
   validIdCheck(id);
@@ -21,7 +21,7 @@ export const validateIdCompanyFinancialYear = async (
   if (!companyFinancialYear) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "CompanyFinancialYear")
+      generateErrorMessage("NOT_FOUND", "CompanyFinancialYear"),
     );
   }
   logger.info("exiting::validateIdCompanyFinancialYear::service::validation");
@@ -29,10 +29,10 @@ export const validateIdCompanyFinancialYear = async (
 };
 
 export const createOrUpdateCompanyFinancialYearServiceValidation = async (
-  input: CreateOrUpdateCompanyFinancialYear
+  input: CreateOrUpdateCompanyFinancialYear,
 ) => {
   logger.info(
-    "entering::createOrUpdateCompanyFinancialYear::service::validation"
+    "entering::createOrUpdateCompanyFinancialYear::service::validation",
   );
 
   if (input.id) {
@@ -40,7 +40,7 @@ export const createOrUpdateCompanyFinancialYearServiceValidation = async (
     if (companyFinancialYear?.companyId !== input.companyId) {
       throw new ErrorHandler(
         400,
-        "Cannot update company financial year of another company"
+        "Cannot update company financial year of another company",
       );
     }
   }
@@ -63,7 +63,7 @@ export const createOrUpdateCompanyFinancialYearServiceValidation = async (
   if (companyFinancialYear) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Company Financial Year")
+      generateErrorMessage("DUPLICATE_ITEM", "Company Financial Year"),
     );
   }
 
@@ -74,13 +74,13 @@ export const createOrUpdateCompanyFinancialYearServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Books begin from",
         "start date",
-        "end date"
-      )
+        "end date",
+      ),
     );
   }
 
   const existingCompanyFY = await getAllCompanyFinancialYearsByCompanyIdFromDb(
-    input.companyId
+    input.companyId,
   );
 
   const hasOverlap = existingCompanyFY.some((fy) => {
@@ -97,12 +97,56 @@ export const createOrUpdateCompanyFinancialYearServiceValidation = async (
         "DATE_RANGE_OVERLAP",
         "Company Financial Year",
         `${input.fyName}`,
-        "company"
-      )
+        "company",
+      ),
     );
   }
 
   logger.info(
-    "exiting::createOrUpdateCompanyFinancialYear::service::validation"
+    "exiting::createOrUpdateCompanyFinancialYear::service::validation",
   );
+};
+
+export const validateCloseCompanyFinancialYearServiceValidation = async (
+  id: number,
+) => {
+  logger.info(
+    "entering::validateCloseCompanyFinancialYear::service::validation",
+  );
+  const fy = await validateIdCompanyFinancialYear(id);
+  if (fy.isClosed) {
+    throw new ErrorHandler(400, "Company Financial Year is already closed");
+  }
+  if (fy.isLocked) {
+    throw new ErrorHandler(
+      400,
+      "Company Financial Year is locked, cannot be closed",
+    );
+  }
+  logger.info(
+    "exiting::validateCloseCompanyFinancialYear::service::validation",
+  );
+};
+
+export const validateToggleLockCompanyFinancialYearServiceValidation = async (
+  id: number,
+) => {
+  logger.info(
+    "entering::validateToggleLockCompanyFinancialYear::service::validation",
+  );
+  const fy = await validateIdCompanyFinancialYear(id);
+  // if (fy.isCurrent) {
+  //   throw new ErrorHandler(400, "Current Financial Year cannot be locked");
+  // }
+  if (fy.isClosed) {
+    throw new ErrorHandler(
+      400,
+      "Company Financial Year is closed, cannot be locked",
+    );
+  }
+  const status = fy.isLocked ? false : true;
+  logger.info(
+    "exiting::validateToggleLockCompanyFinancialYear::service::validation",
+  );
+  return status;
 };

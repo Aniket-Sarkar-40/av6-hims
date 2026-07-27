@@ -35,5 +35,5 @@ locationRouter.post(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "LOCATION", "VIEW")),
-  collectionCenterGet
+  collectionCenterGet,
 );

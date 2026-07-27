@@ -21,7 +21,7 @@ export const validateIdCronDetails = async (id: number) => {
   if (!cron) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Cron Details")
+      generateErrorMessage("NOT_FOUND", "Cron Details"),
     );
   }
   logger.info("exiting::validateIdCronDetails::serviceValidation");
@@ -29,7 +29,7 @@ export const validateIdCronDetails = async (id: number) => {
 };
 
 export const beginCronDetailsServiceValidation = async (
-  input: CronDetailsInput
+  input: CronDetailsInput,
 ): Promise<CronDetailsShouldRunResult> => {
   logger.info("entering::beginCronDetailsServiceValidation::serviceValidation");
 
@@ -57,7 +57,7 @@ export const beginCronDetailsServiceValidation = async (
 
     await markCronFailedById(
       latest.id,
-      `stale in-progress takeover (ageMs=${ageMs})`
+      `stale in-progress takeover (ageMs=${ageMs})`,
     );
   }
 

@@ -13,10 +13,9 @@ export type VoucherTypeResponse = Prisma.VoucherTypeGetPayload<{
   };
 }>;
 
-export interface VoucherTypeDTO
-  extends Omit<
-    VoucherTypeResponse,
-    BaseModelAttrWoCancel | "company" | "companyId"
-  > {
+export interface VoucherTypeDTO extends Omit<
+  VoucherTypeResponse,
+  BaseModelAttrWoCancel | "company" | "companyId"
+> {
   company: IdValue | null;
 }

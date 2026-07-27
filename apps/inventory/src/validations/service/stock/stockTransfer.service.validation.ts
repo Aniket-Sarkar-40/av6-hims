@@ -28,14 +28,14 @@ export const validateStockTransferId = async (id: number) => {
   if (!st) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Stock Transfer")
+      generateErrorMessage("NOT_FOUND", "Stock Transfer"),
     );
   }
   logger.info("exiting::validateStockTransferId::service::validation");
   return st;
 };
 export const createStockTransferServiceValidation = async (
-  input: CreateItemStockTransferInput
+  input: CreateItemStockTransferInput,
 ): Promise<void> => {
   logger.info("entering::createStockTransfer::service::validation");
 
@@ -44,7 +44,7 @@ export const createStockTransferServiceValidation = async (
   const warehouseMode = settings?.warehouseMode;
 
   const staff = await employeeService.getEmployeeByIdFrmCacheOrDb(
-    input.staffId
+    input.staffId,
   );
 
   if (!staff) {
@@ -59,7 +59,7 @@ export const createStockTransferServiceValidation = async (
     if (!branch.isMain) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("ACCESS_FAIL", "Switch To Main Branch")
+        generateErrorMessage("ACCESS_FAIL", "Switch To Main Branch"),
       );
     }
   }
@@ -70,7 +70,7 @@ export const createStockTransferServiceValidation = async (
   if (input.fromId === input.toId) {
     throw new ErrorHandler(
       400,
-      "Please choose different branch for sending and receiving"
+      "Please choose different branch for sending and receiving",
     );
   }
 
@@ -97,14 +97,14 @@ export const createStockTransferServiceValidation = async (
     if (!fromStock) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", `${itemName} Stock`)
+        generateErrorMessage("NOT_FOUND", `${itemName} Stock`),
       );
     }
 
     if (fromStock < (item.quantity ?? 0)) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INSUFFICIENT_STOCK", itemName)
+        generateErrorMessage("INSUFFICIENT_STOCK", itemName),
       );
     }
   }
@@ -113,10 +113,10 @@ export const createStockTransferServiceValidation = async (
 };
 
 export const updateStockTransferServiceValidation = async (
-  input: UpdateItemStockTransferInput
+  input: UpdateItemStockTransferInput,
 ): Promise<void> => {
   logger.info(
-    "entering::updateStockTransferServiceValidation::service::validation"
+    "entering::updateStockTransferServiceValidation::service::validation",
   );
 
   const st = await validateStockTransferId(input.id);
@@ -130,15 +130,15 @@ export const updateStockTransferServiceValidation = async (
   const existingIds = st.stockTransferDetails.map((item) => item.id);
   // check if any item is not in stock transfer details
   const notInStockTransferDetails = updatedIds.filter(
-    (id) => !existingIds.includes(id)
+    (id) => !existingIds.includes(id),
   );
   if (notInStockTransferDetails.length > 0) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "INVALID_FIELD",
-        `Id ${notInStockTransferDetails.join(", ")} of Stock Transfer Details`
-      )
+        `Id ${notInStockTransferDetails.join(", ")} of Stock Transfer Details`,
+      ),
     );
   }
 
@@ -149,19 +149,19 @@ export const updateStockTransferServiceValidation = async (
   if (st.status !== ST_STATUS.CREATED) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Stock Transfer")
+      generateErrorMessage("INVALID_STATUS", "Stock Transfer"),
     );
   }
 
   await createStockTransferServiceValidation(input);
 
   logger.info(
-    "exiting::updateStockTransferServiceValidation::service::validation"
+    "exiting::updateStockTransferServiceValidation::service::validation",
   );
 };
 
 export const approveStockTransferServiceValidation = async (
-  input: StockTransferUpdate
+  input: StockTransferUpdate,
 ): Promise<void> => {
   logger.info("entering::approveStockTransfer::service::validation");
   const st = await validateStockTransferId(input.id);
@@ -173,7 +173,7 @@ export const approveStockTransferServiceValidation = async (
   if (st.status !== ST_STATUS.CREATED) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Stock Transfer")
+      generateErrorMessage("INVALID_STATUS", "Stock Transfer"),
     );
   }
 
@@ -181,7 +181,7 @@ export const approveStockTransferServiceValidation = async (
 };
 
 export const acknowledgeStockTransferServiceValidation = async (
-  input: StockTransferAcknowledgeInput
+  input: StockTransferAcknowledgeInput,
 ): Promise<void> => {
   logger.info("entering::acknowledgeStockTransfer::service::validation");
   await validateIdBranch(input.ccId);
@@ -195,7 +195,7 @@ export const acknowledgeStockTransferServiceValidation = async (
   if (st.status !== ST_STATUS.DISPATCHED) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Stock Transfer")
+      generateErrorMessage("INVALID_STATUS", "Stock Transfer"),
     );
   }
   const updatedIds: number[] = input.stockTransferDetails
@@ -206,15 +206,15 @@ export const acknowledgeStockTransferServiceValidation = async (
   const existingIds = st.stockTransferDetails.map((item) => item.id);
   // check if any item is not in stock transfer details
   const notInStockTransferDetails = updatedIds.filter(
-    (id) => !existingIds.includes(id)
+    (id) => !existingIds.includes(id),
   );
   if (notInStockTransferDetails.length > 0) {
     throw new ErrorHandler(
       400,
       generateErrorMessage(
         "INVALID_FIELD",
-        `Id ${notInStockTransferDetails.join(", ")} of Stock Transfer Details`
-      )
+        `Id ${notInStockTransferDetails.join(", ")} of Stock Transfer Details`,
+      ),
     );
   }
 
@@ -227,13 +227,13 @@ export const acknowledgeStockTransferServiceValidation = async (
     if (!reqQty) {
       throw new ErrorHandler(
         400,
-        `Item with id ${item.id} not found in stock transfer details`
+        `Item with id ${item.id} not found in stock transfer details`,
       );
     }
     if ((item.quantity ?? 0) > reqQty) {
       throw new ErrorHandler(
         400,
-        "Acknowledged quantity cannot be greater than dispatched quantity"
+        "Acknowledged quantity cannot be greater than dispatched quantity",
       );
     } else if ((item.quantity ?? 0) < reqQty) {
       item.returnQuantity = reqQty - (item.quantity ?? 0);
@@ -250,10 +250,10 @@ export const acknowledgeStockTransferServiceValidation = async (
 };
 
 export const deleteStockTransferServiceValidation = async (
-  input: StockTransferUpdate
+  input: StockTransferUpdate,
 ): Promise<void> => {
   logger.info(
-    "entering::deleteStockTransferServiceValidation::service::validation"
+    "entering::deleteStockTransferServiceValidation::service::validation",
   );
   const st = await validateStockTransferId(input.id);
   //Write condition for check unauthorized access
@@ -264,16 +264,16 @@ export const deleteStockTransferServiceValidation = async (
   if (st.status !== ST_STATUS.CREATED) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Stock Transfer")
+      generateErrorMessage("INVALID_STATUS", "Stock Transfer"),
     );
   }
 
   logger.info(
-    "exiting::deleteStockTransferServiceValidation::service::validation"
+    "exiting::deleteStockTransferServiceValidation::service::validation",
   );
 };
 export const approveReturnStockTransferServiceValidation = async (
-  input: StockTransferUpdate
+  input: StockTransferUpdate,
 ): Promise<void> => {
   logger.info("entering::approveReturnStockTransfer::service::validation");
   const st = await validateStockTransferId(input.id);
@@ -288,7 +288,7 @@ export const approveReturnStockTransferServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_STATUS", "Stock Transfer")
+      generateErrorMessage("INVALID_STATUS", "Stock Transfer"),
     );
   }
 

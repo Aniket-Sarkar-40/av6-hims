@@ -19,7 +19,7 @@ export const createGrnReturn = TryCatch(async (req: Request, res: Response) => {
   const grnReturn = await grnReturnService.createGrnReturn(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: grnReturn },
-    "Good Received Return"
+    "Good Received Return",
   );
 
   logger.info("exiting::createGrnReturn::controller");
@@ -37,7 +37,7 @@ export const updateGrnReturn = TryCatch(async (req: Request, res: Response) => {
 
   const response = BaseResponse.success(
     { type: "UPDATED", data: updated },
-    "Good Received Return"
+    "Good Received Return",
   );
   return res.status(200).json(response);
 });
@@ -48,7 +48,7 @@ export const getAllGrnReturn = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::getAllGrnReturn::controller");
   const response = BaseResponse.success(
     { type: "CREATED", data: grnReturn },
-    "Good Received return"
+    "Good Received return",
   );
   return res.status(200).json(response);
 });
@@ -59,7 +59,7 @@ export const getGrnReturnById = TryCatch(
     const { grnReturnId } = req.query as { grnReturnId: string };
 
     const grnReturn = await grnReturnService.getGrnReturnById(
-      Number(grnReturnId)
+      Number(grnReturnId),
     );
 
     if (!grnReturn) {
@@ -71,10 +71,10 @@ export const getGrnReturnById = TryCatch(
     logger.info("exiting::getGrnReturnById::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: grnReturn },
-      "Good Received return"
+      "Good Received return",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteGrnReturn = TryCatch(async (req, res) => {
@@ -86,7 +86,7 @@ export const deleteGrnReturn = TryCatch(async (req, res) => {
   logger.info("exiting::deleteGrnReturn::controller");
   const response = BaseResponse.success(
     { type: "DELETED", data: del },
-    "Good Received return"
+    "Good Received return",
   );
   return res.status(200).json(response);
 });
@@ -98,11 +98,11 @@ export const approveGrnReturn = TryCatch(
     const grnReturn = await grnReturnService.approveGrnReturn(input);
     const response = BaseResponse.success(
       { type: "APPROVED", data: grnReturn },
-      "Good Received return"
+      "Good Received return",
     );
     logger.info("exiting::approveGrnReturn::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const rejectedGrnReturn = TryCatch(
@@ -112,11 +112,11 @@ export const rejectedGrnReturn = TryCatch(
     const grnReturn = await grnReturnService.rejectedGrnReturn(input);
     const response = BaseResponse.success(
       { type: "REJECTED", data: grnReturn },
-      "Good Received return"
+      "Good Received return",
     );
     logger.info("exiting::rejectedGrnReturn::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 // export const excelGrnReturnReport = TryCatch(async (req: Request, res: Response) => {
@@ -146,7 +146,7 @@ export const printGrnReturnById = TryCatch(
       return res.status(404).json(
         BaseResponse.error({
           message: generateErrorMessage("NOT_FOUND", "Good Receive Return"),
-        })
+        }),
       );
     }
 
@@ -162,7 +162,7 @@ export const printGrnReturnById = TryCatch(
       "templates",
       "pdf",
       "reports-pdf",
-      "grn"
+      "grn",
     );
     const bodyTpl = path.join(tplDir, "grnReturn.hbs");
     const base64Image = imageToBase64("public/images/logo.png");
@@ -184,5 +184,5 @@ export const printGrnReturnById = TryCatch(
       .send(pdfBuffer);
 
     logger.info("exiting::printGrnReturnById::controller");
-  }
+  },
 );

@@ -2,7 +2,6 @@ import {
   ConsultationComplaint,
   Prisma,
 } from "@repo/db/generated/prisma/client";
-``;
 import { IdValue } from "@repo/shared/types/global.js";
 import { AppointmentDetailsDto } from "./appointment.js";
 

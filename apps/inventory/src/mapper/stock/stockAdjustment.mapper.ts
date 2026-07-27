@@ -12,7 +12,7 @@ import { InvStockAdjustmentDetails } from "@repo/db/generated/prisma/client";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toStockAdjustmentDTO = async (
-  data: StockAdjustmentResponse[]
+  data: StockAdjustmentResponse[],
 ): Promise<StockAdjustmentDTO[]> => {
   const allBranches = await commonService.getAllElements<"InvBranch">({
     cacheCode: "BRANCH",
@@ -74,17 +74,17 @@ export const toStockAdjustmentDTO = async (
           const item = detail.itemId
             ? await itemMasterService.getItemMasterById(
                 { itemId: detail.itemId },
-                true
+                true,
               )
             : null;
           const createdBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.createdBy
+                detail.createdBy,
               )
             : null;
           const updatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.updatedBy
+                detail.updatedBy,
               )
             : null;
 
@@ -94,7 +94,7 @@ export const toStockAdjustmentDTO = async (
             createdBy,
             updatedBy,
           };
-        })
+        }),
       );
 
       const cc =
@@ -112,12 +112,12 @@ export const toStockAdjustmentDTO = async (
         targetCollectionCenter: toIdValue(targetCc, "name"),
         stockAdjustmentDetails: detailDTO,
       };
-    })
+    }),
   );
 };
 
 export const toStockAdjustmentDetailDTO = async (
-  data: InvStockAdjustmentDetails[]
+  data: InvStockAdjustmentDetails[],
 ): Promise<StockAdjDetailDTO[]> => {
   return Promise.all(
     data.map(async (detail) => {
@@ -144,7 +144,7 @@ export const toStockAdjustmentDetailDTO = async (
       const item = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           )
         : null;
       const createdBy = detail.createdBy
@@ -159,6 +159,6 @@ export const toStockAdjustmentDetailDTO = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

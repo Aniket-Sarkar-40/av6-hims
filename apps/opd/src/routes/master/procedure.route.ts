@@ -46,7 +46,7 @@ procedureRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PROCEDURE", "CREATE")),
   validateCreateProcedureSchema,
-  createProcedure
+  createProcedure,
 );
 
 /**
@@ -69,10 +69,10 @@ procedureRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "PROCEDURE", "VIEW"),
-    getPermission("OPD", "PROCEDURE", "UPDATE")
+    getPermission("OPD", "PROCEDURE", "UPDATE"),
   ),
   validateUpdateProcedureSchema,
-  updateProcedure
+  updateProcedure,
 );
 
 /**
@@ -95,7 +95,7 @@ procedureRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PROCEDURE", "VIEW")),
-  getProcedureById
+  getProcedureById,
 );
 
 /**
@@ -118,5 +118,5 @@ procedureRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PROCEDURE", "VIEW")),
   validateFetchProcedureSchema,
-  fetchProcedure
+  fetchProcedure,
 );

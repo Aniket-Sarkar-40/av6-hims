@@ -17,7 +17,7 @@ function isValidDate(value: unknown): boolean {
 
 function flattenObject(
   obj: Record<string, any>,
-  parentKey: string = ""
+  parentKey: string = "",
 ): Record<string, any> {
   const result: Record<string, any> = {};
 
@@ -44,7 +44,7 @@ function flattenObject(
 
 export function findDifferences<T extends Record<string, any>>(
   obj1: T,
-  obj2: T
+  obj2: T,
 ): CreateTransaction[] {
   const flatObj1 = flattenObject(obj1);
   const flatObj2 = flattenObject(obj2);

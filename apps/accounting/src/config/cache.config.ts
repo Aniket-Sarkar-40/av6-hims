@@ -23,18 +23,21 @@ export enum RedisResource {
   VOUCHER_TYPE = "voucherType",
   COST_CENTER = "costCenter",
   NARRATION = "narration",
+  CHEQUE_MASTER = "chequeMaster",
+  FEATURE_FLAG = "featureFlag",
+  RATE_OF_EXCHANGE = "rateOfExchange",
 }
 
 export const getRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string
+  type: string,
 ): string => {
   return `${REDIS_PREFIX}acc:${RedisResource[resource]}:${type}`;
 };
 
 export const getMasterRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string
+  type: string,
 ): string => {
   return `${REDIS_PREFIX}master:${RedisResource[resource]}:${type}`;
 };

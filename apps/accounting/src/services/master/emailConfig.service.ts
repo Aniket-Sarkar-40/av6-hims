@@ -12,7 +12,7 @@ const cacheKey = getRedisKey("EMAIL_CONFIG", "all");
 
 const emailConfigServiceRaw = {
   async upsertEmailConfig(
-    input: CreateOrUpdateEmailConfig
+    input: CreateOrUpdateEmailConfig,
   ): Promise<AccEmailConfig> {
     logger.info("entering::upsertEmailConfig::service");
 
@@ -33,5 +33,5 @@ const emailConfigServiceRaw = {
 
 export const emailConfigService = auditProxy.createAuditedService(
   "emailConfig",
-  emailConfigServiceRaw
+  emailConfigServiceRaw,
 );

@@ -15,11 +15,11 @@ export const createCountryCode = TryCatch(
     const result = await countryCodeService.createCountryCode(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: result },
-      "Country Code"
+      "Country Code",
     );
     logger.info("exiting::createCountryCode::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateCountryCode = TryCatch(
@@ -29,11 +29,11 @@ export const updateCountryCode = TryCatch(
     const result = await countryCodeService.updateCountryCode(input);
     const response = BaseResponse.success(
       { type: "UPDATED", data: result },
-      "Country Code"
+      "Country Code",
     );
     logger.info("exiting::updateCountryCode::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getAllCountryCode = TryCatch(
@@ -42,11 +42,11 @@ export const getAllCountryCode = TryCatch(
     const result = await countryCodeService.getAllCountryCode();
     const response = BaseResponse.success(
       { type: "FETCHED", data: result },
-      "Country Code"
+      "Country Code",
     );
     logger.info("exiting::getAllCountryCode::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getCountryCodeById = TryCatch(
@@ -54,15 +54,15 @@ export const getCountryCodeById = TryCatch(
     logger.info("entering::getCountryCodeById::controller");
     const { countryCodeId } = req.query as { countryCodeId: string };
     const result = await countryCodeService.getCountryCodeById(
-      Number(countryCodeId)
+      Number(countryCodeId),
     );
     const response = BaseResponse.success(
       { type: "FETCHED", data: result },
-      "Country Code"
+      "Country Code",
     );
     logger.info("exiting::getCountryCodeById::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const deleteCountryCodeById = TryCatch(
@@ -70,13 +70,13 @@ export const deleteCountryCodeById = TryCatch(
     logger.info("entering::deleteCountryCodeById::controller");
     const { countryCodeId } = req.query as { countryCodeId: string };
     const result = await countryCodeService.deleteCountryCodeById(
-      Number(countryCodeId)
+      Number(countryCodeId),
     );
     const response = BaseResponse.success(
       { type: "DELETED", data: result },
-      "Country Code"
+      "Country Code",
     );
     logger.info("exiting::deleteCountryCodeById::controller");
     return res.status(200).json(response);
-  }
+  },
 );

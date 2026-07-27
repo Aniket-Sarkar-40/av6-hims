@@ -11,7 +11,7 @@ export const consultationNotesCreateSchema =
 export const consultationNotesUpdateSchema = consultationNotesCreateSchema.keys(
   {
     id: idRequired("ID"),
-  }
+  },
 );
 
 // Validation handler for Consultation Notes creation

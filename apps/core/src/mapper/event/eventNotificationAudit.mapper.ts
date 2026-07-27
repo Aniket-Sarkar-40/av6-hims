@@ -8,26 +8,26 @@ import { toIdValue } from "av6-utils";
 import { EventDelivery } from "@repo/db/generated/prisma/client";
 
 export const toEventNotificationAuditDTO = async (
-  data: EventDelivery[]
+  data: EventDelivery[],
 ): Promise<EventNotificationAuditDTO[]> => {
   const eventConfigs = await eventConfigService.getAllEventConfigs();
 
   return Promise.all(
     data.map(async (eventNotificationAudit) => {
       const eventConfig = eventConfigs.find(
-        (e) => e.id === eventNotificationAudit.eventConfigId
+        (e) => e.id === eventNotificationAudit.eventConfigId,
       );
 
       return {
         ...eventNotificationAudit,
         eventConfig: toIdValue(eventConfig, "eventName"),
       };
-    })
+    }),
   );
 };
 
 export const toNotificationDto = async (
-  notifications: NotificationInput[]
+  notifications: NotificationInput[],
 ): Promise<NotificationDTO[]> => {
   return Promise.all(
     notifications.map(async (notification) => {
@@ -36,6 +36,6 @@ export const toNotificationDto = async (
         level1: toIdValue(notification.level1, "colName"),
         user: toIdValue(notification.user, "name"),
       };
-    })
+    }),
   );
 };

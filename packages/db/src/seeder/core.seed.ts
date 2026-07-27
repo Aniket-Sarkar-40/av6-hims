@@ -36,7 +36,7 @@ const DYNAMIC_SC_CACHE_KEY = `${redisPrefix}core:dynamicShortCode:all`;
 const PDF_TEMPLATE_CACHE_KEY = `${redisPrefix}core:pdfTemplate:all`;
 
 async function updateDynamicShortCodeConfigsByShortCode(
-  input: Record<string, Prisma.InputJsonObject>
+  input: Record<string, Prisma.InputJsonObject>,
 ) {
   const mapping = Object.entries(input);
 
@@ -45,8 +45,8 @@ async function updateDynamicShortCodeConfigsByShortCode(
       db.coreDynamicShortCode.updateMany({
         where: { shortCode },
         data: { config },
-      })
-    )
+      }),
+    ),
   );
 }
 

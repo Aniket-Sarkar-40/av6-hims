@@ -9,7 +9,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { customOmit } from "av6-utils";
 
 export const createAccountingIntegrationConfigInDb = async (
-  input: CreateOrUpdateAccountingIntegrationConfigInput
+  input: CreateOrUpdateAccountingIntegrationConfigInput,
 ): Promise<AccountingIntegrationConfigResponse> => {
   logger.info("entering::createAccountingIntegrationConfigInDb::repository");
   const store = requestStorage.getStore();
@@ -41,7 +41,7 @@ export const createAccountingIntegrationConfigInDb = async (
 };
 
 export const updateAccountingIntegrationConfigInDb = async (
-  input: CreateOrUpdateAccountingIntegrationConfigInput
+  input: CreateOrUpdateAccountingIntegrationConfigInput,
 ): Promise<AccountingIntegrationConfigResponse> => {
   logger.info("entering::updateAccountingIntegrationConfigInDb::repository");
   const store = requestStorage.getStore();
@@ -62,7 +62,7 @@ export const updateAccountingIntegrationConfigInDb = async (
     existing.accountingIntegrationConfigDetails
       .filter(
         (detail) =>
-          !accountingIntegrationConfigDetails.some((d) => d.id === detail.id)
+          !accountingIntegrationConfigDetails.some((d) => d.id === detail.id),
       )
       .map((detail) => detail.id);
 
@@ -106,7 +106,7 @@ export const updateAccountingIntegrationConfigInDb = async (
 };
 
 export const getAccountingIntegrationConfigFromDb = async (
-  id: number
+  id: number,
 ): Promise<AccountingIntegrationConfigResponse | null> => {
   logger.info("entering::getAccountingIntegrationConfigFromDb::repository");
   return await db.accountingIntegrationConfig.findFirst({
@@ -125,10 +125,10 @@ export const getAccountingIntegrationConfigFromDb = async (
 };
 
 export const getAccountingIntegrationConfigDetailsFromDb = async (
-  id: number
+  id: number,
 ): Promise<AccountingIntegrationConfigDetails | null> => {
   logger.info(
-    "entering::getAccountingIntegrationConfigDetailsFromDb::repository"
+    "entering::getAccountingIntegrationConfigDetailsFromDb::repository",
   );
   return await db.accountingIntegrationConfigDetails.findFirst({
     where: {

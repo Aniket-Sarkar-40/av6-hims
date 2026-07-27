@@ -49,7 +49,7 @@ grnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "CREATE")),
   validateGrn,
-  createGrn
+  createGrn,
 );
 
 /**
@@ -65,7 +65,7 @@ grnRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "VIEW")),
-  getAllGrn
+  getAllGrn,
 );
 
 /**
@@ -86,7 +86,7 @@ grnRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "VIEW")),
-  getGrnById
+  getGrnById,
 );
 
 /**
@@ -116,10 +116,10 @@ grnRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "GRN", "VIEW"),
-    getPermission("PMS", "GRN", "UPDATE")
+    getPermission("PMS", "GRN", "UPDATE"),
   ),
   validateGrnUpdate,
-  updateGrn
+  updateGrn,
 );
 
 /**
@@ -146,7 +146,7 @@ grnRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "DELETE")),
-  deleteGrn
+  deleteGrn,
 );
 
 /**
@@ -169,7 +169,7 @@ grnRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_EXCEL", "VIEW")),
   validateExcelFilterGrn,
-  excelGrnReport
+  excelGrnReport,
 );
 
 /**
@@ -185,12 +185,12 @@ grnRouter.post(
   "/pdf",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN_PDF", "VIEW")),
-  printGrnById
+  printGrnById,
 );
 
 grnRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GRN", "DELETE")),
-  deleteGrn
+  deleteGrn,
 );

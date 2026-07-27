@@ -30,7 +30,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toStoreRequisitionDTO = async (
-  storeRequisition: StoreRequisitionResponse[]
+  storeRequisition: StoreRequisitionResponse[],
 ): Promise<StoreRequisitionDTO[]> => {
   logger.info("entering::toStoreRequisitionDTO::mapper");
   return Promise.all(
@@ -56,38 +56,38 @@ export const toStoreRequisitionDTO = async (
       const createdBy = requisition.createdBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             requisition.createdBy,
-            true
+            true,
           )
         : null;
       const reqFrom = requisition.requisitionFrom
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             requisition.requisitionFrom,
-            true
+            true,
           )
         : null;
       const updatedBy = requisition.updatedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             requisition.updatedBy,
-            true
+            true,
           )
         : null;
       const approvedBy = requisition.approvedBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             requisition.approvedBy,
-            true
+            true,
           )
         : null;
       const rejectBy = requisition.rejectBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             requisition.rejectBy,
-            true
+            true,
           )
         : null;
 
       const acknowledgementBy = requisition.acknowledgementBy
         ? await employeeService.getEmployeeByIdFrmCacheOrDb(
             requisition.acknowledgementBy,
-            true
+            true,
           )
         : null;
 
@@ -96,7 +96,7 @@ export const toStoreRequisitionDTO = async (
           const itemDTO = detail.itemId
             ? await itemMasterService.getItemMasterById(
                 { itemId: detail.itemId },
-                true
+                true,
               )
             : null;
 
@@ -116,27 +116,27 @@ export const toStoreRequisitionDTO = async (
                   });
 
                   return stockQty;
-                })
+                }),
             )
           ).reduce((total, qty) => total + qty, 0);
 
           const qtyAtCc = await getItemStockQtyByLocation(
             detail.itemId,
-            requisition.ccId
+            requisition.ccId,
           );
           let inHandWarehouseQty: number | null = null;
           let inHandBranchQty: number | null = null;
 
           const warehouseRow = await warehouseService.getWarehouseById(
             requisition.ccId,
-            true
+            true,
           );
           if (warehouseRow) {
             inHandWarehouseQty = qtyAtCc;
           } else {
             const branchRow = await branchService.getBranchById(
               requisition.ccId,
-              true
+              true,
             );
             if (branchRow) inHandBranchQty = qtyAtCc;
           }
@@ -145,18 +145,18 @@ export const toStoreRequisitionDTO = async (
           if (requisition.requisitionFrom) {
             userInHandStock = await getItemStockQtyByUser(
               detail.itemId,
-              requisition.requisitionFrom
+              requisition.requisitionFrom,
             );
           }
 
           const detailCreatedBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.createdBy
+                detail.createdBy,
               )
             : null;
           const detailUpdatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.updatedBy
+                detail.updatedBy,
               )
             : null;
 
@@ -170,7 +170,7 @@ export const toStoreRequisitionDTO = async (
             createdBy: detailCreatedBy,
             updatedBy: detailUpdatedBy,
           };
-        })
+        }),
       );
 
       return {
@@ -186,30 +186,30 @@ export const toStoreRequisitionDTO = async (
         acknowledgementBy: acknowledgementBy,
         isAnyPendingReturn,
       };
-    })
+    }),
   );
 };
 
 export const toRequisitionItemDetailDTO = async (
   storeRequisition: RequisitionItemDetailResponse,
-  requisitionFrom: number
+  requisitionFrom: number,
 ): Promise<RequisitionItemDetailDTO> => {
   const itemDTO = storeRequisition.itemId
     ? await itemMasterService.getItemMasterById(
         { itemId: storeRequisition.itemId },
-        true
+        true,
       )
     : null;
 
   const inHandBranchQty = storeRequisition.ackCCId
     ? await getItemStockQtyByLocation(
         storeRequisition.itemId,
-        storeRequisition.ackCCId
+        storeRequisition.ackCCId,
       )
     : null;
   const inHandWarehouseQty = await getItemStockQtyByLocation(
     storeRequisition.itemId,
-    storeRequisition.ccId
+    storeRequisition.ccId,
   );
 
   const stockQty = await getItemStockQtyByBatchWise({
@@ -225,12 +225,12 @@ export const toRequisitionItemDetailDTO = async (
   const detailReturnableQty = Math.max(
     Number(storeRequisition.acknowledgedQty ?? 0) -
       Number(storeRequisition.returnedQty ?? 0),
-    0
+    0,
   );
 
   const availableQtyToReturn = Math.min(
     Number(stockQty ?? 0),
-    detailReturnableQty
+    detailReturnableQty,
   );
 
   const detailDTO: StoreRequisitionDetailDTO = {
@@ -248,14 +248,14 @@ export const toRequisitionItemDetailDTO = async (
 };
 
 export const toStoreRequisitionBatchWiseDTO = async (
-  storeRequisition: StoreReqBatchWiseResponse
+  storeRequisition: StoreReqBatchWiseResponse,
 ): Promise<StoreRequisitionBatchWiseDTO> => {
   const branch = await branchService.getBranchById(storeRequisition.ccId, true);
 
   const reqFrom = storeRequisition.requisitionFrom
     ? await employeeService.getEmployeeByIdFrmCacheOrDb(
         storeRequisition.requisitionFrom,
-        true
+        true,
       )
     : null;
   const detailDTO: RequisitionItemDetailDTO[] = await Promise.all(
@@ -263,9 +263,9 @@ export const toStoreRequisitionBatchWiseDTO = async (
       async (detail) =>
         await toRequisitionItemDetailDTO(
           detail,
-          storeRequisition.requisitionFrom
-        )
-    )
+          storeRequisition.requisitionFrom,
+        ),
+    ),
   );
 
   return {
@@ -310,7 +310,7 @@ export const toStockEntity = (raw: RawItemStock): ItemStockWithQtyBreakdown => {
 };
 
 export const toStoreRequisitionDetailDTO = async (
-  details: StoreRequisitionDetails[]
+  details: StoreRequisitionDetails[],
 ): Promise<StrDetailDTO[]> => {
   return await Promise.all(
     details.map(async (detail) => {
@@ -321,7 +321,7 @@ export const toStoreRequisitionDetailDTO = async (
       const itemDTO = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           )
         : null;
       const createdBy = detail.createdBy
@@ -336,6 +336,6 @@ export const toStoreRequisitionDetailDTO = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

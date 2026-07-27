@@ -12,7 +12,7 @@ export const createCurrency = TryCatch(async (req: Request, res: Response) => {
   const currency = await currencyService.createCurrency(data);
   const response = BaseResponse.success(
     { type: "CREATED", data: currency },
-    "Currency"
+    "Currency",
   );
   logger.info("exiting::createCurrency::controller");
   return res.status(201).json(response);
@@ -24,7 +24,7 @@ export const getAllCurrency = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::getAllCurrency::controller");
   const response = BaseResponse.success(
     { type: "FETCHED", data: currency },
-    "Currency"
+    "Currency",
   );
   return res.status(200).json(response);
 });
@@ -43,7 +43,7 @@ export const getCurrencyById = TryCatch(async (req: Request, res: Response) => {
   logger.info("exiting::getCurrencyById::controller");
   const response = BaseResponse.success(
     { type: "FETCHED", data: currency },
-    "Currency"
+    "Currency",
   );
   return res.status(200).json(response);
 });
@@ -53,12 +53,12 @@ export const updateCurrency = TryCatch(async (req: Request, res: Response) => {
   const data = req.body as CurrencyReq;
   const updatedCurrency = await currencyService.updateCurrency(
     Number(data.id),
-    data
+    data,
   );
   logger.info("exiting::updateCurrency::controller");
   const response = BaseResponse.success(
     { type: "UPDATED", data: updatedCurrency },
-    "Currency"
+    "Currency",
   );
   return res.status(200).json(response);
 });

@@ -6,7 +6,6 @@ import {
   CreateOrUpdateBankStatementInput,
   ManualBankReconcileWithBankStatementRow,
 } from "@/types/bankReconciliation/bankReconciliation.js";
-
 import { customOmit } from "av6-utils";
 import { createBatchJobInDb } from "../batch/batch.repository.js";
 import { logger } from "@repo/platform/logging/logger.js";
@@ -19,16 +18,16 @@ import {
   Batch_Type,
   DrCr,
 } from "@repo/db/generated/prisma/enums.js";
-import { db } from "@repo/db";
-import { Prisma } from "@repo/db/generated/prisma/client";
+import { db } from "@repo/db/client";
 import { API_TIMEOUT } from "@repo/shared";
+import { Prisma } from "@repo/db/generated/prisma/client";
 
 export const createBankStatementExcelInDb = async (
-  input: CreateOrUpdateBankStatementExcelCreateInput[]
+  input: CreateOrUpdateBankStatementExcelCreateInput[],
 ) => {
   logger.info("entering::createBankStatementExcelInDb::repository");
   const batchUin = await uinServiceFactory.generateUIN(
-    AccUinShortCode.BATCH_JOB
+    AccUinShortCode.BATCH_JOB,
   );
   return await db.$transaction(
     async (tx) => {
@@ -50,13 +49,13 @@ export const createBankStatementExcelInDb = async (
 
       return batch;
     },
-    { timeout: API_TIMEOUT }
+    { timeout: API_TIMEOUT },
   );
 };
 
 export const createBankStatementFromExcelInDb = async (
   tx: Prisma.TransactionClient,
-  input: CreateOrUpdateBankStatementInput
+  input: CreateOrUpdateBankStatementInput,
 ) => {
   logger.info("entering::createBankStatementFromExcelInDb::repository");
   const store = requestStorage.getStore();
@@ -181,21 +180,21 @@ export async function bankStatementExcelBatchJob(params: {
               },
             });
           },
-          { timeout: API_TIMEOUT }
+          { timeout: API_TIMEOUT },
         );
       } catch (error) {
         logger.error(
           `❌ Error processing bank statement row ${
             row.rowNo
-          }: ${JSON.stringify(error)}`
+          }: ${JSON.stringify(error)}`,
         );
 
         const errorMessage =
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
 
         await db.batchJobDetails.create({
           data: {
@@ -240,10 +239,10 @@ export async function bankStatementExcelBatchJob(params: {
 }
 
 export const manualBankReconcileWithBankStatementRowInDb = async (
-  input: ManualBankReconcileWithBankStatementRow[]
+  input: ManualBankReconcileWithBankStatementRow[],
 ) => {
   logger.info(
-    "entering::manualBankReconcileWithBankStatementRowInDb::repository"
+    "entering::manualBankReconcileWithBankStatementRowInDb::repository",
   );
   const store = requestStorage.getStore();
   const currentUser = store?.user?.id;
@@ -288,7 +287,7 @@ export const manualBankReconcileWithBankStatementRowInDb = async (
           bankStatementRowId: bankStatementRowId,
           matchedAmount: matchedAmount,
           clearedDate: clearedDate,
-          matchType: BankMatchType.MANUAL,
+          matchType: BankMatchType.AUTO,
           matchConfidence: BankMatchConfidence.HIGH,
           remarks: remarks,
           createdBy: currentUser,
@@ -330,7 +329,7 @@ export const getUnmatchedBankStatementRowsForAutoSuggestion = async (params: {
   toDate: Date;
 }) => {
   logger.info(
-    "entering::getUnmatchedBankStatementRowsForAutoSuggestion::repository"
+    "entering::getUnmatchedBankStatementRowsForAutoSuggestion::repository",
   );
   const { ledgerId, fromDate, toDate } = params;
   const result = await db.bankStatementRow.findMany({
@@ -356,7 +355,7 @@ export const getUnmatchedBankStatementRowsForAutoSuggestion = async (params: {
     orderBy: [{ transactionDate: "asc" }, { id: "asc" }],
   });
   logger.info(
-    "exiting::getUnmatchedBankStatementRowsForAutoSuggestion::repository"
+    "exiting::getUnmatchedBankStatementRowsForAutoSuggestion::repository",
   );
   return result;
 };

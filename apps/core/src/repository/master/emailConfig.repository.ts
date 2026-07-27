@@ -11,7 +11,7 @@ export const getEmailConfigFromDb = async (): Promise<EmailConfig | null> => {
 };
 
 export const createEmailConfigInDb = async (
-  data: CreateOrUpdateEmailConfig
+  data: CreateOrUpdateEmailConfig,
 ): Promise<EmailConfig> => {
   logger.info("entering::createEmailConfig::repository");
   return db.emailConfig.create({
@@ -20,7 +20,7 @@ export const createEmailConfigInDb = async (
 };
 
 export const deleteEmailConfigInDb = async (
-  id: number
+  id: number,
 ): Promise<EmailConfig> => {
   logger.info("entering::deleteEmailConfig::repository");
   return db.emailConfig.update({

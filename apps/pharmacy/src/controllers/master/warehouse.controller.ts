@@ -16,7 +16,7 @@ export const createWarehouse = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Warehouse"),
     },
-    warehouse
+    warehouse,
   );
   logger.info("exiting::createWarehouse::controller");
   return res.status(201).json(response);
@@ -33,8 +33,8 @@ export const updateWarehouse = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Warehouse"),
       },
-      updatedWarehouse
-    )
+      updatedWarehouse,
+    ),
   );
 });
 
@@ -48,8 +48,8 @@ export const getAllWarehouse = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Warehouse"),
       },
-      cities
-    )
+      cities,
+    ),
   );
 });
 
@@ -59,14 +59,14 @@ export const getWarehouseById = TryCatch(
     const { warehouseId } = req.query as { warehouseId: string };
 
     const medCategory = await warehouseService.getWarehouseById(
-      Number(warehouseId)
+      Number(warehouseId),
     );
 
     if (!medCategory) {
       return res.status(400).json(
         new BaseResponse({
           success: false,
-        })
+        }),
       );
     }
     logger.info("exiting::getWarehouseById::controller");
@@ -76,10 +76,10 @@ export const getWarehouseById = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Warehouse"),
         },
-        medCategory
-      )
+        medCategory,
+      ),
     );
-  }
+  },
 );
 
 export const toggleActiveWarehouse = TryCatch(
@@ -96,8 +96,8 @@ export const toggleActiveWarehouse = TryCatch(
           success: true,
           message: generateSuccessMessage("UPDATED", "Warehouse"),
         },
-        warehouse
-      )
+        warehouse,
+      ),
     );
-  }
+  },
 );

@@ -4,6 +4,7 @@ import {
   createVoucherExcel,
   createVoucherInvoice,
   deleteVoucher,
+  exportVoucherExcel,
   postExternalVoucher,
   updateVoucher,
 } from "@/controllers/voucher/voucher.controller.js";
@@ -11,9 +12,11 @@ import { authorizeExternalRequest } from "@/middleware/auth.middleware.js";
 import {
   validateCreateVoucher,
   validateCreateVoucherExcel,
+  validateExportVoucherExcel,
   validatePostExternalVoucher,
   validateUpdateVoucher,
 } from "@/validations/request/voucher/voucher.validation.js";
+import { ServiceCode } from "@repo/db/generated/prisma/enums.js";
 import {
   authorize,
   verifyToken,
@@ -21,61 +24,84 @@ import {
 import { createUploadMiddleware } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { uploadToHetzner } from "@repo/platform/middlewares/s3bucket.middleware.js";
 import { getPermission } from "@repo/shared/utils/permission.utils.js";
-
 import { Router } from "express";
 
 export const voucherRouter: Router = Router();
 
 voucherRouter.post(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "CREATE")),
   validateCreateVoucher,
-  createVoucher
+  createVoucher,
 );
 
 voucherRouter.put(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "UPDATE")),
   validateUpdateVoucher,
-  updateVoucher
+  updateVoucher,
 );
 
 voucherRouter.post(
   "/external",
   authorizeExternalRequest(),
   validatePostExternalVoucher,
-  postExternalVoucher
+  postExternalVoucher,
 );
 
 voucherRouter.delete(
   "/",
-  verifyToken,
+  verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "DELETE")),
-  deleteVoucher
+  deleteVoucher,
 );
 
 voucherRouter.patch(
   "/cancel",
-  verifyToken,
+  verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "CANCEL_VOUCHER", "CREATE")),
-  cancelVoucher
+  cancelVoucher,
 );
 
 voucherRouter.post(
   "/excel-import",
-  verifyToken,
+  verifyToken(ServiceCode.ACCOUNTING),
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   authorize(getPermission("ACC", "VOUCHER_EXCEL_IMPORT", "CREATE")),
   validateCreateVoucherExcel,
-  createVoucherExcel
+  createVoucherExcel,
+);
+
+voucherRouter.post(
+  "/excel-export",
+  verifyToken(ServiceCode.ACCOUNTING),
+  authorize(getPermission("ACC", "VOUCHER_EXCEL_EXPORT", "CREATE")),
+  validateExportVoucherExcel,
+  exportVoucherExcel,
 );
 
 voucherRouter.get(
   "/invoice",
-  verifyToken,
+  verifyToken(ServiceCode.ACCOUNTING),
   authorize(getPermission("ACC", "VOUCHER_ENTRY", "VIEW")),
-  createVoucherInvoice
+  createVoucherInvoice,
+);
+
+voucherRouter.post(
+  "/single-entry",
+  verifyToken(ServiceCode.ACCOUNTING),
+  authorize(getPermission("ACC", "VOUCHER_SINGLE_ENTRY", "CREATE")),
+  validateCreateVoucher,
+  createVoucher,
+);
+
+voucherRouter.put(
+  "/single-entry",
+  verifyToken(ServiceCode.ACCOUNTING),
+  authorize(getPermission("ACC", "VOUCHER_SINGLE_ENTRY", "UPDATE")),
+  validateUpdateVoucher,
+  updateVoucher,
 );

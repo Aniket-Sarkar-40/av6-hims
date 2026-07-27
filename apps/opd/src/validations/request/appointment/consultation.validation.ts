@@ -37,23 +37,23 @@ export const CreateConsultationSchema = Joi.object<CreateConsultationInput>({
     .messages({
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Consultation Notes"
+        "Consultation Notes",
       ),
       "object.base": generateValidationErrorMessage(
         "JSON_OBJECT",
-        "Consultation Notes"
+        "Consultation Notes",
       ),
       "any.invalid": generateValidationErrorMessage(
         "INVALID",
-        "Consultation Notes keys/values"
+        "Consultation Notes keys/values",
       ),
       "string.base": generateValidationErrorMessage(
         "STRING",
-        "Consultation Notes values"
+        "Consultation Notes values",
       ),
       "number.base": generateValidationErrorMessage(
         "NUMBER",
-        "Consultation Notes keys"
+        "Consultation Notes keys",
       ),
     }),
 });

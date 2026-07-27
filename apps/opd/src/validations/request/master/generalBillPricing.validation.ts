@@ -44,7 +44,7 @@ export const GeneralBillPricingSearchSchema = Joi.object({
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Search Text",
-        "3"
+        "3",
       ),
     }),
 });

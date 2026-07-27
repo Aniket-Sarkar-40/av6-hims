@@ -5,7 +5,7 @@ import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const createDefaultUnitMasterInDb = async (
-  defaultUnitMaster: DefaultUnitMasterReq
+  defaultUnitMaster: DefaultUnitMasterReq,
 ): Promise<InvDefaultUnitMaster> => {
   logger.info("entering::createDefaultUnitMasterInDb::repository");
   const store = requestStorage.getStore();
@@ -18,7 +18,7 @@ export const createDefaultUnitMasterInDb = async (
 };
 
 export const updateDefaultUnitMasterInDb = async (
-  defaultUnitMaster: DefaultUnitMasterReq
+  defaultUnitMaster: DefaultUnitMasterReq,
 ): Promise<InvDefaultUnitMaster> => {
   logger.info("entering::updateDefaultUnitMasterInDb::repository");
   const store = requestStorage.getStore();
@@ -29,7 +29,7 @@ export const updateDefaultUnitMasterInDb = async (
 };
 
 export const getDefaultUnitMasterByNameFromDb = async (
-  name: string
+  name: string,
 ): Promise<InvDefaultUnitMaster | null> => {
   logger.info("entering::getDefaultUnitMasterByNameFromDb::repository");
   return db.invDefaultUnitMaster.findFirst({
@@ -38,7 +38,7 @@ export const getDefaultUnitMasterByNameFromDb = async (
 };
 
 export const getDefaultUnitMasterByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<InvDefaultUnitMaster | null> => {
   logger.info("entering::getDefaultUnitMasterByIdFromDb::repository");
   return db.invDefaultUnitMaster.findUnique({

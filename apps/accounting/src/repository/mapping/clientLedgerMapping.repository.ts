@@ -9,7 +9,6 @@ export const getClientLedgerMappingByClientIdAndClientType = async (params: {
 }): Promise<ClientLedgerMapping | null> => {
   logger.info(
     "entering::getClientLedgerMappingByClientIdAndClientType::repository",
-    { params }
   );
   const { clientId, clientType } = params;
   return await db.clientLedgerMapping.findFirst({
@@ -27,7 +26,7 @@ export const createClientLedgerMapping = async (params: {
   ledgerId: number;
   createdBy?: number;
 }): Promise<ClientLedgerMapping> => {
-  logger.info("entering::createClientLedgerMapping::repository", { params });
+  logger.info("entering::createClientLedgerMapping::repository");
   const { clientId, clientType, ledgerId, createdBy } = params;
   return await db.clientLedgerMapping.create({
     data: {
@@ -35,6 +34,19 @@ export const createClientLedgerMapping = async (params: {
       clientType,
       ledgerId,
       createdBy,
+    },
+  });
+};
+
+export const getClientLedgerMappingByLedgerId = async (params: {
+  ledgerId: number;
+}): Promise<ClientLedgerMapping | null> => {
+  logger.info("entering::getClientLedgerMappingByLedgerId::repository");
+  const { ledgerId } = params;
+  return await db.clientLedgerMapping.findFirst({
+    where: {
+      ledgerId,
+      isActive: true,
     },
   });
 };

@@ -40,7 +40,7 @@ settingsRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "SETTING", "CREATE")),
   validateSettings,
-  upsertSettings
+  upsertSettings,
 );
 
 /**
@@ -56,5 +56,5 @@ settingsRouter.get(
   "/",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "SETTING", "VIEW")),
-  getSettings
+  getSettings,
 );

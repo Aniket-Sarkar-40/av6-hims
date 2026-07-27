@@ -25,10 +25,10 @@ export const createStockTransfer = TryCatch(
           success: true,
           message: generateSuccessMessage("CREATED", "Stock Transfer"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );
 
 export const updateStockTransfer = TryCatch(
@@ -44,10 +44,10 @@ export const updateStockTransfer = TryCatch(
           success: true,
           message: generateSuccessMessage("UPDATED", "Stock Transfer"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );
 
 export const deleteStockTransfer = TryCatch(
@@ -59,7 +59,7 @@ export const deleteStockTransfer = TryCatch(
         new BaseResponse({
           success: false,
           message: "Missing required query parameters: id and ccId",
-        })
+        }),
       );
     }
     const input: StockTransferUpdate = {
@@ -73,9 +73,9 @@ export const deleteStockTransfer = TryCatch(
       new BaseResponse({
         success: true,
         message: generateSuccessMessage("DELETED", "Stock Transfer"),
-      })
+      }),
     );
-  }
+  },
 );
 
 export const approveStockTransfer = TryCatch(
@@ -91,18 +91,17 @@ export const approveStockTransfer = TryCatch(
           success: true,
           message: generateSuccessMessage("APPROVED", "Stock Transfer"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );
 export const approveReturnStockTransfer = TryCatch(
   async (req: Request, res: Response) => {
     logger.info("entering::approveReturnStockTransfer::controller");
     const input = req.body as StockTransferUpdate;
-    const response = await stockTransferService.approveReturnStockTransfer(
-      input
-    );
+    const response =
+      await stockTransferService.approveReturnStockTransfer(input);
 
     logger.info("exiting::approveReturnStockTransfer::controller");
     return res.status(200).json(
@@ -111,10 +110,10 @@ export const approveReturnStockTransfer = TryCatch(
           success: true,
           message: generateSuccessMessage("APPROVED", "Stock Transfer Return"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );
 
 export const acknowledgeStockTransfer = TryCatch(
@@ -130,10 +129,10 @@ export const acknowledgeStockTransfer = TryCatch(
           success: true,
           message: generateSuccessMessage("ACKNOWLEDGED", "Stock Transfer"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );
 
 export const getStockTransferById = TryCatch(
@@ -141,7 +140,7 @@ export const getStockTransferById = TryCatch(
     logger.info("entering::getStockTransferById::controller");
     const { id } = req.query as { id: string };
     const response = await stockTransferService.getStockTransferById(
-      Number(id)
+      Number(id),
     );
     logger.info("exiting::getStockTransferById::controller");
     return res.status(200).json(
@@ -150,10 +149,10 @@ export const getStockTransferById = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Stock Transfer"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );
 
 export const getAllStockTransfer = TryCatch(
@@ -167,10 +166,10 @@ export const getAllStockTransfer = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Stock Transfer"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );
 
 export const searchStockTransfer = TryCatch(
@@ -184,8 +183,8 @@ export const searchStockTransfer = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Stock Transfer"),
         },
-        response
-      )
+        response,
+      ),
     );
-  }
+  },
 );

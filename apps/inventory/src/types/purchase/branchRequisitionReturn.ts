@@ -52,32 +52,34 @@ export interface BranchReturnItemBatch {
   comment?: string | null;
 }
 
-export interface ApproveBranchReturnItemBatch
-  extends Omit<BranchReturnItemBatch, "branchItemDetailsId"> {
+export interface ApproveBranchReturnItemBatch extends Omit<
+  BranchReturnItemBatch,
+  "branchItemDetailsId"
+> {
   id: number;
 }
 
-export interface AcknowledgeBranchReturnItemBatch
-  extends Omit<
-    BranchReturnItemBatch,
-    "branchItemDetailsId" | "returnQty" | "comment"
-  > {
+export interface AcknowledgeBranchReturnItemBatch extends Omit<
+  BranchReturnItemBatch,
+  "branchItemDetailsId" | "returnQty" | "comment"
+> {
   id: number;
   acknowledgedQty: number;
   isCompleted: boolean;
 }
 
-export interface ApproveBranchReturnItem
-  extends Omit<BranchReturnItem, "itemBatch" | "branchRequisitionDetailsId"> {
+export interface ApproveBranchReturnItem extends Omit<
+  BranchReturnItem,
+  "itemBatch" | "branchRequisitionDetailsId"
+> {
   id: number;
   itemBatch: ApproveBranchReturnItemBatch[];
 }
 
-export interface AcknowledgeBranchReturnItem
-  extends Omit<
-    BranchReturnItem,
-    "itemBatch" | "branchRequisitionDetailsId" | "requestedReturnQty"
-  > {
+export interface AcknowledgeBranchReturnItem extends Omit<
+  BranchReturnItem,
+  "itemBatch" | "branchRequisitionDetailsId" | "requestedReturnQty"
+> {
   id: number;
   acknowledgedReturnQty: number;
   itemBatch: AcknowledgeBranchReturnItemBatch[];
@@ -119,8 +121,10 @@ export type GetBranchRequisitionReturnResponse =
     };
   }>;
 
-export interface BranchRequisitionReturnDetailDTO
-  extends Omit<BranchReturnItemDetails, "createdBy" | "updatedBy"> {
+export interface BranchRequisitionReturnDetailDTO extends Omit<
+  BranchReturnItemDetails,
+  "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
 
   createdBy: EmployeeCache | null;
@@ -140,16 +144,15 @@ export interface BranchRequisitionReturnDetailDTO
   inTransitStock: number | null;
 }
 
-export interface BranchRequisitionReturnDTO
-  extends Omit<
-    BranchRequisitionReturn,
-    | "requisitionFrom"
-    | "ccId"
-    | "branchId"
-    | "approvedBy"
-    | "rejectBy"
-    | "acknowledgementBy"
-  > {
+export interface BranchRequisitionReturnDTO extends Omit<
+  BranchRequisitionReturn,
+  | "requisitionFrom"
+  | "ccId"
+  | "branchId"
+  | "approvedBy"
+  | "rejectBy"
+  | "acknowledgementBy"
+> {
   requisitionFrom: IdValue | null;
   warehouse: IdValue | null;
   branch: IdValue | null;
@@ -187,8 +190,10 @@ export interface AcknowledgeBranchRequisitionReturn {
   branchReqReturn: ValBranchRequisitionReturnResponse;
 }
 
-export interface BrReturnDetailDTO
-  extends Omit<BranchReturnItemDetails, "itemId" | "createdBy" | "updatedBy"> {
+export interface BrReturnDetailDTO extends Omit<
+  BranchReturnItemDetails,
+  "itemId" | "createdBy" | "updatedBy"
+> {
   item: ItemMasterToDto | null;
   createdBy: EmployeeCache | null;
   updatedBy: EmployeeCache | null;

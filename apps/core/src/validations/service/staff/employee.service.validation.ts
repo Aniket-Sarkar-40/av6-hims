@@ -24,7 +24,7 @@ export const validateIdEmployee = async (employeeId: number) => {
 };
 
 export const createEmployeeServiceValidation = async (
-  body: CreateOrUpdateEmployee
+  body: CreateOrUpdateEmployee,
 ): Promise<Staff | null> => {
   logger.info("entering::createEmployeeServiceValidation::service::validation");
 
@@ -43,13 +43,13 @@ const validateDuplicateEmployeeId = async (employeeId: string, id?: number) => {
   if (id && employeeByEmployeeId && employeeByEmployeeId.id !== id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Employee ID")
+      generateErrorMessage("DUPLICATE_ITEM", "Employee ID"),
     );
   }
   if (!id && employeeByEmployeeId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Employee ID")
+      generateErrorMessage("DUPLICATE_ITEM", "Employee ID"),
     );
   }
   logger.info("exiting::validateDuplicateEmployeeId::service::validation");
@@ -57,7 +57,7 @@ const validateDuplicateEmployeeId = async (employeeId: string, id?: number) => {
 
 export const updateEmployeeServiceValidation = async (
   body: CreateOrUpdateEmployee,
-  employeeId: number
+  employeeId: number,
 ): Promise<Staff | null> => {
   logger.info("entering::updateEmployeeServiceValidation::service::validation");
 
@@ -75,7 +75,7 @@ export const updateEmployeeServiceValidation = async (
 
 // Validate foreign keys such as locationId, siteId, and departmentId
 export const validateEmployeeForeignKeys = async (
-  input: CreateOrUpdateEmployee
+  input: CreateOrUpdateEmployee,
 ): Promise<void> => {
   logger.info("entering::validateEmployeeForeignKeys::service::validation");
   // Handle departmentId validation if it's provided
@@ -84,19 +84,19 @@ export const validateEmployeeForeignKeys = async (
     if (!department) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Department")
+        generateErrorMessage("NOT_FOUND", "Department"),
       );
     }
   }
 
   if (input.designationId) {
     const designation = await getStaffDesignationByIdFromDb(
-      input.designationId
+      input.designationId,
     );
     if (!designation) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Designation")
+        generateErrorMessage("NOT_FOUND", "Designation"),
       );
     }
   }

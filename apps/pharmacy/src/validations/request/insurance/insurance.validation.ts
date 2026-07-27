@@ -118,7 +118,7 @@ export const insuranceSchema = Joi.object<InsuranceReq>({
   insuranceBusinessMapping: arrayRequired(
     "Insurance Business Mapping",
     insuranceBusinessSchema,
-    1
+    1,
   ),
 });
 

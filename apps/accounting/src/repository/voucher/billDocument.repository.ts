@@ -1,4 +1,4 @@
-import { db } from "@repo/db";
+import { db } from "@repo/db/client";
 import { BillStatus, Prisma } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 
@@ -23,7 +23,7 @@ export const adjustBillDocumentAgainstRef = async (
     partyLedgerId: number;
     amountToAdjust: number;
     updatedBy: number | null;
-  }
+  },
 ): Promise<{ ok: boolean; reason?: string }> => {
   const {
     billDocumentId,

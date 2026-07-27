@@ -28,12 +28,12 @@ export const validateIdItemMaster = async (itemMasterId: number) => {
 
   const itemMaster = await itemMasterService.getItemMasterByIdWoDto(
     itemMasterId,
-    true
+    true,
   );
   if (!itemMaster) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Item Master")
+      generateErrorMessage("NOT_FOUND", "Item Master"),
     );
   }
 
@@ -45,34 +45,34 @@ export const validateIdItemMaster = async (itemMasterId: number) => {
 export const foreignKeyValidation = async (body: ItemMasterReq) => {
   const itemCategory = await itemCategoryService.getItemCategoryById(
     body.itemCategoryId,
-    true
+    true,
   );
   if (!itemCategory) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Item Category")
+      generateErrorMessage("NOT_FOUND", "Item Category"),
     );
   }
 
   const itemStore = await unitMasterService.getUnitMasterById(
     body.unitId,
-    true
+    true,
   );
   if (!itemStore) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Unit Master")
+      generateErrorMessage("NOT_FOUND", "Unit Master"),
     );
   }
   if (body.taxDetailsId) {
     const taxDetails = await taxDetailsService.getTaxDetailsById(
       body.taxDetailsId,
-      true
+      true,
     );
     if (!taxDetails) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Tax Details")
+        generateErrorMessage("NOT_FOUND", "Tax Details"),
       );
     }
   }
@@ -84,7 +84,7 @@ export const foreignKeyValidation = async (body: ItemMasterReq) => {
   }
 };
 export const updateIdItemMasterServiceValidation = async (
-  body: ItemMasterUpdateReq
+  body: ItemMasterUpdateReq,
 ): Promise<InvItem> => {
   logger.info("entering::updateIdItemMaster::service::validation");
   const item = await validateIdItemMaster(Number(body.id));
@@ -94,28 +94,28 @@ export const updateIdItemMasterServiceValidation = async (
   if (itemStock) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("NOT_POSSIBLE", "Item Master")
+      generateErrorMessage("NOT_POSSIBLE", "Item Master"),
     );
   }
 
   const itemMasterByName = await getItemMasterByItemMasterNameFromDb(
-    String(body.item)
+    String(body.item),
   );
   if (itemMasterByName && itemMasterByName.id !== body.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Item Master Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Item Master Name"),
     );
   }
 
   if (body.itemCode) {
     const itemMasterByCode = await getItemMasterByItemMasterCodeFromDb(
-      body.itemCode
+      body.itemCode,
     );
     if (itemMasterByCode && itemMasterByCode.id !== body.id) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Master Code")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Master Code"),
       );
     }
   }
@@ -124,7 +124,7 @@ export const updateIdItemMasterServiceValidation = async (
 };
 
 export const createItemMasterServiceValidation = async (
-  body: ItemMasterReq
+  body: ItemMasterReq,
 ): Promise<void> => {
   logger.info("entering::createItemMaster::service::validation");
   await foreignKeyValidation(body);
@@ -133,18 +133,18 @@ export const createItemMasterServiceValidation = async (
   if (itemMaster) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Item Master Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Item Master Name"),
     );
   }
 
   if (body.itemCode) {
     const itemMasterByCode = await getItemMasterByItemMasterCodeFromDb(
-      body.itemCode
+      body.itemCode,
     );
     if (itemMasterByCode) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("DUPLICATE_ITEM", "Item Master Code")
+        generateErrorMessage("DUPLICATE_ITEM", "Item Master Code"),
       );
     }
   }
@@ -155,20 +155,20 @@ export const createItemMasterServiceValidation = async (
 };
 
 export const validateBulkItemSupplierPricesService = async (
-  input: getItems
+  input: getItems,
 ): Promise<void> => {
   logger.info(
-    "entering::validateBulkItemSupplierPricesService::service::validation"
+    "entering::validateBulkItemSupplierPricesService::service::validation",
   );
   validIdCheck(input.supplierId);
   const supplier = await itemSupplierService.getItemSupplierById(
     input.supplierId,
-    true
+    true,
   );
   if (!supplier) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Item Supplier")
+      generateErrorMessage("NOT_FOUND", "Item Supplier"),
     );
   }
 
@@ -178,7 +178,7 @@ export const validateBulkItemSupplierPricesService = async (
     if (!cc) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Collection Center")
+        generateErrorMessage("NOT_FOUND", "Collection Center"),
       );
     }
   }
@@ -187,7 +187,7 @@ export const validateBulkItemSupplierPricesService = async (
   if (uniqueItemIds.length === 0) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_FIELD", "Item Ids")
+      generateErrorMessage("INVALID_FIELD", "Item Ids"),
     );
   }
   uniqueItemIds.forEach((id) => validIdCheck(id));
@@ -196,6 +196,6 @@ export const validateBulkItemSupplierPricesService = async (
     throw new ErrorHandler(404, generateErrorMessage("NOT_FOUND", "Item"));
   }
   logger.info(
-    "exiting::validateBulkItemSupplierPricesService::service::validation"
+    "exiting::validateBulkItemSupplierPricesService::service::validation",
   );
 };

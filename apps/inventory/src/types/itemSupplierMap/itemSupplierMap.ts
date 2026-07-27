@@ -22,8 +22,7 @@ export interface ItemSupplierMapImportExcelInput {
   ccId: number;
   supplierId: number;
 }
-export interface ItemSupplierMapBatchJobInput
-  extends ItemSupplierMapImportExcelInput {
+export interface ItemSupplierMapBatchJobInput extends ItemSupplierMapImportExcelInput {
   batchJobId: number;
 }
 export type ItemSupplierMapExcelRow = {
@@ -35,11 +34,10 @@ export type ItemSupplierMapExcelRow = {
   "Supplier Price": number;
 };
 
-export interface ItemSupplierMapDTO
-  extends Omit<
-    InvItemSupplierMapping,
-    BaseModelAttrWoCancel | "ccId" | "itemId" | "supplierId"
-  > {
+export interface ItemSupplierMapDTO extends Omit<
+  InvItemSupplierMapping,
+  BaseModelAttrWoCancel | "ccId" | "itemId" | "supplierId"
+> {
   item: IdValue | null;
   supplier: IdValue | null;
   collectionCenter: IdValue | null;

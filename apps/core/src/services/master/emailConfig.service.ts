@@ -23,7 +23,7 @@ const cacheKey = getRedisKey("EMAIL_CONFIG", "all");
 
 const emailConfigServiceRaw = {
   async upsertEmailConfig(
-    input: CreateOrUpdateEmailConfig
+    input: CreateOrUpdateEmailConfig,
   ): Promise<EmailConfig> {
     logger.info("entering::upsertEmailConfig::service");
 
@@ -62,7 +62,7 @@ const emailConfigServiceRaw = {
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Email Configs")
+          generateErrorMessage("NOT_FOUND", "Email Configs"),
         );
       }
     }
@@ -71,7 +71,7 @@ const emailConfigServiceRaw = {
     if (!config) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Email Configs")
+        generateErrorMessage("NOT_FOUND", "Email Configs"),
       );
     }
 
@@ -88,7 +88,7 @@ const emailConfigServiceRaw = {
     if (!configs) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Email Config")
+        generateErrorMessage("NOT_FOUND", "Email Config"),
       );
     }
 
@@ -106,5 +106,5 @@ const emailConfigServiceRaw = {
 
 export const emailConfigService = auditProxy.createAuditedService(
   "emailConfig",
-  emailConfigServiceRaw
+  emailConfigServiceRaw,
 );

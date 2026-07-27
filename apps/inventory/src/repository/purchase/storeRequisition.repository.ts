@@ -32,7 +32,7 @@ import { API_TIMEOUT } from "@repo/shared/config/index.js";
 import { customOmit } from "av6-utils";
 
 export const createStoreRequisitionInDb = async (
-  input: CreateStoreRequisitionInput
+  input: CreateStoreRequisitionInput,
 ) => {
   logger.info("entering::createStoreRequisitionInDb::repository");
 
@@ -85,12 +85,12 @@ export const createStoreRequisitionInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
 export const updateStoreRequisitionInDb = async (
-  input: CreateStoreRequisitionInput
+  input: CreateStoreRequisitionInput,
 ) => {
   logger.info("entering::updateStoreRequisition::repository");
 
@@ -108,17 +108,17 @@ export const updateStoreRequisitionInDb = async (
   const currentUser = store?.user?.id;
 
   const toUpdate = omittedInput.omitted.storeRequisitionDetails.filter(
-    (d) => typeof d.id === "number"
+    (d) => typeof d.id === "number",
   );
   const toCreate = omittedInput.omitted.storeRequisitionDetails.filter(
-    (d) => typeof d.id !== "number"
+    (d) => typeof d.id !== "number",
   );
   const toDelete =
     omittedInput.omitted.storeReq?.storeRequisitionDetails?.filter(
       (d) =>
         !omittedInput.omitted.storeRequisitionDetails.some(
-          (item) => item.id === d.id
-        )
+          (item) => item.id === d.id,
+        ),
     ) || [];
 
   return await db.$transaction(
@@ -201,13 +201,13 @@ export const updateStoreRequisitionInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
 export const getCountSRDetailsFromDb = async (
   detailIds: number[],
-  storeRequisitionId: number
+  storeRequisitionId: number,
 ): Promise<number> => {
   return db.invStoreRequisitionDetails.count({
     where: {
@@ -240,7 +240,7 @@ export const getAllStoreRequisitionFromDb = async (): Promise<
 };
 
 export const getStoreRequisitionByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<StoreRequisitionResponse | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository`);
   const storeReq = await db.invStoreRequisition.findFirst({
@@ -261,7 +261,7 @@ export const getStoreRequisitionByIdFromDb = async (
 };
 
 export const validateStoreRequisitionByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<ValStoreRequisitionResponse | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository`);
   const storeReq = await db.invStoreRequisition.findUnique({
@@ -310,7 +310,7 @@ export const deleteStoreRequisitionFromDb = async (id: number) => {
 };
 
 export const rejectStoreRequisition = async (
-  inp: RejectStoreRequisitionInput
+  inp: RejectStoreRequisitionInput,
 ) => {
   logger.info(`entering::rejectStoreRequisition::repository id=${inp.id}`);
   const store = requestStorage.getStore();
@@ -330,7 +330,7 @@ export const rejectStoreRequisition = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 
   logger.info(`exiting::rejectStoreRequisition::repository`);
@@ -353,7 +353,7 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
     const assignItems = rawAssignItems.map((details) => {
       const omittedFlags = customOmit<AssignItem, "isBatch" | "isExpiry">(
         details,
-        ["isBatch", "isExpiry"]
+        ["isBatch", "isExpiry"],
       );
       return {
         ...omittedFlags.rest,
@@ -383,7 +383,7 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
       for (const item of assignItems) {
         agg.set(
           item.storeRequisitionDetailsId,
-          (agg.get(item.storeRequisitionDetailsId) ?? 0) + item.assignedQty
+          (agg.get(item.storeRequisitionDetailsId) ?? 0) + item.assignedQty,
         );
       }
       await Promise.all(
@@ -391,8 +391,8 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
           tx.invStoreRequisitionDetails.update({
             where: { id },
             data: { assignedQuantity: { increment: qty } },
-          })
-        )
+          }),
+        ),
       );
     }
 
@@ -425,7 +425,7 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
           refId: appStr.rest.storeReqId,
           refNo: appStr.rest.storeReqNo,
           refApprovedAt: now,
-        }
+        },
       );
 
       await addInTransitStock(
@@ -447,7 +447,7 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
           refId: appStr.rest.storeReqId,
           refNo: appStr.rest.storeReqNo,
           refApprovedAt: now,
-        }
+        },
       );
     }
   });
@@ -456,7 +456,7 @@ export const approveStoreRequisition = async (inp: ApproveStoreReqInput) => {
 };
 
 export const acknowledgeStoreRequisition = async (
-  inp: AcknowledgeRequisition
+  inp: AcknowledgeRequisition,
 ) => {
   logger.info(`entering::approveStoreRequisition::repository`);
 
@@ -500,7 +500,7 @@ export const acknowledgeStoreRequisition = async (
               refDetailsId: detail.storeRequisitionDetailsId,
               refId: ackStore.rest.storeReqId,
               refNo: ackStore.rest.storeReqNo,
-            }
+            },
           );
 
           await subInTransitStock(
@@ -520,7 +520,7 @@ export const acknowledgeStoreRequisition = async (
               refDetailsId: detail.storeRequisitionDetailsId,
               refId: ackStore.rest.storeReqId,
               refNo: ackStore.rest.storeReqNo,
-            }
+            },
           );
         }
 
@@ -548,14 +548,14 @@ export const acknowledgeStoreRequisition = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 
   logger.info(`exiting::approveStoreRequisition::repository`);
 };
 
 export const getRequisitionItemDetailsFromDb = async (
-  id: number
+  id: number,
 ): Promise<RequisitionInvItemDetails | null> => {
   logger.info(`entering::getPurchaseByIdFromDb::repository`);
   const storeReq = await db.requisitionInvItemDetails.findFirst({
@@ -566,7 +566,7 @@ export const getRequisitionItemDetailsFromDb = async (
 };
 
 export const getStoreRequisitionBatchWiseFromDb = async (
-  id: number
+  id: number,
 ): Promise<StoreReqBatchWiseResponse | null> => {
   logger.info(`entering::getStoreRequisitionBatchWiseFromDb::repository`);
   const storeReq = await db.invStoreRequisition.findFirst({
@@ -590,7 +590,7 @@ export const getItemRequisitionDetails = async (
   itemId: number,
   location: { storeRequisitionId?: number; storeRequisitionDetailsId?: number },
   batchNo?: string,
-  expiryDate?: Date | null
+  expiryDate?: Date | null,
 ) => {
   logger.info(`entering::getItemRequisitionDetails::repository`);
 
@@ -608,10 +608,10 @@ export const getItemRequisitionDetails = async (
 };
 
 export const valStoreRequisitionBatchWiseFromDb = async (
-  id: number
+  id: number,
 ): Promise<StoreReqBatchWiseResponse | null> => {
   logger.info(
-    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
+    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
   );
   const storeReq = await db.invStoreRequisition.findFirst({
     where: { id, isActive: true },
@@ -627,16 +627,16 @@ export const valStoreRequisitionBatchWiseFromDb = async (
     },
   });
   logger.info(
-    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
+    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
   );
   return storeReq;
 };
 
 export const valStoreRequisitionFromDb = async (
-  id: number
+  id: number,
 ): Promise<StoreReqValResponse | null> => {
   logger.info(
-    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
+    `entering::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
   );
   const storeReq = await db.invStoreRequisition.findFirst({
     where: { id, isActive: true },
@@ -654,7 +654,7 @@ export const valStoreRequisitionFromDb = async (
     },
   });
   logger.info(
-    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`
+    `exiting::getStoreRequisitionBatchWiseFromDb::repository id=${id}`,
   );
   return storeReq;
 };

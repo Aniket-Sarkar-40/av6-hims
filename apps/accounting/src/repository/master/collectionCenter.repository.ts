@@ -3,7 +3,7 @@ import { BinaryFlag, CollectionCenter } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const getCollectionCenterByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<CollectionCenter | null> => {
   logger.info("entering::getCollectionCenterByIdFromDb::repository");
   return db.collectionCenter.findFirst({

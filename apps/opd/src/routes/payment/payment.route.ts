@@ -46,7 +46,7 @@ paymentRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PAYMENT", "VIEW")),
   validateGetPayment,
-  getPayment
+  getPayment,
 );
 
 /**
@@ -69,7 +69,7 @@ paymentRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PAYMENT", "CREATE")),
   validateCreatePayment,
-  createPayment
+  createPayment,
 );
 
 /**
@@ -92,5 +92,5 @@ paymentRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "PAYMENT", "VIEW")),
   validateGetPaymentDetailsWithModule,
-  getPaymentDetailsWithModule
+  getPaymentDetailsWithModule,
 );

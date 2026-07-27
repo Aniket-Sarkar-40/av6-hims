@@ -57,7 +57,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "CREATE")),
   validateStoreRequisition,
-  createStoreRequisition
+  createStoreRequisition,
 );
 
 /**
@@ -73,7 +73,7 @@ storeRequisitionRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisition
+  getAllStoreRequisition,
 );
 
 /**
@@ -94,7 +94,7 @@ storeRequisitionRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionById
+  getstoreRequisitionById,
 );
 
 /**
@@ -124,10 +124,10 @@ storeRequisitionRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STORE_REQUISITION", "VIEW"),
-    getPermission("PMS", "STORE_REQUISITION", "UPDATE")
+    getPermission("PMS", "STORE_REQUISITION", "UPDATE"),
   ),
   validateStoreRequisitionUpdate,
-  updateStoreRequisition
+  updateStoreRequisition,
 );
 
 /**
@@ -154,7 +154,7 @@ storeRequisitionRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "DELETE")),
-  deleteStoreRequisition
+  deleteStoreRequisition,
 );
 
 /**
@@ -177,7 +177,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_REJECT", "CREATE")),
   validateStoreRequisitionReject,
-  rejectStoreRequisition
+  rejectStoreRequisition,
 );
 
 /**
@@ -200,7 +200,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_APPROVE", "CREATE")),
   validateSentStoreRequisition,
-  approveStoreRequisition
+  approveStoreRequisition,
 );
 
 /**
@@ -223,7 +223,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_ACK", "CREATE")),
   validateAcknowledgeStoreRequisition,
-  acknowledgeStoreRequisition
+  acknowledgeStoreRequisition,
 );
 
 /**
@@ -244,7 +244,7 @@ storeRequisitionRouter.get(
   "/batch-wise-by-id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getstoreRequisitionBatchWiseById
+  getstoreRequisitionBatchWiseById,
 );
 
 /**
@@ -265,7 +265,7 @@ storeRequisitionRouter.get(
   "/batch-wise",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION", "VIEW")),
-  getAllStoreRequisitionBatchWiseById
+  getAllStoreRequisitionBatchWiseById,
 );
 
 /**
@@ -288,7 +288,7 @@ storeRequisitionRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_EXCEL", "VIEW")),
   validateExcelFilterStoreRequisition,
-  excelStoreReqReport
+  excelStoreReqReport,
 );
 
 /**
@@ -311,5 +311,5 @@ storeRequisitionRouter.get(
   "/pdf",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STORE_REQUISITION_PDF", "VIEW")),
-  storeRequisitionPdfById
+  storeRequisitionPdfById,
 );

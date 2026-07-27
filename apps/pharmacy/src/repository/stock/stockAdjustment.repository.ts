@@ -17,7 +17,7 @@ import {
 } from "@repo/db/generated/prisma/enums.js";
 
 export const createStockAdjustmentInDb = async (
-  input: CreateStockAjustmentInput
+  input: CreateStockAjustmentInput,
 ): Promise<boolean> => {
   logger.info("entering::createStockAdjustmentInDb::repository");
   const store = requestStorage.getStore();
@@ -75,7 +75,7 @@ export const createStockAdjustmentInDb = async (
               refDetailsId: detail.id,
               refNo: createdStockAdjustment.refNo,
               refDate: createdStockAdjustment.date,
-            }
+            },
           );
         } else {
           await subItemStock(
@@ -97,7 +97,7 @@ export const createStockAdjustmentInDb = async (
               refDetailsId: detail.id,
               refNo: createdStockAdjustment.refNo,
               refDate: createdStockAdjustment.date,
-            }
+            },
           );
         }
       }
@@ -109,7 +109,7 @@ export const createStockAdjustmentInDb = async (
 };
 
 export const updateStockAdjustmentInDb = async (
-  input: UpdateStockAjustmentInput
+  input: UpdateStockAjustmentInput,
 ): Promise<boolean> => {
   logger.info("entering::updateStockAdjustmentInDb::repository");
   const store = requestStorage.getStore();
@@ -123,10 +123,10 @@ export const updateStockAdjustmentInDb = async (
   const { stockAdjustmentDetails } = input;
 
   const toCreate = stockAdjustmentDetails.filter(
-    (d) => typeof d.id !== "number"
+    (d) => typeof d.id !== "number",
   );
   const toUpdate = stockAdjustmentDetails.filter(
-    (d) => typeof d.id === "number"
+    (d) => typeof d.id === "number",
   );
   const toDelete = input.existing.stockAdjustmentDetails
     .filter((d) => !stockAdjustmentDetails.some((item) => item.id === d.id))
@@ -196,7 +196,7 @@ export const updateStockAdjustmentInDb = async (
               refDetailsId: detail.id,
               refNo: updatedStockAdjustment.refNo,
               refDate: updatedStockAdjustment.date,
-            }
+            },
           );
         } else {
           await subItemStock(
@@ -218,7 +218,7 @@ export const updateStockAdjustmentInDb = async (
               refDetailsId: detail.id,
               refNo: updatedStockAdjustment.refNo,
               refDate: updatedStockAdjustment.date,
-            }
+            },
           );
         }
       }
@@ -231,7 +231,7 @@ export const updateStockAdjustmentInDb = async (
 };
 
 export const getStockAdjustmentByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<StockAdjustmentResponse | null> => {
   logger.info("entering::getStockAdjustmentByIdFromDb::repository");
   const record = await db.stockAdjustment.findFirst({

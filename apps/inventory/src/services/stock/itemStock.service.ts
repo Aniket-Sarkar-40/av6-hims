@@ -36,7 +36,7 @@ const ITEM_STOCK_EXCEL_PAGE_SIZE = 1_000_000;
 export const itemStockService = {
   async getAllItemBatchStock(
     input: ItemBatchStockLookupInput,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ItemBatchStockDTO[]> {
     logger.info("entering::getAllItemBatchStock::service");
     await validateIdItemMaster(input.itemId);
@@ -45,7 +45,7 @@ export const itemStockService = {
     let itemBatchStock: ItemBatchStockCacheDTO[];
     if (isCacheable) {
       itemBatchStock = (await getAllCache(
-        cacheKeyForItemBatchStock
+        cacheKeyForItemBatchStock,
       )) as ItemBatchStockCacheDTO[];
     } else {
       const stocks = await getItemBatchStockByBatchFromDb(input);
@@ -54,14 +54,14 @@ export const itemStockService = {
 
     const itemBatchStockDTO = toAvailableItemBatchStockDTOList(
       itemBatchStock,
-      input
+      input,
     );
 
     if (itemBatchStockDTO.length === 0) {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Item Batch Stock")
+          generateErrorMessage("NOT_FOUND", "Item Batch Stock"),
         );
       else return [];
     }
@@ -80,7 +80,7 @@ export const itemStockService = {
     return stocks;
   },
   async getAllItemStock(
-    input: ItemStockSearchFilter
+    input: ItemStockSearchFilter,
   ): Promise<ItemStockPaginatedDTO> {
     logger.info("entering::getAllItemStock::service");
 
@@ -97,7 +97,7 @@ export const itemStockService = {
   },
 
   async itemStockExcelExport(
-    input: ItemStockExcelExportFilter
+    input: ItemStockExcelExportFilter,
   ): Promise<ExcelJs.Workbook> {
     logger.info("entering::itemStockExcelExport::service");
 

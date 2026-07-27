@@ -50,7 +50,7 @@ medPackageRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_PACKAGE", "CREATE")),
   validateMedPackage,
-  medPackageCreate
+  medPackageCreate,
 );
 
 /**
@@ -69,7 +69,7 @@ medPackageRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_PACKAGE", "VIEW")),
-  medPackageGet
+  medPackageGet,
 );
 
 /**
@@ -90,7 +90,7 @@ medPackageRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_PACKAGE", "VIEW")),
-  getMedPackageById
+  getMedPackageById,
 );
 
 /**
@@ -120,10 +120,10 @@ medPackageRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_PACKAGE", "VIEW"),
-    getPermission("PMS", "MEDICINE_PACKAGE", "UPDATE")
+    getPermission("PMS", "MEDICINE_PACKAGE", "UPDATE"),
   ),
   validateMedPackageUpdate,
-  updateMedPackage
+  updateMedPackage,
 );
 
 export default medPackageRouter;

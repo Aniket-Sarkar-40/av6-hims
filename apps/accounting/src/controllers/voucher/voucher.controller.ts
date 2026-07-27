@@ -3,10 +3,11 @@ import {
   CreateOrUpdateVoucherInput,
   ExternalPostVoucherInput,
 } from "@/types/voucher/voucher.js";
+import { TryCatch } from "@repo/platform";
 import { logger } from "@repo/platform/logging/logger.js";
-import { TryCatch } from "@repo/platform/middlewares/error.middleware.js";
 import { deleteFileIfExists } from "@repo/platform/middlewares/imageUpload.middleware.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";
+import { Workbook } from "exceljs";
 import { Request, Response } from "express";
 
 export const createVoucher = TryCatch(async (req: Request, res: Response) => {
@@ -15,7 +16,7 @@ export const createVoucher = TryCatch(async (req: Request, res: Response) => {
   const created = await voucherService.createVoucher(input);
   const response = BaseResponse.success(
     { type: "CREATED", data: created },
-    "Voucher"
+    "Voucher",
   );
   logger.info("exiting::createVoucher::controller");
   return res.status(201).json(response);
@@ -27,7 +28,7 @@ export const updateVoucher = TryCatch(async (req: Request, res: Response) => {
   const created = await voucherService.updateVoucher(input);
   const response = BaseResponse.success(
     { type: "UPDATED", data: created },
-    "Voucher"
+    "Voucher",
   );
   logger.info("exiting::updateVoucher::controller");
   return res.status(200).json(response);
@@ -40,11 +41,11 @@ export const postExternalVoucher = TryCatch(
     const posted = await voucherService.postExternalVoucher(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: posted },
-      "Voucher"
+      "Voucher",
     );
     logger.info("exiting::postExternalVoucher::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const deleteVoucher = TryCatch(async (req: Request, res: Response) => {
@@ -93,7 +94,7 @@ export const createVoucherExcel = TryCatch(
     });
     logger.info("exiting::createVoucherExcel::controller");
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const createVoucherInvoice = TryCatch(
@@ -103,7 +104,7 @@ export const createVoucherInvoice = TryCatch(
     const { voucherId } = req.query as { voucherId: string };
 
     const data = await voucherService.buildPdfForVoucherInvoice(
-      Number(voucherId)
+      Number(voucherId),
     );
 
     const pdfBuffer = data.pdf;
@@ -112,12 +113,42 @@ export const createVoucherInvoice = TryCatch(
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="voucher_${voucherNo}.pdf"`
+      `attachment; filename="voucher_${voucherNo}.pdf"`,
     );
     res.setHeader("Content-Length", pdfBuffer.length);
 
     res.end(pdfBuffer);
 
     logger.info("exiting::createVoucherInvoice::controller");
-  }
+  },
+);
+
+export const exportVoucherExcel = TryCatch(
+  async (req: Request, res: Response) => {
+    logger.info("entering::exportVoucherExcel::controller");
+
+    const { voucherTypeId } = req.body as { voucherTypeId: string };
+
+    const data = await voucherService.buildExcelForVoucherExport(
+      Number(voucherTypeId),
+    );
+
+    const wb: Workbook = data.excel;
+
+    const name = data.name;
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${name}_sample_excel.xlsx"`,
+    );
+
+    await wb.xlsx.write(res);
+    res.end();
+
+    logger.info("exiting::exportVoucherExcel::controller");
+  },
 );

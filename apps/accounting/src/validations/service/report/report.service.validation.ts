@@ -18,10 +18,10 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { Ledger } from "@repo/db/generated/prisma/client";
 
-export const validatetrialBalanceServiceValidation = async (
-  input: TrialBalanceRequestInput
+export const validateTrialBalanceServiceValidation = async (
+  input: TrialBalanceRequestInput,
 ) => {
-  logger.info("entering::validatetrialBalance::service::validation");
+  logger.info("entering::validateTrialBalance::service::validation");
   const { companyId, financialYearId, fromDate, toDate, ccId, ledgerIds } =
     input;
   await validateIdCompany(companyId);
@@ -29,14 +29,14 @@ export const validatetrialBalanceServiceValidation = async (
   if (fy.companyId !== companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
 
   if (dayjs(fromDate).isAfter(dayjs(toDate))) {
     throw new ErrorHandler(
       400,
-      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`
+      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`,
     );
   }
 
@@ -50,8 +50,8 @@ export const validatetrialBalanceServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Financial Year",
         `From Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
 
@@ -73,22 +73,22 @@ export const validatetrialBalanceServiceValidation = async (
       if (!ledger) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Ledger")
+          generateErrorMessage("NOT_FOUND", "Ledger"),
         );
       }
       if (ledger.companyId !== companyId) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company")
+          generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company"),
         );
       }
     }
   }
-  logger.info("exiting::validatetrialBalance::service::validation");
+  logger.info("exiting::validateTrialBalance::service::validation");
 };
 
 export const validateLedgerBookServiceValidation = async (
-  input: LedgerBookRequestInput
+  input: LedgerBookRequestInput,
 ) => {
   logger.info("entering::validateLedgerBook::service::validation");
   const { companyId, financialYearId, fromDate, toDate, ccId, ledgerId } =
@@ -98,14 +98,14 @@ export const validateLedgerBookServiceValidation = async (
   if (fy.companyId !== companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
 
   if (dayjs(fromDate).isAfter(dayjs(toDate))) {
     throw new ErrorHandler(
       400,
-      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`
+      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`,
     );
   }
 
@@ -119,8 +119,8 @@ export const validateLedgerBookServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Financial Year",
         `From Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
   if (ccId) {
@@ -133,7 +133,7 @@ export const validateLedgerBookServiceValidation = async (
 
 export const validateReportCommonServiceValidation = async (
   input: ReportCommonRequestInput,
-  groupId?: number
+  groupId?: number,
 ) => {
   logger.info("entering::validateReportCommon::service::validation");
 
@@ -144,14 +144,14 @@ export const validateReportCommonServiceValidation = async (
   if (fy.companyId !== companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
 
   if (dayjs(fromDate).isAfter(dayjs(toDate))) {
     throw new ErrorHandler(
       400,
-      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`
+      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`,
     );
   }
 
@@ -165,8 +165,8 @@ export const validateReportCommonServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Financial Year",
         `From Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
 
@@ -180,7 +180,7 @@ export const validateReportCommonServiceValidation = async (
 };
 
 export const validateBalanceSheetServiceValidation = async (
-  input: BalanceSheetRequestInput
+  input: BalanceSheetRequestInput,
 ) => {
   logger.info("entering::validateBalanceSheet::service::validation");
   const { companyId, financialYearId, asOnDate, ccId } = input;
@@ -189,7 +189,7 @@ export const validateBalanceSheetServiceValidation = async (
   if (fy.companyId !== companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
   input.fromDate = fy.booksBeginFrom;
@@ -203,8 +203,8 @@ export const validateBalanceSheetServiceValidation = async (
         "INVALID_DATE_RANGE",
         "As On Date",
         `Start Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `End Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `End Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
 
@@ -217,7 +217,7 @@ export const validateBalanceSheetServiceValidation = async (
 };
 
 export const validateCashFlowServiceValidation = async (
-  input: CashFlowRequestInput
+  input: CashFlowRequestInput,
 ) => {
   logger.info("entering::validateCashFlow::service::validation");
   const {
@@ -235,13 +235,13 @@ export const validateCashFlowServiceValidation = async (
   if (fy.companyId !== companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
   if (dayjs(fromDate).isAfter(dayjs(toDate))) {
     throw new ErrorHandler(
       400,
-      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`
+      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`,
     );
   }
   if (
@@ -254,8 +254,8 @@ export const validateCashFlowServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Financial Year",
         `From Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
 
@@ -269,26 +269,26 @@ export const validateCashFlowServiceValidation = async (
   if (view === "MONTH_DETAIL" && !month) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Month")
+      generateErrorMessage("FIELD_REQUIRED", "Month"),
     );
   }
   if (view === "GROUP_DETAIL" && !groupId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Group")
+      generateErrorMessage("FIELD_REQUIRED", "Group"),
     );
   }
   if (view === "MONTHLY" && month) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_NOT_ALLOWED", "Month")
+      generateErrorMessage("FIELD_NOT_ALLOWED", "Month"),
     );
   }
   logger.info("exiting::validateCashFlow::service::validation");
 };
 
 export const validateFundFlowServiceValidation = async (
-  input: FundFlowRequestInput
+  input: FundFlowRequestInput,
 ) => {
   logger.info("entering::validateFundFlow::service::validation");
   const {
@@ -307,13 +307,13 @@ export const validateFundFlowServiceValidation = async (
   if (fy.companyId !== companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
   if (dayjs(fromDate).isAfter(dayjs(toDate))) {
     throw new ErrorHandler(
       400,
-      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`
+      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`,
     );
   }
   if (
@@ -326,8 +326,8 @@ export const validateFundFlowServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Financial Year",
         `From Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
   if (ccId) {
@@ -339,13 +339,13 @@ export const validateFundFlowServiceValidation = async (
   if (view === "MONTHLY" && month) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_NOT_ALLOWED", "Month")
+      generateErrorMessage("FIELD_NOT_ALLOWED", "Month"),
     );
   }
   if (view === "GROUP_DETAIL" && !groupId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Group")
+      generateErrorMessage("FIELD_REQUIRED", "Group"),
     );
   }
   if (input.month && !dayjs(`${input.month}-01`).isValid()) {
@@ -364,19 +364,19 @@ export const validateFundFlowServiceValidation = async (
   if (view === "SUMMARY" && !month) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Month")
+      generateErrorMessage("FIELD_REQUIRED", "Month"),
     );
   }
   if (view === "GROUP_DETAIL" && !month) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_REQUIRED", "Month")
+      generateErrorMessage("FIELD_REQUIRED", "Month"),
     );
   }
   if (view === "SUMMARY" && groupId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("FIELD_NOT_ALLOWED", "Group")
+      generateErrorMessage("FIELD_NOT_ALLOWED", "Group"),
     );
   }
   logger.info("exiting::validateFundFlow::service::validation");

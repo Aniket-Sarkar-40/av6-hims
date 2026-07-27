@@ -50,7 +50,7 @@ consumptionRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "CREATE")),
   validateCreateConsumption,
-  createConsumption
+  createConsumption,
 );
 
 /**
@@ -74,7 +74,7 @@ consumptionRouter.put(
   verifyToken,
   authorize(getPermission("INV", "CONSUMPTION", "UPDATE")),
   validateUpdateConsumption,
-  updateConsumption
+  updateConsumption,
 );
 
 /**
@@ -90,7 +90,7 @@ consumptionRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getAllConsumption
+  getAllConsumption,
 );
 
 /** * @swagger
@@ -112,7 +112,7 @@ consumptionRouter.get(
   "/id",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getConsumptionById
+  getConsumptionById,
 );
 
 /**
@@ -136,7 +136,7 @@ consumptionRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION_APPROVE", "CREATE")),
   validateApproveConsumption,
-  approveConsumption
+  approveConsumption,
 );
 
 /**
@@ -159,7 +159,7 @@ consumptionRouter.delete(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "DELETE")),
   validateCommonConsumptionInput,
-  deleteConsumptionById
+  deleteConsumptionById,
 );
 
 /**
@@ -182,7 +182,7 @@ consumptionRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION_REJECT", "CREATE")),
   validateCommonConsumptionInput,
-  rejectConsumption
+  rejectConsumption,
 );
 
 /**
@@ -204,5 +204,5 @@ consumptionRouter.get(
   "/by-user",
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "CONSUMPTION", "VIEW")),
-  getConsumptionByUserId
+  getConsumptionByUserId,
 );

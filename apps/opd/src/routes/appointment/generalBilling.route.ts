@@ -47,7 +47,7 @@ generalBillingRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "CREATE")),
   validateCreateGeneralBilling,
-  createGeneralBilling
+  createGeneralBilling,
 );
 /**
  * @swagger
@@ -70,7 +70,7 @@ generalBillingRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "UPDATE")),
   validateUpdateGeneralBilling,
-  updateGeneralBilling
+  updateGeneralBilling,
 );
 
 /**
@@ -94,7 +94,7 @@ generalBillingRouter.delete(
   "/delete",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "DELETE")),
-  deleteGeneralBilling
+  deleteGeneralBilling,
 );
 
 generalBillingRouter.put(
@@ -102,5 +102,5 @@ generalBillingRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "GENERAL_BILLING", "UPDATE")),
   validateReturnGeneralBilling,
-  returnGeneralBilling
+  returnGeneralBilling,
 );

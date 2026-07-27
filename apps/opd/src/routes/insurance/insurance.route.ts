@@ -48,7 +48,7 @@ insuranceRouter.post(
   authorize(getPermission("OPD", "INSURANCE", "CREATE")),
   createUploadFieldsMiddleware("insurance", ["logoImage", "attachments"]),
   validateInsurance,
-  createInsurance
+  createInsurance,
 );
 
 /**
@@ -71,11 +71,11 @@ insuranceRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "INSURANCE", "VIEW"),
-    getPermission("OPD", "INSURANCE", "UPDATE")
+    getPermission("OPD", "INSURANCE", "UPDATE"),
   ),
   createUploadFieldsMiddleware("insurance", ["logoImage", "attachments"]),
   validateInsuranceUpdate,
-  updateInsurance
+  updateInsurance,
 );
 
 /**
@@ -90,7 +90,7 @@ insuranceRouter.put(
 insuranceRouter.get(
   "/",
   // verifyToken, authorize(getPermission("INSURANCE", "VIEW")),
-  getAllInsurance
+  getAllInsurance,
 );
 
 /**
@@ -112,7 +112,7 @@ insuranceRouter.get(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "INSURANCE", "VIEW")),
-  getInsuranceById
+  getInsuranceById,
 );
 
 /**
@@ -128,7 +128,7 @@ insuranceRouter.delete(
   "/id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "INSURANCE", "DELETE")),
-  deleteInsurance
+  deleteInsurance,
 );
 
 // /**

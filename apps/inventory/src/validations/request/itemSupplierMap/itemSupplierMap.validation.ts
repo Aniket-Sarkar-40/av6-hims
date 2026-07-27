@@ -20,7 +20,7 @@ export const itemSupplierMapCreateSchema = Joi.object({
   itemId: idRequired("Item ID"),
   supplierId: idRequired("Supplier ID"),
   purchasePrice: numberWithMaxDecimalsRequired("basePrice", () =>
-    getSchemaPrecision("item")
+    getSchemaPrecision("item"),
   ),
   isLock: boolOptional("Is Lock"),
   validUpto: dateOptional("Valid Upto"),
@@ -47,7 +47,7 @@ export const itemSupplierMapImportExcelSchema =
 export function validateImportExcelItemSupplierMap(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   req.body = toItemSupplierMapImportExcelEntity(req.body);
   const { error } = itemSupplierMapImportExcelSchema.validate(req.body, {
@@ -65,7 +65,7 @@ export function validateImportExcelItemSupplierMap(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 

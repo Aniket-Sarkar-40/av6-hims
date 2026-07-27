@@ -4,9 +4,6 @@
       "mode": "auto"
     }
   ],
-  "cSpell.words": [
-    "autoincrement",
-    "DMMF"
-  ],
+  "cSpell.words": ["autoincrement", "DMMF"],
   "prisma.pinToPrisma6": false
 }

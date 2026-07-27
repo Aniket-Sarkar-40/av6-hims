@@ -17,7 +17,7 @@ export const toCityDTO = async (city: City): Promise<CityDTO> => {
 };
 
 export const toCityDTOOnlyForCity = async (
-  city: City
+  city: City,
 ): Promise<CityDTOForCity> => {
   const state = await stateService.getStateById(city.stateId, true);
   return {

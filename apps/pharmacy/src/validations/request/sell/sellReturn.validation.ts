@@ -248,7 +248,7 @@ export const sellReturnInputSchema = Joi.object<SellReturnInput>({
   sellReturnDetails: arrayRequired(
     "Sell Return Details",
     sellReturnDetailInputSchema,
-    1
+    1,
   ),
   coPayAmount: joiDecimalFromSettings({
     key: "sellPrecision",
@@ -278,7 +278,7 @@ export const sellReturnSchemaUpdate = sellReturnInputSchema.keys({
   sellReturnDetails: Joi.array().items(
     sellReturnDetailInputSchema.keys({
       id: idRequired("Id"),
-    })
+    }),
   ),
 });
 

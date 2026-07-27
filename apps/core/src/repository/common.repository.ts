@@ -69,7 +69,7 @@ const lowerFirst = <S extends string>(s: S) =>
   (s.charAt(0).toLowerCase() + s.slice(1)) as Uncapitalize<S>;
 
 export async function getByUnique<M extends ModelName>(
-  input: CommonFindUniqueInput<M>
+  input: CommonFindUniqueInput<M>,
 ): Promise<FindFirstResult<M> | null> {
   const { model, useActiveFlag = true, where, args } = input;
   const delegateKey = lowerFirst(model) as keyof PrismaClient;
@@ -78,7 +78,7 @@ export async function getByUnique<M extends ModelName>(
   if (!delegate?.findFirst) {
     throw new ErrorHandler(
       500,
-      `Model delegate "${String(delegateKey)}" not found on PrismaClient`
+      `Model delegate "${String(delegateKey)}" not found on PrismaClient`,
     );
   }
 
@@ -92,7 +92,7 @@ export async function getByUnique<M extends ModelName>(
 }
 
 export async function getAll<M extends ModelName>(
-  input: CommonFindManyInput<M>
+  input: CommonFindManyInput<M>,
 ): Promise<FindManyResult<M>> {
   const { model, useActiveFlag = true, where, args } = input;
   const delegateKey = lowerFirst(model) as keyof PrismaClient;
@@ -100,7 +100,7 @@ export async function getAll<M extends ModelName>(
 
   if (!delegate?.findMany) {
     throw new Error(
-      `Model delegate "${String(delegateKey)}" not found on PrismaClient`
+      `Model delegate "${String(delegateKey)}" not found on PrismaClient`,
     );
   }
 

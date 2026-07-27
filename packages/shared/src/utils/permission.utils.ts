@@ -70,6 +70,7 @@ export enum PermissionResource {
   GRN_RETURN_DETAILS = "grn-return-details",
   DEFAULT_UNIT_MASTER = "default-unit-master",
   STOCK_TRANSFER_DETAILS = "stock-transfer-details",
+  STOCK_OPENING_CLOSING = "stock-opening-closing",
 
   // CORE
   COUNTRY = "country",
@@ -212,10 +213,40 @@ export enum PermissionResource {
   SELL_DETAILS = "sell-details",
 
   //ACCOUNTING
+  // =========== master group resource start ===========
+  EMAIL_CONFIG = "email-config",
+  DYNAMIC_SHORT_CODE = "dynamic-short-code",
+  AUDIT_CONFIG = "audit-config",
+  COMPANY = "company",
+  GROUP = "group",
+  GROUP_EXCEL_IMPORT = "group-excel-import",
+  GROUP_EXCEL_EXPORT = "group-excel-export",
+  LEDGER_EXCEL_IMPORT = "ledger-excel-import",
+  LEDGER_EXCEL_EXPORT = "ledger-excel-export",
+  LEDGER = "ledger",
+  VOUCHER_TYPE = "voucher-type",
+  COST_CENTER = "cost-center",
+  NARRATION = "narration",
+  COMPANY_FINANCIAL_YEAR = "company-financial-year",
+  VOUCHER_UIN_CONFIG = "voucher-uin-config",
+  CHEQUE_MASTER = "cheque-master",
+  CHART_OF_ACCOUNTS = "chart-of-accounts",
+  RATE_OF_EXCHANGE = "rate-of-exchange",
+  CLOSE_COMPANY_FINANCIAL_YEAR = "close-company-financial-year",
+  LOCK_UNLOCK_COMPANY_FINANCIAL_YEAR = "lock-unlock-company-financial-year",
+  // =========== master group resource end ===========
+
+  // =========== settings group resource start ===========
+  SETTINGS = "settings",
+  // =========== settings group resource end ===========
+
+  // =========== voucher group resource start ===========
   VOUCHER_ENTRY = "voucher-entry",
   CANCEL_VOUCHER = "cancel-voucher",
-  VOUCHER_EXCEL_IMPORT = "voucher-excel-import",
-  LEDGER_BALANCE = "ledger-balance",
+  VOUCHER_SINGLE_ENTRY = "voucher-single-entry",
+  // =========== voucher group resource end ===========
+
+  // =========== report group resource start ===========
   TRIAL_BALANCE = "trial-balance",
   LEDGER_BOOK = "ledger-book",
   GROUP_SUMMARY_TREE = "group-summary-tree",
@@ -226,20 +257,25 @@ export enum PermissionResource {
   PAYABLE_SUMMARY = "payable-summary",
   CASH_FLOW = "cash-flow",
   FUND_FLOW = "fund-flow",
+  LEDGER_FOREX_GAIN_LOSS = "ledger-forex-gain-loss",
+  // =========== report group resource end ===========
 
-  EMAIL_CONFIG = "email-config",
-  DYNAMIC_SHORT_CODE = "dynamic-short-code",
-  AUDIT_CONFIG = "audit-config",
-  COMPANY = "company",
-  GROUP = "group",
-  LEDGER = "ledger",
-  VOUCHER_TYPE = "voucher-type",
-  COST_CENTER = "cost-center",
-  NARRATION = "narration",
-  COMPANY_FINANCIAL_YEAR = "company-financial-year",
+  // =========== integration config group resource start ===========
   INTEGRATION_CONFIG = "integration-config",
+  // =========== integration config group resource end ===========
+
+  // =========== ledger balance group resource start ===========
+  LEDGER_BALANCE = "ledger-balance",
+  // =========== ledger balance group resource end ===========
+  // =========== batch group resource start ===========
   BATCH_JOB = "batch-job",
   BATCH_JOB_DETAILS = "batch-job-details",
+  // =========== batch group resource end ===========
+  // =========== voucher excel import group resource start ===========
+  VOUCHER_EXCEL_IMPORT = "voucher-excel-import",
+  VOUCHER_EXCEL_EXPORT = "voucher-excel-export",
+  // =========== voucher excel import group resource end ===========
+  // =========== bank reconciliation group resource start ===========
   UNRECONCILED_BANK_VOUCHER_LINES = "unreconciled-bank-voucher-lines",
   MANUAL_RECONCILE = "manual-reconcile",
   BANK_STATEMENT = "bank-statement",
@@ -247,6 +283,17 @@ export enum PermissionResource {
   MANUAL_BANK_RECONCILE = "manual-bank-reconcile",
   BANK_RECONCILIATION_SUMMARY = "bank-reconciliation-summary",
   BANK_AUTO_SUGGESTIONS = "bank-auto-suggestions",
+  USED_CHEQUE_NUMBER = "used-cheque-number",
+  // =========== bank reconciliation group resource end ===========
+
+  // =========== multi voucher group resource start ===========
+  MULTI_VOUCHER = "multi-voucher",
+  UPDATE_POSTED_MULTI_VOUCHER = "update-posted-multi-voucher",
+  // =========== multi voucher group resource end ===========
+
+  // =========== client ledger mapping group resource start ===========
+  CLIENT_LEDGER_MAPPING = "client-ledger-mapping",
+  // =========== client ledger mapping group resource end ===========
   SETTINGS = "settings",
 
   //Blood Bank
@@ -268,7 +315,7 @@ export enum PermissionModule {
 export const getPermission = (
   module: keyof typeof PermissionModule,
   resource: keyof typeof PermissionResource,
-  type: keyof typeof PermissionType
+  type: keyof typeof PermissionType,
 ): string => {
   return `${module}:${PermissionResource[resource]}:${PermissionType[type]}`;
 };

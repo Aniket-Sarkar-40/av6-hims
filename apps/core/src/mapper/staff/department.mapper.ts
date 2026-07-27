@@ -5,7 +5,7 @@ import {
 import { BinaryFlag, YesNoFlag } from "@repo/db/generated/prisma/client";
 
 export const toDepartmentFromExcel = (
-  row: ExcelDepartmentRow
+  row: ExcelDepartmentRow,
 ): CreateDepartmentInput => {
   return {
     name: row.name,
@@ -23,7 +23,7 @@ export const toDepartmentFromExcel = (
 };
 
 export const toExcelFromDepartment = (
-  department: CreateDepartmentInput | null
+  department: CreateDepartmentInput | null,
 ): ExcelDepartmentRow => {
   return {
     name: department ? department.name : "",

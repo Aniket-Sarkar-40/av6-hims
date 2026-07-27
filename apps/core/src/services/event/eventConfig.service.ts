@@ -27,7 +27,7 @@ export const eventConfigService = {
   },
 
   async getAllEventConfigs(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<EventConfig[]> {
     logger.info("entering::getAllEventConfigs::service");
 
@@ -38,7 +38,7 @@ export const eventConfigService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Event Config")
+          generateErrorMessage("NOT_FOUND", "Event Config"),
         );
       }
     }
@@ -48,7 +48,7 @@ export const eventConfigService = {
 
   async getEventConfigById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<EventConfig | null> {
     logger.info("entering::getEventConfigById::service");
     validIdCheck(id);
@@ -59,7 +59,7 @@ export const eventConfigService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Event Config")
+          generateErrorMessage("NOT_FOUND", "Event Config"),
         );
       }
     }

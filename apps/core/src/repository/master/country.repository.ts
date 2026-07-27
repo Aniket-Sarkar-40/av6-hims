@@ -9,7 +9,7 @@ import { customOmit } from "av6-utils";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 
 export const createCountryInDb = async (
-  country: CreateCountryInput
+  country: CreateCountryInput,
 ): Promise<Country> => {
   logger.info("entering::createCountry::repository");
   return db.country.create({
@@ -23,7 +23,7 @@ export const getAllCountriesFromDb = async (): Promise<Country[]> => {
 };
 
 export const getCountryByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<Country | null> => {
   logger.info("entering::getCountryById::repository");
   return db.country.findUnique({
@@ -32,7 +32,7 @@ export const getCountryByIdFromDb = async (
 };
 
 export const getCountryByCountryNameFromDb = async (
-  nationality: string
+  nationality: string,
 ): Promise<Country | null> => {
   logger.info("entering::getCountryByCountryName::repository");
   return db.country.findFirst({
@@ -40,7 +40,7 @@ export const getCountryByCountryNameFromDb = async (
   });
 };
 export const getCountryByCountryShortNameFromDb = async (
-  shortName: string
+  shortName: string,
 ): Promise<Country | null> => {
   logger.info("entering::getCountryByCountryName::repository");
   return db.country.findFirst({
@@ -49,7 +49,7 @@ export const getCountryByCountryShortNameFromDb = async (
 };
 
 export const getCountryByCountryAlpha2CodeFromDb = async (
-  alpha2Code: string
+  alpha2Code: string,
 ): Promise<Country | null> => {
   logger.info("entering::getCountryByCountryName::repository");
   return db.country.findFirst({
@@ -58,7 +58,7 @@ export const getCountryByCountryAlpha2CodeFromDb = async (
 };
 
 export const getCountryByCountryAlpha3CodeFromDb = async (
-  alpha3Code: string
+  alpha3Code: string,
 ): Promise<Country | null> => {
   logger.info("entering::getCountryByCountryName::repository");
   return db.country.findFirst({
@@ -67,7 +67,7 @@ export const getCountryByCountryAlpha3CodeFromDb = async (
 };
 
 export const updateCountryInDb = async (
-  country: UpdateCountryInput
+  country: UpdateCountryInput,
 ): Promise<Country> => {
   logger.info("entering::updateCountry::repository");
   const omitted = customOmit<UpdateCountryInput, "id">(country, ["id"]);
@@ -94,7 +94,7 @@ export const deleteCountryInDb = async (id: number): Promise<void> => {
     });
   } catch (error) {
     logger.error(
-      `Error deleting country with numCode=${id}: ${JSON.stringify(error)}`
+      `Error deleting country with numCode=${id}: ${JSON.stringify(error)}`,
     );
     throw new ErrorHandler(404, "Failed to delete country. It may be in use.");
   }

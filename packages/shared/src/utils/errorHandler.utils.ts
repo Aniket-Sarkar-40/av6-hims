@@ -4,7 +4,7 @@ export default class ErrorHandler extends Error {
   constructor(
     public statusCode: number,
     public override message: string,
-    public errors?: ValidationErrorItem[]
+    public errors?: ValidationErrorItem[],
   ) {
     super(message);
     this.statusCode = statusCode;

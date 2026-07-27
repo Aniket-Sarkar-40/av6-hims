@@ -17,6 +17,7 @@ import {
 import { logger } from "@repo/platform/logging/logger.js";
 import { db } from "@repo/db";
 import { API_TIMEOUT } from "@repo/shared";
+import { createOrUpdateVoucherServiceValidation } from "@/validations/service/voucher/voucher.service.validation.js";
 
 export type PrismaTransactionClient = Omit<
   PrismaClient,
@@ -26,7 +27,7 @@ type Tx = Prisma.TransactionClient;
 
 export const createBatchJobInDb = async (
   tx: Tx,
-  inp: CreateOrUpdateBatchJobInput
+  inp: CreateOrUpdateBatchJobInput,
 ) => {
   logger.info("entering::createBatchJobInDb::repository");
   return tx.batchJob.create({
@@ -36,7 +37,7 @@ export const createBatchJobInDb = async (
 
 export const createBatchDetailsInDb = async (
   tx: Tx,
-  inp: CreateOrUpdateBatchJobDetailsInput
+  inp: CreateOrUpdateBatchJobDetailsInput,
 ) => {
   logger.info("entering::createBatchDetailsInDb::repository");
   return tx.batchJobDetails.create({
@@ -45,11 +46,11 @@ export const createBatchDetailsInDb = async (
 };
 
 export const createVoucherExcelInDb = async (
-  input: CreateOrUpdateVoucherEntryExcelInput[]
+  input: CreateOrUpdateVoucherEntryExcelInput[],
 ) => {
   logger.info("entering::createVoucherExcelInDb::repository");
   const batchUin = await uinServiceFactory.generateUIN(
-    AccUinShortCode.BATCH_JOB
+    AccUinShortCode.BATCH_JOB,
   );
   // input.voucherNo = await uinServiceFactory.generateUIN(UinShortCode.VOUCHER);
   return await db.$transaction(
@@ -71,7 +72,7 @@ export const createVoucherExcelInDb = async (
 
       return batch;
     },
-    { timeout: API_TIMEOUT }
+    { timeout: API_TIMEOUT },
   );
 };
 
@@ -114,10 +115,12 @@ export async function voucherExcelBatchJob(params: {
               voucherTypeId,
               ccId,
             });
-
+            await createOrUpdateVoucherServiceValidation({
+              input: voucherInput as CreateOrUpdateVoucherInput,
+            });
             const createdVoucher = await createVoucherFromExcelInDb(
               tx,
-              voucherInput as CreateOrUpdateVoucherInput
+              voucherInput as CreateOrUpdateVoucherInput,
             );
 
             await tx.batchJobDetails.create({
@@ -140,7 +143,7 @@ export async function voucherExcelBatchJob(params: {
               },
             });
           },
-          { timeout: API_TIMEOUT }
+          { timeout: API_TIMEOUT },
         );
       } catch (error) {
         console.error(`❌ Error processing voucher row ${item.rowNo}:`, error);
@@ -149,8 +152,8 @@ export async function voucherExcelBatchJob(params: {
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
 
         // Log failure
         await db.batchJobDetails.create({

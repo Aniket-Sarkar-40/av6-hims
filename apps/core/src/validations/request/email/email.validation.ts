@@ -36,7 +36,7 @@ export const emailConfigSchema = Joi.object({
 export const validateEmailConfig = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = emailConfigSchema.validate(req.body, {
     abortEarly: false,
@@ -48,7 +48,7 @@ export const validateEmailConfig = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

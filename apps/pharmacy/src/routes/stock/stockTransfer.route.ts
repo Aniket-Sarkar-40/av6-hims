@@ -56,7 +56,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "CREATE")),
   validateCreateStockTransfer,
-  createStockTransfer
+  createStockTransfer,
 );
 
 /**
@@ -80,10 +80,10 @@ stockTransferRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STOCK_TRANSFER", "VIEW"),
-    getPermission("PMS", "STOCK_TRANSFER", "UPDATE")
+    getPermission("PMS", "STOCK_TRANSFER", "UPDATE"),
   ),
   validateUpdateStockTransfer,
-  updateStockTransfer
+  updateStockTransfer,
 );
 
 /**
@@ -107,7 +107,7 @@ stockTransferRouter.delete(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "DELETE")),
   validateDeleteStockTransfer,
-  deleteStockTransfer
+  deleteStockTransfer,
 );
 
 /**
@@ -131,7 +131,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER_APPROVE", "CREATE")),
   validateAppAckStockTransfer,
-  approveStockTransfer
+  approveStockTransfer,
 );
 /**
  * @swagger
@@ -153,10 +153,10 @@ stockTransferRouter.post(
   "/approve-return",
   verifyToken(ServiceCode.PHARMACY),
   authorize(
-    getPermission("PMS", "BRANCH_STOCK_TRANSFER_APPROVE_RETURN", "CREATE")
+    getPermission("PMS", "BRANCH_STOCK_TRANSFER_APPROVE_RETURN", "CREATE"),
   ),
   validateAppAckStockTransfer,
-  approveReturnStockTransfer
+  approveReturnStockTransfer,
 );
 
 /**
@@ -179,7 +179,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER_ACK", "CREATE")),
   validateAcknowledgeSearchStockTransfer,
-  acknowledgeStockTransfer
+  acknowledgeStockTransfer,
 );
 
 /**
@@ -203,7 +203,7 @@ stockTransferRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "VIEW")),
-  getStockTransferById
+  getStockTransferById,
 );
 
 /**
@@ -219,7 +219,7 @@ stockTransferRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER", "VIEW")),
-  getAllStockTransfer
+  getAllStockTransfer,
 );
 
 /**
@@ -242,7 +242,7 @@ stockTransferRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STOCK_TRANSFER_SEARCH", "VIEW")),
   validateSearchStockTransfer,
-  searchStockTransfer
+  searchStockTransfer,
 );
 
 export default stockTransferRouter;

@@ -44,7 +44,7 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
       ]);
 
       const supplierDTO = suppliers.find(
-        (supplier) => supplier.id === grn.supplierId
+        (supplier) => supplier.id === grn.supplierId,
       );
       const ccSettingsId = settings?.warehouseMode;
 
@@ -54,7 +54,7 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
       if (ccSettingsId) {
         warehouseDTO = await warehouseService.getWarehouseByIdWoDTO(
           grn.ccId,
-          true
+          true,
         );
       } else {
         branchDTO = await branchService.getBranchByIdWoDTO(grn.ccId, true);
@@ -76,7 +76,7 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
 
           const item = await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           );
 
           const inHandQty =
@@ -89,12 +89,12 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
 
           const createdBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.createdBy
+                detail.createdBy,
               )
             : null;
           const updatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.updatedBy
+                detail.updatedBy,
               )
             : null;
 
@@ -112,7 +112,7 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
           const grnRemainingQty = Math.max(totalGrnQty - alreadyReturnedQty, 0);
           const availableTotalQtyToReturn = Math.min(
             grnRemainingQty,
-            stockQtyForReturn
+            stockQtyForReturn,
           );
 
           return {
@@ -128,7 +128,7 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
             createdBy: omitAudit(createdBy),
             updatedBy: omitAudit(updatedBy),
           };
-        })
+        }),
       );
 
       const location = warehouseDTO
@@ -145,12 +145,12 @@ export const toGrnDTO = async (data: GrnResponse[]): Promise<GrnDTO[]> => {
         createdBy,
         goodReceiveDetails: detailDTO,
       };
-    })
+    }),
   );
 };
 
 export const toGrnDetailsDto = async (
-  grnDetails: InvGoodReceiveDetails[]
+  grnDetails: InvGoodReceiveDetails[],
 ): Promise<GoodReceiveDetailDTO[]> => {
   return Promise.all(
     grnDetails.map(async (detail) => {
@@ -161,7 +161,7 @@ export const toGrnDetailsDto = async (
       const itemDTO = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           )
         : null;
       const createdBy = detail.createdBy
@@ -177,7 +177,7 @@ export const toGrnDetailsDto = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };
 
@@ -197,7 +197,7 @@ export const toGrnPdfDTO = async (grn: GrnResponse): Promise<GrnPdfDTO> => {
 
   const supplier = await itemSupplierService.getItemSupplierWoDtoById(
     grn.supplierId,
-    true
+    true,
   );
 
   const settings = await settingsService.getSettings(true);
@@ -219,14 +219,14 @@ export const toGrnPdfDTO = async (grn: GrnResponse): Promise<GrnPdfDTO> => {
     (grn.goodReceiveDetails || []).map(async (detail) => {
       const item = await itemMasterService.getItemMasterByIdWoDto(
         detail.itemId,
-        true
+        true,
       );
 
       return {
         ...detail,
         item: item ?? null,
       };
-    })
+    }),
   );
 
   return {

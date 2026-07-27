@@ -19,7 +19,7 @@ authRouter.post(
   "/get-user-details",
   verifyToken(),
   // authorize("pms:user:view"),
-  getUserDetails
+  getUserDetails,
 );
 
 authRouter.post("/permission", verifyToken(), verifyPermission);

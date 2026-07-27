@@ -50,11 +50,11 @@ export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
   focQuantity: intOptional("FOC Quantity").default(0),
 
   purchasedPrice: numberWithMaxDecimalsRequired("purchasedPrice", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   totalAmount: numberWithMaxDecimalsOptional("totalAmount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   tax: intOptional("Tax"),
@@ -62,16 +62,16 @@ export const grnReturnDetailSchema = Joi.object<GrnReturnDetailInput>({
   netTax: intRequired("Net Tax"),
 
   netAmount: numberWithMaxDecimalsOptional("netAmount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
 
   discount: numberWithMaxDecimalsOptional("Discount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
   netDiscount: priceRequired("Net Discount amount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   orderQty: intRequired("Order quantity"),
@@ -102,10 +102,10 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
   conversionRate: Joi.when("currencyId", {
     is: Joi.exist().not(null),
     then: numberWithMaxDecimalsRequired("Conversion Rate", () =>
-      getSchemaPrecision("grn")
+      getSchemaPrecision("grn"),
     ),
     otherwise: numberWithMaxDecimalsOptional("Conversion Rate", () =>
-      getSchemaPrecision("grn")
+      getSchemaPrecision("grn"),
     ),
   }),
 
@@ -114,11 +114,11 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
   ccId: idRequired("CC ID"),
 
   totalAmount: numberWithMaxDecimalsOptional("totalAmount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   discount: numberWithMaxDecimalsOptional("Discount", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   discountMethod: enumRequired("Discount method", DiscMethod),
@@ -126,7 +126,7 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
   netDiscount: intOptional("Discount amount"),
 
   netTotal: numberWithMaxDecimalsOptional("netTotal", () =>
-    getSchemaPrecision("grn")
+    getSchemaPrecision("grn"),
   ),
 
   paidAmount: priceOptional("Paid amount", () => getSchemaPrecision("grn")),
@@ -142,7 +142,7 @@ export const grnReturnSchema = Joi.object<CreateGrnReturnInput>({
   goodReceiveReturnDetails: arrayRequired(
     "Good receive return details",
     grnReturnDetailSchema,
-    1
+    1,
   ),
 });
 
@@ -169,7 +169,7 @@ export const grnReturnSchemaUpdate = grnReturnSchema.keys({
     grnReturnDetailSchema.keys({
       id: idOptional("Id"),
       grnDetailId: idOptional("GRN details ID"),
-    })
+    }),
   ),
 });
 

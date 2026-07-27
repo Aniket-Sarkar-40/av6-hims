@@ -29,7 +29,7 @@ import { settingsService } from "@/services/master/settings.service.js";
 type Tx = Prisma.TransactionClient;
 
 export const createItemBranchMapInDb = async (
-  itemBranch: createItemBranchMapInput
+  itemBranch: createItemBranchMapInput,
 ): Promise<void> => {
   logger.info("entering::createItemBranchInDb::repository");
   const store = requestStorage.getStore();
@@ -37,7 +37,7 @@ export const createItemBranchMapInDb = async (
   const precision = setting?.itemPrecision ?? setting?.defaultPrecision ?? 2;
   const omittedInput = customOmit<createItemBranchMapInput, "branchId">(
     itemBranch,
-    ["branchId"]
+    ["branchId"],
   );
   const { branchId } = omittedInput.omitted;
   for (const branch of branchId) {
@@ -51,7 +51,7 @@ export const createItemBranchMapInDb = async (
             ? applyRound(
                 itemBranch.purchaseAmount,
                 RoundFormat.TO_FIXED,
-                precision
+                precision,
               )
             : undefined,
         saleAmount:
@@ -65,7 +65,7 @@ export const createItemBranchMapInDb = async (
 };
 
 export const updateItemBranchMapInDb = async (
-  itemBranch: ItemBranchMap
+  itemBranch: ItemBranchMap,
 ): Promise<void> => {
   logger.info("entering::createItemBranchInDb::repository");
   const store = requestStorage.getStore();
@@ -84,7 +84,7 @@ export const updateItemBranchMapInDb = async (
           ? applyRound(
               itemBranch.purchaseAmount,
               RoundFormat.TO_FIXED,
-              precision
+              precision,
             )
           : undefined,
       saleAmount:
@@ -109,7 +109,7 @@ export const deleteItemBranchMapInDB = async (id: number) => {
 };
 
 export const getItemBranchMapByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<BranchItemMap | null> => {
   logger.info("entering::getItemByIdFromDb::repository");
   return db.branchItemMap.findUnique({
@@ -118,7 +118,7 @@ export const getItemBranchMapByIdFromDb = async (
 };
 
 export const getItemBranchMapByItemAndBranchIdFromDb = async (
-  input: GetItemBranchPricing
+  input: GetItemBranchPricing,
 ): Promise<BranchItemMap | null> => {
   logger.info("entering::getItemByIdFromDb::repository");
   return db.branchItemMap.findFirst({
@@ -131,7 +131,7 @@ export const getItemBranchMapByItemAndBranchIdFromDb = async (
 };
 
 export const getItemBranchMapByBranchIdFromDb = async (
-  branchId: number
+  branchId: number,
 ): Promise<BranchItemMap[]> => {
   logger.info("entering::getItemBranchMapByBranchIdFromDb::repository");
   return db.branchItemMap.findMany({
@@ -152,7 +152,7 @@ export const getAllBranchMapFromDb = async (): Promise<BranchItemMap[]> => {
 };
 
 export const countItemBranchMapByItemIdFromDb = async (
-  itemId: number
+  itemId: number,
 ): Promise<number> => {
   logger.info("entering::countItemBranchMapByItemIdFromDb::repository");
   return db.branchItemMap.count({
@@ -164,7 +164,7 @@ export const countItemBranchMapByItemIdFromDb = async (
 };
 
 export const getItemBranchMapByItemIdFromDb = async (
-  itemId: number
+  itemId: number,
 ): Promise<BranchWithSellAmountMap[]> => {
   logger.info("entering::getItemBranchMapByItemIdFromDb::repository");
 
@@ -182,7 +182,7 @@ export const getItemBranchMapByItemIdFromDb = async (
 };
 
 export const UpdateItemWiseItemBranchMapInDb = async (
-  input: ItemWiseItemBranchMapUpdate
+  input: ItemWiseItemBranchMapUpdate,
 ): Promise<void> => {
   logger.info("entering::UpdateItemWiseItemBranchMapInDb::repository");
   const store = requestStorage.getStore();
@@ -236,7 +236,7 @@ export const UpdateItemWiseItemBranchMapInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -244,7 +244,7 @@ export const copyBranchToBranchPriceMappingInDb = async (
   tx: Tx,
   toBranchId: number,
   sourceMapping: BranchItemMap,
-  itemArray: BranchItemMap[]
+  itemArray: BranchItemMap[],
 ) => {
   logger.info("entering::copyBranchToBranchPriceMappingInDb::repository");
   const store = requestStorage.getStore();
@@ -292,7 +292,7 @@ export const copyBranchToBranchPriceMappingInDb = async (
   ]);
 
   const existingMapping = itemArray.find(
-    (item) => item.itemId === sourceMapping.itemId
+    (item) => item.itemId === sourceMapping.itemId,
   );
 
   if (existingMapping) {
@@ -333,7 +333,7 @@ export const copyBranchToBranchPriceMappingInDb = async (
 
 export const CreateBranchItemMapAudit = async (
   tx: Tx,
-  input: BranchItemMapAuditCreateInput
+  input: BranchItemMapAuditCreateInput,
 ) => {
   logger.info("entering::CreateBranchItemMapAudit::repository");
   return tx.branchItemMapAudit.create({
@@ -346,7 +346,7 @@ export const CreateBranchItemMapAudit = async (
 
 export const CreateBranchItemMapAuditDetails = async (
   tx: Tx,
-  input: BranchItemMapAuditDetailsCreateInput
+  input: BranchItemMapAuditDetailsCreateInput,
 ) => {
   logger.info("entering::CreateBranchItemMapAuditDetails::repository");
   return tx.branchItemMapAuditDetails.create({
@@ -355,11 +355,11 @@ export const CreateBranchItemMapAuditDetails = async (
 };
 
 export const CreateBranchItemMapExcelInDb = async (
-  inp: Omit<Prisma.PmsBranchItemMapExcelUncheckedCreateInput, "batchJobId">[]
+  inp: Omit<Prisma.PmsBranchItemMapExcelUncheckedCreateInput, "batchJobId">[],
 ) => {
   logger.info("entering::CreateBranchItemMapExcelInDb::repository");
   const batchUin = await uinServiceFactory.generateUIN(
-    PmsUinShortCode.BATCH_JOB
+    PmsUinShortCode.BATCH_JOB,
   );
   return await db.$transaction(
     async (tx) => {
@@ -374,7 +374,7 @@ export const CreateBranchItemMapExcelInDb = async (
         (doc) => ({
           ...doc,
           batchJobId: batch.id,
-        })
+        }),
       );
 
       await tx.pmsBranchItemMapExcel.createMany({
@@ -385,7 +385,7 @@ export const CreateBranchItemMapExcelInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -482,20 +482,20 @@ export async function branchItemMapBatchJob(batchJobId: number) {
           },
           {
             timeout: API_TIMEOUT,
-          }
+          },
         );
       } catch (error) {
         console.error(
           `❌ Error processing batchItemMapExcel ${item.itemId}:`,
-          error
+          error,
         );
 
         const errorMessage =
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
         await db.batchJobDetails.create({
           data: {
             batchId: batchJobId,
@@ -538,7 +538,7 @@ export async function branchItemMapBatchJob(batchJobId: number) {
 }
 
 export async function copyBranchToBranchItemMapBatchJob(
-  input: BranchToBranchPriceCopy
+  input: BranchToBranchPriceCopy,
 ) {
   let skip = 0;
   let isDone = false;
@@ -546,7 +546,7 @@ export async function copyBranchToBranchItemMapBatchJob(
   // const BATCH_SIZE = settingsService;
   const BATCH_SIZE = store?.settings?.batchSize || 100;
   const batchUin = await uinServiceFactory.generateUIN(
-    PmsUinShortCode.BATCH_JOB
+    PmsUinShortCode.BATCH_JOB,
   );
 
   const total = await db.branchItemMap.count({
@@ -608,7 +608,7 @@ export async function copyBranchToBranchItemMapBatchJob(
               tx,
               input.toBranchId,
               item,
-              itemArray
+              itemArray,
             );
 
             /*---------------------------Audit----------------------------------*/
@@ -657,20 +657,20 @@ export async function copyBranchToBranchItemMapBatchJob(
           },
           {
             timeout: API_TIMEOUT,
-          }
+          },
         );
       } catch (error) {
         console.error(
           `❌ Error processing coping item pricing ${item.itemId}:`,
-          error
+          error,
         );
 
         const errorMessage =
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
         await db.batchJobDetails.create({
           data: {
             batchId: batchJob.id,
@@ -707,7 +707,7 @@ export async function copyBranchToBranchItemMapBatchJob(
 
 export async function getMappedItemIdsForBranch(
   branchId: number,
-  itemIds: number[]
+  itemIds: number[],
 ) {
   return await db.branchItemMap.findMany({
     where: { branchId, itemId: { in: itemIds }, isActive: true },

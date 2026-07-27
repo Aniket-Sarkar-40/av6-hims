@@ -16,8 +16,8 @@ export const getCompanySettings = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Company settings"),
         },
-        data
-      )
+        data,
+      ),
     );
-  }
+  },
 );

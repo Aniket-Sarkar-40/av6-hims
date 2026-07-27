@@ -9,7 +9,7 @@ export const fetchStoreRequisitionByItemPaginated = async (
   page: number,
   perPage: number,
   branchId: number,
-  sort: "ASC" | "DESC" = "DESC"
+  sort: "ASC" | "DESC" = "DESC",
 ): Promise<PaginatedResponse<IStoreRequisitionByItemSummary>> => {
   const setting = await settingsService.getSettings();
   const precision = setting?.grnPrecision ?? setting?.defaultPrecision ?? 2;

@@ -44,7 +44,7 @@ doctorRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "CREATE")),
   validateDoctor,
-  createDoctor
+  createDoctor,
 );
 
 /**
@@ -61,7 +61,7 @@ doctorRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "VIEW")),
-  getAllDoctors
+  getAllDoctors,
 );
 
 /**
@@ -85,7 +85,7 @@ doctorRouter.get(
   "/:doctorId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "VIEW")),
-  getDoctorById
+  getDoctorById,
 );
 
 /**
@@ -116,10 +116,10 @@ doctorRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "DOCTOR", "VIEW"),
-    getPermission("PMS", "DOCTOR", "UPDATE")
+    getPermission("PMS", "DOCTOR", "UPDATE"),
   ),
   validateDoctor,
-  updateDoctor
+  updateDoctor,
 );
 
 /**
@@ -143,5 +143,5 @@ doctorRouter.delete(
   "/:doctorId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "DOCTOR", "DELETE")),
-  deleteDoctor
+  deleteDoctor,
 );

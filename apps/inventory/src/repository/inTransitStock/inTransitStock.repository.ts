@@ -13,7 +13,7 @@ type Tx = Prisma.TransactionClient;
 export const addInTransitStock = async (
   tx: Tx,
   data: CreateInTransitStockInput,
-  detail: inTransitStockAudit
+  detail: inTransitStockAudit,
 ): Promise<void> => {
   logger.info(`entering::addInTransitStock::repository`);
   const store = requestStorage.getStore();
@@ -82,7 +82,7 @@ export const addInTransitStock = async (
 export const subInTransitStock = async (
   tx: Tx,
   data: CreateInTransitStockInput,
-  detail: inTransitStockAudit
+  detail: inTransitStockAudit,
 ): Promise<void> => {
   logger.info(`entering::subInTransitStock::repository`);
   const store = requestStorage.getStore();

@@ -50,7 +50,7 @@ gatePassRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "CREATE")),
   validateGatePass,
-  createGatePass
+  createGatePass,
 );
 
 /**
@@ -66,7 +66,7 @@ gatePassRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "VIEW")),
-  getAllGatePass
+  getAllGatePass,
 );
 
 /**
@@ -94,7 +94,7 @@ gatePassRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "VIEW")),
-  getGatePassById
+  getGatePassById,
 );
 
 /**
@@ -117,10 +117,10 @@ gatePassRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "GATE_PASS", "VIEW"),
-    getPermission("PMS", "GATE_PASS", "UPDATE")
+    getPermission("PMS", "GATE_PASS", "UPDATE"),
   ),
   validateGatePassUpdate,
-  updateGatePass
+  updateGatePass,
 );
 
 /**
@@ -141,7 +141,7 @@ gatePassRouter.delete(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS", "DELETE")),
-  deleteGatePass
+  deleteGatePass,
 );
 
 /**
@@ -164,7 +164,7 @@ gatePassRouter.post(
   "/pdf",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS_PDF", "VIEW")),
-  getGatePassPdfById
+  getGatePassPdfById,
 );
 
 gatePassRouter.post(
@@ -172,5 +172,5 @@ gatePassRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "GATE_PASS_EXCEL", "VIEW")),
   validateGatePassFilter,
-  excelGatePassReport
+  excelGatePassReport,
 );

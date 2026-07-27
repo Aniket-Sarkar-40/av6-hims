@@ -28,7 +28,7 @@ const redisPrefix = process.env.REDIS_PREFIX || "";
 const DYNAMIC_SC_CACHE_KEY = `${redisPrefix}accounting:dynamicShortCode:all`;
 
 async function updateDynamicShortCodeConfigsByShortCode(
-  input: Record<string, Prisma.InputJsonObject>
+  input: Record<string, Prisma.InputJsonObject>,
 ) {
   const mapping = Object.entries(input);
 
@@ -37,8 +37,8 @@ async function updateDynamicShortCodeConfigsByShortCode(
       db.accDynamicShortCode.updateMany({
         where: { shortCode },
         data: { config },
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -247,6 +247,66 @@ export async function runSeed() {
       isDTO: true,
       isCacheable: false,
       permission: "acc:bank-statement:view",
+      isDropDown: false,
+      isSingleDto: false,
+      whereClause: JSON.stringify({ isActive: true }),
+    },
+    {
+      shortCode: "VOUCHER_UIN_CONFIG",
+      tableName: "voucherUINConfig",
+      isDTO: true,
+      isCacheable: false,
+      permission: "acc:voucher-uin-config:view",
+      isDropDown: false,
+      isSingleDto: false,
+      whereClause: JSON.stringify({ isActive: true }),
+    },
+    {
+      shortCode: "CHEQUE_MASTER",
+      tableName: "chequeMaster",
+      isDTO: true,
+      isCacheable: true,
+      permission: "acc:cheque-master:view",
+      isDropDown: false,
+      isSingleDto: false,
+      whereClause: JSON.stringify({ isActive: true }),
+    },
+    {
+      shortCode: "MULTI_VOUCHER",
+      tableName: "multiVoucher",
+      isDTO: true,
+      isCacheable: false,
+      permission: "acc:multi-voucher:view",
+      isDropDown: false,
+      isSingleDto: false,
+      whereClause: JSON.stringify({ isActive: true }),
+    },
+    {
+      shortCode: "CLIENT_LEDGER_MAPPING",
+      tableName: "clientLedgerMapping",
+      isDTO: true,
+      isCacheable: false,
+      permission: "acc:client-ledger-mapping:view",
+      isDropDown: false,
+      isSingleDto: false,
+      whereClause: JSON.stringify({ isActive: true }),
+    },
+    {
+      shortCode: "USED_CHEQUE_NUMBER",
+      tableName: "usedChequeNumber",
+      isDTO: true,
+      isCacheable: false,
+      permission: "acc:used-cheque-number:view",
+      isDropDown: false,
+      isSingleDto: false,
+      whereClause: JSON.stringify({ isActive: true }),
+    },
+    {
+      shortCode: "RATE_OF_EXCHANGE",
+      tableName: "rateOfExchange",
+      isDTO: true,
+      isCacheable: true,
+      permission: "acc:rate-of-exchange:view",
       isDropDown: false,
       isSingleDto: false,
       whereClause: JSON.stringify({ isActive: true }),

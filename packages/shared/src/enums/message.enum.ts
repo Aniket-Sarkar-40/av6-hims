@@ -19,6 +19,9 @@ export enum SuccessMessageType {
   UPGRADED = "%1 has been successfully upgraded.",
   STARTED = "%1 has been started successfully.",
   RESEND = "%1 has been successfully resend.",
+  CLOSED = "%1 has been successfully closed.",
+  LOCKED = "%1 has been successfully locked.",
+  UNLOCKED = "%1 has been successfully unlocked.",
 }
 
 export enum ErrorMessageType {
@@ -134,4 +137,5 @@ export enum ValidationErrorMessage {
   ONLY_NULL = "%1 must be null",
   DUPLICATE = "Duplicate %1 exists.",
   PATTERN = "%1 must match the pattern",
+  MUST_GREATER_THAN = "%1 must be greater than %2",
 }

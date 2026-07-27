@@ -18,11 +18,11 @@ export const createCollectionCenter = TryCatch(
       await collectionCenterService.createCollectionCenter(input);
     const response = BaseResponse.success(
       { type: "CREATED", data: collectionCenter },
-      "Collection Center"
+      "Collection Center",
     );
     logger.info("exiting::createCollectionCenter::controller");
     return res.status(201).json(response);
-  }
+  },
 );
 
 export const updateCollectionCenter = TryCatch(
@@ -34,10 +34,10 @@ export const updateCollectionCenter = TryCatch(
     logger.info("exiting::updateCollectionCenter::controller");
     const response = BaseResponse.success(
       { type: "UPDATED", data: updateCollectionCenter },
-      "Collection Center"
+      "Collection Center",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getAllCollectionCenter = TryCatch(
@@ -47,10 +47,10 @@ export const getAllCollectionCenter = TryCatch(
     logger.info("exiting::getAllCollectionCenter::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: collCenters },
-      "Collection Center"
+      "Collection Center",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getAvailableCollectionCenter = TryCatch(
@@ -61,10 +61,10 @@ export const getAvailableCollectionCenter = TryCatch(
     logger.info("exiting::getAvailableCollectionCenter::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: collCenters },
-      "Collection Center"
+      "Collection Center",
     );
     return res.status(200).json(response);
-  }
+  },
 );
 
 export const getCollectionCenterById = TryCatch(
@@ -73,7 +73,7 @@ export const getCollectionCenterById = TryCatch(
     const { collectionCenterId } = req.query as { collectionCenterId: string };
 
     const medCategory = await collectionCenterService.getCollectionCenterById(
-      Number(collectionCenterId)
+      Number(collectionCenterId),
     );
 
     if (!medCategory) {
@@ -89,10 +89,10 @@ export const getCollectionCenterById = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Collection Center"),
         },
-        medCategory
-      )
+        medCategory,
+      ),
     );
-  }
+  },
 );
 
 export const getBranchOrWarehouse = TryCatch(
@@ -109,8 +109,8 @@ export const getBranchOrWarehouse = TryCatch(
     logger.info("exiting::getCollectionCentersForStaff::controller");
     const response = BaseResponse.success(
       { type: "FETCHED", data: collectionCenters },
-      "Collection Center"
+      "Collection Center",
     );
     return res.status(200).json(response);
-  }
+  },
 );

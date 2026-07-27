@@ -42,7 +42,7 @@ departmentRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "CREATE")),
   validateDepartment,
-  createDepartment
+  createDepartment,
 );
 
 /**
@@ -58,7 +58,7 @@ departmentRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "VIEW")),
-  getAllDepartments
+  getAllDepartments,
 );
 
 /**
@@ -81,7 +81,7 @@ departmentRouter.get(
   "/:departmentId",
   verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "VIEW")),
-  getDepartmentById
+  getDepartmentById,
 );
 
 /**
@@ -111,10 +111,10 @@ departmentRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "DEPARTMENT", "VIEW"),
-    getPermission("CORE", "DEPARTMENT", "UPDATE")
+    getPermission("CORE", "DEPARTMENT", "UPDATE"),
   ),
   validateDepartment,
-  updateDepartment
+  updateDepartment,
 );
 
 /**
@@ -137,7 +137,7 @@ departmentRouter.delete(
   "/:departmentId",
   verifyToken(),
   authorize(getPermission("CORE", "DEPARTMENT", "DELETE")),
-  deleteDepartment
+  deleteDepartment,
 );
 
 export default departmentRouter;

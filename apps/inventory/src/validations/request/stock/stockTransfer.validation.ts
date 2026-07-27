@@ -57,7 +57,7 @@ export const createStockTransferSchema = Joi.object({
   stockTransferDetails: arrayRequired(
     "Stock Transfer Details",
     stockTransferDetailsSchema,
-    1
+    1,
   ),
 });
 
@@ -81,7 +81,7 @@ export const acknowledgeStockTransferSchema = Joi.object({
   stockTransferDetails: arrayRequired(
     "Stock Transfer Details",
     stockTransferAcknowledgeDetailSchema,
-    1
+    1,
   ),
 });
 

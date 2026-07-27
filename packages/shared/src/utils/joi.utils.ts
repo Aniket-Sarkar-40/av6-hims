@@ -1,6 +1,6 @@
+import { getPattern } from "av6-utils";
 import Joi, { SchemaLikeWithoutArray } from "joi";
 import { generateValidationErrorMessage } from "./responseMessage.utils.js";
-import { getPattern } from "av6-utils";
 
 export const priceRequired = (label: string, getPrecision?: () => number) =>
   Joi.number()
@@ -69,7 +69,7 @@ const baseBoolean = (
   options?: {
     required?: boolean;
     defaultValue?: boolean;
-  }
+  },
 ) => {
   let schema = Joi.boolean();
 
@@ -101,7 +101,7 @@ export const boolWithDefault = (label: string, defaultValue = false) =>
 
 export const enumRequired = <T extends Record<string, string>>(
   label: string,
-  enumObj: T
+  enumObj: T,
 ) =>
   Joi.string()
     .valid(...(Object.values(enumObj) as string[]))
@@ -112,13 +112,13 @@ export const enumRequired = <T extends Record<string, string>>(
       "any.required": `${label} is required`,
       "string.base": `${label} must be a string`,
       "any.only": `${label} must be one of [${Object.values(enumObj).join(
-        ", "
+        ", ",
       )}]`,
     });
 
 export const enumOptional = <T extends Record<string, string>>(
   label: string,
-  enumObj: T
+  enumObj: T,
 ) =>
   Joi.string()
     .valid(...(Object.values(enumObj) as string[]))
@@ -128,14 +128,14 @@ export const enumOptional = <T extends Record<string, string>>(
     .messages({
       "string.base": `${label} must be a string`,
       "any.only": `${label} must be one of [${Object.values(enumObj).join(
-        ", "
+        ", ",
       )}]`,
     });
 
 export const idRequired = (
   label: string,
   min?: number | Joi.Reference,
-  max?: number | Joi.Reference
+  max?: number | Joi.Reference,
 ) => {
   let schema = Joi.number().integer().required();
 
@@ -152,7 +152,7 @@ export const idRequired = (
     "number.min": generateValidationErrorMessage(
       "MIN_VALUE",
       label,
-      String(min)
+      String(min),
     ),
     "number.max": generateValidationErrorMessage("MAX_VALUE", label),
     "any.required": generateValidationErrorMessage("REQUIRED", label),
@@ -193,7 +193,7 @@ const baseArray = (
   options?: {
     min?: number;
     required?: boolean;
-  }
+  },
 ) => {
   let schema = Joi.alternatives().try(
     Joi.array().items(itemSchema),
@@ -209,7 +209,7 @@ const baseArray = (
       } catch (err) {
         return helpers.error("array.base");
       }
-    })
+    }),
   );
 
   if (options?.min !== undefined) {
@@ -233,7 +233,7 @@ const baseArray = (
       "array.min": generateValidationErrorMessage(
         "MIN",
         label,
-        String(options.min)
+        String(options.min),
       ),
     }),
     ...(options?.required && {
@@ -245,13 +245,13 @@ const baseArray = (
 export const arrayRequired = (
   label: string,
   itemSchema: SchemaLikeWithoutArray,
-  min = 1
+  min = 1,
 ) => baseArray(label, itemSchema, { min, required: true });
 
 export const arrayOptional = (
   label: string,
   itemSchema: SchemaLikeWithoutArray,
-  min?: number
+  min?: number,
 ) => baseArray(label, itemSchema, { min });
 
 export const numberArrayRequired = (label: string, min = 1) => {
@@ -344,12 +344,12 @@ export const numberArrayOptional = (label: string, min?: number) => {
 
 export const numberWithMaxDecimals = (
   fieldName: string,
-  getPrecision?: () => number
+  getPrecision?: () => number,
 ) => {
   const precision = getPrecision?.() ?? 2;
 
   return Joi.number()
-    .positive()
+    .min(0)
     .messages({
       "number.base": `${fieldName} must be a valid number`,
       "number.positive": `${fieldName} must be a positive number`,
@@ -371,7 +371,7 @@ export const numberWithMaxDecimals = (
 
 export const numberWithMaxDecimalsRequired = (
   fieldName: string,
-  getPrecision?: () => number
+  getPrecision?: () => number,
 ) =>
   numberWithMaxDecimals(fieldName, getPrecision)
     .required()
@@ -381,7 +381,7 @@ export const numberWithMaxDecimalsRequired = (
 
 export const numberWithMaxDecimalsOptional = (
   fieldName: string,
-  getPrecision?: () => number
+  getPrecision?: () => number,
 ) => numberWithMaxDecimals(fieldName, getPrecision).optional().allow(null, 0);
 
 export const emailRequired = (label: string) =>
@@ -395,7 +395,7 @@ export const emailRequired = (label: string) =>
       "string.email": generateValidationErrorMessage("EMAIL", label),
       "string.pattern.base": generateValidationErrorMessage(
         "INVALID_FORMAT",
-        label
+        label,
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", label),
       "string.empty": generateValidationErrorMessage("REQUIRED", label),
@@ -413,7 +413,7 @@ export const emailOptional = (label: string) =>
       "string.email": generateValidationErrorMessage("EMAIL", label),
       "string.pattern.base": generateValidationErrorMessage(
         "INVALID_FORMAT",
-        label
+        label,
       ),
     });
 
@@ -485,7 +485,7 @@ export const aadharOptional = (label: string) =>
 export const intRequired = (
   label: string,
   min?: number | Joi.Reference,
-  max?: number | Joi.Reference
+  max?: number | Joi.Reference,
 ) => {
   let schema = Joi.number().integer().required();
 
@@ -498,12 +498,12 @@ export const intRequired = (
     "number.min": generateValidationErrorMessage(
       "MIN_VALUE",
       label,
-      String(min)
+      String(min),
     ),
     "number.max": generateValidationErrorMessage(
       "MAX_VALUE",
       label,
-      String(max)
+      String(max),
     ),
     "any.required": generateValidationErrorMessage("REQUIRED", label),
   });
@@ -512,11 +512,13 @@ export const intRequired = (
 export const intOptional = (
   label: string,
   min?: number | Joi.Reference,
-  max?: number | Joi.Reference
+  max?: number | Joi.Reference,
 ) => {
-  let schema = Joi.number().integer().optional().allow(null);
+  let schema = Joi.number().min(0).optional().allow(null);
 
-  if (min !== undefined) schema = schema.min(min);
+  if (min !== undefined) {
+    schema = schema.min(typeof min === "number" ? Math.max(0, min) : min);
+  }
   if (max !== undefined) schema = schema.max(max);
 
   return schema.messages({
@@ -525,12 +527,12 @@ export const intOptional = (
     "number.min": generateValidationErrorMessage(
       "MIN_VALUE",
       label,
-      String(min)
+      String(min),
     ),
     "number.max": generateValidationErrorMessage(
       "MAX_VALUE",
       label,
-      String(max)
+      String(max),
     ),
   });
 };
@@ -570,7 +572,7 @@ export const decimalRequired = (label: string, precision = 2) =>
       "number.precision": generateValidationErrorMessage(
         "DECIMAL",
         label,
-        String(precision)
+        String(precision),
       ),
       "any.required": generateValidationErrorMessage("REQUIRED", label),
     });
@@ -587,7 +589,7 @@ export const decimalOptional = (label: string, precision = 2) =>
       "number.precision": generateValidationErrorMessage(
         "DECIMAL",
         label,
-        String(precision)
+        String(precision),
       ),
     });
 
@@ -601,7 +603,7 @@ export const modelFieldRequired = (label: string) =>
       "string.base": generateValidationErrorMessage("STRING", label),
       "string.pattern.base": generateValidationErrorMessage(
         "INVALID_FORMAT",
-        label
+        label,
       ),
     });
 

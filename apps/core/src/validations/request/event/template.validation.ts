@@ -21,11 +21,11 @@ export const createTemplateSchema = Joi.object<CreateOrUpdateTemplate>({
       "string.base": generateValidationErrorMessage("STRING", "Template Code"),
       "string.empty": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Code"
+        "Template Code",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Code"
+        "Template Code",
       ),
     }),
 
@@ -38,11 +38,11 @@ export const createTemplateSchema = Joi.object<CreateOrUpdateTemplate>({
       "string.base": generateValidationErrorMessage("STRING", "Template Name"),
       "string.empty": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Name"
+        "Template Name",
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Name"
+        "Template Name",
       ),
     }),
 
@@ -54,11 +54,11 @@ export const createTemplateSchema = Joi.object<CreateOrUpdateTemplate>({
       "any.only": generateValidationErrorMessage(
         "VALID_ENUM",
         "Template Type",
-        Object.values(TemplateType).join(", ")
+        Object.values(TemplateType).join(", "),
       ),
       "any.required": generateValidationErrorMessage(
         "REQUIRED",
-        "Template Type"
+        "Template Type",
       ),
     }),
 
@@ -100,7 +100,7 @@ export const createTemplateSchema = Joi.object<CreateOrUpdateTemplate>({
         "string.base": generateValidationErrorMessage("STRING", "Body Text"),
         "any.forbidden": generateValidationErrorMessage(
           "FORBIDDEN",
-          "Body Text"
+          "Body Text",
         ),
       }),
     otherwise: Joi.string()

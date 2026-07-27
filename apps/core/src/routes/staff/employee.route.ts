@@ -45,7 +45,7 @@ employeeRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "CREATE")),
   validateEmployee,
-  createEmployee
+  createEmployee,
 );
 
 /**
@@ -62,7 +62,7 @@ employeeRouter.get(
   "/",
   verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "VIEW")),
-  getAllEmployees
+  getAllEmployees,
 );
 
 /**
@@ -86,7 +86,7 @@ employeeRouter.get(
   "/:employeeId",
   verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "VIEW")),
-  getEmployeeById
+  getEmployeeById,
 );
 
 /**
@@ -117,10 +117,10 @@ employeeRouter.put(
   verifyToken(),
   authorize(
     getPermission("CORE", "EMPLOYEE", "VIEW"),
-    getPermission("CORE", "EMPLOYEE", "UPDATE")
+    getPermission("CORE", "EMPLOYEE", "UPDATE"),
   ),
   validateEmployee,
-  updateEmployee
+  updateEmployee,
 );
 
 /**
@@ -144,14 +144,14 @@ employeeRouter.delete(
   "/:employeeId",
   verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "DELETE")),
-  deleteEmployee
+  deleteEmployee,
 );
 
 employeeRouter.get(
   "/cache/:employeeId",
   verifyToken(),
   authorize(getPermission("CORE", "EMPLOYEE", "VIEW")),
-  getEmployeeByIdWithCache
+  getEmployeeByIdWithCache,
 );
 
 export default employeeRouter;

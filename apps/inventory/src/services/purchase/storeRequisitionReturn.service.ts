@@ -59,12 +59,12 @@ export const storeRequisitionReturnService = {
     if (records.length === 0) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition Return")
+        generateErrorMessage("NOT_FOUND", "Store Requisition Return"),
       );
     }
 
     const dto = await Promise.all(
-      records.map((srr) => toStoreRequisitionReturnDTO(srr))
+      records.map((srr) => toStoreRequisitionReturnDTO(srr)),
     );
 
     logger.info("exiting::getAllStoreRequisitionReturn::service");
@@ -80,7 +80,7 @@ export const storeRequisitionReturnService = {
     if (!storeReqReturn) {
       throw new ErrorHandler(
         404,
-        generateErrorMessage("NOT_FOUND", "Store Requisition Return")
+        generateErrorMessage("NOT_FOUND", "Store Requisition Return"),
       );
     }
 
@@ -101,10 +101,10 @@ export const storeRequisitionReturnService = {
   },
 
   async rejectStoreRequisitionReturn(
-    input: RejectStoreRequisitionReturnInput
+    input: RejectStoreRequisitionReturnInput,
   ): Promise<void> {
     logger.info(
-      `entering::rejectStoreRequisitionReturn::service id=${input.id}`
+      `entering::rejectStoreRequisitionReturn::service id=${input.id}`,
     );
 
     await rejectStoreRequisitionReturnServiceValidation(input);
@@ -112,15 +112,15 @@ export const storeRequisitionReturnService = {
     await rejectStoreRequisitionReturnInDb(input);
 
     logger.info(
-      `exiting::rejectStoreRequisitionReturn::service id=${input.id}`
+      `exiting::rejectStoreRequisitionReturn::service id=${input.id}`,
     );
   },
 
   async approveStoreRequisitionReturn(
-    input: ApproveStoreReqReturnInput
+    input: ApproveStoreReqReturnInput,
   ): Promise<void> {
     logger.info(
-      `entering::approveStoreRequisitionReturn::service id=${input.id}`
+      `entering::approveStoreRequisitionReturn::service id=${input.id}`,
     );
 
     await approveStoreRequisitionReturnServiceValidation(input);
@@ -128,15 +128,15 @@ export const storeRequisitionReturnService = {
     await approveStoreRequisitionReturnInDb(input);
 
     logger.info(
-      `exiting::approveStoreRequisitionReturn::service id=${input.id}`
+      `exiting::approveStoreRequisitionReturn::service id=${input.id}`,
     );
   },
 
   async acknowledgeStoreRequisitionReturn(
-    input: AcknowledgeRequisitionReturn
+    input: AcknowledgeRequisitionReturn,
   ): Promise<void> {
     logger.info(
-      `entering::acknowledgeStoreRequisitionReturn::service id=${input.id}`
+      `entering::acknowledgeStoreRequisitionReturn::service id=${input.id}`,
     );
 
     await acknowledgeStoreRequisitionReturnServiceValidation(input);
@@ -144,7 +144,7 @@ export const storeRequisitionReturnService = {
     await acknowledgeStoreRequisitionReturnInDb(input);
 
     logger.info(
-      `exiting::acknowledgeStoreRequisitionReturn::service id=${input.id}`
+      `exiting::acknowledgeStoreRequisitionReturn::service id=${input.id}`,
     );
   },
 };

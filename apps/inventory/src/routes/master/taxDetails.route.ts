@@ -43,7 +43,7 @@ taxDetailsRouter.post(
   verifyToken(ServiceCode.INVENTORY),
   authorize(getPermission("INV", "TAX_DETAILS", "CREATE")),
   validateTaxDetailsCreate,
-  createTaxDetails
+  createTaxDetails,
 );
 
 /**
@@ -73,8 +73,8 @@ taxDetailsRouter.put(
   verifyToken(ServiceCode.INVENTORY),
   authorize(
     getPermission("INV", "TAX_DETAILS", "VIEW"),
-    getPermission("INV", "TAX_DETAILS", "UPDATE")
+    getPermission("INV", "TAX_DETAILS", "UPDATE"),
   ),
   validateTaxDetailsUpdate,
-  updateTaxDetails
+  updateTaxDetails,
 );

@@ -49,7 +49,7 @@ const findActiveUnitMasterByName = (trimmed: string) =>
 const resolveItemCategoryId = async (
   name: string,
   rowNo: number,
-  cache: Map<string, number>
+  cache: Map<string, number>,
 ): Promise<number> => {
   const key = normalizeLookupKey(name);
   const cached = cache.get(key);
@@ -67,7 +67,7 @@ const resolveItemCategoryId = async (
       record = await getItemCategoryByItemCategoryNameFromDb(trimmed);
       if (!record) {
         throw new Error(
-          `Row ${rowNo}: Unable to create Item Category "${name}"`
+          `Row ${rowNo}: Unable to create Item Category "${name}"`,
         );
       }
     }
@@ -80,7 +80,7 @@ const resolveItemCategoryId = async (
 const resolveStorageId = async (
   name: string | null | undefined,
   rowNo: number,
-  cache: Map<string, number>
+  cache: Map<string, number>,
 ): Promise<number | null> => {
   if (!name?.trim()) return null;
 
@@ -110,7 +110,7 @@ const resolveStorageId = async (
 
 const resolveDefaultUnitMasterId = async (
   unitName: string,
-  cache: Map<string, number>
+  cache: Map<string, number>,
 ): Promise<number> => {
   const key = normalizeLookupKey(`default:${unitName}`);
   const cached = cache.get(key);
@@ -135,7 +135,7 @@ const resolveDefaultUnitMasterId = async (
         });
         if (!fallback) {
           throw new Error(
-            `Unable to create Default Unit Master for "${unitName}"`
+            `Unable to create Default Unit Master for "${unitName}"`,
           );
         }
         record = fallback;
@@ -151,7 +151,7 @@ const resolveUnitId = async (
   name: string,
   rowNo: number,
   cache: Map<string, number>,
-  defaultUnitCache: Map<string, number>
+  defaultUnitCache: Map<string, number>,
 ): Promise<number> => {
   const key = normalizeLookupKey(name);
   const cached = cache.get(key);
@@ -163,7 +163,7 @@ const resolveUnitId = async (
   if (!record) {
     const defaultUnitMasterId = await resolveDefaultUnitMasterId(
       trimmed,
-      defaultUnitCache
+      defaultUnitCache,
     );
     try {
       record = await unitMasterService.createUnitMaster({
@@ -187,7 +187,7 @@ const resolveUnitId = async (
 };
 
 export const createItemMasterInDb = async (
-  itemMaster: ItemMasterReq
+  itemMaster: ItemMasterReq,
 ): Promise<InvItem> => {
   logger.info("entering::createItemMasterInDb::repository");
   const store = requestStorage.getStore();
@@ -199,7 +199,7 @@ export const createItemMasterInDb = async (
       basePrice: applyRound(
         Number(itemMaster.basePrice),
         RoundFormat.TO_FIXED,
-        precision
+        precision,
       ),
       itemCode:
         itemMaster.itemCode ??
@@ -212,7 +212,7 @@ export const createItemMasterInDb = async (
 };
 
 export const updateItemMasterInDb = async (
-  itemMaster: ItemMasterUpdateReq
+  itemMaster: ItemMasterUpdateReq,
 ): Promise<InvItem> => {
   logger.info("entering::updateItemMasterInDb::repository");
   const store = requestStorage.getStore();
@@ -225,7 +225,7 @@ export const updateItemMasterInDb = async (
       basePrice: applyRound(
         Number(itemMaster.basePrice),
         RoundFormat.TO_FIXED,
-        precision
+        precision,
       ),
       itemCode:
         itemMaster.itemCode ??
@@ -240,7 +240,7 @@ export const updateItemMasterInDb = async (
 };
 
 export const getItemMasterByItemMasterNameFromDb = async (
-  item: string
+  item: string,
 ): Promise<InvItem | null> => {
   logger.info("entering::getItemMasterByItemMasterNameFromDb::repository");
   return db.invItem.findFirst({
@@ -249,7 +249,7 @@ export const getItemMasterByItemMasterNameFromDb = async (
 };
 
 export const getItemMasterByItemMasterCodeFromDb = async (
-  itemCode: string
+  itemCode: string,
 ): Promise<InvItem | null> => {
   logger.info("entering::getItemMasterByItemMasterNameFromDb::repository");
   return db.invItem.findFirst({
@@ -258,7 +258,7 @@ export const getItemMasterByItemMasterCodeFromDb = async (
 };
 
 export const getItemMasterByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<InvItem | null> => {
   logger.info("entering::getItemMasterByIdFromDb::repository");
   return db.invItem.findUnique({
@@ -302,7 +302,7 @@ export const toggleItemActiveInDb = async (id: number): Promise<InvItem> => {
 };
 
 export const getItemStocksByItemId = async (
-  itemReq: GetItemStockRequest
+  itemReq: GetItemStockRequest,
 ): Promise<InvItemStock[]> => {
   logger.info("entering::getItemStocksByItemId::repository");
 
@@ -316,7 +316,7 @@ export const getItemStocksByItemId = async (
       id,
       userId,
       isZeroQty,
-      ccId
+      ccId,
     );
 
     return stocks;
@@ -324,11 +324,11 @@ export const getItemStocksByItemId = async (
 };
 
 export const createItemMasterExcelInDb = async (
-  inp: ItemMasterExcelStagingRow[]
+  inp: ItemMasterExcelStagingRow[],
 ) => {
   logger.info("entering::createItemMasterExcelInDb::repository");
   const batchJobNo = await uinServiceFactory.generateUIN(
-    InvUinShortCode.BATCH_JOB
+    InvUinShortCode.BATCH_JOB,
   );
   const settings = requestStorage.getStore()?.settings;
   const precision = settings?.defaultPrecision || 2;
@@ -362,8 +362,8 @@ export const createItemMasterExcelInDb = async (
                   applyRound(
                     Number(record.basePrice),
                     RoundFormat.TO_FIXED,
-                    precision
-                  )
+                    precision,
+                  ),
                 )
               : null,
           batchJobId: batchJob.id,
@@ -376,7 +376,7 @@ export const createItemMasterExcelInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -421,18 +421,18 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
           itemCategoryId: await resolveItemCategoryId(
             row.itemCategory,
             row.rowNo,
-            itemCategoryCache
+            itemCategoryCache,
           ),
           storageId: await resolveStorageId(
             row.storage,
             row.rowNo,
-            storageCache
+            storageCache,
           ),
           unitId: await resolveUnitId(
             row.unit,
             row.rowNo,
             unitCache,
-            defaultUnitCache
+            defaultUnitCache,
           ),
         };
 
@@ -464,8 +464,8 @@ export async function ItemMasterBatchJob(input: ItemMasterBatchJobInput) {
           error instanceof Error
             ? error.message
             : typeof error === "string"
-            ? error
-            : "Unknown error";
+              ? error
+              : "Unknown error";
 
         await db.batchJobDetails.create({
           data: {

@@ -3,25 +3,34 @@ import { commonGetService } from "@/services/common.service.js";
 import {
   CreateOrUpdateVoucherEntryExcelInput,
   LedgerColumnMeta,
+  OtherLedger,
   VoucherEntryExcelRow,
 } from "@/types/batch/batch.js";
 import { BaseModelAttrWoCancelAndCreated } from "@/types/common.js";
 import {
   BillAllocationDTO,
   CostCenterAllocationDTO,
+  UsedChequeNumberDTO,
+  UsedChequeNumberResponse,
   VoucherDTO,
   VoucherLineDTO,
+  VoucherLinePdfDTO,
+  VoucherPdfDTO,
   VoucherResponseForDTO,
 } from "@/types/voucher/voucher.js";
+import { numberToWords } from "@/utils/helper.utils.js";
 import { extractOtherLedgersWithMeta } from "@/utils/voucherExcelImport.utils.js";
+import { getTopLedger } from "@/utils/voucherPdf.utils.js";
+import { currencyService } from "@apps/core/services/master/currency.service.js";
+import { employeeService } from "@apps/core/services/staff/employee.service.js";
+import { VoucherStatus } from "@repo/db/generated/prisma/enums.js";
+import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
+import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 import { customOmit, toIdValue } from "av6-utils";
 import dayjs from "dayjs";
-import { employeeService } from "@apps/core/services/staff/employee.service.js";
-import { currencyService } from "@apps/core/services/master/currency.service.js";
-import { VoucherStatus } from "@repo/db/generated/prisma/enums.js";
 
 export const toVoucherDTO = async (
-  input: VoucherResponseForDTO[]
+  input: VoucherResponseForDTO[],
 ): Promise<VoucherDTO[]> => {
   const collectionCenters = await getAllCollectionCentersFromDb();
   const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
@@ -44,6 +53,14 @@ export const toVoucherDTO = async (
     canNullReturnable: true,
     modelName: "Ledger",
     shortCode: "LEDGER",
+    useActiveFlag: true,
+  });
+
+  const groups = await commonGetService.getAllElements<"Group">({
+    cacheCode: "GROUP",
+    canNullReturnable: true,
+    modelName: "Group",
+    shortCode: "GROUP",
     useActiveFlag: true,
   });
 
@@ -79,16 +96,16 @@ export const toVoucherDTO = async (
       ]);
 
       const collectionCenter = collectionCenters.find(
-        (cc) => cc.id === voucher.ccId
+        (cc) => cc.id === voucher.ccId,
       );
       const voucherType = voucherTypes.find(
-        (vt) => vt.id === voucher.voucherTypeId
+        (vt) => vt.id === voucher.voucherTypeId,
       );
       const createdBy = voucher.createdBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.createdBy)
+        ? await employeeService.getEmployeeById(voucher.createdBy)
         : null;
       const approvedBy = voucher.approvedBy
-        ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.approvedBy)
+        ? await employeeService.getEmployeeById(voucher.approvedBy)
         : null;
       const voucherLineDto: VoucherLineDTO[] = voucher.voucherLines.map(
         (vl) => {
@@ -103,12 +120,21 @@ export const toVoucherDTO = async (
             "ledgerId",
           ]);
           const ledger = ledgers.find((l) => l.id === vl.ledgerId);
-
+          const group = groups.find((g) => g.id === ledger?.groupId);
           return {
             ...omittedData.rest,
-            ledger: toIdValue(ledger, "name"),
+            ledger: ledger
+              ? {
+                  id: ledger.id,
+                  value: ledger.name,
+                  groupName: group?.name ?? null,
+                  nature: group?.nature ?? null,
+                  isBankAccount: ledger.isBankAccount,
+                  isCashAccount: ledger.isCashAccount,
+                }
+              : null,
           };
-        }
+        },
       );
 
       const billAllocationsDto: BillAllocationDTO[] =
@@ -146,7 +172,7 @@ export const toVoucherDTO = async (
             "costCenterId",
           ]);
           const costCenter = costCenters.find(
-            (cc) => cc.id === ca.costCenterId
+            (cc) => cc.id === ca.costCenterId,
           );
           return {
             ...omittedData.rest,
@@ -162,7 +188,11 @@ export const toVoucherDTO = async (
         ...omittedData.rest,
         createdBy: toIdValue(createdBy, "name"),
         approvedBy: toIdValue(approvedBy, "name"),
-        company: toIdValue(voucher.company, "name"),
+        company: {
+          id: voucher.company.id,
+          name: voucher.company.name,
+          currencyId: voucher.company.currencyId,
+        },
         financialYear: customOmit(voucher.financialYear, [
           "isActive",
           "createdBy",
@@ -173,13 +203,19 @@ export const toVoucherDTO = async (
           "deletedAt",
         ]).rest,
         collectionCenter: toIdValue(collectionCenter, "colName"),
-        voucherType: toIdValue(voucherType, "name"),
+        voucherType: voucherType
+          ? {
+              id: voucherType.id,
+              value: voucherType.name,
+              nature: voucherType.nature,
+            }
+          : null,
         voucherLines: voucherLineDto,
         billAllocations: billAllocationsDto,
         costCenterAllocations: costCenterAllocationsDto,
         currency: toIdValue(currency, "code"),
       };
-    })
+    }),
   );
 
   return response;
@@ -188,9 +224,9 @@ export const toVoucherDTO = async (
 export function mapRowToVoucherExcelCreateInput(
   row: VoucherEntryExcelRow,
   rowNo: number,
-  meta: LedgerColumnMeta[]
+  meta: LedgerColumnMeta[],
 ): CreateOrUpdateVoucherEntryExcelInput {
-  const otherLedgers = extractOtherLedgersWithMeta(row, meta);
+  const otherLedgers: OtherLedger[] = extractOtherLedgersWithMeta(row, meta);
 
   return {
     rowNo,
@@ -206,3 +242,361 @@ export function mapRowToVoucherExcelCreateInput(
     status: row["Status"] as VoucherStatus,
   };
 }
+
+export const toUsedChequeNumberDTO = async (
+  input: UsedChequeNumberResponse[],
+): Promise<UsedChequeNumberDTO[]> => {
+  const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
+    cacheCode: "VOUCHER_TYPE",
+    canNullReturnable: true,
+    modelName: "VoucherType",
+    shortCode: "VOUCHER_TYPE",
+    useActiveFlag: true,
+  });
+  const response: UsedChequeNumberDTO[] = input.map((usedChequeNumber) => {
+    const voucherType = voucherTypes.find(
+      (vt) => vt.id === usedChequeNumber.voucherLine.voucher.voucherTypeId,
+    );
+    return {
+      id: usedChequeNumber.id,
+      chequeNo: usedChequeNumber.chequeNo.toString(),
+      isUsed: usedChequeNumber.isUsed,
+      voucherId: usedChequeNumber.voucherLine.voucher.id,
+      voucherLineId: usedChequeNumber.voucherLine.id,
+      voucherNo: usedChequeNumber.voucherLine.voucher.voucherNo,
+      voucherDate: usedChequeNumber.voucherLine.voucher.voucherDate,
+      voucherType: toIdValue(voucherType, "name"),
+    };
+  });
+  return response;
+};
+
+export const toVoucherPdfDTO = async (
+  voucher: VoucherResponseForDTO,
+): Promise<VoucherPdfDTO> => {
+  const collectionCenters = await getAllCollectionCentersFromDb();
+  const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
+    cacheCode: "VOUCHER_TYPE",
+    canNullReturnable: true,
+    modelName: "VoucherType",
+    shortCode: "VOUCHER_TYPE",
+    useActiveFlag: true,
+  });
+
+  const ledgers = await commonGetService.getAllElements<"Ledger">({
+    cacheCode: "LEDGER",
+    canNullReturnable: true,
+    modelName: "Ledger",
+    shortCode: "LEDGER",
+    useActiveFlag: true,
+  });
+
+  const groups = await commonGetService.getAllElements<"Group">({
+    cacheCode: "GROUP",
+    canNullReturnable: true,
+    modelName: "Group",
+    shortCode: "GROUP",
+    useActiveFlag: true,
+  });
+
+  const omittedData = customOmit<
+    VoucherResponseForDTO,
+    | BaseModelAttrWoCancelAndCreated
+    | "company"
+    | "voucherLines"
+    | "financialYear"
+    | "companyId"
+    | "ccId"
+    | "voucherTypeId"
+    | "financialYearId"
+    | "createdBy"
+    | "currencyId"
+  >(voucher, [
+    "createdBy",
+    "isActive",
+    "updatedBy",
+    "updatedAt",
+    "deletedBy",
+    "deletedAt",
+    "company",
+    "voucherLines",
+    "financialYear",
+    "companyId",
+    "ccId",
+    "voucherTypeId",
+    "financialYearId",
+    "currencyId",
+  ]);
+
+  const collectionCenter = collectionCenters.find(
+    (cc) => cc.id === voucher.ccId,
+  );
+  const voucherType = voucherTypes.find(
+    (vt) => vt.id === voucher.voucherTypeId,
+  );
+  const createdBy = voucher.createdBy
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.createdBy)
+    : null;
+  const approvedBy = voucher.approvedBy
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.approvedBy)
+    : null;
+  const allLines = voucher.voucherLines;
+  const topLedgerData = getTopLedger(
+    voucherType!.nature,
+    allLines,
+    ledgers,
+    groups,
+  );
+  if (!topLedgerData) {
+    throw new ErrorHandler(
+      404,
+      generateErrorMessage("NOT_FOUND", "Top Ledger"),
+    );
+  }
+  const topLine = topLedgerData.line;
+  const topLedger = topLedgerData.ledger;
+  const rowLines = allLines.filter((line) => line.id !== topLine?.id);
+  const topLedgerEntityLabel =
+    voucherType?.nature === "CREDIT_NOTE" ||
+    voucherType?.nature === "DEBIT_NOTE"
+      ? "Party A/c Name"
+      : "Account";
+  const transactionLine =
+    allLines.find(
+      (line) =>
+        line.transactionType || line.instrumentNo || line.instrumentDate,
+    ) ?? null;
+  const transactionType = transactionLine?.transactionType ?? null;
+  const instrumentNo = transactionLine?.instrumentNo ?? null;
+  const instrumentDate = transactionLine?.instrumentDate ?? null;
+  const topDrCr = topLine?.drCr ?? null;
+  const voucherLineDto: VoucherLinePdfDTO[] = rowLines.map((vl, index) => {
+    const omittedLine = customOmit(vl, [
+      "isActive",
+      "createdBy",
+      "createdAt",
+      "updatedBy",
+      "updatedAt",
+      "deletedBy",
+      "deletedAt",
+      "ledgerId",
+      "amount",
+    ]);
+
+    const ledger = ledgers.find((l) => l.id === vl.ledgerId);
+    const group = groups.find((g) => g.id === ledger?.groupId);
+    const amount = topDrCr !== vl.drCr ? vl.amount : vl.amount.mul(-1);
+
+    return {
+      ...omittedLine.rest,
+      ledger: ledger
+        ? {
+            id: ledger.id,
+            value: ledger.name,
+            groupName: group?.name ?? null,
+            nature: group?.nature ?? null,
+            isBankAccount: ledger.isBankAccount,
+            isCashAccount: ledger.isCashAccount,
+          }
+        : null,
+      index: index + 1,
+      amount,
+    };
+  });
+  const currency = voucher.currencyId
+    ? await currencyService.getCurrencyById(voucher.currencyId)
+    : null;
+  const amountInWords = topLine.amount
+    ? numberToWords.convert(topLine.amount.toNumber())
+    : "";
+  return {
+    ...omittedData.rest,
+    createdBy: toIdValue(createdBy, "name"),
+    approvedBy: toIdValue(approvedBy, "name"),
+    company: {
+      id: voucher.company.id,
+      name: voucher.company.name,
+      currencyId: voucher.company.currencyId,
+    },
+    financialYear: customOmit(voucher.financialYear, [
+      "isActive",
+      "createdBy",
+      "createdAt",
+      "updatedBy",
+      "updatedAt",
+      "deletedBy",
+      "deletedAt",
+    ]).rest,
+    collectionCenter: toIdValue(collectionCenter, "colName"),
+    voucherType: voucherType
+      ? {
+          id: voucherType.id,
+          value: voucherType.name,
+          nature: voucherType.nature,
+        }
+      : null,
+    topLedger: {
+      name: topLedger?.name ?? "",
+      label: topLedgerEntityLabel,
+      amount: topLine.amount.toNumber(),
+    },
+    transactionType,
+    instrumentNo,
+    instrumentDate,
+    voucherLines: voucherLineDto,
+    currency: toIdValue(currency, "code"),
+    amountInWords,
+  };
+};
+
+export const toVoucherJournalPdfDTO = async (
+  voucher: VoucherResponseForDTO,
+): Promise<VoucherPdfDTO> => {
+  const collectionCenters = await getAllCollectionCentersFromDb();
+  const voucherTypes = await commonGetService.getAllElements<"VoucherType">({
+    cacheCode: "VOUCHER_TYPE",
+    canNullReturnable: true,
+    modelName: "VoucherType",
+    shortCode: "VOUCHER_TYPE",
+    useActiveFlag: true,
+  });
+
+  const ledgers = await commonGetService.getAllElements<"Ledger">({
+    cacheCode: "LEDGER",
+    canNullReturnable: true,
+    modelName: "Ledger",
+    shortCode: "LEDGER",
+    useActiveFlag: true,
+  });
+  const groups = await commonGetService.getAllElements<"Group">({
+    cacheCode: "GROUP",
+    canNullReturnable: true,
+    modelName: "Group",
+    shortCode: "GROUP",
+    useActiveFlag: true,
+  });
+
+  const omittedData = customOmit<
+    VoucherResponseForDTO,
+    | BaseModelAttrWoCancelAndCreated
+    | "company"
+    | "voucherLines"
+    | "financialYear"
+    | "companyId"
+    | "ccId"
+    | "voucherTypeId"
+    | "financialYearId"
+    | "createdBy"
+    | "currencyId"
+  >(voucher, [
+    "createdBy",
+    "isActive",
+    "updatedBy",
+    "updatedAt",
+    "deletedBy",
+    "deletedAt",
+    "company",
+    "voucherLines",
+    "financialYear",
+    "companyId",
+    "ccId",
+    "voucherTypeId",
+    "financialYearId",
+    "currencyId",
+  ]);
+
+  const collectionCenter = collectionCenters.find(
+    (cc) => cc.id === voucher.ccId,
+  );
+  const voucherType = voucherTypes.find(
+    (vt) => vt.id === voucher.voucherTypeId,
+  );
+  const createdBy = voucher.createdBy
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.createdBy)
+    : null;
+  const approvedBy = voucher.approvedBy
+    ? await employeeService.getEmployeeByIdFrmCacheOrDb(voucher.approvedBy)
+    : null;
+  const byLines = voucher.voucherLines.filter((line) => line.drCr === "DR");
+  const toLines = voucher.voucherLines.filter((line) => line.drCr === "CR");
+  const sortedLines = [...byLines, ...toLines];
+  const voucherLineDto: VoucherLinePdfDTO[] = sortedLines.map((vl, index) => {
+    const omittedLine = customOmit(vl, [
+      "isActive",
+      "createdBy",
+      "createdAt",
+      "updatedBy",
+      "updatedAt",
+      "deletedBy",
+      "deletedAt",
+      "ledgerId",
+    ]);
+
+    const ledger = ledgers.find((l) => l.id === vl.ledgerId);
+    const group = groups.find((g) => g.id === ledger?.groupId);
+    return {
+      ...omittedLine.rest,
+      ledger: ledger
+        ? {
+            id: ledger.id,
+            value: ledger.name,
+            groupName: group?.name ?? null,
+            nature: group?.nature ?? null,
+            isBankAccount: ledger.isBankAccount,
+            isCashAccount: ledger.isCashAccount,
+          }
+        : null,
+      index: index + 1,
+      byTo: vl.drCr === "DR" ? "BY" : "TO",
+    };
+  });
+
+  const currency = voucher.currencyId
+    ? await currencyService.getCurrencyById(voucher.currencyId)
+    : null;
+
+  const netAmount =
+    voucher.totalDebit &&
+    voucher.currencyConversionRate &&
+    !voucher.currencyConversionRate.isZero()
+      ? voucher.totalDebit.div(voucher.currencyConversionRate)
+      : voucher.totalDebit;
+
+  const amountInWords = netAmount
+    ? numberToWords.convert(netAmount.toNumber())
+    : "";
+  return {
+    ...omittedData.rest,
+    createdBy: toIdValue(createdBy, "name"),
+    approvedBy: toIdValue(approvedBy, "name"),
+    company: {
+      id: voucher.company.id,
+      name: voucher.company.name,
+      currencyId: voucher.company.currencyId,
+    },
+    financialYear: customOmit(voucher.financialYear, [
+      "isActive",
+      "createdBy",
+      "createdAt",
+      "updatedBy",
+      "updatedAt",
+      "deletedBy",
+      "deletedAt",
+    ]).rest,
+    collectionCenter: toIdValue(collectionCenter, "colName"),
+    voucherType: voucherType
+      ? {
+          id: voucherType.id,
+          value: voucherType.name,
+          nature: voucherType.nature,
+        }
+      : null,
+    transactionType: null,
+    instrumentNo: null,
+    instrumentDate: null,
+    voucherLines: voucherLineDto,
+    currency: toIdValue(currency, "code"),
+    amountInWords,
+    topLedger: null,
+  };
+};

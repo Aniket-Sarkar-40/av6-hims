@@ -42,7 +42,7 @@ templateRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "TEMPLATE", "CREATE")),
   validateTemplateCreate,
-  createTemplate
+  createTemplate,
 );
 
 /**
@@ -72,7 +72,7 @@ templateRouter.put(
   verifyToken(),
   authorize(getPermission("CORE", "TEMPLATE", "UPDATE")),
   validateTemplateUpdate,
-  updateTemplate
+  updateTemplate,
 );
 
 export default templateRouter;

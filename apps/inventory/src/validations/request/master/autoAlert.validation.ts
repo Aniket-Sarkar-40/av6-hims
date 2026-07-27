@@ -14,7 +14,7 @@ export const createAutoAlertEmailSchema = Joi.object({
       "string.empty": `Short Code cannot be empty`,
       "any.required": `Short Code is required`,
       "any.only": `Short Code must be one of ${Object.values(
-        INV_ALERT_TYPE
+        INV_ALERT_TYPE,
       ).join(", ")}`,
     }),
 
@@ -57,7 +57,7 @@ export const updateAutoAlertEmailSchema = createAutoAlertEmailSchema.keys({
 export function validateCreateAutoAlertEmail(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = createAutoAlertEmailSchema.validate(req.body, {
     abortEarly: false,
@@ -74,7 +74,7 @@ export function validateCreateAutoAlertEmail(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -84,7 +84,7 @@ export function validateCreateAutoAlertEmail(
 export function validateUpdateAutoAlertEmail(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { error } = updateAutoAlertEmailSchema.validate(req.body, {
     abortEarly: false,
@@ -101,7 +101,7 @@ export function validateUpdateAutoAlertEmail(
         errorCode: "PARAMETER_INVALID",
         errorMessage: messages,
         errors: error.details,
-      })
+      }),
     );
   }
 

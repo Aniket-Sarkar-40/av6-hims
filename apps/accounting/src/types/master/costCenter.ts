@@ -13,11 +13,10 @@ export type CostCenterResponse = Prisma.CostCenterGetPayload<{
   };
 }>;
 
-export interface CostCenterDTO
-  extends Omit<
-    CostCenterResponse,
-    BaseModelAttrWoCancel | "companyId" | "parentId" | "company"
-  > {
+export interface CostCenterDTO extends Omit<
+  CostCenterResponse,
+  BaseModelAttrWoCancel | "companyId" | "parentId" | "company"
+> {
   company: IdValue | null;
   parent: IdValue | null;
 }

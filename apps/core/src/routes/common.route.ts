@@ -59,7 +59,7 @@ commonRouter.post(
   verifyToken(),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch
+  commonSearch,
 );
 
 /**
@@ -81,7 +81,7 @@ commonRouter.post(
   verifyToken(),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch
+  commonDropdownSearch,
 );
 
 /**
@@ -103,7 +103,7 @@ commonRouter.post(
   verifyToken(),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch
+  fixedSearch,
 );
 
 /**
@@ -125,7 +125,7 @@ commonRouter.post(
   verifyToken(),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController
+  fixedSearchWoPaginationController,
 );
 
 /**
@@ -147,7 +147,7 @@ commonRouter.post(
   verifyToken(),
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport
+  commonFSExcelExport,
 );
 
 /**
@@ -169,7 +169,7 @@ commonRouter.post(
   verifyToken(),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch
+  commonFetch,
 );
 
 /**
@@ -191,7 +191,7 @@ commonRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport
+  commonExcelImport,
 );
 
 /**
@@ -223,7 +223,7 @@ commonRouter.delete(
   verifyToken(),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete
+  commonDelete,
 );
 
 /**
@@ -245,7 +245,7 @@ commonRouter.patch(
   verifyToken(),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus
+  commonUpdateStatus,
 );
 
 /**

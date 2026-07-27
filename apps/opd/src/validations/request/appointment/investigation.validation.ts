@@ -73,7 +73,7 @@ export const UpdatePatientTestSchema = Joi.object({
   data: arrayRequired(
     "Updated Patient Tests Data",
     UpdatePatientTestItemSchema,
-    1
+    1,
   ),
 });
 

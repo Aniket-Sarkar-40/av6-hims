@@ -14,12 +14,12 @@ export const validateIdUnitMaster = async (unitMasterId: number) => {
 
   const unitMaster = await unitMasterService.getUnitMasterById(
     unitMasterId,
-    true
+    true,
   );
   if (!unitMaster) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Unit Master")
+      generateErrorMessage("NOT_FOUND", "Unit Master"),
     );
   }
   logger.info("exiting::validateIdUnitMaster::service::validation");
@@ -28,18 +28,18 @@ export const validateIdUnitMaster = async (unitMasterId: number) => {
 };
 
 export const updateIdUnitMasterServiceValidation = async (
-  input: UnitMasterUpdate
+  input: UnitMasterUpdate,
 ): Promise<void> => {
   logger.info("entering::updateIdUnitMaster::service::validation");
   await validateIdUnitMaster(input.id);
 
   const unitMasterByName = await getUnitMasterByUnitMasterPackNameFromDb(
-    input.packagingTypeName
+    input.packagingTypeName,
   );
   if (unitMasterByName && unitMasterByName.id !== input.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Unit Master Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Unit Master Name"),
     );
   }
 
@@ -50,16 +50,16 @@ export const updateIdUnitMasterServiceValidation = async (
 };
 
 export const createUnitMasterServiceValidation = async (
-  body: UnitMasterReq
+  body: UnitMasterReq,
 ): Promise<void> => {
   logger.info("entering::createUnitMaster::service::validation");
   const unitMasterName = await getUnitMasterByUnitMasterPackNameFromDb(
-    body.packagingTypeName
+    body.packagingTypeName,
   );
   if (unitMasterName) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Unit Master Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Unit Master Name"),
     );
   }
 

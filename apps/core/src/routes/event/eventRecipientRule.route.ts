@@ -44,7 +44,7 @@ eventRecipientRuleRouter.post(
   verifyToken(),
   authorize(getPermission("CORE", "EVENT_RECIPIENT_RULE", "CREATE")),
   validateRecipientRuleCreate,
-  createEventRecipientRule
+  createEventRecipientRule,
 );
 
 /**
@@ -67,7 +67,7 @@ eventRecipientRuleRouter.put(
   verifyToken(),
   authorize(getPermission("CORE", "EVENT_RECIPIENT_RULE", "UPDATE")),
   validateRecipientRuleUpdate,
-  updateEventRecipientRule
+  updateEventRecipientRule,
 );
 
 /**
@@ -90,10 +90,10 @@ eventRecipientRuleRouter.post(
   verifyToken(),
   authorize(
     getPermission("CORE", "EVENT_RECIPIENT_RULE", "CREATE"),
-    getPermission("CORE", "EVENT_RECIPIENT_RULE", "UPDATE")
+    getPermission("CORE", "EVENT_RECIPIENT_RULE", "UPDATE"),
   ),
   validateRecipientRuleMultiCreateUpdate,
-  multiCreateUpdateEventRecipientRule
+  multiCreateUpdateEventRecipientRule,
 );
 
 export default eventRecipientRuleRouter;

@@ -18,7 +18,7 @@ export const moduleConfigService = {
     const moduleConfig = await createOrUpdateModuleConfigInDb(data);
 
     const activeModules: ServiceCode[] = moduleConfig.map(
-      (item) => item.module
+      (item) => item.module,
     );
 
     const prevToken = requestStorage.getStore()?.token;

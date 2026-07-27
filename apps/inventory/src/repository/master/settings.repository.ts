@@ -4,7 +4,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { InvSettings } from "@repo/db/generated/prisma/client";
 
 export const createSettingsInDb = async (
-  data: CreateOrUpdateSettings
+  data: CreateOrUpdateSettings,
 ): Promise<InvSettings> => {
   logger.info("entering::createSettings::repository");
   return db.$transaction(async (tx) => {

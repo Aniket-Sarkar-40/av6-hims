@@ -50,7 +50,7 @@ uinConfigRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "UIN_CONFIG", "CREATE")),
   validateCreateConfig,
-  createUINConfig
+  createUINConfig,
 );
 
 /**
@@ -73,10 +73,10 @@ uinConfigRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(
     getPermission("OPD", "UIN_CONFIG", "VIEW"),
-    getPermission("OPD", "UIN_CONFIG", "UPDATE")
+    getPermission("OPD", "UIN_CONFIG", "UPDATE"),
   ),
   validateUpdateConfig,
-  updateUINConfig
+  updateUINConfig,
 );
 
 /**
@@ -100,7 +100,7 @@ uinConfigRouter.get(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "UIN_CONFIG", "VIEW")),
   validateGetUINConfig,
-  getUIN
+  getUIN,
 );
 
 /**
@@ -124,7 +124,7 @@ uinConfigRouter.get(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "UIN_CONFIG", "VIEW")),
   validateGetUINConfig,
-  previewUIN
+  previewUIN,
 );
 
 /**
@@ -147,7 +147,7 @@ uinConfigRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "UIN_CONFIG", "CREATE")),
   validatePreviewCustomConfig,
-  previewCustomUIN
+  previewCustomUIN,
 );
 
 /**
@@ -162,7 +162,7 @@ uinConfigRouter.delete(
   "/:id",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "UIN_CONFIG", "DELETE")),
-  deleteUINConfig
+  deleteUINConfig,
 );
 
 /**
@@ -177,5 +177,5 @@ uinConfigRouter.get(
   "/uin-short-code",
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "UIN_CONFIG", "VIEW")),
-  getAllUinShortCodes
+  getAllUinShortCodes,
 );

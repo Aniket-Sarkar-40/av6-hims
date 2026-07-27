@@ -43,7 +43,7 @@ consultationICDTenListRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_ICD_TEN_LIST", "CREATE")),
   validateConsultationICDTenListCreate,
-  createConsultationICDTenList
+  createConsultationICDTenList,
 );
 
 /**
@@ -66,5 +66,5 @@ consultationICDTenListRouter.put(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION_ICD_TEN_LIST", "UPDATE")),
   validateConsultationICDTenListUpdate,
-  updateConsultationICDTenList
+  updateConsultationICDTenList,
 );

@@ -24,5 +24,5 @@ const companyServiceRaw = {
 
 export const companyService = auditProxy.createAuditedService(
   "company",
-  companyServiceRaw
+  companyServiceRaw,
 );

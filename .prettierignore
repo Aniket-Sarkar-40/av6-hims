@@ -1,0 +1,9 @@
+**/dist/**
+**/generated/**
+**/node_modules/**
+**/.turbo/**
+**/coverage/**
+**/logs/**
+pnpm-lock.yaml
+*.log
+query.sql

@@ -10,19 +10,18 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 
 export const validateIdCollectionCenter = async (
-  collectionCenterId: number
+  collectionCenterId: number,
 ) => {
   logger.info("entering::validateIdCollectionCenter::service::validation");
 
   validIdCheck(collectionCenterId);
 
-  const collectionCenter = await getCollectionCenterByIdFromDb(
-    collectionCenterId
-  );
+  const collectionCenter =
+    await getCollectionCenterByIdFromDb(collectionCenterId);
   if (!collectionCenter || collectionCenter.isActive === "false") {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Collection Center")
+      generateErrorMessage("NOT_FOUND", "Collection Center"),
     );
   }
   logger.info("exiting::validateIdCollectionCenter::service::validation");
@@ -31,30 +30,30 @@ export const validateIdCollectionCenter = async (
 };
 
 export const deleteCollectionCenterServiceValidation = async (
-  collectionCenterId: number
+  collectionCenterId: number,
 ): Promise<void> => {
   logger.info(
-    "entering::deleteCollectionCenterServiceValidation::service::validation"
+    "entering::deleteCollectionCenterServiceValidation::service::validation",
   );
 
   await validateIdCollectionCenter(collectionCenterId);
   logger.info(
-    "exiting::deleteCollectionCenterServiceValidation::service::validation"
+    "exiting::deleteCollectionCenterServiceValidation::service::validation",
   );
 
   return;
 };
 
 export const getIdCollectionCenterServiceValidation = async (
-  collectionCenterId: number
+  collectionCenterId: number,
 ): Promise<void> => {
   logger.info(
-    "entering::getIdCollectionCenterServiceValidation::service::validation"
+    "entering::getIdCollectionCenterServiceValidation::service::validation",
   );
 
   await validateIdCollectionCenter(collectionCenterId);
   logger.info(
-    "exiting::getIdCollectionCenterServiceValidation::service::validation"
+    "exiting::getIdCollectionCenterServiceValidation::service::validation",
   );
 
   return;
@@ -62,10 +61,10 @@ export const getIdCollectionCenterServiceValidation = async (
 
 export const updateIdCollectionCenterServiceValidation = async (
   collectionCenterId: number,
-  body: CollectionCenterReq
+  body: CollectionCenterReq,
 ): Promise<void> => {
   logger.info(
-    "entering::updateIdCollectionCenterServiceValidation::service::validation"
+    "entering::updateIdCollectionCenterServiceValidation::service::validation",
   );
   await validateIdCollectionCenter(collectionCenterId);
 
@@ -77,7 +76,7 @@ export const updateIdCollectionCenterServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Collection Center Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Collection Center Name"),
     );
   }
 
@@ -89,20 +88,20 @@ export const updateIdCollectionCenterServiceValidation = async (
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Connection Code")
+      generateErrorMessage("DUPLICATE_ITEM", "Connection Code"),
     );
   }
   logger.info(
-    "exiting::updateIdCollectionCenterServiceValidation::service::validation"
+    "exiting::updateIdCollectionCenterServiceValidation::service::validation",
   );
   return;
 };
 
 export const createCollectionCenterServiceValidation = async (
-  body: CollectionCenterReq
+  body: CollectionCenterReq,
 ): Promise<void> => {
   logger.info(
-    "entering::createCollectionCenterServiceValidation::service::validation"
+    "entering::createCollectionCenterServiceValidation::service::validation",
   );
   // await validateCollectionCenterForeignKeys(body);
   const collectionCenter =
@@ -110,7 +109,7 @@ export const createCollectionCenterServiceValidation = async (
   if (collectionCenter) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Collection Center Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Collection Center Name"),
     );
   }
   const collectionCenterByConnCode =
@@ -118,11 +117,11 @@ export const createCollectionCenterServiceValidation = async (
   if (collectionCenterByConnCode) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Connection Code")
+      generateErrorMessage("DUPLICATE_ITEM", "Connection Code"),
     );
   }
   logger.info(
-    "exiting::createCollectionCenterServiceValidation::service::validation"
+    "exiting::createCollectionCenterServiceValidation::service::validation",
   );
 
   return;

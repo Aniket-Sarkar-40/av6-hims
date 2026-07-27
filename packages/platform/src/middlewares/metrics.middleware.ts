@@ -20,7 +20,7 @@ function getRouteLabel(req: Request): string {
 export function metricsMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const start = process.hrtime.bigint();
 

@@ -62,10 +62,10 @@ export const commonRouter: Router = Router();
  */
 commonRouter.post(
   "/fixedSearch",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch
+  fixedSearch,
 );
 
 /**
@@ -83,10 +83,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/search",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch
+  commonSearch,
 );
 
 /**
@@ -104,10 +104,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/dropdownSearch",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch
+  commonDropdownSearch,
 );
 
 /**
@@ -125,10 +125,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/fixedSearchWOP",
-  // verifyToken,
-  // authorizeCommonSearch(),
+  verifyToken("ACCOUNTING"),
+  authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController
+  fixedSearchWoPaginationController,
 );
 
 /**
@@ -146,10 +146,10 @@ commonRouter.post(
  */
 commonRouter.post(
   "/fetch",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch
+  commonFetch,
 );
 
 /**
@@ -167,12 +167,12 @@ commonRouter.post(
  */
 commonRouter.post(
   "/importExcel",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport
+  commonExcelImport,
 );
 
 /**
@@ -199,10 +199,10 @@ commonRouter.post("/exportExcel", validateCommonExportExcel, commonExcelExport);
  */
 commonRouter.delete(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete
+  commonDelete,
 );
 
 /**
@@ -220,24 +220,24 @@ commonRouter.delete(
  */
 commonRouter.patch(
   "/updateStatus",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus
+  commonUpdateStatus,
 );
 
 commonRouter.post(
   "/create",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
-  commonCreate
+  commonCreate,
 );
 
 commonRouter.post(
   "/multi-create-update",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
-  commonMultiCreateUpdate
+  commonMultiCreateUpdate,
 );
 
 commonRouter.put("/update", verifyToken, authorizeCommonSearch(), commonUpdate);
@@ -258,23 +258,23 @@ commonRouter.put("/update", verifyToken, authorizeCommonSearch(), commonUpdate);
 // POST /fixedSearch
 commonRouter.post(
   "/excel-export-fs",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport
+  commonFSExcelExport,
 );
 
 commonRouter.patch(
   "/update-shortcode-config",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "DYNAMIC_SHORT_CODE", "UPDATE")),
   validateUpdateConfigByCode,
-  updateConfigByCode
+  updateConfigByCode,
 );
 
 commonRouter.get(
   "/shortcode-config",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "DYNAMIC_SHORT_CODE", "VIEW")),
-  getConfigByShortCode
+  getConfigByShortCode,
 );

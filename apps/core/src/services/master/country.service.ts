@@ -59,13 +59,13 @@ const countryServiceRaw = {
 
       if (cachedCountries && cachedCountries.length > 0) {
         const cachedCountryDTOs: CountryDTO[] = await Promise.all(
-          cachedCountries.map(toCountryDto)
+          cachedCountries.map(toCountryDto),
         );
         return cachedCountryDTOs;
       } else {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Countries")
+          generateErrorMessage("NOT_FOUND", "Countries"),
         );
       }
     } else {
@@ -73,11 +73,11 @@ const countryServiceRaw = {
       if (countries.length === 0) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Countries")
+          generateErrorMessage("NOT_FOUND", "Countries"),
         );
       }
       const countryDTOs: CountryDTO[] = await Promise.all(
-        countries.map(toCountryDto)
+        countries.map(toCountryDto),
       );
       logger.info("exiting::getAllCountries::service");
       return countryDTOs;
@@ -86,7 +86,7 @@ const countryServiceRaw = {
 
   async getCountryById(
     countryId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<CountryDTO | null> {
     logger.info("entering::getCountryById::service");
     validIdCheck(countryId);
@@ -101,7 +101,7 @@ const countryServiceRaw = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Country")
+          generateErrorMessage("NOT_FOUND", "Country"),
         );
       else return null;
     }
@@ -142,5 +142,5 @@ const countryServiceRaw = {
 
 export const countryService = auditProxy.createAuditedService(
   "country",
-  countryServiceRaw
+  countryServiceRaw,
 );

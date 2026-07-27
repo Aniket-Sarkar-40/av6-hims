@@ -50,7 +50,7 @@ medInstructionRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_INSTRUCTIONS", "CREATE")),
   validateInstructionName,
-  instructionCreate
+  instructionCreate,
 );
 
 /**
@@ -69,7 +69,7 @@ medInstructionRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_INSTRUCTIONS", "VIEW")),
-  medInstructionGet
+  medInstructionGet,
 );
 
 /**
@@ -90,7 +90,7 @@ medInstructionRouter.get(
   "/id",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MEDICINE_INSTRUCTIONS", "VIEW")),
-  getMedInstructionById
+  getMedInstructionById,
 );
 
 /**
@@ -120,10 +120,10 @@ medInstructionRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "MEDICINE_INSTRUCTIONS", "VIEW"),
-    getPermission("PMS", "MEDICINE_INSTRUCTIONS", "UPDATE")
+    getPermission("PMS", "MEDICINE_INSTRUCTIONS", "UPDATE"),
   ),
   validateInstructionNameUpdate,
-  updateMedInstruction
+  updateMedInstruction,
 );
 
 export default medInstructionRouter;

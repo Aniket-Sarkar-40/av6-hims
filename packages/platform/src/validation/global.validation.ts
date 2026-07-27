@@ -13,7 +13,7 @@ export const validIdCheck = (id: number): void => {
   ) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ID", id.toString())
+      generateErrorMessage("INVALID_ID", id.toString()),
     );
   }
   logger.info(`exiting::validIdCheck id::${id}`);

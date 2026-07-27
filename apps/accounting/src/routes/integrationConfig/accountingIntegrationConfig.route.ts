@@ -18,23 +18,23 @@ export const accountingIntegrationConfigRoutes: Router = Router();
 
 accountingIntegrationConfigRoutes.post(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "INTEGRATION_CONFIG", "CREATE")),
   validateCreateAccountingIntegrationConfig,
-  createAccountingIntegrationConfig
+  createAccountingIntegrationConfig,
 );
 
 accountingIntegrationConfigRoutes.put(
   "/",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "INTEGRATION_CONFIG", "UPDATE")),
   validateUpdateAccountingIntegrationConfig,
-  updateAccountingIntegrationConfig
+  updateAccountingIntegrationConfig,
 );
 
 accountingIntegrationConfigRoutes.get(
   "/keys",
-  verifyToken,
+  verifyToken("ACCOUNTING"),
   authorize(getPermission("ACC", "INTEGRATION_CONFIG", "VIEW")),
-  getIntegrationConfigKeys
+  getIntegrationConfigKeys,
 );

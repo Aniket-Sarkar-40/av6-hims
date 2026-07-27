@@ -17,11 +17,11 @@ const patientUrlPhp = "patient_images/patient_captured_images";
 
 export const toPatientEntity = (
   patient: PatientCreateFormData,
-  patientImage?: PatientImage
+  patientImage?: PatientImage,
 ): PatientReq => ({
   admissionDate: patient.admissionDate
     ? new Date(patient.admissionDate).toISOString()
-    : patient.admissionDate ?? null,
+    : (patient.admissionDate ?? null),
   patientName: patient.patientName || null,
   age: patient.age,
   month: patient.month,
@@ -90,7 +90,7 @@ export const toPatientEntity = (
 
 export const toPatientUpdateEntity = (
   patient: PatientUpdateFormData,
-  patientImage?: PatientImage
+  patientImage?: PatientImage,
 ): PatientReq => ({
   id: Number(patient.id),
   ...toPatientEntity(patient, patientImage),

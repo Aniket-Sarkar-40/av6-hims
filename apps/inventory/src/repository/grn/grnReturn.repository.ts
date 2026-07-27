@@ -52,7 +52,7 @@ export const createGrnReturnInDb = async (input: CreateGrnReturnInput) => {
                   : null,
                 createdBy: currentUser,
               };
-            }
+            },
           ),
         },
       },
@@ -98,13 +98,13 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number"
+    (d) => typeof d.id === "number",
   );
   const toCreate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id !== "number"
+    (d) => typeof d.id !== "number",
   );
   const toDelete = grnReturn.goodReceiveReturnDetails.filter(
-    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id)
+    (d) => !goodReceiveReturnDetails.some((item) => item.id === d.id),
   );
 
   return await db.$transaction(async (tx) => {
@@ -201,7 +201,7 @@ export const updateGrnReturnInDb = async (input: CreateGrnReturnInput) => {
 
 export const getCountGrnReturnDetailsFromDb = async (
   detailIds: number[],
-  grnReturnId: number
+  grnReturnId: number,
 ): Promise<number> => {
   logger.info("entering::getCountGrnReturnDetailsFromDb::repository");
 
@@ -234,7 +234,7 @@ export const getAllGrnReturnFromDb = async (): Promise<GrnReturnResponse[]> => {
 };
 
 export const getGrnReturnByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<GoodReceivedReturnResponse | null> => {
   logger.info(`entering::getGrnReturnByIdFromDb::repository id=${id}`);
 
@@ -279,7 +279,7 @@ export const deleteGrnReturnFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`
+    `exiting::deleteGrnReturnFromDb::repository id=${id} (deletedBy=${currentUser})`,
   );
 };
 
@@ -292,7 +292,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
   const currentUser = store?.user?.id;
 
   const toUpdate = goodReceiveReturnDetails.filter(
-    (d) => typeof d.id === "number"
+    (d) => typeof d.id === "number",
   );
   // const toCreate = goodReceiveReturnDetails.filter(
   //   (d) => typeof d.id !== "number"
@@ -336,7 +336,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           itemId: detail.itemId,
           quantity: Number(
             detail.stockQuantity ??
-              Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0)
+              Number(detail.quantity ?? 0) + Number(detail.focQuantity ?? 0),
           ),
           batchNo: detail.batchNo ?? null,
           ccId: grnReturnData.ccId,
@@ -351,7 +351,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
           refId: id,
           refNo: grnReturnData.grnNumber,
         },
-        { consumeFromAll: true }
+        { consumeFromAll: true },
       );
     }
 
@@ -370,7 +370,7 @@ export const approvedGrnReturnInDb = async (input: CreateGrnReturnInput) => {
             },
           },
         });
-      })
+      }),
     );
 
     await tx.invGoodReceive.update({
@@ -457,14 +457,14 @@ export const getOpenGrnReturnDetailsByGrnDetailIdsFromDb = async ({
   excludeGrnReturnId?: number;
 }) => {
   logger.info(
-    "entering::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+    "entering::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository",
   );
 
   const uniqueGrnDetailIds = [...new Set(grnDetailIds.filter(Boolean))];
 
   if (!uniqueGrnDetailIds.length) {
     logger.info(
-      "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+      "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository",
     );
     return [];
   }
@@ -489,7 +489,7 @@ export const getOpenGrnReturnDetailsByGrnDetailIdsFromDb = async ({
   });
 
   logger.info(
-    "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository"
+    "exiting::getOpenGrnReturnDetailsByGrnDetailIdsFromDb::repository",
   );
 
   return openDetails;

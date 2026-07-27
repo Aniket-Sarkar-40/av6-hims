@@ -27,7 +27,7 @@ export const CreateClinicalHistorySchema = Joi.object<
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Allergies Note",
-        "5"
+        "5",
       ),
     }),
 
@@ -46,7 +46,7 @@ export const CreateClinicalHistorySchema = Joi.object<
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Other Note",
-        "5"
+        "5",
       ),
     }),
 
@@ -59,7 +59,7 @@ export const CreateClinicalHistorySchema = Joi.object<
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Surgery Note",
-        "5"
+        "5",
       ),
     }),
 
@@ -70,7 +70,7 @@ export const CreateClinicalHistorySchema = Joi.object<
       "string.min": generateValidationErrorMessage(
         "STRING_MIN",
         "Medication Note",
-        "5"
+        "5",
       ),
     }),
 

@@ -16,7 +16,7 @@ export const createBranch = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Branch"),
     },
-    branch
+    branch,
   );
   logger.info("exiting::createBranch::controller");
   return res.status(201).json(response);
@@ -33,8 +33,8 @@ export const updateBranch = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Branch"),
       },
-      updateBranch
-    )
+      updateBranch,
+    ),
   );
 });
 
@@ -48,8 +48,8 @@ export const getAllBranch = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Branch"),
       },
-      branches
-    )
+      branches,
+    ),
   );
 });
 
@@ -63,7 +63,7 @@ export const getBranchById = TryCatch(async (req: Request, res: Response) => {
     return res.status(400).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
   logger.info("exiting::getBranchById::controller");
@@ -73,8 +73,8 @@ export const getBranchById = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Branch"),
       },
-      branch
-    )
+      branch,
+    ),
   );
 });
 
@@ -92,10 +92,10 @@ export const toggleActiveBranch = TryCatch(
           success: true,
           message: generateSuccessMessage("UPDATED", "Branch"),
         },
-        branch
-      )
+        branch,
+      ),
     );
-  }
+  },
 );
 
 export const getAllBranchFromItemBanchMap = TryCatch(
@@ -109,8 +109,8 @@ export const getAllBranchFromItemBanchMap = TryCatch(
           success: true,
           message: generateSuccessMessage("FETCHED", "Branch"),
         },
-        branch
-      )
+        branch,
+      ),
     );
-  }
+  },
 );

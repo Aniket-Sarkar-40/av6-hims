@@ -18,7 +18,7 @@ export const branchOnMonthExpiration = async (
   searchText?: string,
   categoryId?: number,
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
 ): Promise<PaginatedResponse<BranchOnMonthExpiration>> => {
   logger.info("entering::branchOnMonthExpiration::service");
 
@@ -155,7 +155,7 @@ export const getHighestSellingDrugByBranch = async (
   id: number,
   categoryId?: number,
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
 ): Promise<PaginatedResponse<HighestDrugSold>> => {
   logger.info("entering::getHighestSellingDrugByBranch::service");
   const store = await settingsService.getSettings();
@@ -255,7 +255,7 @@ export const getHighestAmountSellDrugByBranch = async (
   id: number,
   categoryId?: number,
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
 ): Promise<PaginatedResponse<HighestDrugSold>> => {
   logger.info("entering::getHighestAmountSellDrugByBranch::service");
   const store = await settingsService.getSettings();
@@ -349,7 +349,7 @@ export async function getHighestSellingDrugByBranchExcel(
   searchText?: string,
   categoryId?: number,
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
 ): Promise<HighestDrugSold[]> {
   logger.info("entering::getHighestSellingDrugByBranchExcel::repository");
   const store = await settingsService.getSettings();
@@ -407,7 +407,7 @@ export async function getHighestAmountSellDrugByBranchAll(
   searchText?: string,
   categoryId?: number,
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
 ): Promise<HighestDrugSold[]> {
   logger.info("entering::getHighestAmountSellDrugByBranchAll::repository");
   const store = await settingsService.getSettings();

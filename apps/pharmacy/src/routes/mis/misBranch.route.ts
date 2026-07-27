@@ -38,12 +38,12 @@ misBranchRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_BRANCH", "VIEW")),
-  misBranchList
+  misBranchList,
 );
 
 misBranchRouter.post(
   "/excel",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "MIS_BRANCH", "VIEW")),
-  excelMisBranch
+  excelMisBranch,
 );

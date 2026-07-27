@@ -6,7 +6,7 @@ export const serializeBigInt = <T>(data: T): T => {
       }
 
       return value;
-    })
+    }),
   );
 };
 
@@ -33,7 +33,7 @@ export function convertBigIntToString(obj: any): any {
 
   if (obj && isPlainObject(obj)) {
     return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [k, convertBigIntToString(v)])
+      Object.entries(obj).map(([k, v]) => [k, convertBigIntToString(v)]),
     );
   }
 

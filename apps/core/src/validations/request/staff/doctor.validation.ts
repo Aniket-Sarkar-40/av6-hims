@@ -98,7 +98,7 @@ export const doctorSchema = Joi.object<CreateOrUpdateDoctor>({
 export const validateDoctor = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = doctorSchema.validate(req.body, { abortEarly: false });
 
@@ -109,7 +109,7 @@ export const validateDoctor = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

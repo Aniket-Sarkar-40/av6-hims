@@ -10,7 +10,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 
 const accountingIntegrationConfigServiceRaw = {
   async createAccountingIntegrationConfig(
-    input: CreateOrUpdateAccountingIntegrationConfigInput
+    input: CreateOrUpdateAccountingIntegrationConfigInput,
   ) {
     logger.info("entering::createAccountingIntegrationConfig::service");
     await validateCreateOrUpdateAccountingIntegrationConfig(input);
@@ -19,7 +19,7 @@ const accountingIntegrationConfigServiceRaw = {
     return createdDate;
   },
   async updateAccountingIntegrationConfig(
-    input: CreateOrUpdateAccountingIntegrationConfigInput
+    input: CreateOrUpdateAccountingIntegrationConfigInput,
   ) {
     logger.info("entering::updateAccountingIntegrationConfig::service");
     await validateCreateOrUpdateAccountingIntegrationConfig(input);
@@ -32,5 +32,5 @@ const accountingIntegrationConfigServiceRaw = {
 export const accountingIntegrationConfigService =
   auditProxy.createAuditedService(
     "accountingIntegrationConfig",
-    accountingIntegrationConfigServiceRaw
+    accountingIntegrationConfigServiceRaw,
   );

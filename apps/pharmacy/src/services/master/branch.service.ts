@@ -71,13 +71,13 @@ export const branchService = {
       const cachedBranch = (await getAllCache(cacheKey)) as PmsBranch[];
       if (cachedBranch && cachedBranch.length > 0) {
         return await Promise.all(
-          cachedBranch.map((branch) => toBranchDTO(branch))
+          cachedBranch.map((branch) => toBranchDTO(branch)),
         );
       } else {
         if (!canNullReturnable)
           throw new ErrorHandler(
             404,
-            generateErrorMessage("NOT_FOUND", "Branch")
+            generateErrorMessage("NOT_FOUND", "Branch"),
           );
         else return [];
       }
@@ -85,13 +85,13 @@ export const branchService = {
       const branch = await getAllBranchFromDb();
 
       const branchDTO = await Promise.all(
-        branch.map((branch) => toBranchDTO(branch))
+        branch.map((branch) => toBranchDTO(branch)),
       );
 
       if (branchDTO.length === 0 && !canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Branch")
+          generateErrorMessage("NOT_FOUND", "Branch"),
         );
       }
       logger.info("exiting::getAllBranch::service");
@@ -114,7 +114,7 @@ export const branchService = {
 
   async getBranchById(
     branchId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<BranchDTO | null> {
     logger.info("entering::getBranchById::service");
     validIdCheck(branchId);
@@ -130,7 +130,7 @@ export const branchService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Branch")
+          generateErrorMessage("NOT_FOUND", "Branch"),
         );
       else return null;
     }
@@ -143,7 +143,7 @@ export const branchService = {
 
   async getBranchByIdWoDTO(
     branchId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<PmsBranch | null> {
     logger.info("entering::getBranchById::service");
     validIdCheck(branchId);
@@ -159,7 +159,7 @@ export const branchService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Branch")
+          generateErrorMessage("NOT_FOUND", "Branch"),
         );
       else return null;
     }

@@ -19,7 +19,7 @@ import { itemMasterToDto } from "@/utils/commonResponse.utils.js";
 import { InvPurchaseOrderDetails } from "@repo/db/generated/prisma/client";
 
 export const toPurchaseOrderDTO = async (
-  purchaseOrders: PurchaseOrderWithDetails[]
+  purchaseOrders: PurchaseOrderWithDetails[],
 ): Promise<PurchaseOrderDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplier(true);
   const stores = await itemStoreService.getAllItemStore(true);
@@ -43,7 +43,7 @@ export const toPurchaseOrderDTO = async (
       }
 
       const supplierDTO = suppliers.find(
-        (supplier) => supplier.id === po.supplierId
+        (supplier) => supplier.id === po.supplierId,
       );
       const storeDTO = stores.find((store) => store.id === po.storeId);
 
@@ -71,19 +71,19 @@ export const toPurchaseOrderDTO = async (
           const itemDTO = detail.itemId
             ? await itemMasterService.getItemMasterById(
                 { itemId: detail.itemId },
-                true
+                true,
               )
             : null;
           const createdBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
                 detail.createdBy,
-                true
+                true,
               )
             : null;
           const updatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
                 detail.updatedBy,
-                true
+                true,
               )
             : null;
 
@@ -93,7 +93,7 @@ export const toPurchaseOrderDTO = async (
             createdBy: omitAudit(createdBy),
             updatedBy: omitAudit(updatedBy),
           };
-        })
+        }),
       );
 
       const location = warehouse
@@ -112,12 +112,12 @@ export const toPurchaseOrderDTO = async (
         purchaseOrderDetails: detailDTO,
         lastVerifiedBy: omitAudit(lastVerifiedBy),
       };
-    })
+    }),
   );
 };
 
 export const toPurchaseOrderPdfDTO = async (
-  purchaseOrders: PurchaseOrderWithDetails[]
+  purchaseOrders: PurchaseOrderWithDetails[],
 ): Promise<PurchaseOrderPdfDTO[]> => {
   const suppliers = await itemSupplierService.getAllItemSupplierWoDto(true);
   const stores = await itemStoreService.getAllItemStoreWoDto(true);
@@ -141,7 +141,7 @@ export const toPurchaseOrderPdfDTO = async (
       }
 
       const supplierDTO = suppliers.find(
-        (supplier) => supplier.id === po.supplierId
+        (supplier) => supplier.id === po.supplierId,
       );
       const storeDTO = stores.find((store) => store.id === po.storeId);
 
@@ -157,17 +157,17 @@ export const toPurchaseOrderPdfDTO = async (
           const itemDTO = detail.itemId
             ? await itemMasterService.getItemMasterById(
                 { itemId: detail.itemId },
-                true
+                true,
               )
             : null;
           const createdBy = detail.createdBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.createdBy
+                detail.createdBy,
               )
             : null;
           const updatedBy = detail.updatedBy
             ? await employeeService.getEmployeeByIdFrmCacheOrDb(
-                detail.updatedBy
+                detail.updatedBy,
               )
             : null;
 
@@ -177,7 +177,7 @@ export const toPurchaseOrderPdfDTO = async (
             createdBy: createdBy,
             updatedBy: updatedBy,
           };
-        })
+        }),
       );
 
       return {
@@ -190,12 +190,12 @@ export const toPurchaseOrderPdfDTO = async (
         updatedBy: omitAudit(updatedBy),
         purchaseOrderDetails: omitAudit(detailDTO),
       };
-    })
+    }),
   );
 };
 
 export const toPurchaseOrderDetailsDto = async (
-  purchaseOrderDetails: InvPurchaseOrderDetails[]
+  purchaseOrderDetails: InvPurchaseOrderDetails[],
 ): Promise<PurchaseOrderDetailDTO[]> => {
   return Promise.all(
     purchaseOrderDetails.map(async (detail) => {
@@ -206,7 +206,7 @@ export const toPurchaseOrderDetailsDto = async (
       const itemDTO = detail.itemId
         ? await itemMasterService.getItemMasterById(
             { itemId: detail.itemId },
-            true
+            true,
           )
         : null;
       const createdBy = detail.createdBy
@@ -222,6 +222,6 @@ export const toPurchaseOrderDetailsDto = async (
         createdBy,
         updatedBy,
       };
-    })
+    }),
   );
 };

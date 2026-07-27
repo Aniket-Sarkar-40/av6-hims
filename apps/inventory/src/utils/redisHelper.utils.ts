@@ -10,7 +10,7 @@ import { DataType } from "av6-core-v2";
 const hSetPayload = async (
   redisClient: NonNullable<ReturnType<typeof getRedisClient>>,
   key: string,
-  payload: Record<string, string>
+  payload: Record<string, string>,
 ) => {
   if (Object.keys(payload).length === 0) return;
 
@@ -24,7 +24,7 @@ const hSetPayload = async (
  */
 export async function createCache(
   table: string,
-  data: DataType[]
+  data: DataType[],
 ): Promise<void> {
   logger.info("entering:createCache");
 
@@ -50,7 +50,7 @@ export async function createCache(
     await hSetPayload(
       redisClient,
       cacheKeyForItemBatchStock,
-      batchStockPayload
+      batchStockPayload,
     );
   }
 

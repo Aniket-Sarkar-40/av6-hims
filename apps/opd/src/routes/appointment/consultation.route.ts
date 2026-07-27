@@ -37,5 +37,5 @@ consultationRouter.post(
   verifyToken(ServiceCode.OPD),
   authorize(getPermission("OPD", "CONSULTATION", "CREATE")),
   validateCreateConsultation,
-  createConsultation
+  createConsultation,
 );

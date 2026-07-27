@@ -3,6 +3,7 @@ import {
   validateIdCompany,
   validateIdFinancialYear,
 } from "../company/company.service.validation.js";
+
 import dayjs from "dayjs";
 import { validateIdCollectionCenter } from "../master/collectionCenter.service.validation.js";
 import { commonGetService } from "@/services/common.service.js";
@@ -12,10 +13,10 @@ import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.j
 import { Ledger } from "@repo/db/generated/prisma/client";
 
 export const validateLedgerBalanceEngineServiceValidation = async (
-  input: LedgerBalanceEngineInput
+  input: LedgerBalanceEngineInput,
 ) => {
   logger.info(
-    "entering::validateLedgerBalanceEngineServiceValidation::service::validation"
+    "entering::validateLedgerBalanceEngineServiceValidation::service::validation",
   );
   const { companyId, financialYearId, fromDate, toDate, ccId, ledgerIds } =
     input;
@@ -24,14 +25,14 @@ export const validateLedgerBalanceEngineServiceValidation = async (
   if (fy.companyId !== companyId) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company")
+      generateErrorMessage("INVALID_ASSOCIATION", "Financial Year", "Company"),
     );
   }
 
   if (dayjs(fromDate).isAfter(dayjs(toDate))) {
     throw new ErrorHandler(
       400,
-      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`
+      `From Date: ${fromDate} cannot be greater than To Date: ${toDate}`,
     );
   }
 
@@ -45,8 +46,8 @@ export const validateLedgerBalanceEngineServiceValidation = async (
         "INVALID_DATE_RANGE",
         "Financial Year",
         `From Date: ${dayjs(fy.startDate).format("YYYY-MM-DD")}`,
-        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`
-      )
+        `To Date: ${dayjs(fy.endDate).format("YYYY-MM-DD")}`,
+      ),
     );
   }
 
@@ -68,18 +69,18 @@ export const validateLedgerBalanceEngineServiceValidation = async (
       if (!ledger) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Ledger")
+          generateErrorMessage("NOT_FOUND", "Ledger"),
         );
       }
       if (ledger.companyId !== companyId) {
         throw new ErrorHandler(
           400,
-          generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company")
+          generateErrorMessage("INVALID_ASSOCIATION", "Ledger", "Company"),
         );
       }
     }
   }
   logger.info(
-    "exiting::validateLedgerBalanceEngineServiceValidation::service::validation"
+    "exiting::validateLedgerBalanceEngineServiceValidation::service::validation",
   );
 };

@@ -17,7 +17,7 @@ export const toStateDTO = async (state: State): Promise<StateDTO> => {
 };
 
 export const toStateDTOForState = async (
-  state: State
+  state: State,
 ): Promise<StateDTOForState> => {
   const country = await countryService.getCountryById(state.countryId, true);
   return {
@@ -27,7 +27,7 @@ export const toStateDTOForState = async (
 };
 
 export const toExcelFromState = (
-  state: CreateStateInput | null
+  state: CreateStateInput | null,
 ): ExcelStateRow => {
   return {
     Name: state ? state.name : "",

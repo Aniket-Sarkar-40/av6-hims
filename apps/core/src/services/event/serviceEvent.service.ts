@@ -42,7 +42,7 @@ export const serviceEventService = {
   },
 
   async getAllServiceEvents(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ServiceEvent[]> {
     logger.info("entering::getAllServiceEvents::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.SERVICE_EVENT);
@@ -59,7 +59,7 @@ export const serviceEventService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Service Event")
+          generateErrorMessage("NOT_FOUND", "Service Event"),
         );
       }
     }
@@ -68,7 +68,7 @@ export const serviceEventService = {
 
   async getServiceEventById(
     id: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<ServiceEvent | null> {
     logger.info("entering::getServiceEventById::service");
     validIdCheck(id);
@@ -85,7 +85,7 @@ export const serviceEventService = {
       if (!canNullReturnable) {
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Service Event")
+          generateErrorMessage("NOT_FOUND", "Service Event"),
         );
       }
     }
@@ -94,7 +94,7 @@ export const serviceEventService = {
     return row;
   },
   async updateServiceEvent(
-    input: CreateServiceEvent[]
+    input: CreateServiceEvent[],
   ): Promise<ServiceEvent[]> {
     logger.info("entering::updateServiceEvent::service");
     await updateIdServiceEventServiceValidation(input);

@@ -28,7 +28,7 @@ import { featureFlagService } from "@/services/feature/feature.service.js";
 import { emailConfigService } from "@/services/master/emailConfig.service.js";
 
 export const createSellInDb = async (
-  input: SellInput
+  input: SellInput,
 ): Promise<SellResponse> => {
   logger.info("entering::createSell::repository");
 
@@ -48,7 +48,7 @@ export const createSellInDb = async (
       if (omittedSale.omitted.patient?.patientUniqueId) {
         billNo = billNo.replace(
           "{PATIENT_UNQ_ID}",
-          omittedSale.omitted.patient?.patientUniqueId.toString()
+          omittedSale.omitted.patient?.patientUniqueId.toString(),
         );
       }
 
@@ -98,7 +98,7 @@ export const createSellInDb = async (
       if (input.status === SELL_STATUS.COMPLETED) {
         const feature = await featureFlagService.getFeatureFlagByShortCode(
           "SELL_STOCK_ADJ",
-          true
+          true,
         );
         if (
           !feature ||
@@ -124,7 +124,7 @@ export const createSellInDb = async (
                 refDate: createdSell.billDate,
                 refApprovedBy: undefined,
                 refApprovedAt: undefined,
-              }
+              },
             );
           }
           await tx.pmsSell.update({
@@ -157,11 +157,11 @@ export const createSellInDb = async (
 
           await tx.$queryRaw(Prisma.sql`UPDATE patient_medicine
             SET sell_id = ${createdSell.id}, sell_ref_no = ${
-            createdSell.sellRefNo
-          }
+              createdSell.sellRefNo
+            }
             WHERE appointment_id = ${input.aptId} AND med_id IN (${Prisma.join(
-            uniqueItemIds
-          )}) and sell_id IS NULL
+              uniqueItemIds,
+            )}) and sell_id IS NULL
             `);
         }
 
@@ -178,7 +178,7 @@ export const createSellInDb = async (
 
         logger.info("Created Sell--------->" + JSON.stringify(createdSell));
         logger.info(
-          "Created Sell By User --------->" + JSON.stringify(store?.user)
+          "Created Sell By User --------->" + JSON.stringify(store?.user),
         );
 
         if (input.corporateClientId) {
@@ -195,7 +195,7 @@ export const createSellInDb = async (
       const patient = omittedSale.omitted.patient;
       const feature = await featureFlagService.getFeatureFlagByShortCode(
         "SELL_NOTIFICATION",
-        true
+        true,
       );
 
       if (patient?.email && feature?.isEnabled) {
@@ -225,7 +225,7 @@ export const createSellInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 
@@ -261,7 +261,7 @@ export const getSellFromDb = async (): Promise<SellResponse[]> => {
 };
 
 export const getSellByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<SellResponse | null> => {
   logger.info("entering::getSellByIdFromDb::repository");
   return db.pmsSell.findFirst({
@@ -295,7 +295,7 @@ export const getSellByIdFromDb = async (
 };
 
 export const valSellByIdFromDb = async (
-  id: number
+  id: number,
 ): Promise<ValSellResponse | null> => {
   logger.info("entering::getSellByIdFromDb::repository");
   return db.pmsSell.findFirst({
@@ -315,7 +315,7 @@ export const valSellByIdFromDb = async (
 
 //Sell status update(DRAFT TO COMPLETED)
 export const updateSellStatusInDb = async (
-  input: SellInput
+  input: SellInput,
 ): Promise<SellResponse> => {
   logger.info("entering::updateSellStatusInDb::repository");
 
@@ -337,11 +337,11 @@ export const updateSellStatusInDb = async (
   const { sellDetails, existingSell, id } = omittedSale.omitted;
 
   const toUpdate = sellDetails.filter(
-    (d): d is typeof d & { id: number } => typeof d.id === "number"
+    (d): d is typeof d & { id: number } => typeof d.id === "number",
   );
   const toCreate = sellDetails.filter((d) => typeof d.id !== "number");
   const toDelete = existingSell.sellDetails.filter(
-    (d) => !sellDetails.some((item) => item.id === d.id)
+    (d) => !sellDetails.some((item) => item.id === d.id),
   );
 
   return db.$transaction(
@@ -424,11 +424,11 @@ export const updateSellStatusInDb = async (
 
         await tx.$queryRaw(Prisma.sql`UPDATE patient_medicine
             SET sell_id = ${updatedSell.id}, sell_ref_no = ${
-          updatedSell.sellRefNo
-        }
+              updatedSell.sellRefNo
+            }
             WHERE appointment_id = ${input.aptId} AND med_id IN (${Prisma.join(
-          uniqueItemIds
-        )}) and sell_id IS NULL
+              uniqueItemIds,
+            )}) and sell_id IS NULL
             `);
       }
 
@@ -455,12 +455,12 @@ export const updateSellStatusInDb = async (
 
       return updatedSell;
     },
-    { timeout: API_TIMEOUT }
+    { timeout: API_TIMEOUT },
   );
 };
 
 export const getLastPaymentTransaction = async (
-  sellId: number
+  sellId: number,
 ): Promise<PaymentTransaction | null> => {
   logger.info("entering::getPaymentTransaction::repository");
 
@@ -487,7 +487,7 @@ export const getLastPaymentTransaction = async (
 };
 
 export const getPaymentTransactionsBySell = async (
-  sellId: number
+  sellId: number,
 ): Promise<PaymentTransaction[]> => {
   logger.info("entering::getPaymentTransactionsBySell::repository");
 
@@ -513,7 +513,7 @@ export const getPaymentTransactionsBySell = async (
 };
 
 export const getAppointment = async (
-  id: number
+  id: number,
 ): Promise<Appointment | null> => {
   logger.info("entering::getSellByIdForReceipt::repository");
   const response = db.$queryRaw<Appointment[] | null>`
@@ -523,7 +523,7 @@ export const getAppointment = async (
 };
 
 export const getSellExcelFromDb = async (
-  input: sellExcelFilter
+  input: sellExcelFilter,
 ): Promise<SellResponse[]> => {
   logger.info("entering::getSellExcelFromDb::repository");
   return db.pmsSell.findMany({
@@ -598,12 +598,12 @@ export const deleteSellFromDb = async (id: number) => {
   });
 
   logger.info(
-    `exiting::deleteSellFromDb::repository id=${id} (deletedBy=${currentUser})`
+    `exiting::deleteSellFromDb::repository id=${id} (deletedBy=${currentUser})`,
   );
 };
 
 export const getSellBySellNo = async (
-  sellRefNo: string
+  sellRefNo: string,
 ): Promise<SellByRefNoResponse | null> => {
   logger.info("entering::getSaleBySaleNo::repository");
 
@@ -623,7 +623,7 @@ export const getSellBySellNo = async (
 };
 
 export const getSellByAppointmentNo = async (
-  appointmentNo: string
+  appointmentNo: string,
 ): Promise<SellByRefNoResponse | null> => {
   logger.info("entering::getSaleBySaleNo::repository");
 
@@ -643,7 +643,7 @@ export const getSellByAppointmentNo = async (
 };
 
 export const updateSellCopay = async (
-  sellUpdateInput: UpdateSellCopayInput
+  sellUpdateInput: UpdateSellCopayInput,
 ): Promise<void> => {
   logger.info("entering::updateSellCopay::repository");
   await db.$transaction(
@@ -699,6 +699,6 @@ export const updateSellCopay = async (
         });
       }
     },
-    { timeout: API_TIMEOUT }
+    { timeout: API_TIMEOUT },
   );
 };

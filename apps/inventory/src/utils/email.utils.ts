@@ -19,7 +19,7 @@ const templatesDir = path.resolve(
   "src",
   "utils",
   "templates",
-  "emails"
+  "emails",
 );
 
 interface TemplateMailOptions<T> extends SendMailOptions {
@@ -66,7 +66,7 @@ export const sendEmail = async <T>(options: TemplateMailOptions<T>) => {
   ) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Email Config")
+      generateErrorMessage("NOT_FOUND", "Email Config"),
     );
   }
 
@@ -146,7 +146,7 @@ export async function sendTemplatedEmail(opts: {
   ) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Email Config")
+      generateErrorMessage("NOT_FOUND", "Email Config"),
     );
   }
 

@@ -43,7 +43,7 @@ staffDesignationRouter.post(
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "CREATE")),
   validateStaffDesignation,
-  createStaffDesignation
+  createStaffDesignation,
 );
 
 /**
@@ -59,7 +59,7 @@ staffDesignationRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "VIEW")),
-  getAllStaffDesignations
+  getAllStaffDesignations,
 );
 
 /**
@@ -82,7 +82,7 @@ staffDesignationRouter.get(
   "/:staffDesignationId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "VIEW")),
-  getStaffDesignationById
+  getStaffDesignationById,
 );
 
 /**
@@ -112,10 +112,10 @@ staffDesignationRouter.put(
   verifyToken(ServiceCode.PHARMACY),
   authorize(
     getPermission("PMS", "STAFF_DESIGNATION", "VIEW"),
-    getPermission("PMS", "STAFF_DESIGNATION", "UPDATE")
+    getPermission("PMS", "STAFF_DESIGNATION", "UPDATE"),
   ),
   validateStaffDesignation,
-  updateStaffDesignation
+  updateStaffDesignation,
 );
 
 /**
@@ -138,7 +138,7 @@ staffDesignationRouter.delete(
   "/:staffDesignationId",
   verifyToken(ServiceCode.PHARMACY),
   authorize(getPermission("PMS", "STAFF_DESIGNATION", "DELETE")),
-  deleteStaffDesignation
+  deleteStaffDesignation,
 );
 
 export default staffDesignationRouter;

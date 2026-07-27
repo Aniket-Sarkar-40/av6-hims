@@ -12,7 +12,7 @@ export const createState = TryCatch(async (req: Request, res: Response) => {
   const state = await stateService.createState({ name, countryId });
   const response = new BaseResponse(
     { success: true, message: generateSuccessMessage("CREATED", "State") },
-    state
+    state,
   );
   logger.info("exiting::createState::controller");
   return res.status(201).json(response);
@@ -27,8 +27,8 @@ export const getAllStates = TryCatch(async (req: Request, res: Response) => {
     .json(
       new BaseResponse(
         { success: true, message: generateSuccessMessage("FETCHED", "States") },
-        states
-      )
+        states,
+      ),
     );
 });
 
@@ -41,7 +41,7 @@ export const getStateById = TryCatch(async (req: Request, res: Response) => {
     return res.status(404).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
   logger.info("exiting::getStateById::controller");
@@ -50,8 +50,8 @@ export const getStateById = TryCatch(async (req: Request, res: Response) => {
     .json(
       new BaseResponse(
         { success: true, message: generateSuccessMessage("FETCHED", "State") },
-        state
-      )
+        state,
+      ),
     );
 });
 
@@ -65,8 +65,8 @@ export const updateState = TryCatch(async (req: Request, res: Response) => {
     .json(
       new BaseResponse(
         { success: true, message: generateSuccessMessage("UPDATED", "State") },
-        updatedState
-      )
+        updatedState,
+      ),
     );
 });
 
@@ -79,6 +79,6 @@ export const deleteState = TryCatch(async (req: Request, res: Response) => {
     new BaseResponse({
       success: true,
       message: generateSuccessMessage("DELETED", "State"),
-    })
+    }),
   );
 });

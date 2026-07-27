@@ -16,14 +16,14 @@ export const toBranchDTO = async (branch: PmsBranch): Promise<BranchDTO> => {
   const collectionCenter =
     await collectionCenterService.getCollectionCenterById(branch.id, true);
   const branchCategoryMap = await getBranchCategoryMapByBranchIdFromDb(
-    branch.id
+    branch.id,
   );
   let IdValues: IdValue[] = [];
   if (branchCategoryMap.length !== 0) {
     const categories = await Promise.all(
       branchCategoryMap.map((cat) =>
-        medCategoryService.getMedCategoryById(cat, true)
-      )
+        medCategoryService.getMedCategoryById(cat, true),
+      ),
     ).then((cats) => cats.filter((cat) => cat !== null));
 
     IdValues = categories
@@ -56,7 +56,7 @@ export const toBranchDTO = async (branch: PmsBranch): Promise<BranchDTO> => {
 };
 
 export const toItemBranchMapBranchDTO = async (
-  branchId: number
+  branchId: number,
 ): Promise<BranchDropDown> => {
   const branch = await branchService.getBranchByIdWoDTO(branchId, true);
 
