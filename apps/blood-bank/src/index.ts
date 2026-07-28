@@ -1,18 +1,11 @@
-import express from "express";
-import { setupPlatform, errorMiddleware } from "@repo/platform";
-import { type Application as ExpressApplication } from "express";
 import { bloodBankRouter } from "@/app.js";
+import { AppMode, createApp } from "@repo/platform";
+import { type Application as ExpressApplication } from "express";
 
-export function createBloodBankApp(
-  mode: "STANDALONE" | "GATEWAY"
-): ExpressApplication {
-  const app = express();
-  setupPlatform(app);
-  if (mode === "STANDALONE") {
-    app.use("/api/v1/blood-bank", bloodBankRouter);
-  } else {
-    app.use("/", bloodBankRouter);
-  }
-  app.use(errorMiddleware);
-  return app;
+export function createBloodBankApp(mode: AppMode): ExpressApplication {
+  return createApp({
+    router: bloodBankRouter,
+    basePath: "/api/v1/blood-bank",
+    mode,
+  });
 }

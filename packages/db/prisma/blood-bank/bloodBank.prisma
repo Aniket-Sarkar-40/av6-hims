@@ -92,24 +92,26 @@ model Hospital {
 }
 
 model BloodBankCenter {
-    id                     Int                     @id @default(autoincrement())
-    hospitalId             Int                     @map("hospital_id")
-    centerCode             String                  @map("center_code") @db.VarChar(50)
-    centerName             String                  @map("center_name") @db.VarChar(150)
-    address                String?                 @db.Text
-    licenseNumber          String?                 @map("license_number") @db.VarChar(100)
-    phone                  String?                 @map("phone") @db.VarChar(30)
-    email                  String?                 @db.VarChar(100)
-    isActive               Boolean                 @default(true) @map("is_active")
-    createdBy              Int?                    @map("created_by")
-    updatedBy              Int?                    @map("updated_by")
-    deletedBy              Int?                    @map("deleted_by")
-    createdAt              DateTime                @default(now()) @map("created_at")
-    updatedAt              DateTime                @updatedAt @map("updated_at")
-    deletedAt              DateTime?               @map("deleted_at")
-    hospital               Hospital                @relation(fields: [hospitalId], references: [id])
-    bloodComponents        BloodComponent[]
-    bloodCrossMatchMethods BloodCrossMatchMethod[]
+    id                         Int                         @id @default(autoincrement())
+    hospitalId                 Int                         @map("hospital_id")
+    centerCode                 String                      @map("center_code") @db.VarChar(50)
+    centerName                 String                      @map("center_name") @db.VarChar(150)
+    address                    String?                     @db.Text
+    licenseNumber              String?                     @map("license_number") @db.VarChar(100)
+    phone                      String?                     @map("phone") @db.VarChar(30)
+    email                      String?                     @db.VarChar(100)
+    isActive                   Boolean                     @default(true) @map("is_active")
+    createdBy                  Int?                        @map("created_by")
+    updatedBy                  Int?                        @map("updated_by")
+    deletedBy                  Int?                        @map("deleted_by")
+    createdAt                  DateTime                    @default(now()) @map("created_at")
+    updatedAt                  DateTime                    @updatedAt @map("updated_at")
+    deletedAt                  DateTime?                   @map("deleted_at")
+    hospital                   Hospital                    @relation(fields: [hospitalId], references: [id])
+    bloodComponents            BloodComponent[]
+    bloodCrossMatchMethods     BloodCrossMatchMethod[]
+    bloodPhysicalExamQuestions BloodPhysicalExamQuestion[]
+    bloodExternalCenters       BloodExternalCenter[]
 
     @@map("bb_master_blood_bank_centers")
 }
@@ -170,4 +172,55 @@ model BloodCrossMatchMethod {
     bloodBankCenter BloodBankCenter @relation(fields: [bloodBankCenterId], references: [id])
 
     @@map("bb_master_blood_cross_match_method")
+}
+
+model BloodPhysicalExamQuestion {
+    id                Int @id @default(autoincrement())
+    bloodBankCenterId Int @map("blood_bank_center_id")
+
+    question    String                  @db.Text
+    answerType  BloodQuestionAnswerType @map("answer_type")
+    optionsJson Json?                   @map("options_json")
+    isRequired  Boolean                 @default(false) @map("is_required")
+    sortOrder   Int                     @default(0) @map("sort_order")
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    bloodBankCenter BloodBankCenter @relation(fields: [bloodBankCenterId], references: [id])
+    //answers         BloodDonationPhysicalExamAnswer[]
+
+    @@index([bloodBankCenterId, sortOrder])
+    @@map("bb_master_blood_physical_exam_question")
+}
+
+model BloodExternalCenter {
+    id                Int @id @default(autoincrement())
+    bloodBankCenterId Int @map("blood_bank_center_id")
+
+    centerName String  @map("center_name") @db.VarChar(150)
+    address    String? @db.Text
+    licenseNo  String? @map("license_no") @db.VarChar(100)
+    contactNo  String? @map("contact_no") @db.VarChar(30)
+    email      String? @db.VarChar(100)
+    remark     String? @db.Text
+
+    isActive  Boolean   @default(true) @map("is_active")
+    createdBy Int?      @map("created_by")
+    updatedBy Int?      @map("updated_by")
+    deletedBy Int?      @map("deleted_by")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    bloodBankCenter BloodBankCenter @relation(fields: [bloodBankCenterId], references: [id])
+    //collections     BloodCollection[]
+
+    @@unique([bloodBankCenterId, centerName])
+    @@map("bb_master_blood_external_center")
 }

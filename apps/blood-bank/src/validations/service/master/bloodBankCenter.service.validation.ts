@@ -13,36 +13,38 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdBloodBankCenter = async (
-  id: number
+  id: number,
 ): Promise<BloodBankCenter> => {
   logger.info("entering::validateIdBloodBankCenter::service::validation");
 
   validIdCheck(id);
 
-  const row = await commonService.getElementById<"BloodBankCenter">({
-    cacheCode: "BLOOD_BANK_CENTER",
-    canNullReturnable: true,
-    id,
-    modelName: "BloodBankCenter",
-    shortCode: "BLOOD_BANK_CENTER",
-    useActiveFlag: true,
-  });
-  if (!row) {
+  const bloodBankCenter = await commonService.getElementById<"BloodBankCenter">(
+    {
+      cacheCode: "BLOOD_BANK_CENTER",
+      canNullReturnable: true,
+      id,
+      modelName: "BloodBankCenter",
+      shortCode: "BLOOD_BANK_CENTER",
+      useActiveFlag: true,
+    },
+  );
+  if (!bloodBankCenter) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Blood Bank Center")
+      generateErrorMessage("NOT_FOUND", "Blood Bank Center"),
     );
   }
   logger.info("exiting::validateIdBloodBankCenter::service::validation");
 
-  return row;
+  return bloodBankCenter;
 };
 
 export const createOrUpdateBloodBankCenterServiceValidation = async (
-  body: CreateOrUpdateBloodBankCenter
+  body: CreateOrUpdateBloodBankCenter,
 ) => {
   logger.info(
-    "entering::createOrUpdateBloodBankCenterServiceValidation::service::validation"
+    "entering::createOrUpdateBloodBankCenterServiceValidation::service::validation",
   );
   if (body.id) {
     await validateIdBloodBankCenter(body.id);
@@ -50,7 +52,7 @@ export const createOrUpdateBloodBankCenterServiceValidation = async (
 
   if (!body.centerCode) {
     body.centerCode = await uinServiceFactory.generateUIN(
-      BloodBankUinShortCode.BBC
+      BloodBankUinShortCode.BBC,
     );
   }
 
@@ -67,11 +69,11 @@ export const createOrUpdateBloodBankCenterServiceValidation = async (
   if (bloodBankCenter) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Blood Bank Center")
+      generateErrorMessage("DUPLICATE_ITEM", "Blood Bank Center"),
     );
   }
 
   logger.info(
-    "exiting::createOrUpdateBloodBankCenterServiceValidation::service::validation"
+    "exiting::createOrUpdateBloodBankCenterServiceValidation::service::validation",
   );
 };

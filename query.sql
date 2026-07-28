@@ -2761,3 +2761,46 @@ CREATE TABLE `accounting_feature_flag` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_master_blood_physical_exam_question` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `question` TEXT NOT NULL,
+    `answer_type` ENUM('YES_NO', 'TEXT', 'NUMBER', 'DROPDOWN', 'DATE') NOT NULL,
+    `options_json` JSON NULL,
+    `is_required` BOOLEAN NOT NULL DEFAULT false,
+    `sort_order` INTEGER NOT NULL DEFAULT 0,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `bb_master_blood_physical_exam_question_blood_bank_center_id__idx`(`blood_bank_center_id`, `sort_order`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_master_blood_external_center` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `center_name` VARCHAR(150) NOT NULL,
+    `address` TEXT NULL,
+    `license_no` VARCHAR(100) NULL,
+    `contact_no` VARCHAR(30) NULL,
+    `email` VARCHAR(100) NULL,
+    `remark` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    UNIQUE INDEX `bb_master_blood_external_center_blood_bank_center_id_center__key`(`blood_bank_center_id`, `center_name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

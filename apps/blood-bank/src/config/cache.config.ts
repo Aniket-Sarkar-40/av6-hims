@@ -17,18 +17,20 @@ export enum RedisResource {
   BLOOD_BANK_CENTER = "bloodBankCenter",
   BLOOD_COMPONENT = "bloodComponent",
   BLOOD_CROSS_MATCH_METHOD = "bloodCrossMatchMethod",
+  BLOOD_PHYSICAL_EXAM_QUESTION = "bloodPhysicalExamQuestion",
+  BLOOD_EXTERNAL_CENTER = "bloodExternalCenter",
 }
 
 export const getRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string
+  type: string,
 ): string => {
   return `${REDIS_PREFIX}blood-bank:${RedisResource[resource]}:${type}`;
 };
 
 export const getMasterRedisKey = (
   resource: keyof typeof RedisResource,
-  type: string
+  type: string,
 ): string => {
   return `${REDIS_PREFIX}master:${RedisResource[resource]}:${type}`;
 };

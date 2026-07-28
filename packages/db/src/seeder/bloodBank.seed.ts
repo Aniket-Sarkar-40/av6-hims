@@ -24,7 +24,7 @@ const redisPrefix = process.env.REDIS_PREFIX || "";
 const DYNAMIC_SC_CACHE_KEY = `${redisPrefix}blood-bank:dynamicShortCode:all`;
 
 async function updateDynamicShortCodeConfigsByShortCode(
-  input: Record<string, Prisma.InputJsonObject>
+  input: Record<string, Prisma.InputJsonObject>,
 ) {
   const mapping = Object.entries(input);
 
@@ -33,8 +33,8 @@ async function updateDynamicShortCodeConfigsByShortCode(
       db.bloodBankDynamicShortCode.updateMany({
         where: { shortCode },
         data: { config },
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -123,6 +123,28 @@ export async function runSeed() {
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true }),
       selectClause: JSON.stringify({ id: "id", value: "methodName" }),
+    },
+    {
+      shortCode: "BLOOD_PHYSICAL_EXAM_QUESTION",
+      tableName: "bloodPhysicalExamQuestion",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: true,
+      permission: "blood-bank:blood-physical-exam-question:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "question" }),
+    },
+    {
+      shortCode: "BLOOD_EXTERNAL_CENTER",
+      tableName: "bloodExternalCenter",
+      isDTO: true,
+      isSingleDto: false,
+      isCacheable: true,
+      permission: "blood-bank:blood-external-center:view",
+      isDropDown: true,
+      whereClause: JSON.stringify({ isActive: true }),
+      selectClause: JSON.stringify({ id: "id", value: "centerName" }),
     },
   ];
 
