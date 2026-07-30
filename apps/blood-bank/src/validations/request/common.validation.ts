@@ -17,7 +17,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.number().messages({
             "number.base": "Each value in the fixed field must be a number.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -35,7 +35,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.string().messages({
             "string.base": "Each value in the fixed field must be a string.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -53,7 +53,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.boolean().messages({
             "boolean.base": "Each value in the fixed field must be a boolean.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -71,7 +71,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.string().messages({
             "string.base": "Each value in the fixed field must be a string.",
-          })
+          }),
         )
         .required()
         .messages({
@@ -89,7 +89,7 @@ export const fixedFieldSchema = Joi.alternatives()
         .items(
           Joi.string().messages({
             "string.base": "Each value in the fixed field must be a string.",
-          })
+          }),
         )
         .length(2)
         .required()
@@ -113,8 +113,8 @@ export const fixedFieldSchema = Joi.alternatives()
             }),
             Joi.number().messages({
               "number.base": "Each value in the fixed field must be a number.",
-            })
-          )
+            }),
+          ),
         )
         .length(1)
         .required()
@@ -136,7 +136,7 @@ export const fixedFieldSchema = Joi.alternatives()
         "array.length": "Fixed field value must contain exactly 1 element.",
         "any.only": "Fixed field value must contain only null.",
       }),
-    })
+    }),
   )
   .messages({
     "alternatives.match": "Fixed field does not match any allowed schema.",
@@ -196,7 +196,7 @@ export const fixedSearchSchema = Joi.object({
     .messages({
       "string.base": "Short code must be a string.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
       "any.required": "Short code is required.",
     }),
@@ -215,7 +215,7 @@ export const fixedSearchSchema = Joi.object({
               "Search column type must be either 'string', 'number', or 'boolean'.",
             "any.required": "Search column type is required.",
           }),
-      })
+      }),
     )
     .required()
     .messages({
@@ -311,7 +311,7 @@ export const fixedSearchWoPaginationSchema = Joi.object({
     .messages({
       "string.base": "Short code must be a string.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
       "any.required": "Short code is required.",
     }),
@@ -330,7 +330,7 @@ export const fixedSearchWoPaginationSchema = Joi.object({
               "Search column type must be either 'string', 'number', or 'boolean'.",
             "any.required": "Search column type is required.",
           }),
-      })
+      }),
     )
     .required()
     .messages({
@@ -491,7 +491,7 @@ export const dropdownSchema = Joi.object({
       "string.base": "Short code must be a string.",
       "any.required": "Short code is required.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
     }),
 
@@ -499,7 +499,7 @@ export const dropdownSchema = Joi.object({
     .items(
       Joi.string().messages({
         "string.base": "Each search column must be a string.",
-      })
+      }),
     )
     .required()
     .messages({
@@ -568,7 +568,7 @@ export const searchRequestSchema = Joi.object({
     .messages({
       "string.base": "Short code must be a string.",
       "any.only": `Short code must be one of [${Object.values(SHORT_CODE).join(
-        ", "
+        ", ",
       )}].`,
       "any.required": "Short code is required.",
     }),
@@ -577,7 +577,7 @@ export const searchRequestSchema = Joi.object({
     .items(
       Joi.string().messages({
         "string.base": "Each search column must be a string.",
-      })
+      }),
     )
     .required()
     .messages({
@@ -609,7 +609,7 @@ export const searchRequestSchema = Joi.object({
 export const validateFixedSearchFetch = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = fixedSearchSchema.validate(req.body, { abortEarly: false });
 
@@ -620,7 +620,7 @@ export const validateFixedSearchFetch = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -630,7 +630,7 @@ export const validateFixedSearchFetch = (
 export const validateSearchRequest = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = searchRequestSchema.validate(req.body, {
     abortEarly: false,
@@ -645,8 +645,8 @@ export const validateSearchRequest = (
           errorMessage: error.message,
           errors: error.details,
         },
-        null
-      )
+        null,
+      ),
     );
   }
 
@@ -656,7 +656,7 @@ export const validateSearchRequest = (
 export const validateDropdownRequest = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = dropdownSchema.validate(req.body, { abortEarly: false });
 
@@ -669,8 +669,8 @@ export const validateDropdownRequest = (
           errorMessage: error.message,
           errors: error.details,
         },
-        null
-      )
+        null,
+      ),
     );
   }
 
@@ -680,7 +680,7 @@ export const validateDropdownRequest = (
 export const validateCommonFetch = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = commonFetchSchema.validate(req.body, { abortEarly: false });
 
@@ -691,7 +691,7 @@ export const validateCommonFetch = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -701,7 +701,7 @@ export const validateCommonFetch = (
 export const validateCommonUpdateStatus = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = commonUpdateStatusSchema.validate(req.body, {
     abortEarly: false,
@@ -714,7 +714,7 @@ export const validateCommonUpdateStatus = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -724,13 +724,13 @@ export const validateCommonUpdateStatus = (
 export const validateCommonDelete = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { shortCode, id } = req.body;
 
   const { error } = commonDeleteSchema.validate(
     { shortCode, id },
-    { abortEarly: false }
+    { abortEarly: false },
   );
 
   if (error) {
@@ -740,7 +740,7 @@ export const validateCommonDelete = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -750,7 +750,7 @@ export const validateCommonDelete = (
 export const validateFixedSearchWoPagination = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = fixedSearchWoPaginationSchema.validate(req.body, {
     abortEarly: false,
@@ -763,7 +763,7 @@ export const validateFixedSearchWoPagination = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -773,7 +773,7 @@ export const validateFixedSearchWoPagination = (
 export const validateCommonExcelExport = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = commonExcelExportSchema.validate(req.body, {
     abortEarly: false,
@@ -786,7 +786,7 @@ export const validateCommonExcelExport = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -796,7 +796,7 @@ export const validateCommonExcelExport = (
 export const validateToggleActive = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = toggleActiveSchema.validate(req.body, {
     abortEarly: false,
@@ -809,7 +809,7 @@ export const validateToggleActive = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -819,7 +819,7 @@ export const validateToggleActive = (
 export const validateCommonImportExcel = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = commonImportExcelSchema.validate(req.body, {
     abortEarly: false,
@@ -832,7 +832,7 @@ export const validateCommonImportExcel = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 
@@ -842,7 +842,7 @@ export const validateCommonImportExcel = (
 export const validateCommonExportExcel = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { error } = commonExportExcelSchema.validate(req.body, {
     abortEarly: false,
@@ -855,7 +855,7 @@ export const validateCommonExportExcel = (
         errorCode: "PARAMETER_INVALID",
         errorMessage: error.message,
         errors: error.details,
-      })
+      }),
     );
   }
 

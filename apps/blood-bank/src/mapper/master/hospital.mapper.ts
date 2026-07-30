@@ -8,7 +8,7 @@ import { customOmit } from "av6-utils";
 import { commonService } from "@/services/common.service.js";
 
 export const toHospitalDTO = async (
-  data: HospitalResponse[]
+  data: HospitalResponse[],
 ): Promise<HospitalDTO[]> => {
   const allCollectionCenters =
     await commonService.getAllElements<"CollectionCenter">({
@@ -29,7 +29,7 @@ export const toHospitalDTO = async (
         "createdAt",
         "updatedAt",
         "deletedAt",
-      ]
+      ],
     );
 
     const singleCollectionCenter =
@@ -42,7 +42,7 @@ export const toHospitalDTO = async (
 };
 
 export const toHospitalDTOLocation = async (
-  hospital: HospitalResponse
+  hospital: HospitalResponse,
 ): Promise<HospitalDTOLocation> => {
   const omittedHospital = customOmit<
     HospitalResponse,

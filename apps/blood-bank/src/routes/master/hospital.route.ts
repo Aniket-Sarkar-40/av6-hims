@@ -44,7 +44,7 @@ hospitalRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "HOSPITAL", "CREATE")),
   validateHospital,
-  createHospital
+  createHospital,
 );
 
 /**
@@ -60,7 +60,7 @@ hospitalRouter.get(
   "/",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "HOSPITAL", "VIEW")),
-  getAllHospital
+  getAllHospital,
 );
 
 /**
@@ -81,7 +81,7 @@ hospitalRouter.get(
   "/id",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "HOSPITAL", "VIEW")),
-  getHospitalById
+  getHospitalById,
 );
 
 /**
@@ -111,10 +111,10 @@ hospitalRouter.put(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(
     getPermission("BLOOD_BANK", "HOSPITAL", "VIEW"),
-    getPermission("BLOOD_BANK", "HOSPITAL", "UPDATE")
+    getPermission("BLOOD_BANK", "HOSPITAL", "UPDATE"),
   ),
   validateHospital,
-  updateHospital
+  updateHospital,
 );
 
 /**
@@ -137,10 +137,10 @@ hospitalRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(
     getPermission("BLOOD_BANK", "HOSPITAL", "VIEW"),
-    getPermission("BLOOD_BANK", "HOSPITAL", "UPDATE")
+    getPermission("BLOOD_BANK", "HOSPITAL", "UPDATE"),
   ),
   validateToggleActive,
-  toggleActiveHospital
+  toggleActiveHospital,
 );
 
 export default hospitalRouter;

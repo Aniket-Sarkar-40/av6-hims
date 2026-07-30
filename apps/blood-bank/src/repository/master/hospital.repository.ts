@@ -47,7 +47,7 @@ export const updateHospitalInDb = async (hospital: HospitalReq) => {
 };
 
 export const getHospitalByHospitalNameFromDb = async (
-  name: string
+  name: string,
 ): Promise<Hospital | null> => {
   logger.info("entering::getHospitalByHospitalNameFromDb::repository");
   return db.hospital.findFirst({

@@ -45,7 +45,8 @@ describe("authorizeCommonApproval", () => {
 
     await authorizeCommonApproval()(req, res, next);
 
-    const err = (next as ReturnType<typeof vi.fn>).mock.calls[0]![0] as ErrorHandler;
+    const err = (next as ReturnType<typeof vi.fn>).mock
+      .calls[0]![0] as ErrorHandler;
     expect(err).toBeInstanceOf(ErrorHandler);
     expect(err.statusCode).toBe(403);
   });
@@ -61,7 +62,8 @@ describe("authorizeCommonApproval", () => {
 
     await authorizeCommonApproval()(req, res, next);
 
-    const err = (next as ReturnType<typeof vi.fn>).mock.calls[0]![0] as ErrorHandler;
+    const err = (next as ReturnType<typeof vi.fn>).mock
+      .calls[0]![0] as ErrorHandler;
     expect(err.statusCode).toBe(403);
   });
 });

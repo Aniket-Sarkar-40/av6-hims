@@ -6,7 +6,7 @@ import { BloodBankDynamicShortCode } from "@repo/db/generated/prisma/client";
 
 export const shortCodeService = {
   async getShortCodeByCode(
-    shortCode: string
+    shortCode: string,
   ): Promise<BloodBankDynamicShortCode | null> {
     logger.info("entering::getShortCodeByCode::service");
     const cacheKey = getRedisKey("DYNAMIC_SHORT_CODE", "all");

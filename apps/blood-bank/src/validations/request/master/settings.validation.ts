@@ -6,14 +6,14 @@ import Joi from "joi";
 export const createOrUpdateSettingsSchema = Joi.object<CreateOrUpdateSettings>({
   isCrossMatchRequired: boolOptional("Is Cross Match Required"),
   allowEmergencyIssueWithoutCrossMatch: boolOptional(
-    "Allow Emergency Issue Without Cross Match"
+    "Allow Emergency Issue Without Cross Match",
   ),
   isTransfusionTrackingRequired: boolOptional(
-    "Is Transfusion Tracking Required"
+    "Is Transfusion Tracking Required",
   ),
   isTransfusionVitalsRequired: boolOptional("Is Transfusion Vitals Required"),
   isTransfusionReactionRequired: boolOptional(
-    "Is Transfusion Reaction Required"
+    "Is Transfusion Reaction Required",
   ),
   reservationExpiryMinutes: intOptional("Reservation Expiry Minutes"),
   allowReservationReversal: boolOptional("Allow Reservation Reversal"),

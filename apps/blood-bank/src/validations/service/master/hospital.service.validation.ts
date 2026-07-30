@@ -21,7 +21,7 @@ export const validateHospitalId = async (hospitalId: number) => {
 };
 
 export const deleteHospitalServiceValidation = async (
-  hospitalId: number
+  hospitalId: number,
 ): Promise<void> => {
   logger.info("entering::deleteHospitalServiceValidation::service::validation");
 
@@ -32,7 +32,7 @@ export const deleteHospitalServiceValidation = async (
 };
 
 export const getIdHospitalServiceValidation = async (
-  hospitalId: number
+  hospitalId: number,
 ): Promise<void> => {
   logger.info("entering::getIdHospitalServiceValidation::service::validation");
 
@@ -43,7 +43,7 @@ export const getIdHospitalServiceValidation = async (
 };
 
 export const updateHospitalServiceValidation = async (
-  body: HospitalReq
+  body: HospitalReq,
 ): Promise<void> => {
   logger.info("entering::updateHospitalServiceValidation::service::validation");
   await validateHospitalId(body.id);
@@ -52,7 +52,7 @@ export const updateHospitalServiceValidation = async (
   if (hospitalByName && hospitalByName.id !== body.id) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Hospital Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Hospital Name"),
     );
   }
   logger.info("exiting::updateHospitalServiceValidation::service::validation");
@@ -60,13 +60,13 @@ export const updateHospitalServiceValidation = async (
 };
 
 export const createHospitalServiceValidation = async (
-  body: HospitalReq
+  body: HospitalReq,
 ): Promise<void> => {
   logger.info("entering::createHospitalServiceValidation::service::validation");
   // await validateHospitalForeignKeys(body);
   const alreadyExistsHospital = await hospitalService.getHospitalById(
     body.id,
-    true
+    true,
   );
   if (alreadyExistsHospital) {
     throw new ErrorHandler(400, "Collection center is already mapped");
@@ -76,7 +76,7 @@ export const createHospitalServiceValidation = async (
   if (hospital) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Hospital Name")
+      generateErrorMessage("DUPLICATE_ITEM", "Hospital Name"),
     );
   }
   logger.info("exiting::createHospitalServiceValidation::service::validation");

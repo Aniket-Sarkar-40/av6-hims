@@ -16,7 +16,7 @@ export const createHospital = TryCatch(async (req: Request, res: Response) => {
       success: true,
       message: generateSuccessMessage("CREATED", "Hospital"),
     },
-    hospital
+    hospital,
   );
   logger.info("exiting::createHospital::controller");
   return res.status(201).json(response);
@@ -33,8 +33,8 @@ export const updateHospital = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("UPDATED", "Hospital"),
       },
-      updatedHospital
-    )
+      updatedHospital,
+    ),
   );
 });
 
@@ -48,8 +48,8 @@ export const getAllHospital = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Hospital"),
       },
-      cities
-    )
+      cities,
+    ),
   );
 });
 
@@ -63,7 +63,7 @@ export const getHospitalById = TryCatch(async (req: Request, res: Response) => {
     return res.status(400).json(
       new BaseResponse({
         success: false,
-      })
+      }),
     );
   }
   logger.info("exiting::getHospitalById::controller");
@@ -73,8 +73,8 @@ export const getHospitalById = TryCatch(async (req: Request, res: Response) => {
         success: true,
         message: generateSuccessMessage("FETCHED", "Hospital"),
       },
-      medCategory
-    )
+      medCategory,
+    ),
   );
 });
 
@@ -92,8 +92,8 @@ export const toggleActiveHospital = TryCatch(
           success: true,
           message: generateSuccessMessage("UPDATED", "Hospital"),
         },
-        hospital
-      )
+        hospital,
+      ),
     );
-  }
+  },
 );

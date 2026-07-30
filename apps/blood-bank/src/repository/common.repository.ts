@@ -11,7 +11,6 @@ import {
 import { db } from "@repo/db/client";
 import {
   BloodBankDynamicShortCode,
-  InvDynamicShortCode,
   PrismaClient,
 } from "@repo/db/generated/prisma/client";
 import { createCache } from "@repo/platform/cache/redis.utils.js";
@@ -89,14 +88,14 @@ const lowerFirst = <S extends string>(s: S) =>
  * Overload 1: no args -> return plain model type (Brand | null)
  */
 export async function getByUnique<M extends ModelName>(
-  input: Omit<CommonFindUniqueInput<M>, "args"> & { args?: undefined }
+  input: Omit<CommonFindUniqueInput<M>, "args"> & { args?: undefined },
 ): Promise<FullRow<M> | null>;
 
 /**
  * Overload 2: args present -> return Prisma computed type (PayloadToResult... | null)
  */
 export async function getByUnique<M extends ModelName>(
-  input: CommonFindUniqueInput<M>
+  input: CommonFindUniqueInput<M>,
 ): Promise<FindFirstResult<M>>;
 
 /**
@@ -114,7 +113,7 @@ export async function getByUnique<M extends ModelName>({
   if (!delegate?.findFirst) {
     throw new ErrorHandler(
       500,
-      `Model delegate "${String(delegateKey)}" not found on PrismaClient`
+      `Model delegate "${String(delegateKey)}" not found on PrismaClient`,
     );
   }
 
@@ -131,14 +130,14 @@ export async function getByUnique<M extends ModelName>({
  * Overload 1: no args => returns plain model rows (Brand[] etc.)
  */
 export async function getAll<M extends ModelName>(
-  input: Omit<CommonFindManyInput<M>, "args"> & { args?: undefined }
+  input: Omit<CommonFindManyInput<M>, "args"> & { args?: undefined },
 ): Promise<FullRow<M>[]>;
 
 /**
  * Overload 2: args present => returns computed Prisma result array
  */
 export async function getAll<M extends ModelName>(
-  input: CommonFindManyInput<M>
+  input: CommonFindManyInput<M>,
 ): Promise<FindManyResult<M>>;
 
 /**
@@ -155,7 +154,7 @@ export async function getAll<M extends ModelName>({
 
   if (!delegate?.findMany) {
     throw new Error(
-      `Model delegate "${String(delegateKey)}" not found on PrismaClient`
+      `Model delegate "${String(delegateKey)}" not found on PrismaClient`,
     );
   }
 

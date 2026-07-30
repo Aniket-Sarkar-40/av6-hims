@@ -5,7 +5,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toBloodBankCenterDTO = async (
-  data: BloodBankCenter[]
+  data: BloodBankCenter[],
 ): Promise<BloodBankCenterDTO[]> => {
   const allHospitals = await commonService.getAllElements<"Hospital">({
     cacheCode: "HOSPITAL",
@@ -30,7 +30,7 @@ export const toBloodBankCenterDTO = async (
     ]);
 
     const hospital = allHospitals.find(
-      (h) => h.id === bloodBankCenter.hospitalId
+      (h) => h.id === bloodBankCenter.hospitalId,
     );
     return {
       ...omittedBloodBankCenter.rest,

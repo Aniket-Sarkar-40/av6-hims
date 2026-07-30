@@ -13,7 +13,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdBloodComponent = async (
-  id: number
+  id: number,
 ): Promise<BloodComponent> => {
   logger.info("entering::validateIdBloodComponent::service::validation");
 
@@ -30,7 +30,7 @@ export const validateIdBloodComponent = async (
   if (!row) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Blood Component")
+      generateErrorMessage("NOT_FOUND", "Blood Component"),
     );
   }
   logger.info("exiting::validateIdBloodComponent::service::validation");
@@ -39,10 +39,10 @@ export const validateIdBloodComponent = async (
 };
 
 export const createOrUpdateBloodComponentServiceValidation = async (
-  body: CreateOrUpdateBloodComponent
+  body: CreateOrUpdateBloodComponent,
 ) => {
   logger.info(
-    "entering::createOrUpdateBloodComponentServiceValidation::service::validation"
+    "entering::createOrUpdateBloodComponentServiceValidation::service::validation",
   );
   if (body.id) {
     await validateIdBloodComponent(body.id);
@@ -52,7 +52,7 @@ export const createOrUpdateBloodComponentServiceValidation = async (
 
   if (!body.componentCode) {
     body.componentCode = await uinServiceFactory.generateUIN(
-      BloodBankUinShortCode.COM
+      BloodBankUinShortCode.COM,
     );
   }
 
@@ -67,11 +67,11 @@ export const createOrUpdateBloodComponentServiceValidation = async (
   if (bloodComponent) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Blood Component")
+      generateErrorMessage("DUPLICATE_ITEM", "Blood Component"),
     );
   }
 
   logger.info(
-    "exiting::createOrUpdateBloodComponentServiceValidation::service::validation"
+    "exiting::createOrUpdateBloodComponentServiceValidation::service::validation",
   );
 };

@@ -70,7 +70,8 @@ describe("verifyToken (V2 strategy)", () => {
 
     expect(res.clearCookie).toHaveBeenCalled();
     expect(next).toHaveBeenCalledOnce();
-    const err = (next as ReturnType<typeof vi.fn>).mock.calls[0]![0] as ErrorHandler;
+    const err = (next as ReturnType<typeof vi.fn>).mock
+      .calls[0]![0] as ErrorHandler;
     expect(err).toBeInstanceOf(ErrorHandler);
     expect(err.statusCode).toBe(401);
     expect(err.message).toMatch(/expired/i);
@@ -95,7 +96,8 @@ describe("verifyToken (V2 strategy)", () => {
 
     await verifyToken(ServiceCode.CORE)(req, res, next);
 
-    const err = (next as ReturnType<typeof vi.fn>).mock.calls[0]![0] as ErrorHandler;
+    const err = (next as ReturnType<typeof vi.fn>).mock
+      .calls[0]![0] as ErrorHandler;
     expect(err.statusCode).toBe(403);
   });
 

@@ -1,8 +1,14 @@
+import { CreateOrUpdateBloodCollection } from "@/types/bloodCollection/bloodCollection.js";
+import { CreateOrUpdateBloodCollectionItem } from "@/types/bloodCollectionItem/bloodCollectionItem.js";
+import { CreateOrUpdateBloodDonor } from "@/types/bloodDonor/bloodDonor.js";
 import { CreateOrUpdateBloodBankCenter } from "@/types/master/bloodBankCenter.js";
 import { CreateOrUpdateBloodComponent } from "@/types/master/bloodComponent.js";
 import { CreateOrUpdateBloodCrossMatchMethod } from "@/types/master/bloodCrossMatchMethod.js";
 import { CreateOrUpdateBloodExternalCenter } from "@/types/master/bloodExternalCenter.js";
 import { CreateOrUpdateBloodPhysicalExamQuestion } from "@/types/master/bloodPhysicalExamQuestion.js";
+import { createOrUpdateBloodCollectionServiceValidation } from "@/validations/service/bloodCollection/bloodCollection.service.validation.js";
+import { createOrUpdateBloodCollectionItemServiceValidation } from "@/validations/service/bloodCollectionItem/bloodCollectionItem.service.validation.js";
+import { createOrUpdateBloodDonorServiceValidation } from "@/validations/service/bloodDonor/bloodDonor.service.validation.js";
 import { createOrUpdateBloodBankCenterServiceValidation } from "@/validations/service/master/bloodBankCenter.service.validation.js";
 import { createOrUpdateBloodComponentServiceValidation } from "@/validations/service/master/bloodComponent.service.validation.js";
 import { createOrUpdateBloodCrossMatchMethodServiceValidation } from "@/validations/service/master/bloodCrossMatchMethod.service.validation.js";
@@ -63,6 +69,36 @@ export const commonCreateUpdateValidationMapping: Record<
     update: (data: unknown) =>
       createOrUpdateBloodExternalCenterServiceValidation(
         data as CreateOrUpdateBloodExternalCenter,
+      ),
+  },
+  [SHORT_CODE.BLOOD_DONOR]: {
+    create: (data: unknown) =>
+      createOrUpdateBloodDonorServiceValidation(
+        data as CreateOrUpdateBloodDonor,
+      ),
+    update: (data: unknown) =>
+      createOrUpdateBloodDonorServiceValidation(
+        data as CreateOrUpdateBloodDonor,
+      ),
+  },
+  [SHORT_CODE.BLOOD_COLLECTION]: {
+    create: (data: unknown) =>
+      createOrUpdateBloodCollectionServiceValidation(
+        data as CreateOrUpdateBloodCollection,
+      ),
+    update: (data: unknown) =>
+      createOrUpdateBloodCollectionServiceValidation(
+        data as CreateOrUpdateBloodCollection,
+      ),
+  },
+  [SHORT_CODE.BLOOD_COLLECTION_ITEM]: {
+    create: (data: unknown) =>
+      createOrUpdateBloodCollectionItemServiceValidation(
+        data as CreateOrUpdateBloodCollectionItem,
+      ),
+    update: (data: unknown) =>
+      createOrUpdateBloodCollectionItemServiceValidation(
+        data as CreateOrUpdateBloodCollectionItem,
       ),
   },
 };

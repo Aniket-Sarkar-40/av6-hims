@@ -13,10 +13,9 @@ export type CreateOrUpdateBloodCrossMatchMethod = Omit<
   BaseModelAttr
 >;
 
-export interface BloodCrossMatchMethodDTO
-  extends Omit<
-    BloodCrossMatchMethod,
-    BaseModelAttrWoCancel | "bloodBankCenterId"
-  > {
+export interface BloodCrossMatchMethodDTO extends Omit<
+  BloodCrossMatchMethod,
+  BaseModelAttrWoCancel | "bloodBankCenterId"
+> {
   bloodBankCenter: IdValue | null;
 }

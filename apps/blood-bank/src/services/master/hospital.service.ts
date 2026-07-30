@@ -71,7 +71,7 @@ export const hospitalService = {
   },
 
   async getAllHospital(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<HospitalDTO[]> {
     logger.info("entering::getAllHospital::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.HOSPITAL);
@@ -85,7 +85,7 @@ export const hospitalService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Hospital")
+          generateErrorMessage("NOT_FOUND", "Hospital"),
         );
       else return [];
     }
@@ -96,7 +96,7 @@ export const hospitalService = {
 
   async getHospitalById(
     hospitalId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<HospitalDTO | null> {
     logger.info("entering::getHospitalById::service");
     validIdCheck(hospitalId);
@@ -107,7 +107,7 @@ export const hospitalService = {
     if (isCacheable) {
       hospital = (await getCacheById(
         cacheKey,
-        hospitalId
+        hospitalId,
       )) as HospitalResponse | null;
 
       if (hospital !== null) {
@@ -125,7 +125,7 @@ export const hospitalService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Hospital")
+          generateErrorMessage("NOT_FOUND", "Hospital"),
         );
       else return null;
     }
@@ -136,7 +136,7 @@ export const hospitalService = {
 
   async getHospitalByIdWoDTO(
     hospitalId: number,
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<Hospital | null> {
     logger.info("entering::getHospitalById::service");
     validIdCheck(hospitalId);
@@ -153,7 +153,7 @@ export const hospitalService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Hospital")
+          generateErrorMessage("NOT_FOUND", "Hospital"),
         );
       else return null;
     }
@@ -189,14 +189,14 @@ export const hospitalService = {
   },
 
   async getHospitalsByCcIdsAsLocation(
-    ccIds: number[]
+    ccIds: number[],
   ): Promise<HospitalDTOLocation[]> {
     logger.info("entering::getHospitalsByCcIdsAsLocation::service");
     if (!ccIds.length) return [];
 
     const hospitals = await getHospitalsByCcIdsFromDb(ccIds);
     const dtos = await Promise.all(
-      hospitals.map((w) => toHospitalDTOLocation(w))
+      hospitals.map((w) => toHospitalDTOLocation(w)),
     );
 
     logger.info("exiting::getHospitalsByCcIdsAsLocation::service");
@@ -204,7 +204,7 @@ export const hospitalService = {
   },
 
   async getAllHospitalWoDto(
-    canNullReturnable: boolean = false
+    canNullReturnable: boolean = false,
   ): Promise<Hospital[]> {
     logger.info("entering::getAllHospital::service");
     const isCacheable = await checkIsCacheable(SHORT_CODE.HOSPITAL);
@@ -218,7 +218,7 @@ export const hospitalService = {
       if (!canNullReturnable)
         throw new ErrorHandler(
           404,
-          generateErrorMessage("NOT_FOUND", "Hospital")
+          generateErrorMessage("NOT_FOUND", "Hospital"),
         );
       else return [];
     }

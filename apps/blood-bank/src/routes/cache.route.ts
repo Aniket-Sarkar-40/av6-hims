@@ -35,7 +35,7 @@ cacheRouter.post(
   "/load",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "CACHE", "VIEW")),
-  getAllCacheController
+  getAllCacheController,
 );
 /**
  * @swagger
@@ -57,13 +57,13 @@ cacheRouter.delete(
   "/delete",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "CACHE", "DELETE")),
-  clearCacheController
+  clearCacheController,
 );
 cacheRouter.delete(
   "/all",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "CACHE", "DELETE")),
-  clearAllCacheController
+  clearAllCacheController,
 );
 
 export default cacheRouter;

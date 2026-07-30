@@ -4,15 +4,15 @@ import { getFlowWiseApprovalStatus } from "../approval.utils.js";
 
 describe("getFlowWiseApprovalStatus", () => {
   it("maps pharmacy purchase order approve/reject to domain statuses", () => {
-    expect(
-      getFlowWiseApprovalStatus.APPROVED.PHARMACY.PURCHASE_ORDER,
-    ).toBe(ApprovalStatus.APPROVED);
-    expect(
-      getFlowWiseApprovalStatus.REJECTED.PHARMACY.PURCHASE_ORDER,
-    ).toBe("REJECTED");
-    expect(
-      getFlowWiseApprovalStatus.PENDING.PHARMACY.PURCHASE_ORDER,
-    ).toBe("SENT_FOR_APPROVAL");
+    expect(getFlowWiseApprovalStatus.APPROVED.PHARMACY.PURCHASE_ORDER).toBe(
+      ApprovalStatus.APPROVED,
+    );
+    expect(getFlowWiseApprovalStatus.REJECTED.PHARMACY.PURCHASE_ORDER).toBe(
+      "REJECTED",
+    );
+    expect(getFlowWiseApprovalStatus.PENDING.PHARMACY.PURCHASE_ORDER).toBe(
+      "SENT_FOR_APPROVAL",
+    );
   });
 
   it("maps inventory requisition statuses used by approval callbacks", () => {

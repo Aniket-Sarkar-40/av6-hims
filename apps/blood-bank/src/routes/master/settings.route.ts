@@ -40,7 +40,7 @@ settingsRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "SETTING", "CREATE")),
   validateSettings,
-  upsertSettings
+  upsertSettings,
 );
 
 /**
@@ -56,5 +56,5 @@ settingsRouter.get(
   "/",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "SETTING", "VIEW")),
-  getSettings
+  getSettings,
 );

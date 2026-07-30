@@ -3,6 +3,9 @@ enum BloodBankUinShortCode {
     HOS
     BBC
     COM
+    DONOR
+    CC
+    UNIT
 }
 
 enum BloodGroup {

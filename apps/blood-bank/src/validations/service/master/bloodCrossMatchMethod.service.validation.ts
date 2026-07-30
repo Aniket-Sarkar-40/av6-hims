@@ -9,7 +9,7 @@ import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
 
 export const validateIdBloodCrossMatchMethod = async (
-  id: number
+  id: number,
 ): Promise<BloodCrossMatchMethod> => {
   logger.info("entering::validateIdBloodCrossMatchMethod::service::validation");
 
@@ -26,7 +26,7 @@ export const validateIdBloodCrossMatchMethod = async (
   if (!row) {
     throw new ErrorHandler(
       404,
-      generateErrorMessage("NOT_FOUND", "Blood Cross Match Method")
+      generateErrorMessage("NOT_FOUND", "Blood Cross Match Method"),
     );
   }
   logger.info("exiting::validateIdBloodCrossMatchMethod::service::validation");
@@ -35,10 +35,10 @@ export const validateIdBloodCrossMatchMethod = async (
 };
 
 export const createOrUpdateBloodCrossMatchMethodServiceValidation = async (
-  body: CreateOrUpdateBloodCrossMatchMethod
+  body: CreateOrUpdateBloodCrossMatchMethod,
 ) => {
   logger.info(
-    "entering::createOrUpdateBloodCrossMatchMethodServiceValidation::service::validation"
+    "entering::createOrUpdateBloodCrossMatchMethodServiceValidation::service::validation",
   );
   if (body.id) {
     await validateIdBloodCrossMatchMethod(body.id);
@@ -57,11 +57,11 @@ export const createOrUpdateBloodCrossMatchMethodServiceValidation = async (
   if (bloodCrossMatchMethod) {
     throw new ErrorHandler(
       400,
-      generateErrorMessage("DUPLICATE_ITEM", "Blood Cross Match Method")
+      generateErrorMessage("DUPLICATE_ITEM", "Blood Cross Match Method"),
     );
   }
 
   logger.info(
-    "exiting::createOrUpdateBloodCrossMatchMethodServiceValidation::service::validation"
+    "exiting::createOrUpdateBloodCrossMatchMethodServiceValidation::service::validation",
   );
 };

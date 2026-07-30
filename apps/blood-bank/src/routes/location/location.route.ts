@@ -29,5 +29,5 @@ export const locationRouter: Router = Router();
 locationRouter.get(
   "/",
   verifyToken(ServiceCode.BLOOD_BANK),
-  getCollectionCenter
+  getCollectionCenter,
 );

@@ -5,7 +5,7 @@ import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toBloodComponentDTO = async (
-  data: BloodComponent[]
+  data: BloodComponent[],
 ): Promise<BloodComponentDTO[]> => {
   const allBloodBankCenters =
     await commonService.getAllElements<"BloodBankCenter">({
@@ -31,7 +31,7 @@ export const toBloodComponentDTO = async (
     ]);
 
     const bloodBankCenter = allBloodBankCenters.find(
-      (b) => b.id === bloodComponent.bloodBankCenterId
+      (b) => b.id === bloodComponent.bloodBankCenterId,
     );
     return {
       ...omittedBloodComponent.rest,

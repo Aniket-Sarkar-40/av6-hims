@@ -2804,3 +2804,146 @@ CREATE TABLE `bb_master_blood_external_center` (
     UNIQUE INDEX `bb_master_blood_external_center_blood_bank_center_id_center__key`(`blood_bank_center_id`, `center_name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+-- DropIndex
+DROP INDEX `bb_master_blood_external_center_blood_bank_center_id_center__key` ON `bb_master_blood_external_center`;
+
+-- AlterTable
+ALTER TABLE `bb_bank_uin_config` MODIFY `short_code` ENUM('TEMP_CODE', 'HOS', 'BBC', 'COM', 'DONOR', 'CC', 'UNIT') NOT NULL;
+
+-- CreateTable
+CREATE TABLE `bb_blood_donors` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `donor_no` VARCHAR(50) NOT NULL,
+    `donor_name` VARCHAR(150) NOT NULL,
+    `gender` ENUM('MALE', 'FEMALE', 'OTHER', 'UNKNOWN') NOT NULL DEFAULT 'UNKNOWN',
+    `date_of_birth` DATE NULL,
+    `age_years` INTEGER NULL,
+    `phone_no` VARCHAR(30) NULL,
+    `email` VARCHAR(100) NULL,
+    `address` TEXT NULL,
+    `blood_group` ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'BOMBAY', 'UNKNOWN') NULL,
+    `is_deferred` BOOLEAN NOT NULL DEFAULT false,
+    `deferral_reason` TEXT NULL,
+    `last_donation_at` DATETIME(3) NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `bb_blood_donors_blood_bank_center_id_phone_no_idx`(`blood_bank_center_id`, `phone_no`),
+    INDEX `bb_blood_donors_blood_group_idx`(`blood_group`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_blood_collections` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `collection_no` VARCHAR(100) NOT NULL,
+    `source_type` ENUM('DONOR_COLLECTION', 'EXTERNAL_RECEIVE', 'MANUAL_STOCK_ENTRY') NOT NULL,
+    `donor_id` INTEGER NULL,
+    `external_center_id` INTEGER NULL,
+    `donation_type` ENUM('VOLUNTARY', 'REPLACEMENT', 'DIRECTED', 'AUTOLOGOUS', 'APHERESIS', 'EXTERNAL', 'OTHER') NULL,
+    `collection_date` DATE NULL,
+    `received_at` DATETIME(3) NULL,
+    `received_by_staff_id` INTEGER NULL,
+    `external_reference_no` VARCHAR(100) NULL,
+    `external_document_no` VARCHAR(100) NULL,
+    `status` ENUM('DRAFT', 'COLLECTED', 'SCREENING_PENDING', 'PARTIALLY_ACCEPTED', 'ACCEPTED', 'PARTIALLY_POSTED_TO_STOCK', 'POSTED_TO_STOCK', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'DRAFT',
+    `remark` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `bb_blood_collections_blood_bank_center_id_status_idx`(`blood_bank_center_id`, `status`),
+    INDEX `bb_blood_collections_donor_id_idx`(`donor_id`),
+    INDEX `bb_blood_collections_external_center_id_idx`(`external_center_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_blood_collection_items` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `collection_id` INTEGER NOT NULL,
+    `unit_no` VARCHAR(100) NOT NULL,
+    `is_manual_unit_no` BOOLEAN NOT NULL DEFAULT false,
+    `batch_no` VARCHAR(100) NULL,
+    `bag_type` ENUM('SINGLE', 'DOUBLE', 'TRIPLE', 'QUADRUPLE', 'APHERESIS', 'OTHER') NULL,
+    `preliminary_blood_group` ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'BOMBAY', 'UNKNOWN') NULL,
+    `quantity_ml` DECIMAL(10, 2) NOT NULL,
+    `collection_date` DATE NULL,
+    `bag_expiry_date` DATE NULL,
+    `status` ENUM('DRAFT', 'COLLECTED', 'SCREENING_PENDING', 'SCREENING_ACCEPTED', 'SCREENING_REJECTED', 'QUARANTINED', 'POSTED_TO_STOCK', 'DISCARDED', 'CANCELLED') NOT NULL DEFAULT 'COLLECTED',
+    `is_stock_posted` BOOLEAN NOT NULL DEFAULT false,
+    `stock_posted_at` DATETIME(3) NULL,
+    `stock_posted_by_staff_id` INTEGER NULL,
+    `reject_reason` TEXT NULL,
+    `remark` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    INDEX `bb_blood_collection_items_blood_bank_center_id_status_idx`(`blood_bank_center_id`, `status`),
+    INDEX `bb_blood_collection_items_collection_id_idx`(`collection_id`),
+    INDEX `bb_blood_collection_items_batch_no_idx`(`batch_no`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_blood_donation_physical_exams` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `blood_bank_center_id` INTEGER NOT NULL,
+    `collection_id` INTEGER NOT NULL,
+    `donor_id` INTEGER NULL,
+    `examined_at` DATETIME(3) NULL,
+    `examined_by_staff_id` INTEGER NULL,
+    `is_accepted` BOOLEAN NULL,
+    `rejection_reason` TEXT NULL,
+    `remark` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    UNIQUE INDEX `bb_blood_donation_physical_exams_collection_id_key`(`collection_id`),
+    INDEX `bb_blood_donation_physical_exams_blood_bank_center_id_idx`(`blood_bank_center_id`),
+    INDEX `bb_blood_donation_physical_exams_donor_id_idx`(`donor_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `bb_blood_donation_physical_exam_answers` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `physical_exam_id` INTEGER NOT NULL,
+    `question_id` INTEGER NOT NULL,
+    `answer_value` TEXT NULL,
+    `answer_json` JSON NULL,
+    `remark` TEXT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_by` INTEGER NULL,
+    `updated_by` INTEGER NULL,
+    `deleted_by` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -5,7 +5,7 @@ import { logger } from "@repo/platform/logging/logger.js";
 import { BloodBankSetting } from "@repo/db/generated/prisma/client";
 
 export const createSettingsInDb = async (
-  data: CreateOrUpdateSettings
+  data: CreateOrUpdateSettings,
 ): Promise<BloodBankSetting> => {
   logger.info("entering::createSettingsInDb::repository");
   return db.$transaction(
@@ -30,7 +30,7 @@ export const createSettingsInDb = async (
     },
     {
       timeout: API_TIMEOUT,
-    }
+    },
   );
 };
 

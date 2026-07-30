@@ -1,3 +1,6 @@
+import { toBloodCollectionDTO } from "@/mapper/bloodCollection/bloodCollection.mapper.js";
+import { toBloodCollectionItemDTO } from "@/mapper/bloodCollectionItem/bloodCollectionItem.mapper.js";
+import { toBloodDonorDTO } from "@/mapper/bloodDonor/bloodDonor.mapper.js";
 import { toBloodBankCenterDTO } from "@/mapper/master/bloodBankCenter.mapper.js";
 import { toBloodComponentDTO } from "@/mapper/master/bloodComponent.mapper.js";
 import { toBloodCrossMatchMethodDTO } from "@/mapper/master/bloodCrossMatchMethod.mapper.js";
@@ -6,8 +9,11 @@ import { toBloodPhysicalExamQuestionDTO } from "@/mapper/master/bloodPhysicalExa
 import {
   BloodBankCenter,
   BloodBankUINConfig,
+  BloodCollection,
+  BloodCollectionItem,
   BloodComponent,
   BloodCrossMatchMethod,
+  BloodDonor,
   BloodExternalCenter,
   BloodPhysicalExamQuestion,
 } from "@repo/db/generated/prisma/client";
@@ -26,7 +32,13 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.BLOOD_CROSS_MATCH_METHOD]: (data: unknown) =>
     toBloodCrossMatchMethodDTO(data as BloodCrossMatchMethod[]),
   [SHORT_CODE.BLOOD_PHYSICAL_EXAM_QUESTION]: (data: unknown) =>
-    toBloodPhysicalExamQuestionDTO(data as BloodPhysicalExamQuestion[]), // Assuming no specific mapping is needed for this type
+    toBloodPhysicalExamQuestionDTO(data as BloodPhysicalExamQuestion[]),
   [SHORT_CODE.BLOOD_EXTERNAL_CENTER]: (data: unknown) =>
-    toBloodExternalCenterDTO(data as BloodExternalCenter[]), // Assuming no specific mapping is needed for this type
+    toBloodExternalCenterDTO(data as BloodExternalCenter[]),
+  [SHORT_CODE.BLOOD_DONOR]: (data: unknown) =>
+    toBloodDonorDTO(data as BloodDonor[]),
+  [SHORT_CODE.BLOOD_COLLECTION]: (data: unknown) =>
+    toBloodCollectionDTO(data as BloodCollection[]),
+  [SHORT_CODE.BLOOD_COLLECTION_ITEM]: (data: unknown) =>
+    toBloodCollectionItemDTO(data as BloodCollectionItem[]),
 };

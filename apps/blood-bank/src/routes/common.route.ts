@@ -65,7 +65,7 @@ commonRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateFixedSearchFetch,
-  fixedSearch
+  fixedSearch,
 );
 
 /**
@@ -86,7 +86,7 @@ commonRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateSearchRequest,
-  commonSearch
+  commonSearch,
 );
 
 /**
@@ -107,7 +107,7 @@ commonRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateDropdownRequest,
-  commonDropdownSearch
+  commonDropdownSearch,
 );
 
 /**
@@ -128,7 +128,7 @@ commonRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateFixedSearchWoPagination,
-  fixedSearchWoPaginationController
+  fixedSearchWoPaginationController,
 );
 
 /**
@@ -149,7 +149,7 @@ commonRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateCommonFetch,
-  commonFetch
+  commonFetch,
 );
 
 /**
@@ -170,7 +170,7 @@ commonRouter.post(
   createUploadMiddleware("excelFile"),
   uploadToHetzner("excel"),
   validateCommonImportExcel,
-  commonExcelImport
+  commonExcelImport,
 );
 
 /**
@@ -200,7 +200,7 @@ commonRouter.delete(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateCommonDelete,
-  commonDelete
+  commonDelete,
 );
 
 /**
@@ -221,28 +221,28 @@ commonRouter.patch(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateCommonUpdateStatus,
-  commonUpdateStatus
+  commonUpdateStatus,
 );
 
 commonRouter.post(
   "/create",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
-  commonCreate
+  commonCreate,
 );
 
 commonRouter.post(
   "/multi-create-update",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
-  commonMultiCreateUpdate
+  commonMultiCreateUpdate,
 );
 
 commonRouter.put(
   "/update",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
-  commonUpdate
+  commonUpdate,
 );
 
 /**
@@ -264,7 +264,7 @@ commonRouter.post(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorizeCommonSearch(),
   validateCommonExcelExport,
-  commonFSExcelExport
+  commonFSExcelExport,
 );
 
 commonRouter.patch(
@@ -272,12 +272,12 @@ commonRouter.patch(
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "DYNAMIC_SHORT_CODE", "UPDATE")),
   validateUpdateConfigByCode,
-  updateConfigByCode
+  updateConfigByCode,
 );
 
 commonRouter.get(
   "/shortcode-config",
   verifyToken(ServiceCode.BLOOD_BANK),
   authorize(getPermission("BLOOD_BANK", "DYNAMIC_SHORT_CODE", "VIEW")),
-  getConfigByShortCode
+  getConfigByShortCode,
 );

@@ -10,7 +10,9 @@ export type CreateOrUpdateBloodBankCenter = Omit<
   BaseModelAttr
 >;
 
-export interface BloodBankCenterDTO
-  extends Omit<BloodBankCenter, BaseModelAttrWoCancel | "hospitalId"> {
+export interface BloodBankCenterDTO extends Omit<
+  BloodBankCenter,
+  BaseModelAttrWoCancel | "hospitalId"
+> {
   hospital: IdValue | null;
 }
