@@ -1,5 +1,5 @@
 import { uinServiceFactory } from "@/config/core.config.js";
-import { getByUnique } from "@/repository/common.repository.js";
+import { getAll, getByUnique } from "@/repository/common.repository.js";
 import { CreateOrUpdateBloodCollection } from "@/types/bloodCollection/bloodCollection.js";
 import { validateIdBloodDonor } from "@/validations/service/bloodDonor/bloodDonor.service.validation.js";
 import { validateIdBloodBankCenter } from "@/validations/service/master/bloodBankCenter.service.validation.js";
@@ -10,6 +10,7 @@ import {
   BloodCollectionSourceType,
   BloodCollectionStatus,
   BloodDonationType,
+  BloodDonorGender,
 } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
@@ -154,14 +155,73 @@ export const createOrUpdateBloodCollectionServiceValidation = async (
     );
   }
 
-  if (
-    body.donationType &&
-    !Object.values(BloodDonationType).includes(body.donationType)
-  ) {
-    throw new ErrorHandler(
-      400,
-      generateErrorMessage("INVALID_VALUE", "Donation Type"),
-    );
+  if (body.donorId) {
+    const donor = await validateIdBloodDonor(body.donorId);
+    if (!donor.ageYears) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("NOT_FOUND", "Donor Age"),
+      );
+    }
+    const ageYears = donor.ageYears;
+    if (ageYears < 18 || ageYears > 65) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("MUST_BETWEEN", "Age", "18", "65"),
+      );
+    }
+
+    const totalDonationCount = await getAll({
+      model: "BloodCollection",
+      where: {
+        donorId: donor.id,
+      },
+    });
+
+    if (totalDonationCount.length < 1 && donor.ageYears > 60) {
+      throw new ErrorHandler(
+        400,
+        "First time donors must be below 60 years of age.",
+      );
+    }
+
+    if (body.donationType === BloodDonationType.WHOLE_BLOOD) {
+      const lastDonationDate = donor.lastDonationAt;
+      if (lastDonationDate) {
+        const currentDate = new Date();
+        const lastDonation = new Date(lastDonationDate);
+        const diffInDays =
+          (currentDate.getTime() - lastDonation.getTime()) / (1000 * 3600 * 24);
+        if (donor.gender) {
+          if (donor.gender === BloodDonorGender.FEMALE && lastDonationDate) {
+            if (diffInDays < 120) {
+              throw new ErrorHandler(
+                400,
+                generateErrorMessage(
+                  "GREATER_THAN_OR_EQUAL_TO",
+                  "Last Donation Date",
+                  "120 days",
+                ),
+              );
+            }
+          } else if (
+            donor.gender === BloodDonorGender.MALE &&
+            lastDonationDate
+          ) {
+            if (diffInDays < 90) {
+              throw new ErrorHandler(
+                400,
+                generateErrorMessage(
+                  "GREATER_THAN_OR_EQUAL_TO",
+                  "Last Donation Date",
+                  "90 days",
+                ),
+              );
+            }
+          }
+        }
+      }
+    }
   }
 
   logger.info(

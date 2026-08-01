@@ -51,42 +51,6 @@ export const createOrUpdateBloodDonorServiceValidation = async (
     );
   }
 
-  const duplicateDonor = await getByUnique({
-    model: "BloodDonor",
-    where: {
-      bloodBankCenterId: body.bloodBankCenterId,
-      donorNo: body.donorNo,
-      NOT: body.id ? { id: body.id } : undefined,
-    },
-  });
-
-  if (duplicateDonor) {
-    throw new ErrorHandler(
-      400,
-      generateErrorMessage(
-        "DUPLICATE_ITEM",
-        "Donor No for this Blood Bank Center",
-      ),
-    );
-  }
-
-  if (body.email) {
-    const emailDuplicate = await getByUnique({
-      model: "BloodDonor",
-      where: {
-        email: body.email,
-        NOT: body.id ? { id: body.id } : undefined,
-      },
-    });
-
-    if (emailDuplicate) {
-      throw new ErrorHandler(
-        400,
-        generateErrorMessage("DUPLICATE_ITEM", "Email"),
-      );
-    }
-  }
-
   if (body.phoneNo && (body.donorName || body.dateOfBirth)) {
     const phoneDuplicate = await getByUnique({
       model: "BloodDonor",
@@ -125,12 +89,52 @@ export const createOrUpdateBloodDonorServiceValidation = async (
     if (body.ageYears && body.ageYears !== age) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_VALUE", "Age Years"),
+        generateErrorMessage(
+          "VALUE_MISMATCH",
+          "Age Years",
+          "Age calculated from DOB",
+        ),
       );
     }
   }
 
+  if (body.email) {
+    const emailDuplicate = await getByUnique({
+      model: "BloodDonor",
+      where: {
+        email: body.email,
+        NOT: body.id ? { id: body.id } : undefined,
+      },
+    });
+
+    if (emailDuplicate) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage("DUPLICATE_ITEM", "Email"),
+      );
+    }
+  }
+
+  const duplicateDonor = await getByUnique({
+    model: "BloodDonor",
+    where: {
+      bloodBankCenterId: body.bloodBankCenterId,
+      donorNo: body.donorNo,
+      NOT: body.id ? { id: body.id } : undefined,
+    },
+  });
+
+  if (duplicateDonor) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "DUPLICATE_ITEM",
+        "Donor No for this Blood Bank Center",
+      ),
+    );
+  }
+
   logger.info(
-    "exiting::createOrUpdateBloodBankCenterServiceValidation::service::validation",
+    "exiting::createOrUpdateBloodDonorServiceValidation::service::validation",
   );
 };
