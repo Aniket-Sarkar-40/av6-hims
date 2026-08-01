@@ -2947,3 +2947,19 @@ CREATE TABLE `bb_blood_donation_physical_exam_answers` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+-- AlterTable
+ALTER TABLE `bb_blood_collections` MODIFY `donation_type` ENUM('WHOLE_BLOOD', 'VOLUNTARY', 'REPLACEMENT', 'DIRECTED', 'AUTOLOGOUS', 'APHERESIS', 'EXTERNAL', 'OTHER') NULL;
+
+-- AlterTable
+ALTER TABLE `bb_blood_donation_physical_exams` ADD COLUMN `deferral_reason` TEXT NULL,
+    ADD COLUMN `deferral_type` ENUM('TEMPORARY', 'PERMANENT', 'MEDICAL', 'OTHER') NULL,
+    ADD COLUMN `diastolic_bp` INTEGER NULL,
+    ADD COLUMN `hemoglobin_gdl` DECIMAL(6, 2) NULL,
+    ADD COLUMN `is_fit` BOOLEAN NULL,
+    ADD COLUMN `next_eligible_date` DATE NULL,
+    ADD COLUMN `pulse_per_min` INTEGER NULL,
+    ADD COLUMN `systolic_bp` INTEGER NULL,
+    ADD COLUMN `temperature_c` DECIMAL(6, 2) NULL,
+    ADD COLUMN `weight_kg` DECIMAL(6, 2) NULL;

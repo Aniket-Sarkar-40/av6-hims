@@ -42,6 +42,7 @@ enum BloodCollectionSourceType {
 }
 
 enum BloodDonationType {
+    WHOLE_BLOOD
     VOLUNTARY
     REPLACEMENT
     DIRECTED
@@ -275,4 +276,11 @@ enum BloodReactionSeverity {
     LIFE_THREATENING
     FATAL
     UNKNOWN
+}
+
+enum BloodDeferralType {
+    TEMPORARY
+    PERMANENT
+    MEDICAL
+    OTHER
 }

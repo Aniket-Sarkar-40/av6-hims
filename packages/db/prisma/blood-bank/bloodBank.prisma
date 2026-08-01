@@ -322,7 +322,6 @@ model BloodPhysicalExamQuestion {
     deletedAt DateTime? @map("deleted_at")
 
     bloodBankCenter                  BloodBankCenter                   @relation(fields: [bloodBankCenterId], references: [id])
-    //answers         BloodDonationPhysicalExamAnswer[]
     bloodDonationPhysicalExamAnswers BloodDonationPhysicalExamAnswer[]
 
     @@index([bloodBankCenterId, sortOrder])
@@ -334,6 +333,17 @@ model BloodDonationPhysicalExam {
     bloodBankCenterId Int  @map("blood_bank_center_id")
     collectionId      Int  @unique @map("collection_id")
     donorId           Int? @map("donor_id")
+
+    weightKg         Decimal?           @map("weight_kg") @db.Decimal(6, 2)
+    hemoglobinGdl    Decimal?           @map("hemoglobin_gdl") @db.Decimal(6, 2)
+    systolicBp       Int?               @map("systolic_bp")
+    diastolicBp      Int?               @map("diastolic_bp")
+    pulsePerMin      Int?               @map("pulse_per_min")
+    temperatureC     Decimal?           @map("temperature_c") @db.Decimal(6, 2)
+    isFit            Boolean?           @map("is_fit")
+    deferralType     BloodDeferralType? @map("deferral_type")
+    deferralReason   String?            @map("deferral_reason") @db.Text
+    nextEligibleDate DateTime?          @map("next_eligible_date") @db.Date
 
     examinedAt        DateTime? @map("examined_at")
     examinedByStaffId Int?      @map("examined_by_staff_id")
