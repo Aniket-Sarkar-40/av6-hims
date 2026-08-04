@@ -56,6 +56,17 @@ export async function runSeed() {
 
   const dynamicShortCodes: DynamicShortCodeSeeder[] = [
     {
+      shortCode: "DYNAMIC_SHORT_CODE",
+      tableName: "bloodBankDynamicShortCode",
+      isDTO: true,
+      isCacheable: true,
+      permission: "blood-bank:dynamic-short-code:view",
+      isDropDown: true,
+      isSingleDto: false,
+      whereClause: JSON.stringify({}),
+      selectClause: JSON.stringify({ id: "id", value: "shortCode" }),
+    },
+    {
       shortCode: "SETTINGS",
       tableName: "bloodBankSetting",
       isDTO: false,

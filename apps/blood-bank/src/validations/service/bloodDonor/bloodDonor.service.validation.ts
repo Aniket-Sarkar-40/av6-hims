@@ -5,7 +5,6 @@ import { validateIdBloodBankCenter } from "@/validations/service/master/bloodBan
 import {
   BloodBankUinShortCode,
   BloodDonor,
-  BloodDonorGender,
 } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
@@ -75,13 +74,6 @@ export const createOrUpdateBloodDonorServiceValidation = async (
     }
   }
 
-  if (body.gender && !Object.values(BloodDonorGender).includes(body.gender)) {
-    throw new ErrorHandler(
-      400,
-      generateErrorMessage("INVALID_VALUE", "Gender"),
-    );
-  }
-
   if (body.dateOfBirth) {
     const today = new Date();
     const birthDate = new Date(body.dateOfBirth);
@@ -120,6 +112,7 @@ export const createOrUpdateBloodDonorServiceValidation = async (
     where: {
       bloodBankCenterId: body.bloodBankCenterId,
       donorNo: body.donorNo,
+      donorName: body.donorName,
       NOT: body.id ? { id: body.id } : undefined,
     },
   });

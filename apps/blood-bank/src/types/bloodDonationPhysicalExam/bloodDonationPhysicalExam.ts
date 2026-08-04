@@ -8,10 +8,17 @@ import {
   BaseModelAttrWoCancel,
 } from "@repo/shared/types/global.js";
 
-export type CreateOrUpdateBloodDonationPhysicalExam = Omit<
+export type BloodDonationPhysicalExamResponse = Omit<
+  Prisma.BloodDonationPhysicalExamAnswerUncheckedCreateInput,
+  BaseModelAttrWoCancel | "physicalExamId"
+>;
+
+export interface CreateOrUpdateBloodDonationPhysicalExam extends Omit<
   Prisma.BloodDonationPhysicalExamUncheckedCreateInput,
   BaseModelAttr
->;
+> {
+  examResponse: BloodDonationPhysicalExamResponse[];
+}
 
 export interface BloodDonationPhysicalExamDTO extends Omit<
   BloodDonationPhysicalExam,

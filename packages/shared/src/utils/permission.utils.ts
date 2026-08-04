@@ -236,10 +236,6 @@ export enum PermissionResource {
   LOCK_UNLOCK_COMPANY_FINANCIAL_YEAR = "lock-unlock-company-financial-year",
   // =========== master group resource end ===========
 
-  // =========== settings group resource start ===========
-  SETTINGS = "settings",
-  // =========== settings group resource end ===========
-
   // =========== voucher group resource start ===========
   VOUCHER_ENTRY = "voucher-entry",
   CANCEL_VOUCHER = "cancel-voucher",
@@ -300,6 +296,11 @@ export enum PermissionResource {
   BLOOD_BANK_CENTER = "blood-bank-center",
   BLOOD_COMPONENT = "blood-component",
   BLOOD_CROSS_MATCH_METHOD = "blood-cross-match-method",
+  BLOOD_DONOR = "blood-donor",
+  BLOOD_DONATION_PHYSICAL_EXAM = "blood-donation-physical-exam",
+  BLOOD_DONATION_PHYSICAL_EXAM_ANSWER = "blood-donation-physical-exam-answer",
+  BLOOD_COLLECTION = "blood-collection",
+  BLOOD_COLLECTION_ITEM = "blood-collection-item",
 }
 
 export enum PermissionModule {

@@ -117,6 +117,7 @@ model BloodBankCenter {
     bloodCollectionItems       BloodCollectionItem[]
     bloodDonationPhysicalExams BloodDonationPhysicalExam[]
 
+    @@index([hospitalId])
     @@map("bb_master_blood_bank_centers")
 }
 
@@ -175,6 +176,7 @@ model BloodCrossMatchMethod {
 
     bloodBankCenter BloodBankCenter @relation(fields: [bloodBankCenterId], references: [id])
 
+    @@index([bloodBankCenterId])
     @@map("bb_master_blood_cross_match_method")
 }
 
@@ -216,6 +218,7 @@ model BloodDonor {
 model BloodCollection {
     id                Int @id @default(autoincrement())
     bloodBankCenterId Int @map("blood_bank_center_id")
+    physicalExamId    Int @map("physical_exam_id")
 
     collectionNo String                    @map("collection_no") @db.VarChar(100)
     sourceType   BloodCollectionSourceType @map("source_type")
@@ -249,11 +252,13 @@ model BloodCollection {
     receivedByStaff Staff?               @relation(fields: [receivedByStaffId], references: [id])
 
     items        BloodCollectionItem[]
-    physicalExam BloodDonationPhysicalExam?
+    physicalExam BloodDonationPhysicalExam? @relation(fields: [physicalExamId], references: [id])
 
+    @@index([externalCenterId])
     @@index([bloodBankCenterId, status])
     @@index([donorId])
-    @@index([externalCenterId])
+    @@index([receivedByStaffId])
+    @@index([physicalExamId])
     @@map("bb_blood_collections")
 }
 
@@ -300,6 +305,7 @@ model BloodCollectionItem {
     @@index([bloodBankCenterId, status])
     @@index([collectionId])
     @@index([batchNo])
+    @@index([stockPostedByStaffId])
     @@map("bb_blood_collection_items")
 }
 
@@ -329,27 +335,14 @@ model BloodPhysicalExamQuestion {
 }
 
 model BloodDonationPhysicalExam {
-    id                Int  @id @default(autoincrement())
-    bloodBankCenterId Int  @map("blood_bank_center_id")
-    collectionId      Int  @unique @map("collection_id")
-    donorId           Int? @map("donor_id")
-
-    weightKg         Decimal?           @map("weight_kg") @db.Decimal(6, 2)
-    hemoglobinGdl    Decimal?           @map("hemoglobin_gdl") @db.Decimal(6, 2)
-    systolicBp       Int?               @map("systolic_bp")
-    diastolicBp      Int?               @map("diastolic_bp")
-    pulsePerMin      Int?               @map("pulse_per_min")
-    temperatureC     Decimal?           @map("temperature_c") @db.Decimal(6, 2)
-    isFit            Boolean?           @map("is_fit")
-    deferralType     BloodDeferralType? @map("deferral_type")
-    deferralReason   String?            @map("deferral_reason") @db.Text
-    nextEligibleDate DateTime?          @map("next_eligible_date") @db.Date
-
-    examinedAt        DateTime? @map("examined_at")
-    examinedByStaffId Int?      @map("examined_by_staff_id")
-    isAccepted        Boolean?  @map("is_accepted")
-    rejectionReason   String?   @map("rejection_reason") @db.Text
-    remark            String?   @db.Text
+    id                Int      @id @default(autoincrement())
+    bloodBankCenterId Int      @map("blood_bank_center_id")
+    donorId           Int      @map("donor_id")
+    examinedAt        DateTime @map("examined_at")
+    examinedByStaffId Int      @map("examined_by_staff_id")
+    isAccepted        Boolean? @default(false) @map("is_accepted")
+    rejectionReason   String?  @map("rejection_reason") @db.Text
+    remark            String?  @db.Text
 
     isActive  Boolean   @default(true) @map("is_active")
     createdBy Int?      @map("created_by")
@@ -360,14 +353,15 @@ model BloodDonationPhysicalExam {
     deletedAt DateTime? @map("deleted_at")
 
     bloodBankCenter BloodBankCenter @relation(fields: [bloodBankCenterId], references: [id])
-    collection      BloodCollection @relation(fields: [collectionId], references: [id])
     donor           BloodDonor?     @relation(fields: [donorId], references: [id])
     examinedByStaff Staff?          @relation(fields: [examinedByStaffId], references: [id])
 
-    answers BloodDonationPhysicalExamAnswer[]
+    answers          BloodDonationPhysicalExamAnswer[]
+    bloodCollections BloodCollection[]
 
     @@index([bloodBankCenterId])
     @@index([donorId])
+    @@index([examinedByStaffId])
     @@map("bb_blood_donation_physical_exams")
 }
 
@@ -391,6 +385,8 @@ model BloodDonationPhysicalExamAnswer {
     physicalExam BloodDonationPhysicalExam @relation(fields: [physicalExamId], references: [id])
     question     BloodPhysicalExamQuestion @relation(fields: [questionId], references: [id])
 
+    @@index([physicalExamId])
+    @@index([questionId])
     @@map("bb_blood_donation_physical_exam_answers")
 }
 
@@ -417,5 +413,6 @@ model BloodExternalCenter {
     //collections     BloodCollection[]
     bloodCollections BloodCollection[]
 
+    @@index([bloodBankCenterId])
     @@map("bb_master_blood_external_center")
 }

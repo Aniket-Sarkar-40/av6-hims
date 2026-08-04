@@ -59,6 +59,12 @@ const MODULE_REGISTRY: ModuleDefinition[] = [
     createApp: createAccApp,
     initializeCache: initializeAccCache,
   },
+  {
+    code: "blood-bank",
+    mountPath: "/api/v1/blood-bank",
+    createApp: createBloodBankApp,
+    initializeCache: initializeBloodBankCache,
+  },
 ];
 
 // Empty ENABLED_APPS => enable everything (dev convenience).
