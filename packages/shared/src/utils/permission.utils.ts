@@ -14,7 +14,7 @@ export enum PermissionResource {
   STORAGE = "storage",
   TAX_DETAILS = "tax-details",
   DYNAMIC_FROM = "dynamic-from",
-  SETTING = "settings",
+  SETTINGS = "settings",
   ITEM_SUPPLIER = "item-supplier",
   ITEM_CATEGORY = "item-category",
   ITEM_STORE = "item-store",

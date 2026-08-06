@@ -1,9 +1,12 @@
 import { getAll, getByUnique } from "@/repository/common.repository.js";
-import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/bloodDonationPhysicalExam/bloodDonationPhysicalExam.js";
+import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/physicalExam/physicalExam.js";
 import { validateIdBloodDonor } from "@/validations/service/bloodDonor/bloodDonor.service.validation.js";
 import { validateIdBloodBankCenter } from "@/validations/service/master/bloodBankCenter.service.validation.js";
 import { validateIdBloodPhysicalExamQuestion } from "@/validations/service/master/bloodPhysicalExamQuestion.service.validation.js";
-import { BloodDonationPhysicalExam } from "@repo/db/generated/prisma/client";
+import {
+  BloodDonationPhysicalExam,
+  BloodDonorGender,
+} from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
@@ -44,7 +47,53 @@ export const upsertPhysicalExamServiceValidation = async (
     await validateIdPhysicalExam(body.id);
   }
 
-  await validateIdBloodDonor(body.donorId);
+  const donor = await validateIdBloodDonor(body.donorId);
+
+  if (donor.ageYears && (donor.ageYears < 18 || donor.ageYears > 60)) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage("MUST_BETWEEN", "Donor Age", "18", "60"),
+    );
+  }
+
+  const lastDonationAt = donor.lastDonationAt;
+  const currentDate = new Date();
+  const daysSinceLastDonation = lastDonationAt
+    ? Math.floor(
+        (currentDate.getTime() - lastDonationAt.getTime()) /
+          (1000 * 60 * 60 * 24),
+      )
+    : null;
+
+  if (
+    donor.gender === BloodDonorGender.FEMALE &&
+    daysSinceLastDonation !== null &&
+    daysSinceLastDonation < 120
+  ) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "MUST_GREATER_THEN",
+        "Days Since Last Donation",
+        "120",
+      ),
+    );
+  }
+
+  if (
+    donor.gender === BloodDonorGender.MALE &&
+    daysSinceLastDonation !== null &&
+    daysSinceLastDonation < 90
+  ) {
+    throw new ErrorHandler(
+      400,
+      generateErrorMessage(
+        "MUST_GREATER_THEN",
+        "Days Since Last Donation",
+        "90",
+      ),
+    );
+  }
 
   await validateIdBloodBankCenter(body.bloodBankCenterId);
 

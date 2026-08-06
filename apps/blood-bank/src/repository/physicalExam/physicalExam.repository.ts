@@ -1,4 +1,4 @@
-import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/bloodDonationPhysicalExam/bloodDonationPhysicalExam.js";
+import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/physicalExam/physicalExam.js";
 import { db } from "@repo/db/client";
 import { requestStorage } from "@repo/platform/config/requestContext.js";
 import { logger } from "@repo/platform/logging/logger.js";

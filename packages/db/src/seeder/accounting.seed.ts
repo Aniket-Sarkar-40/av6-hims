@@ -1,9 +1,5 @@
 import { db } from "@repo/db";
-import {
-  PdfTemplateType,
-  Prisma,
-  ServiceCode,
-} from "@repo/db/generated/prisma/client";
+import { Prisma } from "@repo/db/generated/prisma/client";
 
 import { createClient } from "redis";
 

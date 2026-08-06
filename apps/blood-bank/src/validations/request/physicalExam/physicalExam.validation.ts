@@ -1,7 +1,7 @@
 import {
-  BloodDonationPhysicalExamResponse,
+  BloodDonationPhysicalExamAnswers,
   CreateOrUpdateBloodDonationPhysicalExam,
-} from "@/types/bloodDonationPhysicalExam/bloodDonationPhysicalExam.js";
+} from "@/types/physicalExam/physicalExam.js";
 import {
   boolOptional,
   dateRequired,
@@ -25,7 +25,7 @@ export const upsertPhysicalExamSchema =
     remark: strOptional("Remarks"),
     examResponse: Joi.array()
       .items(
-        Joi.object<BloodDonationPhysicalExamResponse>({
+        Joi.object<BloodDonationPhysicalExamAnswers>({
           id: idOptional("Answer Id"),
           questionId: idRequired("Question Id"),
           answerJson: strOptional("Answer Json"),
@@ -34,7 +34,7 @@ export const upsertPhysicalExamSchema =
       )
       .min(1)
       .required()
-      .custom((value: BloodDonationPhysicalExamResponse[], helpers) => {
+      .custom((value: BloodDonationPhysicalExamAnswers[], helpers) => {
         const questionIds = value.map((item) => item.questionId);
 
         const duplicateQuestionId = questionIds.find(

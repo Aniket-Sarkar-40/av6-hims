@@ -1,13 +1,13 @@
 import { toBloodCollectionDTO } from "@/mapper/bloodCollection/bloodCollection.mapper.js";
 import { toBloodCollectionItemDTO } from "@/mapper/bloodCollectionItem/bloodCollectionItem.mapper.js";
-import { toBloodDonationPhysicalExamDTO } from "@/mapper/bloodDonationPhysicalExam/bloodDonationPhysicalExam.mapper.js";
-import { toBloodDonationPhysicalExamAnswerDTO } from "@/mapper/bloodDonationPhysicalExamQuestion/bloodDonationPhysicalExamQuestion.mapper.js";
 import { toBloodDonorDTO } from "@/mapper/bloodDonor/bloodDonor.mapper.js";
 import { toBloodBankCenterDTO } from "@/mapper/master/bloodBankCenter.mapper.js";
 import { toBloodComponentDTO } from "@/mapper/master/bloodComponent.mapper.js";
 import { toBloodCrossMatchMethodDTO } from "@/mapper/master/bloodCrossMatchMethod.mapper.js";
 import { toBloodExternalCenterDTO } from "@/mapper/master/bloodExternalCenter.mapper.js";
 import { toBloodPhysicalExamQuestionDTO } from "@/mapper/master/bloodPhysicalExamQuestion.mapper.js";
+import { toBloodDonationPhysicalExamDTO } from "@/mapper/physicalExam/physicalExam.mapper.js";
+import { BloodDonationPhysicalExamResponse } from "@/types/physicalExam/physicalExam.js";
 import {
   BloodBankCenter,
   BloodBankUINConfig,
@@ -15,8 +15,6 @@ import {
   BloodCollectionItem,
   BloodComponent,
   BloodCrossMatchMethod,
-  BloodDonationPhysicalExam,
-  BloodDonationPhysicalExamAnswer,
   BloodDonor,
   BloodExternalCenter,
   BloodPhysicalExamQuestion,
@@ -46,9 +44,5 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.BLOOD_COLLECTION_ITEM]: (data: unknown) =>
     toBloodCollectionItemDTO(data as BloodCollectionItem[]),
   [SHORT_CODE.BLOOD_DONATION_PHYSICAL_EXAM]: (data: unknown) =>
-    toBloodDonationPhysicalExamDTO(data as BloodDonationPhysicalExam[]),
-  [SHORT_CODE.BLOOD_DONATION_PHYSICAL_EXAM_ANSWER]: (data: unknown) =>
-    toBloodDonationPhysicalExamAnswerDTO(
-      data as BloodDonationPhysicalExamAnswer[],
-    ),
+    toBloodDonationPhysicalExamDTO(data as BloodDonationPhysicalExamResponse[]),
 };

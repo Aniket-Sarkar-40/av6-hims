@@ -1,5 +1,5 @@
 import { physicalExamService } from "@/services/physicalExam/physicalExam.service.js";
-import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/bloodDonationPhysicalExam/bloodDonationPhysicalExam.js";
+import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/physicalExam/physicalExam.js";
 import { TryCatch } from "@repo/platform";
 import { logger } from "@repo/platform/logging/logger.js";
 import { BaseResponse } from "@repo/shared/utils/baseResponse.utils.js";

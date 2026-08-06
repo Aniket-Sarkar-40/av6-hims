@@ -2462,27 +2462,6 @@ ALTER TABLE `staff` ADD COLUMN `tele_radiologist` ENUM('Yes', 'No') NOT NULL DEF
     MODIFY `ssnit_no` VARCHAR(255) NOT NULL,
     MODIFY `other_scheme` VARCHAR(255) NOT NULL;
 
--- DropTable
-DROP TABLE `bb_bank_uin_config`;
-
--- DropTable
-DROP TABLE `bb_dynamic_short_code`;
-
--- DropTable
-DROP TABLE `bb_master_blood_bank_centers`;
-
--- DropTable
-DROP TABLE `bb_master_blood_component`;
-
--- DropTable
-DROP TABLE `bb_master_blood_cross_match_method`;
-
--- DropTable
-DROP TABLE `bb_master_hospital`;
-
--- DropTable
-DROP TABLE `bb_settings`;
-
 -- CreateTable
 CREATE TABLE `accounting_multi_voucher` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -2963,3 +2942,74 @@ ALTER TABLE `bb_blood_donation_physical_exams` ADD COLUMN `deferral_reason` TEXT
     ADD COLUMN `systolic_bp` INTEGER NULL,
     ADD COLUMN `temperature_c` DECIMAL(6, 2) NULL,
     ADD COLUMN `weight_kg` DECIMAL(6, 2) NULL;
+
+
+/*
+  Warnings:
+
+  - You are about to drop the column `collection_id` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `deferral_reason` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `deferral_type` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `diastolic_bp` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `hemoglobin_gdl` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `is_fit` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `next_eligible_date` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `pulse_per_min` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `systolic_bp` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `temperature_c` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - You are about to drop the column `weight_kg` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
+  - Added the required column `physical_exam_id` to the `bb_blood_collections` table without a default value. This is not possible if the table is not empty.
+  - Made the column `donor_id` on table `bb_blood_donation_physical_exams` required. This step will fail if there are existing NULL values in that column.
+  - Made the column `examined_at` on table `bb_blood_donation_physical_exams` required. This step will fail if there are existing NULL values in that column.
+  - Made the column `examined_by_staff_id` on table `bb_blood_donation_physical_exams` required. This step will fail if there are existing NULL values in that column.
+
+*/
+-- DropIndex
+DROP INDEX `bb_blood_donation_physical_exams_collection_id_key` ON `bb_blood_donation_physical_exams`;
+
+-- AlterTable
+ALTER TABLE `bb_blood_collections` ADD COLUMN `physical_exam_id` INTEGER NOT NULL;
+
+-- AlterTable
+ALTER TABLE `bb_blood_donation_physical_exams` DROP COLUMN `collection_id`,
+    DROP COLUMN `deferral_reason`,
+    DROP COLUMN `deferral_type`,
+    DROP COLUMN `diastolic_bp`,
+    DROP COLUMN `hemoglobin_gdl`,
+    DROP COLUMN `is_fit`,
+    DROP COLUMN `next_eligible_date`,
+    DROP COLUMN `pulse_per_min`,
+    DROP COLUMN `systolic_bp`,
+    DROP COLUMN `temperature_c`,
+    DROP COLUMN `weight_kg`,
+    MODIFY `donor_id` INTEGER NOT NULL,
+    MODIFY `examined_at` DATETIME(3) NOT NULL,
+    MODIFY `examined_by_staff_id` INTEGER NOT NULL,
+    MODIFY `is_accepted` BOOLEAN NULL DEFAULT false;
+
+-- CreateIndex
+CREATE INDEX `bb_blood_collection_items_stock_posted_by_staff_id_idx` ON `bb_blood_collection_items`(`stock_posted_by_staff_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_blood_collections_received_by_staff_id_idx` ON `bb_blood_collections`(`received_by_staff_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_blood_collections_physical_exam_id_idx` ON `bb_blood_collections`(`physical_exam_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_blood_donation_physical_exam_answers_physical_exam_id_idx` ON `bb_blood_donation_physical_exam_answers`(`physical_exam_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_blood_donation_physical_exam_answers_question_id_idx` ON `bb_blood_donation_physical_exam_answers`(`question_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_blood_donation_physical_exams_examined_by_staff_id_idx` ON `bb_blood_donation_physical_exams`(`examined_by_staff_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_master_blood_bank_centers_hospital_id_idx` ON `bb_master_blood_bank_centers`(`hospital_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_master_blood_cross_match_method_blood_bank_center_id_idx` ON `bb_master_blood_cross_match_method`(`blood_bank_center_id`);
+
+-- CreateIndex
+CREATE INDEX `bb_master_blood_external_center_blood_bank_center_id_idx` ON `bb_master_blood_external_center`(`blood_bank_center_id`);

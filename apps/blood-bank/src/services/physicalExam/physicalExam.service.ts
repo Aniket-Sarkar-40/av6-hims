@@ -1,6 +1,6 @@
 import { upsertPhysicalExamInDb } from "@/repository/physicalExam/physicalExam.repository.js";
-import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/bloodDonationPhysicalExam/bloodDonationPhysicalExam.js";
-import { upsertPhysicalExamServiceValidation } from "@/validations/service/bloodDonationPhysicalExam/bloodDonationPhysicalExam.service.validation.js";
+import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/physicalExam/physicalExam.js";
+import { upsertPhysicalExamServiceValidation } from "@/validations/service/physicalExam/physicalExam.service.validation.js";
 import { logger } from "@repo/platform/logging/logger.js";
 
 export const physicalExamService = {

@@ -1,3 +1,4 @@
+import { BloodDonationPhysicalExamAnswerDTO } from "@/types/physicalExamAnswer/physicalExamAnswer.js";
 import {
   BloodDonationPhysicalExam,
   Prisma,
@@ -8,7 +9,7 @@ import {
   BaseModelAttrWoCancel,
 } from "@repo/shared/types/global.js";
 
-export type BloodDonationPhysicalExamResponse = Omit<
+export type BloodDonationPhysicalExamAnswers = Omit<
   Prisma.BloodDonationPhysicalExamAnswerUncheckedCreateInput,
   BaseModelAttrWoCancel | "physicalExamId"
 >;
@@ -17,19 +18,22 @@ export interface CreateOrUpdateBloodDonationPhysicalExam extends Omit<
   Prisma.BloodDonationPhysicalExamUncheckedCreateInput,
   BaseModelAttr
 > {
-  examResponse: BloodDonationPhysicalExamResponse[];
+  examResponse: BloodDonationPhysicalExamAnswers[];
 }
 
 export interface BloodDonationPhysicalExamDTO extends Omit<
   BloodDonationPhysicalExam,
-  | BaseModelAttrWoCancel
-  | "bloodBankCenterId"
-  | "donorId"
-  | "collectionId"
-  | "examinedByStaffId"
+  BaseModelAttrWoCancel | "bloodBankCenterId" | "donorId" | "examinedByStaffId"
 > {
   bloodBankCenter: IdValue | null;
   donor: IdValue | null;
-  collection: IdValue | null;
   examinedByStaff: IdValue | null;
+  answers: BloodDonationPhysicalExamAnswerDTO[];
 }
+
+export type BloodDonationPhysicalExamResponse =
+  Prisma.BloodDonationPhysicalExamGetPayload<{
+    include: {
+      answers: true;
+    };
+  }>;

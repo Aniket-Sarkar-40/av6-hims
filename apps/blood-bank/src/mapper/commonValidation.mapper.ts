@@ -1,7 +1,5 @@
 import { CreateOrUpdateBloodCollection } from "@/types/bloodCollection/bloodCollection.js";
 import { CreateOrUpdateBloodCollectionItem } from "@/types/bloodCollectionItem/bloodCollectionItem.js";
-import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/bloodDonationPhysicalExam/bloodDonationPhysicalExam.js";
-import { CreateOrUpdateBloodDonationPhysicalExamAnswer } from "@/types/bloodDonationPhysicalExamAnswer/bloodDonationPhysicalExamAnswer.js";
 import { CreateOrUpdateBloodDonor } from "@/types/bloodDonor/bloodDonor.js";
 import { CreateOrUpdateBloodBankCenter } from "@/types/master/bloodBankCenter.js";
 import { CreateOrUpdateBloodComponent } from "@/types/master/bloodComponent.js";
@@ -10,8 +8,6 @@ import { CreateOrUpdateBloodExternalCenter } from "@/types/master/bloodExternalC
 import { CreateOrUpdateBloodPhysicalExamQuestion } from "@/types/master/bloodPhysicalExamQuestion.js";
 import { createOrUpdateBloodCollectionServiceValidation } from "@/validations/service/bloodCollection/bloodCollection.service.validation.js";
 import { createOrUpdateBloodCollectionItemServiceValidation } from "@/validations/service/bloodCollectionItem/bloodCollectionItem.service.validation.js";
-import { createOrUpdateBloodDonationPhysicalExamServiceValidation } from "@/validations/service/bloodDonationPhysicalExam/bloodDonationPhysicalExam.service.validation.js";
-import { createOrUpdateBloodDonationPhysicalExamAnswerServiceValidation } from "@/validations/service/bloodDonationPhysicalExamAnswer/bloodDonationPhysicalExamAnswer.service.validation.js";
 import { createOrUpdateBloodDonorServiceValidation } from "@/validations/service/bloodDonor/bloodDonor.service.validation.js";
 import { createOrUpdateBloodBankCenterServiceValidation } from "@/validations/service/master/bloodBankCenter.service.validation.js";
 import { createOrUpdateBloodComponentServiceValidation } from "@/validations/service/master/bloodComponent.service.validation.js";
@@ -103,26 +99,6 @@ export const commonCreateUpdateValidationMapping: Record<
     update: (data: unknown) =>
       createOrUpdateBloodCollectionItemServiceValidation(
         data as CreateOrUpdateBloodCollectionItem,
-      ),
-  },
-  [SHORT_CODE.BLOOD_DONATION_PHYSICAL_EXAM]: {
-    create: (data: unknown) =>
-      createOrUpdateBloodDonationPhysicalExamServiceValidation(
-        data as CreateOrUpdateBloodDonationPhysicalExam,
-      ),
-    update: (data: unknown) =>
-      createOrUpdateBloodDonationPhysicalExamServiceValidation(
-        data as CreateOrUpdateBloodDonationPhysicalExam,
-      ),
-  },
-  [SHORT_CODE.BLOOD_DONATION_PHYSICAL_EXAM_ANSWER]: {
-    create: (data: unknown) =>
-      createOrUpdateBloodDonationPhysicalExamAnswerServiceValidation(
-        data as CreateOrUpdateBloodDonationPhysicalExamAnswer,
-      ),
-    update: (data: unknown) =>
-      createOrUpdateBloodDonationPhysicalExamAnswerServiceValidation(
-        data as CreateOrUpdateBloodDonationPhysicalExamAnswer,
       ),
   },
 };
