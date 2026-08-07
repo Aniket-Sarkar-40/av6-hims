@@ -17,6 +17,7 @@ export const upsertPhysicalExamInDb = async (
       bloodBankCenterId,
       donorId,
       examinedAt,
+      examNo,
       examinedByStaffId,
       isAccepted,
       rejectionReason,
@@ -32,6 +33,7 @@ export const upsertPhysicalExamInDb = async (
         data: {
           bloodBankCenterId,
           donorId,
+          examNo,
           examinedAt,
           examinedByStaffId,
           isAccepted,
@@ -48,6 +50,7 @@ export const upsertPhysicalExamInDb = async (
         data: {
           bloodBankCenterId,
           donorId,
+          examNo,
           examinedAt,
           examinedByStaffId,
           isAccepted,

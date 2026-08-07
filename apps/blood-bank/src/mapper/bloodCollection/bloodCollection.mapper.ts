@@ -1,47 +1,52 @@
 import { getAll } from "@/repository/common.repository.js";
-import { commonService } from "@/services/common.service.js";
-import { BloodCollectionDTO } from "@/types/bloodCollection/bloodCollection.js";
+import {
+  BloodCollectionDTO,
+  BloodCollectionResponse,
+} from "@/types/bloodCollection/bloodCollection.js";
+import { BloodCollectionItemDTO } from "@/types/bloodCollectionItem/bloodCollectionItem.js";
 import { employeeService } from "@apps/core/services/staff/employee.service.js";
 import { BloodCollection } from "@repo/db/generated/prisma/client";
-import { BaseModelAttrWoCancel } from "@repo/shared/types/global.js";
 import { customOmit, toIdValue } from "av6-utils";
 
 export const toBloodCollectionDTO = async (
-  data: BloodCollection[],
+  data: BloodCollectionResponse[],
 ): Promise<BloodCollectionDTO[]> => {
-  const allBloodBankCenters =
-    await commonService.getAllElements<"BloodBankCenter">({
-      cacheCode: "BLOOD_BANK_CENTER",
-      canNullReturnable: true,
-      modelName: "BloodBankCenter",
-      shortCode: "BLOOD_BANK_CENTER",
-      useActiveFlag: true,
-    });
+  const allPhysicalExams = await getAll({
+    model: "BloodDonationPhysicalExam",
+    useActiveFlag: true,
+  });
 
-  const allBloodDonors = await getAll({
+  const allBloodBankCenters = await getAll({
+    model: "BloodBankCenter",
+    useActiveFlag: true,
+  });
+
+  const allDonors = await getAll({
     model: "BloodDonor",
     useActiveFlag: true,
   });
 
-  const allStaffs = await employeeService.getAllEmployees();
+  const allExternalCenters = await getAll({
+    model: "BloodExternalCenter",
+    useActiveFlag: true,
+  });
 
-  const allExternalCenters =
-    await commonService.getAllElements<"BloodExternalCenter">({
-      cacheCode: "BLOOD_EXTERNAL_CENTER",
-      canNullReturnable: true,
-      modelName: "BloodExternalCenter",
-      shortCode: "BLOOD_EXTERNAL_CENTER",
-      useActiveFlag: true,
-    });
+  const allStaff = await employeeService.getAllEmployees();
 
   return data.map((bloodCollection) => {
     const omittedBloodCollection = customOmit<
       BloodCollection,
-      | BaseModelAttrWoCancel
+      | "createdBy"
+      | "updatedBy"
+      | "deletedBy"
+      | "createdAt"
+      | "updatedAt"
+      | "deletedAt"
+      | "isActive"
       | "bloodBankCenterId"
       | "donorId"
-      | "receivedByStaffId"
       | "externalCenterId"
+      | "receivedByStaffId"
     >(bloodCollection, [
       "createdBy",
       "updatedBy",
@@ -49,28 +54,60 @@ export const toBloodCollectionDTO = async (
       "createdAt",
       "updatedAt",
       "deletedAt",
+      "isActive",
       "bloodBankCenterId",
       "donorId",
-      "receivedByStaffId",
       "externalCenterId",
+      "receivedByStaffId",
     ]);
 
-    const bloodBankCenter = allBloodBankCenters.find(
-      (b) => b.id === bloodCollection.bloodBankCenterId,
+    const matchedBloodBankCenter = allBloodBankCenters.find(
+      (center) => center.id === bloodCollection.bloodBankCenterId,
     );
-    const donor = allBloodDonors.find((d) => d.id === bloodCollection.donorId);
-    const receivedByStaff = allStaffs.find(
-      (s) => s.id === bloodCollection.receivedByStaffId,
+
+    const matchedDonor = allDonors.find(
+      (donor) => donor.id === bloodCollection.donorId,
     );
-    const externalCenter = allExternalCenters.find(
-      (e) => e.id === bloodCollection.externalCenterId,
+
+    const matchedStaff = allStaff.find(
+      (staff) => staff.id === bloodCollection.receivedByStaffId,
     );
+
+    const matchedExternalCenter = allExternalCenters.find(
+      (center) => center.id === bloodCollection.externalCenterId,
+    );
+
+    const matchedPhysicalExam = allPhysicalExams.find(
+      (exam) => exam.id === bloodCollection.physicalExamId,
+    );
+
+    const collectionItems: BloodCollectionItemDTO[] = bloodCollection.items.map(
+      (result) => {
+        const omittedResult = customOmit(result, [
+          "createdBy",
+          "updatedBy",
+          "deletedBy",
+          "createdAt",
+          "updatedAt",
+          "deletedAt",
+          "isActive",
+          "bloodBankCenterId",
+          "collectionId",
+          "stockPostedByStaffId",
+        ]);
+
+        return omittedResult.rest;
+      },
+    );
+
     return {
       ...omittedBloodCollection.rest,
-      bloodBankCenter: toIdValue(bloodBankCenter, "centerName") ?? null,
-      donor: toIdValue(donor, "donorName") ?? null,
-      receivedByStaff: toIdValue(receivedByStaff, "name") ?? null,
-      externalCenter: toIdValue(externalCenter, "centerName") ?? null,
+      bloodBankCenter: toIdValue(matchedBloodBankCenter, "centerName") ?? null,
+      donor: toIdValue(matchedDonor, "donorName") ?? null,
+      externalCenter: toIdValue(matchedExternalCenter, "centerName") ?? null,
+      receivedByStaff: toIdValue(matchedStaff, "name") ?? null,
+      physicalExam: toIdValue(matchedPhysicalExam, "examNo") ?? null,
+      items: collectionItems,
     };
   });
 };

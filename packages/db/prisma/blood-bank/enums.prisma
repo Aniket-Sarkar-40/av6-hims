@@ -6,6 +6,8 @@ enum BloodBankUinShortCode {
     DONOR
     CC
     UNIT
+    ITEM
+    EXAM
 }
 
 enum BloodGroup {

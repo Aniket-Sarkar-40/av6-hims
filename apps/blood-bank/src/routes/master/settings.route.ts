@@ -38,7 +38,7 @@ export const settingsRouter: Router = Router();
 settingsRouter.post(
   "/",
   verifyToken(ServiceCode.BLOOD_BANK),
-  authorize(getPermission("BLOOD_BANK", "SETTING", "CREATE")),
+  authorize(getPermission("BLOOD_BANK", "SETTINGS", "CREATE")),
   validateSettings,
   upsertSettings,
 );
@@ -55,6 +55,6 @@ settingsRouter.post(
 settingsRouter.get(
   "/",
   verifyToken(ServiceCode.BLOOD_BANK),
-  authorize(getPermission("BLOOD_BANK", "SETTING", "VIEW")),
+  authorize(getPermission("BLOOD_BANK", "SETTINGS", "VIEW")),
   getSettings,
 );

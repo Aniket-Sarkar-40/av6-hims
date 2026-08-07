@@ -212,18 +212,7 @@ export async function runSeed() {
       permission: "blood-bank:blood-donation-physical-exam:view",
       isDropDown: true,
       whereClause: JSON.stringify({ isActive: true }),
-      selectClause: JSON.stringify({ id: "id", value: "donor.value" }),
-    },
-    {
-      shortCode: "BLOOD_DONATION_PHYSICAL_EXAM_ANSWER",
-      tableName: "bloodDonationPhysicalExamAnswer",
-      isDTO: true,
-      isSingleDto: false,
-      isCacheable: false,
-      permission: "blood-bank:blood-donation-physical-exam-answer:view",
-      isDropDown: false,
-      whereClause: JSON.stringify({ isActive: true }),
-      selectClause: JSON.stringify({ id: "id", value: "answer" }),
+      selectClause: JSON.stringify({ id: "id", value: "examNo" }),
     },
   ];
 

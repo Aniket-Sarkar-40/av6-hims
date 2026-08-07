@@ -3,7 +3,9 @@ import { CreateOrUpdateBloodDonationPhysicalExam } from "@/types/physicalExam/ph
 import { validateIdBloodDonor } from "@/validations/service/bloodDonor/bloodDonor.service.validation.js";
 import { validateIdBloodBankCenter } from "@/validations/service/master/bloodBankCenter.service.validation.js";
 import { validateIdBloodPhysicalExamQuestion } from "@/validations/service/master/bloodPhysicalExamQuestion.service.validation.js";
+import { uinServiceFactory } from "@apps/core/config/core.config.js";
 import {
+  BloodBankUinShortCode,
   BloodDonationPhysicalExam,
   BloodDonorGender,
 } from "@repo/db/generated/prisma/client";
@@ -45,6 +47,12 @@ export const upsertPhysicalExamServiceValidation = async (
 
   if (body.id) {
     await validateIdPhysicalExam(body.id);
+  }
+
+  if (!body.examNo) {
+    body.examNo = await uinServiceFactory.generateUIN(
+      BloodBankUinShortCode.EXAM,
+    );
   }
 
   const donor = await validateIdBloodDonor(body.donorId);

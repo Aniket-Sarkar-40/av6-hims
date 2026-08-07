@@ -6,6 +6,7 @@ import { settingsRouter } from "./routes/master/settings.route.js";
 import { uinConfigRouter } from "./routes/master/uinConfig.route.js";
 import hospitalRouter from "@/routes/master/hospital.route.js";
 import { physicalExamRouter } from "@/routes/physicalExam/physicalExam.route.js";
+import { bloodCollectionRouter } from "@/routes/bloodCollection/bloodCollection.route.js";
 
 export const bloodBankRouter: ExpressRouter = Router();
 
@@ -20,3 +21,4 @@ bloodBankRouter.use("/master/settings", settingsRouter);
 bloodBankRouter.use("/master/uin-config", uinConfigRouter);
 bloodBankRouter.use("/master/hospital", hospitalRouter);
 bloodBankRouter.use("/physical-exam", physicalExamRouter);
+bloodBankRouter.use("/blood-collection", bloodCollectionRouter);

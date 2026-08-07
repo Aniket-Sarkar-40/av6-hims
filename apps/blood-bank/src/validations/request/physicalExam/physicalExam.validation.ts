@@ -18,6 +18,7 @@ export const upsertPhysicalExamSchema =
     id: idOptional("Id"),
     donorId: idRequired("Donor Id"),
     bloodBankCenterId: idRequired("Blood Bank Center Id"),
+    examNo: strOptional("Exam No"),
     examinedAt: dateRequired("Examined At"),
     examinedByStaffId: idRequired("Examined By Staff Id"),
     isAccepted: boolOptional("Is Accepted"),

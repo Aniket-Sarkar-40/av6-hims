@@ -216,9 +216,9 @@ model BloodDonor {
 }
 
 model BloodCollection {
-    id                Int @id @default(autoincrement())
-    bloodBankCenterId Int @map("blood_bank_center_id")
-    physicalExamId    Int @map("physical_exam_id")
+    id                Int  @id @default(autoincrement())
+    bloodBankCenterId Int  @map("blood_bank_center_id")
+    physicalExamId    Int? @map("physical_exam_id")
 
     collectionNo String                    @map("collection_no") @db.VarChar(100)
     sourceType   BloodCollectionSourceType @map("source_type")
@@ -338,6 +338,7 @@ model BloodDonationPhysicalExam {
     id                Int      @id @default(autoincrement())
     bloodBankCenterId Int      @map("blood_bank_center_id")
     donorId           Int      @map("donor_id")
+    examNo            String   @map("exam_no") @db.VarChar(100)
     examinedAt        DateTime @map("examined_at")
     examinedByStaffId Int      @map("examined_by_staff_id")
     isAccepted        Boolean? @default(false) @map("is_accepted")

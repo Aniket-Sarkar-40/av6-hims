@@ -1,5 +1,4 @@
 import { toBloodCollectionDTO } from "@/mapper/bloodCollection/bloodCollection.mapper.js";
-import { toBloodCollectionItemDTO } from "@/mapper/bloodCollectionItem/bloodCollectionItem.mapper.js";
 import { toBloodDonorDTO } from "@/mapper/bloodDonor/bloodDonor.mapper.js";
 import { toBloodBankCenterDTO } from "@/mapper/master/bloodBankCenter.mapper.js";
 import { toBloodComponentDTO } from "@/mapper/master/bloodComponent.mapper.js";
@@ -7,12 +6,11 @@ import { toBloodCrossMatchMethodDTO } from "@/mapper/master/bloodCrossMatchMetho
 import { toBloodExternalCenterDTO } from "@/mapper/master/bloodExternalCenter.mapper.js";
 import { toBloodPhysicalExamQuestionDTO } from "@/mapper/master/bloodPhysicalExamQuestion.mapper.js";
 import { toBloodDonationPhysicalExamDTO } from "@/mapper/physicalExam/physicalExam.mapper.js";
+import { BloodCollectionResponse } from "@/types/bloodCollection/bloodCollection.js";
 import { BloodDonationPhysicalExamResponse } from "@/types/physicalExam/physicalExam.js";
 import {
   BloodBankCenter,
   BloodBankUINConfig,
-  BloodCollection,
-  BloodCollectionItem,
   BloodComponent,
   BloodCrossMatchMethod,
   BloodDonor,
@@ -40,9 +38,7 @@ export const dtoMapping: Record<string, DtoMappingFunction> = {
   [SHORT_CODE.BLOOD_DONOR]: (data: unknown) =>
     toBloodDonorDTO(data as BloodDonor[]),
   [SHORT_CODE.BLOOD_COLLECTION]: (data: unknown) =>
-    toBloodCollectionDTO(data as BloodCollection[]),
-  [SHORT_CODE.BLOOD_COLLECTION_ITEM]: (data: unknown) =>
-    toBloodCollectionItemDTO(data as BloodCollectionItem[]),
+    toBloodCollectionDTO(data as BloodCollectionResponse[]),
   [SHORT_CODE.BLOOD_DONATION_PHYSICAL_EXAM]: (data: unknown) =>
     toBloodDonationPhysicalExamDTO(data as BloodDonationPhysicalExamResponse[]),
 };

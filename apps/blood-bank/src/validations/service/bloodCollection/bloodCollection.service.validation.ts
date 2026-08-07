@@ -1,16 +1,18 @@
 import { uinServiceFactory } from "@/config/core.config.js";
-import { getAll, getByUnique } from "@/repository/common.repository.js";
-import { CreateOrUpdateBloodCollection } from "@/types/bloodCollection/bloodCollection.js";
+import { getByUnique } from "@/repository/common.repository.js";
+import {
+  BloodCollectionItem,
+  CreateOrUpdateBloodCollection,
+} from "@/types/bloodCollection/bloodCollection.js";
 import { validateIdBloodDonor } from "@/validations/service/bloodDonor/bloodDonor.service.validation.js";
 import { validateIdBloodBankCenter } from "@/validations/service/master/bloodBankCenter.service.validation.js";
 import { validateIdBloodExternalCenter } from "@/validations/service/master/bloodExternalCenter.service.validation.js";
+import { validateIdPhysicalExam } from "@/validations/service/physicalExam/physicalExam.service.validation.js";
 import {
   BloodBankUinShortCode,
   BloodCollection,
   BloodCollectionSourceType,
   BloodCollectionStatus,
-  BloodDonationType,
-  BloodDonorGender,
 } from "@repo/db/generated/prisma/client";
 import { logger } from "@repo/platform/logging/logger.js";
 import { validIdCheck } from "@repo/platform/validation/global.validation.js";
@@ -41,11 +43,35 @@ export const validateIdBloodCollection = async (
   return bloodCollection;
 };
 
-export const createOrUpdateBloodCollectionServiceValidation = async (
+export const validateIdBloodCollectionItem = async (
+  id: number,
+): Promise<BloodCollectionItem> => {
+  logger.info("entering::validateIdBloodCollectionItem::service::validation");
+
+  validIdCheck(id);
+
+  const bloodCollectionItem = await getByUnique({
+    model: "BloodCollectionItem",
+    where: {
+      id,
+    },
+  });
+  if (!bloodCollectionItem) {
+    throw new ErrorHandler(
+      404,
+      generateErrorMessage("NOT_FOUND", "Blood Collection Item"),
+    );
+  }
+  logger.info("exiting::validateIdBloodCollectionItem::service::validation");
+
+  return bloodCollectionItem;
+};
+
+export const upsertBloodCollectionServiceValidation = async (
   body: CreateOrUpdateBloodCollection,
 ) => {
   logger.info(
-    "entering::createOrUpdateBloodCollectionServiceValidation::service::validation",
+    "entering::upsertBloodCollectionServiceValidation::service::validation",
   );
   if (body.id) {
     await validateIdBloodCollection(body.id);
@@ -77,45 +103,48 @@ export const createOrUpdateBloodCollectionServiceValidation = async (
     );
   }
 
-  if (
-    !body.sourceType ||
-    !Object.values(BloodCollectionSourceType).includes(body.sourceType)
-  ) {
-    throw new ErrorHandler(
-      400,
-      generateErrorMessage("REQUIRED_FIELD", "Source Type"),
-    );
-  }
-
-  if (body.status) {
-    if (!Object.values(BloodCollectionStatus).includes(body.status)) {
+  if (body.status === BloodCollectionStatus.COLLECTED) {
+    if (!body.receivedByStaffId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("INVALID_VALUE", "Status"),
+        generateErrorMessage("REQUIRED_FIELD", "Received By Staff Id"),
       );
-    }
-    if (body.status === BloodCollectionStatus.COLLECTED) {
-      if (!body.receivedByStaffId) {
-        throw new ErrorHandler(
-          400,
-          generateErrorMessage("REQUIRED_FIELD", "Received By Staff Id"),
-        );
-      }
     }
   }
 
   if (body.sourceType === BloodCollectionSourceType.DONOR_COLLECTION) {
-    if (!body.donorId) {
+    await validateIdBloodDonor(body.donorId!);
+    const physicalExam = await validateIdPhysicalExam(body.physicalExamId!);
+    if (physicalExam.donorId !== body.donorId) {
       throw new ErrorHandler(
         400,
-        generateErrorMessage("REQUIRED_FIELD", "Donor Id"),
+        generateErrorMessage("INVALID_ASSOCIATION", "Physical Exam", "Donor"),
       );
     }
-    await validateIdBloodDonor(body.donorId!);
+    if (physicalExam.bloodBankCenterId !== body.bloodBankCenterId) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage(
+          "INVALID_ASSOCIATION",
+          "Physical Exam",
+          "Blood Bank Center",
+        ),
+      );
+    }
+    if (!physicalExam.isAccepted) {
+      throw new ErrorHandler(
+        400,
+        generateErrorMessage(
+          "ACTION_NOT_PERFORMED_BECAUSE",
+          "Blood Collection",
+          "Physical Exam is not accepted",
+        ),
+      );
+    }
     if (body.externalCenterId) {
       throw new ErrorHandler(
         400,
-        "External Center Id should be null for Donor Collection",
+        generateErrorMessage("INVALID_FIELD", "External Center Id"),
       );
     }
   } else if (body.sourceType === BloodCollectionSourceType.EXTERNAL_RECEIVE) {
@@ -155,76 +184,33 @@ export const createOrUpdateBloodCollectionServiceValidation = async (
     );
   }
 
-  if (body.donorId) {
-    const donor = await validateIdBloodDonor(body.donorId);
-    if (!donor.ageYears) {
-      throw new ErrorHandler(
-        400,
-        generateErrorMessage("NOT_FOUND", "Donor Age"),
-      );
-    }
-    const ageYears = donor.ageYears;
-    if (ageYears < 18 || ageYears > 65) {
-      throw new ErrorHandler(
-        400,
-        generateErrorMessage("MUST_BETWEEN", "Age", "18", "65"),
-      );
-    }
-
-    const totalDonationCount = await getAll({
-      model: "BloodCollection",
-      where: {
-        donorId: donor.id,
-      },
-    });
-
-    if (totalDonationCount.length < 1 && donor.ageYears > 60) {
-      throw new ErrorHandler(
-        400,
-        "First time donors must be below 60 years of age.",
-      );
-    }
-
-    if (body.donationType === BloodDonationType.WHOLE_BLOOD) {
-      const lastDonationDate = donor.lastDonationAt;
-      if (lastDonationDate) {
-        const currentDate = new Date();
-        const lastDonation = new Date(lastDonationDate);
-        const diffInDays =
-          (currentDate.getTime() - lastDonation.getTime()) / (1000 * 3600 * 24);
-        if (donor.gender) {
-          if (donor.gender === BloodDonorGender.FEMALE && lastDonationDate) {
-            if (diffInDays < 120) {
-              throw new ErrorHandler(
-                400,
-                generateErrorMessage(
-                  "GREATER_THAN_OR_EQUAL_TO",
-                  "Last Donation Date",
-                  "120 days",
-                ),
-              );
-            }
-          } else if (
-            donor.gender === BloodDonorGender.MALE &&
-            lastDonationDate
-          ) {
-            if (diffInDays < 90) {
-              throw new ErrorHandler(
-                400,
-                generateErrorMessage(
-                  "GREATER_THAN_OR_EQUAL_TO",
-                  "Last Donation Date",
-                  "90 days",
-                ),
-              );
-            }
-          }
+  if (body.collectionItems) {
+    for (const item of body.collectionItems) {
+      if (item.id) {
+        await validateIdBloodCollectionItem(item.id);
+      }
+      if (item.bagExpiryDate && item.bagExpiryDate < new Date()) {
+        throw new ErrorHandler(
+          400,
+          generateErrorMessage("INVALID_DATE", "Bag Expiry Date"),
+        );
+      }
+      if (item.isManualUnitNo) {
+        if (!item.unitNo || item.unitNo.trim() === "") {
+          throw new ErrorHandler(
+            400,
+            generateErrorMessage("REQUIRED_FIELD", "Unit No"),
+          );
         }
+      } else {
+        item.unitNo = await uinServiceFactory.generateUIN(
+          BloodBankUinShortCode.ITEM,
+        );
       }
     }
   }
 
   logger.info(
-    "exiting::createOrUpdateBloodCollectionServiceValidation::service::validation",
+    "exiting::upsertBloodCollectionServiceValidation::service::validation",
   );
 };

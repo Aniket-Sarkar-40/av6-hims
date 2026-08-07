@@ -2944,26 +2944,6 @@ ALTER TABLE `bb_blood_donation_physical_exams` ADD COLUMN `deferral_reason` TEXT
     ADD COLUMN `weight_kg` DECIMAL(6, 2) NULL;
 
 
-/*
-  Warnings:
-
-  - You are about to drop the column `collection_id` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `deferral_reason` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `deferral_type` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `diastolic_bp` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `hemoglobin_gdl` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `is_fit` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `next_eligible_date` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `pulse_per_min` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `systolic_bp` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `temperature_c` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - You are about to drop the column `weight_kg` on the `bb_blood_donation_physical_exams` table. All the data in the column will be lost.
-  - Added the required column `physical_exam_id` to the `bb_blood_collections` table without a default value. This is not possible if the table is not empty.
-  - Made the column `donor_id` on table `bb_blood_donation_physical_exams` required. This step will fail if there are existing NULL values in that column.
-  - Made the column `examined_at` on table `bb_blood_donation_physical_exams` required. This step will fail if there are existing NULL values in that column.
-  - Made the column `examined_by_staff_id` on table `bb_blood_donation_physical_exams` required. This step will fail if there are existing NULL values in that column.
-
-*/
 -- DropIndex
 DROP INDEX `bb_blood_donation_physical_exams_collection_id_key` ON `bb_blood_donation_physical_exams`;
 
@@ -3013,3 +2993,12 @@ CREATE INDEX `bb_master_blood_cross_match_method_blood_bank_center_id_idx` ON `b
 
 -- CreateIndex
 CREATE INDEX `bb_master_blood_external_center_blood_bank_center_id_idx` ON `bb_master_blood_external_center`(`blood_bank_center_id`);
+
+-- AlterTable
+ALTER TABLE `bb_bank_uin_config` MODIFY `short_code` ENUM('TEMP_CODE', 'HOS', 'BBC', 'COM', 'DONOR', 'CC', 'UNIT', 'ITEM') NOT NULL;
+
+-- AlterTable
+ALTER TABLE `bb_blood_collections` MODIFY `physical_exam_id` INTEGER NULL;
+
+-- AlterTable
+ALTER TABLE `bb_blood_donation_physical_exams` ADD COLUMN `exam_no` VARCHAR(100) NOT NULL;

@@ -38,7 +38,7 @@ const settingsRouter: Router = Router();
 settingsRouter.post(
   "/",
   verifyToken(ServiceCode.PHARMACY),
-  authorize(getPermission("PMS", "SETTING", "CREATE")),
+  authorize(getPermission("PMS", "SETTINGS", "CREATE")),
   validateSettings,
   upsertSettings,
 );
@@ -55,7 +55,7 @@ settingsRouter.post(
 settingsRouter.get(
   "/",
   verifyToken(ServiceCode.PHARMACY),
-  authorize(getPermission("PMS", "SETTING", "VIEW")),
+  authorize(getPermission("PMS", "SETTINGS", "VIEW")),
   getSettings,
 );
 
