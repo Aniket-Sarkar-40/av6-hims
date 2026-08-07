@@ -1,0 +1,42 @@
+{
+  "name": "@apps/blood-bank",
+  "version": "0.0.1",
+  "dependencies": {
+    "@apps/core": "workspace:*",
+    "@repo/db": "workspace:*",
+    "@repo/platform": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "av6-core-v2": "^1.0.5",
+    "av6-utils": "^1.0.6",
+    "axios": "catalog:",
+    "dayjs": "catalog:",
+    "exceljs": "catalog:",
+    "express": "catalog:",
+    "joi": "catalog:",
+    "xlsx": "catalog:"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.2"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./*": "./dist/*"
+  },
+  "main": "./dist/index.js",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
+    "dev": "tsx watch src/server.ts",
+    "lint": "echo lint core",
+    "start": "node dist/src/server.js",
+    "test": "echo test core"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts"
+}

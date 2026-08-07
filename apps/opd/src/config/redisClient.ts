@@ -58,7 +58,7 @@ export const loadCache = async (
     isCacheable: boolean;
   };
 
-  const dynamicShortCodes: DSCRow[] = await db.coreDynamicShortCode.findMany({
+  const dynamicShortCodes: DSCRow[] = await db.opdDynamicShortCode.findMany({
     select: { shortCode: true, tableName: true, isCacheable: true },
   });
 

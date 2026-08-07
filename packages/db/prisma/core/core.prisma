@@ -241,6 +241,7 @@ model CollectionCenter {
     multiVouchers              MultiVoucher[]
     multiVoucherDetails        MultiVoucherDetails[]
     voucherAudits              VoucherAudit[]
+    hospitals                  Hospital[]
 
     @@unique([connectionCode], name: "sch_collection_center_unique")
     @@map("sch_collection_center")
@@ -361,6 +362,9 @@ model Staff {
     invStoreRequisitions         InvStoreRequisition[]
     invPurchaseOrders            InvPurchaseOrder[]
     consumptions                 Consumption[]
+    bloodCollections             BloodCollection[]
+    bloodCollectionItems         BloodCollectionItem[]
+    bloodDonationPhysicalExams   BloodDonationPhysicalExam[]
 
     @@map("staff")
 }

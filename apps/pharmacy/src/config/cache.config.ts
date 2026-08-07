@@ -39,8 +39,8 @@ export enum RedisResource {
   STORE = "store",
   EMPLOYEE = "employee",
   BOX_SIZE = "boxSize",
-  FEATURE_FLAG = "featureFlag",
-  AUTO_ALERT_EMAIL = "autoAlertEmail",
+  FEATURE_FLAG = "pmsFeatureFlag",
+  AUTO_ALERT_EMAIL = "pmsAutoAlertEmail",
 }
 
 export const getRedisKey = (

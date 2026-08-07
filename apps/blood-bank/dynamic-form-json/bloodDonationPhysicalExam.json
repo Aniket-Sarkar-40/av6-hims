@@ -1,0 +1,618 @@
+{
+  "version": 1,
+  "primaryKey": "id",
+  "validation": {
+    "abortEarly": true,
+    "allowUnknown": true,
+    "stripUnknown": true,
+    "convert": true
+  },
+  "audit": {
+    "createdByField": "createdBy",
+    "updatedByField": "updatedBy"
+  },
+  "operations": {
+    "create": {
+      "requirePrimaryKey": true
+    },
+    "update": {
+      "requirePrimaryKey": true,
+      "primaryKeyFrom": "body"
+    }
+  },
+  "uniques": [],
+  "fields": [
+    {
+      "name": "bloodBankCenter",
+      "db": "bloodBankCenterId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "label": "Blood Bank Center",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_BANK_CENTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Blood Bank Center",
+        "accessorPath": "bloodBankCenter.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "collection",
+      "db": "collectionId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "label": "Collection",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_COLLECTION"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Collection",
+        "accessorPath": "collection.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "donor",
+      "db": "donorId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Donor",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_DONOR"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Donor",
+        "accessorPath": "donor.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "weightKg",
+      "db": "weightKg",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Weight Kg",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Weight Kg",
+        "accessorKey": "weightKg",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "hemoglobinGdl",
+      "db": "hemoglobinGdl",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Hemoglobin Gdl",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Hemoglobin Gdl",
+        "accessorKey": "hemoglobinGdl",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "systolicBp",
+      "db": "systolicBp",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Systolic Bp",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Systolic Bp",
+        "accessorKey": "systolicBp",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "diastolicBp",
+      "db": "diastolicBp",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Diastolic Bp",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Diastolic Bp",
+        "accessorKey": "diastolicBp",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "pulsePerMin",
+      "db": "pulsePerMin",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Pulse Per Min",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Pulse Per Min",
+        "accessorKey": "pulsePerMin",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "temperatureC",
+      "db": "temperatureC",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false
+      },
+      "label": "Temperature C",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Temperature C",
+        "accessorKey": "temperatureC",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "isFit",
+      "db": "isFit",
+      "type": "boolean",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "default": true,
+      "label": "Is Fit",
+      "ui": {
+        "component": "switch"
+      },
+      "table": {
+        "show": true,
+        "header": "Is Fit",
+        "accessorKey": "isFit",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 99
+      },
+      "allowNull": true
+    },
+    {
+      "name": "deferralType",
+      "db": "deferralType",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "values": ["TEMPORARY", "PERMANENT", "MEDICAL", "OTHER"]
+      },
+      "label": "Deferral Type",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Deferral Type",
+        "accessorKey": "deferralType",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "deferralReason",
+      "db": "deferralReason",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Deferral Reason",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Deferral Reason",
+        "accessorKey": "deferralReason",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "nextEligibleDate",
+      "db": "nextEligibleDate",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Next Eligible Date",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Next Eligible Date",
+        "accessorKey": "nextEligibleDate",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "examinedAt",
+      "db": "examinedAt",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Examined At",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Examined At",
+        "accessorKey": "examinedAt",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "examinedByStaff",
+      "db": "examinedByStaffId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Examined By Staff",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "STAFF"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Examined By Staff",
+        "accessorPath": "examinedByStaff.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "isAccepted",
+      "db": "isAccepted",
+      "type": "boolean",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "default": true,
+      "label": "Is Accepted",
+      "ui": {
+        "component": "switch"
+      },
+      "table": {
+        "show": true,
+        "header": "Is Accepted",
+        "accessorKey": "isAccepted",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 99
+      },
+      "allowNull": true
+    },
+    {
+      "name": "rejectionReason",
+      "db": "rejectionReason",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Rejection Reason",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Rejection Reason",
+        "accessorKey": "rejectionReason",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "remark",
+      "db": "remark",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Remark",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Remark",
+        "accessorKey": "remark",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    }
+  ],
+  "relations": [],
+  "response": {
+    "include": {},
+    "select": null
+  },
+  "modal": {
+    "size": "xs",
+    "entityLabel": "Record",
+    "formLayout": {
+      "spacing": 2,
+      "columns": {
+        "xs": 1,
+        "md": 2
+      }
+    }
+  },
+  "table": {
+    "isFormData": false,
+    "endpoint": "",
+    "includes": {},
+    "searchColumns": [],
+    "service": "CORE",
+    "enableGrouping": false,
+    "enableSorting": true,
+    "enablePagination": true,
+    "enableGlobalFilter": true,
+    "enableColumnVisibility": true,
+    "enableRowSelection": false,
+    "enableExpanding": false,
+    "enableCSVExport": true,
+    "enableTableHeaders": true,
+    "enableColumnDragging": true,
+    "enableRowDragging": false,
+    "isActive": true,
+    "sortById": "",
+    "iconsEnabled": true,
+    "useMainCard": true,
+    "mainCardTitle": "",
+    "mainCardSubheader": "",
+    "globalSearchPlaceholder": "Search...",
+    "showSrNo": true,
+    "initialPageSize": 10,
+    "fieldOrder": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "isActive",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "isActive",
+      "",
+      ""
+    ],
+    "buttons": [
+      {
+        "action": "add",
+        "tooltip": "Add",
+        "iconKey": "AddCircle",
+        "color": "primary"
+      }
+    ],
+    "rowActions": [
+      {
+        "type": "edit",
+        "tooltip": "Edit",
+        "iconKey": "Edit",
+        "color": "primary"
+      },
+      {
+        "type": "delete",
+        "tooltip": "Delete",
+        "iconKey": "Trash",
+        "color": "error"
+      }
+    ]
+  }
+}

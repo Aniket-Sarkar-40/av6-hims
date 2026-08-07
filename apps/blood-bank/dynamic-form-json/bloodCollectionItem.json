@@ -1,0 +1,578 @@
+{
+  "version": 1,
+  "primaryKey": "id",
+  "validation": {
+    "abortEarly": true,
+    "allowUnknown": true,
+    "stripUnknown": true,
+    "convert": true
+  },
+  "audit": {
+    "createdByField": "createdBy",
+    "updatedByField": "updatedBy"
+  },
+  "operations": {
+    "create": {
+      "requirePrimaryKey": true
+    },
+    "update": {
+      "requirePrimaryKey": true,
+      "primaryKeyFrom": "body"
+    }
+  },
+  "uniques": [],
+  "fields": [
+    {
+      "name": "bloodBankCenter",
+      "db": "bloodBankCenterId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "label": "Blood Bank Center",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_BANK_CENTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Blood Bank Center",
+        "accessorPath": "bloodBankCenter.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "collection",
+      "db": "collectionId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "label": "Collection",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_COLLECTION"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Collection",
+        "accessorPath": "collection.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "unitNo",
+      "db": "unitNo",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Unit No",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Unit No",
+        "accessorKey": "unitNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "isManualUnitNo",
+      "db": "isManualUnitNo",
+      "type": "boolean",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "default": false,
+      "label": "Is Manual Unit No",
+      "ui": {
+        "component": "switch"
+      },
+      "table": {
+        "show": true,
+        "header": "Is Manual Unit No",
+        "accessorKey": "isManualUnitNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 99
+      }
+    },
+    {
+      "name": "batchNo",
+      "db": "batchNo",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Batch No",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Batch No",
+        "accessorKey": "batchNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "bagType",
+      "db": "bagType",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "values": [
+          "SINGLE",
+          "DOUBLE",
+          "TRIPLE",
+          "QUADRUPLE",
+          "APHERESIS",
+          "OTHER"
+        ]
+      },
+      "label": "Bag Type",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Bag Type",
+        "accessorKey": "bagType",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "preliminaryBloodGroup",
+      "db": "preliminaryBloodGroup",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "values": [
+          "A_POSITIVE",
+          "B_POSITIVE",
+          "AB_POSITIVE",
+          "O_POSITIVE",
+          "A_NEGETIVE",
+          "B_NEGETIVE",
+          "AB_NEGETIVE",
+          "O_NEGETIVE",
+          "BOMBAY",
+          "UNKNOWN"
+        ]
+      },
+      "label": "Preliminary Blood Group",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Preliminary Blood Group",
+        "accessorKey": "preliminaryBloodGroup",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "quantityMl",
+      "db": "quantityMl",
+      "type": "number",
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "integer": false,
+        "min": 0
+      },
+      "label": "Quantity Ml",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Quantity Ml",
+        "accessorKey": "quantityMl",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "collectionDate",
+      "db": "collectionDate",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Collection Date",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Collection Date",
+        "accessorKey": "collectionDate",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "bagExpiryDate",
+      "db": "bagExpiryDate",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Bag Expiry Date",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Bag Expiry Date",
+        "accessorKey": "bagExpiryDate",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "status",
+      "db": "status",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "values": [
+          "DRAFT",
+          "COLLECTED",
+          "SCREENING_PENDING",
+          "SCREENING_ACCEPTED",
+          "SCREENING_REJECTED",
+          "QUARANTINED",
+          "POSTED_TO_STOCK",
+          "DISCARDED",
+          "CANCELLED"
+        ]
+      },
+      "label": "Status",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Status",
+        "accessorKey": "status",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "default": "COLLECTED"
+    },
+    {
+      "name": "isStockPosted",
+      "db": "isStockPosted",
+      "type": "boolean",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "default": false,
+      "label": "Is Stock Posted",
+      "ui": {
+        "component": "switch"
+      },
+      "table": {
+        "show": true,
+        "header": "Is Stock Posted",
+        "accessorKey": "isStockPosted",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 99
+      }
+    },
+    {
+      "name": "stockPostedAt",
+      "db": "stockPostedAt",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Stock Posted At",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Stock Posted At",
+        "accessorKey": "stockPostedAt",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "stockPostedByStaff",
+      "db": "stockPostedByStaffId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Stock Posted By Staff",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "STAFF"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Stock Posted By Staff",
+        "accessorPath": "stockPostedByStaff.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "rejectReason",
+      "db": "rejectReason",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Reject Reason",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Reject Reason",
+        "accessorKey": "rejectReason",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "remark",
+      "db": "remark",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Remark",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Remark",
+        "accessorKey": "remark",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    }
+  ],
+  "relations": [],
+  "response": {
+    "include": {},
+    "select": null
+  },
+  "modal": {
+    "size": "xs",
+    "entityLabel": "Record",
+    "formLayout": {
+      "spacing": 2,
+      "columns": {
+        "xs": 1,
+        "md": 2
+      }
+    }
+  },
+  "table": {
+    "isFormData": false,
+    "endpoint": "",
+    "includes": {},
+    "searchColumns": [],
+    "service": "CORE",
+    "enableGrouping": false,
+    "enableSorting": true,
+    "enablePagination": true,
+    "enableGlobalFilter": true,
+    "enableColumnVisibility": true,
+    "enableRowSelection": false,
+    "enableExpanding": false,
+    "enableCSVExport": true,
+    "enableTableHeaders": true,
+    "enableColumnDragging": true,
+    "enableRowDragging": false,
+    "isActive": true,
+    "sortById": "",
+    "iconsEnabled": true,
+    "useMainCard": true,
+    "mainCardTitle": "",
+    "mainCardSubheader": "",
+    "globalSearchPlaceholder": "Search...",
+    "showSrNo": true,
+    "initialPageSize": 10,
+    "fieldOrder": [
+      "",
+      "",
+      "",
+      "isActive",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "isActive",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "buttons": [
+      {
+        "action": "add",
+        "tooltip": "Add",
+        "iconKey": "AddCircle",
+        "color": "primary"
+      }
+    ],
+    "rowActions": [
+      {
+        "type": "edit",
+        "tooltip": "Edit",
+        "iconKey": "Edit",
+        "color": "primary"
+      },
+      {
+        "type": "delete",
+        "tooltip": "Delete",
+        "iconKey": "Trash",
+        "color": "error"
+      }
+    ]
+  }
+}

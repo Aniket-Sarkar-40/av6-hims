@@ -1,0 +1,486 @@
+{
+  "version": 1,
+  "primaryKey": "id",
+  "validation": {
+    "abortEarly": true,
+    "allowUnknown": true,
+    "stripUnknown": true,
+    "convert": true
+  },
+  "audit": {
+    "createdByField": "createdBy",
+    "updatedByField": "updatedBy"
+  },
+  "operations": {
+    "create": {
+      "requirePrimaryKey": true
+    },
+    "update": {
+      "requirePrimaryKey": true,
+      "primaryKeyFrom": "body"
+    }
+  },
+  "uniques": [],
+  "fields": [
+    {
+      "name": "bloodBankCenter",
+      "db": "bloodBankCenterId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "label": "Blood Bank Center",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "SOME_MASTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Blood Bank Center",
+        "accessorPath": "bloodBankCenter.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "collectionNo",
+      "db": "collectionNo",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "trim": true,
+        "min": 1,
+        "max": 100
+      },
+      "label": "Collection No",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Collection No",
+        "accessorKey": "collectionNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "sourceType",
+      "db": "sourceType",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "values": ["DONOR_COLLECTION", "EXTERNAL_RECEIVE", "MANUAL_STOCK_ENTRY"]
+      },
+      "label": "Source Type",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Source Type",
+        "accessorKey": "sourceType",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "donor",
+      "db": "donorId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Donor",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "SOME_MASTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Donor",
+        "accessorPath": "donor.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "externalCenter",
+      "db": "externalCenterId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "External Center",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_EXTERNAL_CENTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "External Center",
+        "accessorPath": "bloodBankCenter.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "donationType",
+      "db": "donationType",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "values": [
+          "VOLUNTARY",
+          "REPLACEMENT",
+          "DIRECTED",
+          "AUTOLOGOUS",
+          "EXTERNAL",
+          "APHERESIS",
+          "OTHER"
+        ]
+      },
+      "label": "Donation Type",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Donation Type",
+        "accessorKey": "donationType",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "collectionDate",
+      "db": "collectionDate",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Collection Date",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Collection Date",
+        "accessorKey": "collectionDate",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "receivedAt",
+      "db": "receivedAt",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Received At",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Received At",
+        "accessorKey": "receivedAt",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "receivedByStaff",
+      "db": "receivedByStaffId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Received By Staff",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "STAFF"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Received By Staff",
+        "accessorPath": "receivedByStaff.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "externalReferenceNo",
+      "db": "externalReferenceNo",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "External Reference No",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "External Reference No",
+        "accessorKey": "externalReferenceNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "externalDocumentNo",
+      "db": "externalDocumentNo",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "External Document No",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "External Document No",
+        "accessorKey": "externalDocumentNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "status",
+      "db": "status",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "values": [
+          "DRAFT",
+          "COLLECTED",
+          "SCREENING_PENDING",
+          "PARTIALLY_ACCEPTED",
+          "ACCEPTED",
+          "PARTIALLY_POSTED_TO_STOCK",
+          "POSTED_TO_STOCK",
+          "REJECTED",
+          "CANCELLED"
+        ]
+      },
+      "label": "Status",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Status",
+        "accessorKey": "status",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "remark",
+      "db": "remark",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Remark",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Remark",
+        "accessorKey": "remark",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    }
+  ],
+  "relations": [],
+  "response": {
+    "include": {},
+    "select": null
+  },
+  "modal": {
+    "size": "xs",
+    "entityLabel": "Record",
+    "formLayout": {
+      "spacing": 2,
+      "columns": {
+        "xs": 1,
+        "md": 2
+      }
+    }
+  },
+  "table": {
+    "isFormData": false,
+    "endpoint": "",
+    "includes": {},
+    "searchColumns": [],
+    "service": "CORE",
+    "enableGrouping": false,
+    "enableSorting": true,
+    "enablePagination": true,
+    "enableGlobalFilter": true,
+    "enableColumnVisibility": true,
+    "enableRowSelection": false,
+    "enableExpanding": false,
+    "enableCSVExport": true,
+    "enableTableHeaders": true,
+    "enableColumnDragging": true,
+    "enableRowDragging": false,
+    "isActive": true,
+    "sortById": "",
+    "iconsEnabled": true,
+    "useMainCard": true,
+    "mainCardTitle": "",
+    "mainCardSubheader": "",
+    "globalSearchPlaceholder": "Search...",
+    "showSrNo": true,
+    "initialPageSize": 10,
+    "fieldOrder": ["", "", "", "", "", "", "", "", "", "", "", "", ""],
+    "buttons": [
+      {
+        "action": "add",
+        "tooltip": "Add",
+        "iconKey": "AddCircle",
+        "color": "primary"
+      }
+    ],
+    "rowActions": [
+      {
+        "type": "edit",
+        "tooltip": "Edit",
+        "iconKey": "Edit",
+        "color": "primary"
+      },
+      {
+        "type": "delete",
+        "tooltip": "Delete",
+        "iconKey": "Trash",
+        "color": "error"
+      }
+    ]
+  }
+}

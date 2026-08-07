@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "primaryKey": "id",
+  "validation": {
+    "abortEarly": true,
+    "allowUnknown": true,
+    "stripUnknown": true,
+    "convert": true
+  },
+  "audit": { "createdByField": "createdBy", "updatedByField": "updatedBy" },
+  "operations": {
+    "create": { "requirePrimaryKey": true },
+    "update": { "requirePrimaryKey": true, "primaryKeyFrom": "body" }
+  },
+  "uniques": [],
+  "fields": [
+    {
+      "name": "bloodBankCenter",
+      "db": "bloodBankCenterId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": { "integer": true },
+      "presence": { "create": "required", "update": "required" },
+      "label": "Blood Bank Center",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_BANK_CENTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value",
+        "customOptions": { "enabled": true, "options": [] }
+      },
+      "table": {
+        "show": true,
+        "header": "Blood Bank Center",
+        "accessorPath": "bloodBankCenter.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "question",
+      "db": "question",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": { "create": "required", "update": "required" },
+      "rules": { "trim": true, "min": 1, "max": 100 },
+      "label": "Question",
+      "ui": { "component": "text", "placeholder": "Enter text" },
+      "table": {
+        "show": true,
+        "header": "Question",
+        "accessorKey": "question",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "answerType",
+      "db": "answerType",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": { "create": "required", "update": "required" },
+      "rules": { "values": ["YES_NO", "TEXT", "NUMBER", "DROPDOWN", "DATE"] },
+      "label": "Answer Type",
+      "ui": { "component": "autocomplete", "placeholder": "Select status" },
+      "table": {
+        "show": true,
+        "header": "Answer Type",
+        "accessorKey": "answerType",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "optionsJson",
+      "db": "optionsJson",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": { "create": "optional", "update": "optional" },
+      "rules": { "trim": true, "max": 100 },
+      "label": "Options Json",
+      "ui": { "component": "text", "placeholder": "Enter text" },
+      "table": {
+        "show": true,
+        "header": "Options Json",
+        "accessorKey": "optionsJson",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "isRequired",
+      "db": "isRequired",
+      "type": "boolean",
+      "sendToBackend": true,
+      "presence": { "create": "required", "update": "required" },
+      "default": true,
+      "label": "Is Required",
+      "ui": { "component": "switch" },
+      "table": {
+        "show": true,
+        "header": "Is Required",
+        "accessorKey": "isRequired",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 99
+      }
+    },
+    {
+      "name": "sortOrder",
+      "db": "sortOrder",
+      "type": "number",
+      "presence": { "create": "optional", "update": "optional" },
+      "rules": { "integer": false },
+      "label": "Sort Order",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number",
+        "fieldHidden": true
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Sort Order",
+        "accessorKey": "sortOrder",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    }
+  ],
+  "relations": [],
+  "response": { "include": {}, "select": null },
+  "modal": {
+    "size": "xs",
+    "entityLabel": "Record",
+    "formLayout": { "spacing": 2, "columns": { "xs": 1, "md": 2 } }
+  },
+  "table": {
+    "isFormData": false,
+    "endpoint": "",
+    "includes": {},
+    "searchColumns": [],
+    "service": "CORE",
+    "enableGrouping": false,
+    "enableSorting": true,
+    "enablePagination": true,
+    "enableGlobalFilter": true,
+    "enableColumnVisibility": true,
+    "enableRowSelection": false,
+    "enableExpanding": false,
+    "enableCSVExport": true,
+    "enableTableHeaders": true,
+    "enableColumnDragging": true,
+    "enableRowDragging": false,
+    "isActive": true,
+    "sortById": "",
+    "iconsEnabled": true,
+    "useMainCard": true,
+    "mainCardTitle": "",
+    "mainCardSubheader": "",
+    "globalSearchPlaceholder": "Search...",
+    "showSrNo": true,
+    "initialPageSize": 10,
+    "fieldOrder": ["", "", "", "", "isActive", ""],
+    "buttons": [
+      {
+        "action": "add",
+        "tooltip": "Add",
+        "iconKey": "AddCircle",
+        "color": "primary"
+      }
+    ],
+    "rowActions": [
+      {
+        "type": "edit",
+        "tooltip": "Edit",
+        "iconKey": "Edit",
+        "color": "primary"
+      },
+      {
+        "type": "delete",
+        "tooltip": "Delete",
+        "iconKey": "Trash",
+        "color": "error"
+      }
+    ]
+  }
+}

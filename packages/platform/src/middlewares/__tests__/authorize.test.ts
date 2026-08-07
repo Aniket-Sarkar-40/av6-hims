@@ -47,7 +47,8 @@ describe("authorize", () => {
     authorize("ledger", "voucher")(req, mockRes(), next);
 
     expect(next).toHaveBeenCalledOnce();
-    const err = (next as ReturnType<typeof vi.fn>).mock.calls[0]![0] as ErrorHandler;
+    const err = (next as ReturnType<typeof vi.fn>).mock
+      .calls[0]![0] as ErrorHandler;
     expect(err).toBeInstanceOf(ErrorHandler);
     expect(err.statusCode).toBe(403);
   });
@@ -58,7 +59,8 @@ describe("authorize", () => {
     authorize("ledger")(req, mockRes(), next);
 
     expect(next).toHaveBeenCalledOnce();
-    const err = (next as ReturnType<typeof vi.fn>).mock.calls[0]![0] as ErrorHandler;
+    const err = (next as ReturnType<typeof vi.fn>).mock
+      .calls[0]![0] as ErrorHandler;
     expect(err).toBeInstanceOf(ErrorHandler);
     expect(err.statusCode).toBe(500);
   });

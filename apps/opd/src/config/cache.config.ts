@@ -9,7 +9,7 @@ export async function checkIsCacheable(shortCode: string): Promise<boolean> {
 }
 
 export enum RedisResource {
-  SETTINGS = "settings",
+  SETTINGS = "opdSettings",
   DYNAMIC_SHORT_CODE = "opdDynamicShortCode",
   UIN_CONFIG = "opdUINConfig",
   OPD_DEPARTMENT = "opdDepartment",

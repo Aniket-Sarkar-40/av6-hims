@@ -5,7 +5,6 @@ import { mappingExport, mappingImport } from "@/mapper/excelMapping.js";
 import ErrorHandler from "@repo/shared/utils/errorHandler.utils.js";
 import { logger } from "@repo/platform/logging/logger.js";
 import { generateErrorMessage } from "@repo/shared/utils/responseMessage.utils.js";
-import { SHORT_CODE } from "@repo/shared/utils/shortCode/core.shortCode.utils.js";
 import * as prismaClient from "@repo/db/generated/prisma/client";
 import {
   commonService,
@@ -27,6 +26,7 @@ import {
   updateCache,
 } from "@repo/platform/cache/redis.utils.js";
 import { checkIsCacheable, getRedisKey } from "./cache.config.js";
+import { SHORT_CODE } from "@repo/shared/utils/shortCode/opd.shortCode.utils.js";
 
 const createOpdCache = async (table: string, data: DataType[]) =>
   await createCache(table, data, "opd");

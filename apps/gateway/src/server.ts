@@ -59,6 +59,12 @@ const MODULE_REGISTRY: ModuleDefinition[] = [
     createApp: createAccApp,
     initializeCache: initializeAccCache,
   },
+  {
+    code: "blood-bank",
+    mountPath: "/api/v1/blood-bank",
+    createApp: createBloodBankApp,
+    initializeCache: initializeBloodBankCache,
+  },
 ];
 
 // Empty ENABLED_APPS => enable everything (dev convenience).
@@ -66,6 +72,8 @@ const enabledCodes = new Set(
   ENABLED_APPS.length ? ENABLED_APPS : MODULE_REGISTRY.map((m) => m.code),
 );
 const enabledModules = MODULE_REGISTRY.filter((m) => enabledCodes.has(m.code));
+import { createBloodBankApp } from "@apps/blood-bank";
+import { initializeCache as initializeBloodBankCache } from "@apps/blood-bank/config/redisClient.js";
 
 const app = express();
 
@@ -91,6 +99,12 @@ for (const module of enabledModules) {
   app.use(module.mountPath, module.createApp("GATEWAY"));
   logger.info(`Mounted module "${module.code}" at ${module.mountPath}`);
 }
+app.use("/api/v1/core", createCoreApp("GATEWAY"));
+app.use("/api/v1/opd", createOpdApp("GATEWAY"));
+app.use("/api/v1/pms", createPharmacyApp("GATEWAY"));
+app.use("/api/v1/inv", createInvApp("GATEWAY"));
+app.use("/api/v1/acc", createAccApp("GATEWAY"));
+app.use("/api/v1/blood-bank", createBloodBankApp("GATEWAY"));
 
 connectRedis()
   .then(() => {
@@ -101,6 +115,12 @@ connectRedis()
         for (const module of enabledModules) {
           await module.initializeCache();
         }
+        await initializeCoreCache();
+        await initializeOpdCache();
+        await initializePharmacyCache();
+        await initializeInvCache();
+        await initializeAccCache();
+        await initializeBloodBankCache();
       }
     });
   })

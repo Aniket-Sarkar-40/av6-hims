@@ -1,0 +1,466 @@
+{
+  "version": 1,
+  "primaryKey": "id",
+  "validation": {
+    "abortEarly": true,
+    "allowUnknown": true,
+    "stripUnknown": true,
+    "convert": true
+  },
+  "audit": {
+    "createdByField": "createdBy",
+    "updatedByField": "updatedBy"
+  },
+  "operations": {
+    "create": {
+      "requirePrimaryKey": true
+    },
+    "update": {
+      "requirePrimaryKey": true,
+      "primaryKeyFrom": "body"
+    }
+  },
+  "uniques": [],
+  "fields": [
+    {
+      "name": "bloodBankCenter",
+      "db": "bloodBankCenterId",
+      "type": "number",
+      "sendToBackend": true,
+      "isAutocomplete": true,
+      "rules": {
+        "integer": true
+      },
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "label": "Blood Bank Center",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select",
+        "dataSource": {
+          "type": "masterDropdown",
+          "shortCode": "BLOOD_BANK_CENTER"
+        },
+        "storeAs": "object",
+        "payloadPick": "id",
+        "optionLabelKey": "value"
+      },
+      "table": {
+        "show": true,
+        "header": "Blood Bank Center",
+        "accessorPath": "bloodBankCenter.value",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "donorNo",
+      "db": "donorNo",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "trim": true,
+        "min": 1,
+        "max": 100
+      },
+      "label": "Donor No",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Donor No",
+        "accessorKey": "donorNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "donorName",
+      "db": "donorName",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "trim": true,
+        "min": 1,
+        "max": 100
+      },
+      "label": "Donor Name",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Donor Name",
+        "accessorKey": "donorName",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "gender",
+      "db": "gender",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "rules": {
+        "values": ["MALE", "FEMALE", "OTHER", "UNKNOWN"]
+      },
+      "label": "Gender",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Gender",
+        "accessorKey": "gender",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      }
+    },
+    {
+      "name": "dateOfBirth",
+      "db": "dateOfBirth",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Date Of Birth",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Date Of Birth",
+        "accessorKey": "dateOfBirth",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "rules": {
+        "maxDate": "today"
+      }
+    },
+    {
+      "name": "ageYears",
+      "db": "ageYears",
+      "type": "number",
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "integer": false,
+        "min": 0
+      },
+      "label": "Age Years",
+      "ui": {
+        "component": "number",
+        "placeholder": "Enter number"
+      },
+      "sendToBackend": true,
+      "table": {
+        "show": true,
+        "header": "Age Years",
+        "accessorKey": "ageYears",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "phoneNo",
+      "db": "phoneNo",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Phone No",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Phone No",
+        "accessorKey": "phoneNo",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "email",
+      "db": "email",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100,
+        "isEmail": true,
+        "regex": "^(?:[^\\s@]+@[^\\s@]+\\.[^\\s@]+)?$"
+      },
+      "label": "Email",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Email",
+        "accessorKey": "email",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "address",
+      "db": "address",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Address",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text",
+        "isFullWidth": true
+      },
+      "table": {
+        "show": true,
+        "header": "Address",
+        "accessorKey": "address",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "bloodGroup",
+      "db": "bloodGroup",
+      "type": "enum",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "values": [
+          "A_POSITIVE",
+          "B_POSITIVE",
+          "AB_POSITIVE",
+          "O_POSITIVE",
+          "A_NEGATIVE",
+          "B_NEGATIVE",
+          "AB_NEGATIVE",
+          "O_NEGATIVE",
+          "BOMBAY",
+          "UNKNOWN"
+        ]
+      },
+      "label": "Blood Group",
+      "ui": {
+        "component": "autocomplete",
+        "placeholder": "Select status"
+      },
+      "table": {
+        "show": true,
+        "header": "Blood Group",
+        "accessorKey": "bloodGroup",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "isDeferred",
+      "db": "isDeferred",
+      "type": "boolean",
+      "sendToBackend": true,
+      "presence": {
+        "create": "required",
+        "update": "required"
+      },
+      "default": false,
+      "label": "Is Deferred",
+      "ui": {
+        "component": "switch"
+      },
+      "table": {
+        "show": true,
+        "header": "Is Deferred",
+        "accessorKey": "isDeferred",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 99
+      }
+    },
+    {
+      "name": "deferralReason",
+      "db": "deferralReason",
+      "type": "string",
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "rules": {
+        "trim": true,
+        "max": 100
+      },
+      "label": "Deferral Reason",
+      "ui": {
+        "component": "text",
+        "placeholder": "Enter text"
+      },
+      "table": {
+        "show": true,
+        "header": "Deferral Reason",
+        "accessorKey": "deferralReason",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "allowNull": true
+    },
+    {
+      "name": "lastDonationAt",
+      "db": "lastDonationAt",
+      "type": "date",
+      "allowNull": true,
+      "sendToBackend": true,
+      "presence": {
+        "create": "optional",
+        "update": "optional"
+      },
+      "label": "Last Donation At",
+      "ui": {
+        "component": "date",
+        "placeholder": "Select date"
+      },
+      "table": {
+        "show": true,
+        "header": "Last Donation At",
+        "accessorKey": "lastDonationAt",
+        "enableSorting": true,
+        "enableGrouping": false,
+        "order": 1
+      },
+      "rules": {
+        "maxDate": "today"
+      }
+    }
+  ],
+  "relations": [],
+  "response": {
+    "include": {},
+    "select": null
+  },
+  "modal": {
+    "size": "xs",
+    "entityLabel": "Record",
+    "formLayout": {
+      "spacing": 2,
+      "columns": {
+        "xs": 1,
+        "md": 2
+      }
+    }
+  },
+  "table": {
+    "isFormData": false,
+    "endpoint": "",
+    "includes": {},
+    "searchColumns": [],
+    "service": "CORE",
+    "enableGrouping": false,
+    "enableSorting": true,
+    "enablePagination": true,
+    "enableGlobalFilter": true,
+    "enableColumnVisibility": true,
+    "enableRowSelection": false,
+    "enableExpanding": false,
+    "enableCSVExport": true,
+    "enableTableHeaders": true,
+    "enableColumnDragging": true,
+    "enableRowDragging": false,
+    "isActive": true,
+    "sortById": "",
+    "iconsEnabled": true,
+    "useMainCard": true,
+    "mainCardTitle": "",
+    "mainCardSubheader": "",
+    "globalSearchPlaceholder": "Search...",
+    "showSrNo": true,
+    "initialPageSize": 10,
+    "fieldOrder": ["", "", "", "", "", "", "", "", "", "", "isActive", "", ""],
+    "buttons": [
+      {
+        "action": "add",
+        "tooltip": "Add",
+        "iconKey": "AddCircle",
+        "color": "primary"
+      }
+    ],
+    "rowActions": [
+      {
+        "type": "edit",
+        "tooltip": "Edit",
+        "iconKey": "Edit",
+        "color": "primary"
+      },
+      {
+        "type": "delete",
+        "tooltip": "Delete",
+        "iconKey": "Trash",
+        "color": "error"
+      }
+    ]
+  }
+}

@@ -53,10 +53,7 @@ describe("commonApproveSchema", () => {
   });
 
   it("requires service, subjectType, id, ccId, approverId, approveType", () => {
-    const { error } = commonApproveSchema.validate(
-      {},
-      { abortEarly: false },
-    );
+    const { error } = commonApproveSchema.validate({}, { abortEarly: false });
     expect(error).toBeDefined();
     const keys = error!.details.map((d) => d.path.join("."));
     expect(keys).toEqual(

@@ -1,0 +1,288 @@
+enum BloodBankUinShortCode {
+    TEMP_CODE
+    HOS
+    BBC
+    COM
+    DONOR
+    CC
+    UNIT
+    ITEM
+    EXAM
+}
+
+enum BloodGroup {
+    A_POSITIVE  @map("A+")
+    A_NEGATIVE  @map("A-")
+    B_POSITIVE  @map("B+")
+    B_NEGATIVE  @map("B-")
+    AB_POSITIVE @map("AB+")
+    AB_NEGATIVE @map("AB-")
+    O_POSITIVE  @map("O+")
+    O_NEGATIVE  @map("O-")
+    BOMBAY
+    UNKNOWN
+}
+
+enum BloodDonorGender {
+    MALE
+    FEMALE
+    OTHER
+    UNKNOWN
+}
+
+enum BloodShelfLifeUnit {
+    HOUR
+    DAY
+    MONTH
+    YEAR
+}
+
+enum BloodCollectionSourceType {
+    DONOR_COLLECTION
+    EXTERNAL_RECEIVE
+    MANUAL_STOCK_ENTRY
+}
+
+enum BloodDonationType {
+    WHOLE_BLOOD
+    VOLUNTARY
+    REPLACEMENT
+    DIRECTED
+    AUTOLOGOUS
+    APHERESIS
+    EXTERNAL
+    OTHER
+}
+
+enum BloodBagType {
+    SINGLE
+    DOUBLE
+    TRIPLE
+    QUADRUPLE
+    APHERESIS
+    OTHER
+}
+
+enum BloodCollectionStatus {
+    DRAFT
+    COLLECTED
+    SCREENING_PENDING
+    PARTIALLY_ACCEPTED
+    ACCEPTED
+    PARTIALLY_POSTED_TO_STOCK
+    POSTED_TO_STOCK
+    REJECTED
+    CANCELLED
+}
+
+enum BloodCollectionItemStatus {
+    DRAFT
+    COLLECTED
+    SCREENING_PENDING
+    SCREENING_ACCEPTED
+    SCREENING_REJECTED
+    QUARANTINED
+    POSTED_TO_STOCK
+    DISCARDED
+    CANCELLED
+}
+
+enum BloodQuestionAnswerType {
+    YES_NO
+    TEXT
+    NUMBER
+    DROPDOWN
+    DATE
+}
+
+enum BloodCellResult {
+    POSITIVE
+    NEGATIVE
+    NOT_DONE
+}
+
+enum BloodReactiveResult {
+    REACTIVE
+    NON_REACTIVE
+    INDETERMINATE
+    NOT_DONE
+    NOT_REQUIRED
+}
+
+enum BloodScreeningStatus {
+    DRAFT
+    PENDING
+    ACCEPTED
+    REJECTED
+    AMENDED
+    CANCELLED
+}
+
+enum BloodScreeningFinalResult {
+    ACCEPT
+    REJECT
+}
+
+enum BloodStockSourceType {
+    COLLECTION_POSTING
+    COMPONENT_SEPARATION
+    MANUAL_STOCK_ENTRY
+}
+
+enum BloodStockStatus {
+    QUARANTINE
+    AVAILABLE
+    PARTIALLY_RESERVED
+    RESERVED
+    PARTIALLY_ISSUED
+    ISSUED
+    PARTIALLY_SEPARATED
+    SEPARATED
+    EXPIRED
+    DISCARDED
+    TRANSFERRED_OUT
+}
+
+enum BloodStockMovementType {
+    POSTED_FROM_COLLECTION
+
+    SCREENING_ACCEPTED
+    SCREENING_REJECTED
+    QUARANTINED
+    AVAILABLE
+
+    RESERVED
+    RESERVATION_REVERSED
+    RESERVATION_EXPIRED
+    RESERVED_TO_ISSUED
+
+    DIRECT_ISSUED
+    PARTIALLY_ISSUED
+    ISSUED
+
+    COMPONENT_SEPARATION_OUT
+    COMPONENT_SEPARATION_IN
+
+    RETURNED_TO_STOCK
+    EXPIRED
+    DISCARDED
+    ADJUSTED
+    TRANSFERRED_OUT
+}
+
+enum BloodStockReservationStatus {
+    ACTIVE
+    PARTIALLY_ISSUED
+    ISSUED
+    PARTIALLY_REVERSED
+    REVERSED
+    EXPIRED
+    CANCELLED
+}
+
+enum BloodComponentSeparationStatus {
+    DRAFT
+    COMPLETED
+    CANCELLED
+}
+
+enum BloodRequestType {
+    ROUTINE
+    URGENT
+    IMMEDIATE
+    EMERGENCY
+}
+
+enum BloodPatientType {
+    OPD
+    IPD
+    EMERGENCY
+    EXTERNAL
+}
+
+enum BloodRequisitionStatus {
+    DRAFT
+    REQUESTED
+    ACKNOWLEDGED
+    PARTIALLY_RESERVED
+    RESERVED
+    PARTIALLY_ISSUED
+    ISSUED
+    CANCELLED
+    CLOSED
+    REJECTED
+}
+
+enum BloodRequisitionItemStatus {
+    REQUESTED
+    ACKNOWLEDGED
+    PARTIALLY_RESERVED
+    RESERVED
+    PARTIALLY_ISSUED
+    ISSUED
+    CANCELLED
+    CLOSED
+}
+
+enum BloodCrossMatchResult {
+    PENDING
+    COMPATIBLE
+    INCOMPATIBLE
+    NOT_REQUIRED
+    EMERGENCY_BYPASSED
+}
+
+enum BloodIssueMode {
+    NORMAL
+    EMERGENCY
+}
+
+enum BloodIssueStatus {
+    DRAFT
+    ISSUED
+    PARTIALLY_RETURNED
+    RETURNED
+    CANCELLED
+    CLOSED
+}
+
+enum BloodIssueItemStatus {
+    ISSUED
+    PARTIALLY_TRANSFUSED
+    TRANSFUSED
+    PARTIALLY_RETURNED
+    RETURNED
+    DISCARDED
+    CANCELLED
+}
+
+enum BloodReturnDecision {
+    ACCEPT_TO_STOCK
+    DISCARD
+    QUARANTINE
+}
+
+enum BloodTransfusionStatus {
+    NOT_STARTED
+    IN_PROGRESS
+    COMPLETED
+    STOPPED
+    REACTION
+    CANCELLED
+}
+
+enum BloodReactionSeverity {
+    MILD
+    MODERATE
+    SEVERE
+    LIFE_THREATENING
+    FATAL
+    UNKNOWN
+}
+
+enum BloodDeferralType {
+    TEMPORARY
+    PERMANENT
+    MEDICAL
+    OTHER
+}

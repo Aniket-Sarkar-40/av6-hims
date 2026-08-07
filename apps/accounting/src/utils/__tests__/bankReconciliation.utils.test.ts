@@ -69,7 +69,9 @@ describe("bank reconciliation DR/CR helpers", () => {
     expect(parseAmountOrNull({ value: 10, rowNo: 1, label: "Amount" })).toBe(
       10,
     );
-    expect(parseAmountOrNull({ value: "", rowNo: 1, label: "Amount" })).toBeNull();
+    expect(
+      parseAmountOrNull({ value: "", rowNo: 1, label: "Amount" }),
+    ).toBeNull();
     expect(
       parseAmountOrNull({ value: "(100.00)", rowNo: 1, label: "Amount" }),
     ).toBe(-100);

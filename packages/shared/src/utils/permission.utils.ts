@@ -14,7 +14,7 @@ export enum PermissionResource {
   STORAGE = "storage",
   TAX_DETAILS = "tax-details",
   DYNAMIC_FROM = "dynamic-from",
-  SETTING = "settings",
+  SETTINGS = "settings",
   ITEM_SUPPLIER = "item-supplier",
   ITEM_CATEGORY = "item-category",
   ITEM_STORE = "item-store",
@@ -236,10 +236,6 @@ export enum PermissionResource {
   LOCK_UNLOCK_COMPANY_FINANCIAL_YEAR = "lock-unlock-company-financial-year",
   // =========== master group resource end ===========
 
-  // =========== settings group resource start ===========
-  SETTINGS = "settings",
-  // =========== settings group resource end ===========
-
   // =========== voucher group resource start ===========
   VOUCHER_ENTRY = "voucher-entry",
   CANCEL_VOUCHER = "cancel-voucher",
@@ -294,6 +290,17 @@ export enum PermissionResource {
   // =========== client ledger mapping group resource start ===========
   CLIENT_LEDGER_MAPPING = "client-ledger-mapping",
   // =========== client ledger mapping group resource end ===========
+
+  //Blood Bank
+  HOSPITAL = "hospital",
+  BLOOD_BANK_CENTER = "blood-bank-center",
+  BLOOD_COMPONENT = "blood-component",
+  BLOOD_CROSS_MATCH_METHOD = "blood-cross-match-method",
+  BLOOD_DONOR = "blood-donor",
+  BLOOD_DONATION_PHYSICAL_EXAM = "blood-donation-physical-exam",
+  BLOOD_DONATION_PHYSICAL_EXAM_ANSWER = "blood-donation-physical-exam-answer",
+  BLOOD_COLLECTION = "blood-collection",
+  BLOOD_COLLECTION_ITEM = "blood-collection-item",
 }
 
 export enum PermissionModule {
@@ -302,6 +309,7 @@ export enum PermissionModule {
   CORE = "core",
   INV = "inv",
   ACC = "acc",
+  BLOOD_BANK = "blood-bank",
 }
 
 export const getPermission = (

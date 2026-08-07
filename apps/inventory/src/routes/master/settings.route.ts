@@ -38,7 +38,7 @@ export const settingsRouter: Router = Router();
 settingsRouter.post(
   "/",
   verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "SETTING", "CREATE")),
+  authorize(getPermission("INV", "SETTINGS", "CREATE")),
   validateSettings,
   upsertSettings,
 );
@@ -55,7 +55,7 @@ settingsRouter.post(
 settingsRouter.get(
   "/",
   verifyToken(ServiceCode.INVENTORY),
-  authorize(getPermission("INV", "SETTING", "VIEW")),
+  authorize(getPermission("INV", "SETTINGS", "VIEW")),
   getSettings,
 );
 

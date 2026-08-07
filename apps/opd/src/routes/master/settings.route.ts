@@ -38,7 +38,7 @@ export const settingsRouter: Router = Router();
 settingsRouter.post(
   "/",
   verifyToken(ServiceCode.OPD),
-  authorize(getPermission("OPD", "SETTING", "CREATE")),
+  authorize(getPermission("OPD", "SETTINGS", "CREATE")),
   validateSettings,
   upsertSettings,
 );
@@ -55,6 +55,6 @@ settingsRouter.post(
 settingsRouter.get(
   "/",
   verifyToken(ServiceCode.OPD),
-  authorize(getPermission("OPD", "SETTING", "VIEW")),
+  authorize(getPermission("OPD", "SETTINGS", "VIEW")),
   getSettings,
 );
